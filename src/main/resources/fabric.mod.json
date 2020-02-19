@@ -1,0 +1,35 @@
+{
+    "schemaVersion": 1,
+    "id": "justmap",
+    "version": "${version}",
+    "name": "Just Map",
+    "description": "A minimap mod for Minecraft.",
+    "authors": [
+        "Bulldog83"
+    ],
+    "contact": {
+        "sources": "https://github.com/Bulldog83/JustMap",
+        "issues": "https://github.com/Bulldog83/JustMap/issues"
+    },
+    "icon": "assets/justmap/icon.png",
+    "environment": "client",
+    "custom": {
+        "modmenu:clientsideOnly": true
+    },
+    "entrypoints": {
+        "client": [
+            "ru.bulldog.justmap.JustMap"
+        ],
+        "modmenu": [
+            "ru.bulldog.justmap.config.ModMenuEntry"
+        ]
+    },
+    "mixins": [
+        "justmap.mixins.json"
+    ],
+
+    "depends": {
+        "fabricloader": ">=0.7.0",
+        "fabric": "*"
+    }
+}
