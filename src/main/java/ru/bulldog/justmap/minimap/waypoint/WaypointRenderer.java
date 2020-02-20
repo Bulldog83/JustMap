@@ -62,18 +62,19 @@ public class WaypointRenderer {
 		int size = icon != null ? icon.getWidth() : 18;
 		int screenWidth = client.getWindow().getScaledWidth();
 		
-		float dx = (float) (client.player.getX() - wpX);
-		float dy = (float) (wpZ - client.player.getZ());
+		int dx = (int) client.player.getX() - wpX;
+		int dy = wpZ - (int) client.player.getZ();
 		
-		float wpFi = correctAngle((float) (Math.atan2(dx, dy) * (180 / Math.PI)));		
-		float pFi = correctAngle(client.player.getYaw(delta) % 360);
+		int wpFi = correctAngle((int) (Math.atan2(dx, dy) * (180 / Math.PI)));		
+		int pFi = correctAngle((int) (client.player.getYaw(delta) % 360));
 		
-		float a0 = pFi - fov / 2;
-		float a1 = pFi + fov / 2;		
-		float ax = 2 * pFi - wpFi;
+		int a0 = pFi - (int) fov / 2;
+		int a1 = pFi + (int) fov / 2;		
+		int ax = correctAngle(2 * pFi - wpFi);
+		
 		float scale = (MathUtil.clamp(ax, a0, a1) - a0) / fov;
 		
-		int x = (int) MathUtil.clamp(screenWidth * scale - size / 2, 0, screenWidth - size);
+		int x = (int) MathUtil.clamp((screenWidth - screenWidth * scale) - size / 2, 0, screenWidth - size);
 		int y = Params.positionOffset;
 		
 		if (icon != null) {
@@ -215,7 +216,7 @@ public class WaypointRenderer {
 		vertexConsumer.vertex(matrix4f, x, y, l).color(red, green, blue, alpha).texture(m, n).overlay(OverlayTexture.DEFAULT_UV).light(15728880).normal(matrix3f, 0.0F, 1.0F, 0.0F).next();
 	 }
 	 
-	 private float correctAngle(float fi) {
+	 private int correctAngle(int fi) {
 		 return fi < -180 ? fi += 360 : fi > 180 ? fi -= 360 : fi;
 	 }
 }
