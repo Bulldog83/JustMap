@@ -85,7 +85,7 @@ public class Waypoint {
 	private int icon = -1;
 	
 	public boolean isVisible() {
-		return !hidden && showAlways;
+		return !hidden || showAlways;
 	}
 	
 	public void setIcon(Icon icon, int color) {

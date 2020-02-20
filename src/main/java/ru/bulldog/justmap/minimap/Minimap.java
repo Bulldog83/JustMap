@@ -89,6 +89,9 @@ public class Minimap {
 	}
 	
 	public void onConfigChanges() {
+		
+		isMapVisible = JustMap.CONFIG.getBoolean("map_visible");
+		
 		float configScale = JustMap.CONFIG.getFloat("map_scale");
 		int configSize = JustMap.CONFIG.getInt("map_size");
 		
