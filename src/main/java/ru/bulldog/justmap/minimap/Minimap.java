@@ -36,14 +36,14 @@ public class Minimap {
 	
 	private static final MinecraftClient minecraftClient = MinecraftClient.getInstance();
 	
-	private final TextManager manager;
+	private final TextManager textManager;
 	
 	private MapText txtCoords = new MapText(TextAlignment.CENTER, "0, 0, 0");
 	private MapText txtBiome = new MapText(TextAlignment.CENTER, "Void");
 	private MapText txtTime = new MapText(TextAlignment.CENTER, "00:00");
 	private MapText txtFPS = new MapText(TextAlignment.CENTER, "00 fps");
 	
-	private int size = JustMap.CONFIG.getInt("map_size");
+	private int mapSize = JustMap.CONFIG.getInt("map_size");
 	
 	private float mapScale = 1;
 	
@@ -60,8 +60,8 @@ public class Minimap {
 	private static boolean isMapVisible = true;
 	
 	public Minimap() {
-		image = new NativeImage(NativeImage.Format.RGBA, size, size, false);	
-		manager = new TextManager(this);
+		image = new NativeImage(NativeImage.Format.RGBA, mapSize, mapSize, false);	
+		textManager = new TextManager(this);
 		isMapVisible = JustMap.CONFIG.getBoolean("map_visible");
 	}
 	
@@ -83,7 +83,7 @@ public class Minimap {
 		}
 	}
 	
-	private void resize(int newSize) {
+	private void resizeMap(int newSize) {
 		image = new NativeImage(NativeImage.Format.RGBA, newSize, newSize, false);
 		JustMap.LOGGER.logInfo(String.format("Map resized to %dx%d", newSize, newSize));
 	}
@@ -92,48 +92,36 @@ public class Minimap {
 		
 		isMapVisible = JustMap.CONFIG.getBoolean("map_visible");
 		
-		float configScale = JustMap.CONFIG.getFloat("map_scale");
 		int configSize = JustMap.CONFIG.getInt("map_size");
+		float configScale = JustMap.CONFIG.getFloat("map_scale");
 		
-		boolean resize = false;
-		
-		if (configScale != mapScale) {
-			mapScale = configScale;
-			resize = true;
-		}		
-	
-		if (configSize != size) {
-			this.size = configSize;
-			resize = true;
-		}
-		
-		if (resize) {
-			resize((int) (size * mapScale));
+		if (configSize != mapSize || configScale != mapScale) {
+			this.mapSize = configSize;
+			this.mapScale = configScale;
+			
+			resizeMap((int) (mapSize * mapScale));
 		}
 	}
 	
 	private void updateInfo(PlayerEntity player) {
-		manager.clear();
+		textManager.clear();
 		
 		if (Params.showPosition) {
 			BlockPos playerPos = minecraftClient.player.getBlockPos();
 			txtCoords.setText(playerPos.getX() + ", " + playerPos.getY() + ", " + playerPos.getZ());
-			manager.add(txtCoords);
-		}
-		
+			textManager.add(txtCoords);
+		}		
 		if (Params.showBiome) {
 			txtBiome.setText(I18n.translate(currentBiome.getTranslationKey()));
-			manager.add(txtBiome);
-		}
-		
+			textManager.add(txtBiome);
+		}		
 		if (Params.showFPS) {
 			txtFPS.setText(minecraftClient.fpsDebugString.substring(0, minecraftClient.fpsDebugString.indexOf("fps") + 3));
-			manager.add(txtFPS);
-		}
-		
+			textManager.add(txtFPS);
+		}		
 		if (Params.showTime) {
 			txtTime.setText(getTimeString(minecraftClient.world.getTimeOfDay()));
-			manager.add(txtTime);
+			textManager.add(txtTime);
 		}
 	}
 	
@@ -189,7 +177,7 @@ public class Minimap {
 		
 		currentBiome = world.getBiome(pos);
 		
-		int scaled = (int) (size * mapScale);
+		int scaled = (int) (mapSize * mapScale);
 		int startX = pos.getX() - scaled / 2;
 		int startZ = pos.getZ() - scaled / 2;
 		int endX = startX + scaled;
@@ -217,7 +205,7 @@ public class Minimap {
 				
 				if (x >= startX && x <= endX && z >= startZ && z <= endZ) {
 					PlayerIcon playerIcon = new PlayerIcon(this, p, false);
-					playerIcon.setPosition(MapIcon.getScaled(x, startX, endX, size), MapIcon.getScaled(z, startZ, endZ, size));
+					playerIcon.setPosition(MapIcon.getScaled(x, startX, endX, mapSize), MapIcon.getScaled(z, startZ, endZ, mapSize));
 					this.players.add(playerIcon);
 				}
 			}
@@ -240,11 +228,11 @@ public class Minimap {
 					boolean hostile = livingEntity instanceof HostileEntity;
 					if (allowHostileRadar() && hostile) {
 						EntityIcon entIcon = new EntityIcon(this, entity, hostile);						
-						entIcon.setPosition(MapIcon.getScaled((int) entity.getX(), startX, endX, size), MapIcon.getScaled((int) entity.getZ(), startZ, endZ, size));						
+						entIcon.setPosition(MapIcon.getScaled((int) entity.getX(), startX, endX, mapSize), MapIcon.getScaled((int) entity.getZ(), startZ, endZ, mapSize));						
 						this.entities.add(entIcon);
 					} else if (allowCreatureRadar()) {
 						EntityIcon entIcon = new EntityIcon(this, entity, hostile);						
-						entIcon.setPosition(MapIcon.getScaled((int) entity.getX(), startX, endX, size), MapIcon.getScaled((int) entity.getZ(), startZ, endZ, size));						
+						entIcon.setPosition(MapIcon.getScaled((int) entity.getX(), startX, endX, mapSize), MapIcon.getScaled((int) entity.getZ(), startZ, endZ, mapSize));						
 						this.entities.add(entIcon);
 					}
 				}
@@ -260,8 +248,8 @@ public class Minimap {
 			wps.stream().filter(wp -> MathUtil.getDistance(pos, wp.pos, true) <= wp.showRange).forEach(wp -> {
 				WaypointIcon waypoint = new WaypointIcon(this, wp);
 				waypoint.setPosition(
-					MathUtil.clamp(MapIcon.getScaled(wp.pos.getX(), startX, endX, size), 0, size),
-					MathUtil.clamp(MapIcon.getScaled(wp.pos.getZ(), startZ, endZ, size), 0, size)
+					MathUtil.clamp(MapIcon.getScaled(wp.pos.getX(), startX, endX, mapSize), 0, mapSize),
+					MathUtil.clamp(MapIcon.getScaled(wp.pos.getZ(), startZ, endZ, mapSize), 0, mapSize)
 				);
 				waypoints.add(waypoint);
 			});
@@ -289,7 +277,7 @@ public class Minimap {
 	}
 	
 	public int getSize() {
-		return size;
+		return mapSize;
 	}
 	
 	public float getScale() {
@@ -305,7 +293,7 @@ public class Minimap {
 	}
 	
 	public TextManager getTextManager() {
-		return manager;
+		return textManager;
 	}
 	
 	public boolean isMapVisible() {
