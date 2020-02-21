@@ -61,7 +61,7 @@ public class MapGameRules {
 				int valPos = command.indexOf(key) + 2;
 				boolean value = command.substring(valPos, valPos + 2).equals("§1");
 				gameRules.get(rule).set(value, null);
-				JustMap.LOGGER.logInfo(String.format("[%s] Map rule %s switched to: %s.", JustMap.MODID, rule, value));
+				JustMap.LOGGER.logInfo(String.format("Map rule %s switched to: %s.", rule, value));
 			}
 		});
 	}

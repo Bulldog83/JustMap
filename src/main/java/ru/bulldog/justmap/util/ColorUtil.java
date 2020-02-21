@@ -204,7 +204,7 @@ public class ColorUtil {
 					g += (col >> 8) & 255;
 					r += col & 255;
 					pixels++;
-				}					
+				}
 			}
 		}
 		image.close();

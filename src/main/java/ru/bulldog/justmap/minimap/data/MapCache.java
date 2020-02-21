@@ -3,6 +3,7 @@ package ru.bulldog.justmap.minimap.data;
 import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.config.Params;
 import ru.bulldog.justmap.minimap.Minimap;
+import ru.bulldog.justmap.util.CacheUtil;
 import ru.bulldog.justmap.util.Colors;
 import ru.bulldog.justmap.util.ImageUtil;
 import net.minecraft.client.texture.NativeImage;
@@ -15,7 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class MapCache {
+public class MapCache extends CacheUtil {
 	private static MapProcessor.Layer currentLayer = MapProcessor.Layer.SURFACE;
 	private static Map<Integer, Map<MapProcessor.Layer, MapCache>> dimensions = new HashMap<>();
 	
@@ -174,7 +175,7 @@ public class MapCache {
 		if (mapChunks.containsKey(chunkPos)) {
 			MapChunk mapChunk = mapChunks.get(chunkPos);
 			if (!mapChunk.getWorldChunk().getPos().equals(chunkPos)) {
-				mapChunk.updateChunk();				
+				mapChunk.updateChunk();
 				if (!empty) {
 					mapChunk.update();
 				}
