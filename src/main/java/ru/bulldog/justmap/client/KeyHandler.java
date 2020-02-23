@@ -29,7 +29,7 @@ public enum KeyHandler {
 		INSTANCE.register(new KeyParser(createKeyBinding("create_waypoint", GLFW.GLFW_KEY_B)) {
 			@Override
 			public void onKeyUp() {
-				JustMap.MINIMAP.createWaypoint();
+				JustMap.MAP.createWaypoint();
 			}
 
 			@Override
@@ -55,7 +55,7 @@ public enum KeyHandler {
 	
 			@Override
 			public boolean isListening() {
-				return JustMap.MINIMAP.isMapVisible();
+				return JustMap.MAP.isMapVisible();
 			}
 		});
 		
@@ -68,7 +68,7 @@ public enum KeyHandler {
 	
 			@Override
 			public boolean isListening() {
-				return JustMap.MINIMAP.isMapVisible();
+				return JustMap.MAP.isMapVisible();
 			}
 		});
 		
@@ -93,7 +93,7 @@ public enum KeyHandler {
 	
 			@Override
 			public boolean isListening() {
-				return JustMap.MINIMAP.isMapVisible();
+				return JustMap.MAP.isMapVisible();
 			}
 		});
 		
@@ -106,7 +106,7 @@ public enum KeyHandler {
 	
 			@Override
 			public boolean isListening() {
-				return JustMap.MINIMAP.isMapVisible();
+				return JustMap.MAP.isMapVisible();
 			}
 		});
 	}

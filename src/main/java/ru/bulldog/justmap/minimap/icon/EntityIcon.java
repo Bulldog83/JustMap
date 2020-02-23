@@ -5,7 +5,7 @@ import ru.bulldog.justmap.config.Params;
 import ru.bulldog.justmap.minimap.EntityModelRenderer;
 import ru.bulldog.justmap.minimap.Minimap;
 import ru.bulldog.justmap.util.Colors;
-import ru.bulldog.justmap.util.Drawer;
+import ru.bulldog.justmap.util.DrawHelper;
 
 public class EntityIcon extends MapIcon<EntityIcon> {
 	
@@ -39,11 +39,11 @@ public class EntityIcon extends MapIcon<EntityIcon> {
 				if (icon != null) {
 					icon.draw(drawX, drawY, size);
 				} else {
-					Drawer.fill(drawX, drawY, drawX + size, drawY + size, col);
+					DrawHelper.fill(drawX, drawY, drawX + size, drawY + size, col);
 				}
 			}
 		} else {
-			Drawer.fill(drawX, drawY, drawX + size, drawY + size, col);
+			DrawHelper.fill(drawX, drawY, drawX + size, drawY + size, col);
 		}
 	}
 }

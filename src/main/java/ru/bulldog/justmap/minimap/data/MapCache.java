@@ -3,7 +3,6 @@ package ru.bulldog.justmap.minimap.data;
 import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.config.Params;
 import ru.bulldog.justmap.minimap.Minimap;
-import ru.bulldog.justmap.util.CacheUtil;
 import ru.bulldog.justmap.util.Colors;
 import ru.bulldog.justmap.util.ImageUtil;
 import net.minecraft.client.texture.NativeImage;
@@ -16,7 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class MapCache extends CacheUtil {
+public class MapCache {
 	private static MapProcessor.Layer currentLayer = MapProcessor.Layer.SURFACE;
 	private static Map<Integer, Map<MapProcessor.Layer, MapCache>> dimensions = new HashMap<>();
 	
@@ -33,21 +32,21 @@ public class MapCache extends CacheUtil {
 	}
 	
 	public static MapCache get(World world, MapProcessor.Layer layer) {
-		int dimId = world.dimension.getType().getRawId();		
+		int dimId = world.dimension.getType().getRawId();
 		Map<MapProcessor.Layer, MapCache> layers = getDimensionLayers(dimId);
 		
 		if (layers.containsKey(layer)) {
-			MapCache chache = layers.get(layer);
-			if (chache.world != world) {
-				chache.world = world;
-				chache.clear();
-				NativeImage img = JustMap.MINIMAP.getImage();
+			MapCache cache = layers.get(layer);
+			if (cache.world != world) {
+				cache.world = world;
+				cache.clear();
+				NativeImage img = JustMap.MAP.getImage();
 				img.fillRect(0, 0, img.getWidth(), img.getHeight(), Colors.BLACK);
 				
 				JustMap.LOGGER.logInfo("Updated world " + world + " " + dimId);			   
 			}
 			
-			return chache;
+			return cache;
 		}
 		
 		MapCache loader = new MapCache(layer, world);
@@ -103,8 +102,6 @@ public class MapCache extends CacheUtil {
 		int offsetX = startX * 16 - x;
 		int offsetZ = startZ * 16 - z;
 		
-		long currentTime = System.currentTimeMillis();
-		
 		int index = 0, posX = 0;
 		for (int chunkX = startX; chunkX < endX; chunkX++) {
 			int posY = 0;
@@ -139,6 +136,7 @@ public class MapCache extends CacheUtil {
 			updateIndex = 0;
 		}
 		
+		long currentTime = System.currentTimeMillis();
 		if (currentTime - lastPurged > purgeDelay) {
 			purge(purgeAmount);
 			lastPurged = currentTime;
@@ -184,7 +182,9 @@ public class MapCache extends CacheUtil {
 			return mapChunk;
 		}
 		
+		int dimId = this.world.dimension.getType().getRawId();
 		MapChunk mapChunk = new MapChunk(world.getChunk(posX, posZ), currentLayer);
+		mapChunk.dimension = dimId;
 		mapChunk.setEmpty(empty);
 		
 		if(!mapChunk.getPos().equals(chunkPos)) {
@@ -197,5 +197,5 @@ public class MapCache extends CacheUtil {
 		mapChunks.put(chunkPos, mapChunk);
 		
 		return mapChunk;
-	}
+	}	
 }

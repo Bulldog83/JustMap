@@ -5,7 +5,7 @@ import ru.bulldog.justmap.config.Params;
 import ru.bulldog.justmap.minimap.EntityModelRenderer;
 import ru.bulldog.justmap.minimap.Minimap;
 import ru.bulldog.justmap.util.Colors;
-import ru.bulldog.justmap.util.Drawer;
+import ru.bulldog.justmap.util.DrawHelper;
 
 public class PlayerIcon extends MapIcon<PlayerIcon> {
 	
@@ -32,11 +32,11 @@ public class PlayerIcon extends MapIcon<PlayerIcon> {
 				PlayerHeadIcon.getIcon(player).draw(drawX, drawY);
 			}
 		} else {
-			Drawer.fill(drawX, drawY, drawX + size, drawY + size, Colors.GREEN);
+			DrawHelper.fill(drawX, drawY, drawX + size, drawY + size, Colors.GREEN);
 		}
 			
 		if (Params.showPlayerNames) {
-			Drawer.drawBoundedString(client.textRenderer, player.getName().getString(), drawX + size / 2, drawY - size / 2 - 10, 0, client.getWindow().getScaledWidth(), Colors.WHITE);
+			DrawHelper.drawBoundedString(client.textRenderer, player.getName().getString(), drawX + size / 2, drawY - size / 2 - 10, 0, client.getWindow().getScaledWidth(), Colors.WHITE);
 		}
 	}
 }

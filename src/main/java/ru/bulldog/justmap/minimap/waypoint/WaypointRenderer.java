@@ -6,7 +6,7 @@ import ru.bulldog.justmap.config.Params;
 import ru.bulldog.justmap.minimap.waypoint.Waypoint.Icon;
 import ru.bulldog.justmap.util.ColorUtil;
 import ru.bulldog.justmap.util.Colors;
-import ru.bulldog.justmap.util.Drawer;
+import ru.bulldog.justmap.util.DrawHelper;
 import ru.bulldog.justmap.util.MathUtil;
 
 import net.fabricmc.api.EnvType;
@@ -81,10 +81,10 @@ public class WaypointRenderer {
 			icon.draw(x, y);
 		} else {
 			RenderSystem.pushMatrix();
-			Drawer.drawDiamond(x, y, size, size, waypoint.color);
+			DrawHelper.drawDiamond(x, y, size, size, waypoint.color);
 			RenderSystem.popMatrix();
 		}
-		Drawer.drawBoundedString(client.textRenderer, (int) dist + "m", x + size / 2, y + size + 2, 0, screenWidth, Colors.WHITE);
+		DrawHelper.drawBoundedString(client.textRenderer, (int) dist + "m", x + size / 2, y + size + 2, 0, screenWidth, Colors.WHITE);
 	}
 	
 	public static void renderWaypoint(MatrixStack matrixStack, MinecraftClient client, Camera camera, float tickDelta) {

@@ -1,8 +1,8 @@
 package ru.bulldog.justmap.minimap;
 
 import ru.bulldog.justmap.util.Colors;
-import ru.bulldog.justmap.util.Drawer;
-import ru.bulldog.justmap.util.Drawer.TextAlignment;
+import ru.bulldog.justmap.util.DrawHelper;
+import ru.bulldog.justmap.util.DrawHelper.TextAlignment;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 
@@ -42,13 +42,13 @@ public class MapText {
 		  switch (alignment) {
 			 default:
 			 case LEFT:
-				 Drawer.DRAWER.drawString(textRenderer, text, x, y, color);
+				 DrawHelper.DRAWER.drawString(textRenderer, text, x, y, color);
 			 break;
 			 case CENTER:
-				 Drawer.drawBoundedString(textRenderer, text, x, y, 0, width - 2, color);
+				 DrawHelper.drawBoundedString(textRenderer, text, x, y, 0, width - 2, color);
 			 break;
 			 case RIGHT:
-				 Drawer.DRAWER.drawRightAlignedString(textRenderer, text, x, y, color);
+				 DrawHelper.DRAWER.drawRightAlignedString(textRenderer, text, x, y, color);
 			 break;
 		  }
 	  }

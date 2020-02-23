@@ -8,8 +8,8 @@ import ru.bulldog.justmap.minimap.icon.EntityIcon;
 import ru.bulldog.justmap.minimap.icon.PlayerIcon;
 import ru.bulldog.justmap.minimap.icon.WaypointIcon;
 import ru.bulldog.justmap.util.Colors;
-import ru.bulldog.justmap.util.Drawer;
-import ru.bulldog.justmap.util.Drawer.TextAlignment;
+import ru.bulldog.justmap.util.DrawHelper;
+import ru.bulldog.justmap.util.DrawHelper.TextAlignment;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
@@ -61,7 +61,7 @@ public class MapRenderer {
 	}
 	
 	private MapRenderer() {
-		this.minimap = JustMap.MINIMAP;
+		this.minimap = JustMap.MAP;
 		this.offset = Params.positionOffset;
 		this.mapPosition = Params.mapPosition;
 		this.textManager = this.minimap.getTextManager();
@@ -94,8 +94,6 @@ public class MapRenderer {
 			border = mapSkin.resizable ?
 						  (int) (mapW * ((float)(mapSkin.border) / mapSkin.getWidth())) :
 						  mapSkin.border;
-		} else {
-			border = 2;
 		}		
 		
 		posX = offset;
@@ -196,8 +194,6 @@ public class MapRenderer {
 		
 		if (Params.useSkins) {
 			mapSkin.draw(posX, posY, mapW + border * 2);
-		} else {
-			Drawer.fill(posX, posY, mapX + mapW + border, mapY + mapH + border, borderColor);
 		}
 
 		drawMap();
@@ -268,7 +264,7 @@ public class MapRenderer {
 			if (yp < mapY || yp > mapY + mapH) {
 				continue;
 			}
-			Drawer.drawLine(mapX, yp, mapX + mapW, yp, color);
+			DrawHelper.drawLine(mapX, yp, mapX + mapW, yp, color);
 		}
 	
 		for (int v = xOff; v < mapW; v += step) {
@@ -277,7 +273,7 @@ public class MapRenderer {
 				continue;
 			}
 			
-			Drawer.drawLine(xp, mapY, xp, mapY + mapH, color);
+			DrawHelper.drawLine(xp, mapY, xp, mapY + mapH, color);
 		}
 	}
 }

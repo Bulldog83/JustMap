@@ -4,7 +4,7 @@ import com.mojang.datafixers.util.Pair;
 
 import ru.bulldog.justmap.minimap.waypoint.Waypoint.Icon;
 import ru.bulldog.justmap.util.Colors;
-import ru.bulldog.justmap.util.Drawer;
+import ru.bulldog.justmap.util.DrawHelper;
 import ru.bulldog.justmap.util.MathUtil;
 import ru.bulldog.justmap.util.RandomUtil;
 import net.minecraft.client.MinecraftClient;
@@ -16,7 +16,6 @@ import net.minecraft.client.resource.language.I18n;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.dimension.DimensionType;
 
 import java.util.ArrayList;
@@ -67,17 +66,17 @@ public class WaypointsList extends WaypointScreen {
 			if (icon != null) {
 				icon.draw(x, y + 1, diamondSize, diamondSize);
 			} else {
-				Drawer.drawDiamond(x, y + 1, diamondSize, diamondSize, waypoint.color);
+				DrawHelper.drawDiamond(x, y + 1, diamondSize, diamondSize, waypoint.color);
 			}
 			
 			int stringY = y + 6;
 			
 			int nameX = x + diamondSize + 2;
 
-			Drawer.DRAWER.drawString(font, waypoint.name, nameX, stringY, Colors.WHITE);
+			DrawHelper.DRAWER.drawString(font, waypoint.name, nameX, stringY, Colors.WHITE);
 			
 			int posX = editButton.x - 2;
-			Drawer.DRAWER.drawRightAlignedString(font, waypoint.pos.toShortString(), posX, stringY, Colors.WHITE);
+			DrawHelper.DRAWER.drawRightAlignedString(font, waypoint.pos.toShortString(), posX, stringY, Colors.WHITE);
 			
 			editButton.render(mouseX, mouseY, delta);
 			deleteButton.render(mouseX, mouseY, delta);
@@ -85,12 +84,12 @@ public class WaypointsList extends WaypointScreen {
 	
 		@Override
 		public boolean mouseClicked(double double_1, double double_2, int int_1) {
-			return editButton.mouseClicked(double_1, double_2, int_1) || deleteButton.mouseClicked(double_1, double_2, int_1);// || chatButton.mouseReleased(double_1, double_2, int_1);
+			return editButton.mouseClicked(double_1, double_2, int_1) || deleteButton.mouseClicked(double_1, double_2, int_1);
 		}
 	
 		@Override
 		public boolean mouseReleased(double double_1, double double_2, int int_1) {
-			return editButton.mouseReleased(double_1, double_2, int_1) || deleteButton.mouseReleased(double_1, double_2, int_1);// || chatButton.mouseReleased(double_1, double_2, int_1);
+			return editButton.mouseReleased(double_1, double_2, int_1) || deleteButton.mouseReleased(double_1, double_2, int_1);
 		}
 	
 		@Override
@@ -250,7 +249,7 @@ public class WaypointsList extends WaypointScreen {
 		Waypoint waypoint = new Waypoint();
 		waypoint.dimension = currentDim;
 		waypoint.color = RandomUtil.getElement(Waypoint.WAYPOINT_COLORS);
-		waypoint.pos = new BlockPos(0, 0, 0);
+		waypoint.pos = minecraft.player.getBlockPos();
 		waypoint.name = "Waypoint";
 		
 		minecraft.openScreen(new WaypointEditor(waypoint, this, keeper::addNew));

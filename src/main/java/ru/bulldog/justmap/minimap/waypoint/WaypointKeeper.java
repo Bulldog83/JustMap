@@ -12,15 +12,10 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.ServerInfo;
-import net.minecraft.server.MinecraftServer;
-import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.util.JsonFactory;
+import ru.bulldog.justmap.util.StorageUtil;
 
 public class WaypointKeeper extends JsonFactory {
-	
-	private final static File WAYPOINTS_DIR = new File(JustMap.MAP_DIR, "waypoints/");
 	
 	private static Map<Integer, List<Waypoint>> waypoints;	
 	
@@ -32,7 +27,7 @@ public class WaypointKeeper extends JsonFactory {
 			instance = new WaypointKeeper();
 		}		
 		
-		File waypointsFile = new File(waypointsFolder(), "/waypoints.json");
+		File waypointsFile = new File(StorageUtil.filesDir(), "/waypoints.json");
 		if (currentStorage == null || !currentStorage.equals(waypointsFile)) {
 			currentStorage = waypointsFile;
 			instance.loadWaypoints();
@@ -69,7 +64,7 @@ public class WaypointKeeper extends JsonFactory {
 		JsonObject jsonObject = new JsonObject();
 		jsonObject.add("waypoints", waypointArray);
 		
-		File waypointsFile = new File(waypointsFolder(), "/waypoints.json");
+		File waypointsFile = new File(StorageUtil.filesDir(), "/waypoints.json");
 		storeJson(waypointsFile, jsonObject);
 	}
 	
@@ -100,26 +95,5 @@ public class WaypointKeeper extends JsonFactory {
 	
 	public List<Integer> getDimensions() {
 		return new ArrayList<>(waypoints.keySet());
-	}
-	
-	private static File waypointsFolder() {
-		MinecraftClient client = MinecraftClient.getInstance();
-		
-		File waypointsDir;
-		if (client.isIntegratedServerRunning()) {
-			MinecraftServer server = client.getServer();
-			waypointsDir = new File(WAYPOINTS_DIR, String.format("local/%s/", server.getLevelName()));
-		} else if (!client.isInSingleplayer()) {
-			ServerInfo server = client.getCurrentServerEntry();
-			waypointsDir = new File(WAYPOINTS_DIR, String.format("servers/%s/", server.name));
-		} else {		
-			waypointsDir = new File(WAYPOINTS_DIR, "undefined/");
-		}
-		
-		if (!waypointsDir.exists()) {
-			waypointsDir.mkdirs();
-		}
-		
-		return waypointsDir;
 	}
 }

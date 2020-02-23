@@ -24,6 +24,7 @@
   "justmap.configuration.map_brightness": "Map Brightness",
   "justmap.configuration.show_in_chat": "Show map while in chat",
   "justmap.configuration.show_terrain": "Show Terrain",
+  "justmap.configuration.show_caves": "Show Caves",
   "justmap.configuration.terrain_strength": "Terrain Strength",
   "justmap.configuration.show_grid": "Show Grid Lines",
   "justmap.configuration.show_position": "Show Position",
@@ -51,6 +52,7 @@
   "justmap.configuration.show_player_heads": "Show player heads",
   "justmap.configuration.show_player_names": "Show player names",
   "justmap.configuration.render_entity_model": "Render entities models (reduces FPS)",
+  "justmap.configuration.show_icons_outline": "Show outline for icons",
   "justmap.configuration.entity_icon_size": "Entities icon size",
   "justmap.configuration.entity_model_size": "Entities model size",
   
@@ -73,6 +75,6 @@
   "justmap.gui.name": "Name",
   "justmap.gui.chat": "Chat",
   "justmap.gui.wp_hidden": "Hidden",
-  "justmap.gui.wp_tracking": "Tracking",
-  "justmap.gui.wp_render": "Render"
+  "justmap.gui.wp_tracking": "Screen Edge",
+  "justmap.gui.wp_render": "In World"
 }

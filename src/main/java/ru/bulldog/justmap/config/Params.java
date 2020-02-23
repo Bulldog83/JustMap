@@ -31,9 +31,10 @@ public class Params {
 	public static boolean showPlayers = true;
 	public static boolean showPlayerHeads = true;
 	public static boolean showPlayerNames = true;
+	public static boolean showIconsOutline = false;
 	public static boolean renderEntityModel = false;
 	public static int entityIconSize = 8;
-	public static int entityModelSize = 10;	
+	public static int entityModelSize = 10;
 	
 	public static int updatePerCycle = 10;
 	public static int purgeDelay = 60;

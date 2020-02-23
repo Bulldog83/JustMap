@@ -9,7 +9,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.config.Params;
 import ru.bulldog.justmap.util.ImageUtil;
-import ru.bulldog.justmap.util.Drawer;
+import ru.bulldog.justmap.util.DrawHelper;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 
@@ -90,7 +90,7 @@ public class MapSkin extends Sprite {
 		}
 		RenderSystem.enableAlphaTest();
 		RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
-		Drawer.blit(x, y, 0, w, h, this);
+		DrawHelper.blit(x, y, 0, w, h, this);
 	}
 	
 	public void draw(int x, int y, int size) {
@@ -99,6 +99,11 @@ public class MapSkin extends Sprite {
 	
 	public String getName() {
 		return this.name;
+	}
+	
+	@Override
+	public String toString() {
+		return this.getName();
 	}
 	
 	public static MapSkin getSkinByName(String name) {
@@ -121,9 +126,9 @@ public class MapSkin extends Sprite {
 	
 	static {
 		addSkin("Minecraft Map", new Identifier("textures/map/map_background.png"), 64, 64, 4, true);
-		addSkin("Minecraft Gui", new Identifier(JustMap.MODID, "textures/skin/mad_def_gui_2.png"), 64, 64, 6, true);
-		addSkin("Minecraft Gui Fancy", new Identifier(JustMap.MODID, "textures/skin/mad_def_gui.png"), 64, 64, 8, true);
-		addSkin("Metal Frame", new Identifier(JustMap.MODID, "textures/skin/frame_simple_metal.png"), 64, 64, 6, true);
+		addSkin("Minecraft Gui", new Identifier(JustMap.MODID, "textures/skin/mad_def_gui_2.png"), 128, 128, 5, true);
+		addSkin("Minecraft Gui Fancy", new Identifier(JustMap.MODID, "textures/skin/mad_def_gui.png"), 128, 128, 7, true);
+		addSkin("Metal Frame", new Identifier(JustMap.MODID, "textures/skin/frame_simple_metal.png"), 128, 128, 5, true);
 		addSkin("Oak Frame", new Identifier(JustMap.MODID, "textures/skin/map_frame_oak.png"), 64, 64, 10, true);
 		addSkin("Bamboo Frame", new Identifier(JustMap.MODID, "textures/skin/map_frame_bamboo.png"), 64, 64, 10, true);
 		addSkin("Stone", new Identifier("textures/block/stone.png"), 16, 16, 4, false);

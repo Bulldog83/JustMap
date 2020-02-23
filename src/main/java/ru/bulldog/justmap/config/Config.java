@@ -60,6 +60,7 @@ public final class Config {
 		KEEPER.registerEntry("show_player_heads", new BooleanEntry(Params.showPlayerHeads, (b) -> Params.showPlayerHeads = b, () -> Params.showPlayerHeads));
 		KEEPER.registerEntry("show_player_names", new BooleanEntry(Params.showPlayerNames, (b) -> Params.showPlayerNames = b, () -> Params.showPlayerNames));
 		KEEPER.registerEntry("render_entity_model", new BooleanEntry(Params.renderEntityModel, (b) -> Params.renderEntityModel = b, () -> Params.renderEntityModel));
+		KEEPER.registerEntry("show_icons_outline", new BooleanEntry(Params.showIconsOutline, (b) -> Params.showIconsOutline = b, () -> Params.showIconsOutline));
 		KEEPER.registerEntry("entity_icon_size", new IntegerRange(Params.entityIconSize, (i) -> Params.entityIconSize = i, () -> Params.entityIconSize, 2, 16));
 		KEEPER.registerEntry("entity_model_size", new IntegerRange(Params.entityModelSize, (i) -> Params.entityModelSize = i, () -> Params.entityModelSize, 2, 16));
 		
@@ -179,6 +180,6 @@ public final class Config {
 	
 	public void saveChanges() {
 		ConfigWriter.save(KEEPER.toJson());
-		JustMap.MINIMAP.onConfigChanges();
+		JustMap.MAP.onConfigChanges();
 	}
 }

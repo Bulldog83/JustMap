@@ -109,10 +109,6 @@ public class ModMenuEntry implements ModMenuApi {
 					.setDefaultValue(MapSkin.getSkin((int) JustMap.CONFIG.getDefault("current_skin")))
 					.setSelections(MapSkin.getSkins())
 					.build());
-			mapAppearance.addEntry(entryBuilder.startIntSlider(lang("current_skin"), JustMap.CONFIG.getInt("current_skin") + 1, 1, MapSkin.getSkins().size())
-					.setSaveConsumer(val -> JustMap.CONFIG.setInt("current_skin", val - 1))
-					.setDefaultValue((int) JustMap.CONFIG.getDefault("current_skin") + 1)
-					.build());
 			
 			ConfigCategory waypoints = builder.getOrCreateCategory(lang("category.waypoints"));
 			waypoints.addEntry(entryBuilder.startBooleanToggle(lang("waypoints_tracking"), JustMap.CONFIG.getBoolean("waypoints_tracking"))
@@ -176,6 +172,10 @@ public class ModMenuEntry implements ModMenuApi {
 			entityRadar.addEntry(entryBuilder.startBooleanToggle(lang("show_player_names"), JustMap.CONFIG.getBoolean("show_player_names"))
 					.setSaveConsumer(val -> JustMap.CONFIG.setBoolean("show_player_names", val))
 					.setDefaultValue((boolean) JustMap.CONFIG.getDefault("show_player_names"))
+					.build());
+			entityRadar.addEntry(entryBuilder.startBooleanToggle(lang("show_icons_outline"), JustMap.CONFIG.getBoolean("show_icons_outline"))
+					.setSaveConsumer(val -> JustMap.CONFIG.setBoolean("show_icons_outline", val))
+					.setDefaultValue((boolean) JustMap.CONFIG.getDefault("show_icons_outline"))
 					.build());
 			entityRadar.addEntry(entryBuilder.startBooleanToggle(lang("render_entity_model"), JustMap.CONFIG.getBoolean("render_entity_model"))
 					.setSaveConsumer(val -> JustMap.CONFIG.setBoolean("render_entity_model", val))

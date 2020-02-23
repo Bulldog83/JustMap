@@ -9,6 +9,9 @@ import net.minecraft.client.texture.*;
 import net.minecraft.client.util.DefaultSkinHelper;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.Identifier;
+import ru.bulldog.justmap.config.Params;
+import ru.bulldog.justmap.util.DrawHelper;
+
 import java.util.Map;
 import java.util.HashMap;
 import java.util.UUID;
@@ -54,6 +57,9 @@ public class PlayerHeadIcon {
 	}
 	
 	public void draw(int x, int y) {
+		if (Params.showIconsOutline) {
+			DrawHelper.fill(x - 1, y - 1, x + 9, y + 9, 0xFF444444);
+		}
 		textureManager.bindTexture(this.skin);
 		RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
 		DrawableHelper.blit(x, y, 8, 8, 8.0F, 8.0F, 8, 8, 64, 64);

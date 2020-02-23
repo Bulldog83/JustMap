@@ -24,6 +24,7 @@
   "justmap.configuration.map_brightness": "Яркость карты",
   "justmap.configuration.show_in_chat": "Отображать миникарту когда открыт чат",
   "justmap.configuration.show_terrain": "Показывать рельеф",
+  "justmap.configuration.show_caves": "Показывать пещеры",
   "justmap.configuration.terrain_strength": "Сила перепада рельефа",
   "justmap.configuration.show_grid": "Отображать линии сетки",
   "justmap.configuration.show_position": "Отображать позицию",
@@ -51,6 +52,7 @@
   "justmap.configuration.show_player_heads": "Отображать головы игроков",
   "justmap.configuration.show_player_names": "Отображать имена игроков",
   "justmap.configuration.render_entity_model": "Рендерить модельки сущностей (снижает FPS)",
+  "justmap.configuration.show_icons_outline": "Отображать обводку иконок",
   "justmap.configuration.entity_icon_size": "Размер иконки сущностей",
   "justmap.configuration.entity_model_size": "Размер модели сущностей",
   

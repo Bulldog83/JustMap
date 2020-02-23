@@ -2,7 +2,7 @@ package ru.bulldog.justmap.minimap.icon;
 
 import ru.bulldog.justmap.minimap.Minimap;
 import ru.bulldog.justmap.minimap.waypoint.Waypoint;
-import ru.bulldog.justmap.util.Drawer;
+import ru.bulldog.justmap.util.DrawHelper;
 
 public class WaypointIcon extends MapIcon<WaypointIcon> {
 	private Waypoint waypoint;
@@ -23,7 +23,7 @@ public class WaypointIcon extends MapIcon<WaypointIcon> {
 		if (icon != null) {
 			icon.draw(drawX, drawY, size);
 		} else {
-			Drawer.drawDiamond(drawX, drawY, size, size, col);
+			DrawHelper.drawDiamond(drawX, drawY, size, size, col);
 		}			
 	}
 	

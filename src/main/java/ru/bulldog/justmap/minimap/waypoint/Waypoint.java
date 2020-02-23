@@ -10,7 +10,7 @@ import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.util.ColorUtil;
 import ru.bulldog.justmap.util.Colors;
 import ru.bulldog.justmap.util.ImageUtil;
-import ru.bulldog.justmap.util.Drawer;
+import ru.bulldog.justmap.util.DrawHelper;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.resource.metadata.AnimationResourceMetadata;
 import net.minecraft.client.texture.NativeImage;
@@ -201,7 +201,7 @@ public class Waypoint {
 			}			
 			RenderSystem.enableAlphaTest();
 			RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
-			Drawer.blit(x, y, 0, w, h, this);
+			DrawHelper.blit(x, y, 0, w, h, this);
 		}
 		
 		public void draw(int x, int y, int size) {

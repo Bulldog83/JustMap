@@ -13,7 +13,7 @@ public final class Logger {
 	
 	private Logger() {}
 	
-	public static Logger getLogger() {
+	public static Logger get() {
 		return new Logger();
 	}
 	

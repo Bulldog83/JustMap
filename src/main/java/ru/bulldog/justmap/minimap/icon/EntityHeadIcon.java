@@ -5,8 +5,9 @@ import java.util.Map;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import ru.bulldog.justmap.JustMap;
+import ru.bulldog.justmap.config.Params;
 import ru.bulldog.justmap.util.ImageUtil;
-import ru.bulldog.justmap.util.Drawer;
+import ru.bulldog.justmap.util.DrawHelper;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.resource.metadata.AnimationResourceMetadata;
 import net.minecraft.client.texture.NativeImage;
@@ -39,11 +40,14 @@ public class EntityHeadIcon extends Sprite {
 		return ICONS.get(id);
 	}
 	
-	public void draw(int x, int y, int w, int h) {
+	public void draw(int x, int y, int w, int h) {		
+		if (Params.showIconsOutline) {
+			DrawHelper.fill(x - 1, y - 1, x + w + 1, y + h + 1, 0xFF444444);
+		}
 		textureManager.bindTexture(this.getId());
 		RenderSystem.enableAlphaTest();
 		RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
-		Drawer.blit(x, y, 0, w, h, this);
+		DrawHelper.blit(x, y, 0, w, h, this);
 	}
 	
 	public void draw(int x, int y, int size) {

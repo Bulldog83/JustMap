@@ -10,16 +10,16 @@ import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormats;
 import org.lwjgl.opengl.GL11;
 
-public class Drawer extends DrawableHelper {	
+public class DrawHelper extends DrawableHelper {	
 	public static enum TextAlignment {
 		LEFT,
 		CENTER,
 		RIGHT
 	}
 	
-	private Drawer() {}
+	private DrawHelper() {}
 	
-	public final static Drawer DRAWER = new Drawer();
+	public final static DrawHelper DRAWER = new DrawHelper();
 	
 	public void fillNoDepth(int x, int y, int right, int left, int color) {
 		RenderSystem.disableDepthTest();

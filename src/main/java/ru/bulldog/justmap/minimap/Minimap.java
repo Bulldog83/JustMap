@@ -13,7 +13,7 @@ import ru.bulldog.justmap.minimap.waypoint.WaypointEditor;
 import ru.bulldog.justmap.minimap.waypoint.WaypointKeeper;
 import ru.bulldog.justmap.util.MathUtil;
 import ru.bulldog.justmap.util.RandomUtil;
-import ru.bulldog.justmap.util.Drawer.TextAlignment;
+import ru.bulldog.justmap.util.DrawHelper.TextAlignment;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.resource.language.I18n;
