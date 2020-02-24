@@ -3,7 +3,8 @@ package ru.bulldog.justmap.minimap;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import ru.bulldog.justmap.JustMap;
-import ru.bulldog.justmap.config.Params;
+import ru.bulldog.justmap.client.JustMapClient;
+import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.minimap.icon.EntityIcon;
 import ru.bulldog.justmap.minimap.icon.PlayerIcon;
 import ru.bulldog.justmap.minimap.icon.WaypointIcon;
@@ -61,9 +62,9 @@ public class MapRenderer {
 	}
 	
 	private MapRenderer() {
-		this.minimap = JustMap.MAP;
-		this.offset = Params.positionOffset;
-		this.mapPosition = Params.mapPosition;
+		this.minimap = JustMapClient.MAP;
+		this.offset = ClientParams.positionOffset;
+		this.mapPosition = ClientParams.mapPosition;
 		this.textManager = this.minimap.getTextManager();
 	}
 	
@@ -80,16 +81,16 @@ public class MapRenderer {
 	}
 	
 	public void updateParams() {		
-		offset = Params.positionOffset;
-		mapPosition = Params.mapPosition;
+		offset = ClientParams.positionOffset;
+		mapPosition = ClientParams.mapPosition;
 		
 		backingImage = minimap.getImage();
 	
 		mapW = minimap.getSize();
 		mapH = minimap.getSize();
 		
-		if (Params.useSkins) {
-			mapSkin = MapSkin.getSkin(Params.currentSkin);
+		if (ClientParams.useSkins) {
+			mapSkin = MapSkin.getSkin(ClientParams.currentSkin);
 			
 			border = mapSkin.resizable ?
 						  (int) (mapW * ((float)(mapSkin.border) / mapSkin.getWidth())) :
@@ -178,7 +179,7 @@ public class MapRenderer {
 		}
 		
 		if (client.currentScreen != null) {
-			if (!(Params.showInChat && client.currentScreen instanceof ChatScreen)) {
+			if (!(ClientParams.showInChat && client.currentScreen instanceof ChatScreen)) {
 				return;
 			}
 		}
@@ -192,13 +193,13 @@ public class MapRenderer {
 		
 		RenderSystem.disableDepthTest();
 		
-		if (Params.useSkins) {
+		if (ClientParams.useSkins) {
 			mapSkin.draw(posX, posY, mapW + border * 2);
 		}
 
 		drawMap();
 
-		if (Params.drawChunkGrid) {
+		if (ClientParams.drawChunkGrid) {
 			drawChunkGrid();
 		}
 		
@@ -253,7 +254,7 @@ public class MapRenderer {
 		int px = client.player.getBlockPos().getX();
 		int pz = client.player.getBlockPos().getZ();
 		
-		float scale = Params.mapScale;
+		float scale = ClientParams.mapScale;
 		
 		int xOff = (int) ((((px / 16) * 16) - px) / scale);
 		int yOff = (int) ((((pz / 16) * 16) - pz) / scale);

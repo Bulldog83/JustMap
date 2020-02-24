@@ -1,10 +1,10 @@
-package ru.bulldog.justmap.mixins;
+package ru.bulldog.justmap.mixins.client;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Ordering;
 import com.mojang.blaze3d.systems.RenderSystem;
 
-import ru.bulldog.justmap.config.Params;
+import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.minimap.MapPosition;
 import ru.bulldog.justmap.minimap.MapRenderer;
 import ru.bulldog.justmap.util.Colors;
@@ -48,11 +48,11 @@ abstract class HudMixin extends DrawableHelper {
 	
 	@Inject(at = @At("HEAD"), method = "renderStatusEffectOverlay", cancellable = true)
 	protected void renderStatusEffects(CallbackInfo info) {
-		if (Params.moveEffects) {
+		if (ClientParams.moveEffects) {
 			Collection<StatusEffectInstance> collection = this.client.player.getStatusEffects();
 			if (!collection.isEmpty()) {
 				int posX = this.scaledWidth;
-				if (Params.mapPosition == MapPosition.TOP_RIGHT) {
+				if (ClientParams.mapPosition == MapPosition.TOP_RIGHT) {
 					posX = MapRenderer.getInstance().getX();
 				}
 				
@@ -63,7 +63,7 @@ abstract class HudMixin extends DrawableHelper {
 				int size = 24;
 				int hOffset = 6;
 				int vOffset = 10;
-				if (!Params.showEffectTimers) {
+				if (!ClientParams.showEffectTimers) {
 					hOffset = 1;
 					vOffset = 2;
 				}
@@ -79,7 +79,7 @@ abstract class HudMixin extends DrawableHelper {
 					StatusEffect statusEffect = statusEffectInstance.getEffectType();
 					if (statusEffectInstance.shouldShowIcon()) {
 						int k = posX;
-					   	int l = Params.positionOffset;
+					   	int l = ClientParams.positionOffset;
 					   	if (this.client.isDemo()) {
 						   l += 15;
 					   	}
@@ -114,7 +114,7 @@ abstract class HudMixin extends DrawableHelper {
 							RenderSystem.color4f(1.0F, 1.0F, 1.0F, ff);
 					  		blit(fk + 3, fl + 3, this.getBlitOffset(), 18, 18, sprite);
 				   		});
-				   		if (Params.showEffectTimers) {
+				   		if (ClientParams.showEffectTimers) {
 					   		timers.add(() -> {
 					   			drawCenteredString(client.textRenderer, convertDuration(effectDuration), fk + size / 2, fl + (size + 1), Colors.WHITE);
 					   		});

@@ -32,7 +32,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import ru.bulldog.justmap.JustMap;
-import ru.bulldog.justmap.config.Params;
+import ru.bulldog.justmap.client.config.ClientParams;
 
 public class ColorUtil {
 	
@@ -221,11 +221,11 @@ public class ColorUtil {
 	
 	private static int proccessColor(int color, int heightDiff) {
 		float[] hsb = RGBtoHSB((color >> 16) & 255, (color >> 8) & 255, color & 255, null);
-		hsb[1] += Params.mapSaturation / 100.0F;
+		hsb[1] += ClientParams.mapSaturation / 100.0F;
 		hsb[1] = MathUtil.clamp(hsb[1], 0.0F, 1.0F);
-		hsb[2] += Params.mapBrightness / 100.0F;
+		hsb[2] += ClientParams.mapBrightness / 100.0F;
 		hsb[2] = MathUtil.clamp(hsb[2], 0.0F, 1.0F);
-		if (Params.showTerrain) {
+		if (ClientParams.showTerrain) {
 			hsb[2] += heightDiff / 10.0F;
 			hsb[2] = MathUtil.clamp(hsb[2], 0.0F, 1.0F);
 		}
@@ -252,7 +252,7 @@ public class ColorUtil {
 		
 		int blockColor = -1;
 		int materialColor = state.getTopMaterialColor(world, pos).color;
-		if (Params.alternateColorRender) {
+		if (ClientParams.alternateColorRender) {
 			int textureColor = ColorUtil.extractColor(state);
 			
 			blockColor = colorMap.getColor(state, world, pos, -1);

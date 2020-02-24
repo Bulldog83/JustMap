@@ -2,7 +2,7 @@ package ru.bulldog.justmap.minimap;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
-import ru.bulldog.justmap.config.Params;
+import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.util.Colors;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.DiffuseLighting;
@@ -38,7 +38,7 @@ public class EntityModelRenderer {
 		
 		MatrixStack matrixStack = new MatrixStack();
 		
-		int modelSize = Params.entityModelSize;
+		int modelSize = ClientParams.entityModelSize;
 		
 		matrixStack.push();
 		matrixStack.translate(x, y, 0);
@@ -64,7 +64,7 @@ public class EntityModelRenderer {
 	}
 	
 	private static float getScale(LivingEntity livingEntity) {
-		int modelSize = Params.entityModelSize;
+		int modelSize = ClientParams.entityModelSize;
 		
 		float scaleX = modelSize / Math.max(livingEntity.getWidth(), 0.5F);
 		float scaleY = modelSize / Math.max(livingEntity.getHeight(), 0.5F);

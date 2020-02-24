@@ -1,0 +1,12 @@
+{
+    "required": true,
+    "package": "ru.bulldog.justmap.mixins.server",
+    "compatibilityLevel": "JAVA_8",
+    "server": [
+		"GameRuleCommandMixin",
+		"PlayerManagerMixin"
+	],
+    "injectors": {
+        "defaultRequire": 1
+    }
+}

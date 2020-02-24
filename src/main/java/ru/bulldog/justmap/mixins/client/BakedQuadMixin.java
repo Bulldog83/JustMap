@@ -1,4 +1,4 @@
-package ru.bulldog.justmap.mixins;
+package ru.bulldog.justmap.mixins.client;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;

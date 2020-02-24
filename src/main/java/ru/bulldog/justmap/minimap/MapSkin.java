@@ -7,7 +7,7 @@ import java.util.List;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import ru.bulldog.justmap.JustMap;
-import ru.bulldog.justmap.config.Params;
+import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.util.ImageUtil;
 import ru.bulldog.justmap.util.DrawHelper;
 import net.fabricmc.api.EnvType;
@@ -121,7 +121,7 @@ public class MapSkin extends Sprite {
 	}
 	
 	public static MapSkin getCurrentSkin() {
-		return getSkin(Params.currentSkin);
+		return getSkin(ClientParams.currentSkin);
 	}
 	
 	static {

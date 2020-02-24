@@ -1,4 +1,4 @@
-package ru.bulldog.justmap.mixins;
+package ru.bulldog.justmap.mixins.client;
 
 import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.GameRenderer;

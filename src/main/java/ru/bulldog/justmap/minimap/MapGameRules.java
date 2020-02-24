@@ -6,7 +6,8 @@ import java.util.Map;
 import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.mixins.BooleanRuleProcessor;
 import ru.bulldog.justmap.mixins.GameRulesProcessor;
-
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.world.GameRules;
 import net.minecraft.world.GameRules.RuleKey;
@@ -49,11 +50,12 @@ public class MapGameRules {
 	 *	§b: entities radar (all)
 	 *	§c: entities radar (player)
 	 *	§d: entities radar (animal)
-	 *	§e: entities radar (mob)
+	 *	§e: entities radar (hostile)
 	 *
 	 *  §1: enable
 	 *  §0: disable
 	 */	
+	@Environment(EnvType.CLIENT)
 	public static void parseCommand(String command) {
 		GameRules gameRules = MinecraftClient.getInstance().world.getGameRules();
 		codes.forEach((key, rule) -> {
@@ -66,6 +68,7 @@ public class MapGameRules {
 		});
 	}
 	
+	@Environment(EnvType.CLIENT)
 	public static boolean isAllowed(GameRules.RuleKey<GameRules.BooleanRule> rule) {
 		MinecraftClient client = MinecraftClient.getInstance();
 		

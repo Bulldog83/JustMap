@@ -1,7 +1,8 @@
 package ru.bulldog.justmap.minimap.data;
 
 import ru.bulldog.justmap.JustMap;
-import ru.bulldog.justmap.config.Params;
+import ru.bulldog.justmap.client.JustMapClient;
+import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.minimap.Minimap;
 import ru.bulldog.justmap.util.Colors;
 import ru.bulldog.justmap.util.ImageUtil;
@@ -40,7 +41,7 @@ public class MapCache {
 			if (cache.world != world) {
 				cache.world = world;
 				cache.clear();
-				NativeImage img = JustMap.MAP.getImage();
+				NativeImage img = JustMapClient.MAP.getImage();
 				img.fillRect(0, 0, img.getWidth(), img.getHeight(), Colors.BLACK);
 				
 				JustMap.LOGGER.logInfo("Updated world " + world + " " + dimId);			   
@@ -87,9 +88,9 @@ public class MapCache {
 	}
 	
 	public void update(Minimap map, int x, int z) {
-		updatePerCycle = Params.updatePerCycle;
-		purgeDelay = Params.purgeDelay * 1000;
-		purgeAmount = Params.purgeAmount;
+		updatePerCycle = ClientParams.updatePerCycle;
+		purgeDelay = ClientParams.purgeDelay * 1000;
+		purgeAmount = ClientParams.purgeAmount;
 		
 		int size = (int) (map.getSize() * map.getScale());
 		

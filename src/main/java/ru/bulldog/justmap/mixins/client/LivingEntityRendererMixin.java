@@ -1,4 +1,4 @@
-package ru.bulldog.justmap.mixins;
+package ru.bulldog.justmap.mixins.client;
 
 import java.util.Iterator;
 import java.util.List;
@@ -23,7 +23,7 @@ import net.minecraft.client.util.math.Vector3f;
 import net.minecraft.entity.EntityPose;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.math.MathHelper;
-import ru.bulldog.justmap.config.Params;
+import ru.bulldog.justmap.client.config.ClientParams;
 
 @Mixin(LivingEntityRenderer.class)
 public abstract class LivingEntityRendererMixin<T extends LivingEntity, M extends EntityModel<T>> extends EntityRenderer<T> implements FeatureRendererContext<T, M> {
@@ -53,7 +53,7 @@ public abstract class LivingEntityRendererMixin<T extends LivingEntity, M extend
 	
 	@Inject(at = @At("HEAD"), method = "render", cancellable = true)
 	public void renderStatic(T livingEntity, float f, float g, MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int i, CallbackInfo ci) {
-		if (Params.renderEntityModel && f == 0.0F && g == 0.0F) {
+		if (ClientParams.renderEntityModel && f == 0.0F && g == 0.0F) {
 			matrixStack.push();
 			this.model.child = livingEntity.isBaby();
 			float h = MathHelper.lerpAngleDegrees(g, livingEntity.prevBodyYaw, livingEntity.bodyYaw);

@@ -1,7 +1,8 @@
 package ru.bulldog.justmap.minimap;
 
 import ru.bulldog.justmap.JustMap;
-import ru.bulldog.justmap.config.Params;
+import ru.bulldog.justmap.client.JustMapClient;
+import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.minimap.data.MapCache;
 import ru.bulldog.justmap.minimap.data.MapProcessor;
 import ru.bulldog.justmap.minimap.icon.EntityIcon;
@@ -43,7 +44,7 @@ public class Minimap {
 	private MapText txtTime = new MapText(TextAlignment.CENTER, "00:00");
 	private MapText txtFPS = new MapText(TextAlignment.CENTER, "00 fps");
 	
-	private int mapSize = JustMap.CONFIG.getInt("map_size");
+	private int mapSize = JustMapClient.CONFIG.getInt("map_size");
 	
 	private float mapScale = 1;
 	
@@ -62,7 +63,7 @@ public class Minimap {
 	public Minimap() {
 		image = new NativeImage(NativeImage.Format.RGBA, mapSize, mapSize, false);	
 		textManager = new TextManager(this);
-		isMapVisible = JustMap.CONFIG.getBoolean("map_visible");
+		isMapVisible = JustMapClient.CONFIG.getBoolean("map_visible");
 	}
 	
 	public void update() {
@@ -90,10 +91,10 @@ public class Minimap {
 	
 	public void onConfigChanges() {
 		
-		isMapVisible = JustMap.CONFIG.getBoolean("map_visible");
+		isMapVisible = JustMapClient.CONFIG.getBoolean("map_visible");
 		
-		int configSize = JustMap.CONFIG.getInt("map_size");
-		float configScale = JustMap.CONFIG.getFloat("map_scale");
+		int configSize = JustMapClient.CONFIG.getInt("map_size");
+		float configScale = JustMapClient.CONFIG.getFloat("map_scale");
 		
 		if (configSize != mapSize || configScale != mapScale) {
 			this.mapSize = configSize;
@@ -106,20 +107,20 @@ public class Minimap {
 	private void updateInfo(PlayerEntity player) {
 		textManager.clear();
 		
-		if (Params.showPosition) {
+		if (ClientParams.showPosition) {
 			BlockPos playerPos = minecraftClient.player.getBlockPos();
 			txtCoords.setText(playerPos.getX() + ", " + playerPos.getY() + ", " + playerPos.getZ());
 			textManager.add(txtCoords);
 		}		
-		if (Params.showBiome) {
+		if (ClientParams.showBiome) {
 			txtBiome.setText(I18n.translate(currentBiome.getTranslationKey()));
 			textManager.add(txtBiome);
 		}		
-		if (Params.showFPS) {
+		if (ClientParams.showFPS) {
 			txtFPS.setText(minecraftClient.fpsDebugString.substring(0, minecraftClient.fpsDebugString.indexOf("fps") + 3));
 			textManager.add(txtFPS);
 		}		
-		if (Params.showTime) {
+		if (ClientParams.showTime) {
 			txtTime.setText(getTimeString(minecraftClient.world.getTimeOfDay()));
 			textManager.add(txtTime);
 		}
@@ -149,26 +150,26 @@ public class Minimap {
 			return true;
 		}
 		
-		boolean allowCaves = isAllowed(Params.showCaves, MapGameRules.ALLOW_CAVES_MAP);
+		boolean allowCaves = isAllowed(ClientParams.showCaves, MapGameRules.ALLOW_CAVES_MAP);
 		
 		return allowCaves && !world.isSkyVisibleAllowingSea(playerPos) &&
 			   world.getLightLevel(LightType.SKY, playerPos) == 0;
 	}
 	
 	public static boolean allowEntityRadar() {
-		return isAllowed(Params.showEntities, MapGameRules.ALLOW_ENTITY_RADAR);
+		return isAllowed(ClientParams.showEntities, MapGameRules.ALLOW_ENTITY_RADAR);
 	}
 	
 	public static boolean allowHostileRadar() {
-		return isAllowed(Params.showHostile, MapGameRules.ALLOW_HOSTILE_RADAR);
+		return isAllowed(ClientParams.showHostile, MapGameRules.ALLOW_HOSTILE_RADAR);
 	}
 	
 	public static boolean allowCreatureRadar() {
-		return isAllowed(Params.showCreatures, MapGameRules.ALLOW_CREATURE_RADAR);
+		return isAllowed(ClientParams.showCreatures, MapGameRules.ALLOW_CREATURE_RADAR);
 	}
 	
 	public static boolean allowPlayerRadar() {
-		return isAllowed(Params.showPlayers, MapGameRules.ALLOW_PLAYER_RADAR);
+		return isAllowed(ClientParams.showPlayers, MapGameRules.ALLOW_PLAYER_RADAR);
 	}
 	
 	public void prepareMap(PlayerEntity player) {
@@ -190,7 +191,7 @@ public class Minimap {
 		}
 		MapCache.get(world).update(this, startX, startZ);
 		
-		if (allowPlayerRadar() && Params.showPlayers) {
+		if (allowPlayerRadar() && ClientParams.showPlayers) {
 			players.clear();			
 			List<? extends PlayerEntity> players = world.getPlayers();
 			for (PlayerEntity p : players) {

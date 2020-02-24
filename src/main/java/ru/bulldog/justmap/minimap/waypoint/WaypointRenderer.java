@@ -2,7 +2,7 @@ package ru.bulldog.justmap.minimap.waypoint;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
-import ru.bulldog.justmap.config.Params;
+import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.minimap.waypoint.Waypoint.Icon;
 import ru.bulldog.justmap.util.ColorUtil;
 import ru.bulldog.justmap.util.Colors;
@@ -34,7 +34,7 @@ public class WaypointRenderer {
 	private final static Identifier BEAM_TEX = new Identifier("textures/entity/beacon_beam.png");
 	
 	public static void renderHUD(float delta, float fov) {
-		if (Params.waypointsTracking) {
+		if (ClientParams.waypointsTracking) {
 			if (renderer == null) {
 				renderer = new WaypointRenderer();
 			}
@@ -75,7 +75,7 @@ public class WaypointRenderer {
 		float scale = (MathUtil.clamp(ax, a0, a1) - a0) / fov;
 		
 		int x = (int) MathUtil.clamp((screenWidth - screenWidth * scale) - size / 2, 0, screenWidth - size);
-		int y = Params.positionOffset;
+		int y = ClientParams.positionOffset;
 		
 		if (icon != null) {
 			icon.draw(x, y);
@@ -88,7 +88,7 @@ public class WaypointRenderer {
 	}
 	
 	public static void renderWaypoint(MatrixStack matrixStack, MinecraftClient client, Camera camera, float tickDelta) {
-		if (Params.waypointsWorldRender) {
+		if (ClientParams.waypointsWorldRender) {
 			if (renderer == null) {
 				renderer = new WaypointRenderer();
 			}
@@ -104,7 +104,7 @@ public class WaypointRenderer {
 			List<Waypoint> wayPoints = WaypointKeeper.getInstance().getWaypoints(client.world.dimension.getType().getRawId(), true);			
 			for (Waypoint wp : wayPoints) {
 				int dist = (int) MathUtil.getDistance(wp.pos, playerPos, true);
-				if (wp.render && dist > Params.minRenderDist && dist < Params.maxRenderDist) {
+				if (wp.render && dist > ClientParams.minRenderDist && dist < ClientParams.maxRenderDist) {
 					renderer.renderWaypoint(matrixStack, immediate, wp, client, camera, tick, dist);
 				}
 			}			
@@ -128,16 +128,16 @@ public class WaypointRenderer {
 		matrixStack.push();
 		matrixStack.translate((double) wpX - camX, (double) wpY - camY, (double) wpZ - camZ);
 		matrixStack.translate(0.5D, 1.5D, 0.5D);
-		if (Params.renderLightBeam) {
+		if (ClientParams.renderLightBeam) {
 			renderLightBeam(matrixStack, immediate, waypoint, BEAM_TEX, tick, -wpY, 512 - wpY, colors, alpha, 0.15F, 0.2F);
 		}
 		
-		if (Params.renderAnimation) {
+		if (ClientParams.renderAnimation) {
 			double swing = 0.25 * Math.sin((tick * 2.25 - 45.0) / 15.0);		
 			matrixStack.translate(0.0D, swing, 0.0D);
 		}
 		
-		if (Params.renderMarkers) {
+		if (ClientParams.renderMarkers) {
 			matrixStack.multiply(camera.getRotation());
    	 		matrixStack.multiply(Vector3f.POSITIVE_Y.getDegreesQuaternion(180.0F));
    	 		renderIcon(matrixStack, immediate.getBuffer(RenderLayer.getEntityTranslucent(waypoint.getIcon().getTexture())), colors, alpha, waypoint.getIcon().getWidth());

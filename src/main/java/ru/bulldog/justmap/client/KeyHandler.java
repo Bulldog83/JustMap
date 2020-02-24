@@ -29,7 +29,7 @@ public enum KeyHandler {
 		INSTANCE.register(new KeyParser(createKeyBinding("create_waypoint", GLFW.GLFW_KEY_B)) {
 			@Override
 			public void onKeyUp() {
-				JustMap.MAP.createWaypoint();
+				JustMapClient.MAP.createWaypoint();
 			}
 
 			@Override
@@ -41,34 +41,34 @@ public enum KeyHandler {
 		INSTANCE.register(new KeyParser(createKeyBinding("toggle_map_visible", GLFW.GLFW_KEY_H)) {
 			@Override
 			public void onKeyUp() {
-				JustMap.CONFIG.setBoolean("map_visible", !JustMap.CONFIG.getBoolean("map_visible"));
-				JustMap.CONFIG.saveChanges();
+				JustMapClient.CONFIG.setBoolean("map_visible", !JustMapClient.CONFIG.getBoolean("map_visible"));
+				JustMapClient.CONFIG.saveChanges();
 			}
 		});
 		
 		INSTANCE.register(new KeyParser(createKeyBinding("toggle_show_caves", GLFW.GLFW_KEY_K)) {
 			@Override
 			public void onKeyUp() {
-				JustMap.CONFIG.setBoolean("show_caves", !JustMap.CONFIG.getBoolean("show_caves"));
-				JustMap.CONFIG.saveChanges();
+				JustMapClient.CONFIG.setBoolean("show_caves", !JustMapClient.CONFIG.getBoolean("show_caves"));
+				JustMapClient.CONFIG.saveChanges();
 			}
 	
 			@Override
 			public boolean isListening() {
-				return JustMap.MAP.isMapVisible();
+				return JustMapClient.MAP.isMapVisible();
 			}
 		});
 		
 		INSTANCE.register(new KeyParser(createKeyBinding("toggle_show_entities", GLFW.GLFW_KEY_Y)) {
 			@Override
 			public void onKeyUp() {
-				JustMap.CONFIG.setBoolean("show_entities", !JustMap.CONFIG.getBoolean("show_entities"));
-				JustMap.CONFIG.saveChanges();
+				JustMapClient.CONFIG.setBoolean("show_entities", !JustMapClient.CONFIG.getBoolean("show_entities"));
+				JustMapClient.CONFIG.saveChanges();
 			}
 	
 			@Override
 			public boolean isListening() {
-				return JustMap.MAP.isMapVisible();
+				return JustMapClient.MAP.isMapVisible();
 			}
 		});
 		
@@ -87,26 +87,26 @@ public enum KeyHandler {
 		INSTANCE.register(new KeyParser(createKeyBinding("reduce_scale", GLFW.GLFW_KEY_LEFT_BRACKET)) {
 			@Override
 			public void onKeyUp() {
-				JustMap.CONFIG.setRanged("map_scale", JustMap.CONFIG.getFloat("map_scale") - 0.25F);
-				JustMap.CONFIG.saveChanges();
+				JustMapClient.CONFIG.setRanged("map_scale", JustMapClient.CONFIG.getFloat("map_scale") - 0.25F);
+				JustMapClient.CONFIG.saveChanges();
 			}
 	
 			@Override
 			public boolean isListening() {
-				return JustMap.MAP.isMapVisible();
+				return JustMapClient.MAP.isMapVisible();
 			}
 		});
 		
 		INSTANCE.register(new KeyParser(createKeyBinding("increase_scale", GLFW.GLFW_KEY_RIGHT_BRACKET)) {
 			@Override
 			public void onKeyUp() {
-				JustMap.CONFIG.setRanged("map_scale", JustMap.CONFIG.getFloat("map_scale") + 0.25F);
-				JustMap.CONFIG.saveChanges();
+				JustMapClient.CONFIG.setRanged("map_scale", JustMapClient.CONFIG.getFloat("map_scale") + 0.25F);
+				JustMapClient.CONFIG.saveChanges();
 			}
 	
 			@Override
 			public boolean isListening() {
-				return JustMap.MAP.isMapVisible();
+				return JustMapClient.MAP.isMapVisible();
 			}
 		});
 	}

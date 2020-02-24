@@ -7,18 +7,6 @@
 		"GameRulesProcessor",
 		"GameRulesMixin"
     ],
-    "client": [
-	    "HudMixin",
-	    "GameRenderMixin",
-	    "WorldRendererMixin",
-	    "PlayerEntityMixin",
-		"BakedQuadMixin",
-		"BufferBuilderMixin",
-		"ClientPlayNetworkHandlerMixin",
-		"LivingEntityRendererMixin"
-    ],
-	"server": [
-	],
     "injectors": {
         "defaultRequire": 1
     }

@@ -5,7 +5,7 @@ import java.util.Map;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import ru.bulldog.justmap.JustMap;
-import ru.bulldog.justmap.config.Params;
+import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.util.ImageUtil;
 import ru.bulldog.justmap.util.DrawHelper;
 import net.minecraft.client.MinecraftClient;
@@ -41,7 +41,7 @@ public class EntityHeadIcon extends Sprite {
 	}
 	
 	public void draw(int x, int y, int w, int h) {		
-		if (Params.showIconsOutline) {
+		if (ClientParams.showIconsOutline) {
 			DrawHelper.fill(x - 1, y - 1, x + w + 1, y + h + 1, 0xFF444444);
 		}
 		textureManager.bindTexture(this.getId());

@@ -1,6 +1,6 @@
 package ru.bulldog.justmap.minimap.data;
 
-import ru.bulldog.justmap.config.Params;
+import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.util.ColorUtil;
 import ru.bulldog.justmap.util.Colors;
 import ru.bulldog.justmap.util.StateUtil;
@@ -83,7 +83,7 @@ public class MapProcessor {
 
 		int diff = east - south;
 		
-		int maxDiff = Params.terrainStrength;
+		int maxDiff = ClientParams.terrainStrength;
 		diff = diff < 0 ? Math.max(-maxDiff, diff) : Math.min(maxDiff, diff);
 		
 		return diff;

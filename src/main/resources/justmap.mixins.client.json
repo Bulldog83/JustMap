@@ -1,0 +1,18 @@
+{
+    "required": true,
+    "package": "ru.bulldog.justmap.mixins.client",
+    "compatibilityLevel": "JAVA_8",
+    "client": [
+	    "HudMixin",
+	    "GameRenderMixin",
+	    "WorldRendererMixin",
+	    "PlayerEntityMixin",
+		"BakedQuadMixin",
+		"BufferBuilderMixin",
+		"ClientPlayNetworkHandlerMixin",
+		"LivingEntityRendererMixin"
+    ],
+    "injectors": {
+        "defaultRequire": 1
+    }
+}

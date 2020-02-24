@@ -1,7 +1,7 @@
 package ru.bulldog.justmap.minimap.icon;
 
 import net.minecraft.entity.Entity;
-import ru.bulldog.justmap.config.Params;
+import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.minimap.EntityModelRenderer;
 import ru.bulldog.justmap.minimap.Minimap;
 import ru.bulldog.justmap.util.Colors;
@@ -24,15 +24,15 @@ public class EntityIcon extends MapIcon<EntityIcon> {
 		if (!Minimap.allowCreatureRadar() && !hostile) { return; }
 		if (!Minimap.allowHostileRadar() && hostile) { return; }
 		
-		int size = Params.showEntityHeads ? Params.entityIconSize : 4;
+		int size = ClientParams.showEntityHeads ? ClientParams.entityIconSize : 4;
 		int col = (hostile) ? Colors.ORANGE : Colors.YELLOW;
 		
 		int drawX = mapX + x - size / 2;
 		int drawY = mapY + y - size / 2;
 		
 		EntityHeadIcon icon = null;
-		if (Params.showEntityHeads) {
-			if (Params.renderEntityModel) {
+		if (ClientParams.showEntityHeads) {
+			if (ClientParams.renderEntityModel) {
 				EntityModelRenderer.renderModel(entity, drawX, drawY);
 			} else {
 				icon = EntityHeadIcon.getIcon(entity);
