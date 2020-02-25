@@ -7,40 +7,40 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.util.ImageUtil;
+import ru.bulldog.justmap.util.SpriteAtlas;
 import ru.bulldog.justmap.util.DrawHelper;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.resource.metadata.AnimationResourceMetadata;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.texture.NativeImageBackedTexture;
 import net.minecraft.client.texture.Sprite;
-import net.minecraft.client.texture.SpriteAtlasTexture;
-import net.minecraft.client.texture.TextureManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.util.Identifier;
 
-public class EntityHeadIcon extends Sprite {
+public class EntityHeadIcon extends AbstractIcon {
 	
-	private final static SpriteAtlasTexture ATLAS = new SpriteAtlasTexture(new Identifier(JustMap.MODID, "textures/atlas/entity_head_icons.png"));
 	private final static Map<Identifier, EntityHeadIcon> ICONS = new HashMap<>();
 	
-	private static TextureManager textureManager = MinecraftClient.getInstance().getTextureManager();
-	
 	private EntityHeadIcon(Identifier texture, int w, int h) {
-		super(ATLAS, new Sprite.Info(texture, w, h, AnimationResourceMetadata.EMPTY), 0, w, h, 0, 0, ImageUtil.loadImage(texture, w, h));
+		super(SpriteAtlas.ENTITY_HEAD_ICONS, new Sprite.Info(texture, w, h, AnimationResourceMetadata.EMPTY), 0, w, h, 0, 0, ImageUtil.loadImage(texture, w, h));
 	}
 	
 	private EntityHeadIcon(Identifier id, NativeImage image, int w, int h, int x, int y) {
-		super(ATLAS, new Sprite.Info(id, w, h, AnimationResourceMetadata.EMPTY), 0, w, h, x, y, image);
+		super(SpriteAtlas.ENTITY_HEAD_ICONS, new Sprite.Info(id, w, h, AnimationResourceMetadata.EMPTY), 0, w, h, x, y, image);
 		textureManager.registerTexture(id, new NativeImageBackedTexture(image));
 	}
 	
 	public static EntityHeadIcon getIcon(Entity entity) {
+		if (ICONS.isEmpty()) {
+			initDefaultIcons();
+		}
+		
 		Identifier id = EntityType.getId(entity.getType());
 		return ICONS.get(id);
 	}
 	
-	public void draw(int x, int y, int w, int h) {		
+	@Override
+	public void draw(int x, int y, int w, int h) {
 		if (ClientParams.showIconsOutline) {
 			DrawHelper.fill(x - 1, y - 1, x + w + 1, y + h + 1, 0xFF444444);
 		}
@@ -48,10 +48,6 @@ public class EntityHeadIcon extends Sprite {
 		RenderSystem.enableAlphaTest();
 		RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
 		DrawHelper.blit(x, y, 0, w, h, this);
-	}
-	
-	public void draw(int x, int y, int size) {
-		this.draw(x, y, size, size);
 	}
 	
 	private static void registerIcon(Identifier id) {
@@ -67,7 +63,7 @@ public class EntityHeadIcon extends Sprite {
 		ICONS.put(entityId, new EntityHeadIcon(entityId, image, w, h, x, y));
 	}
 	
-	static {
+	private static void initDefaultIcons() {
 		registerIcon(EntityType.getId(EntityType.BAT));
 		registerIcon(EntityType.getId(EntityType.BEE));
 		registerIcon(EntityType.getId(EntityType.BLAZE));
@@ -132,6 +128,6 @@ public class EntityHeadIcon extends Sprite {
 		registerIcon(EntityType.getId(EntityType.ZOMBIE));
 		registerIcon(EntityType.getId(EntityType.ZOMBIE_HORSE));
 		registerIcon(EntityType.getId(EntityType.ZOMBIE_PIGMAN));
-		registerIcon(EntityType.getId(EntityType.ZOMBIE_VILLAGER));
+		registerIcon(EntityType.getId(EntityType.ZOMBIE_VILLAGER));		
 	}
 }

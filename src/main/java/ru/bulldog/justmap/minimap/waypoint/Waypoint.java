@@ -7,17 +7,16 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.mojang.blaze3d.systems.RenderSystem;
 import ru.bulldog.justmap.JustMap;
+import ru.bulldog.justmap.minimap.icon.AbstractIcon;
 import ru.bulldog.justmap.util.ColorUtil;
 import ru.bulldog.justmap.util.Colors;
 import ru.bulldog.justmap.util.ImageUtil;
+import ru.bulldog.justmap.util.SpriteAtlas;
 import ru.bulldog.justmap.util.DrawHelper;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.resource.metadata.AnimationResourceMetadata;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.texture.NativeImageBackedTexture;
 import net.minecraft.client.texture.Sprite;
-import net.minecraft.client.texture.SpriteAtlasTexture;
-import net.minecraft.client.texture.TextureManager;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.JsonHelper;
 import net.minecraft.util.math.BlockPos;
@@ -159,27 +158,23 @@ public class Waypoint {
 		return waypoint;
 	}
 	
-	public static class Icon extends Sprite {
+	public static class Icon extends AbstractIcon {
 		
 		public final static Identifier DEFAULT_ICON = new Identifier(JustMap.MODID, "textures/icon/default.png");
 		
 		public final int key;
 		public final int color;
 		
-		private final TextureManager textureManager = MinecraftClient.getInstance().getTextureManager();
-		
-		private final static SpriteAtlasTexture ATLAS = new SpriteAtlasTexture(new Identifier(JustMap.MODID, "textures/atlas/waypoint_icons.png"));
-		
 		private final static Map<Integer, Icon> coloredIcons = new HashMap<>();
 		
 		private Icon(int key, Identifier icon, int color, int w, int h) {
-			super(ATLAS, new Sprite.Info(icon, w, h, AnimationResourceMetadata.EMPTY), 0, w, h, 0, 0, ImageUtil.loadImage(icon, w, h));
+			super(SpriteAtlas.WAYPOINT_ICONS, new Sprite.Info(icon, w, h, AnimationResourceMetadata.EMPTY), 0, w, h, 0, 0, ImageUtil.loadImage(icon, w, h));
 			this.key = key;
 			this.color = color;
 		}
 		
 		private Icon(int key, Identifier icon, NativeImage texture, int color, int w, int h) {
-			super(ATLAS, new Sprite.Info(icon, w, h, AnimationResourceMetadata.EMPTY), 0, w, h, 0, 0, texture);
+			super(SpriteAtlas.WAYPOINT_ICONS, new Sprite.Info(icon, w, h, AnimationResourceMetadata.EMPTY), 0, w, h, 0, 0, texture);
 			this.key = key;
 			this.color = color;
 		}
