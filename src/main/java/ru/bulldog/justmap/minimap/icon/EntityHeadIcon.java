@@ -10,8 +10,6 @@ import ru.bulldog.justmap.util.ImageUtil;
 import ru.bulldog.justmap.util.SpriteAtlas;
 import ru.bulldog.justmap.util.DrawHelper;
 import net.minecraft.client.resource.metadata.AnimationResourceMetadata;
-import net.minecraft.client.texture.NativeImage;
-import net.minecraft.client.texture.NativeImageBackedTexture;
 import net.minecraft.client.texture.Sprite;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
@@ -23,11 +21,6 @@ public class EntityHeadIcon extends AbstractIcon {
 	
 	private EntityHeadIcon(Identifier texture, int w, int h) {
 		super(SpriteAtlas.ENTITY_HEAD_ICONS, new Sprite.Info(texture, w, h, AnimationResourceMetadata.EMPTY), 0, w, h, 0, 0, ImageUtil.loadImage(texture, w, h));
-	}
-	
-	private EntityHeadIcon(Identifier id, NativeImage image, int w, int h, int x, int y) {
-		super(SpriteAtlas.ENTITY_HEAD_ICONS, new Sprite.Info(id, w, h, AnimationResourceMetadata.EMPTY), 0, w, h, x, y, image);
-		textureManager.registerTexture(id, new NativeImageBackedTexture(image));
 	}
 	
 	public static EntityHeadIcon getIcon(Entity entity) {
@@ -55,12 +48,8 @@ public class EntityHeadIcon extends AbstractIcon {
 		registerIcon(id, new Identifier(JustMap.MODID, path), 32, 32);
 	}
 	
-	public static void registerIcon(Identifier entityId, Identifier image, int imageWidth, int imageHeight) {
+	private static void registerIcon(Identifier entityId, Identifier image, int imageWidth, int imageHeight) {
 		ICONS.put(entityId, new EntityHeadIcon(image, imageWidth, imageHeight));
-	}
-	
-	public static void registerIcon(Identifier entityId, NativeImage image, int w, int h, int x, int y) {
-		ICONS.put(entityId, new EntityHeadIcon(entityId, image, w, h, x, y));
 	}
 	
 	private static void initDefaultIcons() {
