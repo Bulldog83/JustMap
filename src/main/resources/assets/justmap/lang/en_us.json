@@ -37,6 +37,7 @@
   "justmap.configuration.alternate_color_render": "Alternate map colors rendering",
   "justmap.configuration.use_skins": "Use map skins",
   "justmap.configuration.current_skin": "Current Skin",
+  "justmap.configuration.simple_arrow": "Simple Direction Arrow",
   "justmap.configuration.waypoints_tracking": "Waypoints tracking",
   "justmap.configuration.waypoints_render": "Render waypoints in the world",
   "justmap.configuration.render_light_beam": "Render light beam",

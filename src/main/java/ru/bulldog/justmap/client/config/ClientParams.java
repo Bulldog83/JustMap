@@ -18,6 +18,7 @@ public class ClientParams {
 	public static boolean alternateColorRender = true;
 	public static int mapSaturation = 0;
 	public static int mapBrightness = 0;
+	public static boolean simpleArrow = false;
 	
 	public static boolean showPosition = true;
 	public static boolean showFPS = false;

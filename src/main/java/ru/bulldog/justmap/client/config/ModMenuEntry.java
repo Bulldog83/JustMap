@@ -110,6 +110,10 @@ public class ModMenuEntry implements ModMenuApi {
 					.setDefaultValue(MapSkin.getSkin((int) JustMapClient.CONFIG.getDefault("current_skin")))
 					.setSelections(MapSkin.getSkins())
 					.build());
+			mapAppearance.addEntry(entryBuilder.startBooleanToggle(lang("simple_arrow"), JustMapClient.CONFIG.getBoolean("simple_direction_arrow"))
+					.setSaveConsumer(val -> JustMapClient.CONFIG.setBoolean("simple_direction_arrow", val))
+					.setDefaultValue((boolean) JustMapClient.CONFIG.getDefault("simple_direction_arrow"))
+					.build());
 			
 			ConfigCategory waypoints = builder.getOrCreateCategory(lang("category.waypoints"));
 			waypoints.addEntry(entryBuilder.startBooleanToggle(lang("waypoints_tracking"), JustMapClient.CONFIG.getBoolean("waypoints_tracking"))

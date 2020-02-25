@@ -37,6 +37,7 @@
   "justmap.configuration.alternate_color_render": "Альренативный цветовой рендер карты",
   "justmap.configuration.use_skins": "Использовать скины",
   "justmap.configuration.current_skin": "Текущий скин",
+  "justmap.configuration.simple_arrow": "Прострая стрелка направления",
   "justmap.configuration.waypoints_tracking": "Отслеживать маркеры",
   "justmap.configuration.waypoints_render": "Отображать маркеры в мире",
   "justmap.configuration.render_light_beam": "Отображать луч света",
