@@ -87,12 +87,10 @@ public class MapCache {
 		this.world = world;
 	}
 	
-	public void update(Minimap map, int x, int z) {
+	public void update(Minimap map, int size, int x, int z) {
 		updatePerCycle = ClientParams.updatePerCycle;
 		purgeDelay = ClientParams.purgeDelay * 1000;
 		purgeAmount = ClientParams.purgeAmount;
-		
-		int size = (int) (map.getSize() * map.getScale());
 		
 		int chunks = size / 16 + 4;
 		int startX = x / 16 - 2;

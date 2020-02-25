@@ -22,7 +22,7 @@ public abstract class MapIcon<T extends MapIcon<T>> {
 		return (T) this;
 	}
 	
-	public static int getScaled(int val, int startVal, int endVal, int range) {
+	public static int scaledPos(int val, int startVal, int endVal, int range) {
 		return (int) (((val - startVal) / ((float) (endVal - startVal))) * range);
 	}
 	

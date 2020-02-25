@@ -189,9 +189,9 @@ public class Minimap {
 		} else {
 			MapCache.setCurrentLayer(MapProcessor.Layer.SURFACE);
 		}
-		MapCache.get(world).update(this, startX, startZ);
+		MapCache.get(world).update(this, scaled, startX, startZ);
 		
-		if (allowPlayerRadar() && ClientParams.showPlayers) {
+		if (allowPlayerRadar()) {
 			players.clear();			
 			List<? extends PlayerEntity> players = world.getPlayers();
 			for (PlayerEntity p : players) {
@@ -206,7 +206,7 @@ public class Minimap {
 				
 				if (x >= startX && x <= endX && z >= startZ && z <= endZ) {
 					PlayerIcon playerIcon = new PlayerIcon(this, p, false);
-					playerIcon.setPosition(MapIcon.getScaled(x, startX, endX, mapSize), MapIcon.getScaled(z, startZ, endZ, mapSize));
+					playerIcon.setPosition(MapIcon.scaledPos(x, startX, endX, mapSize), MapIcon.scaledPos(z, startZ, endZ, mapSize));
 					this.players.add(playerIcon);
 				}
 			}
@@ -229,11 +229,11 @@ public class Minimap {
 					boolean hostile = livingEntity instanceof HostileEntity;
 					if (allowHostileRadar() && hostile) {
 						EntityIcon entIcon = new EntityIcon(this, entity, hostile);						
-						entIcon.setPosition(MapIcon.getScaled((int) entity.getX(), startX, endX, mapSize), MapIcon.getScaled((int) entity.getZ(), startZ, endZ, mapSize));						
+						entIcon.setPosition(MapIcon.scaledPos((int) entity.getX(), startX, endX, mapSize), MapIcon.scaledPos((int) entity.getZ(), startZ, endZ, mapSize));						
 						this.entities.add(entIcon);
 					} else if (allowCreatureRadar()) {
 						EntityIcon entIcon = new EntityIcon(this, entity, hostile);						
-						entIcon.setPosition(MapIcon.getScaled((int) entity.getX(), startX, endX, mapSize), MapIcon.getScaled((int) entity.getZ(), startZ, endZ, mapSize));						
+						entIcon.setPosition(MapIcon.scaledPos((int) entity.getX(), startX, endX, mapSize), MapIcon.scaledPos((int) entity.getZ(), startZ, endZ, mapSize));						
 						this.entities.add(entIcon);
 					}
 				}
@@ -249,8 +249,8 @@ public class Minimap {
 			wps.stream().filter(wp -> MathUtil.getDistance(pos, wp.pos, true) <= wp.showRange).forEach(wp -> {
 				WaypointIcon waypoint = new WaypointIcon(this, wp);
 				waypoint.setPosition(
-					MathUtil.clamp(MapIcon.getScaled(wp.pos.getX(), startX, endX, mapSize), 0, mapSize),
-					MathUtil.clamp(MapIcon.getScaled(wp.pos.getZ(), startZ, endZ, mapSize), 0, mapSize)
+					MathUtil.clamp(MapIcon.scaledPos(wp.pos.getX(), startX, endX, mapSize), 0, mapSize),
+					MathUtil.clamp(MapIcon.scaledPos(wp.pos.getZ(), startZ, endZ, mapSize), 0, mapSize)
 				);
 				waypoints.add(waypoint);
 			});
