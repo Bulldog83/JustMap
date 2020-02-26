@@ -1,12 +1,10 @@
 package ru.bulldog.justmap.minimap.data;
 
-import ru.bulldog.justmap.util.Colors;
+import ru.bulldog.justmap.util.ColorUtil;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.world.Heightmap;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.chunk.WorldChunk;
-import net.minecraft.world.dimension.DimensionType;
-
 import java.util.Arrays;
 
 public class MapChunk {
@@ -14,12 +12,14 @@ public class MapChunk {
 	private MapProcessor.Layer layer;
 	private WorldChunk worldChunk;
 	
-	private NativeImage image = new NativeImage(16, 16, false);
+	private NativeImage image = new NativeImage(16, 16, false);	
+	
+	private BlockMeta[] blocks = new BlockMeta[256];
+	public int[] heightmap = new int[256];
 	
 	private boolean updating;
 	private boolean empty;
 	
-	public int[] heightmap;
 	public long updated;
 	public int dimension;
 	
@@ -29,9 +29,9 @@ public class MapChunk {
 		this.chunkPos = chunk.getPos();
 		this.layer = layer;
 		this.worldChunk = chunk;
-		this.heightmap = new int[16 * 16];
 		
-		Arrays.fill(heightmap, -1);
+		Arrays.fill(this.heightmap, -1);
+		Arrays.fill(this.blocks, BlockMeta.EMPTY_BLOCK);
 	}
 	
 	void setChunk(WorldChunk chunk) {
@@ -85,19 +85,28 @@ public class MapChunk {
 		this.updating = true;		
 		for (int x = 0; x < 16; x++) {
 			for (int z = 0; z < 16; z++) {
-				int color = Colors.BLACK;
-				switch (layer) {
-					case SURFACE:
-						heightmap[x + z * 16] = worldChunk.sampleHeightmap(Heightmap.Type.WORLD_SURFACE, x, z);
-						color = MapProcessor.surfaceColor(this, x, z);
-					break;
-					case CAVES:
-						int ceiling = worldChunk.getWorld().getDimension().getType() == DimensionType.THE_NETHER ? 3 : 2;
-						color = MapProcessor.cavesColor(this, x, z, ceiling);
-					break;
-				}
+				int index = x + z * 16;
+				heightmap[index] = worldChunk.sampleHeightmap(Heightmap.Type.WORLD_SURFACE, x, z);
 				
-				image.setPixelRgba(x, z, color);
+				BlockMeta block = MapProcessor.getTopBlock(this, layer, x, z);
+				if(blocks[index].isEmpty() || !blocks[index].equals(block)) {					
+					int heightDiff = MapProcessor.heightDifference(worldChunk, x, z, block.pos.getY() + 1, false);
+					block.setHeightPos(heightDiff);
+					block.setColor(ColorUtil.blockColor(worldChunk, block));
+					
+					blocks[index] = block;
+					
+					int color = ColorUtil.proccessColor(block.getColor(), heightDiff);
+					image.setPixelRgba(x, z, color);
+				} else {				
+					int heightDiff = MapProcessor.heightDifference(worldChunk, x, z, blocks[index].pos.getY() + 1, false);
+					if (blocks[index].getHeightPos() != heightDiff) {
+						blocks[index].setHeightPos(heightDiff);
+						
+						int color = ColorUtil.proccessColor(blocks[index].getColor(), heightDiff);
+						image.setPixelRgba(x, z, color);
+					}
+				}
 			}
 		}
 		

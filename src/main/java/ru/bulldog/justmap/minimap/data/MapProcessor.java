@@ -19,8 +19,22 @@ public class MapProcessor {
 		CAVES
 	}
 	
-	public static int getTopBlockY(MapChunk mapChunk, int x, int z, int yStart, int yStop, boolean skipLiquid, boolean isCaves) {
-		WorldChunk worldChunk = mapChunk.getWorldChunk();
+	public static BlockMeta getTopBlock(MapChunk mapChunk, Layer layer, int x, int z) {
+		WorldChunk chunk = mapChunk.getWorldChunk();
+		
+		int posX = x + chunk.getPos().x * 16;
+		int posZ = z + chunk.getPos().z * 16;
+		
+		int posY = mapChunk.heightmap[x + z * 16];
+		
+		if (posY < 0) {
+			posY = getTopBlockY(chunk, x, z, chunk.getWorld().getEffectiveHeight(), false, false);
+		}
+		
+		return new BlockMeta(new BlockPos(posX, posY, posZ));
+	}
+	
+	public static int getTopBlockY(WorldChunk worldChunk, int x, int z, int yStart, int yStop, boolean skipLiquid, boolean isCaves) {
 		World world = worldChunk.getWorld();
 		ChunkPos chunkPos = worldChunk.getPos();		
 		BlockPos worldPos = new BlockPos(x + chunkPos.x * 16, 0, z + chunkPos.z * 16);
@@ -37,24 +51,28 @@ public class MapProcessor {
 		
 		chunkPos = rightChunk.getPos();
 		
-		MapChunk newChunk = MapCache.get(world).getChunk(chunkPos.x, chunkPos.z, true);
-		int y = !isCaves ? newChunk.heightmap[x + z * 16] : -1;
+		int y;
+		if (isCaves) {
+			y = -1;
+		} else {
+			MapChunk newChunk = MapCache.get(world).getChunk(chunkPos.x, chunkPos.z, true);
+			y = newChunk.heightmap[x + z * 16];
+		}
 		
 		if (worldChunk.isEmpty() || !world.getChunkManager().isChunkLoaded(chunkPos.x, chunkPos.z)) {
 			return y == -1 ? yStart : y;
 		}
 
-		worldPos = new BlockPos(worldPos.getX(), y - 1, worldPos.getZ());
-
-		BlockState state;
-		
 		if (y < 0) {
 			y = yStart;
 		}
 		
+		worldPos = new BlockPos(worldPos.getX(), y, worldPos.getZ());
+		
 		boolean loop = false;
+		
+		BlockState state;
 		do {
-			worldPos = new BlockPos(worldPos.getX(), y - 1, worldPos.getZ());
 			state = world.getBlockState(worldPos);
 			loop = skipLiquid ? state.getMaterial().isLiquid() || state.isAir() : state.isAir();
 			if (!loop) {
@@ -62,21 +80,21 @@ public class MapProcessor {
 					loop = true;
 				}
 			}
-			y--;
-			loop &= y > yStop;
+			worldPos = worldPos.down();
+			loop &= worldPos.getY() > yStop;
 		} while (loop);
 		
 		return y;
 	}
 	
-	public static int getTopBlockY(MapChunk mapChunk, int x, int z, int yStart, boolean skipLiquid, boolean isCaves) {
-		return getTopBlockY(mapChunk, x, z, yStart, 0, skipLiquid, isCaves);
+	public static int getTopBlockY(WorldChunk worldChunk, int x, int z, int yStart, boolean skipLiquid, boolean isCaves) {
+		return getTopBlockY(worldChunk, x, z, yStart, 0, skipLiquid, isCaves);
 	}
 	
-	private static int heightDifference(MapChunk mapChunk, int x, int z, int y, boolean isCaves) {
-		int current = getTopBlockY(mapChunk, x, z, y, true, isCaves);
-		int east = getTopBlockY(mapChunk, x + 1, z, current, true, isCaves);
-		int south = getTopBlockY(mapChunk, x, z - 1, current, true, isCaves);
+	public static int heightDifference(WorldChunk worldChunk, int x, int z, int y, boolean isCaves) {
+		int current = getTopBlockY(worldChunk, x, z, y, true, isCaves);
+		int east = getTopBlockY(worldChunk, x + 1, z, current, true, isCaves);
+		int south = getTopBlockY(worldChunk, x, z - 1, current, true, isCaves);
 
 		east -= current;
 		south -= current;
@@ -96,14 +114,14 @@ public class MapProcessor {
 		int y = mapChunk.heightmap[x + z * 16];
 		
 		if (y < 0) {
-			y = getTopBlockY(mapChunk, x, z, world.getEffectiveHeight(), false, false);
+			y = getTopBlockY(worldChunk, x, z, world.getEffectiveHeight(), false, false);
 		}
 
 		BlockPos worldPos = new BlockPos(x + worldChunk.getPos().x * 16, y, z + worldChunk.getPos().z * 16);	
 		BlockState state = world.getBlockState(worldPos);
 	
 		if (!StateUtil.isAir(state)) {
-			return ColorUtil.blockColor(world, state, worldPos, heightDifference(mapChunk, x, z, y + 1, false));
+			return ColorUtil.blockColor(world, state, worldPos);
 		}
 	
 		return Colors.GRAY;
@@ -115,7 +133,7 @@ public class MapProcessor {
 		
 		int pY = (int) MinecraftClient.getInstance().player.getY();
 		int yMax = pY + ceiling;
-		int y = getTopBlockY(mapChunk, x, z, yMax, false, true);
+		int y = getTopBlockY(worldChunk, x, z, yMax, false, true);
 		
 		BlockPos worldPos = new BlockPos(x + worldChunk.getPos().x * 16, y, z + worldChunk.getPos().z * 16);
 		BlockPos overPos = new BlockPos(worldPos.getX(), worldPos.getY() + 1, worldPos.getZ());
@@ -123,29 +141,9 @@ public class MapProcessor {
 		BlockState stateOver = world.getBlockState(overPos);
 	
 		if (!StateUtil.isAir(state) && stateOver.isAir()) {
-			return ColorUtil.blockColor(world, state, worldPos, heightDifference(mapChunk, x, z, yMax, true));
+			return ColorUtil.blockColor(world, state, worldPos);
 		}
 		
 		return Colors.BLACK;
-	}
-	
-	public static int getHeight(World world, BlockPos pos, boolean ignoreLiquid) {
-		return getHeight(world, pos, ignoreLiquid, world.getHeight());
-	}
-	
-	public static int getHeight(World world, BlockPos pos, boolean ignoreLiquid, int startHeight) {
-		BlockPos.Mutable checkPos = new BlockPos.Mutable(pos.getX(), startHeight, pos.getZ());
-		
-		while (checkPos.getY() > 0) {
-			BlockState state = world.getBlockState(checkPos);
-			if (StateUtil.isAir(state) || (ignoreLiquid && state.getMaterial().isLiquid())) {
-				checkPos.setY(checkPos.getY() - 1);
-				continue;
-			}
-			
-			return checkPos.getY();
-		}
-		
-		return 0;
 	}
 }
