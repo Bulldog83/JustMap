@@ -29,6 +29,7 @@ import net.minecraft.world.GameRules;
 import net.minecraft.world.LightType;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
+import net.minecraft.world.dimension.DimensionType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -146,14 +147,21 @@ public class Minimap {
 	}
 	
 	private boolean needRenderCaves(World world, BlockPos playerPos) {
-		if (world.getDimension().isNether()) {
-			return true;
-		}
-		
 		boolean allowCaves = isAllowed(ClientParams.showCaves, MapGameRules.ALLOW_CAVES_MAP);
 		
-		return allowCaves && !world.isSkyVisibleAllowingSea(playerPos) &&
-			   world.getLightLevel(LightType.SKY, playerPos) == 0;
+		DimensionType dimType = world.getDimension().getType();
+		if (dimType.hasSkyLight()) {
+			return allowCaves && !world.isSkyVisibleAllowingSea(playerPos) &&
+				   world.getLightLevel(LightType.SKY, playerPos) == 0;
+		}
+		if (dimType == DimensionType.THE_NETHER) {
+			return true;
+		}
+		if (dimType == DimensionType.THE_END) {
+			return false;
+		}
+		
+		return allowCaves;
 	}
 	
 	public static boolean allowEntityRadar() {

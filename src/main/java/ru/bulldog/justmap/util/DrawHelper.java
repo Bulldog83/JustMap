@@ -1,6 +1,5 @@
 package ru.bulldog.justmap.util;
 
-import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.font.TextRenderer;
@@ -62,9 +61,7 @@ public class DrawHelper extends DrawableHelper {
 	
 		Tessellator tessellator = Tessellator.getInstance();
 		BufferBuilder builder = tessellator.getBuffer();
-		RenderSystem.enableBlend();
 		RenderSystem.disableTexture();
-		RenderSystem.blendFuncSeparate(GlStateManager.SrcFactor.SRC_ALPHA.value, GlStateManager.DstFactor.ONE_MINUS_SRC_ALPHA.value, GlStateManager.SrcFactor.ONE.value, GlStateManager.DstFactor.ZERO.value);
 		RenderSystem.color4f(r, g, b, a);
 		builder.begin(GL11.GL_TRIANGLES, VertexFormats.POSITION);
 		builder.vertex(x1, y1, 0).next();
@@ -72,7 +69,6 @@ public class DrawHelper extends DrawableHelper {
 		builder.vertex(x3, y3, 0).next();
 		tessellator.draw();
 		RenderSystem.enableTexture();
-		RenderSystem.disableBlend();
 	}
 	
 	public static void drawLine(int x1, int y1, int x2, int y2, int color) {
@@ -83,15 +79,12 @@ public class DrawHelper extends DrawableHelper {
 	
 		Tessellator tessellator = Tessellator.getInstance();
 		BufferBuilder builder = tessellator.getBuffer();
-		RenderSystem.enableBlend();
 		RenderSystem.disableTexture();
-		RenderSystem.blendFuncSeparate(GlStateManager.SrcFactor.SRC_ALPHA.value, GlStateManager.DstFactor.ONE_MINUS_SRC_ALPHA.value, GlStateManager.SrcFactor.ONE.value, GlStateManager.DstFactor.ZERO.value);
 		RenderSystem.color4f(r, g, b, a);
 		builder.begin(GL11.GL_LINES, VertexFormats.POSITION);
 		builder.vertex(x1, y1, 0).next();
 		builder.vertex(x2, y2, 0).next();
 		tessellator.draw();
 		RenderSystem.enableTexture();
-		RenderSystem.disableBlend();
 	}	
 }

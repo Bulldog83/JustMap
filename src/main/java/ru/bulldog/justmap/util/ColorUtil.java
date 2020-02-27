@@ -249,7 +249,8 @@ public class ColorUtil {
 	}
 	
 	public static int blockColor(WorldChunk worldChunk, BlockMeta block) {
-		if (!StateUtil.isAir(block.state)) {
+		BlockPos overPos = new BlockPos(block.pos.getX(), block.pos.getY() + 1, block.pos.getZ());
+		if (!StateUtil.isAir(block.state) && worldChunk.getWorld().getBlockState(overPos).isAir()) {
 			return blockColor(worldChunk.getWorld(), block.state, block.pos);
 		}
 	
