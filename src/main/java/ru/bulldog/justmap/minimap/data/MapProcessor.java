@@ -71,8 +71,9 @@ public class MapProcessor {
 		y = y < 0 ? yStart : y;
 		
 		if (layer == Layer.CAVES) {
-			int level = y / 4;
-			for (int i = 3 + level * 4; i >= level * 4; i--) {
+			int lvlSize = ClientParams.levelSize;
+			int level = y / lvlSize;
+			for (int i = (lvlSize - 1) + level * lvlSize; i >= level * lvlSize; i--) {
 				worldPos = loopPos(world, new BlockPos(posX, i, posZ), yStop, skipLiquid);
 				BlockPos overPos = new BlockPos(posX, worldPos.getY() + 1, posZ);
 				if (world.getBlockState(overPos).isAir()) {

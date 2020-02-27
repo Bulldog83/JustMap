@@ -36,6 +36,11 @@ public class MapChunk {
 	
 	public int[] heightmap = new int[256];
 	
+	public MapChunk(WorldChunk chunk, Layer layer, int level) {
+		this(chunk, layer);
+		this.setLevel(level);
+	}
+	
 	public MapChunk(WorldChunk chunk, Layer layer) {
 		this.chunkPos = chunk.getPos();
 		this.layer = layer;

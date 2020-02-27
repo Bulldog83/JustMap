@@ -20,12 +20,18 @@ public class MapCache {
 	private static MapProcessor.Layer currentLayer = MapProcessor.Layer.SURFACE;
 	private static Map<Integer, Map<MapProcessor.Layer, MapCache>> dimensions = new HashMap<>();
 	
+	private static int currentLevel = 0;
+	
 	public static void setCurrentLayer(MapProcessor.Layer layer) {
 		currentLayer = layer;
 	}
 	
 	public static MapProcessor.Layer getCurrentLayer() {
 		return currentLayer;
+	}
+	
+	public static void setLevel(int level) {
+		currentLevel = level;
 	}
 	
 	public static MapCache get(World world) {
@@ -171,6 +177,9 @@ public class MapCache {
 		ChunkPos chunkPos = new ChunkPos(posX, posZ);
 		if (mapChunks.containsKey(chunkPos)) {
 			MapChunk mapChunk = mapChunks.get(chunkPos);
+			
+			mapChunk.setLevel(currentLevel);
+			
 			if (!mapChunk.getWorldChunk().getPos().equals(chunkPos)) {
 				mapChunk.updateChunk();
 				if (!empty) {
@@ -182,7 +191,7 @@ public class MapCache {
 		}
 		
 		int dimId = this.world.dimension.getType().getRawId();
-		MapChunk mapChunk = new MapChunk(world.getChunk(posX, posZ), currentLayer);
+		MapChunk mapChunk = new MapChunk(world.getChunk(posX, posZ), currentLayer, currentLevel);
 		mapChunk.dimension = dimId;
 		mapChunk.setEmpty(empty);
 		
