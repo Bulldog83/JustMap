@@ -202,11 +202,6 @@ public class MapRenderer {
 		if (ClientParams.drawChunkGrid) {
 			drawChunkGrid();
 		}
-		
-		int arrowX = mapX + mapW / 2;
-		int arrowY = mapY + mapH / 2;
-		
-		PlayerArrow.draw(arrowX, arrowY, client.player.headYaw);
 		if (Minimap.allowEntityRadar()) {
 			if (Minimap.allowPlayerRadar()) {
 				for (PlayerIcon player : minimap.getPlayerIcons()) {
@@ -224,6 +219,11 @@ public class MapRenderer {
 				waypoint.draw(mapX, mapY);
 			}
 		}
+		
+		int arrowX = mapX + mapW / 2;
+		int arrowY = mapY + mapH / 2;
+		
+		PlayerArrow.draw(arrowX, arrowY, client.player.headYaw);
 		
 		textManager.draw();
 		
