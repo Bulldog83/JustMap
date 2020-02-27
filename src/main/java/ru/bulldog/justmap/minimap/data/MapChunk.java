@@ -105,14 +105,14 @@ public class MapChunk {
 		return layer;
 	}
 	
-	public void setLayer(Layer layer) {
+	private void setLayer(Layer layer) {
 		this.layer = layer;		
 		if (!levels.containsKey(layer)) {
 			initLayer();			
 		}
 	}
 	
-	public void setLevel(int level) {
+	private void setLevel(int level) {
 		this.level = level;
 		if (level > 0 && level >= levels.get(layer).size()) {
 			this.currentLevel = new ChunkLevel();
@@ -120,6 +120,11 @@ public class MapChunk {
 		} else {
 			this.currentLevel = levels.get(layer).get(level);
 		}
+	}
+	
+	public void setLevel(Layer layer, int level) {
+		this.setLayer(layer);
+		this.setLevel(level);		
 	}
 	
 	public WorldChunk getWorldChunk() {

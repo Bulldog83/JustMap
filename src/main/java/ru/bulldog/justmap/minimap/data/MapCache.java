@@ -178,7 +178,7 @@ public class MapCache {
 		if (mapChunks.containsKey(chunkPos)) {
 			MapChunk mapChunk = mapChunks.get(chunkPos);
 			
-			mapChunk.setLevel(currentLevel);
+			mapChunk.setLevel(currentLayer, currentLevel);
 			
 			if (!mapChunk.getWorldChunk().getPos().equals(chunkPos)) {
 				mapChunk.updateChunk();

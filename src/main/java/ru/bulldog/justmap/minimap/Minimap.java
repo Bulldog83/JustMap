@@ -197,6 +197,7 @@ public class Minimap {
 			MapCache.setLevel(pos.getY() / ClientParams.levelSize);
 		} else {
 			MapCache.setCurrentLayer(MapProcessor.Layer.SURFACE);
+			MapCache.setLevel(0);
 		}
 		MapCache.get(world).update(this, scaled, startX, startZ);
 		
