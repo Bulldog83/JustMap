@@ -20,6 +20,7 @@ import net.minecraft.block.StemBlock;
 import net.minecraft.block.TallPlantBlock;
 import net.minecraft.block.VineBlock;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.color.block.BlockColors;
 import net.minecraft.client.color.world.BiomeColors;
 import net.minecraft.client.render.block.BlockModels;
 import net.minecraft.client.render.model.BakedQuad;
@@ -30,10 +31,8 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
-import net.minecraft.world.chunk.WorldChunk;
 import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.client.config.ClientParams;
-import ru.bulldog.justmap.minimap.data.BlockMeta;
 
 public class ColorUtil {
 	
@@ -220,7 +219,7 @@ public class ColorUtil {
 		return -1;
 	}
 	
-	public static int proccessColor(int color, int heightDiff) {
+	private static int proccessColor(int color, int heightDiff) {
 		float[] hsb = RGBtoHSB((color >> 16) & 255, (color >> 8) & 255, color & 255, null);
 		hsb[1] += ClientParams.mapSaturation / 100.0F;
 		hsb[1] = MathUtil.clamp(hsb[1], 0.0F, 1.0F);
@@ -248,21 +247,15 @@ public class ColorUtil {
 		return fcolor != -1 ? fcolor : defColor;
 	}
 	
-	public static int blockColor(WorldChunk worldChunk, BlockMeta block) {
-		if (!StateUtil.isAir(block.state)) {
-			return blockColor(worldChunk.getWorld(), block.state, block.pos);
-		}
-	
-		return Colors.BLACK;
-	}
-	
-	public static int blockColor(World world, BlockState state, BlockPos pos) {
+	public static int blockColor(World world, BlockState state, BlockPos pos, int heightDiff) {
+		BlockColors colorMap = minecraftClient.getBlockColorMap();
+		
 		int blockColor = -1;
 		int materialColor = state.getTopMaterialColor(world, pos).color;
 		if (ClientParams.alternateColorRender) {
 			int textureColor = ColorUtil.extractColor(state);
 			
-			blockColor = minecraftClient.getBlockColorMap().getColor(state, world, pos, Colors.LIGHT);
+			blockColor = colorMap.getColor(state, world, pos, -1);
 			
 			Block block = state.getBlock();
 			if (block instanceof GrassBlock || block instanceof FernBlock || block instanceof TallPlantBlock) {				
@@ -284,6 +277,6 @@ public class ColorUtil {
 		}
 		blockColor = ColorUtil.toABGR(blockColor != -1 ? blockColor : materialColor);
 		
-		return blockColor;
+		return proccessColor(blockColor, heightDiff);
 	}
 }
