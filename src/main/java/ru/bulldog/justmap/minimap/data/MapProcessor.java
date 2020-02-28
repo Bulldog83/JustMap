@@ -1,9 +1,6 @@
 package ru.bulldog.justmap.minimap.data;
 
 import ru.bulldog.justmap.client.config.ClientParams;
-import ru.bulldog.justmap.util.ColorUtil;
-import ru.bulldog.justmap.util.Colors;
-import ru.bulldog.justmap.util.StateUtil;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Material;
@@ -26,15 +23,14 @@ public class MapProcessor {
 		int posX = x + chunk.getPos().x * 16;
 		int posZ = z + chunk.getPos().z * 16;
 		
-		int posY = mapChunk.heightmap[x + z * 16];
+		int posY = mapChunk.getHeighmap()[x + (z << 4)];
 		
 		if (layer == Layer.CAVES) {
 			PlayerEntity player = MinecraftClient.getInstance().player;
 			posY = getTopBlockY(chunk, x, z, player.getBlockPos().getY(), false, layer);
 		} else if (posY < 0) {
 			posY = getTopBlockY(chunk, x, z, chunk.getWorld().getEffectiveHeight(), false, layer);
-		}
-		
+		}		
 		
 		return new BlockMeta(new BlockPos(posX, posY, posZ));
 	}
@@ -65,15 +61,15 @@ public class MapProcessor {
 			y = yStart;
 		} else {
 			MapChunk newChunk = MapCache.get(world).getChunk(chunkPos.x, chunkPos.z, true);
-			y = newChunk.heightmap[x + z * 16];
+			y = newChunk.getHeighmap()[x + (z << 4)];
 		}
 		
 		y = y < 0 ? yStart : y;
 		
 		if (layer == Layer.CAVES) {
-			int lvlSize = ClientParams.levelSize;
-			int level = y / lvlSize;
-			for (int i = (lvlSize - 1) + level * lvlSize; i >= level * lvlSize; i--) {
+			int cls = ClientParams.levelSize;
+			int level = y >> cls;
+			for (int i = ((int) Math.pow(2, cls) - 1) + (level << cls); i >= level << cls; i--) {
 				worldPos = loopPos(world, new BlockPos(posX, i, posZ), yStop, skipLiquid);
 				BlockPos overPos = new BlockPos(posX, worldPos.getY() + 1, posZ);
 				if (world.getBlockState(overPos).isAir()) {
@@ -124,45 +120,5 @@ public class MapProcessor {
 		diff = diff < 0 ? Math.max(-maxDiff, diff) : Math.min(maxDiff, diff);
 		
 		return diff;
-	}
-
-	public static int surfaceColor(MapChunk mapChunk, int x, int z) {
-		WorldChunk worldChunk = mapChunk.getWorldChunk();
-		World world = worldChunk.getWorld();
- 
-		int y = mapChunk.heightmap[x + z * 16];
-		
-		if (y < 0) {
-			y = getTopBlockY(worldChunk, x, z, world.getEffectiveHeight(), false, Layer.SURFACE);
-		}
-
-		BlockPos worldPos = new BlockPos(x + worldChunk.getPos().x * 16, y, z + worldChunk.getPos().z * 16);	
-		BlockState state = world.getBlockState(worldPos);
-	
-		if (!StateUtil.isAir(state)) {
-			return ColorUtil.blockColor(world, state, worldPos);
-		}
-	
-		return Colors.GRAY;
-	}
-	
-	public static int cavesColor(MapChunk mapChunk, int x, int z, int ceiling) {
-		WorldChunk worldChunk = mapChunk.getWorldChunk();
-		World world = worldChunk.getWorld();
-		
-		int pY = (int) MinecraftClient.getInstance().player.getY();
-		int yMax = pY + ceiling;
-		int y = getTopBlockY(worldChunk, x, z, yMax, false, Layer.CAVES);
-		
-		BlockPos worldPos = new BlockPos(x + worldChunk.getPos().x * 16, y, z + worldChunk.getPos().z * 16);
-		BlockPos overPos = new BlockPos(worldPos.getX(), worldPos.getY() + 1, worldPos.getZ());
-		BlockState state = world.getBlockState(worldPos);
-		BlockState stateOver = world.getBlockState(overPos);
-	
-		if (!StateUtil.isAir(state) && stateOver.isAir()) {
-			return ColorUtil.blockColor(world, state, worldPos);
-		}
-		
-		return Colors.BLACK;
 	}
 }

@@ -194,10 +194,10 @@ public class Minimap {
 		
 		if (needRenderCaves(world, player.getBlockPos())) {
 			MapCache.setCurrentLayer(MapProcessor.Layer.CAVES);
-			MapCache.setLevel(pos.getY() / ClientParams.levelSize);
+			MapCache.setLayerLevel(pos.getY() / ClientParams.levelSize);
 		} else {
 			MapCache.setCurrentLayer(MapProcessor.Layer.SURFACE);
-			MapCache.setLevel(0);
+			MapCache.setLayerLevel(0);
 		}
 		MapCache.get(world).update(this, scaled, startX, startZ);
 		

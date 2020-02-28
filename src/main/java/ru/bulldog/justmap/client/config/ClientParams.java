@@ -8,7 +8,7 @@ public class ClientParams {
 	public static int positionOffset = 4;
 	public static int mapSize = 64;
 	public static float mapScale = 1.0F;
-	public static int levelSize = 4;
+	public static int levelSize = 2;
 	public static boolean mapVisible = true;
 	public static boolean showCaves = true;
 	public static boolean moveEffects = true;

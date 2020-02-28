@@ -1,6 +1,5 @@
 package ru.bulldog.justmap.minimap.data;
 
-import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.minimap.Minimap;
@@ -18,7 +17,7 @@ import java.util.Map;
 
 public class MapCache {
 	private static MapProcessor.Layer currentLayer = MapProcessor.Layer.SURFACE;
-	private static Map<Integer, Map<MapProcessor.Layer, MapCache>> dimensions = new HashMap<>();
+	private static Map<Integer, MapCache> dimensions = new HashMap<>();
 	
 	private static int currentLevel = 0;
 	
@@ -30,7 +29,7 @@ public class MapCache {
 		return currentLayer;
 	}
 	
-	public static void setLevel(int level) {
+	public static void setLayerLevel(int level) {
 		currentLevel = level;
 	}
 	
@@ -39,42 +38,32 @@ public class MapCache {
 	}
 	
 	public static MapCache get(World world, MapProcessor.Layer layer) {
-		int dimId = world.dimension.getType().getRawId();
-		Map<MapProcessor.Layer, MapCache> layers = getDimensionLayers(dimId);
-		
-		if (layers.containsKey(layer)) {
-			MapCache cache = layers.get(layer);
-			if (cache.world != world) {
-				cache.world = world;
-				cache.clear();
-				NativeImage img = JustMapClient.MAP.getImage();
-				img.fillRect(0, 0, img.getWidth(), img.getHeight(), Colors.BLACK);
-				
-				JustMap.LOGGER.logInfo("Updated world " + world + " " + dimId);			   
-			}
+		MapCache data = getDimensionData(world);
+		if (data.world != world) {
+			data.world = world;
+			data.clear();
 			
-			return cache;
+			NativeImage img = JustMapClient.MAP.getImage();
+			img.fillRect(0, 0, img.getWidth(), img.getHeight(), Colors.BLACK);		   
 		}
 		
-		MapCache loader = new MapCache(layer, world);
-		layers.put(layer, loader);
-		
-		return loader;
+		return data;
 	}
 	
 	private void clear() {
 		mapChunks.clear();
 	}
 	
-	private static Map<MapProcessor.Layer, MapCache> getDimensionLayers(int dimId) {
+	private static MapCache getDimensionData(World world) {
+		int dimId = world.dimension.getType().getRawId();
 		if (dimensions.containsKey(dimId)) {
 			return dimensions.get(dimId);
 		}
 		
-		HashMap<MapProcessor.Layer, MapCache> layers = new HashMap<>();
-		dimensions.put(dimId, layers);
+		MapCache data = new MapCache(currentLayer, world);
+		dimensions.put(dimId, data);
 		
-		return layers;
+		return data;
 	}
 	
 	public final MapProcessor.Layer layer;
@@ -98,19 +87,19 @@ public class MapCache {
 		purgeDelay = ClientParams.purgeDelay * 1000;
 		purgeAmount = ClientParams.purgeAmount;
 		
-		int chunks = size / 16 + 4;
-		int startX = x / 16 - 2;
-		int startZ = z / 16 - 2;
+		int chunks = (size >> 4) + 4;
+		int startX = (x >> 4) - 2;
+		int startZ = (z >> 4) - 2;
 		int endX = startX + chunks;
 		int endZ = startZ + chunks;
 
-		int offsetX = startX * 16 - x;
-		int offsetZ = startZ * 16 - z;
+		int offsetX = (startX << 4) - x;
+		int offsetZ = (startZ << 4) - z;
 		
 		int index = 0, posX = 0;
 		for (int chunkX = startX; chunkX < endX; chunkX++) {
 			int posY = 0;
-			int imgX = posX * 16 + offsetX;
+			int imgX = (posX << 4) + offsetX;
 			for (int chunkZ = startZ; chunkZ < endZ; chunkZ++) {
 				index++;
 
@@ -127,7 +116,7 @@ public class MapCache {
 					}
 				}
 				
-				int imgY = posY * 16 + offsetZ;
+				int imgY = (posY << 4) + offsetZ;
 				ImageUtil.writeIntoImage(mapChunk.getImage(), map.getImage(), imgX, imgY);
 				
 				posY++;
@@ -190,9 +179,7 @@ public class MapCache {
 			return mapChunk;
 		}
 		
-		int dimId = this.world.dimension.getType().getRawId();
 		MapChunk mapChunk = new MapChunk(world.getChunk(posX, posZ), currentLayer, currentLevel);
-		mapChunk.dimension = dimId;
 		mapChunk.setEmpty(empty);
 		
 		if(!mapChunk.getPos().equals(chunkPos)) {
