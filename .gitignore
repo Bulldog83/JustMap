@@ -18,7 +18,6 @@ images/
 .settings/
 .vscode/
 bin/
-.classpath
 .project
 
 # fabric
