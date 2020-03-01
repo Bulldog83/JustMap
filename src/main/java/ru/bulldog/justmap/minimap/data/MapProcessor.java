@@ -46,6 +46,8 @@ public class MapProcessor {
 	
 	private static BlockPos loopPos(World world, BlockPos pos, int stop, boolean liquids) {
 		boolean loop = false;
+		
+		BlockState state;
 		do {
 			state = world.getBlockState(pos);
 			loop = !liquids ? StateUtil.isLiquid(state, false) || StateUtil.isAir(state) : StateUtil.isAir(state);

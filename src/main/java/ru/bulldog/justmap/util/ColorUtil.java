@@ -20,7 +20,6 @@ import net.minecraft.block.StemBlock;
 import net.minecraft.block.TallPlantBlock;
 import net.minecraft.block.VineBlock;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.color.block.BlockColors;
 import net.minecraft.client.color.world.BiomeColors;
 import net.minecraft.client.render.block.BlockModels;
 import net.minecraft.client.render.model.BakedQuad;
@@ -31,8 +30,10 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
+import net.minecraft.world.chunk.WorldChunk;
 import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.client.config.ClientParams;
+import ru.bulldog.justmap.minimap.data.BlockMeta;
 
 public class ColorUtil {
 	
@@ -219,7 +220,7 @@ public class ColorUtil {
 		return -1;
 	}
 	
-	private static int proccessColor(int color, int heightDiff) {
+	public static int proccessColor(int color, int heightDiff) {
 		float[] hsb = RGBtoHSB((color >> 16) & 255, (color >> 8) & 255, color & 255, null);
 		hsb[1] += ClientParams.mapSaturation / 100.0F;
 		hsb[1] = MathUtil.clamp(hsb[1], 0.0F, 1.0F);
@@ -262,7 +263,7 @@ public class ColorUtil {
 		if (ClientParams.alternateColorRender) {
 			int textureColor = ColorUtil.extractColor(state);
 			
-			blockColor = colorMap.getColor(state, world, pos, -1);
+			blockColor = minecraftClient.getBlockColorMap().getColor(state, world, pos, Colors.LIGHT);
 			
 			Block block = state.getBlock();
 			if (block instanceof GrassBlock || block instanceof FernBlock || block instanceof TallPlantBlock) {				
@@ -284,6 +285,6 @@ public class ColorUtil {
 		}
 		blockColor = ColorUtil.toABGR(blockColor != -1 ? blockColor : materialColor);
 		
-		return proccessColor(blockColor, heightDiff);
+		return blockColor;
 	}
 }

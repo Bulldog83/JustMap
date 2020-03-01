@@ -39,7 +39,6 @@ public class MapChunk {
 		this.chunkPos = chunk.getPos();
 		this.layer = layer;
 		this.worldChunk = chunk;
-		this.heightmap = new int[16 * 16];
 		
 		if (!levels.containsKey(layer)) {
 			initLayer();
@@ -206,8 +205,6 @@ public class MapChunk {
 						chunkLevel.image.setPixelRgba(x, z, color);
 					}
 				}
-				
-				image.setPixelRgba(x, z, color);
 			}
 		}
 		
