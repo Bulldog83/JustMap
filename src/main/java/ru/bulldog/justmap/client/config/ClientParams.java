@@ -7,8 +7,8 @@ public class ClientParams {
 	
 	public static int positionOffset = 4;
 	public static int mapSize = 64;
+	public static int chunkLevelSize = 3;
 	public static float mapScale = 1.0F;
-	public static int levelSize = 2;
 	public static boolean mapVisible = true;
 	public static boolean showCaves = true;
 	public static boolean moveEffects = true;
@@ -38,6 +38,8 @@ public class ClientParams {
 	public static int entityIconSize = 8;
 	public static int entityModelSize = 10;
 	
+	public static int chunkUpdateInterval = 1000;
+	public static int chunkLevelUpdateInterval = 3000;
 	public static int updatePerCycle = 10;
 	public static int purgeDelay = 60;
 	public static int purgeAmount = 1500;

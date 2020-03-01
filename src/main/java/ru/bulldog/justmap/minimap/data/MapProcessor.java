@@ -1,11 +1,9 @@
 package ru.bulldog.justmap.minimap.data;
 
 import ru.bulldog.justmap.client.config.ClientParams;
-
+import ru.bulldog.justmap.util.StateUtil;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Material;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
@@ -17,79 +15,42 @@ public class MapProcessor {
 		CAVES
 	}
 	
-	public static BlockMeta getTopBlock(MapChunk mapChunk, Layer layer, int x, int z) {
-		WorldChunk chunk = mapChunk.getWorldChunk();
-		
-		int posX = x + chunk.getPos().x * 16;
-		int posZ = z + chunk.getPos().z * 16;
-		
-		int posY = mapChunk.getHeighmap()[x + (z << 4)];
-		
-		if (layer == Layer.CAVES) {
-			PlayerEntity player = MinecraftClient.getInstance().player;
-			posY = getTopBlockY(chunk, x, z, player.getBlockPos().getY(), false, layer);
-		} else if (posY < 0) {
-			posY = getTopBlockY(chunk, x, z, chunk.getWorld().getEffectiveHeight(), false, layer);
-		}		
-		
-		return new BlockMeta(new BlockPos(posX, posY, posZ));
-	}
-	
-	public static int getTopBlockY(WorldChunk worldChunk, int x, int z, int yStart, int yStop, boolean skipLiquid, Layer layer) {
+	public static int getTopBlockY(MapChunk mapChunk, int x, int y, int z, boolean liquids) {
+		WorldChunk worldChunk = mapChunk.getWorldChunk();
 		World world = worldChunk.getWorld();
 		ChunkPos chunkPos = worldChunk.getPos();		
 		
-		int posX = x + chunkPos.x * 16;
-		int posZ = z + chunkPos.z * 16;
+		int posX = x + (chunkPos.x << 4);
+		int posZ = z + (chunkPos.z << 4);
 		
-		BlockPos worldPos = new BlockPos(posX, 0, posZ);
-		
-		WorldChunk rightChunk;
-		if ((x < 0 || x > 15) || (z < 0 || z > 15)) {			
-			rightChunk = world.getWorldChunk(worldPos);
-		 
-			x = x < 0 ? x + 16 : x > 15 ? x - 16 : x;
-			z = z < 0 ? z + 16 : z > 15 ? z - 16 : z;
-		} else {
-			rightChunk = worldChunk;
-		}
-		
-		chunkPos = rightChunk.getPos();
-		
-		int y = -1;
-		if (layer == Layer.CAVES) {
-			y = yStart;
-		} else {
-			MapChunk newChunk = MapCache.get(world).getChunk(chunkPos.x, chunkPos.z, true);
-			y = newChunk.getHeighmap()[x + (z << 4)];
-		}
-		
-		y = y < 0 ? yStart : y;
-		
-		if (layer == Layer.CAVES) {
-			int cls = ClientParams.levelSize;
-			int level = y >> cls;
+		if (mapChunk.getLayer() == Layer.CAVES && liquids) {
+			int level = mapChunk.getLevel();
+			int cls = ClientParams.chunkLevelSize;
 			for (int i = ((int) Math.pow(2, cls) - 1) + (level << cls); i >= level << cls; i--) {
-				worldPos = loopPos(world, new BlockPos(posX, i, posZ), yStop, skipLiquid);
+				BlockPos worldPos = loopPos(world, new BlockPos(posX, i, posZ), 0, liquids);
 				BlockPos overPos = new BlockPos(posX, worldPos.getY() + 1, posZ);
-				if (world.getBlockState(overPos).isAir()) {
+				if (StateUtil.isAir(world.getBlockState(overPos))) {
 					return worldPos.getY();
 				}
 			}
 		} else {
-			worldPos = loopPos(world, new BlockPos(posX, y, posZ), yStop, skipLiquid);
+			BlockPos worldPos = loopPos(world, new BlockPos(posX, y, posZ), 0, liquids);
+			BlockState overState = world.getBlockState(new BlockPos(posX, worldPos.getY() + 1, posZ));
+			if ((!liquids && StateUtil.isLiquid(overState, false)) || StateUtil.isAir(overState)) {
+				return worldPos.getY();
+			}
 		}
 		
-		return worldPos.getY();
+		return -1;
 	}
 	
-	private static BlockPos loopPos(World world, BlockPos pos, int stop, boolean skipLiquid) {
+	private static BlockPos loopPos(World world, BlockPos pos, int stop, boolean liquids) {
 		boolean loop = false;
 		
 		BlockState state;
 		do {
 			state = world.getBlockState(pos);
-			loop = skipLiquid ? state.getMaterial().isLiquid() || state.isAir() : state.isAir();
+			loop = !liquids ? StateUtil.isLiquid(state, false) || StateUtil.isAir(state) : StateUtil.isAir(state);
 			if (!loop && state.getMaterial() == Material.UNDERWATER_PLANT) {
 				loop = true;
 			}
@@ -102,19 +63,48 @@ public class MapProcessor {
 		return pos;
 	}
 	
-	public static int getTopBlockY(WorldChunk worldChunk, int x, int z, int yStart, boolean skipLiquid, Layer layer) {
-		return getTopBlockY(worldChunk, x, z, yStart, 0, skipLiquid, layer);
+	private static int checkLiquids(MapChunk mapChunk, int x, int y, int z) {
+		if (y == -1) return 0;
+		
+		World world = mapChunk.getWorldChunk().getWorld();
+		BlockPos pos = new BlockPos(x + (mapChunk.getX() << 4), y, z + (mapChunk.getZ() << 4));
+		BlockState state = world.getBlockState(pos);
+		if (StateUtil.isLiquid(state, false)) {
+			y = getTopBlockY(mapChunk, x, y, z, false);
+		}
+		
+		return y;
 	}
 	
-	public static int heightDifference(WorldChunk worldChunk, int x, int z, int y, Layer layer) {
-		int current = getTopBlockY(worldChunk, x, z, y, true, layer);
-		int east = getTopBlockY(worldChunk, x + 1, z, current, true, layer);
-		int south = getTopBlockY(worldChunk, x, z - 1, current, true, layer);
+	public static int heightDifference(MapChunk mapChunk, MapChunk eastChunk, MapChunk southChunk, int x, int y, int z) {
+		int ex = x + 1;
+		int sz = z - 1;
+		
+		int east, south;
+		if (ex > 15) {
+			ex -= 16;
+			east = eastChunk.getHeighmap()[ex + (z << 4)];			
+			east = checkLiquids(eastChunk, ex, east, z);
+		} else {
+			east = mapChunk.getHeighmap()[ex + (z << 4)];
+			east = checkLiquids(mapChunk, ex, east, z);
+		}
+		if (sz < 0) {
+			sz += 16;
+			south = southChunk.getHeighmap()[x + (sz << 4)];
+			south = checkLiquids(southChunk, x, south, sz);
+		} else {			
+			south = mapChunk.getHeighmap()[x + (sz << 4)];
+			south = checkLiquids(mapChunk, x, south, sz);
+		}
+		
+		y = checkLiquids(mapChunk, x, y, z);
+		
+		east = east > 0 ? east - y : 0;
+		south = south > 0 ? south - y : 0;
 
-		east -= current;
-		south -= current;
-
-		int diff = east - south;
+		int diff = east - south;		
+		if (diff == 0) return 0;
 		
 		int maxDiff = ClientParams.terrainStrength;
 		diff = diff < 0 ? Math.max(-maxDiff, diff) : Math.min(maxDiff, diff);

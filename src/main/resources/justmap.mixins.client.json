@@ -10,8 +10,7 @@
 		"BakedQuadMixin",
 		"BufferBuilderMixin",
 		"ClientPlayNetworkHandlerMixin",
-		"LivingEntityRendererMixin",
-		"WorldChunkMixin"
+		"LivingEntityRendererMixin"
     ],
     "injectors": {
         "defaultRequire": 1

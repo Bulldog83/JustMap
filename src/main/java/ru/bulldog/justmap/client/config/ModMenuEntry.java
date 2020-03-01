@@ -5,6 +5,7 @@ import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.config.ConfigKeeper.EnumEntry;
 import ru.bulldog.justmap.minimap.MapPosition;
 import ru.bulldog.justmap.minimap.MapSkin;
+import ru.bulldog.justmap.util.MathUtil;
 import io.github.prospector.modmenu.api.ModMenuApi;
 import me.shedaniel.clothconfig2.api.ConfigBuilder;
 import me.shedaniel.clothconfig2.api.ConfigCategory;
@@ -59,6 +60,10 @@ public class ModMenuEntry implements ModMenuApi {
 					.setSaveConsumer(val -> JustMapClient.CONFIG.setRanged("map_size", val))
 					.setDefaultValue((int) JustMapClient.CONFIG.getDefault("map_size"))
 					.setMin(32).setMax(480).build());
+			general.addEntry(entryBuilder.startIntField(lang("chunk_level_size"), (int) Math.pow(2, JustMapClient.CONFIG.getInt("chunk_level_size")))
+					.setSaveConsumer(val -> JustMapClient.CONFIG.setRanged("chunk_level_size", (int) MathUtil.logn(2, val)))
+					.setDefaultValue((int) Math.pow(2, (int) JustMapClient.CONFIG.getDefault("chunk_level_size")))
+					.setMin(4).setMax(16).build());
 			general.addEntry(entryBuilder.startBooleanToggle(lang("show_in_chat"), JustMapClient.CONFIG.getBoolean("show_in_chat"))
 					.setSaveConsumer(val -> JustMapClient.CONFIG.setBoolean("show_in_chat", val))
 					.setDefaultValue((boolean) JustMapClient.CONFIG.getDefault("show_in_chat"))
@@ -214,6 +219,14 @@ public class ModMenuEntry implements ModMenuApi {
 					.build());
 		
 			ConfigCategory optimization = builder.getOrCreateCategory(lang("category.optimization"));
+			optimization.addEntry(entryBuilder.startIntField(lang("chunk_update_interval"), JustMapClient.CONFIG.getInt("chunk_update_interval"))
+					.setSaveConsumer(val -> JustMapClient.CONFIG.setRanged("chunk_update_interval", val))
+					.setDefaultValue((int) JustMapClient.CONFIG.getDefault("chunk_update_interval"))
+					.setMin(500).setMax(5000).build());
+			optimization.addEntry(entryBuilder.startIntField(lang("chunk_level_update_interval"), JustMapClient.CONFIG.getInt("chunk_level_update_interval"))
+					.setSaveConsumer(val -> JustMapClient.CONFIG.setRanged("chunk_level_update_interval", val))
+					.setDefaultValue((int) JustMapClient.CONFIG.getDefault("chunk_level_update_interval"))
+					.setMin(500).setMax(10000).build());
 			optimization.addEntry(entryBuilder.startIntField(lang("update_cycle"), JustMapClient.CONFIG.getInt("update_per_cycle"))
 					.setSaveConsumer(val -> JustMapClient.CONFIG.setRanged("update_per_cycle", val))
 					.setDefaultValue((int) JustMapClient.CONFIG.getDefault("update_per_cycle"))

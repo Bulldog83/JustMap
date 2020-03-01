@@ -3,8 +3,10 @@ package ru.bulldog.justmap.minimap.data;
 import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.minimap.data.MapProcessor.Layer;
 import ru.bulldog.justmap.util.ColorUtil;
+import ru.bulldog.justmap.util.Colors;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.world.Heightmap;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.chunk.WorldChunk;
 
@@ -15,19 +17,14 @@ import java.util.Map;
 public class MapChunk {
 
 	private Layer layer;
-	private WorldChunk worldChunk;
-	
+	private WorldChunk worldChunk;	
 	private Map<Layer, ChunkLevel[]> levels = new HashMap<>();
-	
-	private ChunkLevel currentLevel;
-	
-	private boolean updating;
-	private boolean empty;
-	
-	public long updated;
-	
-	private ChunkPos chunkPos;
+	private ChunkLevel chunkLevel;	
+	private boolean empty;	
+	private ChunkPos chunkPos;	
 	private int level = 0;
+	
+	public long updated = 0;
 	
 	public MapChunk(WorldChunk chunk, Layer layer, int level) {
 		this.level = level;
@@ -47,15 +44,22 @@ public class MapChunk {
 			initLayer();
 		}
 		
-		currentLevel = levels.get(layer)[level];
+		chunkLevel = levels.get(layer)[level];
+	}
+	
+	public void resetChunk() {
+		this.levels.clear();
 		
-		Arrays.fill(currentLevel.heightmap, -1);
+		initLayer();
+		
+		this.chunkLevel = levels.get(layer)[level];
+		this.updated = 0;
 	}
 	
 	private void initLayer() {
 		int levels;
 		if (layer == Layer.CAVES) {
-			levels = worldChunk.getWorld().getEffectiveHeight() >> ClientParams.levelSize;
+			levels = worldChunk.getWorld().getEffectiveHeight() >> ClientParams.chunkLevelSize;
 		} else {
 			levels = 1;
 		}
@@ -69,7 +73,7 @@ public class MapChunk {
 		chunkPos = chunk.getPos();
 	}
 	
-	public void updateChunk() {
+	public void updateWorldChunk() {
 		this.worldChunk = worldChunk.getWorld().getChunk(chunkPos.x, chunkPos.z);
 	}
 	
@@ -98,15 +102,19 @@ public class MapChunk {
 	}
 	
 	public NativeImage getImage() {
-		return currentLevel.image;
+		return chunkLevel.image;
 	}
 	
 	public Layer getLayer() {
 		return layer;
 	}
 	
+	public int getLevel() {
+		return level;
+	}
+	
 	public int[] getHeighmap() {
-		return currentLevel.heightmap;
+		return chunkLevel.heightmap;
 	}
 	
 	private void setLayer(Layer layer) {
@@ -125,10 +133,10 @@ public class MapChunk {
 		this.setLayer(layer);
 		
 		if (levels.get(layer)[level] == null) {
-			this.currentLevel = new ChunkLevel();
-			levels.get(layer)[level] = currentLevel;
+			this.chunkLevel = new ChunkLevel();
+			levels.get(layer)[level] = chunkLevel;
 		} else {
-			this.currentLevel = levels.get(layer)[level];
+			this.chunkLevel = levels.get(layer)[level];
 		}
 	}
 	
@@ -136,41 +144,95 @@ public class MapChunk {
 		return worldChunk;
 	}
 	
-	public void update() {
-		if (this.updating) { return; }
+	public void updateHeighmap() {
+		for (int x = 0; x < 16; x++) {
+			for (int z = 0; z < 16; z++) {
+				int y = worldChunk.sampleHeightmap(Heightmap.Type.WORLD_SURFACE, x, z);
+				chunkLevel.heightmap[x + (z << 4)] = MapProcessor.getTopBlockY(this, x, y, z, true);
+			}
+		}
+	}
+	
+	public void update() {		
+		long currentTime = System.currentTimeMillis();
+		if (currentTime - updated < ClientParams.chunkUpdateInterval) return;		
 		
-		this.updating = true;		
+		MapChunk eastChunk = MapCache.get(worldChunk.getWorld()).getChunk(chunkPos.x + 1, chunkPos.z, true);
+		MapChunk southChunk = MapCache.get(worldChunk.getWorld()).getChunk(chunkPos.x, chunkPos.z - 1, true);
+		
+		if (currentTime - chunkLevel.updated > ClientParams.chunkLevelUpdateInterval) {
+			this.updateHeighmap();
+			eastChunk.updateHeighmap();
+			southChunk.updateHeighmap();
+			
+			chunkLevel.updated = currentTime;
+		}
+		
 		for (int x = 0; x < 16; x++) {
 			for (int z = 0; z < 16; z++) {
 				int index = x + (z << 4);
-				currentLevel.heightmap[index] = worldChunk.sampleHeightmap(Heightmap.Type.WORLD_SURFACE, x, z);
+				int posY = chunkLevel.heightmap[index];
 				
-				BlockMeta currentBlock = currentLevel.getBlock(index);
+				BlockMeta currentBlock = chunkLevel.getBlock(index);
+				if (posY == -1) {
+					if (!currentBlock.isEmpty()) {
+						chunkLevel.setBlock(index, BlockMeta.EMPTY_BLOCK);
+						chunkLevel.image.setPixelRgba(x, z, Colors.BLACK);
+					}
+					
+					continue;
+				}
 				
-				BlockMeta block = MapProcessor.getTopBlock(this, layer, x, z);
+				int posX = x + (chunkPos.x << 4);
+				int posZ = z + (chunkPos.z << 4);
+				
+				BlockMeta block = new BlockMeta(new BlockPos(posX, posY, posZ));
 				if(currentBlock.isEmpty() || !currentBlock.equals(block)) {					
-					int heightDiff = MapProcessor.heightDifference(worldChunk, x, z, block.pos.getY() + 1, layer);
+					int heightDiff = MapProcessor.heightDifference(this, eastChunk, southChunk, x, posY, z);
 					block.setHeightPos(heightDiff);
 					block.setColor(ColorUtil.blockColor(worldChunk, block));
 					
-					currentLevel.setBlock(index, block);
+					chunkLevel.setBlock(index, block);
 					
 					int color = ColorUtil.proccessColor(block.getColor(), heightDiff);
-					currentLevel.image.setPixelRgba(x, z, color);
+					chunkLevel.image.setPixelRgba(x, z, color);
 				} else {				
-					int heightDiff = MapProcessor.heightDifference(worldChunk, x, z, currentBlock.pos.getY() + 1, layer);
+					int heightDiff = MapProcessor.heightDifference(this, eastChunk, southChunk, x, posY, z);
 					if (currentBlock.getHeightPos() != heightDiff) {
 						currentBlock.setHeightPos(heightDiff);
 						
 						int color = ColorUtil.proccessColor(currentBlock.getColor(), heightDiff);
-						currentLevel.image.setPixelRgba(x, z, color);
+						chunkLevel.image.setPixelRgba(x, z, color);
 					}
 				}
 			}
 		}
 		
 		this.empty = false;
-		this.updated = System.currentTimeMillis();
-		this.updating = false;
+		this.updated = currentTime;
+	}
+	
+	private class ChunkLevel {
+		private BlockMeta[] blocks = new BlockMeta[256];
+		
+		private final NativeImage image = new NativeImage(16, 16, false);
+		private final int[] heightmap = new int[256];
+		
+		public long updated = 0;
+		
+		private ChunkLevel() {
+			Arrays.fill(blocks, BlockMeta.EMPTY_BLOCK);
+			Arrays.fill(heightmap, -1);
+			
+			image.fillRect(0, 0, 16, 16, Colors.BLACK);
+		}
+		
+		public void setBlock(int pos, BlockMeta block) {
+			blocks[pos] = block;
+		}
+		
+		public BlockMeta getBlock(int pos) {
+			return blocks[pos];
+		}
 	}
 }

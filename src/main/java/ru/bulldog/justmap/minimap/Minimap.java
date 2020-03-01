@@ -191,14 +191,15 @@ public class Minimap {
 		int startZ = pos.getZ() - scaled / 2;
 		int endX = startX + scaled;
 		int endZ = startZ + scaled;
-		
+
 		if (needRenderCaves(world, player.getBlockPos())) {
 			MapCache.setCurrentLayer(MapProcessor.Layer.CAVES);
-			MapCache.setLayerLevel(pos.getY() / ClientParams.levelSize);
+			MapCache.setLayerLevel(pos.getY() >> ClientParams.chunkLevelSize);
 		} else {
 			MapCache.setCurrentLayer(MapProcessor.Layer.SURFACE);
 			MapCache.setLayerLevel(0);
 		}
+		
 		MapCache.get(world).update(this, scaled, startX, startZ);
 		
 		if (allowPlayerRadar()) {

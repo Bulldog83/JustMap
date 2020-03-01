@@ -29,6 +29,7 @@ public class ClientConfig extends Config{
 		KEEPER.registerEntry("map_position", new EnumEntry<MapPosition>(ClientParams.mapPosition, (e) -> ClientParams.mapPosition = e, () -> ClientParams.mapPosition));
 		KEEPER.registerEntry("map_offset", new IntegerEntry(ClientParams.positionOffset, (i) -> ClientParams.positionOffset = i, () -> ClientParams.positionOffset));
 		KEEPER.registerEntry("map_size", new IntegerRange(ClientParams.mapSize, (i) -> ClientParams.mapSize = i, () -> ClientParams.mapSize, 16, 256));
+		KEEPER.registerEntry("chunk_level_size", new IntegerRange(ClientParams.chunkLevelSize, (i) -> ClientParams.chunkLevelSize = i, () -> ClientParams.chunkLevelSize, 2, 4));
 		KEEPER.registerEntry("map_scale", new FloatRange(ClientParams.mapScale, (f) -> ClientParams.mapScale = f, () -> ClientParams.mapScale, 0.25F, 2.0F));
 		KEEPER.registerEntry("map_saturation", new IntegerRange(ClientParams.mapSaturation, (i) -> ClientParams.mapSaturation = i, () -> ClientParams.mapSaturation, -50, 50));
 		KEEPER.registerEntry("map_brightness", new IntegerRange(ClientParams.mapBrightness, (i) -> ClientParams.mapBrightness = i, () -> ClientParams.mapBrightness, -50, 50));
@@ -44,6 +45,8 @@ public class ClientConfig extends Config{
 		KEEPER.registerEntry("simple_direction_arrow", new BooleanEntry(ClientParams.simpleArrow, (b) -> ClientParams.simpleArrow = b, () -> ClientParams.simpleArrow));
 		KEEPER.registerEntry("current_skin", new IntegerEntry(ClientParams.currentSkin, (i) -> ClientParams.currentSkin = i, () -> ClientParams.currentSkin));
 		KEEPER.registerEntry("update_per_cycle", new IntegerRange(ClientParams.updatePerCycle, (i) -> ClientParams.updatePerCycle = i, () -> ClientParams.updatePerCycle, 1, 500));
+		KEEPER.registerEntry("chunk_update_interval", new IntegerRange(ClientParams.chunkUpdateInterval, (i) -> ClientParams.chunkUpdateInterval = i, () -> ClientParams.chunkUpdateInterval, 500, 5000));
+		KEEPER.registerEntry("chunk_level_update_interval", new IntegerRange(ClientParams.chunkLevelUpdateInterval, (i) -> ClientParams.chunkLevelUpdateInterval = i, () -> ClientParams.chunkLevelUpdateInterval, 500, 10000));
 		KEEPER.registerEntry("purge_delay", new IntegerRange(ClientParams.purgeDelay, (i) -> ClientParams.purgeDelay = i, () -> ClientParams.purgeDelay, 1, 600));
 		KEEPER.registerEntry("purge_amount", new IntegerRange(ClientParams.purgeAmount, (i) -> ClientParams.purgeAmount = i, () -> ClientParams.purgeAmount, 100, 50000));
 		KEEPER.registerEntry("show_terrain", new BooleanEntry(ClientParams.showTerrain, (b) -> ClientParams.showTerrain = b, () -> ClientParams.showTerrain));

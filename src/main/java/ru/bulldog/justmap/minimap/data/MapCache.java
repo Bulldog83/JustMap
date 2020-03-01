@@ -3,6 +3,7 @@ package ru.bulldog.justmap.minimap.data;
 import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.minimap.Minimap;
+import ru.bulldog.justmap.minimap.data.MapProcessor.Layer;
 import ru.bulldog.justmap.util.Colors;
 import ru.bulldog.justmap.util.ImageUtil;
 import net.minecraft.client.texture.NativeImage;
@@ -60,13 +61,12 @@ public class MapCache {
 			return dimensions.get(dimId);
 		}
 		
-		MapCache data = new MapCache(currentLayer, world);
+		MapCache data = new MapCache(world);
 		dimensions.put(dimId, data);
 		
 		return data;
 	}
 	
-	public final MapProcessor.Layer layer;
 	public World world;
 	
 	private Map<ChunkPos, MapChunk> mapChunks = new HashMap<>();
@@ -76,10 +76,11 @@ public class MapCache {
 	private long lastPurged = 0;
 	private long purgeDelay = 1000;
 	private int purgeAmount = 500;
+	private int levelSize;
 	
-	private MapCache(MapProcessor.Layer layer, World world) {
-		this.layer = layer;
+	private MapCache(World world) {
 		this.world = world;
+		this.levelSize = ClientParams.chunkLevelSize;
 	}
 	
 	public void update(Minimap map, int size, int x, int z) {
@@ -158,39 +159,49 @@ public class MapCache {
 		}
 	}
 	
-	public MapChunk getChunk(int posX, int posZ) {
+	public synchronized MapChunk getChunk(int posX, int posZ) {
 		return getChunk(posX, posZ, false);
 	}
 	
-	public MapChunk getChunk(int posX, int posZ, boolean empty) {
-		ChunkPos chunkPos = new ChunkPos(posX, posZ);
-		if (mapChunks.containsKey(chunkPos)) {
-			MapChunk mapChunk = mapChunks.get(chunkPos);
-			
-			mapChunk.setLevel(currentLayer, currentLevel);
-			
-			if (!mapChunk.getWorldChunk().getPos().equals(chunkPos)) {
-				mapChunk.updateChunk();
-				if (!empty) {
-					mapChunk.update();
-				}
-			}
-			
-			return mapChunk;
-		}
+	public synchronized MapChunk getChunk(int posX, int posZ, boolean empty) {
+		return getChunk(currentLayer, currentLevel, posX, posZ, empty);
+	}
+	
+	public synchronized MapChunk getChunk(Layer layer, int level, int posX, int posZ, boolean empty) {
 		
-		MapChunk mapChunk = new MapChunk(world.getChunk(posX, posZ), currentLayer, currentLevel);
+		MapChunk mapChunk = getChunk(layer, level, posX, posZ);
+		
+		if (levelSize != ClientParams.chunkLevelSize) {
+			levelSize = ClientParams.chunkLevelSize;
+			mapChunk.resetChunk();
+		}		
+		
+		mapChunk.setLevel(layer, level);
 		mapChunk.setEmpty(empty);
 		
+		ChunkPos chunkPos = new ChunkPos(posX, posZ);
 		if(!mapChunk.getPos().equals(chunkPos)) {
 			mapChunk.setPos(chunkPos);
-		}		
-		if (!empty) {
-			mapChunk.update();
+		}
+		if (!mapChunk.getWorldChunk().getPos().equals(chunkPos)) {
+			mapChunk.updateWorldChunk();
+			if (!empty) {
+				mapChunk.update();
+			}
 		}
 		
+		return mapChunk;
+	}
+	
+	public synchronized MapChunk getChunk(Layer layer, int level, int posX, int posZ) {
+		ChunkPos chunkPos = new ChunkPos(posX, posZ);
+		if (mapChunks.containsKey(chunkPos)) {
+			return mapChunks.get(chunkPos);
+		}
+		
+		MapChunk mapChunk = new MapChunk(world.getChunk(posX, posZ), layer, level);
 		mapChunks.put(chunkPos, mapChunk);
 		
 		return mapChunk;
-	}	
+	}
 }

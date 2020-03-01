@@ -19,6 +19,7 @@
   "justmap.configuration.map_offset": "Offset",
   "justmap.configuration.map_position": "Map Position",
   "justmap.configuration.map_size": "Map Size",
+  "justmap.configuration.chunk_level_size": "Chunk Level Size (blocks)",
   "justmap.configuration.map_scale": "Map Scale",
   "justmap.configuration.map_saturation": "Saturation of map colors",
   "justmap.configuration.map_brightness": "Map Brightness",
@@ -57,6 +58,8 @@
   "justmap.configuration.entity_icon_size": "Entities icon size",
   "justmap.configuration.entity_model_size": "Entities model size",
   
+  "justmap.configuration.chunk_update_interval": "Сhunk update interval (milliseconds)",
+  "justmap.configuration.chunk_level_update_interval": "Сhunk level update interval (milliseconds)",
   "justmap.configuration.update_cycle": "Chunks update per cycle",
   "justmap.configuration.purge_delay": "Delay for cache purging (seconds)",
   "justmap.configuration.purge_amount": "Max amount chunks to purge",

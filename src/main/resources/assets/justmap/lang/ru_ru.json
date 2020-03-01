@@ -19,6 +19,7 @@
   "justmap.configuration.map_offset": "Смещение",
   "justmap.configuration.map_position": "Позиция карты",
   "justmap.configuration.map_size": "Размер карты",
+  "justmap.configuration.chunk_level_size": "Высота уровня чанка (блоков)",
   "justmap.configuration.map_scale": "Масштаб карты",
   "justmap.configuration.map_saturation": "Насыщенность цветов карты",
   "justmap.configuration.map_brightness": "Яркость карты",
@@ -57,6 +58,8 @@
   "justmap.configuration.entity_icon_size": "Размер иконки сущностей",
   "justmap.configuration.entity_model_size": "Размер модели сущностей",
   
+  "justmap.configuration.chunk_update_interval": "Интервал обновления чанка (миллисекунд)",
+  "justmap.configuration.chunk_level_update_interval": "Интервал обновления уровней чанка (миллисекунд)",
   "justmap.configuration.update_cycle": "Обновлений чанков за цикл",
   "justmap.configuration.purge_delay": "Задержка очистки кэша (секунд)",
   "justmap.configuration.purge_amount": "Максимальное количество чанков для удаления",
