@@ -59,7 +59,7 @@ public class MapChunk {
 	private void initLayer() {
 		int levels;
 		if (layer == Layer.CAVES) {
-			levels = worldChunk.getWorld().getEffectiveHeight() >> ClientParams.chunkLevelSize;
+			levels = worldChunk.getHeight() >> ClientParams.chunkLevelSize;
 		} else {
 			levels = 1;
 		}

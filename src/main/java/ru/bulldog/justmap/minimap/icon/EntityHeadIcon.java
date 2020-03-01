@@ -74,6 +74,7 @@ public class EntityHeadIcon extends AbstractIcon {
 		registerIcon(EntityType.getId(EntityType.GHAST));
 		registerIcon(EntityType.getId(EntityType.GIANT));
 		registerIcon(EntityType.getId(EntityType.GUARDIAN));
+		registerIcon(EntityType.getId(EntityType.HOGLIN));
 		registerIcon(EntityType.getId(EntityType.HORSE));
 		registerIcon(EntityType.getId(EntityType.HUSK));
 		registerIcon(EntityType.getId(EntityType.ILLUSIONER));
@@ -87,6 +88,7 @@ public class EntityHeadIcon extends AbstractIcon {
 		registerIcon(EntityType.getId(EntityType.PARROT));
 		registerIcon(EntityType.getId(EntityType.PHANTOM));
 		registerIcon(EntityType.getId(EntityType.PIG));
+		registerIcon(EntityType.getId(EntityType.PIGLIN));
 		registerIcon(EntityType.getId(EntityType.PILLAGER));
 		registerIcon(EntityType.getId(EntityType.POLAR_BEAR));
 		registerIcon(EntityType.getId(EntityType.PUFFERFISH));
@@ -116,7 +118,7 @@ public class EntityHeadIcon extends AbstractIcon {
 		registerIcon(EntityType.getId(EntityType.WOLF));
 		registerIcon(EntityType.getId(EntityType.ZOMBIE));
 		registerIcon(EntityType.getId(EntityType.ZOMBIE_HORSE));
-		registerIcon(EntityType.getId(EntityType.ZOMBIE_PIGMAN));
+		registerIcon(EntityType.getId(EntityType.ZOMBIFIED_PIGLIN));
 		registerIcon(EntityType.getId(EntityType.ZOMBIE_VILLAGER));		
 	}
 }
