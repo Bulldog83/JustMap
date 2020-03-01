@@ -249,9 +249,9 @@ public class ColorUtil {
 	}
 	
 	public static int blockColor(WorldChunk worldChunk, BlockMeta block) {
-		BlockPos overPos = new BlockPos(block.pos.getX(), block.pos.getY() + 1, block.pos.getZ());
-		if (!StateUtil.isAir(block.state) && worldChunk.getWorld().getBlockState(overPos).isAir()) {
-			return blockColor(worldChunk.getWorld(), block.state, block.pos);
+		BlockPos overPos = new BlockPos(block.getPos().getX(), block.getPos().getY() + 1, block.getPos().getZ());
+		if (!StateUtil.isAir(block.getState()) && worldChunk.getWorld().getBlockState(overPos).isAir()) {
+			return blockColor(worldChunk.getWorld(), block.getState(), block.getPos());
 		}
 	
 		return Colors.BLACK;
