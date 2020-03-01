@@ -247,9 +247,16 @@ public class ColorUtil {
 		return fcolor != -1 ? fcolor : defColor;
 	}
 	
-	public static int blockColor(World world, BlockState state, BlockPos pos, int heightDiff) {
-		BlockColors colorMap = minecraftClient.getBlockColorMap();
-		
+	public static int blockColor(WorldChunk worldChunk, BlockMeta block) {
+		BlockPos overPos = new BlockPos(block.pos.getX(), block.pos.getY() + 1, block.pos.getZ());
+		if (!StateUtil.isAir(block.state) && worldChunk.getWorld().getBlockState(overPos).isAir()) {
+			return blockColor(worldChunk.getWorld(), block.state, block.pos);
+		}
+	
+		return Colors.BLACK;
+	}
+	
+	public static int blockColor(World world, BlockState state, BlockPos pos) {
 		int blockColor = -1;
 		int materialColor = state.getTopMaterialColor(world, pos).color;
 		if (ClientParams.alternateColorRender) {

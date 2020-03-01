@@ -11,6 +11,10 @@ public class MathUtil {
 		return val < min ? min : val > max ? max : val;
 	}
 	
+	public static double logn(double n, double a) {
+		return Math.log(a) / Math.log(n); 
+	}
+	
 	public static double getDistance(BlockPos a, BlockPos b) {
 		return getDistance(a, b, false);
 	}

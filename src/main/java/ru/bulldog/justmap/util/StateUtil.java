@@ -11,4 +11,9 @@ public class StateUtil {
 	public static boolean isAir(BlockState state) {
 		return state.isAir() || state == AIR_STATE || state == CAVE_AIR_STATE || state == VOID_AIR_STATE;
 	}
+	
+	public static boolean isLiquid(BlockState state, boolean lava) {
+		return lava ? state.getMaterial().isLiquid() :
+					  state.getMaterial().isLiquid() && state.getBlock() != Blocks.LAVA;
+	}
 }
