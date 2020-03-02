@@ -106,14 +106,14 @@ public class MapRegion {
 		int dim = world.getDimension().getType().getRawId();
 		File dimDir = new File(StorageUtil.cacheDir(), String.format("DIM%d/", dim));
 		
-		File cacheDir, png;
+		File cacheDir;
 		if (layer == Layer.CAVES) {
-			cacheDir = new File(dimDir, String.format("%d/", level));
-			png = new File(cacheDir, String.format("%d.%d.png", x, z));
+			cacheDir = new File(dimDir, String.format("caves/%d/", level));
 		} else {
-			cacheDir = dimDir;
-			png = new File(cacheDir, String.format("surface_%d.%d.png", x, z));
+			cacheDir = new File(dimDir, "surface/");
 		}
+		
+		File png = new File(cacheDir, String.format("%d.%d.png", x, z));
 		
 		if (!cacheDir.exists()) {
 			cacheDir.mkdirs();

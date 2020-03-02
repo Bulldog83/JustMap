@@ -6,7 +6,6 @@ import ru.bulldog.justmap.minimap.data.MapProcessor.Layer;
 import ru.bulldog.justmap.util.ColorUtil;
 import ru.bulldog.justmap.util.Colors;
 import net.minecraft.client.texture.NativeImage;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.Heightmap;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
@@ -242,44 +241,6 @@ public class MapChunk {
 		
 		public BlockMeta getBlock(int pos) {
 			return blocks[pos];
-		}
-		
-		public CompoundTag toNBT() {
-			CompoundTag tag = new CompoundTag();
-			
-			CompoundTag blocks = new CompoundTag();
-			for (int i = 0; i < this.blocks.length; i++) {
-				blocks.put("block_" + i, this.blocks[i].toNBT());
-			}
-			
-			tag.put("blocks", blocks);
-			tag.putIntArray("heightmap", heightmap);
-			
-			saveImage();
-			
-			return tag;
-		}
-		
-		public static ChunkLevel fromNBT(CompoundTag tag) {
-			ChunkLevel chunkLevel = new ChunkLevel();
-			
-			chunkLevel.heightmap = tag.getIntArray("heightmap");
-			
-			CompoundTag blocks = tag.getCompound("blocks");			
-			for (int i = 0; i < chunkLevel.blocks.length; i++) {
-				chunkLevel.blocks[i] = BlockMeta.fromNBT(blocks.getCompound("block_" + i));
-			}			
-			chunkLevel.loadImage();
-			
-			return chunkLevel;
-		}
-		
-		private void saveImage() {
-			
-		}
-		
-		private void loadImage() {
-			
 		}
 	}
 }
