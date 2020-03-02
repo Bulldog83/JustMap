@@ -17,8 +17,8 @@ import java.util.List;
 import java.util.Map;
 
 public class MapCache {
-	private static MapProcessor.Layer currentLayer = MapProcessor.Layer.SURFACE;
 	private static Map<Integer, MapCache> dimensions = new HashMap<>();
+	private static MapProcessor.Layer currentLayer = MapProcessor.Layer.SURFACE;
 	
 	private static int currentLevel = 0;
 	
@@ -51,10 +51,6 @@ public class MapCache {
 		return data;
 	}
 	
-	private void clear() {
-		mapChunks.clear();
-	}
-	
 	private static MapCache getDimensionData(World world) {
 		int dimId = world.dimension.getType().getRawId();
 		if (dimensions.containsKey(dimId)) {
@@ -69,7 +65,7 @@ public class MapCache {
 	
 	public World world;
 	
-	private Map<ChunkPos, MapChunk> mapChunks = new HashMap<>();
+	private Map<ChunkPos, MapChunk> chunks = new HashMap<>();
 	
 	private int updateIndex = 0;
 	private int updatePerCycle = 10;
@@ -143,8 +139,8 @@ public class MapCache {
 		int purged = 0;
 	
 		List<ChunkPos> forPurge = new ArrayList<>();
-		for (ChunkPos chunkPos : mapChunks.keySet()) {
-			MapChunk chunkData = mapChunks.get(chunkPos);
+		for (ChunkPos chunkPos : chunks.keySet()) {
+			MapChunk chunkData = chunks.get(chunkPos);
 			if (currentTime - chunkData.updated >= 10000) {
 				forPurge.add(chunkPos);
 				purged++;
@@ -155,7 +151,7 @@ public class MapCache {
 		}
 	
 		for (ChunkPos chunkPos : forPurge) {
-			mapChunks.remove(chunkPos);
+			chunks.remove(chunkPos);
 		}
 	}
 	
@@ -195,13 +191,17 @@ public class MapCache {
 	
 	public synchronized MapChunk getChunk(Layer layer, int level, int posX, int posZ) {
 		ChunkPos chunkPos = new ChunkPos(posX, posZ);
-		if (mapChunks.containsKey(chunkPos)) {
-			return mapChunks.get(chunkPos);
+		if (chunks.containsKey(chunkPos)) {
+			return chunks.get(chunkPos);
 		}
 		
 		MapChunk mapChunk = new MapChunk(world.getChunk(posX, posZ), layer, level);
-		mapChunks.put(chunkPos, mapChunk);
+		chunks.put(chunkPos, mapChunk);
 		
 		return mapChunk;
+	}
+	
+	private void clear() {
+		chunks.clear();
 	}
 }

@@ -1,5 +1,6 @@
 package ru.bulldog.justmap.util;
 
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 
 import ru.bulldog.justmap.JustMap;
@@ -39,6 +40,14 @@ public class ImageUtil {
 		return image;
 	}
 	
+	public static void fillImage(BufferedImage image, int color) {
+		for (int i = 0; i < image.getWidth(); i++) {
+			for (int j = 0; j < image.getHeight(); j++) {
+				image.setRGB(i, j, color);
+			}
+		}
+	}
+	
 	public static NativeImage writeIntoImage(NativeImage toWrite, NativeImage destination, int x, int y) {
 		int drawWidth = toWrite.getWidth();
 		int drawHeight = toWrite.getHeight();
@@ -66,6 +75,40 @@ public class ImageUtil {
 				}
 				
 				destination.setPixelRgba(xp, yp, toWrite.getPixelRgba(xOffset, yOffset));
+			}
+		}
+		
+		return destination;
+	}
+	
+	public static BufferedImage writeIntoImage(NativeImage toWrite, BufferedImage destination, int x, int y) {
+		int drawWidth = toWrite.getWidth();
+		int drawHeight = toWrite.getHeight();
+		int destinationWidth = destination.getWidth();
+		int destinationHeight = destination.getHeight();	   
+		
+		if (x + drawWidth >= destinationWidth) {
+			drawWidth = destinationWidth - x;
+		}
+		
+		if (y + drawHeight >= destinationHeight) {
+			drawHeight = destinationHeight - y;
+		}
+		
+		for (int xOffset = 0; xOffset < drawWidth; xOffset++) {
+			int xp = x + xOffset;
+			if (xp < 0) {
+				continue;
+			}
+			
+			for (int yOffset = 0; yOffset < drawHeight; yOffset++) {
+				int yp = y + yOffset;
+				if (yp < 0) {
+					continue;
+				}
+				
+				int pixel = ColorUtil.ABGRtoARGB(toWrite.getPixelRgba(xOffset, yOffset));
+				destination.setRGB(xp, yp, pixel);
 			}
 		}
 		

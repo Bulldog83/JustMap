@@ -1,5 +1,6 @@
 package ru.bulldog.justmap.minimap.data;
 
+import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.minimap.data.MapProcessor.Layer;
 import ru.bulldog.justmap.util.ColorUtil;
@@ -197,6 +198,10 @@ public class MapChunk {
 					
 					int color = ColorUtil.proccessColor(block.getColor(), heightDiff);
 					chunkLevel.image.setPixelRgba(x, z, color);
+					
+					JustMap.EXECUTOR.execute(() -> {
+						MapRegion.getRegion(worldChunk).storeChunk(this);
+					});
 				} else {				
 					int heightDiff = MapProcessor.heightDifference(this, eastChunk, southChunk, x, posY, z);
 					if (currentBlock.getHeightPos() != heightDiff) {
@@ -204,6 +209,10 @@ public class MapChunk {
 						
 						int color = ColorUtil.proccessColor(currentBlock.getColor(), heightDiff);
 						chunkLevel.image.setPixelRgba(x, z, color);
+						
+						JustMap.EXECUTOR.execute(() -> {
+							MapRegion.getRegion(worldChunk).storeChunk(this);
+						});
 					}
 				}
 			}

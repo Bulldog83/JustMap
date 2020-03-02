@@ -178,6 +178,14 @@ public class ColorUtil {
 		return Colors.BLACK | b << 16 | g << 8 | r;
 	}
 	
+	public static int ABGRtoARGB(int color) {
+		int a = (color >> 24) & 255;
+		int b = (color >> 16) & 255;
+		int g = (color >> 8) & 255;
+		int r = color & 255;
+		return a << 24 | r << 16 | g << 8 | b;
+	}
+	
 	public static int extractColor(BlockState state) {
 		if (colorCache.containsKey(state)) {
 			return colorCache.get(state);
