@@ -148,12 +148,13 @@ public class Waypoint {
 		waypoint.pos = new BlockPos(JsonHelper.getInt(position, "x"),
 									JsonHelper.getInt(position, "y"),
 									JsonHelper.getInt(position, "z"));
+		waypoint.name = JsonHelper.getString(jsonObject, "name");
 		waypoint.dimension = JsonHelper.getInt(jsonObject, "dimension");
-		waypoint.icon = JsonHelper.getInt(jsonObject, "icon");
+		waypoint.showAlways = JsonHelper.getBoolean(jsonObject, "show_always");
+		waypoint.hidden = JsonHelper.getBoolean(jsonObject, "hidden");
 		waypoint.showRange = JsonHelper.getInt(jsonObject, "show_range");
 		waypoint.color = ColorUtil.parseHex(JsonHelper.getString(jsonObject, "color"));
-		waypoint.hidden = JsonHelper.getBoolean(jsonObject, "hidden");
-		waypoint.showAlways = JsonHelper.getBoolean(jsonObject, "show_always");
+		waypoint.icon = JsonHelper.getInt(jsonObject, "icon");
 		
 		return waypoint;
 	}

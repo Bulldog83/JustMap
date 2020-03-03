@@ -40,4 +40,28 @@ public class StorageUtil {
 		
 		return cacheDir;
 	}
+	
+	public static void clearCache() {
+		deleteDir(cacheDir());
+		cacheDir();
+	}
+	
+	private static void deleteDir(File dir) {
+		if (!dir.exists()) return;
+		
+		File[] files = dir.listFiles();
+		if (files == null) {
+			dir.delete();
+			return;
+		}
+		
+		for (File file : files) {
+			if (file.isDirectory()) {
+				deleteDir(file);
+			} else {
+				file.delete();
+			}
+		}
+		dir.delete();
+	}
 }
