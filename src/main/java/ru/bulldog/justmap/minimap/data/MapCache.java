@@ -1,5 +1,6 @@
 package ru.bulldog.justmap.minimap.data;
 
+import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.minimap.Minimap;
@@ -138,7 +139,9 @@ public class MapCache {
 		
 		long currentTime = System.currentTimeMillis();
 		if (currentTime - lastPurged > purgeDelay) {
-			purge(purgeAmount);
+			JustMap.EXECUTOR.execute(() -> {
+				purge(purgeAmount);
+			});
 			lastPurged = currentTime;
 		}
 	}
@@ -153,11 +156,11 @@ public class MapCache {
 		long currentTime = System.currentTimeMillis();
 		int purged = 0;
 	
-		List<ChunkPos> forPurge = new ArrayList<>();
-		for (ChunkPos chunkPos : chunks.keySet()) {
-			MapChunk chunkData = chunks.get(chunkPos);
+		List<ChunkPos> chunks = new ArrayList<>();
+		for (ChunkPos chunkPos : this.chunks.keySet()) {
+			MapChunk chunkData = this.chunks.get(chunkPos);
 			if (currentTime - chunkData.updated >= 10000) {
-				forPurge.add(chunkPos);
+				chunks.add(chunkPos);
 				purged++;
 				if (purged >= maxPurged) {
 					break;
@@ -165,8 +168,26 @@ public class MapCache {
 			}
 		}
 	
-		for (ChunkPos chunkPos : forPurge) {
-			chunks.remove(chunkPos);
+		for (ChunkPos chunkPos : chunks) {
+			this.chunks.remove(chunkPos);
+		}
+		
+		maxPurged = maxPurged >> 5;
+		
+		List<RegionPos> regions = new ArrayList<>();
+		for (RegionPos regionPos : this.regions.keySet()) {
+			MapRegion region = this.regions.get(regionPos);
+			if (currentTime - region.updated >= 10000) {
+				regions.add(regionPos);
+				purged++;
+				if (purged >= maxPurged) {
+					break;
+				}
+			}
+		}
+	
+		for (RegionPos regionPos : regions) {
+			this.regions.remove(regionPos);
 		}
 	}
 	

@@ -36,13 +36,15 @@ public class MapRegion {
 		
 		saved = time;
 	}
-	
-	private Map<Layer, RegionLayer> layers = new HashMap<>();
+
 	private final int x;
 	private final int z;
 	
+	private Map<Layer, RegionLayer> layers = new HashMap<>();	
 	private Layer currentLayer;
 	private int currentLevel;
+	
+	public long updated = 0;
 	
 	public MapRegion(ChunkPos pos) {
 		this(pos.getRegionX(),
@@ -96,6 +98,8 @@ public class MapRegion {
 		int imgX = (pos.x - (x << 5)) << 4;
 		int imgY = (pos.z - (z << 5)) << 4;			
 		ImageUtil.writeTile(getImage(), chunk.getImage(), imgX, imgY);
+		
+		this.updated = System.currentTimeMillis();
 	}
 	
 	public int getX() {
