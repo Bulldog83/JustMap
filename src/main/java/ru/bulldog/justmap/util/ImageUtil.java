@@ -48,11 +48,63 @@ public class ImageUtil {
 		}
 	}
 	
+	public static void writeTile(BufferedImage image, BufferedImage tile, int x, int y) {
+		int tw = tile.getWidth();
+		int th = tile.getHeight();
+		
+		int tx = 0, ix = x;
+		if (x < 0) {
+			if (tw + x > 0) {
+				ix = 0;
+				x += tw;
+				tx = tw - x;
+				tw -= tx;
+			} else return;
+		}
+		int ty = 0, iy = y;
+		if (y < 0) { 
+			if(th + y > 0) {
+				iy = 0;
+				y += th;
+				ty = th - y;
+				th -= ty;
+			} else return;
+		}
+		
+		int iw = image.getWidth();
+		int ih = image.getHeight();
+		
+		if (x + tw > iw) tw = iw - x;
+		if (y + th > ih) th = ih - y;
+		
+		if (tw <= 0 || th <= 0) return;
+		
+		int[] pixels = new int[tw * th];
+		tile.getRGB(tx, ty, tw, th, pixels, 0, tw);
+		
+		image.setRGB(ix, iy, tw, th, pixels, 0, tw);
+	}
+	
+	public static NativeImage toNativeImage(BufferedImage image) {
+		int w = image.getWidth();
+		int h = image.getHeight();
+		
+		NativeImage nativeImage = new NativeImage(w, h, false);
+		
+		for (int i = 0; i < w; i++) {
+			for(int j = 0; j < h; j++) {
+				nativeImage.setPixelRgba(i, j, ColorUtil.toABGR(image.getRGB(i, j)));
+			}
+		}
+		
+		return nativeImage;
+	}
+	
 	public static NativeImage writeIntoImage(NativeImage toWrite, NativeImage destination, int x, int y) {
 		int drawWidth = toWrite.getWidth();
 		int drawHeight = toWrite.getHeight();
 		int destinationWidth = destination.getWidth();
-		int destinationHeight = destination.getHeight();	   
+		int destinationHeight = destination.getHeight();
 
 		if (x + drawWidth >= destinationWidth) {
 			drawWidth = destinationWidth - x;
@@ -75,40 +127,6 @@ public class ImageUtil {
 				}
 				
 				destination.setPixelRgba(xp, yp, toWrite.getPixelRgba(xOffset, yOffset));
-			}
-		}
-		
-		return destination;
-	}
-	
-	public static BufferedImage writeIntoImage(NativeImage toWrite, BufferedImage destination, int x, int y) {
-		int drawWidth = toWrite.getWidth();
-		int drawHeight = toWrite.getHeight();
-		int destinationWidth = destination.getWidth();
-		int destinationHeight = destination.getHeight();	   
-		
-		if (x + drawWidth >= destinationWidth) {
-			drawWidth = destinationWidth - x;
-		}
-		
-		if (y + drawHeight >= destinationHeight) {
-			drawHeight = destinationHeight - y;
-		}
-		
-		for (int xOffset = 0; xOffset < drawWidth; xOffset++) {
-			int xp = x + xOffset;
-			if (xp < 0) {
-				continue;
-			}
-			
-			for (int yOffset = 0; yOffset < drawHeight; yOffset++) {
-				int yp = y + yOffset;
-				if (yp < 0) {
-					continue;
-				}
-				
-				int pixel = ColorUtil.ABGRtoARGB(toWrite.getPixelRgba(xOffset, yOffset));
-				destination.setRGB(xp, yp, pixel);
 			}
 		}
 		

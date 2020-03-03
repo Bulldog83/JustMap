@@ -8,11 +8,7 @@ import java.util.Map;
 
 import javax.imageio.ImageIO;
 
-import com.mojang.datafixers.util.Pair;
-
 import net.minecraft.util.math.ChunkPos;
-import net.minecraft.world.World;
-import net.minecraft.world.chunk.WorldChunk;
 
 import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.minimap.data.MapProcessor.Layer;
@@ -22,67 +18,75 @@ import ru.bulldog.justmap.util.StorageUtil;
 
 public class MapRegion {
 	
-	public final static Map<Pair<Integer, Integer>, MapRegion> regions = new HashMap<>();
-	
-	public static MapRegion getRegion(WorldChunk chunk) {
-		Pair<Integer, Integer> pos = new Pair<>(chunk.getPos().getRegionX(),
-												chunk.getPos().getRegionZ());
-		
-		if (regions.containsKey(pos)) {
-			return regions.get(pos);
-		}
-		
-		MapRegion region = new MapRegion(chunk);
-		regions.put(pos, region);
-		
-		return region;		
-	}
-	
 	private static long saved = 0;
 	
 	public static void saveImages() {
 		long time = System.currentTimeMillis();
-		if (time - saved < 5000) return;
+		if (time - saved < 3000) return;
+		
+		MapCache data = MapCache.get();
+		
+		if (data == null) return;
 		
 		JustMap.EXECUTOR.execute(() -> {
-			regions.forEach((pos, region) -> {
-				region.layers.forEach((layer, regionLayer) -> {
-					regionLayer.images.forEach((level, image) -> {
-						region.saveImage(layer, level);
-					});
-				});
+			data.getRegions().forEach((pos, region) -> {
+				region.saveImage();
 			});
 		});
 		
 		saved = time;
 	}
 	
-	private final World world;
-	
+	private Map<Layer, RegionLayer> layers = new HashMap<>();
 	private final int x;
 	private final int z;
 	
-	private final Map<Layer, RegionLayer> layers = new HashMap<>();
+	private Layer currentLayer;
+	private int currentLevel;
 	
-	public MapRegion(WorldChunk chunk) {
-		this(chunk.getWorld(),
-			 chunk.getPos().getRegionX(),
-			 chunk.getPos().getRegionZ());
+	public MapRegion(ChunkPos pos) {
+		this(pos.getRegionX(),
+			 pos.getRegionZ());
 	}
 	
-	public MapRegion(World world, int x, int z) {
+	public MapRegion(int x, int z) {
 		this.x = x;
 		this.z = z;
-		
-		this.world = world;
 	}
 	
-	private BufferedImage getImage(Layer layer, int level) {
-		if (!layers.containsKey(layer)) {
-			layers.put(layer, new RegionLayer());
+	public void setLevel(int level) {
+		this.currentLevel = level;
+	}
+	
+	public void setLayer(Layer layer) {
+		this.currentLayer = layer;
+	}
+	
+	public BufferedImage getChunkImage(ChunkPos pos) {
+		if (pos.getRegionX() != x || pos.getRegionZ() != z) {
+			BufferedImage image = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
+			ImageUtil.fillImage(image, Colors.BLACK);
+			
+			return image;
 		}
 		
-		return layers.get(layer).getImage(level);
+		int imgX = (pos.x - (x << 5)) << 4;
+		int imgY = (pos.z - (z << 5)) << 4;
+		
+		return getImage().getSubimage(imgX, imgY, 16, 16);
+	}
+	
+	private BufferedImage getImage() {
+		if (!layers.containsKey(currentLayer)) {
+			layers.put(currentLayer, new RegionLayer());
+		}
+		
+		return layers.get(currentLayer).getImage();
+	}
+	
+	public void resetRegion() {
+		layers = new HashMap<>();
+		StorageUtil.clearCache();
 	}
 	
 	public synchronized void storeChunk(MapChunk chunk) {
@@ -91,7 +95,7 @@ public class MapRegion {
 		
 		int imgX = (pos.x - (x << 5)) << 4;
 		int imgY = (pos.z - (z << 5)) << 4;			
-		ImageUtil.writeIntoImage(chunk.getImage(), getImage(chunk.getLayer(), chunk.getLevel()), imgX, imgY);
+		ImageUtil.writeTile(getImage(), chunk.getImage(), imgX, imgY);
 	}
 	
 	public int getX() {
@@ -102,30 +106,34 @@ public class MapRegion {
 		return this.z;
 	}
 	
-	public synchronized void saveImage(Layer layer, int level) {		
-		int dim = world.getDimension().getType().getRawId();
-		File dimDir = new File(StorageUtil.cacheDir(), String.format("DIM%d/", dim));
+	public synchronized void saveImage() {
+		File png = new File(imagesDir(), String.format("%d.%d.png", x, z));
 		
-		File cacheDir;
-		if (layer == Layer.CAVES) {
-			cacheDir = new File(dimDir, String.format("caves/%d/", level));
-		} else {
-			cacheDir = new File(dimDir, "surface/");
-		}
-		
-		File png = new File(cacheDir, String.format("%d.%d.png", x, z));
-		
-		if (!cacheDir.exists()) {
-			cacheDir.mkdirs();
-		}
-		
-		BufferedImage image = getImage(layer, level);
+		BufferedImage image = getImage();
 		
 		try {
 			ImageIO.write(image, "png", png);
 		} catch (IOException ex) {
 			JustMap.LOGGER.catching(ex);
 		}
+	}
+	
+	private File imagesDir() {
+		int dim = MapCache.get().world.getDimension().getType().getRawId();
+		File dimDir = new File(StorageUtil.cacheDir(), String.format("DIM%d/", dim));
+		
+		File cacheDir;
+		if (currentLayer == Layer.CAVES) {
+			cacheDir = new File(dimDir, String.format("caves/%d/", currentLevel));
+		} else {
+			cacheDir = new File(dimDir, "surface/");
+		}
+		
+		if (!cacheDir.exists()) {
+			cacheDir.mkdirs();
+		}
+		
+		return cacheDir;
 	}
 	
 	private class RegionLayer {
@@ -135,15 +143,25 @@ public class MapRegion {
 			images = new HashMap<>();
 		}
 		
-		private BufferedImage getImage(int level) {
-			if (images.containsKey(level)) {
-				return images.get(level);
-			}
+		private BufferedImage getImage() {
+			if (images.containsKey(currentLevel)) {
+				return images.get(currentLevel);
+			}			
+			
+			BufferedImage image = loadImage();
+			images.put(currentLevel, image);
+			
+			return image;
+		}
+		
+		private BufferedImage loadImage() {
+			File png = new File(imagesDir(), String.format("%d.%d.png", x, z));
+			try {
+				return ImageIO.read(png);
+			} catch (IOException ex) {}
 			
 			BufferedImage image = new BufferedImage(512, 512, BufferedImage.TYPE_INT_ARGB);
 			ImageUtil.fillImage(image, Colors.BLACK);
-			
-			images.put(level, image);
 			
 			return image;
 		}

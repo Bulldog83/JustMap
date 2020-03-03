@@ -10,7 +10,13 @@ public class TaskManager implements Executor {
     private final Queue<Runnable> workQueue = new ConcurrentLinkedQueue<>();
     private volatile boolean isRunning = false;
     
+    private String name = JustMap.MODID;
+    
     public TaskManager() {}
+    
+    public TaskManager(String name) {
+    	this.name += "-" + name;
+    }
 
     @Override
     public void execute(Runnable command) {
@@ -20,11 +26,12 @@ public class TaskManager implements Executor {
 
     public void start() {
         isRunning = true;
-        new Thread(new Task(), JustMap.MODID).start();
+        new Thread(new Task(), name).start();
     }
     
     public void stop() {
     	isRunning = false;
+    	if (workQueue.size() > 0) workQueue.clear();
     }
     
     public boolean isRunning() {
