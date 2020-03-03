@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
+	<classpathentry kind="output" path="bin/default"/>
 	<classpathentry output="bin/main" kind="src" path="src/main/java">
 		<attributes>
 			<attribute name="gradle_scope" value="main"/>
@@ -12,7 +13,6 @@
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="output" path="bin/default"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8/"/>
 	<classpathentry sourcepath="./.gradle/caches/modules-2/files-2.1/me.shedaniel.cloth/basic-math/0.3.0/7412bc0678d35e39045bfc801ca638d316ba6029/basic-math-0.3.0-sources.jar" kind="lib" path="./.gradle/caches/modules-2/files-2.1/me.shedaniel.cloth/basic-math/0.3.0/16189df2ecb51d636502a33d9966eeb969d3d578/basic-math-0.3.0.jar">
 		<attributes>
@@ -414,7 +414,7 @@
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="./.gradle/caches/jars-3/9209d7975808ed6f97f48f63540f07ff/fabric-loom-0.2.6-SNAPSHOT.jar">
+	<classpathentry kind="lib" path="./.gradle/caches/modules-2/files-2.1/net.fabricmc/fabric-loom/0.2.6-SNAPSHOT/71308376238c7e047d5c1e52cf6cf08339a50e4f/fabric-loom-0.2.6-SNAPSHOT.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value=""/>
 		</attributes>

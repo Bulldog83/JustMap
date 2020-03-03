@@ -37,8 +37,7 @@ public class MapRegion {
 		saved = time;
 	}
 
-	private final int x;
-	private final int z;
+	private final RegionPos pos;
 	
 	private Map<Layer, RegionLayer> layers = new HashMap<>();	
 	private Layer currentLayer;
@@ -52,8 +51,7 @@ public class MapRegion {
 	}
 	
 	public MapRegion(int x, int z) {
-		this.x = x;
-		this.z = z;
+		this.pos = new RegionPos(x, z);
 	}
 	
 	public void setLevel(int level) {
@@ -64,16 +62,16 @@ public class MapRegion {
 		this.currentLayer = layer;
 	}
 	
-	public BufferedImage getChunkImage(ChunkPos pos) {
-		if (pos.getRegionX() != x || pos.getRegionZ() != z) {
+	public BufferedImage getChunkImage(ChunkPos chunkPos) {
+		if (chunkPos.getRegionX() != this.pos.x || chunkPos.getRegionZ() != this.pos.z) {
 			BufferedImage image = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
 			ImageUtil.fillImage(image, Colors.BLACK);
 			
 			return image;
 		}
 		
-		int imgX = (pos.x - (x << 5)) << 4;
-		int imgY = (pos.z - (z << 5)) << 4;
+		int imgX = (chunkPos.x - (this.pos.x << 5)) << 4;
+		int imgY = (chunkPos.z - (this.pos.z << 5)) << 4;
 		
 		return getImage().getSubimage(imgX, imgY, 16, 16);
 	}
@@ -92,26 +90,26 @@ public class MapRegion {
 	}
 	
 	public synchronized void storeChunk(MapChunk chunk) {
-		ChunkPos pos = chunk.getPos();
-		if (pos.getRegionX() != x || pos.getRegionZ() != z) return;
+		ChunkPos chunkPos = chunk.getPos();
+		if (chunkPos.getRegionX() != this.pos.x || chunkPos.getRegionZ() != this.pos.z) return;
 		
-		int imgX = (pos.x - (x << 5)) << 4;
-		int imgY = (pos.z - (z << 5)) << 4;			
+		int imgX = (chunkPos.x - (this.pos.x << 5)) << 4;
+		int imgY = (chunkPos.z - (this.pos.z << 5)) << 4;			
 		ImageUtil.writeTile(getImage(), chunk.getImage(), imgX, imgY);
 		
 		this.updated = System.currentTimeMillis();
 	}
 	
 	public int getX() {
-		return this.x;
+		return this.pos.x;
 	}
 	
 	public int getZ() {
-		return this.z;
+		return this.pos.z;
 	}
 	
 	public synchronized void saveImage() {
-		File png = new File(imagesDir(), String.format("%d.%d.png", x, z));
+		File png = new File(imagesDir(), String.format("%d.%d.png", this.pos.x, this.pos.z));
 		
 		BufferedImage image = getImage();
 		
@@ -159,7 +157,7 @@ public class MapRegion {
 		}
 		
 		private BufferedImage loadImage() {
-			File png = new File(imagesDir(), String.format("%d.%d.png", x, z));
+			File png = new File(imagesDir(), String.format("%d.%d.png", pos.x, pos.z));
 			try {
 				return ImageIO.read(png);
 			} catch (IOException ex) {}
