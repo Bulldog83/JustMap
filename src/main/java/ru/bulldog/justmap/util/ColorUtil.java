@@ -178,6 +178,14 @@ public class ColorUtil {
 		return Colors.BLACK | b << 16 | g << 8 | r;
 	}
 	
+	public static int ABGRtoARGB(int color) {
+		int a = (color >> 24) & 255;
+		int b = (color >> 16) & 255;
+		int g = (color >> 8) & 255;
+		int r = color & 255;
+		return a << 24 | r << 16 | g << 8 | b;
+	}
+	
 	public static int extractColor(BlockState state) {
 		if (colorCache.containsKey(state)) {
 			return colorCache.get(state);
@@ -249,9 +257,9 @@ public class ColorUtil {
 	}
 	
 	public static int blockColor(WorldChunk worldChunk, BlockMeta block) {
-		BlockPos overPos = new BlockPos(block.pos.getX(), block.pos.getY() + 1, block.pos.getZ());
-		if (!StateUtil.isAir(block.state) && worldChunk.getWorld().getBlockState(overPos).isAir()) {
-			return blockColor(worldChunk.getWorld(), block.state, block.pos);
+		BlockPos overPos = new BlockPos(block.getPos().getX(), block.getPos().getY() + 1, block.getPos().getZ());
+		if (!StateUtil.isAir(block.getState()) && worldChunk.getWorld().getBlockState(overPos).isAir()) {
+			return blockColor(worldChunk.getWorld(), block.getState(), block.getPos());
 		}
 	
 		return Colors.BLACK;
@@ -283,7 +291,7 @@ public class ColorUtil {
 			blockColor = blockColor != -1 ? blockColor : textureColor;
 
 		}
-		blockColor = ColorUtil.toABGR(blockColor != -1 ? blockColor : materialColor);
+		blockColor = blockColor != -1 ? blockColor : materialColor;
 		
 		return blockColor;
 	}

@@ -6,7 +6,7 @@ public class ClientParams {
 	public static MapPosition mapPosition = MapPosition.TOP_RIGHT;
 	
 	public static int positionOffset = 4;
-	public static int mapSize = 64;
+	public static int mapSize = 128;
 	public static int chunkLevelSize = 3;
 	public static float mapScale = 1.0F;
 	public static boolean mapVisible = true;

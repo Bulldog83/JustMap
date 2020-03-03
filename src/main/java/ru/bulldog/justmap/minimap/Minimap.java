@@ -18,7 +18,6 @@ import ru.bulldog.justmap.util.DrawHelper.TextAlignment;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.resource.language.I18n;
-import net.minecraft.client.texture.NativeImage;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.mob.HostileEntity;
@@ -31,6 +30,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.dimension.DimensionType;
 
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -45,13 +45,12 @@ public class Minimap {
 	private MapText txtTime = new MapText(TextAlignment.CENTER, "00:00");
 	private MapText txtFPS = new MapText(TextAlignment.CENTER, "00 fps");
 	
-	private int mapSize = JustMapClient.CONFIG.getInt("map_size");
-	
-	private float mapScale = 1;
+	private int mapSize;	
+	private float mapScale;
 	
 	private Biome currentBiome;
 	
-	private NativeImage image;
+	private BufferedImage image;
 	
 	private List<WaypointIcon> waypoints = new ArrayList<>();
 	private List<PlayerIcon> players = new ArrayList<>();
@@ -62,7 +61,12 @@ public class Minimap {
 	private static boolean isMapVisible = true;
 	
 	public Minimap() {
-		image = new NativeImage(NativeImage.Format.RGBA, mapSize, mapSize, false);	
+		this.mapSize = JustMapClient.CONFIG.getInt("map_size");
+		this.mapScale = JustMapClient.CONFIG.getFloat("map_scale");
+		
+		int scaledSize = getScaledSize();
+		
+		image = new BufferedImage(scaledSize, scaledSize, BufferedImage.TYPE_INT_ARGB);
 		textManager = new TextManager(this);
 		isMapVisible = JustMapClient.CONFIG.getBoolean("map_visible");
 	}
@@ -86,8 +90,12 @@ public class Minimap {
 	}
 	
 	private void resizeMap(int newSize) {
-		image = new NativeImage(NativeImage.Format.RGBA, newSize, newSize, false);
+		image = new BufferedImage(newSize, newSize, BufferedImage.TYPE_INT_ARGB);
 		JustMap.LOGGER.logInfo(String.format("Map resized to %dx%d", newSize, newSize));
+	}
+	
+	public int getScaledSize() {
+		return (int) (mapSize * mapScale);
 	}
 	
 	public void onConfigChanges() {
@@ -101,7 +109,7 @@ public class Minimap {
 			this.mapSize = configSize;
 			this.mapScale = configScale;
 			
-			resizeMap((int) (mapSize * mapScale));
+			resizeMap(getScaledSize());
 		}
 	}
 	
@@ -186,7 +194,7 @@ public class Minimap {
 		
 		currentBiome = world.getBiome(pos);
 		
-		int scaled = (int) (mapSize * mapScale);
+		int scaled = getScaledSize();
 		int startX = pos.getX() - scaled / 2;
 		int startZ = pos.getZ() - scaled / 2;
 		int endX = startX + scaled;
@@ -200,7 +208,7 @@ public class Minimap {
 			MapCache.setLayerLevel(0);
 		}
 		
-		MapCache.get(world).update(this, scaled, startX, startZ);
+		MapCache.get().update(this, scaled, startX, startZ);
 		
 		if (allowPlayerRadar()) {
 			players.clear();			
@@ -225,7 +233,7 @@ public class Minimap {
 		
 		if (allowEntityRadar()) {
 			entities.clear();
-				
+			
 			int checkHeight = 24;
 			BlockPos start = new BlockPos(startX, player.getY() - checkHeight / 2, startZ);
 			BlockPos end = new BlockPos(endX, player.getY() + checkHeight / 2, endZ);
@@ -284,7 +292,7 @@ public class Minimap {
 		minecraftClient.openScreen(new WaypointEditor(waypoint, minecraftClient.currentScreen, WaypointKeeper.getInstance()::addNew));		
 	}
 	
-	public NativeImage getImage() {
+	public BufferedImage getImage() {
 		return image;
 	}
 	
