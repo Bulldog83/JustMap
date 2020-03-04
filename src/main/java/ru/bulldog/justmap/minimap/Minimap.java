@@ -47,6 +47,7 @@ public class Minimap {
 	
 	private int mapSize;	
 	private float mapScale;
+	private int picSize;
 	
 	private Biome currentBiome;
 	
@@ -63,6 +64,8 @@ public class Minimap {
 	public Minimap() {
 		this.mapSize = JustMapClient.CONFIG.getInt("map_size");
 		this.mapScale = JustMapClient.CONFIG.getFloat("map_scale");
+		
+		this.picSize = ClientParams.rotateMap ? (int) (mapSize * 1.3) : mapSize;
 		
 		int scaledSize = getScaledSize();
 		
@@ -95,7 +98,8 @@ public class Minimap {
 	}
 	
 	public int getScaledSize() {
-		return (int) (mapSize * mapScale);
+		this.picSize = ClientParams.rotateMap ? (int) (mapSize * 1.3) : mapSize;
+		return (int) (picSize * mapScale);
 	}
 	
 	public void onConfigChanges() {
@@ -293,27 +297,31 @@ public class Minimap {
 	}
 	
 	public BufferedImage getImage() {
-		return image;
+		return this.image;
 	}
 	
-	public int getSize() {
-		return mapSize;
+	public int getMapSize() {
+		return this.mapSize;
+	}
+	
+	public int getPictureSize() {
+		return this.picSize;
 	}
 	
 	public float getScale() {
-		return mapScale;
+		return this.mapScale;
 	}
 	
 	public List<PlayerIcon> getPlayerIcons() {
-		return players;
+		return this.players;
 	}
 	
 	public List<EntityIcon> getEntities() {
-		return entities;
+		return this.entities;
 	}
 	
 	public TextManager getTextManager() {
-		return textManager;
+		return this.textManager;
 	}
 	
 	public boolean isMapVisible() {

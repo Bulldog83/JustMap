@@ -1,5 +1,7 @@
 package ru.bulldog.justmap.minimap;
 
+import org.lwjgl.opengl.GL11;
+
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import ru.bulldog.justmap.JustMap;
@@ -8,7 +10,6 @@ import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.minimap.icon.EntityIcon;
 import ru.bulldog.justmap.minimap.icon.PlayerIcon;
 import ru.bulldog.justmap.minimap.icon.WaypointIcon;
-import ru.bulldog.justmap.util.Colors;
 import ru.bulldog.justmap.util.DrawHelper;
 import ru.bulldog.justmap.util.DrawHelper.TextAlignment;
 import ru.bulldog.justmap.util.ImageUtil;
@@ -30,7 +31,6 @@ public class MapRenderer {
 	
 	protected MapPosition mapPosition;
 	protected int border = 2;
-	protected int borderColor = Colors.GRAY;
 	
 	private int offset;
 	private int posX, posY;
@@ -87,8 +87,8 @@ public class MapRenderer {
 		
 		backingImage = ImageUtil.toNativeImage(minimap.getImage());
 	
-		mapW = minimap.getSize();
-		mapH = minimap.getSize();
+		mapW = minimap.getMapSize();
+		mapH = minimap.getMapSize();
 		
 		if (ClientParams.useSkins) {
 			mapSkin = MapSkin.getSkin(ClientParams.currentSkin);
@@ -200,31 +200,32 @@ public class MapRenderer {
 
 		drawMap();
 
+		float rotation = client.player.headYaw;
 		if (ClientParams.drawChunkGrid) {
 			drawChunkGrid();
 		}
 		if (Minimap.allowEntityRadar()) {
 			if (Minimap.allowPlayerRadar()) {
 				for (PlayerIcon player : minimap.getPlayerIcons()) {
-					player.draw(mapX, mapY);
+					player.draw(mapX, mapY, rotation);
 				}
 			}
 			if (Minimap.allowCreatureRadar() || Minimap.allowHostileRadar()) {
 				for (EntityIcon entity : minimap.getEntities()) {
-					entity.draw(mapX, mapY);
+					entity.draw(mapX, mapY, rotation);
 				}
 			}
 		}
 		for (WaypointIcon waypoint : minimap.getWaypoints()) {
 			if (!waypoint.isHidden()) {
-				waypoint.draw(mapX, mapY);
+				waypoint.draw(mapX, mapY, rotation);
 			}
 		}
 		
 		int arrowX = mapX + mapW / 2;
 		int arrowY = mapY + mapH / 2;
 		
-		PlayerArrow.draw(arrowX, arrowY, client.player.headYaw);
+		DirectionArrow.draw(arrowX, arrowY, rotation);
 		
 		textManager.draw();
 		
@@ -232,22 +233,41 @@ public class MapRenderer {
 	}
 	
 	private void drawMap() {		
-		client.getTextureManager().bindTexture(mapTexture);
-		
 		Tessellator tessellator = Tessellator.getInstance();
 		BufferBuilder builder = tessellator.getBuffer();
 		builder.begin(7, VertexFormats.POSITION_TEXTURE);
 		
 		double z = 0.09;
+		float angle = client.player.headYaw + 180;
 		
-		RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+		client.getTextureManager().bindTexture(mapTexture);
 		
-		builder.vertex(mapX, mapY + mapH, z).texture(0, 1).next();
-		builder.vertex(mapX + mapW, mapY + mapH, z).texture(1, 1).next();
-		builder.vertex(mapX + mapW, mapY, z).texture(1, 0).next();
-		builder.vertex(mapX, mapY, z).texture(0, 0).next();
+		float f1 = 0, f2 = 1;		
+		if (ClientParams.rotateMap) {		
+			f1 = 0.15F;
+			f2 = 0.85F;
+			
+			RenderSystem.enableTexture();
+			RenderSystem.matrixMode(GL11.GL_TEXTURE);
+			RenderSystem.pushMatrix();
+			RenderSystem.translatef(0.5F, 0.5F, 0);
+			RenderSystem.rotatef(angle, 0, 0, 1.0F);
+			RenderSystem.translatef(-0.5F, -0.5F, 0);
+		}
+		
+		RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);		
+		builder.vertex(mapX, mapY + mapH, z).texture(f1, f2).next();
+		builder.vertex(mapX + mapW, mapY + mapH, z).texture(f2, f2).next();
+		builder.vertex(mapX + mapW, mapY, z).texture(f2, f1).next();
+		builder.vertex(mapX, mapY, z).texture(f1, f1).next();
 		
 		tessellator.draw();
+		
+		if (ClientParams.rotateMap) {		
+			RenderSystem.popMatrix();
+			RenderSystem.matrixMode(GL11.GL_MODELVIEW);
+		}
+
 	}
 	
 	private void drawChunkGrid() {

@@ -12,7 +12,7 @@ public class WaypointIcon extends MapIcon<WaypointIcon> {
 	}
 
 	@Override
-	public void draw(int mapX, int mapY) {
+	public void draw(int mapX, int mapY, float rotation) {
 		int size = 8;
 		int col = waypoint.color;
 		

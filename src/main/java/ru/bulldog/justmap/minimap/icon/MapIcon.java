@@ -26,5 +26,5 @@ public abstract class MapIcon<T extends MapIcon<T>> {
 		return (int) (((val - startVal) / ((float) (endVal - startVal))) * range);
 	}
 	
-	public abstract void draw(int mapX, int mapY);
+	public abstract void draw(int mapX, int mapY, float rotation);
 }

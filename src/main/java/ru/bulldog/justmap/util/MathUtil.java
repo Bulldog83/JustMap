@@ -15,6 +15,10 @@ public class MathUtil {
 		return Math.log(a) / Math.log(n); 
 	}
 	
+	public static double pow2(double n) {
+		return Math.pow(n, 2);
+	}
+	
 	public static double getDistance(BlockPos a, BlockPos b) {
 		return getDistance(a, b, false);
 	}

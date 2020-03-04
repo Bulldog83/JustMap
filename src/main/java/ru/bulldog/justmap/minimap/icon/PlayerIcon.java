@@ -19,7 +19,7 @@ public class PlayerIcon extends MapIcon<PlayerIcon> {
 	}
 
 	@Override
-	public void draw(int mapX, int mapY) {
+	public void draw(int mapX, int mapY, float rotation) {
 		
 		int drawX = mapX + x;
 		int drawY = mapY + y;
