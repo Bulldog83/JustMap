@@ -246,11 +246,11 @@ public class Minimap {
 					t++;
 					LivingEntity livingEntity = (LivingEntity) entity;
 					boolean hostile = livingEntity instanceof HostileEntity;
-					if (allowHostileRadar() && hostile) {
+					if (hostile && allowHostileRadar()) {
 						EntityIcon entIcon = new EntityIcon(this, entity, hostile);						
 						entIcon.setPosition(MapIcon.scaledPos((int) entity.getX(), startX, endX, mapSize), MapIcon.scaledPos((int) entity.getZ(), startZ, endZ, mapSize));						
 						this.entities.add(entIcon);
-					} else if (allowCreatureRadar()) {
+					} else if (!hostile && allowCreatureRadar()) {
 						EntityIcon entIcon = new EntityIcon(this, entity, hostile);						
 						entIcon.setPosition(MapIcon.scaledPos((int) entity.getX(), startX, endX, mapSize), MapIcon.scaledPos((int) entity.getZ(), startZ, endZ, mapSize));						
 						this.entities.add(entIcon);
@@ -268,8 +268,8 @@ public class Minimap {
 			wps.stream().filter(wp -> MathUtil.getDistance(pos, wp.pos, true) <= wp.showRange).forEach(wp -> {
 				WaypointIcon waypoint = new WaypointIcon(this, wp);
 				waypoint.setPosition(
-					MathUtil.clamp(MapIcon.scaledPos(wp.pos.getX(), startX, endX, mapSize), 0, mapSize),
-					MathUtil.clamp(MapIcon.scaledPos(wp.pos.getZ(), startZ, endZ, mapSize), 0, mapSize)
+					MathUtil.clamp(MapIcon.scaledPos(wp.pos.getX(), startX, endX, mapSize), 0, scaled),
+					MathUtil.clamp(MapIcon.scaledPos(wp.pos.getZ(), startZ, endZ, mapSize), 0, scaled)
 				);
 				waypoints.add(waypoint);
 			});

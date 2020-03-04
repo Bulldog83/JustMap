@@ -2,8 +2,10 @@ package ru.bulldog.justmap.minimap;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
+import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.util.Colors;
+
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.DiffuseLighting;
 import net.minecraft.client.render.VertexConsumerProvider;
@@ -13,6 +15,7 @@ import net.minecraft.client.util.math.Vector3f;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.boss.dragon.EnderDragonEntity;
 import net.minecraft.entity.mob.GhastEntity;
+import net.minecraft.entity.mob.WaterCreatureEntity;
 import net.minecraft.entity.LivingEntity;
 
 public class EntityModelRenderer {	
@@ -65,15 +68,21 @@ public class EntityModelRenderer {
 	
 	private static float getScale(LivingEntity livingEntity) {
 		int modelSize = ClientParams.entityModelSize;
+		float mapScale = JustMapClient.MAP.getScale();
 		
-		float scaleX = modelSize / Math.max(livingEntity.getWidth(), 0.5F);
-		float scaleY = modelSize / Math.max(livingEntity.getHeight(), 0.5F);
+		modelSize = (int) Math.min(modelSize, modelSize / mapScale);
+		
+		float scaleX = modelSize / Math.max(livingEntity.getWidth(), 1.0F);
+		float scaleY = modelSize / Math.max(livingEntity.getHeight(), 1.0F);
 		
 		float scale = Math.max(Math.min(scaleX, scaleY), modelSize);
 		
 		if (livingEntity instanceof GhastEntity || livingEntity instanceof EnderDragonEntity) {
-			scale = modelSize / 3;
-		}		
+			scale = modelSize / 3.0F;
+		}
+		if (livingEntity instanceof WaterCreatureEntity) {
+			scale = modelSize / 1.35F;
+		}	
 		if (livingEntity.isSleeping()) {
 			scale = modelSize;
 		}
