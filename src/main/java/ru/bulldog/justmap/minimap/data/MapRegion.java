@@ -63,11 +63,10 @@ public class MapRegion {
 	}
 	
 	public BufferedImage getChunkImage(ChunkPos chunkPos) {
-		if (chunkPos.getRegionX() != this.pos.x || chunkPos.getRegionZ() != this.pos.z) {
-			BufferedImage image = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
-			ImageUtil.fillImage(image, Colors.BLACK);
+		if (chunkPos.getRegionX() != this.pos.x ||
+			chunkPos.getRegionZ() != this.pos.z) {
 			
-			return image;
+			return null;
 		}
 		
 		int imgX = (chunkPos.x - (this.pos.x << 5)) << 4;
@@ -85,7 +84,7 @@ public class MapRegion {
 	}
 	
 	public void resetRegion() {
-		layers = new HashMap<>();
+		layers.clear();
 		StorageUtil.clearCache();
 	}
 	
