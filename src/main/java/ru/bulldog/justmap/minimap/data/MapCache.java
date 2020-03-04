@@ -159,7 +159,7 @@ public class MapCache {
 		List<ChunkPos> chunks = new ArrayList<>();
 		for (ChunkPos chunkPos : this.chunks.keySet()) {
 			MapChunk chunkData = this.chunks.get(chunkPos);
-			if (currentTime - chunkData.updated >= 10000) {
+			if (currentTime - chunkData.updated >= 30000) {
 				chunks.add(chunkPos);
 				purged++;
 				if (purged >= maxPurged) {
@@ -177,7 +177,7 @@ public class MapCache {
 		List<RegionPos> regions = new ArrayList<>();
 		for (RegionPos regionPos : this.regions.keySet()) {
 			MapRegion region = this.regions.get(regionPos);
-			if (currentTime - region.updated >= 10000) {
+			if (currentTime - region.updated >= 30000) {
 				regions.add(regionPos);
 				purged++;
 				if (purged >= maxPurged) {
@@ -255,5 +255,6 @@ public class MapCache {
 	
 	private void clear() {
 		chunks.clear();
+		regions.clear();
 	}
 }

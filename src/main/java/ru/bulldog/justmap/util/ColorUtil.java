@@ -186,6 +186,13 @@ public class ColorUtil {
 		return a << 24 | r << 16 | g << 8 | b;
 	}
 	
+	public static int colorBrigtness(int color, float val) {
+		float[] hsb = RGBtoHSB((color >> 16) & 255, (color >> 8) & 255, color & 255, null);
+		hsb[2] += val / 10.0F;
+		hsb[2] = MathUtil.clamp(hsb[2], 0.0F, 1.0F);
+		return HSBtoRGB(hsb[0], hsb[1], hsb[2]);
+	}
+	
 	public static int extractColor(BlockState state) {
 		if (colorCache.containsKey(state)) {
 			return colorCache.get(state);

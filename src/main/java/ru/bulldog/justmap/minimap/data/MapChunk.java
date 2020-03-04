@@ -4,6 +4,7 @@ import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.minimap.data.MapProcessor.Layer;
 import ru.bulldog.justmap.util.ColorUtil;
 import ru.bulldog.justmap.util.Colors;
+import ru.bulldog.justmap.util.ImageUtil;
 import net.minecraft.world.Heightmap;
 import net.minecraft.world.World;
 import net.minecraft.util.math.BlockPos;
@@ -242,7 +243,13 @@ public class MapChunk {
 		
 		private BufferedImage loadImage() {
 			MapRegion region = MapCache.get().getRegion(chunkPos);			
-			return region.getChunkImage(chunkPos);
+			BufferedImage image = region.getChunkImage(chunkPos);
+			if (image == null) {
+				image = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
+				ImageUtil.fillImage(image, Colors.BLACK);
+			}
+			
+			return image;
 		}
 	}
 }
