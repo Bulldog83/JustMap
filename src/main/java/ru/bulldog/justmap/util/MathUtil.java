@@ -25,7 +25,7 @@ public class MathUtil {
 		int distZ = (a.getZ() - b.getZ());
 		
 		dist = distX * distX + distZ * distZ;
-		if (horizontalOnly) {
+		if (!horizontalOnly) {
 			int distY = (a.getY() - b.getY());
 			dist += distY * distY;
 		}

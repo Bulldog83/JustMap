@@ -43,6 +43,8 @@ public class ColorUtil {
 	
 	private static Map<BlockState, Integer> colorCache = new HashMap<>();
 	
+	private static float[] floatBuffer = new float[3];
+	
 	public static int[] toIntArray(int color) {
 		return new int[] {
 			(color >> 24) & 255,
@@ -53,7 +55,7 @@ public class ColorUtil {
 	}
 	
 	public static float[] toFloatArray(int color) {
-		float[] floats = new float[3];
+		float[] floats = floatBuffer;
 		floats[0] = ((color >> 16 & 255) / 255.0F);
 		floats[1] = ((color >> 8 & 255) / 255.0F);
 		floats[2] = ((color & 255) / 255.0F);
@@ -64,7 +66,7 @@ public class ColorUtil {
 	public static float[] RGBtoHSB(int r, int g, int b, float[] hsbvals) {
 		float hue, saturation, brightness;
 		if (hsbvals == null) {
-			hsbvals = new float[3];
+			hsbvals = floatBuffer;
 		}
 		int cmax = (r > g) ? r : g;
 		if (b > cmax) cmax = b;
@@ -187,7 +189,8 @@ public class ColorUtil {
 	}
 	
 	public static int colorBrigtness(int color, float val) {
-		float[] hsb = RGBtoHSB((color >> 16) & 255, (color >> 8) & 255, color & 255, null);
+		float[] hsb = floatBuffer;
+		RGBtoHSB((color >> 16) & 255, (color >> 8) & 255, color & 255, hsb);
 		hsb[2] += val / 10.0F;
 		hsb[2] = MathUtil.clamp(hsb[2], 0.0F, 1.0F);
 		return HSBtoRGB(hsb[0], hsb[1], hsb[2]);
@@ -236,7 +239,8 @@ public class ColorUtil {
 	}
 	
 	public static int proccessColor(int color, int heightDiff) {
-		float[] hsb = RGBtoHSB((color >> 16) & 255, (color >> 8) & 255, color & 255, null);
+		float[] hsb = floatBuffer;
+		RGBtoHSB((color >> 16) & 255, (color >> 8) & 255, color & 255, hsb);
 		hsb[1] += ClientParams.mapSaturation / 100.0F;
 		hsb[1] = MathUtil.clamp(hsb[1], 0.0F, 1.0F);
 		hsb[2] += ClientParams.mapBrightness / 100.0F;

@@ -265,7 +265,7 @@ public class Minimap {
 		waypoints.clear();
 		List<Waypoint> wps = WaypointKeeper.getInstance().getWaypoints(world.dimension.getType().getRawId(), true);
 		if (wps != null) {
-			wps.stream().filter(wp -> MathUtil.getDistance(pos, wp.pos, true) <= wp.showRange).forEach(wp -> {
+			wps.stream().filter(wp -> MathUtil.getDistance(pos, wp.pos, false) <= wp.showRange).forEach(wp -> {
 				WaypointIcon waypoint = new WaypointIcon(this, wp);
 				waypoint.setPosition(
 					MathUtil.clamp(MapIcon.scaledPos(wp.pos.getX(), startX, endX, mapSize), 0, scaled),
