@@ -36,7 +36,7 @@ public class ClientParams {
 	public static boolean showIconsOutline = false;
 	public static boolean renderEntityModel = false;
 	public static int entityIconSize = 8;
-	public static int entityModelSize = 10;
+	public static int entityModelSize = 5;
 	
 	public static int chunkUpdateInterval = 1000;
 	public static int chunkLevelUpdateInterval = 3000;

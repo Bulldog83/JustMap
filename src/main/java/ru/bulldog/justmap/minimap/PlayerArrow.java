@@ -51,6 +51,7 @@ public class PlayerArrow extends Sprite {
 			
 			textureManager.bindTexture(PLAYER_ARROW.getId());
 			
+			RenderSystem.enableAlphaTest();
 			RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
 			
 			matrix.push();
