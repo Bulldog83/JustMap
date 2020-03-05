@@ -5,13 +5,14 @@ import ru.bulldog.justmap.minimap.data.MapProcessor.Layer;
 import ru.bulldog.justmap.util.ColorUtil;
 import ru.bulldog.justmap.util.Colors;
 import ru.bulldog.justmap.util.ImageUtil;
+
 import net.minecraft.world.Heightmap;
 import net.minecraft.world.World;
+import net.minecraft.client.texture.NativeImage;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.chunk.WorldChunk;
 
-import java.awt.image.BufferedImage;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -19,11 +20,11 @@ import java.util.Map;
 public class MapChunk {
 
 	private Layer layer;
-	private WorldChunk worldChunk;	
-	private Map<Layer, ChunkLevel[]> levels = new HashMap<>();
-	private ChunkLevel chunkLevel;	
-	private boolean empty;	
-	private ChunkPos chunkPos;	
+	private WorldChunk worldChunk;
+	private Map<Layer, ChunkLevel[]> levels;
+	private ChunkLevel chunkLevel;
+	private boolean empty;
+	private ChunkPos chunkPos;
 	private int level = 0;
 	
 	public long updated = 0;
@@ -40,22 +41,17 @@ public class MapChunk {
 	private void initChunk(World world, ChunkPos pos, Layer layer) {
 		this.worldChunk = world.getChunk(pos.x, pos.z);
 		this.chunkPos = pos;
-		this.layer = layer;
+		this.layer = layer;		
+		levels = new HashMap<>();
 		
-		if (!levels.containsKey(layer)) {
-			initLayer();
-		}
-		
-		chunkLevel = levels.get(layer)[level];
+		initLayer();
 	}
 	
 	public void resetChunk() {
 		this.levels.clear();
+		this.updated = 0;
 		
 		initLayer();
-		
-		this.chunkLevel = levels.get(layer)[level];
-		this.updated = 0;
 	}
 	
 	private void initLayer() {
@@ -67,7 +63,9 @@ public class MapChunk {
 		}
 		
 		this.levels.put(layer, new ChunkLevel[levels]);
-		this.levels.get(layer)[level] = new ChunkLevel();
+		
+		this.chunkLevel = new ChunkLevel();
+		this.levels.get(layer)[level] = chunkLevel;
 	}
 	
 	public void setChunk(WorldChunk chunk) {
@@ -98,7 +96,7 @@ public class MapChunk {
 		return this.empty;
 	}
 	
-	public synchronized BufferedImage getImage() {
+	public synchronized NativeImage getImage() {
 		return chunkLevel.image;
 	}
 	
@@ -114,24 +112,15 @@ public class MapChunk {
 		return chunkLevel.heightmap;
 	}
 	
-	private void setLayer(Layer layer) {
-		this.layer = layer;		
-		
-		if (!levels.containsKey(layer)) {
-			initLayer();			
-		}
-	}
-	
 	public void setLevel(Layer layer, int level) {
 		if (this.layer == layer &&
 			this.level == level) return;
 		
 		this.level = level;		
-		this.setLayer(layer);
+		this.layer = layer;
 		
-		if (levels.get(layer)[level] == null) {
-			this.chunkLevel = new ChunkLevel();
-			levels.get(layer)[level] = chunkLevel;
+		if (!levels.containsKey(layer)) {
+			initLayer();			
 		} else {
 			this.chunkLevel = levels.get(layer)[level];
 		}
@@ -174,7 +163,7 @@ public class MapChunk {
 				if (posY == -1) {
 					if (!currentBlock.isEmpty()) {
 						chunkLevel.setBlock(index, BlockMeta.EMPTY_BLOCK);
-						getImage().setRGB(x, z, Colors.BLACK);
+						getImage().setPixelRgba(x, z, Colors.BLACK);
 						
 						updateRegionImage();
 					}
@@ -194,7 +183,7 @@ public class MapChunk {
 					chunkLevel.setBlock(index, block);
 					
 					int color = ColorUtil.proccessColor(block.getColor(), heightDiff);
-					getImage().setRGB(x, z, color);
+					getImage().setPixelRgba(x, z, color);
 					
 					updateRegionImage();
 				} else {				
@@ -203,7 +192,7 @@ public class MapChunk {
 						currentBlock.setHeightPos(heightDiff);
 						
 						int color = ColorUtil.proccessColor(currentBlock.getColor(), heightDiff);
-						getImage().setRGB(x, z, color);
+						getImage().setPixelRgba(x, z, color);
 						
 						updateRegionImage();
 					}
@@ -220,13 +209,16 @@ public class MapChunk {
 	}
 	
 	private class ChunkLevel {
-		private final BlockMeta[] blocks = new BlockMeta[256];
-		private int[] heightmap = new int[256];
-		private BufferedImage image;
+		private final BlockMeta[] blocks;
+		private final int[] heightmap;
+		private NativeImage image;
 		
 		public long updated = 0;
 		
 		private ChunkLevel() {
+			blocks = new BlockMeta[256];
+			heightmap = new int[256];
+			
 			Arrays.fill(blocks, BlockMeta.EMPTY_BLOCK);
 			Arrays.fill(heightmap, -1);
 			
@@ -241,11 +233,11 @@ public class MapChunk {
 			return blocks[pos];
 		}
 		
-		private BufferedImage loadImage() {
+		private NativeImage loadImage() {
 			MapRegion region = MapCache.get().getRegion(chunkPos);			
-			BufferedImage image = region.getChunkImage(chunkPos);
+			NativeImage image = region.getChunkImage(chunkPos);
 			if (image == null) {
-				image = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
+				image = new NativeImage(16, 16, false);
 				ImageUtil.fillImage(image, Colors.BLACK);
 			}
 			

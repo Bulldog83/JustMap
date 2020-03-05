@@ -12,9 +12,10 @@ import ru.bulldog.justmap.minimap.icon.PlayerIcon;
 import ru.bulldog.justmap.minimap.icon.WaypointIcon;
 import ru.bulldog.justmap.util.DrawHelper;
 import ru.bulldog.justmap.util.DrawHelper.TextAlignment;
-import ru.bulldog.justmap.util.ImageUtil;
+
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ChatScreen;
 import net.minecraft.client.render.BufferBuilder;
@@ -85,7 +86,7 @@ public class MapRenderer {
 		offset = ClientParams.positionOffset;
 		mapPosition = ClientParams.mapPosition;
 		
-		backingImage = ImageUtil.toNativeImage(minimap.getImage());
+		backingImage = minimap.getImage();
 	
 		mapW = minimap.getMapSize();
 		mapH = minimap.getMapSize();
@@ -160,7 +161,7 @@ public class MapRenderer {
 	}
 	
 	public void markDirty() {
-		NativeImage img = ImageUtil.toNativeImage(minimap.getImage());
+		NativeImage img = minimap.getImage();
 		if (img != backingImage) {
 			backingImage = img;
 			if (texture != null) {

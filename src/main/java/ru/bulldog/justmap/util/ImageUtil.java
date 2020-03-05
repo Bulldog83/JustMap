@@ -1,6 +1,5 @@
 package ru.bulldog.justmap.util;
 
-import java.awt.image.BufferedImage;
 import java.io.IOException;
 
 import ru.bulldog.justmap.JustMap;
@@ -40,96 +39,52 @@ public class ImageUtil {
 		return image;
 	}
 	
-	public static void fillImage(BufferedImage image, int color) {
-		for (int i = 0; i < image.getWidth(); i++) {
-			for (int j = 0; j < image.getHeight(); j++) {
-				image.setRGB(i, j, color);
-			}
-		}
+	public static void fillImage(NativeImage image, int color) {
+		image.fillRect(0, 0, image.getWidth(), image.getHeight(), color);
 	}
 	
-	public static void writeTile(BufferedImage image, BufferedImage tile, int x, int y) {
-		int tw = tile.getWidth();
-		int th = tile.getHeight();
+	public static NativeImage readTile(NativeImage image, int x, int y, int w, int h) {
+		NativeImage tile = new NativeImage(w, h, false);
 		
-		int tx = 0, ix = x;
-		if (x < 0) {
-			if (tw + x > 0) {
-				ix = 0;
-				x += tw;
-				tx = tw - x;
-				tw -= tx;
-			} else return;
-		}
-		int ty = 0, iy = y;
-		if (y < 0) { 
-			if(th + y > 0) {
-				iy = 0;
-				y += th;
-				ty = th - y;
-				th -= ty;
-			} else return;
-		}
-		
-		int iw = image.getWidth();
-		int ih = image.getHeight();
-		
-		if (x + tw > iw) tw = iw - x;
-		if (y + th > ih) th = ih - y;
-		
-		if (tw <= 0 || th <= 0) return;
-		
-		int[] pixels = new int[tw * th];
-		tile.getRGB(tx, ty, tw, th, pixels, 0, tw);
-		
-		image.setRGB(ix, iy, tw, th, pixels, 0, tw);
-	}
-	
-	public static NativeImage toNativeImage(BufferedImage image) {
-		int w = image.getWidth();
-		int h = image.getHeight();
-		
-		NativeImage nativeImage = new NativeImage(w, h, false);
-		
-		for (int i = 0; i < w; i++) {
+		for(int i = 0; i < w; i++) {
 			for(int j = 0; j < h; j++) {
-				nativeImage.setPixelRgba(i, j, ColorUtil.toABGR(image.getRGB(i, j)));
+				tile.setPixelRgba(i, j, image.getPixelRgba(x + i, y + j));
 			}
 		}
 		
-		return nativeImage;
+		return tile;
 	}
 	
-	public static NativeImage writeIntoImage(NativeImage toWrite, NativeImage destination, int x, int y) {
-		int drawWidth = toWrite.getWidth();
-		int drawHeight = toWrite.getHeight();
-		int destinationWidth = destination.getWidth();
-		int destinationHeight = destination.getHeight();
+	public static NativeImage writeTile(NativeImage image, NativeImage tile, int x, int y) {
+		int tileWidth = tile.getWidth();
+		int tileHeight = tile.getHeight();
+		int imageWidth = image.getWidth();
+		int imageHeight = image.getHeight();
 
-		if (x + drawWidth >= destinationWidth) {
-			drawWidth = destinationWidth - x;
+		if (x + tileWidth > imageWidth) {
+			tileWidth = imageWidth - x;
 		}
 		
-		if (y + drawHeight >= destinationHeight) {
-			drawHeight = destinationHeight - y;
+		if (y + tileHeight > imageHeight) {
+			tileHeight = imageHeight - y;
 		}
 	
-		for (int xOffset = 0; xOffset < drawWidth; xOffset++) {
+		for (int xOffset = 0; xOffset < tileWidth; xOffset++) {
 			int xp = x + xOffset;
 			if (xp < 0) {
 				continue;
 			}
 	
-			for (int yOffset = 0; yOffset < drawHeight; yOffset++) {
+			for (int yOffset = 0; yOffset < tileHeight; yOffset++) {
 				int yp = y + yOffset;
 				if (yp < 0) {
 					continue;
 				}
 				
-				destination.setPixelRgba(xp, yp, toWrite.getPixelRgba(xOffset, yOffset));
+				image.setPixelRgba(xp, yp, tile.getPixelRgba(xOffset, yOffset));
 			}
 		}
 		
-		return destination;
+		return image;
 	}
 }

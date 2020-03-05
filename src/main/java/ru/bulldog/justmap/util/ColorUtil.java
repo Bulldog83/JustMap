@@ -37,11 +37,11 @@ import ru.bulldog.justmap.minimap.data.BlockMeta;
 
 public class ColorUtil {
 	
-	private static MinecraftClient minecraftClient = MinecraftClient.getInstance();	
-	private static BlockModels blockModels = minecraftClient.getBlockRenderManager().getModels();	
-	private static FluidRenderHandlerRegistryImpl fluidRenderHandlerRegistry = FluidRenderHandlerRegistryImpl.INSTANCE;
-	
-	private static Map<BlockState, Integer> colorCache = new HashMap<>();
+	private static MinecraftClient minecraft = MinecraftClient.getInstance();	
+	private static BlockModels blockModels = minecraft.getBlockRenderManager().getModels();	
+	private static FluidRenderHandlerRegistryImpl fluidRenderHandlerRegistry = FluidRenderHandlerRegistryImpl.INSTANCE;	
+	private static Map<BlockState, Integer> colorCache = new HashMap<>();	
+	private static float[] floatBuffer = new float[3];
 	
 	public static int[] toIntArray(int color) {
 		return new int[] {
@@ -53,18 +53,17 @@ public class ColorUtil {
 	}
 	
 	public static float[] toFloatArray(int color) {
-		float[] floats = new float[3];
-		floats[0] = ((color >> 16 & 255) / 255.0F);
-		floats[1] = ((color >> 8 & 255) / 255.0F);
-		floats[2] = ((color & 255) / 255.0F);
+		floatBuffer[0] = ((color >> 16 & 255) / 255.0F);
+		floatBuffer[1] = ((color >> 8 & 255) / 255.0F);
+		floatBuffer[2] = ((color & 255) / 255.0F);
 		
-		return floats;
+		return floatBuffer;
 	}
 	
 	public static float[] RGBtoHSB(int r, int g, int b, float[] hsbvals) {
 		float hue, saturation, brightness;
 		if (hsbvals == null) {
-			hsbvals = new float[3];
+			hsbvals = floatBuffer;
 		}
 		int cmax = (r > g) ? r : g;
 		if (b > cmax) cmax = b;
@@ -175,7 +174,7 @@ public class ColorUtil {
 		int r = (color >> 16) & 255;
 		int g = (color >> 8) & 255;
 		int b = color & 255;
-		return Colors.BLACK | b << 16 | g << 8 | r;
+		return 0xFF000000 | b << 16 | g << 8 | r;
 	}
 	
 	public static int ABGRtoARGB(int color) {
@@ -187,10 +186,10 @@ public class ColorUtil {
 	}
 	
 	public static int colorBrigtness(int color, float val) {
-		float[] hsb = RGBtoHSB((color >> 16) & 255, (color >> 8) & 255, color & 255, null);
-		hsb[2] += val / 10.0F;
-		hsb[2] = MathUtil.clamp(hsb[2], 0.0F, 1.0F);
-		return HSBtoRGB(hsb[0], hsb[1], hsb[2]);
+		RGBtoHSB((color >> 16) & 255, (color >> 8) & 255, color & 255, floatBuffer);
+		floatBuffer[2] += val / 10.0F;
+		floatBuffer[2] = MathUtil.clamp(floatBuffer[2], 0.0F, 1.0F);
+		return HSBtoRGB(floatBuffer[0], floatBuffer[1], floatBuffer[2]);
 	}
 	
 	public static int extractColor(BlockState state) {
@@ -236,16 +235,16 @@ public class ColorUtil {
 	}
 	
 	public static int proccessColor(int color, int heightDiff) {
-		float[] hsb = RGBtoHSB((color >> 16) & 255, (color >> 8) & 255, color & 255, null);
-		hsb[1] += ClientParams.mapSaturation / 100.0F;
-		hsb[1] = MathUtil.clamp(hsb[1], 0.0F, 1.0F);
-		hsb[2] += ClientParams.mapBrightness / 100.0F;
-		hsb[2] = MathUtil.clamp(hsb[2], 0.0F, 1.0F);
+		RGBtoHSB((color >> 16) & 255, (color >> 8) & 255, color & 255, floatBuffer);
+		floatBuffer[1] += ClientParams.mapSaturation / 100.0F;
+		floatBuffer[1] = MathUtil.clamp(floatBuffer[1], 0.0F, 1.0F);
+		floatBuffer[2] += ClientParams.mapBrightness / 100.0F;
+		floatBuffer[2] = MathUtil.clamp(floatBuffer[2], 0.0F, 1.0F);
 		if (ClientParams.showTerrain) {
-			hsb[2] += heightDiff / 10.0F;
-			hsb[2] = MathUtil.clamp(hsb[2], 0.0F, 1.0F);
+			floatBuffer[2] += heightDiff / 10.0F;
+			floatBuffer[2] = MathUtil.clamp(floatBuffer[2], 0.0F, 1.0F);
 		}
-		return HSBtoRGB(hsb[0], hsb[1], hsb[2]);
+		return HSBtoRGB(floatBuffer[0], floatBuffer[1], floatBuffer[2]);
 	}
 	
 	private static int operateColor(int blockColor, int textureColor, int defaultColor) {
@@ -278,7 +277,7 @@ public class ColorUtil {
 		if (ClientParams.alternateColorRender) {
 			int textureColor = ColorUtil.extractColor(state);
 			
-			blockColor = minecraftClient.getBlockColorMap().getColor(state, world, pos, Colors.LIGHT);
+			blockColor = minecraft.getBlockColorMap().getColor(state, world, pos, Colors.LIGHT);
 			
 			Block block = state.getBlock();
 			if (block instanceof GrassBlock || block instanceof FernBlock || block instanceof TallPlantBlock) {				
@@ -300,6 +299,6 @@ public class ColorUtil {
 		}
 		blockColor = blockColor != -1 ? blockColor : materialColor;
 		
-		return blockColor;
+		return toABGR(blockColor);
 	}
 }
