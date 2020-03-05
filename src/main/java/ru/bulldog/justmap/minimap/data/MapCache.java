@@ -157,8 +157,8 @@ public class MapCache {
 		int purged = 0;
 	
 		List<ChunkPos> chunks = new ArrayList<>();
-		for (ChunkPos chunkPos : this.chunks.keySet()) {
-			MapChunk chunkData = this.chunks.get(chunkPos);
+		for (ChunkPos chunkPos : getChunks().keySet()) {
+			MapChunk chunkData = getChunks().get(chunkPos);
 			if (currentTime - chunkData.updated >= 30000) {
 				chunks.add(chunkPos);
 				purged++;
@@ -169,14 +169,14 @@ public class MapCache {
 		}
 	
 		for (ChunkPos chunkPos : chunks) {
-			this.chunks.remove(chunkPos);
+			getChunks().remove(chunkPos);
 		}
 		
 		maxPurged = maxPurged >> 5;
 		
 		List<RegionPos> regions = new ArrayList<>();
-		for (RegionPos regionPos : this.regions.keySet()) {
-			MapRegion region = this.regions.get(regionPos);
+		for (RegionPos regionPos : getRegions().keySet()) {
+			MapRegion region = getRegions().get(regionPos);
 			if (currentTime - region.updated >= 30000) {
 				regions.add(regionPos);
 				purged++;
@@ -187,23 +187,27 @@ public class MapCache {
 		}
 	
 		for (RegionPos regionPos : regions) {
-			this.regions.remove(regionPos);
+			getRegions().remove(regionPos);
 		}
 	}
 	
-	public Map<RegionPos, MapRegion> getRegions() {
-		return regions;
+	private synchronized Map<ChunkPos, MapChunk> getChunks() {
+		return this.chunks;
+	}
+	
+	public synchronized Map<RegionPos, MapRegion> getRegions() {
+		return this.regions;
 	}
 	
 	public MapRegion getRegion(ChunkPos chunkPos) {
 		RegionPos pos = new RegionPos(chunkPos);
 		
 		MapRegion region;
-		if (regions.containsKey(pos)) {
-			region = regions.get(pos);
+		if (getRegions().containsKey(pos)) {
+			region = getRegions().get(pos);
 		} else {
 			region = new MapRegion(chunkPos);
-			regions.put(pos, region);
+			getRegions().put(pos, region);
 		}
 		
 		region.setLayer(currentLayer);
@@ -232,7 +236,7 @@ public class MapCache {
 		ChunkPos chunkPos = new ChunkPos(posX, posZ);
 		if(!mapChunk.getWorldChunk().getPos().equals(chunkPos)) {
 			mapChunk = new MapChunk(world, chunkPos, layer, level);
-			chunks.put(chunkPos, mapChunk);
+			getChunks().put(chunkPos, mapChunk);
 		}
 		
 		mapChunk.setLevel(layer, level);
@@ -243,18 +247,18 @@ public class MapCache {
 	
 	public synchronized MapChunk getChunk(Layer layer, int level, int posX, int posZ) {
 		ChunkPos chunkPos = new ChunkPos(posX, posZ);
-		if (chunks.containsKey(chunkPos)) {
-			return chunks.get(chunkPos);
+		if (getChunks().containsKey(chunkPos)) {
+			return getChunks().get(chunkPos);
 		}
 		
 		MapChunk mapChunk = new MapChunk(world, chunkPos, layer, level);
-		chunks.put(chunkPos, mapChunk);
+		getChunks().put(chunkPos, mapChunk);
 		
 		return mapChunk;
 	}
 	
 	private void clear() {
-		chunks.clear();
-		regions.clear();
+		getChunks().clear();
+		getRegions().clear();
 	}
 }
