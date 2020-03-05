@@ -1,6 +1,5 @@
 package ru.bulldog.justmap.util;
 
-import java.awt.image.BufferedImage;
 import java.io.IOException;
 
 import ru.bulldog.justmap.JustMap;
@@ -56,55 +55,36 @@ public class ImageUtil {
 		return tile;
 	}
 	
-	public static void writeTile(NativeImage image, NativeImage tile, int x, int y) {
-		writeIntoImage(tile, image, x, y);
-	}
-	
-	public static NativeImage writeIntoImage(NativeImage toWrite, NativeImage destination, int x, int y) {
-		int drawWidth = toWrite.getWidth();
-		int drawHeight = toWrite.getHeight();
-		int destinationWidth = destination.getWidth();
-		int destinationHeight = destination.getHeight();
+	public static NativeImage writeTile(NativeImage image, NativeImage tile, int x, int y) {
+		int tileWidth = tile.getWidth();
+		int tileHeight = tile.getHeight();
+		int imageWidth = image.getWidth();
+		int imageHeight = image.getHeight();
 
-		if (x + drawWidth >= destinationWidth) {
-			drawWidth = destinationWidth - x;
+		if (x + tileWidth > imageWidth) {
+			tileWidth = imageWidth - x;
 		}
 		
-		if (y + drawHeight >= destinationHeight) {
-			drawHeight = destinationHeight - y;
+		if (y + tileHeight > imageHeight) {
+			tileHeight = imageHeight - y;
 		}
 	
-		for (int xOffset = 0; xOffset < drawWidth; xOffset++) {
+		for (int xOffset = 0; xOffset < tileWidth; xOffset++) {
 			int xp = x + xOffset;
 			if (xp < 0) {
 				continue;
 			}
 	
-			for (int yOffset = 0; yOffset < drawHeight; yOffset++) {
+			for (int yOffset = 0; yOffset < tileHeight; yOffset++) {
 				int yp = y + yOffset;
 				if (yp < 0) {
 					continue;
 				}
 				
-				destination.setPixelRgba(xp, yp, toWrite.getPixelRgba(xOffset, yOffset));
+				image.setPixelRgba(xp, yp, tile.getPixelRgba(xOffset, yOffset));
 			}
 		}
 		
-		return destination;
-	}
-	
-	public static NativeImage toNativeImage(BufferedImage image) {
-		int w = image.getWidth();
-		int h = image.getHeight();
-		
-		NativeImage nativeImage = new NativeImage(w, h, false);
-		
-		for (int i = 0; i < w; i++) {
-			for(int j = 0; j < h; j++) {
-				nativeImage.setPixelRgba(i, j, ColorUtil.toABGR(image.getRGB(i, j)));
-			}
-		}
-		
-		return nativeImage;
+		return image;
 	}
 }
