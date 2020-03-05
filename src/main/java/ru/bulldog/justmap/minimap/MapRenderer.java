@@ -224,7 +224,7 @@ public class MapRenderer {
 		int arrowX = mapX + mapW / 2;
 		int arrowY = mapY + mapH / 2;
 		
-		PlayerArrow.draw(arrowX, arrowY, client.player.headYaw);
+		DirectionArrow.draw(arrowX, arrowY, client.player.headYaw);
 		
 		textManager.draw();
 		
