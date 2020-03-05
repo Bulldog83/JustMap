@@ -48,7 +48,7 @@ public class MapText {
 				 DrawHelper.drawBoundedString(textRenderer, text, x, y, 0, width - 2, color);
 			 break;
 			 case RIGHT:
-				 DrawHelper.DRAWER.drawRightAlignedString(textRenderer, text, x, y, color);
+				 DrawHelper.drawRightAlignedString(textRenderer, text, x, y, color);
 			 break;
 		  }
 	  }

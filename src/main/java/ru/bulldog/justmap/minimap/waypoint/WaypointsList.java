@@ -76,7 +76,7 @@ public class WaypointsList extends WaypointScreen {
 			DrawHelper.DRAWER.drawString(font, waypoint.name, nameX, stringY, Colors.WHITE);
 			
 			int posX = editButton.x - 2;
-			DrawHelper.DRAWER.drawRightAlignedString(font, waypoint.pos.toShortString(), posX, stringY, Colors.WHITE);
+			DrawHelper.drawRightAlignedString(font, waypoint.pos.toShortString(), posX, stringY, Colors.WHITE);
 			
 			editButton.render(mouseX, mouseY, delta);
 			deleteButton.render(mouseX, mouseY, delta);
