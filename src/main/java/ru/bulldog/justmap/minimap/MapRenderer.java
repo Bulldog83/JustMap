@@ -253,8 +253,8 @@ public class MapRenderer {
 	
 	private void drawChunkGrid() {
 		int color = 0x66333333;
-		int px = client.player.getBlockPos().getX();
-		int pz = client.player.getBlockPos().getZ();
+		int px = (int) client.player.getPos().getX();
+		int pz = (int) client.player.getPos().getZ();
 		
 		float scale = ClientParams.mapScale;
 		

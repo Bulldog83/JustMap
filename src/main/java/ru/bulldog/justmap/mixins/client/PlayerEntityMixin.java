@@ -26,7 +26,7 @@ public abstract class PlayerEntityMixin extends LivingEntity {
 		Waypoint waypoint = new Waypoint();
 		waypoint.dimension = this.world.dimension.getType().getRawId();
 		waypoint.name = "Player Death";
-		waypoint.pos = this.getBlockPos();
+		waypoint.pos = this.getSenseCenterPos();
 		waypoint.setIcon(Waypoint.getIcon(Waypoint.Icons.CROSS), Colors.RED);
 		
 		JustMap.LOGGER.logInfo("Create Death waypoint at " + waypoint.pos.toString());

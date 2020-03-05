@@ -249,7 +249,7 @@ public class WaypointsList extends WaypointScreen {
 		Waypoint waypoint = new Waypoint();
 		waypoint.dimension = currentDim;
 		waypoint.color = RandomUtil.getElement(Waypoint.WAYPOINT_COLORS);
-		waypoint.pos = minecraft.player.getBlockPos();
+		waypoint.pos = minecraft.player.getSenseCenterPos();
 		waypoint.name = "Waypoint";
 		
 		minecraft.openScreen(new WaypointEditor(waypoint, this, keeper::addNew));

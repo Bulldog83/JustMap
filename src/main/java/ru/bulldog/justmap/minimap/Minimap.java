@@ -117,7 +117,7 @@ public class Minimap {
 		textManager.clear();
 		
 		if (ClientParams.showPosition) {
-			BlockPos playerPos = minecraftClient.player.getBlockPos();
+			BlockPos playerPos = minecraftClient.player.getSenseCenterPos();
 			txtCoords.setText(playerPos.getX() + ", " + playerPos.getY() + ", " + playerPos.getZ());
 			textManager.add(txtCoords);
 		}		
@@ -190,7 +190,7 @@ public class Minimap {
 	
 	public void prepareMap(PlayerEntity player) {
 		World world = player.world;
-		BlockPos pos = player.getBlockPos();
+		BlockPos pos = player.getSenseCenterPos();
 		
 		currentBiome = world.getBiome(pos);
 		
@@ -200,7 +200,7 @@ public class Minimap {
 		int endX = startX + scaled;
 		int endZ = startZ + scaled;
 
-		if (needRenderCaves(world, player.getBlockPos())) {
+		if (needRenderCaves(world, player.getSenseCenterPos())) {
 			MapCache.setCurrentLayer(MapProcessor.Layer.CAVES);
 			MapCache.setLayerLevel(pos.getY() >> ClientParams.chunkLevelSize);
 		} else {
@@ -218,7 +218,7 @@ public class Minimap {
 					continue;
 				}
 				
-				BlockPos ppos = p.getBlockPos();
+				BlockPos ppos = p.getSenseCenterPos();
 			 
 				int x = ppos.getX();
 				int z = ppos.getZ();
@@ -287,7 +287,7 @@ public class Minimap {
 		waypoint.dimension = player.world.dimension.getType().getRawId();
 		waypoint.name = "Waypoint";
 		waypoint.color = RandomUtil.getElement(Waypoint.WAYPOINT_COLORS);
-		waypoint.pos = player.getBlockPos();
+		waypoint.pos = player.getSenseCenterPos();
 		
 		minecraftClient.openScreen(new WaypointEditor(waypoint, minecraftClient.currentScreen, WaypointKeeper.getInstance()::addNew));		
 	}
