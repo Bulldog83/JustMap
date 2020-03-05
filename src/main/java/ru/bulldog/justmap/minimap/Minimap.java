@@ -97,11 +97,6 @@ public class Minimap {
 		JustMap.LOGGER.logInfo(String.format("Map resized to %dx%d", newSize, newSize));
 	}
 	
-	public int getScaledSize() {
-		this.picSize = ClientParams.rotateMap ? (int) (mapSize * 1.3) : mapSize;
-		return (int) (picSize * mapScale);
-	}
-	
 	public void onConfigChanges() {
 		
 		isMapVisible = JustMapClient.CONFIG.getBoolean("map_visible");
@@ -302,6 +297,15 @@ public class Minimap {
 	
 	public int getPictureSize() {
 		return this.picSize;
+	}
+	
+	public int getScaledSize() {
+		this.picSize = ClientParams.rotateMap ? (int) (mapSize * 1.3) : mapSize;
+		return (int) (picSize * mapScale);
+	}
+
+	public int getMapSize() {
+		return this.mapSize;
 	}
 	
 	public float getScale() {

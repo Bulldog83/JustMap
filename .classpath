@@ -423,7 +423,5 @@
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="D:/NetBeans/Projects/Minecraft/JustMap/build/libs/Xaeros_Minimap_20.3.1.1_Forge_1.15.2.jar"/>
-	<classpathentry kind="lib" path="D:/NetBeans/Projects/Minecraft/JustMap/build/libs/journeymap-1.12.2-5.5.9.jar"/>
 	<classpathentry kind="output" path="bin/default"/>
 </classpath>
