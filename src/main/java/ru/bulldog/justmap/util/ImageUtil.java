@@ -40,64 +40,24 @@ public class ImageUtil {
 		return image;
 	}
 	
-	public static void fillImage(BufferedImage image, int color) {
-		for (int i = 0; i < image.getWidth(); i++) {
-			for (int j = 0; j < image.getHeight(); j++) {
-				image.setRGB(i, j, color);
-			}
-		}
+	public static void fillImage(NativeImage image, int color) {
+		image.fillRect(0, 0, image.getWidth(), image.getHeight(), color);
 	}
 	
-	public static void writeTile(BufferedImage image, BufferedImage tile, int x, int y) {
-		int tw = tile.getWidth();
-		int th = tile.getHeight();
+	public static NativeImage readTile(NativeImage image, int x, int y, int w, int h) {
+		NativeImage tile = new NativeImage(w, h, false);
 		
-		int tx = 0, ix = x;
-		if (x < 0) {
-			if (tw + x > 0) {
-				ix = 0;
-				x += tw;
-				tx = tw - x;
-				tw -= tx;
-			} else return;
-		}
-		int ty = 0, iy = y;
-		if (y < 0) { 
-			if(th + y > 0) {
-				iy = 0;
-				y += th;
-				ty = th - y;
-				th -= ty;
-			} else return;
-		}
-		
-		int iw = image.getWidth();
-		int ih = image.getHeight();
-		
-		if (x + tw > iw) tw = iw - x;
-		if (y + th > ih) th = ih - y;
-		
-		if (tw <= 0 || th <= 0) return;
-		
-		int[] pixels = new int[tw * th];
-		tile.getRGB(tx, ty, tw, th, pixels, 0, tw);
-		
-		image.setRGB(ix, iy, tw, th, pixels, 0, tw);
-	}
-	
-	public static NativeImage toNativeImage(BufferedImage image) {
-		int w = image.getWidth();
-		int h = image.getHeight();
-		
-		NativeImage nativeImage = new NativeImage(w, h, false);
-		
-		for (int i = 0; i < w; i++) {
+		for(int i = 0; i < w; i++) {
 			for(int j = 0; j < h; j++) {
-				nativeImage.setPixelRgba(i, j, ColorUtil.toABGR(image.getRGB(i, j)));
+				tile.setPixelRgba(i, j, image.getPixelRgba(x + i, y + j));
 			}
 		}
 		
-		return nativeImage;
+		return tile;
+	}
+	
+	public static void writeTile(NativeImage image, NativeImage tile, int x, int y) {
+		writeIntoImage(tile, image, x, y);
 	}
 	
 	public static NativeImage writeIntoImage(NativeImage toWrite, NativeImage destination, int x, int y) {
@@ -131,5 +91,20 @@ public class ImageUtil {
 		}
 		
 		return destination;
+	}
+	
+	public static NativeImage toNativeImage(BufferedImage image) {
+		int w = image.getWidth();
+		int h = image.getHeight();
+		
+		NativeImage nativeImage = new NativeImage(w, h, false);
+		
+		for (int i = 0; i < w; i++) {
+			for(int j = 0; j < h; j++) {
+				nativeImage.setPixelRgba(i, j, ColorUtil.toABGR(image.getRGB(i, j)));
+			}
+		}
+		
+		return nativeImage;
 	}
 }

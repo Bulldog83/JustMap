@@ -37,12 +37,10 @@ import ru.bulldog.justmap.minimap.data.BlockMeta;
 
 public class ColorUtil {
 	
-	private static MinecraftClient minecraftClient = MinecraftClient.getInstance();	
-	private static BlockModels blockModels = minecraftClient.getBlockRenderManager().getModels();	
-	private static FluidRenderHandlerRegistryImpl fluidRenderHandlerRegistry = FluidRenderHandlerRegistryImpl.INSTANCE;
-	
-	private static Map<BlockState, Integer> colorCache = new HashMap<>();
-	
+	private static MinecraftClient minecraft = MinecraftClient.getInstance();	
+	private static BlockModels blockModels = minecraft.getBlockRenderManager().getModels();	
+	private static FluidRenderHandlerRegistryImpl fluidRenderHandlerRegistry = FluidRenderHandlerRegistryImpl.INSTANCE;	
+	private static Map<BlockState, Integer> colorCache = new HashMap<>();	
 	private static float[] floatBuffer = new float[3];
 	
 	public static int[] toIntArray(int color) {
@@ -279,7 +277,7 @@ public class ColorUtil {
 		if (ClientParams.alternateColorRender) {
 			int textureColor = ColorUtil.extractColor(state);
 			
-			blockColor = minecraftClient.getBlockColorMap().getColor(state, world, pos, Colors.LIGHT);
+			blockColor = minecraft.getBlockColorMap().getColor(state, world, pos, Colors.LIGHT);
 			
 			Block block = state.getBlock();
 			if (block instanceof GrassBlock || block instanceof FernBlock || block instanceof TallPlantBlock) {				
@@ -301,6 +299,6 @@ public class ColorUtil {
 		}
 		blockColor = blockColor != -1 ? blockColor : materialColor;
 		
-		return blockColor;
+		return toABGR(blockColor);
 	}
 }

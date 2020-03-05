@@ -8,11 +8,11 @@ import ru.bulldog.justmap.util.ImageUtil;
 
 import net.minecraft.world.Heightmap;
 import net.minecraft.world.World;
+import net.minecraft.client.texture.NativeImage;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.chunk.WorldChunk;
 
-import java.awt.image.BufferedImage;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -96,7 +96,7 @@ public class MapChunk {
 		return this.empty;
 	}
 	
-	public synchronized BufferedImage getImage() {
+	public synchronized NativeImage getImage() {
 		return chunkLevel.image;
 	}
 	
@@ -163,7 +163,7 @@ public class MapChunk {
 				if (posY == -1) {
 					if (!currentBlock.isEmpty()) {
 						chunkLevel.setBlock(index, BlockMeta.EMPTY_BLOCK);
-						getImage().setRGB(x, z, Colors.BLACK);
+						getImage().setPixelRgba(x, z, Colors.BLACK);
 						
 						updateRegionImage();
 					}
@@ -183,7 +183,7 @@ public class MapChunk {
 					chunkLevel.setBlock(index, block);
 					
 					int color = ColorUtil.proccessColor(block.getColor(), heightDiff);
-					getImage().setRGB(x, z, color);
+					getImage().setPixelRgba(x, z, color);
 					
 					updateRegionImage();
 				} else {				
@@ -192,7 +192,7 @@ public class MapChunk {
 						currentBlock.setHeightPos(heightDiff);
 						
 						int color = ColorUtil.proccessColor(currentBlock.getColor(), heightDiff);
-						getImage().setRGB(x, z, color);
+						getImage().setPixelRgba(x, z, color);
 						
 						updateRegionImage();
 					}
@@ -211,7 +211,7 @@ public class MapChunk {
 	private class ChunkLevel {
 		private final BlockMeta[] blocks;
 		private final int[] heightmap;
-		private BufferedImage image;
+		private NativeImage image;
 		
 		public long updated = 0;
 		
@@ -233,11 +233,11 @@ public class MapChunk {
 			return blocks[pos];
 		}
 		
-		private BufferedImage loadImage() {
+		private NativeImage loadImage() {
 			MapRegion region = MapCache.get().getRegion(chunkPos);			
-			BufferedImage image = region.getChunkImage(chunkPos);
+			NativeImage image = region.getChunkImage(chunkPos);
 			if (image == null) {
-				image = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
+				image = new NativeImage(16, 16, false);
 				ImageUtil.fillImage(image, Colors.BLACK);
 			}
 			

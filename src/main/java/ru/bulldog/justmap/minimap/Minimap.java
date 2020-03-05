@@ -18,6 +18,7 @@ import ru.bulldog.justmap.util.DrawHelper.TextAlignment;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.resource.language.I18n;
+import net.minecraft.client.texture.NativeImage;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.mob.HostileEntity;
@@ -30,7 +31,6 @@ import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.dimension.DimensionType;
 
-import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -50,7 +50,7 @@ public class Minimap {
 	
 	private Biome currentBiome;
 	
-	private BufferedImage image;
+	private NativeImage image;
 	
 	private List<WaypointIcon> waypoints = new ArrayList<>();
 	private List<PlayerIcon> players = new ArrayList<>();
@@ -66,7 +66,7 @@ public class Minimap {
 		
 		int scaledSize = getScaledSize();
 		
-		image = new BufferedImage(scaledSize, scaledSize, BufferedImage.TYPE_INT_ARGB);
+		image = new NativeImage(scaledSize, scaledSize, false);
 		textManager = new TextManager(this);
 		isMapVisible = JustMapClient.CONFIG.getBoolean("map_visible");
 	}
@@ -90,7 +90,7 @@ public class Minimap {
 	}
 	
 	private void resizeMap(int newSize) {
-		image = new BufferedImage(newSize, newSize, BufferedImage.TYPE_INT_ARGB);
+		image = new NativeImage(newSize, newSize, false);
 		JustMap.LOGGER.logInfo(String.format("Map resized to %dx%d", newSize, newSize));
 	}
 	
@@ -292,7 +292,7 @@ public class Minimap {
 		minecraftClient.openScreen(new WaypointEditor(waypoint, minecraftClient.currentScreen, WaypointKeeper.getInstance()::addNew));		
 	}
 	
-	public BufferedImage getImage() {
+	public NativeImage getImage() {
 		return image;
 	}
 	
