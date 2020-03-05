@@ -71,7 +71,7 @@ public class MapSkin extends Sprite {
 			int x = 0, y = 0;
 			while(y < h) {
 				while(x < w) {
-					ImageUtil.writeIntoImage(this.images[0], pavedImage, x, y);
+					ImageUtil.writeTile(pavedImage, this.images[0], x, y);
 					x += imgW;
 				}
 				y += imgH;

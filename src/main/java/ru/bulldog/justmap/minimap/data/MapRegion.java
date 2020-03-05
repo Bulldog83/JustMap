@@ -1,13 +1,12 @@
 package ru.bulldog.justmap.minimap.data;
 
-import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.imageio.ImageIO;
-
+import net.minecraft.client.texture.NativeImage;
 import net.minecraft.util.math.ChunkPos;
 
 import ru.bulldog.justmap.JustMap;
@@ -62,7 +61,7 @@ public class MapRegion {
 		this.currentLayer = layer;
 	}
 	
-	public BufferedImage getChunkImage(ChunkPos chunkPos) {
+	public NativeImage getChunkImage(ChunkPos chunkPos) {
 		if (chunkPos.getRegionX() != this.pos.x ||
 			chunkPos.getRegionZ() != this.pos.z) {
 			
@@ -72,10 +71,10 @@ public class MapRegion {
 		int imgX = (chunkPos.x - (this.pos.x << 5)) << 4;
 		int imgY = (chunkPos.z - (this.pos.z << 5)) << 4;
 		
-		return getImage().getSubimage(imgX, imgY, 16, 16);
+		return ImageUtil.readTile(getImage(), imgX, imgY, 16, 16);
 	}
 	
-	private BufferedImage getImage() {
+	private NativeImage getImage() {
 		if (!layers.containsKey(currentLayer)) {
 			layers.put(currentLayer, new RegionLayer());
 		}
@@ -108,12 +107,11 @@ public class MapRegion {
 	}
 	
 	public synchronized void saveImage() {
-		File png = new File(imagesDir(), String.format("%d.%d.png", this.pos.x, this.pos.z));
-		
-		BufferedImage image = getImage();
+		File png = new File(imagesDir(), String.format("%d.%d.png", this.pos.x, this.pos.z));		
+		NativeImage image = getImage();
 		
 		try {
-			ImageIO.write(image, "png", png);
+			image.writeFile(png);
 		} catch (IOException ex) {
 			JustMap.LOGGER.catching(ex);
 		}
@@ -138,30 +136,30 @@ public class MapRegion {
 	}
 	
 	private class RegionLayer {
-		private final Map<Integer, BufferedImage> images;
+		private final Map<Integer, NativeImage> images;
 		
 		private RegionLayer() {
 			images = new HashMap<>();
 		}
 		
-		private BufferedImage getImage() {
+		private NativeImage getImage() {
 			if (images.containsKey(currentLevel)) {
 				return images.get(currentLevel);
 			}			
 			
-			BufferedImage image = loadImage();
+			NativeImage image = loadImage();
 			images.put(currentLevel, image);
 			
 			return image;
 		}
 		
-		private BufferedImage loadImage() {
+		private NativeImage loadImage() {
 			File png = new File(imagesDir(), String.format("%d.%d.png", pos.x, pos.z));
-			try {
-				return ImageIO.read(png);
+			try (FileInputStream fis = new FileInputStream(png)) {
+				return NativeImage.read(fis);
 			} catch (IOException ex) {}
 			
-			BufferedImage image = new BufferedImage(512, 512, BufferedImage.TYPE_INT_ARGB);
+			NativeImage image = new NativeImage(512, 512, false);
 			ImageUtil.fillImage(image, Colors.BLACK);
 			
 			return image;

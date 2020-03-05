@@ -24,21 +24,21 @@ import ru.bulldog.justmap.util.DrawHelper;
 import ru.bulldog.justmap.util.ImageUtil;
 import ru.bulldog.justmap.util.SpriteAtlas;
 
-public class PlayerArrow extends Sprite {
+public class DirectionArrow extends Sprite {
 	
 	private final static TextureManager textureManager = MinecraftClient.getInstance().getTextureManager();
 	private final static VertexFormat vertexFormat = new VertexFormat(ImmutableList.of(VertexFormats.POSITION_ELEMENT, VertexFormats.TEXTURE_ELEMENT, VertexFormats.NORMAL_ELEMENT, VertexFormats.PADDING_ELEMENT));
 	
-	private static PlayerArrow PLAYER_ARROW;
+	private static DirectionArrow ARROW;
 	
-	private PlayerArrow(Identifier texture, int w, int h) {
+	private DirectionArrow(Identifier texture, int w, int h) {
 		super(SpriteAtlas.MAP_ICONS, new Sprite.Info(texture, w, h, AnimationResourceMetadata.EMPTY), 0, w, h, 0, 0, ImageUtil.loadImage(texture, w, h));
 	}
 	
 	public static void draw(int x, int y, float rotation) {
 		if (!ClientParams.simpleArrow) {
-			if (PLAYER_ARROW == null) {
-				PLAYER_ARROW = new PlayerArrow(new Identifier(JustMap.MODID, "textures/icon/player_arrow.png"), 20, 20);
+			if (ARROW == null) {
+				ARROW = new DirectionArrow(new Identifier(JustMap.MODID, "textures/icon/player_arrow.png"), 20, 20);
 			}
 			
 			MatrixStack matrix = new MatrixStack();
@@ -47,9 +47,9 @@ public class PlayerArrow extends Sprite {
 			
 			builder.begin(7, vertexFormat);
 			
-			VertexConsumer vertexConsumer = PLAYER_ARROW.getTextureSpecificVertexConsumer(builder);
+			VertexConsumer vertexConsumer = ARROW.getTextureSpecificVertexConsumer(builder);
 			
-			textureManager.bindTexture(PLAYER_ARROW.getId());
+			textureManager.bindTexture(ARROW.getId());
 			
 			RenderSystem.enableAlphaTest();
 			RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);

@@ -86,7 +86,12 @@ public class BlockMeta {
 		return this.state == null;
 	}
 	
-	public boolean equals(BlockMeta block) {
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) return true;
+		if (!(obj instanceof BlockMeta)) return false;
+		
+		BlockMeta block = (BlockMeta) obj;
 		if(block.isEmpty()) {
 			return this.isEmpty();
 		}
