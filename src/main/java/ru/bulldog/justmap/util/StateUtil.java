@@ -16,4 +16,8 @@ public class StateUtil {
 	public static boolean isLiquid(BlockState state, boolean lava) {
 		return state.getMaterial().isLiquid() && (lava || state.getMaterial() != Material.LAVA);
 	}
+	
+	public static boolean isUnderwater(BlockState state) {
+		return isLiquid(state, false) || state.getMaterial() == Material.UNDERWATER_PLANT;
+	}
 }

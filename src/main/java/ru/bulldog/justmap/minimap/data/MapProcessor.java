@@ -2,8 +2,8 @@ package ru.bulldog.justmap.minimap.data;
 
 import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.util.StateUtil;
+
 import net.minecraft.block.BlockState;
-import net.minecraft.block.Material;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
@@ -36,7 +36,7 @@ public class MapProcessor {
 		} else {
 			BlockPos worldPos = loopPos(world, new BlockPos(posX, y, posZ), 0, liquids);
 			BlockState overState = world.getBlockState(new BlockPos(posX, worldPos.getY() + 1, posZ));
-			if ((!liquids && StateUtil.isLiquid(overState, false)) || StateUtil.isAir(overState)) {
+			if (checkState(overState, liquids)) {
 				return worldPos.getY();
 			}
 		}
@@ -47,20 +47,18 @@ public class MapProcessor {
 	private static BlockPos loopPos(World world, BlockPos pos, int stop, boolean liquids) {
 		boolean loop = false;
 		
-		BlockState state;
 		do {
-			state = world.getBlockState(pos);
-			loop = !liquids ? StateUtil.isLiquid(state, false) || StateUtil.isAir(state) : StateUtil.isAir(state);
-			if (!loop && state.getMaterial() == Material.UNDERWATER_PLANT) {
-				loop = true;
-			}
+			loop = checkState(world.getBlockState(pos), liquids);
+			
 			loop &= pos.getY() > stop;
-			if (loop) {
-				pos = pos.down();
-			}
+			if (loop) pos = pos.down();
 		} while (loop);
 		
 		return pos;
+	}
+	
+	private static boolean checkState(BlockState state, boolean liquids) {
+		return StateUtil.isAir(state) && (!liquids || StateUtil.isUnderwater(state));
 	}
 	
 	private static int checkLiquids(MapChunk mapChunk, int x, int y, int z) {
