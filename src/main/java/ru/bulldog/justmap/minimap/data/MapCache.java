@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class MapCache {
 	private final static MinecraftClient minecraft = MinecraftClient.getInstance();
@@ -85,8 +86,8 @@ public class MapCache {
 		this.world = world;
 		this.levelSize = ClientParams.chunkLevelSize;
 		
-		chunks = new HashMap<>();
-		regions = new HashMap<>();
+		chunks = new ConcurrentHashMap<>();
+		regions = new ConcurrentHashMap<>();
 	}
 	
 	public void update(Minimap map, int size, int x, int z) {

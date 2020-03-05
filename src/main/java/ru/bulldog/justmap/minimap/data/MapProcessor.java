@@ -36,7 +36,7 @@ public class MapProcessor {
 		} else {
 			BlockPos worldPos = loopPos(world, new BlockPos(posX, y, posZ), 0, liquids);
 			BlockState overState = world.getBlockState(new BlockPos(posX, worldPos.getY() + 1, posZ));
-			if (checkState(overState, liquids)) {
+			if (checkBlockState(overState, liquids)) {
 				return worldPos.getY();
 			}
 		}
@@ -45,10 +45,9 @@ public class MapProcessor {
 	}
 	
 	private static BlockPos loopPos(World world, BlockPos pos, int stop, boolean liquids) {
-		boolean loop = false;
-		
+		boolean loop = false;		
 		do {
-			loop = checkState(world.getBlockState(pos), liquids);
+			loop = checkBlockState(world.getBlockState(pos), liquids);
 			
 			loop &= pos.getY() > stop;
 			if (loop) pos = pos.down();
@@ -57,8 +56,8 @@ public class MapProcessor {
 		return pos;
 	}
 	
-	private static boolean checkState(BlockState state, boolean liquids) {
-		return StateUtil.isAir(state) && (!liquids || StateUtil.isUnderwater(state));
+	private static boolean checkBlockState(BlockState state, boolean liquids) {
+		return StateUtil.isAir(state) || (!liquids && StateUtil.isUnderwater(state));
 	}
 	
 	private static int checkLiquids(MapChunk mapChunk, int x, int y, int z) {
