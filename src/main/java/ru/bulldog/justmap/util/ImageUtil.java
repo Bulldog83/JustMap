@@ -61,27 +61,24 @@ public class ImageUtil {
 		int imageWidth = image.getWidth();
 		int imageHeight = image.getHeight();
 
+		if (tileWidth + x <= 0 || tileHeight + y <= 0) return image;
+		
 		if (x + tileWidth > imageWidth) {
 			tileWidth = imageWidth - x;
-		}
-		
+		}		
 		if (y + tileHeight > imageHeight) {
 			tileHeight = imageHeight - y;
 		}
 	
-		for (int xOffset = 0; xOffset < tileWidth; xOffset++) {
-			int xp = x + xOffset;
-			if (xp < 0) {
-				continue;
-			}
+		for (int i = 0; i < tileWidth; i++) {
+			int xp = x + i;
+			if (xp < 0) continue;
 	
-			for (int yOffset = 0; yOffset < tileHeight; yOffset++) {
-				int yp = y + yOffset;
-				if (yp < 0) {
-					continue;
-				}
+			for (int j = 0; j < tileHeight; j++) {
+				int yp = y + j;
+				if (yp < 0) continue;
 				
-				image.setPixelRgba(xp, yp, tile.getPixelRgba(xOffset, yOffset));
+				image.setPixelRgba(xp, yp, tile.getPixelRgba(i, j));
 			}
 		}
 		
