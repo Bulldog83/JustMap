@@ -3,7 +3,6 @@ package ru.bulldog.justmap.minimap.icon;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.util.ImageUtil;
@@ -33,14 +32,13 @@ public class EntityHeadIcon extends AbstractIcon {
 	}
 	
 	@Override
-	public void draw(int x, int y, int w, int h) {
+	public void draw(double x, double y, int w, int h) {
 		if (ClientParams.showIconsOutline) {
 			DrawHelper.fill(x - 1, y - 1, x + w + 1, y + h + 1, 0xFF444444);
 		}
 		textureManager.bindTexture(this.getId());
-		RenderSystem.enableAlphaTest();
-		RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
-		DrawHelper.blit(x, y, 0, w, h, this);
+		
+		this.draw(x, y, (float) w, (float) h);
 	}
 	
 	private static void registerIcon(Identifier id) {

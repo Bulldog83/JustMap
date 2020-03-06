@@ -37,8 +37,6 @@ public class DirectionArrow extends Sprite {
 	
 	public static void draw(int x, int y, float rotation) {
 		
-		rotation = ClientParams.rotateMap ? 180 : rotation;
-		
 		if (!ClientParams.simpleArrow) {
 			if (ARROW == null) {
 				ARROW = new DirectionArrow(new Identifier(JustMap.MODID, "textures/icon/player_arrow.png"), 20, 20);
@@ -59,7 +57,10 @@ public class DirectionArrow extends Sprite {
 			
 			matrix.push();
 			matrix.translate(x, y, 0);
-			matrix.multiply(Vector3f.POSITIVE_Z.getDegreesQuaternion(rotation));
+			
+			if (!ClientParams.rotateMap) {
+				matrix.multiply(Vector3f.POSITIVE_Z.getDegreesQuaternion(rotation));
+			}
 			
 			Matrix4f m4f = matrix.peek().getModel();
 			Matrix3f m3f = matrix.peek().getNormal();
@@ -86,10 +87,10 @@ public class DirectionArrow extends Sprite {
 	}
 	
 	private static void addVertices(Matrix4f m4f, Matrix3f m3f, VertexConsumer vertexConsumer) {
-		vertexConsumer.vertex(m4f, 5.0F, 5.0F, 0.0F).texture(0.0F, 0.0F).normal(m3f, 0.0F, 1.0F, 0.0F).next();
-		vertexConsumer.vertex(m4f, 5.0F, -5.0F, 0.0F).texture(0.0F, 1.0F).normal(m3f, 0.0F, 1.0F, 0.0F).next();
-		vertexConsumer.vertex(m4f, -5.0F, -5.0F, 0.0F).texture(1.0F, 1.0F).normal(m3f, 0.0F, 1.0F, 0.0F).next();
-		vertexConsumer.vertex(m4f, -5.0F, 5.0F, 0.0F).texture(1.0F, 0.0F).normal(m3f, 0.0F, 1.0F, 0.0F).next();
+		vertexConsumer.vertex(m4f, -5.0F, -5.0F, 0.0F).texture(0.0F, 0.0F).normal(m3f, 0.0F, 1.0F, 0.0F).next();
+		vertexConsumer.vertex(m4f, -5.0F, 5.0F, 0.0F).texture(0.0F, 1.0F).normal(m3f, 0.0F, 1.0F, 0.0F).next();
+		vertexConsumer.vertex(m4f, 5.0F, 5.0F, 0.0F).texture(1.0F, 1.0F).normal(m3f, 0.0F, 1.0F, 0.0F).next();
+		vertexConsumer.vertex(m4f, 5.0F, -5.0F, 0.0F).texture(1.0F, 0.0F).normal(m3f, 0.0F, 1.0F, 0.0F).next();
 	}
 	
 }

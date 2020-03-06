@@ -5,14 +5,14 @@ import java.util.Map;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.mojang.blaze3d.systems.RenderSystem;
+
 import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.minimap.icon.AbstractIcon;
 import ru.bulldog.justmap.util.ColorUtil;
 import ru.bulldog.justmap.util.Colors;
-import ru.bulldog.justmap.util.DrawHelper;
 import ru.bulldog.justmap.util.ImageUtil;
 import ru.bulldog.justmap.util.SpriteAtlas;
+
 import net.minecraft.client.resource.metadata.AnimationResourceMetadata;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.texture.NativeImageBackedTexture;
@@ -189,15 +189,14 @@ public class Waypoint {
 			return coloredIcons.get(color);
 		}
 		
-		public void draw(int x, int y, int w, int h) {
+		public void draw(double x, double y, int w, int h) {
 			if (this.key > 0) {
 				textureManager.bindTexture(this.getTexture());
 			} else {
 				textureManager.bindTexture(getColoredTexture());
-			}			
-			RenderSystem.enableAlphaTest();
-			RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
-			DrawHelper.blit(x, y, 0, w, h, this);
+			}
+			
+			this.draw(x, y, (float) w, (float) h);
 		}
 		
 		public void draw(int x, int y, int size) {

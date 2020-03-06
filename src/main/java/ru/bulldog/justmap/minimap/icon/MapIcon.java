@@ -6,7 +6,7 @@ import net.minecraft.client.MinecraftClient;
 public abstract class MapIcon<T extends MapIcon<T>> {
 	
 	protected Minimap map;
-	public int x, y;
+	public double x, y;
 	
 	protected static final MinecraftClient client = MinecraftClient.getInstance();
 	
@@ -15,7 +15,7 @@ public abstract class MapIcon<T extends MapIcon<T>> {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public T setPosition(int x, int y) {
+	public T setPosition(double x, double y) {
 		this.x = x;
 		this.y = y;
 		

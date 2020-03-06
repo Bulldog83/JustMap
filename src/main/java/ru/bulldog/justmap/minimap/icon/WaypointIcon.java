@@ -4,7 +4,6 @@ import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.minimap.Minimap;
 import ru.bulldog.justmap.minimap.waypoint.Waypoint;
-import ru.bulldog.justmap.util.DrawHelper;
 import ru.bulldog.justmap.util.MathUtil;
 
 public class WaypointIcon extends MapIcon<WaypointIcon> {
@@ -17,24 +16,24 @@ public class WaypointIcon extends MapIcon<WaypointIcon> {
 	@Override
 	public void draw(int mapX, int mapY, float rotation) {
 		int size = 8;
-		int col = waypoint.color;
 		
-		int drawX = mapX + x - size / 2;
-		int drawY = mapY + y - size / 2;
+		double drawX = mapX + x - size / 2;
+		double drawY = mapY + y - size / 2;
 		
 		int mapSize = JustMapClient.MAP.getMapSize();
 		if (ClientParams.rotateMap) {
-			int centerX = mapX + mapSize / 2;
-			int centerY = mapY + mapSize / 2;
+			double centerX = mapX + mapSize / 2;
+			double centerY = mapY + mapSize / 2;
 			
-			rotation = MathUtil.correctAngle(rotation);
+			rotation = MathUtil.correctAngle(rotation) + 180;
 			
-			double l = Math.sqrt(MathUtil.pow2(drawX - centerX) + MathUtil.pow2(drawY - centerY));			
-			double angle = Math.toRadians(rotation);
-			double angle2 = Math.atan2(centerY - drawY, centerX - drawX) - angle;
+			double angle = Math.toRadians(-rotation);
 			
-			drawX = (int) (centerX + Math.cos(angle2) * l);
-			drawY = (int) (centerY + Math.sin(angle2) * l);
+			double posX = (int) (centerX + (drawX - centerX) * Math.cos(angle) - (drawY - centerY) * Math.sin(angle));
+			double posY = (int) (centerY + (drawY - centerY) * Math.cos(angle) + (drawX - centerX) * Math.sin(angle));
+			
+			drawX = posX;
+			drawY = posY;
 		}
 		
 		if (drawX < mapX || drawX > (mapX + mapSize) ||
@@ -43,8 +42,6 @@ public class WaypointIcon extends MapIcon<WaypointIcon> {
 		Waypoint.Icon icon = waypoint.getIcon();
 		if (icon != null) {
 			icon.draw(drawX, drawY, size);
-		} else {
-			DrawHelper.drawDiamond(drawX, drawY, size, size, col);
 		}			
 	}
 	
