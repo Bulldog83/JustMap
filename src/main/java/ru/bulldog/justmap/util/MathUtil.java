@@ -19,6 +19,14 @@ public class MathUtil {
 		return Math.pow(n, 2);
 	}
 	
+	public static float correctAngle(float angle) {
+		int turns = (int) Math.abs(angle / 360);		
+		if(angle >= 360) return angle - 360 * turns;
+		if(angle < 0) return angle + 360 * (turns + 1);
+		
+		return angle;
+	}
+	
 	public static double getDistance(BlockPos a, BlockPos b) {
 		return getDistance(a, b, false);
 	}

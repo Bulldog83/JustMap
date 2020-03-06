@@ -63,8 +63,7 @@ public class Minimap {
 	
 	public Minimap() {
 		this.mapSize = JustMapClient.CONFIG.getInt("map_size");
-		this.mapScale = JustMapClient.CONFIG.getFloat("map_scale");
-		
+		this.mapScale = JustMapClient.CONFIG.getFloat("map_scale");		
 		this.picSize = ClientParams.rotateMap ? (int) (mapSize * 1.3) : mapSize;
 		
 		int scaledSize = getScaledSize();
@@ -196,8 +195,6 @@ public class Minimap {
 		int scaled = getScaledSize();
 		int startX = pos.getX() - scaled / 2;
 		int startZ = pos.getZ() - scaled / 2;
-		int endX = startX + scaled;
-		int endZ = startZ + scaled;
 
 		if (needRenderCaves(world, player.getBlockPos())) {
 			MapCache.setCurrentLayer(MapProcessor.Layer.CAVES);
@@ -208,6 +205,15 @@ public class Minimap {
 		}
 		
 		MapCache.get().update(this, scaled, startX, startZ);
+		
+		if (ClientParams.rotateMap) {
+			scaled = (int) (mapSize * mapScale);
+			startX = pos.getX() - scaled / 2;
+			startZ = pos.getZ() - scaled / 2;
+		}		
+		
+		int endX = startX + scaled;
+		int endZ = startZ + scaled;
 		
 		if (allowPlayerRadar()) {
 			players.clear();			
@@ -247,11 +253,13 @@ public class Minimap {
 					boolean hostile = livingEntity instanceof HostileEntity;
 					if (hostile && allowHostileRadar()) {
 						EntityIcon entIcon = new EntityIcon(this, entity, hostile);						
-						entIcon.setPosition(MapIcon.scaledPos((int) entity.getX(), startX, endX, mapSize), MapIcon.scaledPos((int) entity.getZ(), startZ, endZ, mapSize));						
+						entIcon.setPosition(MapIcon.scaledPos((int) entity.getX(), startX, endX, mapSize),
+											MapIcon.scaledPos((int) entity.getZ(), startZ, endZ, mapSize));
 						this.entities.add(entIcon);
 					} else if (!hostile && allowCreatureRadar()) {
 						EntityIcon entIcon = new EntityIcon(this, entity, hostile);						
-						entIcon.setPosition(MapIcon.scaledPos((int) entity.getX(), startX, endX, mapSize), MapIcon.scaledPos((int) entity.getZ(), startZ, endZ, mapSize));						
+						entIcon.setPosition(MapIcon.scaledPos((int) entity.getX(), startX, endX, mapSize),
+											MapIcon.scaledPos((int) entity.getZ(), startZ, endZ, mapSize));
 						this.entities.add(entIcon);
 					}
 				}
@@ -261,14 +269,18 @@ public class Minimap {
 			}
 		}
 		
+		final int range = scaled;
+		final int sx = startX;
+		final int sz = startZ;
+		
 		waypoints.clear();
 		List<Waypoint> wps = WaypointKeeper.getInstance().getWaypoints(world.dimension.getType().getRawId(), true);
 		if (wps != null) {
 			wps.stream().filter(wp -> MathUtil.getDistance(pos, wp.pos, false) <= wp.showRange).forEach(wp -> {
 				WaypointIcon waypoint = new WaypointIcon(this, wp);
 				waypoint.setPosition(
-					MathUtil.clamp(MapIcon.scaledPos(wp.pos.getX(), startX, endX, mapSize), 0, scaled),
-					MathUtil.clamp(MapIcon.scaledPos(wp.pos.getZ(), startZ, endZ, mapSize), 0, scaled)
+					MathUtil.clamp(MapIcon.scaledPos(wp.pos.getX(), sx, endX, mapSize), 0, range),
+					MathUtil.clamp(MapIcon.scaledPos(wp.pos.getZ(), sz, endZ, mapSize), 0, range)
 				);
 				waypoints.add(waypoint);
 			});

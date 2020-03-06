@@ -28,6 +28,7 @@ public class EntityIcon extends MapIcon<EntityIcon> {
 		
 		int size = ClientParams.showEntityHeads ? ClientParams.entityIconSize : 4;
 		int color = (hostile) ? Colors.DARK_RED : Colors.YELLOW;
+		
 		int drawX = mapX + x - size / 2;
 		int drawY = mapY + y - size / 2;
 		
@@ -35,11 +36,19 @@ public class EntityIcon extends MapIcon<EntityIcon> {
 		if (ClientParams.rotateMap) {
 			int centerX = mapX + mapSize / 2;
 			int centerY = mapY + mapSize / 2;
-			double l = Math.sqrt(MathUtil.pow2(drawX - centerX) + MathUtil.pow2(drawY - centerY));
-			double angle = Math.toRadians(rotation + 180);
 			
-			drawX = (int) (drawX + Math.cos(angle) * l);
-			drawY = (int) (drawY + Math.sin(angle) * l);
+			rotation = MathUtil.correctAngle(rotation);
+			
+			double l = Math.sqrt(MathUtil.pow2(drawX - centerX) + MathUtil.pow2(drawY - centerY));			
+			double angle = Math.toRadians(rotation);
+			double angle2 = Math.atan2(centerY - drawY, centerX - drawX) - angle;
+			
+//			System.out.println("========");
+//			System.out.println("" + angle);
+//			System.out.println("" + angle2);
+			
+			drawX = (int) (centerX + Math.cos(angle2) * l);
+			drawY = (int) (centerY + Math.sin(angle2) * l);
 		}
 		
 		if (drawX < mapX || drawX > (mapX + mapSize) ||
