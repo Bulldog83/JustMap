@@ -7,6 +7,7 @@ import ru.bulldog.justmap.minimap.Minimap;
 import ru.bulldog.justmap.minimap.data.MapProcessor.Layer;
 import ru.bulldog.justmap.util.Colors;
 import ru.bulldog.justmap.util.ImageUtil;
+
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
@@ -22,15 +23,11 @@ public class MapCache {
 	private final static MinecraftClient minecraft = MinecraftClient.getInstance();
 	
 	private static Map<Integer, MapCache> dimensions = new HashMap<>();
-	private static MapProcessor.Layer currentLayer = MapProcessor.Layer.SURFACE;	
+	private static Layer currentLayer = Layer.SURFACE;	
 	private static int currentLevel = 0;
 	
-	public static void setCurrentLayer(MapProcessor.Layer layer) {
+	public static void setCurrentLayer(Layer layer) {
 		currentLayer = layer;
-	}
-	
-	public static MapProcessor.Layer getCurrentLayer() {
-		return currentLayer;
 	}
 	
 	public static void setLayerLevel(int level) {
@@ -41,7 +38,7 @@ public class MapCache {
 		return get(minecraft.world, currentLayer);
 	}
 	
-	public static MapCache get(World world, MapProcessor.Layer layer) {
+	public static MapCache get(World world, Layer layer) {
 		MapCache data = getDimensionData(world);
 		
 		if (data == null) return null;
