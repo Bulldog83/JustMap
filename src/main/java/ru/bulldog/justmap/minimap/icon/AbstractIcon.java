@@ -23,6 +23,6 @@ public abstract class AbstractIcon extends Sprite {
 	}
 	
 	protected void draw(double x, double y, float w, float h) {
-		DrawHelper.draw(x, y, w, h, this);
+		DrawHelper.drawSprite(x, y, w, h, this);
 	}
 }

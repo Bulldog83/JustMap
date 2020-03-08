@@ -34,6 +34,7 @@ import net.minecraft.world.chunk.WorldChunk;
 import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.minimap.data.BlockMeta;
+import ru.bulldog.justmap.util.math.MathUtil;
 
 public class ColorUtil {
 	

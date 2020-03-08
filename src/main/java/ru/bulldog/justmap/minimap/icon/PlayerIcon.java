@@ -1,13 +1,13 @@
 package ru.bulldog.justmap.minimap.icon;
 
 import net.minecraft.entity.player.PlayerEntity;
+
 import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.minimap.EntityModelRenderer;
 import ru.bulldog.justmap.minimap.Minimap;
 import ru.bulldog.justmap.util.Colors;
 import ru.bulldog.justmap.util.DrawHelper;
-import ru.bulldog.justmap.util.MathUtil;
 
 public class PlayerIcon extends MapIcon<PlayerIcon> {
 	
@@ -22,39 +22,33 @@ public class PlayerIcon extends MapIcon<PlayerIcon> {
 
 	@Override
 	public void draw(int mapX, int mapY, float rotation) {
+		int size = ClientParams.entityIconSize;
 		
-		double drawX = mapX + x;
-		double drawY = mapY + y;
+		IconPos pos = new IconPos(mapX + x, mapY + y);
 		
 		int mapSize = JustMapClient.MAP.getMapSize();
 		if (ClientParams.rotateMap) {
-			double centerX = mapX + mapSize / 2;
-			double centerY = mapY + mapSize / 2;
-			
-			rotation = MathUtil.correctAngle(rotation) + 180;
-			
-			double angle = Math.toRadians(-rotation);
-			
-			double posX = (int) (centerX + (drawX - centerX) * Math.cos(angle) - (drawY - centerY) * Math.sin(angle));
-			double posY = (int) (centerY + (drawY - centerY) * Math.cos(angle) + (drawX - centerX) * Math.sin(angle));
-			
-			drawX = posX;
-			drawY = posY;
+			rotatePos(pos, mapSize, mapX, mapY, rotation);
 		}
 		
-		int size = ClientParams.entityIconSize;
+		pos.x -= size / 2;
+		pos.y -= size / 2;
+		
+		if (pos.x < mapX + size || pos.x > (mapX + mapSize) - size ||
+			pos.y < mapY + size || pos.y > (mapY + mapSize) - size) return;
+		
 		if (ClientParams.showPlayerHeads) {
 			if (ClientParams.renderEntityModel) {
-				EntityModelRenderer.renderModel(player, drawX, drawY);
+				EntityModelRenderer.renderModel(player, pos.x, pos.y);
 			} else {
-				PlayerHeadIcon.getIcon(player).draw(drawX, drawY);
+				PlayerHeadIcon.getIcon(player).draw(pos.x, pos.y);
 			}
 		} else {
-			DrawHelper.fill(drawX, drawY, drawX + size, drawY + size, Colors.GREEN);
+			DrawHelper.fill(pos.x, pos.y, pos.x, pos.y, Colors.GREEN);
 		}
 			
 		if (ClientParams.showPlayerNames) {
-			DrawHelper.drawBoundedString(client.textRenderer, player.getName().getString(), (int) drawX + size / 2, (int) drawY - size / 2 - 10, 0, client.getWindow().getScaledWidth(), Colors.WHITE);
+			DrawHelper.drawBoundedString(client.textRenderer, player.getName().getString(), (int) pos.x, (int) pos.y + 12, 0, client.getWindow().getScaledWidth(), Colors.WHITE);
 		}
 	}
 }

@@ -7,8 +7,7 @@ import ru.bulldog.justmap.minimap.waypoint.Waypoint.Icon;
 import ru.bulldog.justmap.util.ColorUtil;
 import ru.bulldog.justmap.util.Colors;
 import ru.bulldog.justmap.util.DrawHelper;
-import ru.bulldog.justmap.util.MathUtil;
-
+import ru.bulldog.justmap.util.math.MathUtil;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;

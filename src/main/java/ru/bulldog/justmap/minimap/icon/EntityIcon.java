@@ -1,13 +1,13 @@
 package ru.bulldog.justmap.minimap.icon;
 
 import net.minecraft.entity.Entity;
+
 import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.minimap.EntityModelRenderer;
 import ru.bulldog.justmap.minimap.Minimap;
 import ru.bulldog.justmap.util.Colors;
 import ru.bulldog.justmap.util.DrawHelper;
-import ru.bulldog.justmap.util.MathUtil;
 
 public class EntityIcon extends MapIcon<EntityIcon> {
 	
@@ -29,42 +29,33 @@ public class EntityIcon extends MapIcon<EntityIcon> {
 		int size = ClientParams.showEntityHeads ? ClientParams.entityIconSize : 4;
 		int color = (hostile) ? Colors.DARK_RED : Colors.YELLOW;
 		
-		double drawX = mapX + x - size / 2;
-		double drawY = mapY + y - size / 2;
+		IconPos pos = new IconPos(mapX + x, mapY + y);
 		
 		int mapSize = JustMapClient.MAP.getMapSize();
 		if (ClientParams.rotateMap) {
-			double centerX = mapX + mapSize / 2;
-			double centerY = mapY + mapSize / 2;
-			
-			rotation = MathUtil.correctAngle(rotation) + 180;
-			
-			double angle = Math.toRadians(-rotation);
-			
-			double posX = (int) (centerX + (drawX - centerX) * Math.cos(angle) - (drawY - centerY) * Math.sin(angle));
-			double posY = (int) (centerY + (drawY - centerY) * Math.cos(angle) + (drawX - centerX) * Math.sin(angle));
-			
-			drawX = posX;
-			drawY = posY;
+			rotatePos(pos, mapSize, mapX, mapY, rotation);
 		}
 		
-		if (drawX < mapX || drawX > (mapX + mapSize) ||
-			drawY < mapY || drawY > (mapY + mapSize)) return;
+		pos.x -= size / 2;
+		pos.y -= size / 2;
+		
+		if (pos.x < mapX + size || pos.x > (mapX + mapSize) - size ||
+			pos.y < mapY + size || pos.y > (mapY + mapSize) - size) return;
 		
 		EntityHeadIcon icon = null;
 		if (ClientParams.showEntityHeads) {
 			if (ClientParams.renderEntityModel) {
-				EntityModelRenderer.renderModel(entity, drawX, drawY);
+				EntityModelRenderer.renderModel(entity, pos.x, pos.y);
 			} else {
 				icon = EntityHeadIcon.getIcon(entity);
 				if (icon != null) {
-					icon.draw(drawX, drawY, size);
+					icon.draw(pos.x, pos.y, size);
 				} else {
-					DrawHelper.drawOutlineCircle(drawX, drawY, size / 1.75, 0.6, color);
+					DrawHelper.drawOutlineCircle(pos.x, pos.y, size / 2, 0.6, color);
 				}
 			}
 		} else {
-			DrawHelper.drawOutlineCircle(drawX, drawY, size / 1.75, 0.6, color);
+			DrawHelper.drawOutlineCircle(pos.x, pos.y, size / 2, 0.6, color);
 		}
 	}
 }

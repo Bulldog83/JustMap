@@ -56,12 +56,13 @@ public class PlayerHeadIcon {
 	}
 	
 	public void draw(double x, double y) {
+		int size = ClientParams.entityIconSize;
 		if (ClientParams.showIconsOutline) {
-			DrawHelper.fill(x - 1, y - 1, x + 9, y + 9, 0xFF444444);
+			DrawHelper.fill(x - 1, y - 1, x + size + 1, y + size + 1, 0xFF444444);
 		}
 		textureManager.bindTexture(this.skin);
 		
-		DrawHelper.draw(x, y, 8, 8);
+		DrawHelper.draw(x, y, size, size);
 	}
 	
 	

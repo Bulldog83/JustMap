@@ -5,7 +5,7 @@ import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.config.ConfigKeeper.EnumEntry;
 import ru.bulldog.justmap.minimap.MapPosition;
 import ru.bulldog.justmap.minimap.MapSkin;
-import ru.bulldog.justmap.util.MathUtil;
+import ru.bulldog.justmap.util.math.MathUtil;
 import io.github.prospector.modmenu.api.ModMenuApi;
 import me.shedaniel.clothconfig2.api.ConfigBuilder;
 import me.shedaniel.clothconfig2.api.ConfigCategory;

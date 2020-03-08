@@ -12,10 +12,9 @@ import ru.bulldog.justmap.minimap.icon.WaypointIcon;
 import ru.bulldog.justmap.minimap.waypoint.Waypoint;
 import ru.bulldog.justmap.minimap.waypoint.WaypointEditor;
 import ru.bulldog.justmap.minimap.waypoint.WaypointKeeper;
-import ru.bulldog.justmap.util.MathUtil;
-import ru.bulldog.justmap.util.RandomUtil;
 import ru.bulldog.justmap.util.DrawHelper.TextAlignment;
-
+import ru.bulldog.justmap.util.math.MathUtil;
+import ru.bulldog.justmap.util.math.RandomUtil;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.texture.NativeImage;
@@ -193,8 +192,8 @@ public class Minimap {
 		currentBiome = world.getBiome(pos);
 		
 		int scaled = getScaledSize();
-		int startX = pos.getX() - scaled / 2;
-		int startZ = pos.getZ() - scaled / 2;
+		double startX = pos.getX() - scaled / 2;
+		double startZ = pos.getZ() - scaled / 2;
 
 		if (needRenderCaves(world, player.getBlockPos())) {
 			MapCache.setCurrentLayer(MapProcessor.Layer.CAVES);
@@ -204,7 +203,7 @@ public class Minimap {
 			MapCache.setLayerLevel(0);
 		}
 		
-		MapCache.get().update(this, scaled, startX, startZ);
+		MapCache.get().update(this, (int) scaled, (int) startX, (int) startZ);
 		
 		if (ClientParams.rotateMap) {
 			scaled = (int) (mapSize * mapScale);
@@ -212,8 +211,8 @@ public class Minimap {
 			startZ = pos.getZ() - scaled / 2;
 		}		
 		
-		int endX = startX + scaled;
-		int endZ = startZ + scaled;
+		double endX = startX + scaled;
+		double endZ = startZ + scaled;
 		
 		if (allowPlayerRadar()) {
 			players.clear();			
@@ -269,9 +268,9 @@ public class Minimap {
 			}
 		}
 		
-		final int range = scaled;
-		final int sx = startX;
-		final int sz = startZ;
+		final double range = scaled;
+		final double sx = startX;
+		final double sz = startZ;
 		
 		waypoints.clear();
 		List<Waypoint> wps = WaypointKeeper.getInstance().getWaypoints(world.dimension.getType().getRawId(), true);

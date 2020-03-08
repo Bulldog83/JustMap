@@ -1,9 +1,13 @@
-package ru.bulldog.justmap.util;
+package ru.bulldog.justmap.util.math;
 
 import net.minecraft.util.math.BlockPos;
 
 public class MathUtil {
 	public static int clamp(int val, int min, int max) {
+		return val < min ? min : val > max ? max : val;
+	}
+	
+	public static double clamp(double val, double min, double max) {
 		return val < min ? min : val > max ? max : val;
 	}
 	
