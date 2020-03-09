@@ -7,12 +7,10 @@ import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexFormats;
-import net.minecraft.client.util.Window;
 
 import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.util.math.Line;
@@ -70,29 +68,16 @@ public class ChunkGrid {
 		
 		float angle = -rotation + 180;
 		
-		Window window = MinecraftClient.getInstance().getWindow();
-		
-		int winW = window.getFramebufferWidth();
-		int winH = window.getFramebufferHeight();
-		
-		RenderSystem.viewport(winW - mx, my, mw, mh);
-		
 		RenderSystem.disableTexture();
 		RenderSystem.color4f(r, g, b, a);
 		
-//		System.out.println("=======");
-//		System.out.println("" + mx);
-//		System.out.println("" + my);
-		
-		RenderSystem.matrixMode(GL11.GL_PROJECTION);
 		RenderSystem.pushMatrix();
-		//RenderSystem.loadIdentity();
-		//RenderSystem.ortho(mx, mw, mh, my, -1.0, 1.0);
 		RenderSystem.translatef(cx, cy, 0);
 		RenderSystem.rotatef(angle, 0, 0, 1.0F);
 		RenderSystem.translatef(-cx, -cy, 0);
 		
-		builder.begin(GL11.GL_LINES, VertexFormats.POSITION);
+		builder.begin(GL11.GL_LINES, VertexFormats.POSITION);		
+		
 		lines.forEach((line) -> {
 			line.draw(builder);
 		});
@@ -100,10 +85,7 @@ public class ChunkGrid {
 		tessellator.draw();
 		
 		RenderSystem.popMatrix();
-		RenderSystem.matrixMode(GL11.GL_MODELVIEW);
 		RenderSystem.enableTexture();
-		
-		RenderSystem.viewport(0, 0, winW, winH);
 	}
 	
 	public void draw() {

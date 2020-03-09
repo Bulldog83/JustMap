@@ -162,6 +162,7 @@ public class Waypoint {
 	public static class Icon extends AbstractIcon {
 		
 		public final static Identifier DEFAULT_ICON = new Identifier(JustMap.MODID, "textures/icon/default.png");
+		private final static NativeImage DEFAULT_TEXTURE = ImageUtil.loadImage(DEFAULT_ICON, 18, 18);
 		
 		public final int key;
 		public final int color;
@@ -181,14 +182,18 @@ public class Waypoint {
 		}
 		
 		private static Icon coloredIcon(int color) {
-			if(!coloredIcons.containsKey(color)) {
-				NativeImage texture = ImageUtil.applyColor(ImageUtil.loadImage(DEFAULT_ICON, 18, 18), color);
-				coloredIcons.put(color, new Icon(-1, DEFAULT_ICON, texture, color, 18, 18));
+			if(coloredIcons.containsKey(color)) {
+				return coloredIcons.get(color);
 			}
 			
-			return coloredIcons.get(color);
+			NativeImage texture = ImageUtil.applyColor(DEFAULT_TEXTURE, color);
+			Icon icon = new Icon(-1, DEFAULT_ICON, texture, color, 18, 18);
+			coloredIcons.put(color, icon);
+			
+			return icon;
 		}
 		
+		@Override
 		public void draw(double x, double y, int w, int h) {
 			if (this.key > 0) {
 				textureManager.bindTexture(this.getTexture());
@@ -197,14 +202,6 @@ public class Waypoint {
 			}
 			
 			this.draw(x, y, (float) w, (float) h);
-		}
-		
-		public void draw(int x, int y, int size) {
-			this.draw(x, y, size, size);
-		}
-		
-		public void draw(int x, int y) {
-			this.draw(x, y, this.getWidth(), this.getHeight());
 		}
 		
 		private Identifier getColoredTexture() {

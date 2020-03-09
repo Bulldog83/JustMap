@@ -4,6 +4,7 @@ import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.minimap.Minimap;
 import ru.bulldog.justmap.minimap.waypoint.Waypoint;
+import ru.bulldog.justmap.util.math.MathUtil;
 
 public class WaypointIcon extends MapIcon<WaypointIcon> {
 	private Waypoint waypoint;
@@ -26,9 +27,9 @@ public class WaypointIcon extends MapIcon<WaypointIcon> {
 		pos.x -= size / 2;
 		pos.y -= size / 2;
 		
-		if (pos.x < mapX + size || pos.x > (mapX + mapSize) - size ||
-			pos.y < mapY + size || pos.y > (mapY + mapSize) - size) return;
-
+		pos.x = MathUtil.clamp(pos.x, mapX, mapX + mapSize - size);
+		pos.y = MathUtil.clamp(pos.y, mapY, mapY + mapSize - size);
+		
 		Waypoint.Icon icon = waypoint.getIcon();
 		if (icon != null) {
 			icon.draw(pos.x, pos.y, size);

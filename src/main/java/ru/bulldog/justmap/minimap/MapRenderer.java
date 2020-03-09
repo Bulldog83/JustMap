@@ -202,6 +202,17 @@ public class MapRenderer {
 
 		float rotation = client.player.headYaw;
 		
+		int winH = client.getWindow().getFramebufferHeight();
+		double scale = client.getWindow().getScaleFactor();
+		
+		int scaledX = (int) (mapX * scale);
+		int scaledY = (int) (winH - (mapY + mapH) * scale);
+		int scaledW = (int) (mapW * scale);
+		int scaledH = (int) (mapH * scale);
+		
+		GL11.glEnable(GL11.GL_SCISSOR_TEST);
+		GL11.glScissor(scaledX, scaledY, scaledW, scaledH);
+		
 		drawMap(rotation);
 
 		if (ClientParams.drawChunkGrid) {
@@ -229,6 +240,8 @@ public class MapRenderer {
 		int arrowY = mapY + mapH / 2;
 		
 		DirectionArrow.draw(arrowX, arrowY, rotation);
+		
+		GL11.glDisable(GL11.GL_SCISSOR_TEST);
 		
 		textManager.draw();
 		

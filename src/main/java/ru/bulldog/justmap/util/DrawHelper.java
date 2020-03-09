@@ -186,7 +186,7 @@ public class DrawHelper extends DrawableHelper {
 		tessellator.draw();		
 	}
 	
-	public static void drawSprite(double x, double y, float w, float h, Sprite sprite) {
+	public static void drawSprite(Sprite sprite, double x, double y, float w, float h) {
 		MatrixStack matrix = new MatrixStack();
 		Tessellator tessellator = Tessellator.getInstance();
 		BufferBuilder builder = tessellator.getBuffer();

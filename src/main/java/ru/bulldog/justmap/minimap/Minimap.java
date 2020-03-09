@@ -32,6 +32,7 @@ import net.minecraft.world.dimension.DimensionType;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
 
 public class Minimap {
 	
@@ -268,21 +269,18 @@ public class Minimap {
 			}
 		}
 		
-		final double range = scaled;
-		final double sx = startX;
-		final double sz = startZ;
-		
 		waypoints.clear();
 		List<Waypoint> wps = WaypointKeeper.getInstance().getWaypoints(world.dimension.getType().getRawId(), true);
 		if (wps != null) {
-			wps.stream().filter(wp -> MathUtil.getDistance(pos, wp.pos, false) <= wp.showRange).forEach(wp -> {
+			Stream<Waypoint> stream = wps.stream().filter(wp -> MathUtil.getDistance(pos, wp.pos, false) <= wp.showRange);
+			for (Waypoint wp : stream.toArray(Waypoint[]::new)) {
 				WaypointIcon waypoint = new WaypointIcon(this, wp);
 				waypoint.setPosition(
-					MathUtil.clamp(MapIcon.scaledPos(wp.pos.getX(), sx, endX, mapSize), 0, range),
-					MathUtil.clamp(MapIcon.scaledPos(wp.pos.getZ(), sz, endZ, mapSize), 0, range)
+					MapIcon.scaledPos(wp.pos.getX(), startX, endX, mapSize),
+					MapIcon.scaledPos(wp.pos.getZ(), startZ, endZ, mapSize)
 				);
-				waypoints.add(waypoint);
-			});
+				this.waypoints.add(waypoint);
+			}
 		}
 	}
 	

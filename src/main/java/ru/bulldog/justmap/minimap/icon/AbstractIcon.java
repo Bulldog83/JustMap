@@ -18,11 +18,15 @@ public abstract class AbstractIcon extends Sprite {
 	
 	public abstract void draw(double x, double y, int w, int h);
 	
+	public void draw(int x, int y) {
+		this.draw(x, y, this.getWidth(), this.getHeight());
+	}
+	
 	public void draw(double x, double y, int size) {
 		this.draw(x, y, size, size);
 	}
 	
 	protected void draw(double x, double y, float w, float h) {
-		DrawHelper.drawSprite(x, y, w, h, this);
+		DrawHelper.drawSprite(this, x, y, w, h);
 	}
 }
