@@ -257,7 +257,7 @@ public class MapRenderer {
 		drawMap(rotation);
 
 		if (ClientParams.drawChunkGrid) {
-			drawChunkGrid(rotation);
+			drawChunkGrid();
 		}
 		if (Minimap.allowEntityRadar()) {
 			if (Minimap.allowPlayerRadar()) {
