@@ -11,7 +11,9 @@ import ru.bulldog.justmap.minimap.icon.EntityIcon;
 import ru.bulldog.justmap.minimap.icon.PlayerIcon;
 import ru.bulldog.justmap.minimap.icon.WaypointIcon;
 import ru.bulldog.justmap.util.DrawHelper.TextAlignment;
-
+import ru.bulldog.justmap.util.math.Line;
+import ru.bulldog.justmap.util.math.Line.Point;
+import ru.bulldog.justmap.util.math.MathUtil;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 
@@ -36,6 +38,7 @@ public class MapRenderer {
 	private int posX, posY;
 	private int mapX, mapY;
 	private int mapW, mapH;
+	private float rotation;
 
 	private final Minimap minimap;
 	
@@ -99,6 +102,8 @@ public class MapRenderer {
 		mapX = posX + border;
 		mapY = posY + border;
 		
+		rotation = client.player.headYaw;
+		
 		TextManager.TextPosition textPos = TextManager.TextPosition.UNDER;
 		
 		switch (mapPosition) {
@@ -146,11 +151,40 @@ public class MapRenderer {
 		
 		int centerX = mapX + mapW / 2;
 		int centerY = mapY + mapH / 2;
+		int mapR = mapX + mapW;
+		int mapB = mapY + mapH;
 		
-		textManager.add(dirN, centerX, centerY - mapH / 2 - 3);
-		textManager.add(dirS, centerX, centerY + mapH / 2 - 3);
-		textManager.add(dirE, centerX + mapW / 2, centerY - 5);
-		textManager.add(dirW, centerX - mapW / 2, centerY - 5);
+		Point center = new Point(centerX, centerY);
+		Point pointN = new Point(centerX, mapY);
+		Point pointS = new Point(centerX, mapB);
+		Point pointE = new Point(mapR, centerY);
+		Point pointW = new Point(mapX, centerY);
+		
+		if (ClientParams.rotateMap) {
+			float rotate = MathUtil.correctAngle(rotation) + 180;
+			double angle = Math.toRadians(-rotate);
+			
+			Line radius = new Line(center, pointN);
+			Line corner = new Line(center, new Point(mapX, mapY));
+			
+			radius.add(corner.lenght() - radius.lenght());
+			int len = radius.lenght();
+			
+			pointN.y = centerY - len;
+			pointS.y = centerY + len;
+			pointE.x = centerX + len;
+			pointW.x = centerX - len;
+			
+			calculatePos(center, pointN, mapR, mapB, angle);
+			calculatePos(center, pointS, mapR, mapB, angle);
+			calculatePos(center, pointE, mapR, mapB, angle);
+			calculatePos(center, pointW, mapR, mapB, angle);
+		}
+		
+		textManager.add(dirN, pointN.x, pointN.y - 5);
+		textManager.add(dirS, pointS.x, pointS.y - 5);
+		textManager.add(dirE, pointE.x, pointE.y - 5);
+		textManager.add(dirW, pointW.x, pointW.y - 5);
 		
 		if (ClientParams.useSkins) {
 			mapSkin = MapSkin.getSkin(ClientParams.currentSkin);
@@ -159,6 +193,15 @@ public class MapRenderer {
 						  (int) (mapW * ((float)(mapSkin.border) / mapSkin.getWidth())) :
 						  mapSkin.border;
 		}
+	}
+	
+	private void calculatePos(Point center, Point dir, int mr, int mb, double angle) {		
+		int posX = (int) (center.x + (dir.x - center.x) * Math.cos(angle) - (dir.y - center.y) * Math.sin(angle));
+		int posY = (int) (center.y + (dir.y - center.y) * Math.cos(angle) + (dir.x - center.x) * Math.sin(angle));
+		posX = MathUtil.clamp(posX, mapX, mr);
+		posY = MathUtil.clamp(posY, mapY, mb);
+		
+		dir.x = posX; dir.y = posY;
 	}
 	
 	public void markDirty() {
@@ -200,8 +243,6 @@ public class MapRenderer {
 			mapSkin.draw(posX, posY, mapW + border * 2);
 		}
 
-		float rotation = client.player.headYaw;
-		
 		int winH = client.getWindow().getFramebufferHeight();
 		double scale = client.getWindow().getScaleFactor();
 		
@@ -293,10 +334,12 @@ public class MapRenderer {
 			int picW = (int) (mapW * 1.5);
 			int picH = (int) (mapH * 1.5);
 			int picX = mapX - (picW - mapW) / 2;
-			int picY = mapY - (picH - mapH) / 2;
+			int picY = mapY - (picH - mapH) / 2;			
+			int centerX = mapX + mapW / 2;
+			int centerY = mapY + mapH / 2;
 			
 			chunkGrid = new ChunkGrid(px, pz, picX, picY, picW, picH);
-			chunkGrid.draw(mapX, mapY, mapW, mapH, rotation);
+			chunkGrid.draw(centerX, centerY, rotation);
 		} else {		
 			chunkGrid = new ChunkGrid(px, pz, mapX, mapY, mapW, mapH);
 			chunkGrid.draw();

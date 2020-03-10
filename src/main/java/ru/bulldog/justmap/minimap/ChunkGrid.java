@@ -17,8 +17,7 @@ import ru.bulldog.justmap.util.math.Line;
 
 public class ChunkGrid {
 	
-	private final int color = 0x66333333;
-	
+	private final int color = 0x66333333;	
 	private final List<GridLine> lines;
 	
 	public ChunkGrid(int x, int y, int mx, int my, int mw, int mh) {
@@ -54,12 +53,9 @@ public class ChunkGrid {
 		}
 	}
 	
-	public void draw(int mx, int my, int mw, int mh, float rotation) {
+	public void draw(int cx, int cy, float rotation) {
 		Tessellator tessellator = Tessellator.getInstance();
 		BufferBuilder builder = tessellator.getBuffer();
-		
-		int cx = mx + mw / 2;
-		int cy = my + mh / 2;
 		
 		float a = (float)(color >> 24 & 255) / 255.0F;
 		float r = (float)(color >> 16 & 255) / 255.0F;

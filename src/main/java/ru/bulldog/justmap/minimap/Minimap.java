@@ -60,6 +60,7 @@ public class Minimap {
 	private PlayerEntity locPlayer = null;
 	
 	private static boolean isMapVisible = true;
+	private static boolean rotateMap = false;
 	
 	public Minimap() {
 		this.mapSize = JustMapClient.CONFIG.getInt("map_size");
@@ -97,11 +98,9 @@ public class Minimap {
 	}
 	
 	public void onConfigChanges() {
-		
-		isMapVisible = JustMapClient.CONFIG.getBoolean("map_visible");
-		
 		int configSize = JustMapClient.CONFIG.getInt("map_size");
-		float configScale = JustMapClient.CONFIG.getFloat("map_scale");
+		float configScale = JustMapClient.CONFIG.getFloat("map_scale");		
+		boolean needRotate = JustMapClient.CONFIG.getBoolean("rotate_map");
 		
 		if (configSize != mapSize || configScale != mapScale) {
 			this.mapSize = configSize;
@@ -109,6 +108,12 @@ public class Minimap {
 			
 			resizeMap(getScaledSize());
 		}
+		if (rotateMap != needRotate) {
+			rotateMap = needRotate;
+			resizeMap(getScaledSize());
+		}
+		
+		isMapVisible = JustMapClient.CONFIG.getBoolean("map_visible");
 	}
 	
 	private void updateInfo(PlayerEntity player) {
@@ -230,7 +235,8 @@ public class Minimap {
 				
 				if (x >= startX && x <= endX && z >= startZ && z <= endZ) {
 					PlayerIcon playerIcon = new PlayerIcon(this, p, false);
-					playerIcon.setPosition(MapIcon.scaledPos(x, startX, endX, mapSize), MapIcon.scaledPos(z, startZ, endZ, mapSize));
+					playerIcon.setPosition(MapIcon.scaledPos(x, startX, endX, mapSize),
+										   MapIcon.scaledPos(z, startZ, endZ, mapSize));
 					this.players.add(playerIcon);
 				}
 			}

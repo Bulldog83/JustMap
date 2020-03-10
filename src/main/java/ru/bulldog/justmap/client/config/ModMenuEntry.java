@@ -88,6 +88,10 @@ public class ModMenuEntry implements ModMenuApi {
 					.setSaveConsumer(val -> JustMapClient.CONFIG.setBoolean("show_effect_timers", val))
 					.setDefaultValue((boolean) JustMapClient.CONFIG.getDefault("show_effect_timers"))
 					.build());
+			general.addEntry(entryBuilder.startBooleanToggle(lang("rotate_map"), JustMapClient.CONFIG.getBoolean("rotate_map"))
+					.setSaveConsumer(val -> JustMapClient.CONFIG.setBoolean("rotate_map", val))
+					.setDefaultValue((boolean) JustMapClient.CONFIG.getDefault("rotate_map"))
+					.build());
 			
 			ConfigCategory mapAppearance = builder.getOrCreateCategory(lang("category.appearance"));
 			mapAppearance.addEntry(entryBuilder.startBooleanToggle(lang("alternate_color_render"), JustMapClient.CONFIG.getBoolean("alternate_color_render"))

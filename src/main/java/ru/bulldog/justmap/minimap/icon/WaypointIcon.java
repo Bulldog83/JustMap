@@ -27,8 +27,8 @@ public class WaypointIcon extends MapIcon<WaypointIcon> {
 		pos.x -= size / 2;
 		pos.y -= size / 2;
 		
-		pos.x = MathUtil.clamp(pos.x, mapX, mapX + mapSize - size);
-		pos.y = MathUtil.clamp(pos.y, mapY, mapY + mapSize - size);
+		pos.x = MathUtil.clamp(pos.x, mapX, (mapX + mapSize) - size);
+		pos.y = MathUtil.clamp(pos.y, mapY, (mapY + mapSize) - size);
 		
 		Waypoint.Icon icon = waypoint.getIcon();
 		if (icon != null) {

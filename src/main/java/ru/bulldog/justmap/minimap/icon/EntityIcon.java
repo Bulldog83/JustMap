@@ -39,8 +39,8 @@ public class EntityIcon extends MapIcon<EntityIcon> {
 		pos.x -= size / 2;
 		pos.y -= size / 2;
 		
-		if (pos.x < mapX + size || pos.x > (mapX + mapSize) - size ||
-			pos.y < mapY + size || pos.y > (mapY + mapSize) - size) return;
+		if (pos.x < mapX || pos.x > (mapX + mapSize) - size ||
+			pos.y < mapY || pos.y > (mapY + mapSize) - size) return;
 		
 		EntityHeadIcon icon = null;
 		if (ClientParams.showEntityHeads) {
