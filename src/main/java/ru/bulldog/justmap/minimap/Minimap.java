@@ -1,6 +1,5 @@
 package ru.bulldog.justmap.minimap;
 
-import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.minimap.data.MapCache;
@@ -15,6 +14,7 @@ import ru.bulldog.justmap.minimap.waypoint.WaypointKeeper;
 import ru.bulldog.justmap.util.DrawHelper.TextAlignment;
 import ru.bulldog.justmap.util.math.MathUtil;
 import ru.bulldog.justmap.util.math.RandomUtil;
+
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.texture.NativeImage;
@@ -94,7 +94,6 @@ public class Minimap {
 	
 	private void resizeMap(int newSize) {
 		image = new NativeImage(newSize, newSize, false);
-		JustMap.LOGGER.logInfo(String.format("Map resized to %dx%d", newSize, newSize));
 	}
 	
 	public void onConfigChanges() {
