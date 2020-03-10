@@ -5,7 +5,7 @@ import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.config.ConfigKeeper.EnumEntry;
 import ru.bulldog.justmap.minimap.MapPosition;
 import ru.bulldog.justmap.minimap.MapSkin;
-import ru.bulldog.justmap.util.MathUtil;
+import ru.bulldog.justmap.util.math.MathUtil;
 import io.github.prospector.modmenu.api.ModMenuApi;
 import me.shedaniel.clothconfig2.api.ConfigBuilder;
 import me.shedaniel.clothconfig2.api.ConfigCategory;
@@ -87,6 +87,10 @@ public class ModMenuEntry implements ModMenuApi {
 			general.addEntry(entryBuilder.startBooleanToggle(lang("show_effect_timers"), JustMapClient.CONFIG.getBoolean("show_effect_timers"))
 					.setSaveConsumer(val -> JustMapClient.CONFIG.setBoolean("show_effect_timers", val))
 					.setDefaultValue((boolean) JustMapClient.CONFIG.getDefault("show_effect_timers"))
+					.build());
+			general.addEntry(entryBuilder.startBooleanToggle(lang("rotate_map"), JustMapClient.CONFIG.getBoolean("rotate_map"))
+					.setSaveConsumer(val -> JustMapClient.CONFIG.setBoolean("rotate_map", val))
+					.setDefaultValue((boolean) JustMapClient.CONFIG.getDefault("rotate_map"))
 					.build());
 			
 			ConfigCategory mapAppearance = builder.getOrCreateCategory(lang("category.appearance"));

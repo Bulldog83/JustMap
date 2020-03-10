@@ -24,7 +24,7 @@ public class EntityModelRenderer {
 	private static EntityRenderDispatcher renderDispatcher = minecraftClient.getEntityRenderManager();
 	private static VertexConsumerProvider.Immediate consumerProvider = minecraftClient.getBufferBuilders().getEntityVertexConsumers();
 	
-	public static void renderModel(Entity entity, int x, int y) {
+	public static void renderModel(Entity entity, double x, double y) {
 		
 		LivingEntity livingEntity = (LivingEntity) entity;
 		

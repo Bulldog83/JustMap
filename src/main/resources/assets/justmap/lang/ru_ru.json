@@ -35,6 +35,7 @@
   "justmap.configuration.show_direction": "Отображать направление",
   "justmap.configuration.move_effects": "Переместить иконки эффектов статуса",
   "justmap.configuration.show_effect_timers": "Отображать таймеры эффектов статуса",
+  "justmap.configuration.rotate_map": "Ориентировать карту по игроку",
   "justmap.configuration.alternate_color_render": "Альренативный цветовой рендер карты",
   "justmap.configuration.use_skins": "Использовать скины",
   "justmap.configuration.current_skin": "Текущий скин",

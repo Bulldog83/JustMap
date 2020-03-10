@@ -13,6 +13,7 @@ public class ClientParams {
 	public static boolean showCaves = true;
 	public static boolean moveEffects = true;
 	public static boolean showEffectTimers = true;
+	public static boolean rotateMap = false;
 
 	public static boolean useSkins = true;
 	public static int currentSkin = 0;

@@ -33,6 +33,7 @@ public class ClientConfig extends Config{
 		KEEPER.registerEntry("map_scale", new FloatRange(ClientParams.mapScale, (f) -> ClientParams.mapScale = f, () -> ClientParams.mapScale, 0.25F, 2.0F));
 		KEEPER.registerEntry("map_saturation", new IntegerRange(ClientParams.mapSaturation, (i) -> ClientParams.mapSaturation = i, () -> ClientParams.mapSaturation, -50, 50));
 		KEEPER.registerEntry("map_brightness", new IntegerRange(ClientParams.mapBrightness, (i) -> ClientParams.mapBrightness = i, () -> ClientParams.mapBrightness, -50, 50));
+		KEEPER.registerEntry("rotate_map", new BooleanEntry(ClientParams.rotateMap, (b) -> ClientParams.rotateMap = b, () -> ClientParams.rotateMap));
 		KEEPER.registerEntry("show_caves", new BooleanEntry(ClientParams.showCaves, (b) -> ClientParams.showCaves = b, () -> ClientParams.showCaves));
 		KEEPER.registerEntry("show_position", new BooleanEntry(ClientParams.showPosition, (b) -> ClientParams.showPosition = b, () -> ClientParams.showPosition));
 		KEEPER.registerEntry("show_FPS", new BooleanEntry(ClientParams.showFPS, (b) -> ClientParams.showFPS = b, () -> ClientParams.showFPS));

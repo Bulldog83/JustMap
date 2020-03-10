@@ -5,14 +5,14 @@ import java.util.Map;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.mojang.blaze3d.systems.RenderSystem;
+
 import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.minimap.icon.AbstractIcon;
 import ru.bulldog.justmap.util.ColorUtil;
 import ru.bulldog.justmap.util.Colors;
-import ru.bulldog.justmap.util.DrawHelper;
 import ru.bulldog.justmap.util.ImageUtil;
 import ru.bulldog.justmap.util.SpriteAtlas;
+
 import net.minecraft.client.resource.metadata.AnimationResourceMetadata;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.texture.NativeImageBackedTexture;
@@ -162,6 +162,7 @@ public class Waypoint {
 	public static class Icon extends AbstractIcon {
 		
 		public final static Identifier DEFAULT_ICON = new Identifier(JustMap.MODID, "textures/icon/default.png");
+		private final static NativeImage DEFAULT_TEXTURE = ImageUtil.loadImage(DEFAULT_ICON, 18, 18);
 		
 		public final int key;
 		public final int color;
@@ -181,31 +182,26 @@ public class Waypoint {
 		}
 		
 		private static Icon coloredIcon(int color) {
-			if(!coloredIcons.containsKey(color)) {
-				NativeImage texture = ImageUtil.applyColor(ImageUtil.loadImage(DEFAULT_ICON, 18, 18), color);
-				coloredIcons.put(color, new Icon(-1, DEFAULT_ICON, texture, color, 18, 18));
+			if(coloredIcons.containsKey(color)) {
+				return coloredIcons.get(color);
 			}
 			
-			return coloredIcons.get(color);
+			NativeImage texture = ImageUtil.applyColor(DEFAULT_TEXTURE, color);
+			Icon icon = new Icon(-1, DEFAULT_ICON, texture, color, 18, 18);
+			coloredIcons.put(color, icon);
+			
+			return icon;
 		}
 		
-		public void draw(int x, int y, int w, int h) {
+		@Override
+		public void draw(double x, double y, int w, int h) {
 			if (this.key > 0) {
 				textureManager.bindTexture(this.getTexture());
 			} else {
 				textureManager.bindTexture(getColoredTexture());
-			}			
-			RenderSystem.enableAlphaTest();
-			RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
-			DrawHelper.blit(x, y, 0, w, h, this);
-		}
-		
-		public void draw(int x, int y, int size) {
-			this.draw(x, y, size, size);
-		}
-		
-		public void draw(int x, int y) {
-			this.draw(x, y, this.getWidth(), this.getHeight());
+			}
+			
+			this.draw(x, y, (float) w, (float) h);
 		}
 		
 		private Identifier getColoredTexture() {

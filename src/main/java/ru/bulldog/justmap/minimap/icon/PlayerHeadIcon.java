@@ -1,14 +1,13 @@
 package ru.bulldog.justmap.minimap.icon;
 
 import com.mojang.authlib.minecraft.MinecraftProfileTexture;
-import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.texture.*;
 import net.minecraft.client.util.DefaultSkinHelper;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.Identifier;
+
 import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.util.DrawHelper;
 
@@ -56,13 +55,14 @@ public class PlayerHeadIcon {
 		return icon;
 	}
 	
-	public void draw(int x, int y) {
+	public void draw(double x, double y) {
+		int size = ClientParams.entityIconSize;
 		if (ClientParams.showIconsOutline) {
-			DrawHelper.fill(x - 1, y - 1, x + 9, y + 9, 0xFF444444);
+			DrawHelper.fill(x - 1, y - 1, x + size + 1, y + size + 1, 0xFF444444);
 		}
 		textureManager.bindTexture(this.skin);
-		RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
-		DrawableHelper.blit(x, y, 8, 8, 8.0F, 8.0F, 8, 8, 64, 64);
+		
+		DrawHelper.draw(x, y, size, size);
 	}
 	
 	

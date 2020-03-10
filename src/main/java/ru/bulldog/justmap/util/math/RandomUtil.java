@@ -1,4 +1,4 @@
-package ru.bulldog.justmap.util;
+package ru.bulldog.justmap.util.math;
 
 import java.util.List;
 import java.util.Random;

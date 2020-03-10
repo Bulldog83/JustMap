@@ -12,10 +12,9 @@ import ru.bulldog.justmap.minimap.icon.WaypointIcon;
 import ru.bulldog.justmap.minimap.waypoint.Waypoint;
 import ru.bulldog.justmap.minimap.waypoint.WaypointEditor;
 import ru.bulldog.justmap.minimap.waypoint.WaypointKeeper;
-import ru.bulldog.justmap.util.MathUtil;
-import ru.bulldog.justmap.util.RandomUtil;
 import ru.bulldog.justmap.util.DrawHelper.TextAlignment;
-
+import ru.bulldog.justmap.util.math.MathUtil;
+import ru.bulldog.justmap.util.math.RandomUtil;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.texture.NativeImage;
@@ -33,6 +32,7 @@ import net.minecraft.world.dimension.DimensionType;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
 
 public class Minimap {
 	
@@ -47,6 +47,7 @@ public class Minimap {
 	
 	private int mapSize;	
 	private float mapScale;
+	private int picSize;
 	
 	private Biome currentBiome;
 	
@@ -59,10 +60,12 @@ public class Minimap {
 	private PlayerEntity locPlayer = null;
 	
 	private static boolean isMapVisible = true;
+	private static boolean rotateMap = false;
 	
 	public Minimap() {
 		this.mapSize = JustMapClient.CONFIG.getInt("map_size");
-		this.mapScale = JustMapClient.CONFIG.getFloat("map_scale");
+		this.mapScale = JustMapClient.CONFIG.getFloat("map_scale");		
+		this.picSize = ClientParams.rotateMap ? (int) (mapSize * 1.3) : mapSize;
 		
 		int scaledSize = getScaledSize();
 		
@@ -94,16 +97,10 @@ public class Minimap {
 		JustMap.LOGGER.logInfo(String.format("Map resized to %dx%d", newSize, newSize));
 	}
 	
-	public int getScaledSize() {
-		return (int) (mapSize * mapScale);
-	}
-	
 	public void onConfigChanges() {
-		
-		isMapVisible = JustMapClient.CONFIG.getBoolean("map_visible");
-		
 		int configSize = JustMapClient.CONFIG.getInt("map_size");
-		float configScale = JustMapClient.CONFIG.getFloat("map_scale");
+		float configScale = JustMapClient.CONFIG.getFloat("map_scale");		
+		boolean needRotate = JustMapClient.CONFIG.getBoolean("rotate_map");
 		
 		if (configSize != mapSize || configScale != mapScale) {
 			this.mapSize = configSize;
@@ -111,6 +108,12 @@ public class Minimap {
 			
 			resizeMap(getScaledSize());
 		}
+		if (rotateMap != needRotate) {
+			rotateMap = needRotate;
+			resizeMap(getScaledSize());
+		}
+		
+		isMapVisible = JustMapClient.CONFIG.getBoolean("map_visible");
 	}
 	
 	private void updateInfo(PlayerEntity player) {
@@ -195,10 +198,8 @@ public class Minimap {
 		currentBiome = world.getBiome(pos);
 		
 		int scaled = getScaledSize();
-		int startX = pos.getX() - scaled / 2;
-		int startZ = pos.getZ() - scaled / 2;
-		int endX = startX + scaled;
-		int endZ = startZ + scaled;
+		double startX = pos.getX() - scaled / 2;
+		double startZ = pos.getZ() - scaled / 2;
 
 		if (needRenderCaves(world, player.getSenseCenterPos())) {
 			MapCache.setCurrentLayer(MapProcessor.Layer.CAVES);
@@ -208,7 +209,16 @@ public class Minimap {
 			MapCache.setLayerLevel(0);
 		}
 		
-		MapCache.get().update(this, scaled, startX, startZ);
+		MapCache.get().update(this, (int) scaled, (int) startX, (int) startZ);
+		
+		if (ClientParams.rotateMap) {
+			scaled = (int) (mapSize * mapScale);
+			startX = pos.getX() - scaled / 2;
+			startZ = pos.getZ() - scaled / 2;
+		}		
+		
+		double endX = startX + scaled;
+		double endZ = startZ + scaled;
 		
 		if (allowPlayerRadar()) {
 			players.clear();			
@@ -225,7 +235,8 @@ public class Minimap {
 				
 				if (x >= startX && x <= endX && z >= startZ && z <= endZ) {
 					PlayerIcon playerIcon = new PlayerIcon(this, p, false);
-					playerIcon.setPosition(MapIcon.scaledPos(x, startX, endX, mapSize), MapIcon.scaledPos(z, startZ, endZ, mapSize));
+					playerIcon.setPosition(MapIcon.scaledPos(x, startX, endX, mapSize),
+										   MapIcon.scaledPos(z, startZ, endZ, mapSize));
 					this.players.add(playerIcon);
 				}
 			}
@@ -248,11 +259,13 @@ public class Minimap {
 					boolean hostile = livingEntity instanceof HostileEntity;
 					if (hostile && allowHostileRadar()) {
 						EntityIcon entIcon = new EntityIcon(this, entity, hostile);						
-						entIcon.setPosition(MapIcon.scaledPos((int) entity.getX(), startX, endX, mapSize), MapIcon.scaledPos((int) entity.getZ(), startZ, endZ, mapSize));						
+						entIcon.setPosition(MapIcon.scaledPos((int) entity.getX(), startX, endX, mapSize),
+											MapIcon.scaledPos((int) entity.getZ(), startZ, endZ, mapSize));
 						this.entities.add(entIcon);
 					} else if (!hostile && allowCreatureRadar()) {
 						EntityIcon entIcon = new EntityIcon(this, entity, hostile);						
-						entIcon.setPosition(MapIcon.scaledPos((int) entity.getX(), startX, endX, mapSize), MapIcon.scaledPos((int) entity.getZ(), startZ, endZ, mapSize));						
+						entIcon.setPosition(MapIcon.scaledPos((int) entity.getX(), startX, endX, mapSize),
+											MapIcon.scaledPos((int) entity.getZ(), startZ, endZ, mapSize));
 						this.entities.add(entIcon);
 					}
 				}
@@ -265,14 +278,15 @@ public class Minimap {
 		waypoints.clear();
 		List<Waypoint> wps = WaypointKeeper.getInstance().getWaypoints(world.dimension.getType().getRawId(), true);
 		if (wps != null) {
-			wps.stream().filter(wp -> MathUtil.getDistance(pos, wp.pos, false) <= wp.showRange).forEach(wp -> {
+			Stream<Waypoint> stream = wps.stream().filter(wp -> MathUtil.getDistance(pos, wp.pos, false) <= wp.showRange);
+			for (Waypoint wp : stream.toArray(Waypoint[]::new)) {
 				WaypointIcon waypoint = new WaypointIcon(this, wp);
 				waypoint.setPosition(
-					MathUtil.clamp(MapIcon.scaledPos(wp.pos.getX(), startX, endX, mapSize), 0, scaled),
-					MathUtil.clamp(MapIcon.scaledPos(wp.pos.getZ(), startZ, endZ, mapSize), 0, scaled)
+					MapIcon.scaledPos(wp.pos.getX(), startX, endX, mapSize),
+					MapIcon.scaledPos(wp.pos.getZ(), startZ, endZ, mapSize)
 				);
-				waypoints.add(waypoint);
-			});
+				this.waypoints.add(waypoint);
+			}
 		}
 	}
 	
@@ -296,24 +310,33 @@ public class Minimap {
 		return image;
 	}
 	
-	public int getSize() {
-		return mapSize;
+	public int getPictureSize() {
+		return this.picSize;
+	}
+	
+	public int getScaledSize() {
+		this.picSize = ClientParams.rotateMap ? (int) (mapSize * 1.3) : mapSize;
+		return (int) (picSize * mapScale);
+	}
+
+	public int getMapSize() {
+		return this.mapSize;
 	}
 	
 	public float getScale() {
-		return mapScale;
+		return this.mapScale;
 	}
 	
 	public List<PlayerIcon> getPlayerIcons() {
-		return players;
+		return this.players;
 	}
 	
 	public List<EntityIcon> getEntities() {
-		return entities;
+		return this.entities;
 	}
 	
 	public TextManager getTextManager() {
-		return textManager;
+		return this.textManager;
 	}
 	
 	public boolean isMapVisible() {

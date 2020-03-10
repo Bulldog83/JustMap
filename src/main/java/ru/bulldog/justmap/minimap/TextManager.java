@@ -41,8 +41,8 @@ public class TextManager {
 		for (MapText line : mapInfo) {
 			switch (line.alignment) {
 		  		case LEFT: line.x = x; break;
-		  		case CENTER: line.x = x + map.getSize() / 2; break;
-		  		case RIGHT: line.x = x + map.getSize(); break;
+		  		case CENTER: line.x = x + map.getMapSize() / 2; break;
+		  		case RIGHT: line.x = x + map.getMapSize(); break;
 			}
 		  
 			line.y = yp;

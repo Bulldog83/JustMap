@@ -35,6 +35,7 @@
   "justmap.configuration.show_direction": "Show Direction",
   "justmap.configuration.move_effects": "Move status effect icons",
   "justmap.configuration.show_effect_timers": "Show status effect timers",
+  "justmap.configuration.rotate_map": "Orient the map by player",
   "justmap.configuration.alternate_color_render": "Alternate map colors rendering",
   "justmap.configuration.use_skins": "Use map skins",
   "justmap.configuration.current_skin": "Current Skin",
