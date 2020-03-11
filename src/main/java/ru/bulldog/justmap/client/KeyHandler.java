@@ -7,6 +7,7 @@ import net.minecraft.client.util.InputUtil;
 import net.minecraft.util.Identifier;
 import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.minimap.waypoint.WaypointsList;
+import ru.bulldog.justmap.worldmap.Worldmap;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -78,6 +79,18 @@ public enum KeyHandler {
 				MinecraftClient.getInstance().openScreen(new WaypointsList(null));
 			}
 	
+			@Override
+			public boolean isListening() {
+				return MC.player != null && MC.currentScreen == null;
+			}
+		});
+		
+		INSTANCE.register(new KeyParser(createKeyBinding("worldmap", GLFW.GLFW_KEY_M)) {
+			@Override
+			public void onKeyUp() {
+				MinecraftClient.getInstance().openScreen(new Worldmap());
+			}
+			
 			@Override
 			public boolean isListening() {
 				return MC.player != null && MC.currentScreen == null;

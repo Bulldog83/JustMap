@@ -74,7 +74,7 @@ public class MapRegion {
 		return ImageUtil.readTile(getImage(), imgX, imgY, 16, 16);
 	}
 	
-	private NativeImage getImage() {
+	public synchronized NativeImage getImage() {
 		if (!layers.containsKey(currentLayer)) {
 			layers.put(currentLayer, new RegionLayer());
 		}

@@ -1,4 +1,4 @@
-package ru.bulldog.justmap.minimap.waypoint;
+package ru.bulldog.justmap.client;
 
 import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.Element;
@@ -17,7 +17,7 @@ import org.lwjgl.opengl.GL11;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.datafixers.util.Pair;
 
-public class WaypointScreen extends Screen {
+public class MapScreen extends Screen {
 	public static final Identifier DEFAULT_IDENTIFIER = new Identifier("textures/block/dirt.png");
 	public static final HashMap<String, Pair<String, Identifier>> DIMENSION_INFO = new HashMap<String, Pair<String, Identifier>>() {
 		private static final long serialVersionUID = 1L;
@@ -35,11 +35,11 @@ public class WaypointScreen extends Screen {
 	protected int x, y, center;
 	protected int width, height;
 	
-	protected WaypointScreen(Text title) {
+	protected MapScreen(Text title) {
 		this(title, null);
 	}
 	
-	public WaypointScreen(Text title, Screen parent) {
+	public MapScreen(Text title, Screen parent) {
 		super(title);
 		this.parent = parent;
 	}
@@ -78,10 +78,10 @@ public class WaypointScreen extends Screen {
 		RenderSystem.color4f(1, 1, 1, 1);
 		builder.begin(GL11.GL_QUADS, VertexFormats.POSITION_TEXTURE_COLOR);
 		
-		builder.vertex(x, y + height, 0).texture(0f, 1f).color(255, 255, 255, 255).next();
-		builder.vertex(x + width, y + height, 0).texture(1f, 1f).color(255, 255, 255, 255).next();
-		builder.vertex(x + width, y, 0).texture(1f, 0f).color(255, 255, 255, 255).next();
-		builder.vertex(x, y, 0).texture(0f, 0f).color(255, 255, 255, 255).next();
+		builder.vertex(x, y + height, 0).texture(0, 1).color(255, 255, 255, 255).next();
+		builder.vertex(x + width, y + height, 0).texture(1, 1).color(255, 255, 255, 255).next();
+		builder.vertex(x + width, y, 0).texture(1, 0).color(255, 255, 255, 255).next();
+		builder.vertex(x, y, 0).texture(0, 0).color(255, 255, 255, 255).next();
 		
 		tessellator.draw();
 	}
@@ -120,13 +120,17 @@ public class WaypointScreen extends Screen {
 	}
 	
 	protected void drawBorders() {
+		drawBorders(40, 40);
+	}
+	
+	protected void drawBorders(int top, int bottom) {
 		Identifier id = info.getSecond();
 		if (id == null) {
 			id = DEFAULT_IDENTIFIER;
 		}
 
-		renderTextureRepeating(x, 0, width, 40, 16, 16, id);
-		renderTextureRepeating(x, height - 40, width, 40, 16, 16, id);		
+		renderTextureRepeating(x, 0, width, top, 16, 16, id);
+		renderTextureRepeating(x, height - bottom, width, bottom, 16, 16, id);		
 	}
 	
 	public String lang(String key) {

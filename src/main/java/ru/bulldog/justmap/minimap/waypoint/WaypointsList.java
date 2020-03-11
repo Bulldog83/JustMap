@@ -2,6 +2,7 @@ package ru.bulldog.justmap.minimap.waypoint;
 
 import com.mojang.datafixers.util.Pair;
 
+import ru.bulldog.justmap.client.MapScreen;
 import ru.bulldog.justmap.minimap.waypoint.Waypoint.Icon;
 import ru.bulldog.justmap.util.Colors;
 import ru.bulldog.justmap.util.DrawHelper;
@@ -21,7 +22,7 @@ import net.minecraft.world.dimension.DimensionType;
 import java.util.ArrayList;
 import java.util.List;
 
-public class WaypointsList extends WaypointScreen {
+public class WaypointsList extends MapScreen {
 	private static class Entry implements Element {
 		private MinecraftClient minecraft;
 	

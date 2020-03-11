@@ -1,5 +1,6 @@
 package ru.bulldog.justmap.minimap.waypoint;
 
+import ru.bulldog.justmap.client.MapScreen;
 import ru.bulldog.justmap.client.widget.TitledWidget;
 import ru.bulldog.justmap.minimap.waypoint.Waypoint.Icon;
 import ru.bulldog.justmap.util.Colors;
@@ -19,7 +20,7 @@ import org.lwjgl.glfw.GLFW;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-public class WaypointEditor extends WaypointScreen {
+public class WaypointEditor extends MapScreen {
 	
 	private static final LiteralText title = new LiteralText("Edit Waypoint");
 
@@ -56,7 +57,7 @@ public class WaypointEditor extends WaypointScreen {
 		int dimId = minecraft.player.dimension.getRawId();		
 		info = DIMENSION_INFO.getOrDefault(DimensionType.byRawId(dimId).toString(), null);
 		
-		center = minecraft.getWindow().getScaledWidth() / 2;		
+		center = minecraft.getWindow().getScaledWidth() / 2;
 		width = Math.max(300, center);
 		height = minecraft.getWindow().getScaledHeight();
 	

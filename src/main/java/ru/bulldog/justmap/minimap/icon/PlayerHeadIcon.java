@@ -7,7 +7,7 @@ import net.minecraft.client.texture.*;
 import net.minecraft.client.util.DefaultSkinHelper;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.Identifier;
-
+import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.util.DrawHelper;
 
@@ -16,9 +16,8 @@ import java.util.HashMap;
 import java.util.UUID;
 
 public class PlayerHeadIcon {
-	private static MinecraftClient minecraftClient = MinecraftClient.getInstance();
-	private static PlayerSkinProvider skinProvider = minecraftClient.getSkinProvider();
-	private static TextureManager textureManager = minecraftClient.getTextureManager();
+	private static PlayerSkinProvider skinProvider = MinecraftClient.getInstance().getSkinProvider();
+	private static TextureManager textureManager = MinecraftClient.getInstance().getTextureManager();
 	
 	private static Map<UUID, PlayerHeadIcon> playerIcons = new HashMap<>();
 	
@@ -41,15 +40,21 @@ public class PlayerHeadIcon {
 			icon = playerIcons.get(player.getUuid());
 			
 			if (!icon.succsses) {
-				if (now - icon.lastCheck - icon.delay >= 0) {
-					getPlayerSkin(icon);
-				}
+				JustMap.EXECUTOR.execute(() -> {
+					if (now - icon.lastCheck - icon.delay >= 0) {
+						getPlayerSkin(icon);
+					}
+				});
 			} else if (now - icon.lastCheck >= 300000) {
-				getPlayerSkin(icon);
+				JustMap.EXECUTOR.execute(() -> {
+					getPlayerSkin(icon);
+				});
 			}
 		} else {
 			icon = new PlayerHeadIcon(player);
-			registerIcon(icon);
+			JustMap.EXECUTOR.execute(() -> {
+				registerIcon(icon);
+			});			
 		}
 
 		return icon;
@@ -74,6 +79,8 @@ public class PlayerHeadIcon {
 	private static void getPlayerSkin(PlayerHeadIcon icon) {
 		Map<MinecraftProfileTexture.Type, MinecraftProfileTexture> textures = skinProvider.getTextures(icon.player.getGameProfile());
 	
+		icon.lastCheck = System.currentTimeMillis();
+		
 		if (textures.containsKey(MinecraftProfileTexture.Type.SKIN)) {
 			icon.skin = skinProvider.loadSkin(textures.get(MinecraftProfileTexture.Type.SKIN), MinecraftProfileTexture.Type.SKIN);
 			icon.succsses = true;
@@ -81,7 +88,5 @@ public class PlayerHeadIcon {
 			icon.skin = DefaultSkinHelper.getTexture(icon.player.getUuid());
 			icon.succsses = false;
 		}
-		
-		icon.lastCheck = System.currentTimeMillis();
 	}
 }
