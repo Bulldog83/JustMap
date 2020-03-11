@@ -14,12 +14,12 @@ public class StorageUtil {
 		MinecraftClient client = MinecraftClient.getInstance();
 		
 		File filesDir;
+		ServerInfo serverInfo = client.getCurrentServerEntry();
 		if (client.isIntegratedServerRunning()) {
 			MinecraftServer server = client.getServer();
 			filesDir = new File(MAP_DIR, String.format("local/%s/", server.getLevelName()));
-		} else if (!client.isInSingleplayer()) {
-			ServerInfo server = client.getCurrentServerEntry();
-			filesDir = new File(MAP_DIR, String.format("servers/%s/", server.name));
+		} else if (serverInfo != null) {
+			filesDir = new File(MAP_DIR, String.format("servers/%s/", serverInfo.name));
 		} else {		
 			filesDir = new File(MAP_DIR, "undefined/");
 		}

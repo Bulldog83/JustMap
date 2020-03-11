@@ -254,7 +254,7 @@ public class MapRenderer {
 		GL11.glEnable(GL11.GL_SCISSOR_TEST);
 		GL11.glScissor(scaledX, scaledY, scaledW, scaledH);
 		
-		drawMap(rotation);
+		drawMap();
 
 		if (ClientParams.drawChunkGrid) {
 			drawChunkGrid();
@@ -289,7 +289,7 @@ public class MapRenderer {
 		RenderSystem.enableDepthTest();
 	}
 	
-	private void drawMap(float rotation) {		
+	private void drawMap() {		
 		Tessellator tessellator = Tessellator.getInstance();
 		BufferBuilder builder = tessellator.getBuffer();
 		builder.begin(7, VertexFormats.POSITION_TEXTURE);
