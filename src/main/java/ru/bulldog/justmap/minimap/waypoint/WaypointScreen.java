@@ -64,7 +64,7 @@ public class WaypointScreen extends Screen {
 	
 	@Override
 	public void onClose() {
-		minecraft.openScreen(parent);
+		client.openScreen(parent);
 	}
 	
 	public void renderTexture(int x, int y, int width, int height, String id) {
@@ -74,7 +74,7 @@ public class WaypointScreen extends Screen {
 	public void renderTexture(int x, int y, int width, int height, Identifier id) {
 		Tessellator tessellator = Tessellator.getInstance();
 		BufferBuilder builder = tessellator.getBuffer();
-		minecraft.getTextureManager().bindTexture(id);
+		client.getTextureManager().bindTexture(id);
 		RenderSystem.color4f(1, 1, 1, 1);
 		builder.begin(GL11.GL_QUADS, VertexFormats.POSITION_TEXTURE_COLOR);
 		
@@ -89,7 +89,7 @@ public class WaypointScreen extends Screen {
 	public void renderTexture(int x, int y, int width, int height, float u, float v, int r, int g, int b, int a, Identifier id) {
 		Tessellator tessellator = Tessellator.getInstance();
 		BufferBuilder builder = tessellator.getBuffer();
-		minecraft.getTextureManager().bindTexture(id);
+		client.getTextureManager().bindTexture(id);
 		RenderSystem.color4f(1, 1, 1, 1);
 		builder.begin(GL11.GL_QUADS, VertexFormats.POSITION_TEXTURE_COLOR);
 	

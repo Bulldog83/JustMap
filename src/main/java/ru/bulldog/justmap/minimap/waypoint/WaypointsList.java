@@ -123,9 +123,6 @@ public class WaypointsList extends WaypointScreen {
 	
 	public WaypointsList(Screen parent) {
 		super(title, parent);
-		if (minecraft == null) {
-			minecraft = MinecraftClient.getInstance();
-		}
 		
 		dimensions = keeper.getDimensions();
 		
@@ -142,16 +139,16 @@ public class WaypointsList extends WaypointScreen {
 			dimensions.add(theEnd);
 		}		
 		
-		currentDim = minecraft.player.dimension.getRawId();
+		currentDim = client.player.dimension.getRawId();
 		currentDimIndex = getDimIndex(currentDim);
 	}
 	
 	@Override
 	protected void init() {
-		width = Math.max(300, minecraft.getWindow().getScaledWidth() / 2);
-		height = minecraft.getWindow().getScaledHeight();
+		width = Math.max(300, client.getWindow().getScaledWidth() / 2);
+		height = client.getWindow().getScaledHeight();
 		
-		center = minecraft.getWindow().getScaledWidth() / 2;
+		center = client.getWindow().getScaledWidth() / 2;
 	
 		x = center - width / 2;
 		
@@ -224,7 +221,7 @@ public class WaypointsList extends WaypointScreen {
 		entries.forEach(e -> e.render(mouseX, mouseY, delta));
 		
 		String dimensionName = info == null ? lang("unknown") : I18n.translate(info.getFirst());
-		drawCenteredString(font, dimensionName, center, 15, Colors.WHITE);
+		drawCenteredString(textRenderer, dimensionName, center, 15, Colors.WHITE);
 		
 		drawScrollBar();
 	}
@@ -242,17 +239,17 @@ public class WaypointsList extends WaypointScreen {
 	private void drawScrollBar() {}
 	
 	private void edit(Waypoint waypoint) {
-		minecraft.openScreen(new WaypointEditor(waypoint, this, null));
+		client.openScreen(new WaypointEditor(waypoint, this, null));
 	}
 	
 	private void add() {
 		Waypoint waypoint = new Waypoint();
 		waypoint.dimension = currentDim;
 		waypoint.color = RandomUtil.getElement(Waypoint.WAYPOINT_COLORS);
-		waypoint.pos = minecraft.player.getSenseCenterPos();
+		waypoint.pos = client.player.getSenseCenterPos();
 		waypoint.name = "Waypoint";
 		
-		minecraft.openScreen(new WaypointEditor(waypoint, this, keeper::addNew));
+		client.openScreen(new WaypointEditor(waypoint, this, keeper::addNew));
 	}
 	
 	private void delete(Waypoint waypoint) {

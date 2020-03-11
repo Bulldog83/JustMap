@@ -53,12 +53,12 @@ public class WaypointEditor extends WaypointScreen {
 	
 	@Override
 	public void init() {
-		int dimId = minecraft.player.dimension.getRawId();		
+		int dimId = client.player.dimension.getRawId();		
 		info = DIMENSION_INFO.getOrDefault(DimensionType.byRawId(dimId).toString(), null);
 		
-		center = minecraft.getWindow().getScaledWidth() / 2;		
+		center = client.getWindow().getScaledWidth() / 2;		
 		width = Math.max(300, center);
-		height = minecraft.getWindow().getScaledHeight();
+		height = client.getWindow().getScaledHeight();
 	
 		x = center - width / 2;
 		y = 60;
@@ -68,7 +68,7 @@ public class WaypointEditor extends WaypointScreen {
 		int ex = x + padding;
 		int ey = y;
 		int ew = width - padding * 2;
-		nameField = new TitledWidget<>(font, new TextFieldWidget(font, 0, 0, ew - 30, 12, "Name"), ex, ey, ew, rowH, "", lang("name"));
+		nameField = new TitledWidget<>(textRenderer, new TextFieldWidget(textRenderer, 0, 0, ew - 30, 12, "Name"), ex, ey, ew, rowH, "", lang("name"));
 		nameField.changeFocus(true);
 		nameField.widget.setMaxLength(12);
 		nameField.widget.setText(waypoint.name);
@@ -82,17 +82,17 @@ public class WaypointEditor extends WaypointScreen {
 		
 		ey += row;
 		
-		xField = new TextFieldWidget(font, px, ey, ew, rowH, "");
+		xField = new TextFieldWidget(textRenderer, px, ey, ew, rowH, "");
 		xField.setTextPredicate(validNumber);
 		xField.setMaxLength(7);
 		xField.setText(waypoint.pos.getX() + "");
 		
-		yField = new TextFieldWidget(font, px + ew, ey, ew, rowH, "");
+		yField = new TextFieldWidget(textRenderer, px + ew, ey, ew, rowH, "");
 		yField.setTextPredicate(validNumber);
 		yField.setMaxLength(7);
 		yField.setText(waypoint.pos.getY() + "");
 		
-		zField = new TextFieldWidget(font, px + 2 * ew, ey, ew, rowH, "");
+		zField = new TextFieldWidget(textRenderer, px + 2 * ew, ey, ew, rowH, "");
 		zField.setTextPredicate(validNumber);
 		zField.setMaxLength(7);
 		zField.setText(waypoint.pos.getZ() + "");
@@ -142,7 +142,7 @@ public class WaypointEditor extends WaypointScreen {
 	public void render(int mouseX, int mouseY, float delta) {
 		super.render(mouseX, mouseY, delta);
 		String dimensionName = info == null ? lang("unknown") : I18n.translate(info.getFirst());
-		drawCenteredString(font, dimensionName, center, 15, Colors.WHITE);
+		drawCenteredString(textRenderer, dimensionName, center, 15, Colors.WHITE);
 	}
 	
 	private void cycleColor(int i) {
@@ -190,7 +190,7 @@ public class WaypointEditor extends WaypointScreen {
 	
 	@Override
 	public void onClose() {
-		minecraft.openScreen(parent);
+		client.openScreen(parent);
 	}
 	
 	@Override

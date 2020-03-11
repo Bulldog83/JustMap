@@ -112,7 +112,7 @@ abstract class HudMixin extends DrawableHelper {
 				   		list.add(() -> {
 				   			this.client.getTextureManager().bindTexture(sprite.getAtlas().getId());
 							RenderSystem.color4f(1.0F, 1.0F, 1.0F, ff);
-					  		blit(fk + 3, fl + 3, this.getBlitOffset(), 18, 18, sprite);
+					  		blit(fk + 3, fl + 3, this.getZOffset(), 18, 18, sprite);
 				   		});
 				   		if (ClientParams.showEffectTimers) {
 					   		timers.add(() -> {
