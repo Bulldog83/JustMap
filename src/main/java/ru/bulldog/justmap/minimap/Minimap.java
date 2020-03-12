@@ -208,7 +208,7 @@ public class Minimap {
 			MapCache.setLayerLevel(0);
 		}
 		
-		MapCache.get().update(this, (int) scaled, (int) startX, (int) startZ);
+		MapCache.get().update(this, scaled, (int) startX, (int) startZ);
 		
 		if (ClientParams.rotateMap) {
 			scaled = (int) (mapSize * mapScale);

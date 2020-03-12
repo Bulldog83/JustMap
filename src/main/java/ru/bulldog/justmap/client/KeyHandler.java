@@ -85,10 +85,10 @@ public enum KeyHandler {
 			}
 		});
 		
-		INSTANCE.register(new KeyParser(createKeyBinding("worldmap", GLFW.GLFW_KEY_M)) {
+		INSTANCE.register(new KeyParser(createKeyBinding("show_worldmap", GLFW.GLFW_KEY_M)) {
 			@Override
 			public void onKeyUp() {
-				MinecraftClient.getInstance().openScreen(new Worldmap());
+				MinecraftClient.getInstance().openScreen(Worldmap.getScreen());
 			}
 			
 			@Override
@@ -136,7 +136,7 @@ public enum KeyHandler {
 		}
 	}
 	
-	private FabricKeyBinding createKeyBinding(String name, int key) {
+	public FabricKeyBinding createKeyBinding(String name, int key) {
 		return FabricKeyBinding.Builder.create(new Identifier(JustMap.MODID, name), InputUtil.Type.KEYSYM, key, JustMap.MODID).build();
 	}
 }

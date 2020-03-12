@@ -33,7 +33,6 @@ public class MapScreen extends Screen {
 	protected Pair<String, Identifier> info;
 	
 	protected int x, y, center;
-	protected int width, height;
 	
 	protected MapScreen(Text title) {
 		this(title, null);
