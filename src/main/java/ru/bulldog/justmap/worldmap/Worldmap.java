@@ -120,8 +120,7 @@ public class Worldmap extends MapScreen {
 				
 				chunkImage.close();
 				picY += 16;
-			}
-			
+			}			
 			picX += 16;
 		}
 		
