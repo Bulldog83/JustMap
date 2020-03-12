@@ -45,9 +45,6 @@ public class Worldmap extends MapScreen {
 	private int scaledHeight;
 	private float imageScale = 1.0F;
 	
-	private long updated = 0;
-	private long updateInterval = 250;
-	
 	private BlockPos centerPos;
 	private NativeImage mapImage;
 	private NativeImageBackedTexture mapTexture;
@@ -102,34 +99,30 @@ public class Worldmap extends MapScreen {
 	}
 	
 	private void updateMapTexture() {
-		long time = System.currentTimeMillis();
+		int centerX = centerPos.getX() >> 4;
+		int centerZ = centerPos.getZ() >> 4;		
+		int chunksX = (int) Math.ceil((scaledWidth / 16.0) / 2);
+		int chunksZ = (int) Math.ceil((scaledHeight / 16.0) / 2);
+		int startX = centerX - chunksX;
+		int startZ = centerZ - chunksZ;
+		int stopX = centerX + chunksX;
+		int stopZ = centerZ + chunksZ;
 		
-		if (time - updated > updateInterval) {		
-			int centerX = centerPos.getX() >> 4;
-			int centerZ = centerPos.getZ() >> 4;		
-			int chunksX = (int) Math.ceil((scaledWidth / 16.0) / 2);
-			int chunksZ = (int) Math.ceil((scaledHeight / 16.0) / 2);
-			int startX = centerX - chunksX;
-			int startZ = centerZ - chunksZ;
-			int stopX = centerX + chunksX;
-			int stopZ = centerZ + chunksZ;
-			
-			MapCache mapData = MapCache.get();
-			
-			int picX = 0, picY = 0;
-			for (int posX = startX; posX < stopX; posX++) {
-				picY = 0;
-				for (int posZ = startZ; posZ < stopZ; posZ++) {
-					ChunkPos pos = new ChunkPos(posX, posZ);
-					NativeImage chunkImage = mapData.getRegion(pos).getChunkImage(pos);
-					ImageUtil.writeTile(mapImage, chunkImage, picX, picY);
-					
-					chunkImage.close();
-					picY += 16;
-				}
+		MapCache mapData = MapCache.get();
+		
+		int picX = 0, picY = 0;
+		for (int posX = startX; posX < stopX; posX++) {
+			picY = 0;
+			for (int posZ = startZ; posZ < stopZ; posZ++) {
+				ChunkPos pos = new ChunkPos(posX, posZ);
+				NativeImage chunkImage = mapData.getRegion(pos).getChunkImage(pos);
+				ImageUtil.writeTile(mapImage, chunkImage, picX, picY);
 				
-				picX += 16;
+				chunkImage.close();
+				picY += 16;
 			}
+			
+			picX += 16;
 		}
 		
 		if (mapTexture != null) {
