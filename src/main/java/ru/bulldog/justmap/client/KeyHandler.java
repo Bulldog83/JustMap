@@ -6,8 +6,8 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.util.Identifier;
 import ru.bulldog.justmap.JustMap;
-import ru.bulldog.justmap.minimap.waypoint.WaypointsList;
-import ru.bulldog.justmap.worldmap.Worldmap;
+import ru.bulldog.justmap.map.Worldmap;
+import ru.bulldog.justmap.map.waypoint.WaypointsList;
 
 import java.util.ArrayList;
 import java.util.List;

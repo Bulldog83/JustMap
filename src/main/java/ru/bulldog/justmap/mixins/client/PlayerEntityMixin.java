@@ -6,8 +6,8 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import ru.bulldog.justmap.JustMap;
-import ru.bulldog.justmap.minimap.waypoint.Waypoint;
-import ru.bulldog.justmap.minimap.waypoint.WaypointKeeper;
+import ru.bulldog.justmap.map.waypoint.Waypoint;
+import ru.bulldog.justmap.map.waypoint.WaypointKeeper;
 import ru.bulldog.justmap.util.Colors;
 
 import net.minecraft.entity.EntityType;

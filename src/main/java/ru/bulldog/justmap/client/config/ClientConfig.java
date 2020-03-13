@@ -10,7 +10,7 @@ import ru.bulldog.justmap.config.ConfigKeeper.EnumEntry;
 import ru.bulldog.justmap.config.ConfigKeeper.FloatRange;
 import ru.bulldog.justmap.config.ConfigKeeper.IntegerEntry;
 import ru.bulldog.justmap.config.ConfigKeeper.IntegerRange;
-import ru.bulldog.justmap.minimap.MapPosition;
+import ru.bulldog.justmap.map.minimap.MapPosition;
 
 public class ClientConfig extends Config{
 	

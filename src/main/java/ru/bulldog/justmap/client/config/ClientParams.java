@@ -1,6 +1,6 @@
 package ru.bulldog.justmap.client.config;
 
-import ru.bulldog.justmap.minimap.MapPosition;
+import ru.bulldog.justmap.map.minimap.MapPosition;
 
 public class ClientParams {
 	public static MapPosition mapPosition = MapPosition.TOP_RIGHT;
