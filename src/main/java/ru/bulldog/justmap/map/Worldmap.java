@@ -104,9 +104,7 @@ public class Worldmap extends MapScreen implements AbstractMap {
 		drawMap();
 		
 		int centerX = (centerPos.getX() >> 4) << 4;
-		int centerZ = (centerPos.getZ() >> 4) << 4;		
-		int posX = centerPos.getX() - centerX;
-		int posZ = centerPos.getZ() - centerZ;
+		int centerZ = (centerPos.getZ() >> 4) << 4;
 		
 		double startX = centerX - scaledWidth / 2;
 		double startZ = centerZ - scaledHeight / 2;	
@@ -130,9 +128,6 @@ public class Worldmap extends MapScreen implements AbstractMap {
 		int playerZ = player.getBlockPos().getZ();
 		double arrowX = iconPos(playerX, startX, endX, width);
 		double arrowY = iconPos(playerZ, startZ, endZ, height);
-		
-		arrowX = MathUtil.clamp(arrowX, 5, width);
-		arrowY = MathUtil.clamp(arrowY, paddingTop + iconSize / 2, height - paddingBottom - iconSize / 2);
 		
 		DirectionArrow.draw(arrowX, arrowY, iconSize, player.headYaw);
 	}

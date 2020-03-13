@@ -14,19 +14,14 @@ public class WaypointIcon extends MapIcon<WaypointIcon> {
 		this.waypoint = waypoint;
 	}
 
-	public void draw(int mapX, int mapY, int size) {
-		IconPos pos = new IconPos(mapX + x, mapY + y);
-		
-		pos.x -= size / 2;
-		pos.y -= size / 2;
-		
-		pos.x = MathUtil.clamp(pos.x, mapX, (mapX + map.getWidth()) - size);
-		pos.y = MathUtil.clamp(pos.y, mapY, (mapY + map.getHeight()) - size);
+	public void draw(int size) {
+		double x = this.x - size / 2;
+		double y = this.y - size / 2;
 		
 		Waypoint.Icon icon = waypoint.getIcon();
 		if (icon != null) {
-			icon.draw(pos.x, pos.y, size);
-		}			
+			icon.draw(x, y, size);
+		}
 	}
 	
 	@Override
