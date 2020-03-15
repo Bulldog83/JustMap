@@ -25,6 +25,7 @@ import net.minecraft.world.dimension.DimensionType;
 import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.client.MapScreen;
 import ru.bulldog.justmap.map.data.MapCache;
+import ru.bulldog.justmap.map.data.MapProcessor.Layer;
 import ru.bulldog.justmap.map.icon.MapIcon;
 import ru.bulldog.justmap.map.icon.WaypointIcon;
 import ru.bulldog.justmap.map.waypoint.Waypoint;
@@ -76,6 +77,24 @@ public class Worldmap extends MapScreen implements AbstractMap {
 		int dimId = minecraft.player.dimension.getRawId();
 		this.info = DIMENSION_INFO.getOrDefault(DimensionType.byRawId(dimId).toString(), null);
 		
+		addMapButtons();
+		
+		PlayerEntity player = minecraft.player;
+		
+		waypoints.clear();
+		List<Waypoint> wps = WaypointKeeper.getInstance().getWaypoints(player.world.dimension.getType().getRawId(), true);
+		if (wps != null) {
+			Stream<Waypoint> stream = wps.stream().filter(wp -> MathUtil.getDistance(player.getBlockPos(), wp.pos) <= wp.showRange);
+			for (Waypoint wp : stream.toArray(Waypoint[]::new)) {
+				WaypointIcon waypoint = new WaypointIcon(this, wp);
+				this.waypoints.add(waypoint);
+			}
+		}
+		
+		this.updateInterval = (long) (50 * imageScale);
+	}
+	
+	private void addMapButtons() {
 		children.add(new ButtonWidget(width - 24, 10, 20, 20, "x", (b) -> onClose()));		
 		children.add(new ButtonWidget(width / 2 - 10, height - paddingBottom - 44, 20, 20, "\u2191", (b) -> moveMap(Direction.NORTH)));
 		children.add(new ButtonWidget(width / 2 - 10, height - paddingBottom - 22, 20, 20, "\u2193", (b) -> moveMap(Direction.SOUTH)));
@@ -84,23 +103,12 @@ public class Worldmap extends MapScreen implements AbstractMap {
 		children.add(new ButtonWidget(width - 24, height / 2 - 21, 20, 20, "+", (b) -> changeScale(-0.25F)));
 		children.add(new ButtonWidget(width - 24, height / 2 + 1, 20, 20, "-", (b) -> changeScale(+0.25F)));		
 		children.add(new ButtonWidget(width - 24, height - paddingBottom - 22, 20, 20, "\u271C", (b) -> setCenterByPlayer()));
-		
-		PlayerEntity player = minecraft.player;
-		
-		waypoints.clear();
-		List<Waypoint> wps = WaypointKeeper.getInstance().getWaypoints(player.world.dimension.getType().getRawId(), true);
-		if (wps != null) {
-			Stream<Waypoint> stream = wps.stream().filter(wp -> MathUtil.getDistance(player.getBlockPos(), wp.pos, false) <= wp.showRange);
-			for (Waypoint wp : stream.toArray(Waypoint[]::new)) {
-				WaypointIcon waypoint = new WaypointIcon(this, wp);
-				this.waypoints.add(waypoint);
-			}
-		}
 	}
 	
 	@Override
 	public void renderBackground() {
 		fill(x, 0, x + width, height, 0xFF444444);
+		
 		drawMap();
 		
 		int centerX = (centerPos.getX() >> 4) << 4;
@@ -115,10 +123,10 @@ public class Worldmap extends MapScreen implements AbstractMap {
 		for (WaypointIcon icon : waypoints) {
 			if (!icon.isHidden()) {
 				icon.setPosition(
-					iconPos(icon.waypoint.pos.getX(), startX, endX, width),
-					iconPos(icon.waypoint.pos.getZ(), startZ, endZ, height)
+					MapIcon.scaledPos(icon.waypoint.pos.getX(), startX, endX, width),
+					MapIcon.scaledPos(icon.waypoint.pos.getZ(), startZ, endZ, height)
 				);
-				icon.draw(0, paddingTop, iconSize);
+				icon.draw(iconSize);
 			}
 		}
 		
@@ -126,17 +134,17 @@ public class Worldmap extends MapScreen implements AbstractMap {
 		
 		int playerX = player.getBlockPos().getX();
 		int playerZ = player.getBlockPos().getZ();
-		double arrowX = iconPos(playerX, startX, endX, width);
-		double arrowY = iconPos(playerZ, startZ, endZ, height);
+		double arrowX = MapIcon.scaledPos(playerX, startX, endX, width);
+		double arrowY = MapIcon.scaledPos(playerZ, startZ, endZ, height);
 		
 		DirectionArrow.draw(arrowX, arrowY, iconSize, player.headYaw);
 	}
 	
 	private double iconPos(int i, double start, double end, int range) {
 		int chunkI = (i >> 4) << 4;
-		int posI = i - chunkI;
+		double posI = (i - chunkI) / imageScale;
 		
-		return MapIcon.scaledPos(chunkI, start, end, range) + posI;
+		return MapIcon.scaledPos(i, start, end, range);
 	}
 	
 	@Override
@@ -178,7 +186,7 @@ public class Worldmap extends MapScreen implements AbstractMap {
 			picY = 0;
 			for (int posZ = startZ; posZ < stopZ; posZ++) {
 				ChunkPos pos = new ChunkPos(posX, posZ);
-				NativeImage chunkImage = mapData.getRegion(pos).getChunkImage(pos);
+				NativeImage chunkImage = mapData.getRegion(pos).getChunkImage(pos, Layer.SURFACE, 0);
 				ImageUtil.writeTile(mapImage, chunkImage, picX, picY);
 				
 				chunkImage.close();
@@ -198,6 +206,19 @@ public class Worldmap extends MapScreen implements AbstractMap {
 	}
 	
 	private void drawMap() {
+		int diffW = Math.abs(scaledWidth - width);
+		int diffH = Math.abs(scaledHeight - height);
+		
+		float u = 0;
+		if (diffW > 0 && width != diffW) {
+			u = width > diffW ? diffW / width : width / diffW;
+		}
+		
+		float v = 0;
+		if (diffH > 0 && height != diffH) {
+			v = height > diffH ? diffH / height : height / diffH;
+		}
+		
 		bindMapTexture();
 		
 		RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
@@ -206,10 +227,10 @@ public class Worldmap extends MapScreen implements AbstractMap {
 		BufferBuilder builder = tessellator.getBuffer();
 		
 		builder.begin(7, VertexFormats.POSITION_TEXTURE);			
-		builder.vertex(0, 0, 0).texture(0, 0).next();
-		builder.vertex(0, height, 0).texture(0, 1).next();
-		builder.vertex(width, height, 0).texture(1, 1).next();
-		builder.vertex(width, 0, 0).texture(1, 0).next();
+		builder.vertex(0, 0, 0).texture(u, v).next();
+		builder.vertex(0, height, 0).texture(u, 1 - v).next();
+		builder.vertex(width, height, 0).texture(1 - u, 1 - v).next();
+		builder.vertex(width, 0, 0).texture(1 - u, v).next();
 		
 		tessellator.draw();
 	}
@@ -222,9 +243,15 @@ public class Worldmap extends MapScreen implements AbstractMap {
 	private void changeScale(float value) {
 		this.imageScale = MathUtil.clamp(this.imageScale + value, 0.5F, 3.0F);		
 		prepareTexture();
+		
+		this.updateInterval = (long) (50 * imageScale);
 	}
 	
 	private void moveMap(Direction direction) {
+		long time = System.currentTimeMillis();
+		
+		if (time - updated < updateInterval) return;
+		
 		switch (direction) {
 			case NORTH:
 				this.centerPos = centerPos.add(0, 0, -16);
@@ -242,6 +269,8 @@ public class Worldmap extends MapScreen implements AbstractMap {
 		}
 		
 		updateMapTexture();
+		
+		this.updated = time;
 	}
 	
 	@Override
@@ -282,17 +311,25 @@ public class Worldmap extends MapScreen implements AbstractMap {
 		}
 	}
 	
+	private long updateInterval = 0;
+	private long updated = 0;
+	
 	@Override
 	public boolean mouseDragged(double d, double e, int i, double f, double g) {
+		long time = System.currentTimeMillis();
+		if (time - updated < updateInterval) return true;
+		
 		int x = centerPos.getX();
 		int y = centerPos.getY();
 		int z = centerPos.getZ();
 		
-		x -= Math.ceil(f);
-		z -= Math.ceil(g);
+		x -= MathUtil.clamp(Math.round((8 * f) * imageScale), -32, 32);
+		z -= MathUtil.clamp(Math.round((8 * g) * imageScale), -32, 32);
 		
 		this.centerPos = new BlockPos(x, y, z);
 		updateMapTexture();
+		
+		updated = time;
 		
 		return super.mouseDragged(d, e, i, f, g);
 	}

@@ -184,25 +184,31 @@ public class MapChunk {
 				
 				BlockMeta block = new BlockMeta(new BlockPos(posX, posY, posZ));
 				if(currentBlock.isEmpty() || !currentBlock.equals(block)) {					
-					int heightDiff = MapProcessor.heightDifference(this, eastChunk, southChunk, x, posY, z);
-					block.setHeightPos(heightDiff);
-					block.setColor(ColorUtil.blockColor(worldChunk, block));
-					
-					chunkLevel.setBlock(index, block);
-					
-					int color = ColorUtil.proccessColor(block.getColor(), heightDiff);
-					chunkLevel.getImage().setPixelRgba(x, z, color);
-					
-					updateRegionImage();
-				} else {				
-					int heightDiff = MapProcessor.heightDifference(this, eastChunk, southChunk, x, posY, z);
-					if (currentBlock.getHeightPos() != heightDiff) {
-						currentBlock.setHeightPos(heightDiff);
+					int color = ColorUtil.blockColor(worldChunk, block);
+					if (color != -1) {
+						int heightDiff = MapProcessor.heightDifference(this, eastChunk, southChunk, x, posY, z);
 						
-						int color = ColorUtil.proccessColor(currentBlock.getColor(), heightDiff);
+						block.setColor(color);
+						block.setHeightPos(heightDiff);
+						chunkLevel.setBlock(index, block);
+						
+						color = ColorUtil.proccessColor(color, heightDiff);
 						chunkLevel.getImage().setPixelRgba(x, z, color);
-						
+					
 						updateRegionImage();
+					}
+				} else {				
+					int color = currentBlock.getColor();					
+					if (color != -1) {
+						int heightDiff = MapProcessor.heightDifference(this, eastChunk, southChunk, x, posY, z);
+						if (currentBlock.getHeightPos() != heightDiff) {
+							currentBlock.setHeightPos(heightDiff);
+						
+							color = ColorUtil.proccessColor(color, heightDiff);
+							chunkLevel.getImage().setPixelRgba(x, z, color);
+						
+							updateRegionImage();
+						}
 					}
 				}
 			}

@@ -29,7 +29,9 @@ public class MapRegion {
 		
 		JustMap.EXECUTOR.execute(() -> {
 			data.getRegions().forEach((pos, region) -> {
-				region.saveImage();
+				if (!region.getLayer().isSaved()) {
+					region.saveImage();
+				}
 			});
 		});
 		
@@ -62,6 +64,10 @@ public class MapRegion {
 	}
 	
 	public NativeImage getChunkImage(ChunkPos chunkPos) {
+		return getChunkImage(chunkPos, currentLayer, currentLevel);
+	}
+	
+	public NativeImage getChunkImage(ChunkPos chunkPos, Layer layer, int level) {
 		if (chunkPos.getRegionX() != this.pos.x ||
 			chunkPos.getRegionZ() != this.pos.z) {
 			
@@ -71,15 +77,26 @@ public class MapRegion {
 		int imgX = (chunkPos.x - (this.pos.x << 5)) << 4;
 		int imgY = (chunkPos.z - (this.pos.z << 5)) << 4;
 		
-		return ImageUtil.readTile(getImage(), imgX, imgY, 16, 16);
+		return ImageUtil.readTile(getImage(layer, level), imgX, imgY, 16, 16);
 	}
 	
-	public synchronized NativeImage getImage() {
-		if (!layers.containsKey(currentLayer)) {
-			layers.put(currentLayer, new RegionLayer());
+	public NativeImage getImage(Layer layer, int level) {
+		return getLayer(layer).getImage(level).get();
+	}
+	
+	public RegionLayer getLayer() {
+		return getLayer(currentLayer);
+	}
+	
+	public RegionLayer getLayer(Layer layer) {
+		if (layers.containsKey(layer)) {
+			return layers.get(layer);
 		}
 		
-		return layers.get(currentLayer).getImage();
+		RegionLayer regionLayer = new RegionLayer();
+		layers.put(layer, regionLayer);
+		
+		return regionLayer;
 	}
 	
 	public void resetRegion() {
@@ -87,13 +104,14 @@ public class MapRegion {
 		StorageUtil.clearCache();
 	}
 	
-	public synchronized void storeChunk(MapChunk chunk) {
+	public void storeChunk(MapChunk chunk) {
 		ChunkPos chunkPos = chunk.getPos();
 		if (chunkPos.getRegionX() != this.pos.x || chunkPos.getRegionZ() != this.pos.z) return;
 		
 		int imgX = (chunkPos.x - (this.pos.x << 5)) << 4;
 		int imgY = (chunkPos.z - (this.pos.z << 5)) << 4;			
-		ImageUtil.writeTile(getImage(), chunk.getImage(), imgX, imgY);
+		
+		getLayer().writeImage(chunk.getImage(), imgX, imgY);
 		
 		this.updated = System.currentTimeMillis();
 	}
@@ -106,15 +124,9 @@ public class MapRegion {
 		return this.pos.z;
 	}
 	
-	public synchronized void saveImage() {
+	public void saveImage() {
 		File png = new File(imagesDir(), String.format("%d.%d.png", this.pos.x, this.pos.z));		
-		NativeImage image = getImage();
-		
-		try {
-			image.writeFile(png);
-		} catch (IOException ex) {
-			JustMap.LOGGER.catching(ex);
-		}
+		getLayer().saveImage(png);
 	}
 	
 	private File imagesDir() {
@@ -136,21 +148,46 @@ public class MapRegion {
 	}
 	
 	private class RegionLayer {
-		private final Map<Integer, NativeImage> images;
+		private volatile Map<Integer, RegionImage> images;
 		
 		private RegionLayer() {
-			images = new HashMap<>();
+			this.images = new HashMap<>();
 		}
 		
-		private NativeImage getImage() {
-			if (images.containsKey(currentLevel)) {
-				return images.get(currentLevel);
+		private synchronized RegionImage getImage(int level) {
+			if (images.containsKey(level)) {
+				return images.get(level);
 			}			
 			
-			NativeImage image = loadImage();
-			images.put(currentLevel, image);
+			RegionImage regionImage = new RegionImage();
+			images.put(level, regionImage);
 			
-			return image;
+			return regionImage;
+		}
+		
+		private RegionImage currentImage() {
+			return getImage(currentLevel);
+		}
+		
+		public boolean isSaved() {
+			return currentImage().saved;
+		}
+		
+		public void writeImage(NativeImage tile, int x, int y) {
+			currentImage().write(tile, x, y);
+		}
+		
+		public void saveImage(File png) {
+			currentImage().save(png);
+		}
+	}
+	
+	private class RegionImage {
+		private volatile NativeImage image;
+		private boolean saved = true;
+		
+		private RegionImage() {
+			this.image = loadImage();
 		}
 		
 		private NativeImage loadImage() {
@@ -163,6 +200,24 @@ public class MapRegion {
 			ImageUtil.fillImage(image, Colors.BLACK);
 			
 			return image;
+		}
+		
+		public synchronized NativeImage get() {
+			return this.image;
+		}
+		
+		public synchronized void write(NativeImage tile, int x, int y) {
+			ImageUtil.writeTile(image, tile, x, y);
+			this.saved = false;
+		}
+		
+		public synchronized void save(File png) {
+			try {
+				image.writeFile(png);
+				this.saved = true;
+			} catch (IOException ex) {
+				JustMap.LOGGER.catching(ex);
+			}
 		}
 	}
 }

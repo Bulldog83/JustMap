@@ -31,6 +31,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.WorldChunk;
+
 import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.map.data.BlockMeta;
@@ -269,7 +270,7 @@ public class ColorUtil {
 			return blockColor(worldChunk.getWorld(), block.getState(), block.getPos());
 		}
 	
-		return Colors.BLACK;
+		return -1;
 	}
 	
 	public static int blockColor(World world, BlockState state, BlockPos pos) {
