@@ -6,7 +6,6 @@ import ru.bulldog.justmap.map.AbstractMap;
 import ru.bulldog.justmap.map.data.MapCache;
 import ru.bulldog.justmap.map.data.MapProcessor;
 import ru.bulldog.justmap.map.icon.EntityIcon;
-import ru.bulldog.justmap.map.icon.MapIcon;
 import ru.bulldog.justmap.map.icon.PlayerIcon;
 import ru.bulldog.justmap.map.icon.WaypointIcon;
 import ru.bulldog.justmap.map.waypoint.Waypoint;
@@ -238,8 +237,8 @@ public class Minimap implements AbstractMap{
 				
 				if (x >= startX && x <= endX && z >= startZ && z <= endZ) {
 					PlayerIcon playerIcon = new PlayerIcon(this, p, false);
-					playerIcon.setPosition(MapIcon.scaledPos(x, startX, endX, mapWidth),
-										   MapIcon.scaledPos(z, startZ, endZ, mapWidth));
+					playerIcon.setPosition(MathUtil.scaledPos(x, startX, endX, mapWidth),
+										   MathUtil.scaledPos(z, startZ, endZ, mapWidth));
 					this.players.add(playerIcon);
 				}
 			}
@@ -262,13 +261,13 @@ public class Minimap implements AbstractMap{
 					boolean hostile = livingEntity instanceof HostileEntity;
 					if (hostile && allowHostileRadar()) {
 						EntityIcon entIcon = new EntityIcon(this, entity, hostile);						
-						entIcon.setPosition(MapIcon.scaledPos((int) entity.getX(), startX, endX, mapWidth),
-											MapIcon.scaledPos((int) entity.getZ(), startZ, endZ, mapWidth));
+						entIcon.setPosition(MathUtil.scaledPos((int) entity.getX(), startX, endX, mapWidth),
+											MathUtil.scaledPos((int) entity.getZ(), startZ, endZ, mapWidth));
 						this.entities.add(entIcon);
 					} else if (!hostile && allowCreatureRadar()) {
 						EntityIcon entIcon = new EntityIcon(this, entity, hostile);						
-						entIcon.setPosition(MapIcon.scaledPos((int) entity.getX(), startX, endX, mapWidth),
-											MapIcon.scaledPos((int) entity.getZ(), startZ, endZ, mapWidth));
+						entIcon.setPosition(MathUtil.scaledPos((int) entity.getX(), startX, endX, mapWidth),
+											MathUtil.scaledPos((int) entity.getZ(), startZ, endZ, mapWidth));
 						this.entities.add(entIcon);
 					}
 				}
@@ -285,8 +284,8 @@ public class Minimap implements AbstractMap{
 			for (Waypoint wp : stream.toArray(Waypoint[]::new)) {
 				WaypointIcon waypoint = new WaypointIcon(this, wp);
 				waypoint.setPosition(
-					MapIcon.scaledPos(wp.pos.getX(), startX, endX, mapWidth),
-					MapIcon.scaledPos(wp.pos.getZ(), startZ, endZ, mapWidth)
+					MathUtil.scaledPos(wp.pos.getX(), startX, endX, mapWidth),
+					MathUtil.scaledPos(wp.pos.getZ(), startZ, endZ, mapWidth)
 				);
 				this.waypoints.add(waypoint);
 			}

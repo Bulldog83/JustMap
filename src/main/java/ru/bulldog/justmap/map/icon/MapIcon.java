@@ -39,10 +39,6 @@ public abstract class MapIcon<T extends MapIcon<T>> {
 		pos.y = posY;
 	}
 	
-	public static double scaledPos(double val, double startVal, double endVal, int range) {
-		return ((val - startVal) / (endVal - startVal)) * range;
-	}
-	
 	public abstract void draw(int mapX, int mapY, float rotation);
 	
 	protected class IconPos {

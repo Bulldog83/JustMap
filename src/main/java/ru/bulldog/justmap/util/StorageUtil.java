@@ -41,9 +41,13 @@ public class StorageUtil {
 		return cacheDir;
 	}
 	
+	public static void clearCache(File dir) {
+		deleteDir(dir);
+		dir.mkdirs();
+	}
+	
 	public static void clearCache() {
-		deleteDir(cacheDir());
-		cacheDir();
+		clearCache(cacheDir());
 	}
 	
 	private static void deleteDir(File dir) {

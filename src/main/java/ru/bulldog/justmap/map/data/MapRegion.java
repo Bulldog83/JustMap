@@ -40,7 +40,7 @@ public class MapRegion {
 
 	private final RegionPos pos;
 	
-	private Map<Layer, RegionLayer> layers = new HashMap<>();	
+	private Map<String, RegionLayer> layers = new HashMap<>();	
 	private Layer currentLayer;
 	private int currentLevel;
 	
@@ -80,7 +80,7 @@ public class MapRegion {
 		return ImageUtil.readTile(getImage(layer, level), imgX, imgY, 16, 16);
 	}
 	
-	public NativeImage getImage(Layer layer, int level) {
+	public NativeImage getImage(Layer layer, int level) {		
 		return getLayer(layer).getImage(level).get();
 	}
 	
@@ -89,19 +89,23 @@ public class MapRegion {
 	}
 	
 	public RegionLayer getLayer(Layer layer) {
-		if (layers.containsKey(layer)) {
-			return layers.get(layer);
+		if (layers.containsKey(layer.name())) {
+			return layers.get(layer.name());
 		}
 		
-		RegionLayer regionLayer = new RegionLayer();
-		layers.put(layer, regionLayer);
+		RegionLayer regionLayer = new RegionLayer(layer);
+		layers.put(layer.name(), regionLayer);
 		
 		return regionLayer;
 	}
 	
 	public void resetRegion() {
-		layers.clear();
-		StorageUtil.clearCache();
+		layers.remove(Layer.CAVES.name());
+		
+		File cavesDir = layerDir(Layer.CAVES);
+		if (cavesDir.exists()) {
+			StorageUtil.clearCache(cavesDir);
+		}
 	}
 	
 	public void storeChunk(MapChunk chunk) {
@@ -130,14 +134,11 @@ public class MapRegion {
 	}
 	
 	private File imagesDir() {
-		int dim = MapCache.get().world.getDimension().getType().getRawId();
-		File dimDir = new File(StorageUtil.cacheDir(), String.format("DIM%d/", dim));
-		
 		File cacheDir;
 		if (currentLayer == Layer.CAVES) {
-			cacheDir = new File(dimDir, String.format("caves/%d/", currentLevel));
+			cacheDir = new File(layerDir(Layer.CAVES), String.format("%d/", currentLevel));
 		} else {
-			cacheDir = new File(dimDir, "surface/");
+			cacheDir = layerDir(Layer.SURFACE);
 		}
 		
 		if (!cacheDir.exists()) {
@@ -147,10 +148,26 @@ public class MapRegion {
 		return cacheDir;
 	}
 	
+	private File layerDir(Layer layer) {
+		int dim = MapCache.get().world.getDimension().getType().getRawId();
+		File dimDir = new File(StorageUtil.cacheDir(), String.format("DIM%d/", dim));
+		
+		switch(layer) {
+			case CAVES:
+				return new File(dimDir, "caves/");
+			case SURFACE:
+				return new File(dimDir, "surface/");
+		}
+		
+		return new File(dimDir, "undefined/");
+	}
+	
 	private class RegionLayer {
 		private volatile Map<Integer, RegionImage> images;
+		private final Layer layer;
 		
-		private RegionLayer() {
+		private RegionLayer(Layer layer) {
+			this.layer = layer;
 			this.images = new HashMap<>();
 		}
 		
@@ -179,6 +196,11 @@ public class MapRegion {
 		
 		public void saveImage(File png) {
 			currentImage().save(png);
+		}
+		
+		@Override
+		public String toString() {
+			return this.layer.name();
 		}
 	}
 	

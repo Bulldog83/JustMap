@@ -35,10 +35,10 @@ public class MapCache {
 	}
 	
 	public static MapCache get() {
-		return get(minecraft.world, currentLayer);
+		return get(minecraft.world);
 	}
 	
-	public static MapCache get(World world, Layer layer) {
+	public static MapCache get(World world) {
 		MapCache data = getDimensionData(world);
 		
 		if (data == null) return null;
