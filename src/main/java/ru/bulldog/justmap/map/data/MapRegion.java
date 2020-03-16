@@ -10,7 +10,6 @@ import net.minecraft.client.texture.NativeImage;
 import net.minecraft.util.math.ChunkPos;
 
 import ru.bulldog.justmap.JustMap;
-import ru.bulldog.justmap.map.data.MapProcessor.Layer;
 import ru.bulldog.justmap.util.Colors;
 import ru.bulldog.justmap.util.ImageUtil;
 import ru.bulldog.justmap.util.StorageUtil;
@@ -40,7 +39,7 @@ public class MapRegion {
 
 	private final RegionPos pos;
 	
-	private Map<String, RegionLayer> layers = new HashMap<>();	
+	private Map<Layer, RegionLayer> layers = new HashMap<>();	
 	private Layer currentLayer;
 	private int currentLevel;
 	
@@ -89,18 +88,18 @@ public class MapRegion {
 	}
 	
 	public RegionLayer getLayer(Layer layer) {
-		if (layers.containsKey(layer.name())) {
-			return layers.get(layer.name());
+		if (layers.containsKey(layer)) {
+			return layers.get(layer);
 		}
 		
 		RegionLayer regionLayer = new RegionLayer(layer);
-		layers.put(layer.name(), regionLayer);
+		layers.put(layer, regionLayer);
 		
 		return regionLayer;
 	}
 	
 	public void resetRegion() {
-		layers.remove(Layer.CAVES.name());
+		layers.remove(Layer.CAVES);
 		
 		File cavesDir = layerDir(Layer.CAVES);
 		if (cavesDir.exists()) {
@@ -150,16 +149,7 @@ public class MapRegion {
 	
 	private File layerDir(Layer layer) {
 		int dim = MapCache.get().world.getDimension().getType().getRawId();
-		File dimDir = new File(StorageUtil.cacheDir(), String.format("DIM%d/", dim));
-		
-		switch(layer) {
-			case CAVES:
-				return new File(dimDir, "caves/");
-			case SURFACE:
-				return new File(dimDir, "surface/");
-		}
-		
-		return new File(dimDir, "undefined/");
+		return new File(StorageUtil.cacheDir(), String.format("DIM%d/%s/", dim, layer.name));
 	}
 	
 	private class RegionLayer {
@@ -200,7 +190,7 @@ public class MapRegion {
 		
 		@Override
 		public String toString() {
-			return this.layer.name();
+			return this.layer.name;
 		}
 	}
 	

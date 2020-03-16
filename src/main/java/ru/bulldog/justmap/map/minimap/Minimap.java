@@ -3,8 +3,8 @@ package ru.bulldog.justmap.map.minimap;
 import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.map.AbstractMap;
+import ru.bulldog.justmap.map.data.Layer;
 import ru.bulldog.justmap.map.data.MapCache;
-import ru.bulldog.justmap.map.data.MapProcessor;
 import ru.bulldog.justmap.map.icon.EntityIcon;
 import ru.bulldog.justmap.map.icon.PlayerIcon;
 import ru.bulldog.justmap.map.icon.WaypointIcon;
@@ -167,9 +167,6 @@ public class Minimap implements AbstractMap{
 			return allowCaves && !world.isSkyVisibleAllowingSea(playerPos) &&
 				   world.getLightLevel(LightType.SKY, playerPos) == 0;
 		}
-		if (dimType == DimensionType.THE_NETHER) {
-			return true;
-		}
 		if (dimType == DimensionType.THE_END) {
 			return false;
 		}
@@ -203,11 +200,13 @@ public class Minimap implements AbstractMap{
 		double startX = pos.getX() - scaled / 2;
 		double startZ = pos.getZ() - scaled / 2;
 
-		if (needRenderCaves(world, player.getBlockPos())) {
-			MapCache.setCurrentLayer(MapProcessor.Layer.CAVES);
-			MapCache.setLayerLevel(pos.getY() >> ClientParams.chunkLevelSize);
+		if (world.dimension.isNether()) {
+			MapCache.setCurrentLayer(Layer.NETHER);
+		} else if (needRenderCaves(world, player.getBlockPos())) {
+			MapCache.setCurrentLayer(Layer.CAVES);
+			MapCache.setLayerLevel(pos.getY() / Layer.CAVES.height);
 		} else {
-			MapCache.setCurrentLayer(MapProcessor.Layer.SURFACE);
+			MapCache.setCurrentLayer(Layer.SURFACE);
 			MapCache.setLayerLevel(0);
 		}
 		

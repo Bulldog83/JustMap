@@ -9,11 +9,7 @@ import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.WorldChunk;
 
-public class MapProcessor {	
-	public enum Layer {
-		SURFACE,
-		CAVES
-	}
+public class MapProcessor {
 	
 	public static int getTopBlockY(MapChunk mapChunk, int x, int y, int z, boolean liquids) {
 		WorldChunk worldChunk = mapChunk.getWorldChunk();
@@ -23,7 +19,7 @@ public class MapProcessor {
 		int posX = x + (chunkPos.x << 4);
 		int posZ = z + (chunkPos.z << 4);
 		
-		if (mapChunk.getLayer() == Layer.CAVES && liquids) {
+		if (mapChunk.getLayer().equals(Layer.CAVES) && liquids) {
 			int level = mapChunk.getLevel();
 			int cls = ClientParams.chunkLevelSize;
 			for (int i = ((int) Math.pow(2, cls) - 1) + (level << cls); i >= level << cls; i--) {

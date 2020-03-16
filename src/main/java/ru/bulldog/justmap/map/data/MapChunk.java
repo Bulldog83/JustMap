@@ -1,7 +1,6 @@
 package ru.bulldog.justmap.map.data;
 
 import ru.bulldog.justmap.client.config.ClientParams;
-import ru.bulldog.justmap.map.data.MapProcessor.Layer;
 import ru.bulldog.justmap.util.ColorUtil;
 import ru.bulldog.justmap.util.Colors;
 import ru.bulldog.justmap.util.ImageUtil;
@@ -51,13 +50,7 @@ public class MapChunk {
 	}
 	
 	private void initLayer(Layer layer) {
-		int levels;
-		if (layer == Layer.CAVES) {
-			levels = worldChunk.getHeight() >> ClientParams.chunkLevelSize;
-		} else {
-			levels = 1;
-		}
-		
+		int levels = worldChunk.getHeight() / layer.height;		
 		this.levels.put(layer, new ChunkLevel[levels]);
 	}
 	

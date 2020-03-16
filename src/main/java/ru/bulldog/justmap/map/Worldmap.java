@@ -24,8 +24,8 @@ import net.minecraft.world.dimension.DimensionType;
 
 import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.client.MapScreen;
+import ru.bulldog.justmap.map.data.Layer;
 import ru.bulldog.justmap.map.data.MapCache;
-import ru.bulldog.justmap.map.data.MapProcessor.Layer;
 import ru.bulldog.justmap.map.icon.WaypointIcon;
 import ru.bulldog.justmap.map.waypoint.Waypoint;
 import ru.bulldog.justmap.map.waypoint.WaypointKeeper;
@@ -197,7 +197,7 @@ public class Worldmap extends MapScreen implements AbstractMap {
 				
 				NativeImage chunkImage;
 				if (dimension != -1) {
-					chunkImage = mapData.getRegion(pos).getChunkImage(pos, Layer.SURFACE, 0);					
+					chunkImage = mapData.getRegion(pos).getChunkImage(pos, Layer.SURFACE, 0);
 				} else {
 					chunkImage = mapData.getRegion(pos).getChunkImage(pos);
 				}
