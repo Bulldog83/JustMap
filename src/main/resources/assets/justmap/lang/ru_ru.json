@@ -26,6 +26,7 @@
   "justmap.configuration.show_in_chat": "Отображать миникарту когда открыт чат",
   "justmap.configuration.show_terrain": "Показывать рельеф",
   "justmap.configuration.show_caves": "Показывать пещеры",
+  "justmap.configuration.ignore_plants": "Игнорировать растения",
   "justmap.configuration.terrain_strength": "Сила перепада рельефа",
   "justmap.configuration.show_grid": "Отображать линии сетки",
   "justmap.configuration.show_position": "Отображать позицию",

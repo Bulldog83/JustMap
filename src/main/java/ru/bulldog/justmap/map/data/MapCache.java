@@ -25,7 +25,8 @@ public class MapCache {
 	private static Layer currentLayer = Layer.SURFACE;	
 	private static int currentLevel = 0;
 	
-	public static void setCurrentLayer(Layer layer) {
+	public static void setCurrentLayer(Layer layer, int y) {
+		currentLevel =  y / layer.height;
 		currentLayer = layer;
 	}
 	
@@ -76,11 +77,9 @@ public class MapCache {
 	private long lastPurged = 0;
 	private long purgeDelay = 1000;
 	private int purgeAmount = 500;
-	private int levelSize;
 	
 	private MapCache(World world) {
 		this.world = world;
-		this.levelSize = ClientParams.chunkLevelSize;
 		
 		chunks = new ConcurrentHashMap<>();
 		regions = new ConcurrentHashMap<>();
@@ -224,11 +223,6 @@ public class MapCache {
 	public synchronized MapChunk getChunk(Layer layer, int level, int posX, int posZ, boolean empty) {
 		
 		MapChunk mapChunk = getChunk(layer, level, posX, posZ);
-		
-		if (levelSize != ClientParams.chunkLevelSize) {
-			levelSize = ClientParams.chunkLevelSize;
-			mapChunk.resetChunk();
-		}		
 		
 		ChunkPos chunkPos = new ChunkPos(posX, posZ);
 		if(!mapChunk.getWorldChunk().getPos().equals(chunkPos)) {

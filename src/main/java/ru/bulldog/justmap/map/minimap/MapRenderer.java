@@ -281,7 +281,7 @@ public class MapRenderer {
 		int arrowX = mapX + mapW / 2;
 		int arrowY = mapY + mapH / 2;
 		
-		DirectionArrow.draw(arrowX, arrowY, rotation);
+		DirectionArrow.draw(arrowX, arrowY, ClientParams.rotateMap ? 180 : rotation);
 		
 		GL11.glDisable(GL11.GL_SCISSOR_TEST);
 		
@@ -296,7 +296,6 @@ public class MapRenderer {
 		builder.begin(7, VertexFormats.POSITION_TEXTURE);
 		
 		double z = 0.09;
-		float angle = rotation + 180;
 		
 		client.getTextureManager().bindTexture(mapTexture);
 		
@@ -309,7 +308,7 @@ public class MapRenderer {
 			RenderSystem.matrixMode(GL11.GL_TEXTURE);
 			RenderSystem.pushMatrix();
 			RenderSystem.translatef(0.5F, 0.5F, 0);
-			RenderSystem.rotatef(angle, 0, 0, 1.0F);
+			RenderSystem.rotatef(rotation + 180, 0, 0, 1.0F);
 			RenderSystem.translatef(-0.5F, -0.5F, 0);
 		}
 		

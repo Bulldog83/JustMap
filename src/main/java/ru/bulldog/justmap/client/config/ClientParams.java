@@ -7,10 +7,10 @@ public class ClientParams {
 	
 	public static int positionOffset = 4;
 	public static int mapSize = 128;
-	public static int chunkLevelSize = 3;
 	public static float mapScale = 1.0F;
 	public static boolean mapVisible = true;
 	public static boolean showCaves = true;
+	public static boolean ignorePlants = false;
 	public static boolean moveEffects = true;
 	public static boolean showEffectTimers = true;
 	public static boolean rotateMap = false;

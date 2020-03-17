@@ -201,13 +201,11 @@ public class Minimap implements AbstractMap{
 		double startZ = pos.getZ() - scaled / 2;
 
 		if (world.dimension.isNether()) {
-			MapCache.setCurrentLayer(Layer.NETHER);
+			MapCache.setCurrentLayer(Layer.NETHER, pos.getY());
 		} else if (needRenderCaves(world, player.getBlockPos())) {
-			MapCache.setCurrentLayer(Layer.CAVES);
-			MapCache.setLayerLevel(pos.getY() / Layer.CAVES.height);
+			MapCache.setCurrentLayer(Layer.CAVES, pos.getY());
 		} else {
-			MapCache.setCurrentLayer(Layer.SURFACE);
-			MapCache.setLayerLevel(0);
+			MapCache.setCurrentLayer(Layer.SURFACE, pos.getY());
 		}
 		
 		MapCache.get().update(this, scaled, (int) startX, (int) startZ);
@@ -251,11 +249,10 @@ public class Minimap implements AbstractMap{
 			BlockPos end = new BlockPos(endX, player.getY() + checkHeight / 2, endZ);
 			List<Entity> entities = world.getEntities((Entity) null, new Box(start, end));
 		
-			int t = 0;
+			int amount = 0;
 				
 			for (Entity entity : entities) {
 				if (entity instanceof LivingEntity && !(entity instanceof PlayerEntity)) {
-					t++;
 					LivingEntity livingEntity = (LivingEntity) entity;
 					boolean hostile = livingEntity instanceof HostileEntity;
 					if (hostile && allowHostileRadar()) {
@@ -263,16 +260,16 @@ public class Minimap implements AbstractMap{
 						entIcon.setPosition(MathUtil.scaledPos((int) entity.getX(), startX, endX, mapWidth),
 											MathUtil.scaledPos((int) entity.getZ(), startZ, endZ, mapWidth));
 						this.entities.add(entIcon);
+						amount++;
 					} else if (!hostile && allowCreatureRadar()) {
 						EntityIcon entIcon = new EntityIcon(this, entity, hostile);						
 						entIcon.setPosition(MathUtil.scaledPos((int) entity.getX(), startX, endX, mapWidth),
 											MathUtil.scaledPos((int) entity.getZ(), startZ, endZ, mapWidth));
 						this.entities.add(entIcon);
+						amount++;
 					}
 				}
-				if (t >= 250) {
-					break;
-				}
+				if (amount >= 250) break;
 			}
 		}
 		

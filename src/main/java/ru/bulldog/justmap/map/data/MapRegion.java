@@ -98,15 +98,6 @@ public class MapRegion {
 		return regionLayer;
 	}
 	
-	public void resetRegion() {
-		layers.remove(Layer.CAVES);
-		
-		File cavesDir = layerDir(Layer.CAVES);
-		if (cavesDir.exists()) {
-			StorageUtil.clearCache(cavesDir);
-		}
-	}
-	
 	public void storeChunk(MapChunk chunk) {
 		ChunkPos chunkPos = chunk.getPos();
 		if (chunkPos.getRegionX() != this.pos.x || chunkPos.getRegionZ() != this.pos.z) return;
@@ -133,11 +124,15 @@ public class MapRegion {
 	}
 	
 	private File imagesDir() {
+		return imagesDir(currentLayer, currentLevel);
+	}
+	
+	private File imagesDir(Layer layer, int level) {
 		File cacheDir;
-		if (currentLayer == Layer.CAVES) {
-			cacheDir = new File(layerDir(Layer.CAVES), String.format("%d/", currentLevel));
+		if (layer.equals(Layer.SURFACE)) {
+			cacheDir = layerDir(layer);
 		} else {
-			cacheDir = layerDir(Layer.SURFACE);
+			cacheDir = new File(layerDir(layer), String.format("%d/", level));
 		}
 		
 		if (!cacheDir.exists()) {
@@ -166,7 +161,7 @@ public class MapRegion {
 				return images.get(level);
 			}			
 			
-			RegionImage regionImage = new RegionImage();
+			RegionImage regionImage = new RegionImage(layer, level);
 			images.put(level, regionImage);
 			
 			return regionImage;
@@ -198,15 +193,19 @@ public class MapRegion {
 		private volatile NativeImage image;
 		private boolean saved = true;
 		
-		private RegionImage() {
-			this.image = loadImage();
+		private RegionImage(Layer layer, int level) {
+			this.image = loadImage(layer, level);
 		}
 		
-		private NativeImage loadImage() {
-			File png = new File(imagesDir(), String.format("%d.%d.png", pos.x, pos.z));
-			try (FileInputStream fis = new FileInputStream(png)) {
-				return NativeImage.read(fis);
-			} catch (IOException ex) {}
+		private NativeImage loadImage(Layer layer, int level) {
+			File png = new File(imagesDir(layer, level), String.format("%d.%d.png", pos.x, pos.z));
+			if (png.exists()) {
+				try (FileInputStream fis = new FileInputStream(png)) {
+					return NativeImage.read(fis);
+				} catch (IOException ex) {
+					JustMap.LOGGER.catching(ex);
+				}
+			}
 			
 			NativeImage image = new NativeImage(512, 512, false);
 			ImageUtil.fillImage(image, Colors.BLACK);

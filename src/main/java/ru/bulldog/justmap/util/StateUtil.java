@@ -20,4 +20,10 @@ public class StateUtil {
 	public static boolean isUnderwater(BlockState state) {
 		return isLiquid(state, false) || state.getMaterial() == Material.UNDERWATER_PLANT;
 	}
+	
+	public static boolean isPlant(BlockState state) {
+		Material material = state.getMaterial();
+		return material == Material.PLANT || material == Material.REPLACEABLE_PLANT ||
+			   material == Material.UNUSED_PLANT;
+	}
 }

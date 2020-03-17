@@ -60,10 +60,7 @@ public class DirectionArrow extends Sprite {
 			
 			matrix.push();
 			matrix.translate(x, y, 0);
-			
-			if (!ClientParams.rotateMap) {
-				matrix.multiply(Vector3f.POSITIVE_Z.getDegreesQuaternion(rotation + 180));
-			}
+			matrix.multiply(Vector3f.POSITIVE_Z.getDegreesQuaternion(rotation + 180));
 			
 			Matrix4f m4f = matrix.peek().getModel();
 			Matrix3f m3f = matrix.peek().getNormal();

@@ -6,7 +6,7 @@ public class Layer {
 	
 	public final static Layer SURFACE = new Layer("surface", 256);
 	public final static Layer CAVES = new Layer("caves", 8);
-	public final static Layer NETHER = new Layer("nether", 32);
+	public final static Layer NETHER = new Layer("nether", 16);
 	
 	public final String name;
 	public final int height;

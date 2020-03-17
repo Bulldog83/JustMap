@@ -19,20 +19,23 @@ public class MapProcessor {
 		int posX = x + (chunkPos.x << 4);
 		int posZ = z + (chunkPos.z << 4);
 		
-		if (mapChunk.getLayer().equals(Layer.CAVES) && liquids) {
+		boolean plants = !ClientParams.ignorePlants;
+		
+		Layer layer = mapChunk.getLayer();
+		if ((layer.equals(Layer.NETHER) || layer.equals(Layer.CAVES)) && liquids) {
 			int level = mapChunk.getLevel();
-			int cls = ClientParams.chunkLevelSize;
-			for (int i = ((int) Math.pow(2, cls) - 1) + (level << cls); i >= level << cls; i--) {
-				BlockPos worldPos = loopPos(world, new BlockPos(posX, i, posZ), 0, liquids);
+			int floor = level * layer.height;
+			for (int i = floor + (layer.height - 1); i >= floor; i--) {
+				BlockPos worldPos = loopPos(world, new BlockPos(posX, i, posZ), 0, liquids, plants);
 				BlockPos overPos = new BlockPos(posX, worldPos.getY() + 1, posZ);
 				if (StateUtil.isAir(world.getBlockState(overPos))) {
 					return worldPos.getY();
 				}
 			}
 		} else {
-			BlockPos worldPos = loopPos(world, new BlockPos(posX, y, posZ), 0, liquids);
+			BlockPos worldPos = loopPos(world, new BlockPos(posX, y, posZ), 0, liquids, plants);
 			BlockState overState = world.getBlockState(new BlockPos(posX, worldPos.getY() + 1, posZ));
-			if (checkBlockState(overState, liquids)) {
+			if (checkBlockState(overState, liquids, plants)) {
 				return worldPos.getY();
 			}
 		}
@@ -40,11 +43,10 @@ public class MapProcessor {
 		return -1;
 	}
 	
-	private static BlockPos loopPos(World world, BlockPos pos, int stop, boolean liquids) {
+	private static BlockPos loopPos(World world, BlockPos pos, int stop, boolean liquids, boolean plants) {
 		boolean loop = false;		
 		do {
-			loop = checkBlockState(world.getBlockState(pos), liquids);
-			
+			loop = checkBlockState(world.getBlockState(pos), liquids, plants);			
 			loop &= pos.getY() > stop;
 			if (loop) pos = pos.down();
 		} while (loop);
@@ -52,8 +54,8 @@ public class MapProcessor {
 		return pos;
 	}
 	
-	private static boolean checkBlockState(BlockState state, boolean liquids) {
-		return StateUtil.isAir(state) || (!liquids && StateUtil.isUnderwater(state));
+	private static boolean checkBlockState(BlockState state, boolean liquids, boolean plants) {
+		return StateUtil.isAir(state) || (!liquids && StateUtil.isUnderwater(state)) || (!plants && StateUtil.isPlant(state));
 	}
 	
 	private static int checkLiquids(MapChunk mapChunk, int x, int y, int z) {

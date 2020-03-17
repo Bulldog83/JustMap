@@ -26,6 +26,7 @@
   "justmap.configuration.show_in_chat": "Show map while in chat",
   "justmap.configuration.show_terrain": "Show Terrain",
   "justmap.configuration.show_caves": "Show Caves",
+  "justmap.configuration.ignore_plants": "Ignore Plants",
   "justmap.configuration.terrain_strength": "Terrain Strength",
   "justmap.configuration.show_grid": "Show Grid Lines",
   "justmap.configuration.show_position": "Show Position",

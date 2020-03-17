@@ -57,6 +57,7 @@ public class Worldmap extends MapScreen implements AbstractMap {
 	private double shiftW;
 	private double shiftH;
 	private float imageScale = 1.0F;
+	private boolean playerTracking = true;
 	
 	private BlockPos centerPos;
 	private NativeImage mapImage;
@@ -86,6 +87,8 @@ public class Worldmap extends MapScreen implements AbstractMap {
 			this.dimension = currentDim;
 			this.centerPos = minecraft.player.getBlockPos();
 			this.info = DIMENSION_INFO.getOrDefault(DimensionType.byRawId(dimension).toString(), null);
+		} else if (playerTracking) {
+			this.centerPos = minecraft.player.getBlockPos();
 		}
 		
 		addMapButtons();
@@ -239,6 +242,7 @@ public class Worldmap extends MapScreen implements AbstractMap {
 	}
 	
 	public void setCenterByPlayer() {
+		this.playerTracking = true;
 		this.centerPos = minecraft.player.getBlockPos();
   		updateMapTexture();
 	}
@@ -273,6 +277,7 @@ public class Worldmap extends MapScreen implements AbstractMap {
 		
 		updateMapTexture();
 		
+		this.playerTracking = false;
 		this.updated = time;
 	}
 	
@@ -332,7 +337,8 @@ public class Worldmap extends MapScreen implements AbstractMap {
 		this.centerPos = new BlockPos(x, y, z);
 		updateMapTexture();
 		
-		updated = time;
+		this.playerTracking = false;
+		this.updated = time;
 		
 		return super.mouseDragged(d, e, i, f, g);
 	}
