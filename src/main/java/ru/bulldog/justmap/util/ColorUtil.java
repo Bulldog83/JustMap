@@ -17,7 +17,6 @@ import net.minecraft.block.FluidBlock;
 import net.minecraft.block.GrassBlock;
 import net.minecraft.block.LeavesBlock;
 import net.minecraft.block.LilyPadBlock;
-import net.minecraft.block.Material;
 import net.minecraft.block.StemBlock;
 import net.minecraft.block.TallPlantBlock;
 import net.minecraft.block.VineBlock;
@@ -196,7 +195,7 @@ public class ColorUtil {
 		return HSBtoRGB(floatBuffer[0], floatBuffer[1], floatBuffer[2]);
 	}
 	
-	private static int getBlockColor(BlockState state) {
+	private static int getStateColor(BlockState state) {
 		if (colorCache.containsKey(state)) {
 			return colorCache.get(state);
 		}
@@ -273,7 +272,9 @@ public class ColorUtil {
 	public static int blockColor(WorldChunk worldChunk, BlockMeta block) {
 		BlockPos overPos = new BlockPos(block.getPos().getX(), block.getPos().getY() + 1, block.getPos().getZ());
 		BlockState overState = worldChunk.getWorld().getBlockState(overPos);
-		if (!StateUtil.isAir(block.getState()) && (StateUtil.isAir(overState) || 
+		if (ClientParams.ignorePlants && StateUtil.isSeaweed(overState)) {
+			return blockColor(worldChunk.getWorld(), Blocks.WATER.getDefaultState(), block.getPos());
+		} else if (!StateUtil.isAir(block.getState()) && (StateUtil.isAir(overState) || 
 			ClientParams.ignorePlants && StateUtil.isPlant(overState))) {
 			
 			return blockColor(worldChunk.getWorld(), block.getState(), block.getPos());
@@ -286,7 +287,7 @@ public class ColorUtil {
 		int blockColor = -1;
 		int materialColor = state.getTopMaterialColor(world, pos).color;
 		if (ClientParams.alternateColorRender) {
-			int textureColor = getBlockColor(state);
+			int textureColor = getStateColor(state);
 			
 			blockColor = minecraft.getBlockColorMap().getColor(state, world, pos, Colors.LIGHT);
 			
@@ -304,8 +305,6 @@ public class ColorUtil {
 				} else {
 					blockColor = fluidColor(world, state, pos, textureColor);
 				}
-			} else if (ClientParams.ignorePlants && state.getMaterial() == Material.UNDERWATER_PLANT) {
-				blockColor = operateColor(-1, getBlockColor(Blocks.WATER.getDefaultState()), BiomeColors.getWaterColor(world, pos));
 			}
 			blockColor = blockColor != -1 ? blockColor : textureColor;
 

@@ -28,7 +28,7 @@ public class MapProcessor {
 			for (int i = floor + (layer.height - 1); i >= floor; i--) {
 				BlockPos worldPos = loopPos(world, new BlockPos(posX, i, posZ), 0, liquids, plants);
 				BlockPos overPos = new BlockPos(posX, worldPos.getY() + 1, posZ);
-				if (StateUtil.isAir(world.getBlockState(overPos))) {
+				if (checkBlockState(world.getBlockState(overPos), liquids, plants)) {
 					return worldPos.getY();
 				}
 			}

@@ -14,7 +14,8 @@ public class StateUtil {
 	}
 	
 	public static boolean isLiquid(BlockState state, boolean lava) {
-		return state.getMaterial().isLiquid() && (lava || state.getMaterial() != Material.LAVA);
+		Material material = state.getMaterial();
+		return material.isLiquid() && (lava || material != Material.LAVA);
 	}
 	
 	public static boolean isUnderwater(BlockState state) {
@@ -24,6 +25,11 @@ public class StateUtil {
 	public static boolean isPlant(BlockState state) {
 		Material material = state.getMaterial();
 		return material == Material.PLANT || material == Material.REPLACEABLE_PLANT ||
-			   material == Material.UNUSED_PLANT;
+			   material == Material.UNUSED_PLANT || isSeaweed(state);
+	}
+	
+	public static boolean isSeaweed(BlockState state) {
+		Material material = state.getMaterial();
+		return material == Material.UNDERWATER_PLANT || material == Material.SEAGRASS;
 	}
 }
