@@ -202,7 +202,7 @@ public class Minimap implements AbstractMap{
 
 		if (world.dimension.isNether()) {
 			MapCache.setCurrentLayer(Layer.NETHER, pos.getY());
-		} else if (needRenderCaves(world, player.getBlockPos())) {
+		} else if (needRenderCaves(world, player.getSenseCenterPos())) {
 			MapCache.setCurrentLayer(Layer.CAVES, pos.getY());
 		} else {
 			MapCache.setCurrentLayer(Layer.SURFACE, pos.getY());

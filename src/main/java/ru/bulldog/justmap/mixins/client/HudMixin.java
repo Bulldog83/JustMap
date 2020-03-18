@@ -12,7 +12,7 @@ import ru.bulldog.justmap.util.Colors;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.hud.InGameHud;
-import net.minecraft.client.gui.screen.ingame.ContainerScreen;
+import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.texture.Sprite;
 import net.minecraft.client.texture.StatusEffectSpriteManager;
 import net.minecraft.entity.effect.StatusEffect;
@@ -71,7 +71,7 @@ abstract class HudMixin extends DrawableHelper {
 				StatusEffectSpriteManager statusEffectSpriteManager = this.client.getStatusEffectSpriteManager();
 				List<Runnable> list = Lists.newArrayListWithExpectedSize(collection.size());
 				List<Runnable> timers = Lists.newArrayListWithExpectedSize(collection.size());
-				this.client.getTextureManager().bindTexture(ContainerScreen.BACKGROUND_TEXTURE);
+				this.client.getTextureManager().bindTexture(HandledScreen.BACKGROUND_TEXTURE);
 				Iterator<StatusEffectInstance> var6 = Ordering.natural().reverse().sortedCopy(collection).iterator();
 	
 			 	while(var6.hasNext()) {
@@ -97,9 +97,9 @@ abstract class HudMixin extends DrawableHelper {
 				   		RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
 				   		float f = 1.0F;
 				   		if (statusEffectInstance.isAmbient()) {
-				   			this.blit(k, l, 165, 166, size, size);
+				   			this.drawTexture(k, l, 165, 166, size, size);
 				   		} else {
-					   		this.blit(k, l, 141, 166, size, size);
+					   		this.drawTexture(k, l, 141, 166, size, size);
 					  		if (effectDuration <= 200) {
 						  		int m = 10 - effectDuration / 20;
 						 		f = MathHelper.clamp((float)effectDuration / 10.0F / 5.0F * 0.5F, 0.0F, 0.5F) + MathHelper.cos((float)effectDuration * 3.1415927F / 5.0F) * MathHelper.clamp((float)m / 10.0F * 0.25F, 0.0F, 0.25F);
@@ -112,7 +112,7 @@ abstract class HudMixin extends DrawableHelper {
 				   		list.add(() -> {
 				   			this.client.getTextureManager().bindTexture(sprite.getAtlas().getId());
 							RenderSystem.color4f(1.0F, 1.0F, 1.0F, ff);
-					  		blit(fk + 3, fl + 3, this.getZOffset(), 18, 18, sprite);
+							drawSprite(fk + 3, fl + 3, this.getZOffset(), 18, 18, sprite);
 				   		});
 				   		if (ClientParams.showEffectTimers) {
 					   		timers.add(() -> {

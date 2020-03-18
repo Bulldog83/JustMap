@@ -90,7 +90,7 @@ public class MapSkin extends Sprite {
 		}
 		RenderSystem.enableAlphaTest();
 		RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
-		DrawHelper.blit(x, y, 0, w, h, this);
+		DrawHelper.drawSprite(x, y, 0, w, h, this);
 	}
 	
 	public void draw(int x, int y, int size) {

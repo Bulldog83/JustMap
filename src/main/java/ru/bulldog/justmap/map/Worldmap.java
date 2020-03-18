@@ -80,15 +80,15 @@ public class Worldmap extends MapScreen implements AbstractMap {
 		this.shiftW = (mapWidth - width) / 2F;
 		this.shiftH = (mapHeight - height) / 2F;
 		
-		PlayerEntity player = minecraft.player;
+		PlayerEntity player = client.player;
 		
 		int currentDim = player.dimension.getRawId();
 		if (centerPos == null || currentDim != dimension) {
 			this.dimension = currentDim;
-			this.centerPos = minecraft.player.getBlockPos();
+			this.centerPos = client.player.getSenseCenterPos();
 			this.info = DIMENSION_INFO.getOrDefault(DimensionType.byRawId(dimension).toString(), null);
 		} else if (playerTracking) {
-			this.centerPos = minecraft.player.getBlockPos();
+			this.centerPos = client.player.getSenseCenterPos();
 		}
 		
 		addMapButtons();
@@ -96,7 +96,7 @@ public class Worldmap extends MapScreen implements AbstractMap {
 		waypoints.clear();
 		List<Waypoint> wps = WaypointKeeper.getInstance().getWaypoints(dimension, true);
 		if (wps != null) {
-			Stream<Waypoint> stream = wps.stream().filter(wp -> MathUtil.getDistance(player.getBlockPos(), wp.pos) <= wp.showRange);
+			Stream<Waypoint> stream = wps.stream().filter(wp -> MathUtil.getDistance(player.getSenseCenterPos(), wp.pos) <= wp.showRange);
 			for (Waypoint wp : stream.toArray(Waypoint[]::new)) {
 				WaypointIcon waypoint = new WaypointIcon(this, wp);
 				this.waypoints.add(waypoint);
@@ -148,10 +148,10 @@ public class Worldmap extends MapScreen implements AbstractMap {
 			}
 		}
 		
-		PlayerEntity player = minecraft.player;
+		PlayerEntity player = client.player;
 		
-		int playerX = player.getBlockPos().getX();
-		int playerZ = player.getBlockPos().getZ();
+		int playerX = player.getSenseCenterPos().getX();
+		int playerZ = player.getSenseCenterPos().getZ();
 		double arrowX = MathUtil.scaledPos(playerX, startX, endX, mapWidth) - shiftW;
 		double arrowY = MathUtil.scaledPos(playerZ, startZ, endZ, mapHeight) - shiftH;
 		
@@ -176,7 +176,7 @@ public class Worldmap extends MapScreen implements AbstractMap {
 			if (mapTexture != null) mapTexture.close();
 			
 			mapTexture = new NativeImageBackedTexture(mapImage);
-			textureId = minecraft.getTextureManager().registerDynamicTexture(JustMap.MODID + "_worldmap_texture", mapTexture);
+			textureId = client.getTextureManager().registerDynamicTexture(JustMap.MODID + "_worldmap_texture", mapTexture);
 		}
 	}
 	
@@ -220,7 +220,7 @@ public class Worldmap extends MapScreen implements AbstractMap {
 	
 	private void drawMap() {
 		prepareTexture();		
-		minecraft.getTextureManager().bindTexture(textureId);
+		client.getTextureManager().bindTexture(textureId);
 		
 		RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
 		
@@ -243,7 +243,7 @@ public class Worldmap extends MapScreen implements AbstractMap {
 	
 	public void setCenterByPlayer() {
 		this.playerTracking = true;
-		this.centerPos = minecraft.player.getBlockPos();
+		this.centerPos = client.player.getSenseCenterPos();
   		updateMapTexture();
 	}
 	
