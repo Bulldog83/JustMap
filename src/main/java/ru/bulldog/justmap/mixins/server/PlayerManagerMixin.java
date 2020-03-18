@@ -14,8 +14,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.minecraft.world.GameRules;
-
-import ru.bulldog.justmap.minimap.MapGameRules;
+import ru.bulldog.justmap.map.minimap.MapGameRules;
 import ru.bulldog.justmap.server.config.ServerParams;
 
 @Mixin(PlayerManager.class)

@@ -58,7 +58,7 @@ public class DrawHelper extends DrawableHelper {
 		DRAWER.drawString(textRenderer, string, drawX, y, color);
 	}
 	
-	public static void drawDiamond(int x, int y, int width, int height, int color) {
+	public static void drawDiamond(double x, double y, int width, int height, int color) {
 		drawTriangle(x, y + height / 2,
 				 x + width, y + height / 2,
 				 x + width / 2, y,
@@ -69,7 +69,7 @@ public class DrawHelper extends DrawableHelper {
 				 color);
 	}
 	
-	public static void drawTriangle(int x1, int y1, int x2, int y2, int x3, int y3, int color) {
+	public static void drawTriangle(double x1, double y1, double x2, double y2, double x3, double y3, int color) {
 		float a = (float)(color >> 24 & 255) / 255.0F;
 		float r = (float)(color >> 16 & 255) / 255.0F;
 		float g = (float)(color >> 8 & 255) / 255.0F;
@@ -87,7 +87,7 @@ public class DrawHelper extends DrawableHelper {
 		RenderSystem.enableTexture();
 	}
 	
-	public static void drawLine(int x1, int y1, int x2, int y2, int color) {
+	public static void drawLine(double x1, double y1, double x2, double y2, int color) {
 		float a = (float)(color >> 24 & 255) / 255.0F;
 		float r = (float)(color >> 16 & 255) / 255.0F;
 		float g = (float)(color >> 8 & 255) / 255.0F;

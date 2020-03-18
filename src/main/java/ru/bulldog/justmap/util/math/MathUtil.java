@@ -31,6 +31,10 @@ public class MathUtil {
 		return angle;
 	}
 	
+	public static double scaledPos(double val, double startVal, double endVal, int range) {
+		return ((val - startVal) / (endVal - startVal)) * range;
+	}
+	
 	public static double getDistance(BlockPos a, BlockPos b) {
 		return getDistance(a, b, false);
 	}

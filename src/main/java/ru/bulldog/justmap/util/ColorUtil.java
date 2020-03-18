@@ -11,6 +11,7 @@ import net.fabricmc.fabric.impl.client.rendering.fluid.FluidRenderHandlerRegistr
 import net.minecraft.block.AttachedStemBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.block.FernBlock;
 import net.minecraft.block.FluidBlock;
 import net.minecraft.block.GrassBlock;
@@ -31,9 +32,10 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.WorldChunk;
+
 import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.client.config.ClientParams;
-import ru.bulldog.justmap.minimap.data.BlockMeta;
+import ru.bulldog.justmap.map.data.BlockMeta;
 import ru.bulldog.justmap.util.math.MathUtil;
 
 public class ColorUtil {
@@ -193,11 +195,15 @@ public class ColorUtil {
 		return HSBtoRGB(floatBuffer[0], floatBuffer[1], floatBuffer[2]);
 	}
 	
-	public static int extractColor(BlockState state) {
+	private static int getStateColor(BlockState state) {
 		if (colorCache.containsKey(state)) {
 			return colorCache.get(state);
 		}
 		
+		return extractColor(state);
+	}
+	
+	private static int extractColor(BlockState state) {
 		List<BakedQuad> quads = blockModels.getModel(state).getQuads(state, Direction.UP, new Random());		
 		
 		Identifier blockSprite;
@@ -265,18 +271,23 @@ public class ColorUtil {
 	
 	public static int blockColor(WorldChunk worldChunk, BlockMeta block) {
 		BlockPos overPos = new BlockPos(block.getPos().getX(), block.getPos().getY() + 1, block.getPos().getZ());
-		if (!StateUtil.isAir(block.getState()) && worldChunk.getWorld().getBlockState(overPos).isAir()) {
+		BlockState overState = worldChunk.getWorld().getBlockState(overPos);
+		if (ClientParams.ignorePlants && StateUtil.isSeaweed(overState)) {
+			return blockColor(worldChunk.getWorld(), Blocks.WATER.getDefaultState(), block.getPos());
+		} else if (!StateUtil.isAir(block.getState()) && (StateUtil.isAir(overState) || 
+			ClientParams.ignorePlants && StateUtil.isPlant(overState))) {
+			
 			return blockColor(worldChunk.getWorld(), block.getState(), block.getPos());
 		}
 	
-		return Colors.BLACK;
+		return -1;
 	}
 	
 	public static int blockColor(World world, BlockState state, BlockPos pos) {
 		int blockColor = -1;
 		int materialColor = state.getTopMaterialColor(world, pos).color;
 		if (ClientParams.alternateColorRender) {
-			int textureColor = ColorUtil.extractColor(state);
+			int textureColor = getStateColor(state);
 			
 			blockColor = minecraft.getBlockColorMap().getColor(state, world, pos, Colors.LIGHT);
 			

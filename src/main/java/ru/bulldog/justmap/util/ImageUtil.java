@@ -16,13 +16,20 @@ public class ImageUtil {
 
 	private static ResourceManager resourceManager = MinecraftClient.getInstance().getResourceManager();
 	
+	public static boolean imageExists(Identifier image) {
+		return resourceManager.containsResource(image);
+	}
+	
 	public static NativeImage loadImage(Identifier image, int w, int h) {
-		try (Resource resource = resourceManager.getResource(image)) {
-			return NativeImage.read(resource.getInputStream());			
-		} catch (IOException e) {
-			JustMap.LOGGER.logWarning(String.format("Can't load texture image: %s. Will be created empty image.", image));
-			JustMap.LOGGER.logWarning(String.format("Cause: %s.", e.getMessage()));
-		}		
+		if (imageExists(image)) {
+			try (Resource resource = resourceManager.getResource(image)) {
+				return NativeImage.read(resource.getInputStream());			
+			} catch (IOException e) {
+				JustMap.LOGGER.logWarning(String.format("Can't load texture image: %s. Will be created empty image.", image));
+				JustMap.LOGGER.logWarning(String.format("Cause: %s.", e.getMessage()));
+			}
+		}
+		
 		return new NativeImage(w, h, false);
 	}
 	

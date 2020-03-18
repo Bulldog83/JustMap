@@ -6,8 +6,8 @@ import net.fabricmc.fabric.api.event.client.ClientTickCallback;
 import net.fabricmc.fabric.api.event.server.ServerStopCallback;
 import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.client.config.ClientConfig;
-import ru.bulldog.justmap.minimap.Minimap;
-import ru.bulldog.justmap.minimap.data.MapRegion;
+import ru.bulldog.justmap.map.data.MapRegion;
+import ru.bulldog.justmap.map.minimap.Minimap;
 import ru.bulldog.justmap.util.TaskManager;
 
 public class JustMapClient implements ClientModInitializer {

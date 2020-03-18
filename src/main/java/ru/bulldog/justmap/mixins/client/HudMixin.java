@@ -5,8 +5,8 @@ import com.google.common.collect.Ordering;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import ru.bulldog.justmap.client.config.ClientParams;
-import ru.bulldog.justmap.minimap.MapPosition;
-import ru.bulldog.justmap.minimap.MapRenderer;
+import ru.bulldog.justmap.map.minimap.MapPosition;
+import ru.bulldog.justmap.map.minimap.MapRenderer;
 import ru.bulldog.justmap.util.Colors;
 
 import net.minecraft.client.MinecraftClient;

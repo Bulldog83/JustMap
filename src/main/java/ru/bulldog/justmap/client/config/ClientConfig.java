@@ -10,7 +10,7 @@ import ru.bulldog.justmap.config.ConfigKeeper.EnumEntry;
 import ru.bulldog.justmap.config.ConfigKeeper.FloatRange;
 import ru.bulldog.justmap.config.ConfigKeeper.IntegerEntry;
 import ru.bulldog.justmap.config.ConfigKeeper.IntegerRange;
-import ru.bulldog.justmap.minimap.MapPosition;
+import ru.bulldog.justmap.map.minimap.MapPosition;
 
 public class ClientConfig extends Config{
 	
@@ -29,12 +29,12 @@ public class ClientConfig extends Config{
 		KEEPER.registerEntry("map_position", new EnumEntry<MapPosition>(ClientParams.mapPosition, (e) -> ClientParams.mapPosition = e, () -> ClientParams.mapPosition));
 		KEEPER.registerEntry("map_offset", new IntegerEntry(ClientParams.positionOffset, (i) -> ClientParams.positionOffset = i, () -> ClientParams.positionOffset));
 		KEEPER.registerEntry("map_size", new IntegerRange(ClientParams.mapSize, (i) -> ClientParams.mapSize = i, () -> ClientParams.mapSize, 16, 256));
-		KEEPER.registerEntry("chunk_level_size", new IntegerRange(ClientParams.chunkLevelSize, (i) -> ClientParams.chunkLevelSize = i, () -> ClientParams.chunkLevelSize, 2, 4));
 		KEEPER.registerEntry("map_scale", new FloatRange(ClientParams.mapScale, (f) -> ClientParams.mapScale = f, () -> ClientParams.mapScale, 0.25F, 2.0F));
 		KEEPER.registerEntry("map_saturation", new IntegerRange(ClientParams.mapSaturation, (i) -> ClientParams.mapSaturation = i, () -> ClientParams.mapSaturation, -50, 50));
 		KEEPER.registerEntry("map_brightness", new IntegerRange(ClientParams.mapBrightness, (i) -> ClientParams.mapBrightness = i, () -> ClientParams.mapBrightness, -50, 50));
 		KEEPER.registerEntry("rotate_map", new BooleanEntry(ClientParams.rotateMap, (b) -> ClientParams.rotateMap = b, () -> ClientParams.rotateMap));
 		KEEPER.registerEntry("show_caves", new BooleanEntry(ClientParams.showCaves, (b) -> ClientParams.showCaves = b, () -> ClientParams.showCaves));
+		KEEPER.registerEntry("ignore_plants", new BooleanEntry(ClientParams.ignorePlants, (b) -> ClientParams.ignorePlants = b, () -> ClientParams.ignorePlants));
 		KEEPER.registerEntry("show_position", new BooleanEntry(ClientParams.showPosition, (b) -> ClientParams.showPosition = b, () -> ClientParams.showPosition));
 		KEEPER.registerEntry("show_FPS", new BooleanEntry(ClientParams.showFPS, (b) -> ClientParams.showFPS = b, () -> ClientParams.showFPS));
 		KEEPER.registerEntry("show_biome", new BooleanEntry(ClientParams.showBiome, (b) -> ClientParams.showBiome = b, () -> ClientParams.showBiome));

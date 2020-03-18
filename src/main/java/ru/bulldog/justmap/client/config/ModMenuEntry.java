@@ -3,16 +3,19 @@ package ru.bulldog.justmap.client.config;
 import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.config.ConfigKeeper.EnumEntry;
-import ru.bulldog.justmap.minimap.MapPosition;
-import ru.bulldog.justmap.minimap.MapSkin;
-import ru.bulldog.justmap.util.math.MathUtil;
+import ru.bulldog.justmap.map.minimap.MapPosition;
+import ru.bulldog.justmap.map.minimap.MapSkin;
+
 import io.github.prospector.modmenu.api.ModMenuApi;
+
 import me.shedaniel.clothconfig2.api.ConfigBuilder;
 import me.shedaniel.clothconfig2.api.ConfigCategory;
 import me.shedaniel.clothconfig2.api.ConfigEntryBuilder;
 import me.shedaniel.clothconfig2.impl.builders.EnumSelectorBuilder;
+
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.resource.language.I18n;
+
 import net.fabricmc.api.Environment;
 import net.fabricmc.api.EnvType;
 
@@ -60,10 +63,6 @@ public class ModMenuEntry implements ModMenuApi {
 					.setSaveConsumer(val -> JustMapClient.CONFIG.setRanged("map_size", val))
 					.setDefaultValue((int) JustMapClient.CONFIG.getDefault("map_size"))
 					.setMin(32).setMax(480).build());
-			general.addEntry(entryBuilder.startIntField(lang("chunk_level_size"), (int) Math.pow(2, JustMapClient.CONFIG.getInt("chunk_level_size")))
-					.setSaveConsumer(val -> JustMapClient.CONFIG.setRanged("chunk_level_size", (int) MathUtil.logn(2, val)))
-					.setDefaultValue((int) Math.pow(2, (int) JustMapClient.CONFIG.getDefault("chunk_level_size")))
-					.setMin(4).setMax(16).build());
 			general.addEntry(entryBuilder.startBooleanToggle(lang("show_in_chat"), JustMapClient.CONFIG.getBoolean("show_in_chat"))
 					.setSaveConsumer(val -> JustMapClient.CONFIG.setBoolean("show_in_chat", val))
 					.setDefaultValue((boolean) JustMapClient.CONFIG.getDefault("show_in_chat"))
@@ -71,6 +70,10 @@ public class ModMenuEntry implements ModMenuApi {
 			general.addEntry(entryBuilder.startBooleanToggle(lang("show_caves"), JustMapClient.CONFIG.getBoolean("show_caves"))
 					.setSaveConsumer(val -> JustMapClient.CONFIG.setBoolean("show_caves", val))
 					.setDefaultValue((boolean) JustMapClient.CONFIG.getDefault("show_caves"))
+					.build());
+			general.addEntry(entryBuilder.startBooleanToggle(lang("ignore_plants"), JustMapClient.CONFIG.getBoolean("ignore_plants"))
+					.setSaveConsumer(val -> JustMapClient.CONFIG.setBoolean("ignore_plants", val))
+					.setDefaultValue((boolean) JustMapClient.CONFIG.getDefault("ignore_plants"))
 					.build());
 			general.addEntry(entryBuilder.startBooleanToggle(lang("show_terrain"), JustMapClient.CONFIG.getBoolean("show_terrain"))
 					.setSaveConsumer(val -> JustMapClient.CONFIG.setBoolean("show_terrain", val))

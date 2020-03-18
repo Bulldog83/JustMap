@@ -8,7 +8,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.network.packet.s2c.play.GameMessageS2CPacket;
 import net.minecraft.network.MessageType;
-import ru.bulldog.justmap.minimap.MapGameRules;
 
 @Mixin(ClientPlayNetworkHandler.class)
 public abstract class ClientPlayNetworkHandlerMixin {

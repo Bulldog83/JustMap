@@ -6,7 +6,8 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.util.Identifier;
 import ru.bulldog.justmap.JustMap;
-import ru.bulldog.justmap.minimap.waypoint.WaypointsList;
+import ru.bulldog.justmap.map.Worldmap;
+import ru.bulldog.justmap.map.waypoint.WaypointsList;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -84,6 +85,18 @@ public enum KeyHandler {
 			}
 		});
 		
+		INSTANCE.register(new KeyParser(createKeyBinding("show_worldmap", GLFW.GLFW_KEY_M)) {
+			@Override
+			public void onKeyUp() {
+				MinecraftClient.getInstance().openScreen(Worldmap.getScreen());
+			}
+			
+			@Override
+			public boolean isListening() {
+				return MC.player != null && MC.currentScreen == null;
+			}
+		});
+		
 		INSTANCE.register(new KeyParser(createKeyBinding("reduce_scale", GLFW.GLFW_KEY_LEFT_BRACKET)) {
 			@Override
 			public void onKeyUp() {
@@ -123,7 +136,7 @@ public enum KeyHandler {
 		}
 	}
 	
-	private FabricKeyBinding createKeyBinding(String name, int key) {
+	public FabricKeyBinding createKeyBinding(String name, int key) {
 		return FabricKeyBinding.Builder.create(new Identifier(JustMap.MODID, name), InputUtil.Type.KEYSYM, key, JustMap.MODID).build();
 	}
 }
