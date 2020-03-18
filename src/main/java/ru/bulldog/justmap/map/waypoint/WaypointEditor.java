@@ -57,18 +57,18 @@ public class WaypointEditor extends MapScreen {
 		int dimId = minecraft.player.dimension.getRawId();		
 		info = DIMENSION_INFO.getOrDefault(DimensionType.byRawId(dimId).toString(), null);
 		
-		center = minecraft.getWindow().getScaledWidth() / 2;
-		width = Math.max(300, center);
-		height = minecraft.getWindow().getScaledHeight();
+		center = width / 2;
+		
+		int screenW = Math.max(400, center);
 	
-		x = center - width / 2;
+		x = center - screenW / 2;
 		y = 60;
 		
 		int row = rowH + spacing;
 		
 		int ex = x + padding;
 		int ey = y;
-		int ew = width - padding * 2;
+		int ew = screenW - padding * 2;
 		nameField = new TitledWidget<>(font, new TextFieldWidget(font, 0, 0, ew - 30, 12, "Name"), ex, ey, ew, rowH, "", lang("name"));
 		nameField.changeFocus(true);
 		nameField.widget.setMaxLength(12);
@@ -108,7 +108,7 @@ public class WaypointEditor extends MapScreen {
 		prevColorButton = new ButtonWidget(ex, ey, ew, rowH, "<", (b) -> cycleColor(-1));
 		children.add(prevColorButton);
 		
-		nextColorButton = new ButtonWidget(x + width - ew - padding, ey, ew, rowH, ">", (b) -> cycleColor(1));
+		nextColorButton = new ButtonWidget(x + screenW - ew - padding, ey, ew, rowH, ">", (b) -> cycleColor(1));
 		children.add(nextColorButton);
 		
 		ey += row;
@@ -116,7 +116,7 @@ public class WaypointEditor extends MapScreen {
 		prevIconButton = new ButtonWidget(ex, ey, ew, rowH, "<", (b) -> cycleIcon(-1));
 		children.add(prevIconButton);
 		
-		nextIconButton = new ButtonWidget(x + width - ew - padding, ey, ew, rowH, ">", (b) -> cycleIcon(1));
+		nextIconButton = new ButtonWidget(x + screenW - ew - padding, ey, ew, rowH, ">", (b) -> cycleIcon(1));
 		children.add(nextIconButton);
 		
 		ey += row * 1.5;
@@ -129,7 +129,7 @@ public class WaypointEditor extends MapScreen {
 		children.add(isRenderable);		
 		
 		ew = 60;
-		ey = height - (rowH / 2 + 20);
+		ey = height - (rowH / 2 + 16);
 		saveButton = new ButtonWidget(center - ew - 2, ey, ew, rowH, lang("save"), (b) -> { save(); onClose(); });
 		children.add(saveButton);
 		
