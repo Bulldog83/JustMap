@@ -20,12 +20,14 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.Direction;
-import net.minecraft.world.dimension.DimensionType;
 
 import ru.bulldog.justmap.JustMap;
+import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.client.MapScreen;
+import ru.bulldog.justmap.client.config.ConfigFactory;
 import ru.bulldog.justmap.map.data.Layer;
 import ru.bulldog.justmap.map.data.MapCache;
+import ru.bulldog.justmap.map.data.MapChunk;
 import ru.bulldog.justmap.map.icon.WaypointIcon;
 import ru.bulldog.justmap.map.waypoint.Waypoint;
 import ru.bulldog.justmap.map.waypoint.WaypointKeeper;
@@ -47,8 +49,6 @@ public class Worldmap extends MapScreen implements AbstractMap {
 		return worldmap;
 	}
 	
-	private int paddingTop;
-	private int paddingBottom;
 	private int mapWidth;
 	private int mapHeight;
 	private int scaledWidth;
@@ -63,6 +63,7 @@ public class Worldmap extends MapScreen implements AbstractMap {
 	private NativeImage mapImage;
 	private NativeImageBackedTexture mapTexture;
 	private Identifier textureId;
+	private String cursorCoords;
 	
 	private List<WaypointIcon> waypoints = new ArrayList<>();
 	
@@ -72,6 +73,8 @@ public class Worldmap extends MapScreen implements AbstractMap {
 
 	@Override
 	public void init() {		
+		super.init();
+		
 		this.paddingTop = 8;
 		this.paddingBottom = 8;
 		
@@ -90,6 +93,8 @@ public class Worldmap extends MapScreen implements AbstractMap {
 		} else if (playerTracking) {
 			this.centerPos = client.player.getSenseCenterPos();
 		}
+		
+		this.cursorCoords = String.format("%d, %d", centerPos.getX(), centerPos.getZ());
 		
 		addMapButtons();
 		
@@ -121,6 +126,7 @@ public class Worldmap extends MapScreen implements AbstractMap {
 		children.add(new ButtonWidget(width - 24, height / 2 - 21, 20, 20, "+", (b) -> changeScale(-0.25F)));
 		children.add(new ButtonWidget(width - 24, height / 2 + 1, 20, 20, "-", (b) -> changeScale(+0.25F)));		
 		children.add(new ButtonWidget(width - 24, height - paddingBottom - 22, 20, 20, "\u271C", (b) -> setCenterByPlayer()));
+		children.add(new ButtonWidget(4, paddingTop + 2, 20, 20, "\u2630",(b) -> minecraft.openScreen(ConfigFactory.getConfigScreen(this))));
 	}
 	
 	@Override
@@ -141,8 +147,8 @@ public class Worldmap extends MapScreen implements AbstractMap {
 		for (WaypointIcon icon : waypoints) {
 			if (!icon.isHidden()) {
 				icon.setPosition(
-					MathUtil.scaledPos(icon.waypoint.pos.getX(), startX, endX, mapWidth) - shiftW,
-					MathUtil.scaledPos(icon.waypoint.pos.getZ(), startZ, endZ, mapHeight) - shiftH
+					MathUtil.screenPos(icon.waypoint.pos.getX(), startX, endX, mapWidth) - shiftW,
+					MathUtil.screenPos(icon.waypoint.pos.getZ(), startZ, endZ, mapHeight) - shiftH
 				);
 				icon.draw(iconSize);
 			}
@@ -161,6 +167,9 @@ public class Worldmap extends MapScreen implements AbstractMap {
 	@Override
 	public void renderForeground() {
 		drawBorders(paddingTop, paddingBottom);
+		
+		int x = (width - 15) / 2;
+		this.drawCenteredString(minecraft.textRenderer, cursorCoords, x, paddingTop + 4, Colors.WHITE);
 	}
 	
 	private void prepareTexture() {
@@ -324,29 +333,95 @@ public class Worldmap extends MapScreen implements AbstractMap {
 	
 	@Override
 	public boolean mouseDragged(double d, double e, int i, double f, double g) {
-		long time = System.currentTimeMillis();
-		if (time - updated < updateInterval) return true;
+		if (i == 0) {
+			long time = System.currentTimeMillis();
+			if (time - updated < updateInterval) return true;
+			
+			int x = centerPos.getX();
+			int y = centerPos.getY();
+			int z = centerPos.getZ();
+			
+			x -= MathUtil.clamp(Math.round((8 * f) * imageScale), -32, 32);
+			z -= MathUtil.clamp(Math.round((8 * g) * imageScale), -32, 32);
+			
+			this.centerPos = new BlockPos(x, y, z);
+			updateMapTexture();
+			
+			this.playerTracking = false;
+			this.updated = time;
 		
-		int x = centerPos.getX();
-		int y = centerPos.getY();
-		int z = centerPos.getZ();
-		
-		x -= MathUtil.clamp(Math.round((8 * f) * imageScale), -32, 32);
-		z -= MathUtil.clamp(Math.round((8 * g) * imageScale), -32, 32);
-		
-		this.centerPos = new BlockPos(x, y, z);
-		updateMapTexture();
-		
-		this.playerTracking = false;
-		this.updated = time;
+			return true;
+		}
 		
 		return super.mouseDragged(d, e, i, f, g);
+	}
+	
+	private int pixelToPos(double x, int cx, int range) {
+		double x1 = cx - range / 2;
+		double x2 = x1 + range;
+		
+		return MathUtil.worldPos(x, x1, x2, range);
+	}
+	
+	private BlockPos cursorBlockPos(double x, double y) {
+		int posX = pixelToPos(x + shiftW, (centerPos.getX() >> 4) << 4, scaledWidth);		
+		int posZ = pixelToPos(y + shiftH, (centerPos.getZ() >> 4) << 4, scaledHeight);
+		
+		int chunkX = posX >> 4;
+		int chunkZ = posZ >> 4;
+		
+		MapChunk mapChunk;
+		if (dimension != -1) {
+			mapChunk = MapCache.get().getChunk(Layer.SURFACE, 0, chunkX, chunkZ);
+		} else {
+			mapChunk = MapCache.get().getChunk(chunkX, chunkZ);
+		}
+		
+		mapChunk.updateHeighmap();
+		
+		int cx = posX - (chunkX << 4);
+		int cz = posZ - (chunkZ << 4);
+		
+		int posY = mapChunk.getHeighmap()[cx + (cz << 4)];
+		posY = posY == -1 ? centerPos.getY() : posY;
+		
+		return new BlockPos(posX, posY, posZ);
+	}
+	
+	@Override
+	public void mouseMoved(double d, double e) {		
+		BlockPos worldPos = cursorBlockPos(d, e);		
+		this.cursorCoords = String.format("%d, %d, %d", worldPos.getX(), worldPos.getY(), worldPos.getZ());
+	}
+	
+	private int clicks = 0;
+	private long clicked = 0;
+	
+	@Override
+	public boolean mouseReleased(double d, double e, int i) {
+		if (i == 0) {
+			long time = System.currentTimeMillis();
+			if (time - clicked > 500) clicks = 0;
+			
+			if (++clicks == 2) {			
+				JustMapClient.MAP.createWaypoint(dimension, cursorBlockPos(d, e));
+				
+				clicked = 0;
+				clicks = 0;
+			} else {
+				clicked = time;
+			}
+			
+			return true;
+		}
+		
+		return super.mouseReleased(d, e, i);
 	}
 	
 	@Override
 	public boolean mouseScrolled(double d, double e, double f) {
 		changeScale(f > 0 ? -0.25F : 0.25F);		
-		return super.mouseScrolled(d, e, f);
+		return true;
 	}
 
 	@Override

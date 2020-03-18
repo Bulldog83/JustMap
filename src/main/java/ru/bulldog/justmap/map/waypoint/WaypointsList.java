@@ -118,6 +118,7 @@ public class WaypointsList extends MapScreen {
 
 	private int scrollAmount = 0;
 	private int maxScroll = 0;
+	private int screenWidth;
 	
 	private ButtonWidget prevDimensionButton, nextDimensionButton;
 	private ButtonWidget addButton, closeButton;
@@ -146,18 +147,15 @@ public class WaypointsList extends MapScreen {
 	
 	@Override
 	protected void init() {
-		width = Math.max(300, client.getWindow().getScaledWidth() / 2);
-		height = client.getWindow().getScaledHeight();
+		this.center = width / 2;		
+		this.screenWidth = Math.max(400, center);		
+		this.x = center - screenWidth / 2;
 		
-		center = client.getWindow().getScaledWidth() / 2;
-	
-		x = center - width / 2;
+		this.prevDimensionButton = new ButtonWidget(x + 10, 10, 20, 20, "<", (b) -> cycleDimension(-1));
+		this.nextDimensionButton = new ButtonWidget(x + screenWidth - 30, 10, 20, 20, ">", (b) -> cycleDimension(1));
 		
-		prevDimensionButton = new ButtonWidget(x + 10, 10, 20, 20, "<", (b) -> cycleDimension(-1));
-		nextDimensionButton = new ButtonWidget(x + width - 20 - 10, 10, 20, 20, ">", (b) -> cycleDimension(1));
-		
-		addButton = new ButtonWidget(center - 62, height - 30, 60, 20, lang("create"), (b) -> add());
-		closeButton = new ButtonWidget(center + 2, height - 30, 60, 20, lang("close"), (b) -> onClose());
+		this.addButton = new ButtonWidget(center - 62, height - 26, 60, 20, lang("create"), (b) -> add());
+		this.closeButton = new ButtonWidget(center + 2, height - 26, 60, 20, lang("close"), (b) -> onClose());
 	
 		reset();
 	}
@@ -167,7 +165,7 @@ public class WaypointsList extends MapScreen {
 	
 		int y = 40;
 		for (Waypoint wp : wayPoints) {
-			Entry entry = new Entry(this, x + 10, scrollAmount + y, width - 10 - 10, 20, wp);
+			Entry entry = new Entry(this, x + 10, scrollAmount + y, screenWidth - 20, 20, wp);
 			entries.add(entry);
 			
 			y += entry.height;

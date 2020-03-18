@@ -234,8 +234,8 @@ public class Minimap implements AbstractMap{
 				
 				if (x >= startX && x <= endX && z >= startZ && z <= endZ) {
 					PlayerIcon playerIcon = new PlayerIcon(this, p, false);
-					playerIcon.setPosition(MathUtil.scaledPos(x, startX, endX, mapWidth),
-										   MathUtil.scaledPos(z, startZ, endZ, mapWidth));
+					playerIcon.setPosition(MathUtil.screenPos(x, startX, endX, mapWidth),
+										   MathUtil.screenPos(z, startZ, endZ, mapWidth));
 					this.players.add(playerIcon);
 				}
 			}
@@ -257,14 +257,14 @@ public class Minimap implements AbstractMap{
 					boolean hostile = livingEntity instanceof HostileEntity;
 					if (hostile && allowHostileRadar()) {
 						EntityIcon entIcon = new EntityIcon(this, entity, hostile);						
-						entIcon.setPosition(MathUtil.scaledPos((int) entity.getX(), startX, endX, mapWidth),
-											MathUtil.scaledPos((int) entity.getZ(), startZ, endZ, mapWidth));
+						entIcon.setPosition(MathUtil.screenPos((int) entity.getX(), startX, endX, mapWidth),
+											MathUtil.screenPos((int) entity.getZ(), startZ, endZ, mapWidth));
 						this.entities.add(entIcon);
 						amount++;
 					} else if (!hostile && allowCreatureRadar()) {
 						EntityIcon entIcon = new EntityIcon(this, entity, hostile);						
-						entIcon.setPosition(MathUtil.scaledPos((int) entity.getX(), startX, endX, mapWidth),
-											MathUtil.scaledPos((int) entity.getZ(), startZ, endZ, mapWidth));
+						entIcon.setPosition(MathUtil.screenPos((int) entity.getX(), startX, endX, mapWidth),
+											MathUtil.screenPos((int) entity.getZ(), startZ, endZ, mapWidth));
 						this.entities.add(entIcon);
 						amount++;
 					}
@@ -280,8 +280,8 @@ public class Minimap implements AbstractMap{
 			for (Waypoint wp : stream.toArray(Waypoint[]::new)) {
 				WaypointIcon waypoint = new WaypointIcon(this, wp);
 				waypoint.setPosition(
-					MathUtil.scaledPos(wp.pos.getX(), startX, endX, mapWidth),
-					MathUtil.scaledPos(wp.pos.getZ(), startZ, endZ, mapWidth)
+					MathUtil.screenPos(wp.pos.getX(), startX, endX, mapWidth),
+					MathUtil.screenPos(wp.pos.getZ(), startZ, endZ, mapWidth)
 				);
 				this.waypoints.add(waypoint);
 			}
@@ -292,16 +292,19 @@ public class Minimap implements AbstractMap{
 		return waypoints;
 	}
 	
-	public void createWaypoint() {
-		PlayerEntity player = minecraftClient.player;
-		
+	public void createWaypoint(int dimension, BlockPos pos) {
 		Waypoint waypoint = new Waypoint();
-		waypoint.dimension = player.world.dimension.getType().getRawId();
+		waypoint.dimension = dimension;
 		waypoint.name = "Waypoint";
 		waypoint.color = RandomUtil.getElement(Waypoint.WAYPOINT_COLORS);
-		waypoint.pos = player.getSenseCenterPos();
+		waypoint.pos = pos;
 		
-		minecraftClient.openScreen(new WaypointEditor(waypoint, minecraftClient.currentScreen, WaypointKeeper.getInstance()::addNew));		
+		minecraftClient.openScreen(new WaypointEditor(waypoint, minecraftClient.currentScreen, WaypointKeeper.getInstance()::addNew));
+	}
+	
+	public void createWaypoint() {
+		PlayerEntity player = minecraftClient.player;
+		createWaypoint(player.world.dimension.getType().getRawId(), player.getSenseCenterPos());
 	}
 	
 	public NativeImage getImage() {

@@ -9,6 +9,7 @@ import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
+import net.minecraft.world.dimension.DimensionType;
 
 import java.util.HashMap;
 
@@ -33,6 +34,8 @@ public class MapScreen extends Screen {
 	protected Pair<String, Identifier> info;
 	
 	protected int x, y, center;
+	protected int paddingTop;
+	protected int paddingBottom;
 	
 	protected MapScreen(Text title) {
 		this(title, null);
@@ -41,6 +44,12 @@ public class MapScreen extends Screen {
 	public MapScreen(Text title, Screen parent) {
 		super(title);
 		this.parent = parent;
+	}
+	
+	@Override
+	protected void init() {
+		int dimension = minecraft.player.dimension.getRawId();
+		this.info = DIMENSION_INFO.getOrDefault(DimensionType.byRawId(dimension).toString(), null);
 	}
 	
 	@Override
@@ -55,7 +64,7 @@ public class MapScreen extends Screen {
 	}
 	
 	public void renderBackground() {
-		fill(x, 0, x + width, height, 0x33444444);		
+		fill(0, 0, width, height, 0x88444444);		
 		drawBorders();
 	}
 	
@@ -119,7 +128,7 @@ public class MapScreen extends Screen {
 	}
 	
 	protected void drawBorders() {
-		drawBorders(40, 40);
+		drawBorders(32, 32);
 	}
 	
 	protected void drawBorders(int top, int bottom) {
@@ -128,8 +137,8 @@ public class MapScreen extends Screen {
 			id = DEFAULT_IDENTIFIER;
 		}
 
-		renderTextureRepeating(x, 0, width, top, 16, 16, id);
-		renderTextureRepeating(x, height - bottom, width, bottom, 16, 16, id);		
+		renderTextureRepeating(0, 0, width, top, 16, 16, id);
+		renderTextureRepeating(0, height - bottom, width, bottom, 16, 16, id);		
 	}
 	
 	public String lang(String key) {

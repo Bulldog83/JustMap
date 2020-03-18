@@ -195,6 +195,10 @@ public class DrawHelper extends DrawableHelper {
 		Tessellator tessellator = Tessellator.getInstance();
 		BufferBuilder builder = tessellator.getBuffer();
 		
+		RenderSystem.enableBlend();
+		RenderSystem.enableAlphaTest();		
+		RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+		
 		builder.begin(7, vertexFormat);
 		
 		VertexConsumer vertexConsumer = sprite.getTextureSpecificVertexConsumer(builder);
@@ -204,6 +208,7 @@ public class DrawHelper extends DrawableHelper {
 	}
 	
 	private static void draw(MatrixStack matrixStack, VertexConsumer vertexConsumer, double x, double y, float w, float h) {
+		RenderSystem.enableBlend();
 		RenderSystem.enableAlphaTest();
 		RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
 		

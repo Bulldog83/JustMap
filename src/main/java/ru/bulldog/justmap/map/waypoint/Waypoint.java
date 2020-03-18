@@ -186,7 +186,11 @@ public class Waypoint {
 				return coloredIcons.get(color);
 			}
 			
-			NativeImage texture = ImageUtil.applyColor(DEFAULT_TEXTURE, color);
+			NativeImage texture = new NativeImage(18, 18, false);
+			
+			texture.copyFrom(DEFAULT_TEXTURE);
+			ImageUtil.applyColor(texture, color);
+			
 			Icon icon = new Icon(-1, DEFAULT_ICON, texture, color, 18, 18);
 			coloredIcons.put(color, icon);
 			
@@ -195,12 +199,7 @@ public class Waypoint {
 		
 		@Override
 		public void draw(double x, double y, int w, int h) {
-			if (this.key > 0) {
-				textureManager.bindTexture(this.getTexture());
-			} else {
-				textureManager.bindTexture(getColoredTexture());
-			}
-			
+			textureManager.bindTexture(this.getTexture());			
 			this.draw(x, y, (float) w, (float) h);
 		}
 		
