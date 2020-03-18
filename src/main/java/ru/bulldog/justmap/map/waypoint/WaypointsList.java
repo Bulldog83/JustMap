@@ -139,10 +139,7 @@ public class WaypointsList extends MapScreen {
 		}		
 		if (!dimensions.contains(theEnd)) {
 			dimensions.add(theEnd);
-		}		
-		
-		currentDim = client.player.dimension.getRawId();
-		currentDimIndex = getDimIndex(currentDim);
+		}
 	}
 	
 	@Override
@@ -158,6 +155,9 @@ public class WaypointsList extends MapScreen {
 		this.closeButton = new ButtonWidget(center + 2, height - 26, 60, 20, lang("close"), (b) -> onClose());
 	
 		reset();
+		
+		this.currentDim = client.player.dimension.getRawId();
+		this.currentDimIndex = getDimIndex(currentDim);
 	}
 	
 	private void createEntries() {

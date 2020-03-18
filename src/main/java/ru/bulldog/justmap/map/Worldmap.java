@@ -89,7 +89,6 @@ public class Worldmap extends MapScreen implements AbstractMap {
 		if (centerPos == null || currentDim != dimension) {
 			this.dimension = currentDim;
 			this.centerPos = client.player.getSenseCenterPos();
-			this.info = DIMENSION_INFO.getOrDefault(DimensionType.byRawId(dimension).toString(), null);
 		} else if (playerTracking) {
 			this.centerPos = client.player.getSenseCenterPos();
 		}
@@ -126,7 +125,7 @@ public class Worldmap extends MapScreen implements AbstractMap {
 		children.add(new ButtonWidget(width - 24, height / 2 - 21, 20, 20, "+", (b) -> changeScale(-0.25F)));
 		children.add(new ButtonWidget(width - 24, height / 2 + 1, 20, 20, "-", (b) -> changeScale(+0.25F)));		
 		children.add(new ButtonWidget(width - 24, height - paddingBottom - 22, 20, 20, "\u271C", (b) -> setCenterByPlayer()));
-		children.add(new ButtonWidget(4, paddingTop + 2, 20, 20, "\u2630",(b) -> minecraft.openScreen(ConfigFactory.getConfigScreen(this))));
+		children.add(new ButtonWidget(4, paddingTop + 2, 20, 20, "\u2630",(b) -> client.openScreen(ConfigFactory.getConfigScreen(this))));
 	}
 	
 	@Override
@@ -158,8 +157,8 @@ public class Worldmap extends MapScreen implements AbstractMap {
 		
 		int playerX = player.getSenseCenterPos().getX();
 		int playerZ = player.getSenseCenterPos().getZ();
-		double arrowX = MathUtil.scaledPos(playerX, startX, endX, mapWidth) - shiftW;
-		double arrowY = MathUtil.scaledPos(playerZ, startZ, endZ, mapHeight) - shiftH;
+		double arrowX = MathUtil.screenPos(playerX, startX, endX, mapWidth) - shiftW;
+		double arrowY = MathUtil.screenPos(playerZ, startZ, endZ, mapHeight) - shiftH;
 		
 		DirectionArrow.draw(arrowX, arrowY, iconSize, player.headYaw);
 	}
@@ -169,7 +168,7 @@ public class Worldmap extends MapScreen implements AbstractMap {
 		drawBorders(paddingTop, paddingBottom);
 		
 		int x = (width - 15) / 2;
-		this.drawCenteredString(minecraft.textRenderer, cursorCoords, x, paddingTop + 4, Colors.WHITE);
+		this.drawCenteredString(client.textRenderer, cursorCoords, x, paddingTop + 4, Colors.WHITE);
 	}
 	
 	private void prepareTexture() {

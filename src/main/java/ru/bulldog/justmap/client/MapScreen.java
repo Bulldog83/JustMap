@@ -48,7 +48,7 @@ public class MapScreen extends Screen {
 	
 	@Override
 	protected void init() {
-		int dimension = minecraft.player.dimension.getRawId();
+		int dimension = client.player.dimension.getRawId();
 		this.info = DIMENSION_INFO.getOrDefault(DimensionType.byRawId(dimension).toString(), null);
 	}
 	
