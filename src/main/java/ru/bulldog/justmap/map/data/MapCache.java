@@ -31,7 +31,7 @@ public class MapCache {
 	}
 	
 	public static void setLayerLevel(int level) {
-		currentLevel = level;
+		currentLevel = level > 0 ? level : 0;
 	}
 	
 	public static MapCache get() {

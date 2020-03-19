@@ -8,6 +8,7 @@ import ru.bulldog.justmap.util.Colors;
 import ru.bulldog.justmap.util.DrawHelper;
 import ru.bulldog.justmap.util.math.MathUtil;
 import ru.bulldog.justmap.util.math.RandomUtil;
+
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.Element;

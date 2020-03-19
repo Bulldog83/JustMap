@@ -18,6 +18,8 @@ import java.util.Map;
 
 public class MapChunk {
 
+	public final ChunkLevel INVALID_LEVEL = new ChunkLevel();
+	
 	private volatile Map<Layer, ChunkLevel[]> levels;
 	
 	private WorldChunk worldChunk;
@@ -30,7 +32,7 @@ public class MapChunk {
 	
 	public MapChunk(World world, ChunkPos pos, Layer layer, int level) {
 		this(world, pos, layer);
-		this.level = level;
+		this.level = level > 0 ? level : 0;
 	}
 	
 	public MapChunk(World world, ChunkPos pos, Layer layer) {
@@ -63,15 +65,19 @@ public class MapChunk {
 			initLayer();
 		}
 		
-		ChunkLevel chunkLevel;
-		if (this.levels.get(layer)[level] == null) {
-			chunkLevel = new ChunkLevel();
-			this.levels.get(layer)[level] = chunkLevel;
-		} else {
-			chunkLevel = this.levels.get(layer)[level];
+		try {
+			ChunkLevel chunkLevel;
+			if (this.levels.get(layer)[level] == null) {
+				chunkLevel = new ChunkLevel();
+				this.levels.get(layer)[level] = chunkLevel;
+			} else {
+				chunkLevel = this.levels.get(layer)[level];
+			}
+			
+			return chunkLevel;
+		} catch (ArrayIndexOutOfBoundsException ex) {
+			return INVALID_LEVEL;
 		}
-		
-		return chunkLevel;
 	}
 	
 	public void setChunk(WorldChunk chunk) {
@@ -216,6 +222,7 @@ public class MapChunk {
 	}
 	
 	private class ChunkLevel {
+		
 		private final BlockMeta[] blocks;
 		private final int[] heightmap;
 		private NativeImage image;
