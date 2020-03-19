@@ -143,8 +143,7 @@ public class MapRegion {
 	}
 	
 	private File layerDir(Layer layer) {
-		int dim = MapCache.get().world.getDimension().getType().getRawId();
-		return new File(StorageUtil.cacheDir(), String.format("DIM%d/%s/", dim, layer.name));
+		return new File(StorageUtil.cacheDir(), String.format("%s/", layer.name));
 	}
 	
 	private class RegionLayer {

@@ -1,13 +1,9 @@
 package ru.bulldog.justmap.map.data;
 
-import com.mojang.datafixers.Dynamic;
-import com.mojang.datafixers.types.DynamicOps;
-
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.datafixer.NbtOps;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.Tag;
+import net.minecraft.nbt.NbtHelper;
 import net.minecraft.util.math.BlockPos;
 
 public class BlockMeta {
@@ -30,12 +26,12 @@ public class BlockMeta {
 	}
 	
 	public CompoundTag toNBT() {
-		DynamicOps<Tag> dynamicOps = NbtOps.INSTANCE;
-		
 		CompoundTag tag = new CompoundTag();
 		
-		CompoundTag stateTag = (CompoundTag) BlockState.serialize(dynamicOps, state).getValue();
-		CompoundTag posTag = (CompoundTag) pos.serialize(dynamicOps);
+		if (isEmpty()) return tag;
+		
+		CompoundTag stateTag = NbtHelper.fromBlockState(state);
+		CompoundTag posTag = NbtHelper.fromBlockPos(pos);
 		
 		tag.put("state", stateTag);
 		tag.put("pos", posTag);
@@ -46,12 +42,10 @@ public class BlockMeta {
 	}
 	
 	public static BlockMeta fromNBT(CompoundTag tag) {
-		DynamicOps<Tag> dynamicOps = NbtOps.INSTANCE;
-		
 		BlockMeta block = new BlockMeta(null);
 		
-		block.pos = BlockPos.deserialize(new Dynamic<Tag>(dynamicOps, tag.get("pos")));
-		block.state = BlockState.deserialize(new Dynamic<Tag>(dynamicOps, tag.get("state")));
+		block.pos = NbtHelper.toBlockPos(tag.getCompound("pos"));
+		block.state = NbtHelper.toBlockState(tag.getCompound("state"));
 		block.color = tag.getInt("color");
 		block.heightPos = tag.getInt("heightPos");
 		

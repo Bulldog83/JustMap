@@ -4,10 +4,12 @@ import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.util.ColorUtil;
 import ru.bulldog.justmap.util.Colors;
 import ru.bulldog.justmap.util.ImageUtil;
+import ru.bulldog.justmap.util.StorageUtil;
 
 import net.minecraft.world.Heightmap;
 import net.minecraft.world.World;
 import net.minecraft.client.texture.NativeImage;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.chunk.WorldChunk;
@@ -27,6 +29,7 @@ public class MapChunk {
 	private Layer layer;
 	private int level = 0;
 	private boolean empty;
+	private boolean saveNeeded = false;
 	
 	public long updated = 0;
 	
@@ -40,6 +43,10 @@ public class MapChunk {
 		this.chunkPos = pos;
 		this.layer = layer;
 		this.levels = new HashMap<>();
+		
+		StorageUtil.CACHEIO.execute(() -> {
+			loadFromNBT();
+		});		
 	}
 	
 	public void resetChunk() {
@@ -140,7 +147,10 @@ public class MapChunk {
 		for (int x = 0; x < 16; x++) {
 			for (int z = 0; z < 16; z++) {
 				int y = worldChunk.sampleHeightmap(Heightmap.Type.WORLD_SURFACE, x, z);
-				getHeighmap()[x + (z << 4)] = MapProcessor.getTopBlockY(this, x, y, z, true);
+				y = MapProcessor.getTopBlockY(this, x, y, z, true);
+				if (y != -1) {
+					getHeighmap()[x + (z << 4)] = y;
+				}
 			}
 		}
 	}
@@ -173,6 +183,8 @@ public class MapChunk {
 						chunkLevel.getImage().setPixelRgba(x, z, Colors.BLACK);
 						
 						updateRegionImage();
+						
+						this.saveNeeded = true;
 					}
 					
 					continue;
@@ -195,6 +207,8 @@ public class MapChunk {
 						chunkLevel.getImage().setPixelRgba(x, z, color);
 					
 						updateRegionImage();
+						
+						this.saveNeeded = true;
 					}
 				} else {				
 					int color = currentBlock.getColor();					
@@ -207,6 +221,8 @@ public class MapChunk {
 							chunkLevel.getImage().setPixelRgba(x, z, color);
 						
 							updateRegionImage();
+							
+							this.saveNeeded = true;
 						}
 					}
 				}
@@ -215,16 +231,67 @@ public class MapChunk {
 		
 		this.empty = false;
 		this.updated = currentTime;
+		
+		if (saveNeeded) {
+			StorageUtil.CACHEIO.execute(() -> {
+				saveToNBT();
+			});
+		}
 	}
 	
 	private void updateRegionImage() {
 		MapCache.get().getRegion(chunkPos).storeChunk(this);
 	}
 	
+	public void saveToNBT() {
+		CompoundTag tag = StorageUtil.getCache(chunkPos);
+		
+		CompoundTag layersTag = new CompoundTag();
+		levels.forEach((layer, levels) -> {
+			CompoundTag levelsTag = new CompoundTag();
+			for (int i = 0; i < levels.length; i++) {
+				if (levels[i] == null) continue;
+				
+				String ind = String.valueOf(i);
+				levelsTag.put(ind, levels[i].toNBT());
+			}
+			
+			layersTag.put(layer.name, levelsTag);
+		});
+		
+		String key = "Chunk " + chunkPos.toString();
+		tag.put(key, layersTag);
+		
+		this.saveNeeded = false;
+	}
+	
+	public void loadFromNBT() {
+		CompoundTag tag = StorageUtil.getCache(chunkPos);
+		
+		String key = "Chunk " + chunkPos.toString();
+		if (tag == null || !tag.contains(key)) return;
+		
+		CompoundTag layersTag = tag.getCompound(key);
+		if (layersTag.isEmpty()) return;
+		
+		levels.forEach((layer, levels) -> {
+			if (layersTag.contains(layer.name)) {
+				CompoundTag levelsTag = layersTag.getCompound(layer.name);
+				for (int i = 0; i < levels.length; i++) {
+					String ind = String.valueOf(i);
+					if (!levelsTag.contains(ind)) continue;
+					
+					levels[i] = new ChunkLevel();
+					levels[i].fromNBT(levelsTag.getCompound(ind));
+				}
+			}			
+		});
+	}
+	
 	private class ChunkLevel {
 		
 		private final BlockMeta[] blocks;
-		private final int[] heightmap;
+		private int[] heightmap;
 		private NativeImage image;
 		
 		public long updated = 0;
@@ -262,6 +329,35 @@ public class MapChunk {
 			}
 			
 			return image;
+		}
+		
+		public CompoundTag toNBT() {
+			CompoundTag tag = new CompoundTag();
+			
+			CompoundTag tagBlocks = new CompoundTag();
+			for (int i = 0; i < blocks.length; i++) {
+				if (blocks[i].isEmpty()) continue;
+				tagBlocks.put(String.valueOf(i), blocks[i].toNBT());
+				i++;
+			}
+			
+			tag.put("blocks", tagBlocks);
+			tag.putIntArray("heightmap", heightmap);
+			
+			return tag;
+		}
+		
+		public void fromNBT(CompoundTag tag) {
+			CompoundTag tagBlocks = tag.getCompound("blocks");
+			if (!tagBlocks.isEmpty()) {
+				for (int i = 0; i < this.blocks.length; i++) {
+					String ind = String.valueOf(i);
+					if (tagBlocks.contains(ind)) {
+						this.blocks[i] = BlockMeta.fromNBT(tagBlocks.getCompound(ind));
+					}
+				}				
+				this.heightmap = tag.getIntArray("heightmap");
+			}
 		}
 	}
 }
