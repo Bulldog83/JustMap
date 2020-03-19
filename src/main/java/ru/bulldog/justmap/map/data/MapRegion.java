@@ -55,7 +55,7 @@ public class MapRegion {
 	}
 	
 	public void setLevel(int level) {
-		this.currentLevel = level;
+		this.currentLevel = level > 0 ? level : 0;
 	}
 	
 	public void setLayer(Layer layer) {
