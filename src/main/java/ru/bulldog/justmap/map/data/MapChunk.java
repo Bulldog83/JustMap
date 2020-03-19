@@ -5,7 +5,6 @@ import ru.bulldog.justmap.util.ColorUtil;
 import ru.bulldog.justmap.util.Colors;
 import ru.bulldog.justmap.util.ImageUtil;
 import ru.bulldog.justmap.util.StorageUtil;
-
 import net.minecraft.world.Heightmap;
 import net.minecraft.world.World;
 import net.minecraft.client.texture.NativeImage;
@@ -29,7 +28,6 @@ public class MapChunk {
 	private Layer layer;
 	private int level = 0;
 	private boolean empty;
-	private boolean saveNeeded = false;
 	
 	public long updated = 0;
 	
@@ -44,9 +42,9 @@ public class MapChunk {
 		this.layer = layer;
 		this.levels = new HashMap<>();
 		
-		StorageUtil.CACHEIO.execute(() -> {
+		StorageUtil.PROCESSOR.execute(() -> {
 			loadFromNBT();
-		});		
+		});	
 	}
 	
 	public void resetChunk() {
@@ -182,9 +180,7 @@ public class MapChunk {
 						chunkLevel.setBlock(index, BlockMeta.EMPTY_BLOCK);
 						chunkLevel.getImage().setPixelRgba(x, z, Colors.BLACK);
 						
-						updateRegionImage();
-						
-						this.saveNeeded = true;
+						updateRegionData();
 					}
 					
 					continue;
@@ -206,9 +202,7 @@ public class MapChunk {
 						color = ColorUtil.proccessColor(color, heightDiff);
 						chunkLevel.getImage().setPixelRgba(x, z, color);
 					
-						updateRegionImage();
-						
-						this.saveNeeded = true;
+						updateRegionData();
 					}
 				} else {				
 					int color = currentBlock.getColor();					
@@ -220,9 +214,7 @@ public class MapChunk {
 							color = ColorUtil.proccessColor(color, heightDiff);
 							chunkLevel.getImage().setPixelRgba(x, z, color);
 						
-							updateRegionImage();
-							
-							this.saveNeeded = true;
+							updateRegionData();
 						}
 					}
 				}
@@ -231,21 +223,13 @@ public class MapChunk {
 		
 		this.empty = false;
 		this.updated = currentTime;
-		
-		if (saveNeeded) {
-			StorageUtil.CACHEIO.execute(() -> {
-				saveToNBT();
-			});
-		}
 	}
 	
-	private void updateRegionImage() {
+	private void updateRegionData() {
 		MapCache.get().getRegion(chunkPos).storeChunk(this);
 	}
 	
-	public void saveToNBT() {
-		CompoundTag tag = StorageUtil.getCache(chunkPos);
-		
+	public void saveToNBT(CompoundTag tag) {		
 		CompoundTag layersTag = new CompoundTag();
 		levels.forEach((layer, levels) -> {
 			CompoundTag levelsTag = new CompoundTag();
@@ -261,12 +245,10 @@ public class MapChunk {
 		
 		String key = "Chunk " + chunkPos.toString();
 		tag.put(key, layersTag);
-		
-		this.saveNeeded = false;
 	}
 	
 	public void loadFromNBT() {
-		CompoundTag tag = StorageUtil.getCache(chunkPos);
+		CompoundTag tag = MapCache.get().getRegion(chunkPos).getChunksData();
 		
 		String key = "Chunk " + chunkPos.toString();
 		if (tag == null || !tag.contains(key)) return;

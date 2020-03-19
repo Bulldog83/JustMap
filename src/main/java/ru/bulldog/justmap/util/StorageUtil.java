@@ -10,28 +10,26 @@ import net.minecraft.client.network.ServerInfo;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.math.ChunkPos;
+
 import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.map.data.RegionPos;
 
 public class StorageUtil {	
 	
 	private static MinecraftClient minecraft = MinecraftClient.getInstance();
+	private static volatile Map<RegionPos, CompoundTag> mapCache;
+	private static int currentDimId = 0;
 	
 	public final static File MAP_DIR = new File(minecraft.runDirectory, "justmap/");
-	public static final TaskManager CACHEIO = new TaskManager("cache-io");
-	
-	private static volatile Map<RegionPos, CompoundTag> mapCache;
-	
-	private static long lastSave = 0;
-	
-	public static synchronized CompoundTag getCache(ChunkPos pos) {
+	public static final TaskManager PROCESSOR = new TaskManager("cache-processor");
+	public static final TaskManager IO = new TaskManager("cache-io");
+
+	public static synchronized CompoundTag getCache(RegionPos regPos) {
 		if (mapCache == null) {
 			mapCache = new HashMap<>();
 		}
 		
-		RegionPos regPos = new RegionPos(pos);
-		File cacheFile = new File(chunksCacheDir(), String.format("%s.dat", regPos.toString()));		
+		File cacheFile = new File(chunksCacheDir(), String.format("%s.dat", regPos.toString()));
 		
 		if (!mapCache.containsKey(regPos)) {
 			CompoundTag regCache = null;			
@@ -48,31 +46,15 @@ public class StorageUtil {
 		return mapCache.get(regPos);
 	}
 	
-	public static void saveCache() {
-		long time = System.currentTimeMillis();
-		if (time - lastSave < 10000) return;
-		
-		JustMap.EXECUTOR.execute(() -> {
-			StorageUtil.storeCache();			
-			lastSave = time;
-		});
-	}
-	
-	public static synchronized void storeCache() {
-		if (mapCache == null) return;
-		
-		JustMap.LOGGER.debug("Storing map data...");
-		
-		mapCache.forEach((regPos, tag) -> {
-			File cacheFile = new File(chunksCacheDir(), String.format("%s.dat", regPos.toString()));
+	public static void saveCache(RegionPos regPos, CompoundTag data) {
+		File cacheFile = new File(chunksCacheDir(), String.format("%s.dat", regPos.toString()));
+		StorageUtil.IO.execute(() -> {
 			try {
-				NbtIo.safeWrite(tag, cacheFile);			
+				NbtIo.safeWrite(data, cacheFile);
 			} catch (Exception ex) {
 				JustMap.LOGGER.catching(ex);
 			}
-		});			
-		
-		JustMap.LOGGER.debug("Map data successfully saved.");
+		});
 	}
 	
 	public static File filesDir() {
@@ -97,8 +79,12 @@ public class StorageUtil {
 	}
 	
 	public static File cacheDir() {
-		int dimension = minecraft.world.getDimension().getType().getRawId();		
-		File cacheDir = new File(filesDir(), String.format("cache/DIM%d/", dimension));
+		if (minecraft.world != null) {
+			int dimension = minecraft.world.getDimension().getType().getRawId();
+			currentDimId = currentDimId != dimension ? dimension : currentDimId;
+		}
+		
+		File cacheDir = new File(filesDir(), String.format("cache/DIM%d/", currentDimId));
 		
 		if (!cacheDir.exists()) {
 			cacheDir.mkdirs();

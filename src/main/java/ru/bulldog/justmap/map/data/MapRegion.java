@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import net.minecraft.client.texture.NativeImage;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.math.ChunkPos;
 
 import ru.bulldog.justmap.JustMap;
@@ -18,20 +19,21 @@ public class MapRegion {
 	
 	private static long saved = 0;
 	
-	public static void saveImages() {
+	public static void saveData() {
 		long time = System.currentTimeMillis();
-		if (time - saved < 3000) return;
+		if (time - saved < 5000) return;
 		
 		MapCache data = MapCache.get();
 		
 		if (data == null) return;
 		
-		JustMap.EXECUTOR.execute(() -> {
-			data.getRegions().forEach((pos, region) -> {
-				if (!region.getLayer().isSaved()) {
+		data.getRegions().forEach((pos, region) -> {
+			if (!region.getLayer().isSaved()) {
+				JustMap.EXECUTOR.execute(() -> {
+					region.saveCunksData();
 					region.saveImage();
-				}
-			});
+				});			
+			}
 		});
 		
 		saved = time;
@@ -39,6 +41,7 @@ public class MapRegion {
 
 	private final RegionPos pos;
 	
+	private volatile CompoundTag chunksData;
 	private Map<Layer, RegionLayer> layers = new HashMap<>();	
 	private Layer currentLayer;
 	private int currentLevel;
@@ -66,6 +69,21 @@ public class MapRegion {
 		return getChunkImage(chunkPos, currentLayer, currentLevel);
 	}
 	
+	public synchronized CompoundTag getChunksData() {
+		if (chunksData == null) {
+			chunksData = StorageUtil.getCache(pos);
+		}
+		
+		return chunksData;
+	}
+	
+	public void saveCunksData() {
+		StorageUtil.PROCESSOR.execute(() -> {
+			CompoundTag data = getChunksData().copy();
+			StorageUtil.saveCache(pos, data);
+		});
+	}
+	
 	public NativeImage getChunkImage(ChunkPos chunkPos, Layer layer, int level) {
 		if (chunkPos.getRegionX() != this.pos.x ||
 			chunkPos.getRegionZ() != this.pos.z) {
@@ -81,6 +99,11 @@ public class MapRegion {
 	
 	public NativeImage getImage(Layer layer, int level) {		
 		return getLayer(layer).getImage(level).get();
+	}
+	
+	public void saveImage() {
+		File png = new File(imagesDir(), String.format("%d.%d.png", this.pos.x, this.pos.z));		
+		getLayer().saveImage(png);
 	}
 	
 	public RegionLayer getLayer() {
@@ -106,6 +129,9 @@ public class MapRegion {
 		int imgY = (chunkPos.z - (this.pos.z << 5)) << 4;			
 		
 		getLayer().writeImage(chunk.getImage(), imgX, imgY);
+		StorageUtil.PROCESSOR.execute(() -> {
+			chunk.saveToNBT(getChunksData());
+		});
 		
 		this.updated = System.currentTimeMillis();
 	}
@@ -116,11 +142,6 @@ public class MapRegion {
 	
 	public int getZ() {
 		return this.pos.z;
-	}
-	
-	public void saveImage() {
-		File png = new File(imagesDir(), String.format("%d.%d.png", this.pos.x, this.pos.z));		
-		getLayer().saveImage(png);
 	}
 	
 	private File imagesDir() {

@@ -4,7 +4,7 @@ import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.keybinding.KeyBindingRegistry;
 import net.fabricmc.fabric.api.event.client.ClientTickCallback;
 import net.fabricmc.fabric.api.event.server.ServerStopCallback;
-
+import net.fabricmc.fabric.api.event.world.WorldTickCallback;
 import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.client.config.ClientConfig;
 import ru.bulldog.justmap.map.data.MapRegion;
@@ -24,17 +24,18 @@ public class JustMapClient implements ClientModInitializer {
 		KeyHandler.INSTANCE.initKeyBindings();		
 		ClientTickCallback.EVENT.register((client) -> {
 			KeyHandler.INSTANCE.update();
-			StorageUtil.saveCache();
-			MapRegion.saveImages();
 			MAP.update();
 		});
 		
+		WorldTickCallback.EVENT.register((world) -> {
+			MapRegion.saveData();
+		});
+		
 		ServerStopCallback.EVENT.register((server) -> {
-			StorageUtil.CACHEIO.stop();
 			JustMap.EXECUTOR.stop();
+			StorageUtil.PROCESSOR.stop();
+			StorageUtil.IO.stop();
 			UPDATER.stop();
-			
-			StorageUtil.storeCache();
 		});
 	}
 }
