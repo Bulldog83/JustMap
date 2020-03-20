@@ -22,6 +22,7 @@ public class MapCache {
 	private final static MinecraftClient minecraft = MinecraftClient.getInstance();
 	
 	private static Map<Integer, MapCache> dimensions = new HashMap<>();
+	private static World currentWorld;
 	private static Layer currentLayer = Layer.SURFACE;	
 	private static int currentLevel = 0;
 	
@@ -35,7 +36,13 @@ public class MapCache {
 	}
 	
 	public static MapCache get() {
-		return get(minecraft.world);
+		if (currentWorld == null || (minecraft.world != null &&
+									 minecraft.world != currentWorld)) {
+			
+			currentWorld = minecraft.world;
+		}
+		
+		return get(currentWorld);
 	}
 	
 	public static MapCache get(World world) {
@@ -238,6 +245,7 @@ public class MapCache {
 	
 	public synchronized MapChunk getChunk(Layer layer, int level, int posX, int posZ) {
 		ChunkPos chunkPos = new ChunkPos(posX, posZ);
+		
 		if (getChunks().containsKey(chunkPos)) {
 			return getChunks().get(chunkPos);
 		}

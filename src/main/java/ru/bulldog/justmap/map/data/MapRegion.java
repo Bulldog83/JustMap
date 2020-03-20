@@ -7,7 +7,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import net.minecraft.client.texture.NativeImage;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.math.ChunkPos;
 
 import ru.bulldog.justmap.JustMap;
@@ -25,23 +24,21 @@ public class MapRegion {
 		
 		MapCache data = MapCache.get();
 		
-		if (data == null) return;
+		if (data == null) return;		
 		
-		data.getRegions().forEach((pos, region) -> {
-			if (!region.getLayer().isSaved()) {
-				JustMap.EXECUTOR.execute(() -> {
-					region.saveCunksData();
+		JustMap.EXECUTOR.execute(() -> {
+			data.getRegions().forEach((pos, region) -> {
+				if (!region.getLayer().isSaved()) {
 					region.saveImage();
-				});			
-			}
+				}
+			});
 		});
 		
 		saved = time;
 	}
 
 	private final RegionPos pos;
-	
-	private volatile CompoundTag chunksData;
+
 	private Map<Layer, RegionLayer> layers = new HashMap<>();	
 	private Layer currentLayer;
 	private int currentLevel;
@@ -67,21 +64,6 @@ public class MapRegion {
 	
 	public NativeImage getChunkImage(ChunkPos chunkPos) {
 		return getChunkImage(chunkPos, currentLayer, currentLevel);
-	}
-	
-	public synchronized CompoundTag getChunksData() {
-		if (chunksData == null) {
-			chunksData = StorageUtil.getCache(pos);
-		}
-		
-		return chunksData;
-	}
-	
-	public void saveCunksData() {
-		StorageUtil.PROCESSOR.execute(() -> {
-			CompoundTag data = getChunksData().copy();
-			StorageUtil.saveCache(pos, data);
-		});
 	}
 	
 	public NativeImage getChunkImage(ChunkPos chunkPos, Layer layer, int level) {
@@ -129,9 +111,6 @@ public class MapRegion {
 		int imgY = (chunkPos.z - (this.pos.z << 5)) << 4;			
 		
 		getLayer().writeImage(chunk.getImage(), imgX, imgY);
-		StorageUtil.PROCESSOR.execute(() -> {
-			chunk.saveToNBT(getChunksData());
-		});
 		
 		this.updated = System.currentTimeMillis();
 	}

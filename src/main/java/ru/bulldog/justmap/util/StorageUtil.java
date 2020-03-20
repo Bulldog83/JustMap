@@ -2,14 +2,13 @@ package ru.bulldog.justmap.util;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ServerInfo;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.math.ChunkPos;
 
 import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.map.data.RegionPos;
@@ -17,44 +16,68 @@ import ru.bulldog.justmap.map.data.RegionPos;
 public class StorageUtil {	
 	
 	private static MinecraftClient minecraft = MinecraftClient.getInstance();
-	private static volatile Map<RegionPos, CompoundTag> mapCache;
 	private static int currentDimId = 0;
 	
 	public final static File MAP_DIR = new File(minecraft.runDirectory, "justmap/");
-	public static final TaskManager PROCESSOR = new TaskManager("cache-processor");
-	public static final TaskManager IO = new TaskManager("cache-io");
+	
+	public final static TaskManager LOADER = new TaskManager("cache-loader");
+	public final static TaskManager IO = new TaskManager("cache-io");
 
-	public static synchronized CompoundTag getCache(RegionPos regPos) {
-		if (mapCache == null) {
-			mapCache = new HashMap<>();
-		}
+	public static synchronized CompoundTag getCache(File cacheFile) {
+		CompoundTag chunkCache = null;			
+		try {
+			chunkCache = NbtIo.read(cacheFile);
+		} catch(IOException ex) {}
 		
-		File cacheFile = new File(chunksCacheDir(), String.format("%s.dat", regPos.toString()));
+		if (chunkCache == null) chunkCache = new CompoundTag();
 		
-		if (!mapCache.containsKey(regPos)) {
-			CompoundTag regCache = null;			
-			try {
-				regCache = NbtIo.read(cacheFile);
-			} catch(IOException ex) {}
-			
-			if (regCache == null) regCache = new CompoundTag();
-			mapCache.put(regPos, regCache);
-			
-			return regCache;
-		}
-		
-		return mapCache.get(regPos);
+		return chunkCache;
 	}
 	
-	public static void saveCache(RegionPos regPos, CompoundTag data) {
-		File cacheFile = new File(chunksCacheDir(), String.format("%s.dat", regPos.toString()));
-		StorageUtil.IO.execute(() -> {
-			try {
-				NbtIo.safeWrite(data, cacheFile);
-			} catch (Exception ex) {
-				JustMap.LOGGER.catching(ex);
-			}
-		});
+	public static synchronized void saveCache(File cacheFile, CompoundTag data) {
+		try {
+			NbtIo.safeWrite(data, cacheFile);
+		} catch (Exception ex) {
+			JustMap.LOGGER.catching(ex);
+		} finally {
+			data = null;
+		}
+	}
+	
+	public static File chunkDir(ChunkPos chunkPos) {
+		RegionPos regPos = new RegionPos(chunkPos);
+		File regDir = new File(chunksCacheDir(), String.format("%s/", regPos.toString()));
+		
+		if (!regDir.exists()) {
+			regDir.mkdirs();
+		}
+		
+		return regDir;
+	}
+	
+	public static File chunksCacheDir() {
+		File cacheDir = new File(cacheDir(), "chunk-data/");
+		
+		if (!cacheDir.exists()) {
+			cacheDir.mkdirs();
+		}
+		
+		return cacheDir;
+	}
+	
+	public static File cacheDir() {
+		if (minecraft.world != null) {
+			int dimension = minecraft.world.getDimension().getType().getRawId();
+			currentDimId = currentDimId != dimension ? dimension : currentDimId;
+		}
+		
+		File cacheDir = new File(filesDir(), String.format("cache/DIM%d/", currentDimId));
+		
+		if (!cacheDir.exists()) {
+			cacheDir.mkdirs();
+		}
+		
+		return cacheDir;
 	}
 	
 	public static File filesDir() {
@@ -76,31 +99,6 @@ public class StorageUtil {
 		}
 		
 		return filesDir;
-	}
-	
-	public static File cacheDir() {
-		if (minecraft.world != null) {
-			int dimension = minecraft.world.getDimension().getType().getRawId();
-			currentDimId = currentDimId != dimension ? dimension : currentDimId;
-		}
-		
-		File cacheDir = new File(filesDir(), String.format("cache/DIM%d/", currentDimId));
-		
-		if (!cacheDir.exists()) {
-			cacheDir.mkdirs();
-		}
-		
-		return cacheDir;
-	}
-	
-	public static File chunksCacheDir() {
-		File cacheDir = new File(cacheDir(), "chunk-data/");
-		
-		if (!cacheDir.exists()) {
-			cacheDir.mkdirs();
-		}
-		
-		return cacheDir;
 	}
 	
 	public static void clearCache(File dir) {

@@ -33,7 +33,6 @@ public class JustMapClient implements ClientModInitializer {
 		
 		ServerStopCallback.EVENT.register((server) -> {
 			JustMap.EXECUTOR.stop();
-			StorageUtil.PROCESSOR.stop();
 			StorageUtil.IO.stop();
 			UPDATER.stop();
 		});
