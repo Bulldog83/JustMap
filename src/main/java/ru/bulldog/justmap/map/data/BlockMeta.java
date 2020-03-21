@@ -44,6 +44,8 @@ public class BlockMeta {
 	public static BlockMeta fromNBT(CompoundTag tag) {
 		BlockMeta block = new BlockMeta(null);
 		
+		if (tag.isEmpty()) return block;
+		
 		block.pos = NbtHelper.toBlockPos(tag.getCompound("pos"));
 		block.state = NbtHelper.toBlockState(tag.getCompound("state"));
 		block.color = tag.getInt("color");

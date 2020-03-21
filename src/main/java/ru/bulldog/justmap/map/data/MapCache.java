@@ -6,7 +6,7 @@ import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.map.minimap.Minimap;
 import ru.bulldog.justmap.util.Colors;
 import ru.bulldog.justmap.util.ImageUtil;
-
+import ru.bulldog.justmap.util.StorageUtil;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
@@ -192,6 +192,28 @@ public class MapCache {
 		for (RegionPos regionPos : regions) {
 			getRegions().remove(regionPos);
 		}
+	}
+	
+	public static void saveImages() {
+		MapCache data = get();		
+		if (data == null) return;
+		
+		JustMap.EXECUTOR.execute(() -> {
+			data.getRegions().forEach((pos, region) -> {
+				region.saveImage();			
+			});
+		});
+	}
+	
+	public static void saveData() {
+		MapCache data = get();		
+		if (data == null) return;
+		
+		StorageUtil.IO.execute(() -> {
+			data.getRegions().forEach((pos, region) -> {
+				region.saveChunksData();
+			});
+		});
 	}
 	
 	private synchronized Map<ChunkPos, MapChunk> getChunks() {
