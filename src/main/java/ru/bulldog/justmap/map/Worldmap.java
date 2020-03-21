@@ -423,7 +423,7 @@ public class Worldmap extends MapScreen implements AbstractMap {
 	
 	@Override
 	public boolean mouseScrolled(double d, double e, double f) {
-		changeScale(f > 0 ? -0.25F : 0.25F);		
+		changeScale(f > 0 ? -0.25F : 0.25F);
 		return true;
 	}
 

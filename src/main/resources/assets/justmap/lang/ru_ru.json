@@ -8,6 +8,7 @@
   "key.justmap.toggle_show_entities": "Скрыть/показать сущности",
   "key.justmap.reduce_scale": "Уменьшить масштаб карты",
   "key.justmap.increase_scale": "Увеличить масштаб карты",
+  "key.justmap.show_worldmap": "Открыть карту мира",
 
   "justmap.configuration.category.general": "Основные настройки",
   "justmap.configuration.category.info": "Отображение информации",

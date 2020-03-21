@@ -8,6 +8,7 @@
   "key.justmap.toggle_show_entities": "Toggle entities showing",
   "key.justmap.reduce_scale": "Reduce map scale",
   "key.justmap.increase_scale": "Increase map scale",
+  "key.justmap.show_worldmap": "Show Worldmap",
 
   "justmap.configuration.category.general": "General",
   "justmap.configuration.category.info": "Map Info",
