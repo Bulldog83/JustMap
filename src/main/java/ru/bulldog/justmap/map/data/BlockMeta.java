@@ -25,33 +25,22 @@ public class BlockMeta {
 		}
 	}
 	
-	public CompoundTag toNBT() {
-		CompoundTag tag = new CompoundTag();
+	public void store(CompoundTag tag) {
+		if (isEmpty()) return;
 		
-		if (isEmpty()) return tag;
-		
-		CompoundTag stateTag = NbtHelper.fromBlockState(state);
-		CompoundTag posTag = NbtHelper.fromBlockPos(pos);
-		
-		tag.put("state", stateTag);
-		tag.put("pos", posTag);
+		tag.put("state", NbtHelper.fromBlockState(state));
+		tag.put("pos", NbtHelper.fromBlockPos(pos));
 		tag.putInt("color", color);
 		tag.putInt("heightPos", heightPos);
-		
-		return tag;
 	}
 	
-	public static BlockMeta fromNBT(CompoundTag tag) {
-		BlockMeta block = new BlockMeta(null);
+	public void load(CompoundTag tag) {
+		if (tag.isEmpty()) return;
 		
-		if (tag.isEmpty()) return block;
-		
-		block.pos = NbtHelper.toBlockPos(tag.getCompound("pos"));
-		block.state = NbtHelper.toBlockState(tag.getCompound("state"));
-		block.color = tag.getInt("color");
-		block.heightPos = tag.getInt("heightPos");
-		
-		return block;
+		this.pos = NbtHelper.toBlockPos(tag.getCompound("pos"));
+		this.state = NbtHelper.toBlockState(tag.getCompound("state"));
+		this.color = tag.getInt("color");
+		this.heightPos = tag.getInt("heightPos");
 	}
 	
 	public BlockState getState() {

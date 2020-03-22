@@ -232,7 +232,9 @@ public class MapChunk {
 		levels.forEach((layer, levels) -> {
 			ListTag levelsTag = new ListTag();
 			for (int i = 0; i < levels.length; i++) {
-				levelsTag.addTag(i, levels[i].toNBT());
+				CompoundTag level = new CompoundTag();
+				levels[i].store(level);
+				levelsTag.addTag(i, level);
 			}
 			
 			data.put(layer.name, levelsTag);
@@ -250,7 +252,7 @@ public class MapChunk {
 					CompoundTag level = levelsTag.getCompound(i);
 					if (level != null) {
 						levels[i] = new ChunkLevel();
-						levels[i].fromNBT(level);
+						levels[i].load(level);
 					}
 				}
 			}			
@@ -260,8 +262,9 @@ public class MapChunk {
 	private class ChunkLevel {
 		
 		private final BlockMeta[] blocks;
-		private int[] heightmap;
 		private NativeImage image;
+		
+		private int[] heightmap;
 		
 		public long updated = 0;
 		
@@ -300,27 +303,25 @@ public class MapChunk {
 			return image;
 		}
 		
-		public CompoundTag toNBT() {
-			CompoundTag tag = new CompoundTag();
-			
+		public void store(CompoundTag tag) {
 			ListTag tagBlocks = new ListTag();
 			for (int i = 0; i < blocks.length; i++) {
-				tagBlocks.add(i, blocks[i].toNBT());
+				CompoundTag block = new CompoundTag();
+				blocks[i].store(block);
+				tagBlocks.add(i, block);
 			}
 			
 			tag.put("blocks", tagBlocks);
 			tag.putIntArray("heightmap", heightmap);
-			
-			return tag;
 		}
 		
-		public void fromNBT(CompoundTag tag) {
+		public void load(CompoundTag tag) {
 			ListTag tagBlocks = (ListTag) tag.get("blocks");
 			if (!tagBlocks.isEmpty()) {
 				for (int i = 0; i < this.blocks.length; i++) {
-					CompoundTag block = tagBlocks.getCompound(i);
-					if (!block.isEmpty()) {
-						this.blocks[i] = BlockMeta.fromNBT(block);
+					CompoundTag blockTag = tagBlocks.getCompound(i);
+					if (!blockTag.isEmpty()) {
+						this.blocks[i].load(blockTag);
 					}
 				}				
 				this.heightmap = tag.getIntArray("heightmap");
