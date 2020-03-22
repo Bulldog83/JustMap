@@ -17,6 +17,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class MapChunk {
+	
+	public final ChunkLevel INVALID_LEVEL = new ChunkLevel();
 
 	private volatile Map<Layer, ChunkLevel[]> levels;
 	
@@ -63,15 +65,19 @@ public class MapChunk {
 			initLayer();
 		}
 		
-		ChunkLevel chunkLevel;
-		if (this.levels.get(layer)[level] == null) {
-			chunkLevel = new ChunkLevel();
-			this.levels.get(layer)[level] = chunkLevel;
-		} else {
-			chunkLevel = this.levels.get(layer)[level];
+		try {
+			ChunkLevel chunkLevel;
+			if (this.levels.get(layer)[level] == null) {
+				chunkLevel = new ChunkLevel();
+				this.levels.get(layer)[level] = chunkLevel;
+			} else {
+				chunkLevel = this.levels.get(layer)[level];
+			}
+			
+			return chunkLevel;
+		} catch (ArrayIndexOutOfBoundsException ex) {
+			return INVALID_LEVEL;
 		}
-		
-		return chunkLevel;
 	}
 	
 	public void setChunk(WorldChunk chunk) {
