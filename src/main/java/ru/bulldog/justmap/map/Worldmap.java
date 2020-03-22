@@ -332,6 +332,8 @@ public class Worldmap extends MapScreen implements AbstractMap {
 	
 	@Override
 	public boolean mouseDragged(double d, double e, int i, double f, double g) {
+		if (super.mouseDragged(d, e, i, f, g)) return true;
+		
 		if (i == 0) {
 			long time = System.currentTimeMillis();
 			if (time - updated < updateInterval) return true;
@@ -352,7 +354,7 @@ public class Worldmap extends MapScreen implements AbstractMap {
 			return true;
 		}
 		
-		return super.mouseDragged(d, e, i, f, g);
+		return false;
 	}
 	
 	private int pixelToPos(double x, int cx, int range) {
@@ -398,6 +400,8 @@ public class Worldmap extends MapScreen implements AbstractMap {
 	
 	@Override
 	public boolean mouseReleased(double d, double e, int i) {
+		if (super.mouseReleased(d, e, i)) return true; 
+		
 		if (i == 0) {
 			long time = System.currentTimeMillis();
 			if (time - clicked > 500) clicks = 0;
@@ -414,7 +418,7 @@ public class Worldmap extends MapScreen implements AbstractMap {
 			return true;
 		}
 		
-		return super.mouseReleased(d, e, i);
+		return false;
 	}
 	
 	@Override
