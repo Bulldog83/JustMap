@@ -3,10 +3,11 @@ package ru.bulldog.justmap.map.data;
 import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.util.ColorUtil;
 import ru.bulldog.justmap.util.Colors;
-import ru.bulldog.justmap.util.ImageUtil;
-
+import ru.bulldog.justmap.util.StateUtil;
+import ru.bulldog.justmap.util.StorageUtil;
 import net.minecraft.world.Heightmap;
 import net.minecraft.world.World;
+import net.minecraft.block.BlockState;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -20,7 +21,7 @@ import java.util.Map;
 
 public class MapChunk {
 
-	public final ChunkLevel INVALID_LEVEL = new ChunkLevel();
+	public final static ChunkLevel INVALID_LEVEL = new ChunkLevel(-1);
 	
 	private volatile Map<Layer, ChunkLevel[]> levels;
 	
@@ -29,6 +30,7 @@ public class MapChunk {
 	private Layer layer;
 	private int level = 0;
 	private boolean empty = true;
+	private boolean saved = true;
 	
 	public long updated = 0;
 	
@@ -72,7 +74,7 @@ public class MapChunk {
 		try {
 			ChunkLevel chunkLevel;
 			if (this.levels.get(layer)[level] == null) {
-				chunkLevel = new ChunkLevel();
+				chunkLevel = new ChunkLevel(level);
 				this.levels.get(layer)[level] = chunkLevel;
 			} else {
 				chunkLevel = this.levels.get(layer)[level];
@@ -113,7 +115,7 @@ public class MapChunk {
 	}
 	
 	public synchronized NativeImage getImage() {
-		return getChunkLevel().getImage();
+		return getChunkLevel().getImage(chunkPos);
 	}
 	
 	public Layer getLayer() {
@@ -140,6 +142,14 @@ public class MapChunk {
 		return worldChunk;
 	}
 	
+	public BlockState getBlockState(BlockPos pos) {
+		return getChunkLevel().getBlockState(pos.getX() & 15, pos.getY() & 15, pos.getZ() & 15);
+	}
+	
+	public BlockState setBlockState(BlockPos pos, BlockState blockState) {
+		return getChunkLevel().setBlockState(pos.getX() & 15, pos.getY() & 15, pos.getZ() & 15, blockState);
+	}
+	
 	public void updateHeighmap() {
 		for (int x = 0; x < 16; x++) {
 			for (int z = 0; z < 16; z++) {
@@ -147,6 +157,14 @@ public class MapChunk {
 				y = MapProcessor.getTopBlockY(this, x, y, z, true);
 				if (y != -1) {
 					getHeighmap()[x + (z << 4)] = y;
+				} else if (getHeighmap()[x + (z << 4)] != -1) {
+					ChunkLevel chunkLevel = getChunkLevel();
+					chunkLevel.getImage(chunkPos).setPixelRgba(x, z, Colors.BLACK);
+					chunkLevel.clear(x, z);
+					
+					updateRegionData();
+					
+					this.saved = false;
 				}
 			}
 		}
@@ -171,49 +189,44 @@ public class MapChunk {
 		for (int x = 0; x < 16; x++) {
 			for (int z = 0; z < 16; z++) {
 				int index = x + (z << 4);
-				int posY = getHeighmap()[index];
-				
-				BlockMeta currentBlock = chunkLevel.getBlock(index);
-				if (posY == -1) {
-					if (!currentBlock.isEmpty()) {
-						chunkLevel.setBlock(index, BlockMeta.EMPTY_BLOCK);
-						chunkLevel.getImage().setPixelRgba(x, z, Colors.BLACK);
-						
-						updateRegionData();
-					}
-					
-					continue;
-				}
 				
 				int posX = x + (chunkPos.x << 4);
 				int posZ = z + (chunkPos.z << 4);
+				int posY = getHeighmap()[index];
 				
-				BlockMeta block = new BlockMeta(new BlockPos(posX, posY, posZ));
-				if(currentBlock.isEmpty() || !currentBlock.equals(block)) {					
-					int color = ColorUtil.blockColor(worldChunk, block);
+				BlockPos blockPos = new BlockPos(posX, posY, posZ);
+				BlockState blockState = getBlockState(blockPos);
+				BlockState worldState = worldChunk.getBlockState(blockPos);
+				if(StateUtil.isAir(blockState) || !blockState.equals(worldState)) {
+					int color = ColorUtil.blockColor(worldChunk, blockPos);
 					if (color != -1) {
 						int heightDiff = MapProcessor.heightDifference(this, eastChunk, southChunk, x, posY, z);
 						
-						block.setColor(color);
-						block.setHeightPos(heightDiff);
-						chunkLevel.setBlock(index, block);
+						setBlockState(blockPos, worldState);
+						
+						chunkLevel.colormap[index] = color;
+						chunkLevel.levelmap[index] = heightDiff;
 						
 						color = ColorUtil.proccessColor(color, heightDiff);
-						chunkLevel.getImage().setPixelRgba(x, z, color);
+						chunkLevel.getImage(chunkPos).setPixelRgba(x, z, color);
 					
 						updateRegionData();
+						
+						this.saved = false;
 					}
 				} else {				
-					int color = currentBlock.getColor();					
+					int color = chunkLevel.colormap[index];					
 					if (color != -1) {
 						int heightDiff = MapProcessor.heightDifference(this, eastChunk, southChunk, x, posY, z);
-						if (currentBlock.getHeightPos() != heightDiff) {
-							currentBlock.setHeightPos(heightDiff);
+						if (chunkLevel.levelmap[index] != heightDiff) {
+							chunkLevel.levelmap[index] = heightDiff;
 						
 							color = ColorUtil.proccessColor(color, heightDiff);
-							chunkLevel.getImage().setPixelRgba(x, z, color);
+							chunkLevel.getImage(chunkPos).setPixelRgba(x, z, color);
 						
 							updateRegionData();
+							
+							this.saved = false;
 						}
 					}
 				}
@@ -228,104 +241,57 @@ public class MapChunk {
 		MapCache.get().getRegion(chunkPos).storeChunk(this);
 	}
 	
+	public boolean saveNeeded() {
+		return !this.isEmpty() && this.saved;
+	}
+	
 	public void saveToNBT(CompoundTag data) {
 		levels.forEach((layer, levels) -> {
 			ListTag levelsTag = new ListTag();
-			for (int i = 0; i < levels.length; i++) {
-				CompoundTag level = new CompoundTag();
-				levels[i].store(level);
-				levelsTag.addTag(i, level);
+			
+			CompoundTag level;
+			for(int i = 0; i < levels.length; i++) {
+				int lvl = i;
+				ChunkLevel chunkLevel = Arrays.stream(levels).filter((levelx) -> {
+					return levelx != null && levelx.level == lvl;
+				}).findFirst().orElse(INVALID_LEVEL);
+		         
+				if (chunkLevel != INVALID_LEVEL) {
+		            level = new CompoundTag();
+		            
+		            level.putInt("Level", lvl);
+		            chunkLevel.getContainer().write(level, "Palette", "BlockStates");
+		            chunkLevel.store(level);
+
+		            levelsTag.add(level);
+				}
 			}
 			
 			data.put(layer.name, levelsTag);
 		});
+		
+		this.saved = true;
 	}
 	
 	public void loadFromNBT() {
-		CompoundTag chunkData = MapCache.get().getRegion(chunkPos).getChunkData(chunkPos);
+		CompoundTag chunkData = StorageUtil.getCache(chunkPos);
 		if (chunkData.isEmpty()) return;
 		
 		levels.forEach((layer, levels) -> {
-			if (chunkData.contains(layer.name)) {
-				ListTag levelsTag = (ListTag) chunkData.get(layer.name);
-				for (int i = 0; i < levels.length; i++) {
-					CompoundTag level = levelsTag.getCompound(i);
-					if (level != null) {
-						levels[i] = new ChunkLevel();
-						levels[i].load(level);
-					}
+			ListTag listTag = (ListTag) chunkData.get(layer.name);
+			System.out.println(layer);
+			System.out.println(listTag);
+			for(int i = 0; i < listTag.size(); ++i) {
+				CompoundTag level = listTag.getCompound(i);
+				int lvl = level.getInt("Level");
+				if (level.contains("Palette", 9) && level.contains("BlockStates", 12)) {
+					ChunkLevel chunkLevel = new ChunkLevel(lvl);
+					chunkLevel.getContainer().read(level.getList("Palette", 10), level.getLongArray("BlockStates"));
+					chunkLevel.load(level);
+					
+					levels[lvl] = chunkLevel;
 				}
 			}			
 		});
-	}
-	
-	private class ChunkLevel {
-		
-		private final BlockMeta[] blocks;
-		private NativeImage image;
-		
-		private int[] heightmap;
-		
-		public long updated = 0;
-		
-		private ChunkLevel() {
-			blocks = new BlockMeta[256];
-			heightmap = new int[256];
-			
-			Arrays.fill(blocks, BlockMeta.EMPTY_BLOCK);
-			Arrays.fill(heightmap, -1);
-		}
-		
-		public NativeImage getImage() {
-			if (image == null) {
-				image = loadImage();
-			}
-			
-			return image;
-		}
-		
-		public void setBlock(int pos, BlockMeta block) {
-			blocks[pos] = block;
-		}
-		
-		public BlockMeta getBlock(int pos) {
-			return blocks[pos];
-		}
-		
-		private NativeImage loadImage() {
-			MapRegion region = MapCache.get().getRegion(chunkPos);			
-			NativeImage image = region.getChunkImage(chunkPos);
-			if (image == null) {
-				image = new NativeImage(16, 16, false);
-				ImageUtil.fillImage(image, Colors.BLACK);
-			}
-			
-			return image;
-		}
-		
-		public void store(CompoundTag tag) {
-			ListTag tagBlocks = new ListTag();
-			for (int i = 0; i < blocks.length; i++) {
-				CompoundTag block = new CompoundTag();
-				blocks[i].store(block);
-				tagBlocks.add(i, block);
-			}
-			
-			tag.put("blocks", tagBlocks);
-			tag.putIntArray("heightmap", heightmap);
-		}
-		
-		public void load(CompoundTag tag) {
-			ListTag tagBlocks = (ListTag) tag.get("blocks");
-			if (!tagBlocks.isEmpty()) {
-				for (int i = 0; i < this.blocks.length; i++) {
-					CompoundTag blockTag = tagBlocks.getCompound(i);
-					if (!blockTag.isEmpty()) {
-						this.blocks[i].load(blockTag);
-					}
-				}				
-				this.heightmap = tag.getIntArray("heightmap");
-			}
-		}
 	}
 }

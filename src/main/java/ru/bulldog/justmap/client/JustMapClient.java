@@ -33,7 +33,7 @@ public class JustMapClient implements ClientModInitializer {
 			boolean paused = this.paused;
 			this.paused = MinecraftClient.getInstance().isPaused();
 			if (!paused && this.paused) {
-				JustMap.LOGGER.logInfo("Game paused. Saving chunks data...");
+				JustMap.LOGGER.logInfo("Saving chunks data...");
 				MapCache.saveData();
 			}
 		});

@@ -6,63 +6,47 @@ import java.io.IOException;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ServerInfo;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.NbtIo;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.ChunkPos;
-
-import ru.bulldog.justmap.JustMap;
-import ru.bulldog.justmap.map.data.RegionPos;
+import net.minecraft.world.storage.VersionedChunkStorage;
 
 public class StorageUtil {	
 	
 	private static MinecraftClient minecraft = MinecraftClient.getInstance();
-	private static int currentDimId = 0;
+	private static VersionedChunkStorage storage;
+	private static File storageDir;
 	
 	public final static File MAP_DIR = new File(minecraft.runDirectory, "justmap/");
-	
-	public final static TaskManager LOADER = new TaskManager("cache-loader");
 	public final static TaskManager IO = new TaskManager("cache-io");
+	
+	private static int currentDimId = 0;
 
-	public static synchronized CompoundTag getCache(File cacheFile) {
-		CompoundTag chunkCache = null;			
+	public static synchronized CompoundTag getCache(ChunkPos pos) {
+		updateCacheStorage();
 		try {
-			chunkCache = NbtIo.read(cacheFile);
-		} catch(IOException ex) {}
+			CompoundTag data = storage.getNbt(pos);
+			return data != null ? data : new CompoundTag();
+		} catch (IOException ex) {}
 		
-		if (chunkCache == null) chunkCache = new CompoundTag();
-		
-		return chunkCache;
+		return new CompoundTag();
 	}
 	
-	public static synchronized void saveCache(File cacheFile, CompoundTag data) {
-		try {
-			NbtIo.safeWrite(data, cacheFile);
-		} catch (Exception ex) {
-			JustMap.LOGGER.catching(ex);
-		} finally {
-			data = null;
-		}
+	public static synchronized void saveCache(ChunkPos pos, CompoundTag data) {
+		updateCacheStorage();
+		storage.setTagAt(pos, data);
 	}
 	
-	public static File chunkDir(ChunkPos chunkPos) {
-		RegionPos regPos = new RegionPos(chunkPos);
-		File regDir = new File(chunksCacheDir(), String.format("%s/", regPos.toString()));
-		
-		if (!regDir.exists()) {
-			regDir.mkdirs();
-		}
-		
-		return regDir;
-	}
-	
-	public static File chunksCacheDir() {
+	public static void updateCacheStorage() {
 		File cacheDir = new File(cacheDir(), "chunk-data/");
-		
-		if (!cacheDir.exists()) {
-			cacheDir.mkdirs();
+		if (storageDir == null || !storageDir.equals(cacheDir)) {		
+			storageDir = cacheDir;
+			
+			if (!storageDir.exists()) {
+				storageDir.mkdirs();
+			}
+			
+			storage = new VersionedChunkStorage(storageDir, minecraft.getDataFixer());
 		}
-		
-		return cacheDir;
 	}
 	
 	public static File cacheDir() {

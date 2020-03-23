@@ -8,6 +8,7 @@ import ru.bulldog.justmap.util.Colors;
 import ru.bulldog.justmap.util.ImageUtil;
 import ru.bulldog.justmap.util.StorageUtil;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.WorldChunk;
@@ -198,9 +199,12 @@ public class MapCache {
 		MapCache data = get();		
 		if (data == null) return;
 		
-		JustMap.EXECUTOR.execute(() -> {
+		long time = System.currentTimeMillis();
+		StorageUtil.IO.execute(() -> {
 			data.getRegions().forEach((pos, region) -> {
-				region.saveImage();			
+				if (time - region.saved > 30000) {
+					region.saveImage();
+				}
 			});
 		});
 	}
@@ -211,7 +215,15 @@ public class MapCache {
 		
 		StorageUtil.IO.execute(() -> {
 			data.getRegions().forEach((pos, region) -> {
-				region.saveChunksData();
+				region.saveImage();
+			});
+			data.getChunks().forEach((pos, chunk) -> {
+				if (chunk.saveNeeded()) {
+					CompoundTag chunkData = new CompoundTag();
+					chunk.saveToNBT(chunkData);
+					
+					StorageUtil.saveCache(chunk.getPos(), chunkData);
+				}
 			});
 		});
 	}
