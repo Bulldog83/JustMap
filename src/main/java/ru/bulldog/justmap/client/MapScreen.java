@@ -132,10 +132,7 @@ public class MapScreen extends Screen {
 	}
 	
 	protected void drawBorders(int top, int bottom) {
-		Identifier id = info.getSecond();
-		if (id == null) {
-			id = DEFAULT_IDENTIFIER;
-		}
+		Identifier id = info != null ? info.getSecond() : DEFAULT_IDENTIFIER;
 
 		renderTextureRepeating(0, 0, width, top, 16, 16, id);
 		renderTextureRepeating(0, height - bottom, width, bottom, 16, 16, id);		

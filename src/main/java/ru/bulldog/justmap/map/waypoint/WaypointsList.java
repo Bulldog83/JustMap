@@ -200,18 +200,18 @@ public class WaypointsList extends MapScreen {
 	}
 	
 	public void reset() {
-		info = getDimensionInfo(currentDim);
+		this.info = getDimensionInfo(currentDim);
 		
-		wayPoints = keeper.getWaypoints(currentDim, false);
+		this.wayPoints = keeper.getWaypoints(currentDim, false);
 		createEntries();
-		maxScroll = wayPoints.size() * 20;
+		this.maxScroll = wayPoints.size() * 20;
 		
-		children.clear();
-		children.addAll(entries);
-		children.add(addButton);
-		children.add(closeButton);
-		children.add(prevDimensionButton);
-		children.add(nextDimensionButton);
+		this.children.clear();
+		this.children.addAll(entries);
+		this.children.add(addButton);
+		this.children.add(closeButton);
+		this.children.add(prevDimensionButton);
+		this.children.add(nextDimensionButton);
 	}
 	
 	@Override

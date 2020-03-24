@@ -13,7 +13,6 @@ import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.text.LiteralText;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.dimension.DimensionType;
 
 import org.lwjgl.glfw.GLFW;
 
@@ -54,8 +53,7 @@ public class WaypointEditor extends MapScreen {
 	
 	@Override
 	public void init() {
-		int dimId = client.player.dimension.getRawId();		
-		info = DIMENSION_INFO.getOrDefault(DimensionType.byRawId(dimId).toString(), null);
+		super.init();
 		
 		center = width / 2;
 		
