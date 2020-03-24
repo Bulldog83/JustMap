@@ -49,15 +49,24 @@ public class Worldmap extends MapScreen implements AbstractMap {
 		return worldmap;
 	}
 	
-	private int mapWidth;
-	private int mapHeight;
-	private int scaledWidth;
-	private int scaledHeight;
-	private int dimension;
+	private double mapWidth;
+	private double mapHeight;
+	private double scaledWidth;
+	private double scaledHeight;
+	private double centerX;
+	private double centerZ;
+	private double startX;
+	private double startZ;	
+	private double endX;
+	private double endZ;
 	private double shiftW;
 	private double shiftH;
+	private int dimension;
 	private float imageScale = 1.0F;
 	private boolean playerTracking = true;
+	
+	private long updateInterval = 50;
+	private long updated = 0;
 	
 	private BlockPos centerPos;
 	private NativeImage mapImage;
@@ -78,10 +87,8 @@ public class Worldmap extends MapScreen implements AbstractMap {
 		this.paddingTop = 8;
 		this.paddingBottom = 8;
 		
-		this.mapWidth = (int) (Math.ceil(width / 128F) * 128);
-		this.mapHeight = (int) (Math.ceil(height / 128F) * 128);		
-		this.shiftW = (mapWidth - width) / 2F;
-		this.shiftH = (mapHeight - height) / 2F;
+		this.mapWidth = Math.ceil(width / 128F) * 128;
+		this.mapHeight = Math.ceil(height / 128F) * 128;
 		
 		PlayerEntity player = minecraft.player;
 		
@@ -93,7 +100,7 @@ public class Worldmap extends MapScreen implements AbstractMap {
 			this.centerPos = minecraft.player.getBlockPos();
 		}
 		
-		this.cursorCoords = String.format("%d, %d", centerPos.getX(), centerPos.getZ());
+		this.cursorCoords = String.format("%d, %d, %d", centerPos.getX(), centerPos.getY(), centerPos.getZ());
 		
 		addMapButtons();
 		
@@ -106,8 +113,6 @@ public class Worldmap extends MapScreen implements AbstractMap {
 				this.waypoints.add(waypoint);
 			}
 		}
-		
-		this.updateInterval = (long) (50 * imageScale);
 		
 		if (mapImage == null) {
 			prepareTexture();
@@ -134,15 +139,7 @@ public class Worldmap extends MapScreen implements AbstractMap {
 		
 		drawMap();
 		
-		int centerX = (centerPos.getX() >> 4) << 4;
-		int centerZ = (centerPos.getZ() >> 4) << 4;
-		
-		double startX = centerX - scaledWidth / 2;
-		double startZ = centerZ - scaledHeight / 2;	
-		double endX = startX + scaledWidth;
-		double endZ = startZ + scaledHeight;
-		
-		int iconSize = MathUtil.clamp((int) (8 / imageScale), 4, 8);
+		int iconSize = MathUtil.clamp((int) (10 / imageScale), 6, 10);
 		for (WaypointIcon icon : waypoints) {
 			if (!icon.isHidden()) {
 				icon.setPosition(
@@ -167,16 +164,16 @@ public class Worldmap extends MapScreen implements AbstractMap {
 	public void renderForeground() {
 		drawBorders(paddingTop, paddingBottom);
 		
-		int x = (width - 15) / 2;
+		int x = width / 2;
 		this.drawCenteredString(minecraft.textRenderer, cursorCoords, x, paddingTop + 4, Colors.WHITE);
 	}
 	
 	private void prepareTexture() {
-		this.scaledWidth = (int) (mapWidth * imageScale);
-		this.scaledHeight = (int) (mapHeight * imageScale);
+		this.scaledWidth = mapWidth * imageScale;
+		this.scaledHeight = mapHeight * imageScale;
 		
 		if (mapImage == null || mapImage.getWidth() != scaledWidth || mapImage.getHeight() != scaledHeight) {
-			this.mapImage = new NativeImage(scaledWidth, scaledHeight, false);
+			this.mapImage = new NativeImage((int) Math.ceil(scaledWidth), (int) Math.ceil(scaledHeight), false);
 			ImageUtil.fillImage(mapImage, Colors.BLACK);
 			
 			updateMapTexture();
@@ -189,6 +186,8 @@ public class Worldmap extends MapScreen implements AbstractMap {
 	}
 	
 	private void updateMapTexture() {
+		calculateShift();
+		
 		int centerX = centerPos.getX() >> 4;
 		int centerZ = centerPos.getZ() >> 4;
 		int chunksX = (int) Math.ceil(scaledWidth / 32D);
@@ -200,9 +199,9 @@ public class Worldmap extends MapScreen implements AbstractMap {
 		
 		MapCache mapData = MapCache.get();
 		
-		int picX = 0, picY = 0;
+		int picX = 0;
 		for (int posX = startX; posX < stopX; posX++) {
-			picY = 0;
+			int picY = 0;
 			for (int posZ = startZ; posZ < stopZ; posZ++) {
 				ChunkPos pos = new ChunkPos(posX, posZ);
 				
@@ -249,17 +248,31 @@ public class Worldmap extends MapScreen implements AbstractMap {
 		tessellator.draw();
 	}
 	
+	private void calculateShift() {
+		this.centerX = (centerPos.getX() >> 4) << 4;
+		this.centerZ = (centerPos.getZ() >> 4) << 4;
+		this.startX = centerX - scaledWidth / 2;
+		this.startZ = centerZ - scaledHeight / 2;	
+		this.endX = startX + scaledWidth;
+		this.endZ = startZ + scaledHeight;
+		
+		double screenCX = MathUtil.screenPos(centerPos.getX(), startX, endX, mapWidth);
+		double screenCY = MathUtil.screenPos(centerPos.getZ(), startZ, endZ, mapHeight);
+		
+		this.shiftW = screenCX - width / 2F;
+		this.shiftH = screenCY - height / 2F;
+	}
+	
 	public void setCenterByPlayer() {
 		this.playerTracking = true;
 		this.centerPos = minecraft.player.getBlockPos();
-  		updateMapTexture();
+  		
+		updateMapTexture();
 	}
 	
 	private void changeScale(float value) {
-		this.imageScale = MathUtil.clamp(this.imageScale + value, 0.5F, 4F);		
+		this.imageScale = MathUtil.clamp(this.imageScale + value, 0.75F, 4F);		
 		prepareTexture();
-		
-		this.updateInterval = (long) (50 * imageScale);
 	}
 	
 	private void moveMap(Direction direction) {
@@ -327,9 +340,6 @@ public class Worldmap extends MapScreen implements AbstractMap {
 		}
 	}
 	
-	private long updateInterval = 0;
-	private long updated = 0;
-	
 	@Override
 	public boolean mouseDragged(double d, double e, int i, double f, double g) {
 		if (super.mouseDragged(d, e, i, f, g)) return true;
@@ -346,6 +356,7 @@ public class Worldmap extends MapScreen implements AbstractMap {
 			z -= MathUtil.clamp(Math.round((8 * g) * imageScale), -32, 32);
 			
 			this.centerPos = new BlockPos(x, y, z);
+			
 			updateMapTexture();
 			
 			this.playerTracking = false;
@@ -357,16 +368,17 @@ public class Worldmap extends MapScreen implements AbstractMap {
 		return false;
 	}
 	
-	private int pixelToPos(double x, int cx, int range) {
-		double x1 = cx - range / 2;
-		double x2 = x1 + range;
+	private int pixelToPos(double x, int cx, double d) {
+		double x1 = cx - d / 2;
+		double x2 = x1 + d;
 		
-		return MathUtil.worldPos(x, x1, x2, range);
+		return MathUtil.worldPos(x, x1, x2, d);
 	}
 	
 	private BlockPos cursorBlockPos(double x, double y) {
-		int posX = pixelToPos(x + shiftW, (centerPos.getX() >> 4) << 4, scaledWidth);		
-		int posZ = pixelToPos(y + shiftH, (centerPos.getZ() >> 4) << 4, scaledHeight);
+		
+		int posX = pixelToPos(x + shiftW, (centerPos.getX() >> 4) << 4, mapWidth);
+		int posZ = pixelToPos(y + shiftH, (centerPos.getZ() >> 4) << 4, mapHeight);
 		
 		int chunkX = posX >> 4;
 		int chunkZ = posZ >> 4;
@@ -429,22 +441,22 @@ public class Worldmap extends MapScreen implements AbstractMap {
 
 	@Override
 	public int getWidth() {
-		return this.mapWidth;
+		return (int) this.mapWidth;
 	}
 
 	@Override
 	public int getHeight() {
-		return this.mapHeight;
+		return (int) this.mapHeight;
 	}
 
 	@Override
 	public int getScaledWidth() {
-		return this.scaledWidth;
+		return (int) Math.ceil(this.scaledWidth);
 	}
 
 	@Override
 	public int getScaledHeight() {
-		return this.scaledHeight;
+		return (int) Math.ceil(this.scaledHeight);
 	}
 
 	@Override

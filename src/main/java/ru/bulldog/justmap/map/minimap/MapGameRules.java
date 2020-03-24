@@ -57,7 +57,8 @@ public class MapGameRules {
 	 */	
 	@Environment(EnvType.CLIENT)
 	public static void parseCommand(String command) {
-		GameRules gameRules = MinecraftClient.getInstance().world.getGameRules();
+		MinecraftClient client = MinecraftClient.getInstance();
+		GameRules gameRules = client.world.getGameRules();
 		codes.forEach((key, rule) -> {
 			if (command.contains(key)) {
 				int valPos = command.indexOf(key) + 2;
