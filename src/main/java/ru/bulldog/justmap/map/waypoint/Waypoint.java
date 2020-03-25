@@ -12,7 +12,7 @@ import ru.bulldog.justmap.util.ColorUtil;
 import ru.bulldog.justmap.util.Colors;
 import ru.bulldog.justmap.util.ImageUtil;
 import ru.bulldog.justmap.util.SpriteAtlas;
-
+import ru.bulldog.justmap.util.math.RandomUtil;
 import net.minecraft.client.resource.metadata.AnimationResourceMetadata;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.texture.NativeImageBackedTexture;
@@ -127,6 +127,8 @@ public class Waypoint {
 		waypoint.addProperty("dimension", this.dimension);
 		waypoint.addProperty("show_always", this.showAlways);
 		waypoint.addProperty("hidden", this.hidden);
+		waypoint.addProperty("tracking", this.tracking);
+		waypoint.addProperty("render", this.render);
 		waypoint.addProperty("show_range", this.showRange);
 		waypoint.addProperty("color", Integer.toHexString(this.color).toUpperCase());
 		waypoint.addProperty("icon", this.icon);
@@ -144,17 +146,20 @@ public class Waypoint {
 	public static Waypoint fromJson(JsonObject jsonObject) {
 		Waypoint waypoint = new Waypoint();
 
-		JsonObject position = (JsonObject) jsonObject.get("position");		
-		waypoint.pos = new BlockPos(JsonHelper.getInt(position, "x"),
-									JsonHelper.getInt(position, "y"),
-									JsonHelper.getInt(position, "z"));
-		waypoint.name = JsonHelper.getString(jsonObject, "name");
-		waypoint.dimension = JsonHelper.getInt(jsonObject, "dimension");
-		waypoint.showAlways = JsonHelper.getBoolean(jsonObject, "show_always");
-		waypoint.hidden = JsonHelper.getBoolean(jsonObject, "hidden");
-		waypoint.showRange = JsonHelper.getInt(jsonObject, "show_range");
-		waypoint.color = ColorUtil.parseHex(JsonHelper.getString(jsonObject, "color"));
-		waypoint.icon = JsonHelper.getInt(jsonObject, "icon");
+		JsonObject position = JsonHelper.getObject(jsonObject, "position", new JsonObject());		
+		waypoint.pos = new BlockPos(JsonHelper.getInt(position, "x", 0),
+									JsonHelper.getInt(position, "y", 0),
+									JsonHelper.getInt(position, "z", 0));
+		waypoint.name = JsonHelper.getString(jsonObject, "name", "Waypoint");
+		waypoint.dimension = JsonHelper.getInt(jsonObject, "dimension", 0);
+		waypoint.showAlways = JsonHelper.getBoolean(jsonObject, "show_always", false);
+		waypoint.hidden = JsonHelper.getBoolean(jsonObject, "hidden", false);
+		waypoint.tracking = JsonHelper.getBoolean(jsonObject, "tracking", true);
+		waypoint.render = JsonHelper.getBoolean(jsonObject, "render", true);
+		waypoint.showRange = JsonHelper.getInt(jsonObject, "show_range", 1000);
+		waypoint.color = ColorUtil.parseHex(JsonHelper.getString(jsonObject, "color",
+											Integer.toHexString(RandomUtil.getElement(WAYPOINT_COLORS))));
+		waypoint.icon = JsonHelper.getInt(jsonObject, "icon", -1);
 		
 		return waypoint;
 	}

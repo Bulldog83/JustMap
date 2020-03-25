@@ -1,61 +1,26 @@
 package ru.bulldog.justmap.map.data;
 
-import com.mojang.datafixers.Dynamic;
-import com.mojang.datafixers.types.DynamicOps;
-
 import net.minecraft.block.BlockState;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.datafixer.NbtOps;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.Tag;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 
 public class BlockMeta {
 	
-	public final static BlockMeta EMPTY_BLOCK = new BlockMeta(null);
+	public final static BlockMeta EMPTY_BLOCK = new BlockMeta(null, null);
 	
 	private BlockState state;
 	private BlockPos pos;	
 	private int color = -1;
 	private int heightPos = 0;
 	
-	public BlockMeta(BlockPos pos) {
-		if (pos == null) {
+	public BlockMeta(World world, BlockPos pos) {
+		if (world == null || pos == null) {
 			this.state = null;
 			this.pos = null;
 		} else {		
-			this.state = MinecraftClient.getInstance().world.getBlockState(pos);
+			this.state = world.getBlockState(pos);
 			this.pos = pos;
 		}
-	}
-	
-	public CompoundTag toNBT() {
-		DynamicOps<Tag> dynamicOps = NbtOps.INSTANCE;
-		
-		CompoundTag tag = new CompoundTag();
-		
-		CompoundTag stateTag = (CompoundTag) BlockState.serialize(dynamicOps, state).getValue();
-		CompoundTag posTag = (CompoundTag) pos.serialize(dynamicOps);
-		
-		tag.put("state", stateTag);
-		tag.put("pos", posTag);
-		tag.putInt("color", color);
-		tag.putInt("heightPos", heightPos);
-		
-		return tag;
-	}
-	
-	public static BlockMeta fromNBT(CompoundTag tag) {
-		DynamicOps<Tag> dynamicOps = NbtOps.INSTANCE;
-		
-		BlockMeta block = new BlockMeta(null);
-		
-		block.pos = BlockPos.deserialize(new Dynamic<Tag>(dynamicOps, tag.get("pos")));
-		block.state = BlockState.deserialize(new Dynamic<Tag>(dynamicOps, tag.get("state")));
-		block.color = tag.getInt("color");
-		block.heightPos = tag.getInt("heightPos");
-		
-		return block;
 	}
 	
 	public BlockState getState() {

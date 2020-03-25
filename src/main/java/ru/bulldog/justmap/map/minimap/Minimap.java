@@ -122,8 +122,8 @@ public class Minimap implements AbstractMap{
 		textManager.clear();
 		
 		if (ClientParams.showPosition) {
-			BlockPos playerPos = minecraftClient.player.getSenseCenterPos();
-			txtCoords.setText(playerPos.getX() + ", " + playerPos.getY() + ", " + playerPos.getZ());
+			Entity camera = minecraftClient.cameraEntity;
+			txtCoords.setText(MathUtil.posToString(camera.getX(), camera.getY(), camera.getZ()));
 			textManager.add(txtCoords);
 		}		
 		if (ClientParams.showBiome) {

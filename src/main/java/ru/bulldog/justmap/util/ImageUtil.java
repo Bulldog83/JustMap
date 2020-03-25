@@ -50,14 +50,16 @@ public class ImageUtil {
 		image.fillRect(0, 0, image.getWidth(), image.getHeight(), color);
 	}
 	
-	public static NativeImage readTile(NativeImage image, int x, int y, int w, int h) {
+	public static NativeImage readTile(NativeImage source, int x, int y, int w, int h, boolean closeSource) {
 		NativeImage tile = new NativeImage(w, h, false);
 		
 		for(int i = 0; i < w; i++) {
 			for(int j = 0; j < h; j++) {
-				tile.setPixelRgba(i, j, image.getPixelRgba(x + i, y + j));
+				tile.setPixelRgba(i, j, source.getPixelRgba(x + i, y + j));
 			}
 		}
+		
+		if (closeSource) source.close();
 		
 		return tile;
 	}

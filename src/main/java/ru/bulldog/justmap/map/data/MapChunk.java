@@ -17,6 +17,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class MapChunk {
+	
+	public final ChunkLevel INVALID_LEVEL = new ChunkLevel();
 
 	public final ChunkLevel INVALID_LEVEL = new ChunkLevel();
 	
@@ -181,7 +183,7 @@ public class MapChunk {
 				int posX = x + (chunkPos.x << 4);
 				int posZ = z + (chunkPos.z << 4);
 				
-				BlockMeta block = new BlockMeta(new BlockPos(posX, posY, posZ));
+				BlockMeta block = new BlockMeta(worldChunk.getWorld(), new BlockPos(posX, posY, posZ));
 				if(currentBlock.isEmpty() || !currentBlock.equals(block)) {					
 					int color = ColorUtil.blockColor(worldChunk, block);
 					if (color != -1) {
