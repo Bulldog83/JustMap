@@ -230,6 +230,7 @@ public class Worldmap extends MapScreen implements AbstractMap {
 		try {
 			tmpImage = ImageUtil.readTile(tmpImage, offX, offY, scaledWidth, scaledHeight, true);
 		} catch (Exception ex) {
+			tmpImage = ImageUtil.readTile(tmpImage, 0, 0, scaledWidth, scaledHeight, true);
 			ex.printStackTrace();
 		}
 		mapImage.copyFrom(tmpImage);
