@@ -64,7 +64,7 @@ public class Worldmap extends MapScreen implements AbstractMap {
 	private float imageScale = 1.0F;
 	private boolean playerTracking = true;
 	
-	private long updateInterval = 100;
+	private long updateInterval = 50;
 	private long updated = 0;
 	
 	private BlockPos centerPos;
@@ -110,11 +110,7 @@ public class Worldmap extends MapScreen implements AbstractMap {
 			}
 		}
 		
-		if (mapImage == null) {
-			prepareTexture();
-		} else {
-			updateMapTexture();
-		}
+		this.updateInterval = 50;
 	}
 	
 	private void addMapButtons() {
@@ -282,7 +278,9 @@ public class Worldmap extends MapScreen implements AbstractMap {
 	}
 	
 	private void changeScale(float value) {
-		this.imageScale = MathUtil.clamp(this.imageScale + value, 0.5F, 4F);		
+		this.imageScale = MathUtil.clamp(this.imageScale + value, 0.5F, 3F);
+		this.updateInterval = (long) (imageScale > 1 ? 100 * imageScale : 50);
+		
 		prepareTexture();
 	}
 	
