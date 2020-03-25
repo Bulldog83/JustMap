@@ -168,7 +168,7 @@ public class Worldmap extends MapScreen implements AbstractMap {
 		this.scaledWidth = (int) Math.ceil(width * imageScale);
 		this.scaledHeight = (int) Math.ceil(height * imageScale);
 		
-		TextureManager manager = minecraft.getTextureManager();
+		TextureManager manager = client.getTextureManager();
 		if (mapImage == null || mapImage.getWidth() != scaledWidth || mapImage.getHeight() != scaledHeight) {
 			this.mapImage = new NativeImage(scaledWidth, scaledHeight, false);
 			ImageUtil.fillImage(mapImage, Colors.BLACK);

@@ -19,8 +19,6 @@ import java.util.Map;
 public class MapChunk {
 	
 	public final ChunkLevel INVALID_LEVEL = new ChunkLevel();
-
-	public final ChunkLevel INVALID_LEVEL = new ChunkLevel();
 	
 	private volatile Map<Layer, ChunkLevel[]> levels;
 	
