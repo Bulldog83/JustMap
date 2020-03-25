@@ -56,7 +56,7 @@ public class MapRegion {
 		int imgX = (chunkPos.x - (this.pos.x << 5)) << 4;
 		int imgY = (chunkPos.z - (this.pos.z << 5)) << 4;
 		
-		return ImageUtil.readTile(getImage(layer, level), imgX, imgY, 16, 16);
+		return ImageUtil.readTile(getImage(layer, level), imgX, imgY, 16, 16, false);
 	}
 	
 	public NativeImage getImage(Layer layer, int level) {		

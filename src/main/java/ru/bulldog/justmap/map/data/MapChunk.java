@@ -20,7 +20,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class MapChunk {
-
+	
 	public final static ChunkLevel INVALID_LEVEL = new ChunkLevel(-1);
 	
 	private volatile Map<Layer, ChunkLevel[]> levels;

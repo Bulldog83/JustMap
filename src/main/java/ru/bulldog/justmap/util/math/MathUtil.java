@@ -31,12 +31,12 @@ public class MathUtil {
 		return angle;
 	}
 	
-	public static double screenPos(double val, double x1, double x2, int range) {
-		return ((val - x1) / (x2 - x1)) * range;
+	public static double screenPos(double val, double x1, double x2, double mapWidth) {
+		return ((val - x1) / (x2 - x1)) * mapWidth;
 	}
 	
-	public static int worldPos(double val, double x1, double x2, int range) {
-		return (int) ((val * (x2 - x1) + range * x1) / range);
+	public static int worldPos(double val, double x1, double x2, double range) {
+		return (int) Math.round((val * (x2 - x1) + range * x1) / range);
 	}
 	
 	public static double getDistance(BlockPos a, BlockPos b) {
@@ -55,5 +55,17 @@ public class MathUtil {
 		}
 		
 		return Math.sqrt(dist);
+	}
+	
+	public static String posToString(BlockPos pos) {
+		return posToString(pos.getX(), pos.getY(), pos.getZ());
+	}
+	
+	public static String posToString(double x, double y, double z) {
+		int posX = (int) Math.round(x);
+		int posY = (int) Math.round(y);
+		int posZ = (int) Math.round(z);
+		
+		return String.format("%d, %d, %d", posX, posY, posZ);
 	}
 }
