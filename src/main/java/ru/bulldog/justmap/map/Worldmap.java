@@ -160,8 +160,7 @@ public class Worldmap extends MapScreen implements AbstractMap {
 	public void renderForeground() {
 		drawBorders(paddingTop, paddingBottom);
 		
-		int x = width / 2;
-		this.drawCenteredString(minecraft.textRenderer, cursorCoords, x, paddingTop + 4, Colors.WHITE);
+		this.drawCenteredString(minecraft.textRenderer, cursorCoords, width / 2, paddingTop + 4, Colors.WHITE);
 	}
 	
 	private void prepareTexture() {
@@ -201,8 +200,8 @@ public class Worldmap extends MapScreen implements AbstractMap {
 		int tmpW = (stopX << 4) - (startX << 4);
 		int tmpH = (stopZ << 4) - (startZ << 4);
 		
-		NativeImage tmpImage = new NativeImage(tmpW, tmpH, false);
 		MapCache mapData = MapCache.get();
+		NativeImage tmpImage = new NativeImage(tmpW, tmpH, false);
 		
 		int picX = 0;
 		for (int posX = startX; posX < stopX; posX++) {
