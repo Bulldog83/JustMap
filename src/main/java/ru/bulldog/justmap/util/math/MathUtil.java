@@ -56,4 +56,16 @@ public class MathUtil {
 		
 		return Math.sqrt(dist);
 	}
+	
+	public static String posToString(BlockPos pos) {
+		return posToString(pos.getX(), pos.getY(), pos.getZ());
+	}
+	
+	public static String posToString(double x, double y, double z) {
+		int posX = (int) Math.round(x);
+		int posY = (int) Math.round(y);
+		int posZ = (int) Math.round(z);
+		
+		return String.format("%d, %d, %d", posX, posY, posZ);
+	}
 }
