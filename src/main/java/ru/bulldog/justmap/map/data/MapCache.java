@@ -3,11 +3,13 @@ package ru.bulldog.justmap.map.data;
 import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.client.config.ClientParams;
+import ru.bulldog.justmap.map.data.Layers.Layer;
 import ru.bulldog.justmap.map.minimap.Minimap;
 import ru.bulldog.justmap.util.Colors;
 import ru.bulldog.justmap.util.ImageUtil;
-
+import ru.bulldog.justmap.util.StorageUtil;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.WorldChunk;
@@ -22,10 +24,11 @@ public class MapCache {
 	private final static MinecraftClient minecraft = MinecraftClient.getInstance();
 	
 	private static Map<Integer, MapCache> dimensions = new HashMap<>();
-	private static Layer currentLayer = Layer.SURFACE;	
+	private static World currentWorld;
+	private static Layers currentLayer = Layer.SURFACE.value;	
 	private static int currentLevel = 0;
 	
-	public static void setCurrentLayer(Layer layer, int y) {
+	public static void setCurrentLayer(Layers layer, int y) {
 		currentLevel =  y / layer.height;
 		currentLayer = layer;
 	}
@@ -35,7 +38,13 @@ public class MapCache {
 	}
 	
 	public static MapCache get() {
-		return get(minecraft.world);
+		if (currentWorld == null || (minecraft.world != null &&
+									 minecraft.world != currentWorld)) {
+			
+			currentWorld = minecraft.world;
+		}
+		
+		return get(currentWorld);
 	}
 	
 	public static MapCache get(World world) {
@@ -65,6 +74,31 @@ public class MapCache {
 		dimensions.put(dimId, data);
 		
 		return data;
+	}
+	
+	public static void saveData() {
+		MapCache data = get();		
+		if (data == null) return;
+		
+		StorageUtil.IO.execute(() -> {
+			data.getRegions().forEach((pos, region) -> {
+				region.saveImage();
+			});
+			data.getChunks().forEach((pos, chunk) -> {
+				storeChunk(chunk);
+			});
+		});
+	}
+	
+	private static void storeChunk(MapChunk chunk) {
+		if (chunk.saveNeeded()) {
+			CompoundTag chunkData = new CompoundTag();
+			chunk.saveToNBT(chunkData);
+			
+			if (!chunkData.isEmpty()) {
+				StorageUtil.saveCache(chunk.getPos(), chunkData);
+			}
+		}
 	}
 	
 	public World world;
@@ -156,6 +190,7 @@ public class MapCache {
 		for (ChunkPos chunkPos : getChunks().keySet()) {
 			MapChunk chunkData = getChunks().get(chunkPos);
 			if (currentTime - chunkData.updated >= 30000) {
+				storeChunk(chunkData);
 				chunks.add(chunkPos);
 				purged++;
 				if (purged >= maxPurged) {
@@ -185,6 +220,20 @@ public class MapCache {
 		for (RegionPos regionPos : regions) {
 			getRegions().remove(regionPos);
 		}
+	}
+	
+	public static void saveImages() {
+		MapCache data = get();		
+		if (data == null) return;
+		
+		long time = System.currentTimeMillis();
+		StorageUtil.IO.execute(() -> {
+			data.getRegions().forEach((pos, region) -> {
+				if (time - region.saved > 30000) {
+					region.saveImage();
+				}
+			});
+		});
 	}
 	
 	private synchronized Map<ChunkPos, MapChunk> getChunks() {
@@ -220,7 +269,7 @@ public class MapCache {
 		return getChunk(currentLayer, currentLevel, posX, posZ, empty);
 	}
 	
-	public synchronized MapChunk getChunk(Layer layer, int level, int posX, int posZ, boolean empty) {
+	public synchronized MapChunk getChunk(Layers layer, int level, int posX, int posZ, boolean empty) {
 		
 		MapChunk mapChunk = getChunk(layer, level, posX, posZ);
 		
@@ -236,8 +285,9 @@ public class MapCache {
 		return mapChunk;
 	}
 	
-	public synchronized MapChunk getChunk(Layer layer, int level, int posX, int posZ) {
+	public synchronized MapChunk getChunk(Layers layer, int level, int posX, int posZ) {
 		ChunkPos chunkPos = new ChunkPos(posX, posZ);
+		
 		if (getChunks().containsKey(chunkPos)) {
 			return getChunks().get(chunkPos);
 		}

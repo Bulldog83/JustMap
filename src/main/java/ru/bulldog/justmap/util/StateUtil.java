@@ -5,12 +5,12 @@ import net.minecraft.block.Blocks;
 import net.minecraft.block.Material;
 
 public class StateUtil {
-	public static final BlockState AIR_STATE = Blocks.AIR.getDefaultState();
-	public static final BlockState CAVE_AIR_STATE = Blocks.CAVE_AIR.getDefaultState();
-	public static final BlockState VOID_AIR_STATE = Blocks.VOID_AIR.getDefaultState();
+	public static final BlockState AIR = Blocks.AIR.getDefaultState();
+	public static final BlockState CAVE_AIR = Blocks.CAVE_AIR.getDefaultState();
+	public static final BlockState VOID_AIR = Blocks.VOID_AIR.getDefaultState();
 	
 	public static boolean isAir(BlockState state) {
-		return state.isAir() || state == AIR_STATE || state == CAVE_AIR_STATE || state == VOID_AIR_STATE;
+		return state.isAir() || state == AIR || state == CAVE_AIR || state == VOID_AIR;
 	}
 	
 	public static boolean isLiquid(BlockState state, boolean lava) {

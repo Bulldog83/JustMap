@@ -35,7 +35,6 @@ import net.minecraft.world.chunk.WorldChunk;
 
 import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.client.config.ClientParams;
-import ru.bulldog.justmap.map.data.BlockMeta;
 import ru.bulldog.justmap.util.math.MathUtil;
 
 public class ColorUtil {
@@ -269,15 +268,16 @@ public class ColorUtil {
 		return fcolor != -1 ? fcolor : defColor;
 	}
 	
-	public static int blockColor(WorldChunk worldChunk, BlockMeta block) {
-		BlockPos overPos = new BlockPos(block.getPos().getX(), block.getPos().getY() + 1, block.getPos().getZ());
+	public static int blockColor(WorldChunk worldChunk, BlockPos pos) {
+		BlockPos overPos = new BlockPos(pos.getX(), pos.getY() + 1, pos.getZ());
 		BlockState overState = worldChunk.getWorld().getBlockState(overPos);
+		BlockState blockState = worldChunk.getBlockState(pos);
 		if (ClientParams.ignorePlants && StateUtil.isSeaweed(overState)) {
-			return blockColor(worldChunk.getWorld(), Blocks.WATER.getDefaultState(), block.getPos());
-		} else if (!StateUtil.isAir(block.getState()) && (StateUtil.isAir(overState) || 
+			return blockColor(worldChunk.getWorld(), Blocks.WATER.getDefaultState(), pos);
+		} else if (!StateUtil.isAir(blockState) && (StateUtil.isAir(overState) || 
 			ClientParams.ignorePlants && StateUtil.isPlant(overState))) {
 			
-			return blockColor(worldChunk.getWorld(), block.getState(), block.getPos());
+			return blockColor(worldChunk.getWorld(), blockState, pos);
 		}
 	
 		return -1;

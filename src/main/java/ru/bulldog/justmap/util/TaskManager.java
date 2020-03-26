@@ -11,6 +11,8 @@ public class TaskManager implements Executor {
     private volatile boolean isRunning = false;
     
     private String name = JustMap.MODID;
+    private long downtimeLimit = 3000;
+    private long downtime = 0;
     
     public TaskManager() {}
     
@@ -45,8 +47,14 @@ public class TaskManager implements Executor {
                 Runnable nextTask = workQueue.poll();
                 if (nextTask != null) {
                     nextTask.run();
+                    downtime = 0;
                 } else {
-                	stop();
+                	long time = System.currentTimeMillis();
+                	if (downtime == 0) downtime = time;
+                	if (time - downtime > downtimeLimit) {
+                		isRunning = false;
+                		downtime = 0;
+                	}
                 }
             }
         }

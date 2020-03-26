@@ -20,7 +20,7 @@ public class RegionPos {
 	
 	@Override
 	public String toString() {
-		return String.format("RegionPos [%d, %d]", x, z);
+		return String.format("r.%d.%d", x, z);
 	}
 	
 	@Override
