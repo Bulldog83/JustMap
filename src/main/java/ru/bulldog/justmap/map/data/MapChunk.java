@@ -1,6 +1,7 @@
 package ru.bulldog.justmap.map.data;
 
 import ru.bulldog.justmap.client.config.ClientParams;
+import ru.bulldog.justmap.map.data.Layers.Layer;
 import ru.bulldog.justmap.util.ColorUtil;
 import ru.bulldog.justmap.util.Colors;
 import ru.bulldog.justmap.util.StateUtil;
@@ -21,29 +22,42 @@ import java.util.Map;
 
 public class MapChunk {
 	
-	public final static ChunkLevel INVALID_LEVEL = new ChunkLevel(-1);
+	public final static ChunkLevel EMPTY_LEVEL = new ChunkLevel(-1);
 	
-	private volatile Map<Layer, ChunkLevel[]> levels;
+	private volatile Map<Layers, ChunkLevel[]> levels;
 	
 	private WorldChunk worldChunk;
 	private ChunkPos chunkPos;
-	private Layer layer;
+	private Layers layer;
+	private int dimension;
 	private int level = 0;
 	private boolean empty = true;
 	private boolean saved = true;
 	
 	public long updated = 0;
 	
-	public MapChunk(World world, ChunkPos pos, Layer layer, int level) {
+	public MapChunk(World world, ChunkPos pos, Layers layer, int level) {
 		this(world, pos, layer);
 		this.level = level > 0 ? level : 0;
 	}
 	
-	public MapChunk(World world, ChunkPos pos, Layer layer) {
+	public MapChunk(World world, ChunkPos pos, Layers layer) {
 		this.worldChunk = world.getChunk(pos.x, pos.z);
+		this.dimension = world.getDimension().getType().getRawId();
 		this.chunkPos = pos;
 		this.layer = layer;
 		this.levels = new HashMap<>();
+		
+		this.init();
+	}
+	
+	private void init() {
+		if (dimension == -1) {
+			initLayer(Layer.NETHER.value);
+		} else {
+			initLayer(Layer.SURFACE.value);
+			initLayer(Layer.CAVES.value);
+		}
 		
 		loadFromNBT();
 	}
@@ -57,7 +71,7 @@ public class MapChunk {
 		initLayer(layer);
 	}
 	
-	private void initLayer(Layer layer) {
+	private void initLayer(Layers layer) {
 		int levels = worldChunk.getHeight() / layer.height;		
 		this.levels.put(layer, new ChunkLevel[levels]);
 	}
@@ -66,7 +80,7 @@ public class MapChunk {
 		return getChunkLevel(layer, level);
 	}
 	
-	private synchronized ChunkLevel getChunkLevel(Layer layer, int level) {
+	private synchronized ChunkLevel getChunkLevel(Layers layer, int level) {
 		if (!levels.containsKey(layer)) {
 			initLayer();
 		}
@@ -82,7 +96,7 @@ public class MapChunk {
 			
 			return chunkLevel;
 		} catch (ArrayIndexOutOfBoundsException ex) {
-			return INVALID_LEVEL;
+			return EMPTY_LEVEL;
 		}
 	}
 	
@@ -118,7 +132,7 @@ public class MapChunk {
 		return getChunkLevel().getImage(chunkPos);
 	}
 	
-	public Layer getLayer() {
+	public Layers getLayer() {
 		return layer;
 	}
 	
@@ -130,7 +144,7 @@ public class MapChunk {
 		return getChunkLevel().heightmap;
 	}
 	
-	public void setLevel(Layer layer, int level) {
+	public void setLevel(Layers layer, int level) {
 		if (this.layer == layer &&
 			this.level == level) return;
 		
@@ -151,6 +165,8 @@ public class MapChunk {
 	}
 	
 	public void updateHeighmap() {
+		if (worldChunk.isEmpty()) return;
+		
 		for (int x = 0; x < 16; x++) {
 			for (int z = 0; z < 16; z++) {
 				int y = worldChunk.sampleHeightmap(Heightmap.Type.WORLD_SURFACE, x, z);
@@ -171,6 +187,8 @@ public class MapChunk {
 	}
 	
 	public void update() {
+		if (worldChunk.isEmpty()) return;
+		
 		long currentTime = System.currentTimeMillis();
 		if (currentTime - updated < ClientParams.chunkUpdateInterval) return;		
 		
@@ -242,7 +260,7 @@ public class MapChunk {
 	}
 	
 	public boolean saveNeeded() {
-		return !this.isEmpty() && this.saved;
+		return !this.isEmpty() && !this.saved;
 	}
 	
 	public void saveToNBT(CompoundTag data) {
@@ -254,9 +272,9 @@ public class MapChunk {
 				int lvl = i;
 				ChunkLevel chunkLevel = Arrays.stream(levels).filter((levelx) -> {
 					return levelx != null && levelx.level == lvl;
-				}).findFirst().orElse(INVALID_LEVEL);
+				}).findFirst().orElse(EMPTY_LEVEL);
 		         
-				if (chunkLevel != INVALID_LEVEL) {
+				if (chunkLevel != EMPTY_LEVEL) {
 		            level = new CompoundTag();
 		            
 		            level.putInt("Level", lvl);
@@ -278,9 +296,7 @@ public class MapChunk {
 		if (chunkData.isEmpty()) return;
 		
 		levels.forEach((layer, levels) -> {
-			ListTag listTag = (ListTag) chunkData.get(layer.name);
-			System.out.println(layer);
-			System.out.println(listTag);
+			ListTag listTag = chunkData.getList(layer.name, 10);
 			for(int i = 0; i < listTag.size(); ++i) {
 				CompoundTag level = listTag.getCompound(i);
 				int lvl = level.getInt("Level");

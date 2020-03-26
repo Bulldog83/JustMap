@@ -10,6 +10,7 @@ import net.minecraft.client.texture.NativeImage;
 import net.minecraft.util.math.ChunkPos;
 
 import ru.bulldog.justmap.JustMap;
+import ru.bulldog.justmap.map.data.Layers.Layer;
 import ru.bulldog.justmap.util.Colors;
 import ru.bulldog.justmap.util.ImageUtil;
 import ru.bulldog.justmap.util.StorageUtil;
@@ -18,8 +19,8 @@ public class MapRegion {
 	
 	private final RegionPos pos;
 
-	private Map<Layer, RegionLayer> layers = new HashMap<>();
-	private Layer currentLayer;
+	private Map<Layers, RegionLayer> layers = new HashMap<>();
+	private Layers currentLayer;
 	private int currentLevel;
 	
 	public long updated = 0;
@@ -38,7 +39,7 @@ public class MapRegion {
 		this.currentLevel = level > 0 ? level : 0;
 	}
 	
-	public void setLayer(Layer layer) {
+	public void setLayer(Layers layer) {
 		this.currentLayer = layer;
 	}
 	
@@ -46,7 +47,7 @@ public class MapRegion {
 		return getChunkImage(chunkPos, currentLayer, currentLevel);
 	}
 	
-	public NativeImage getChunkImage(ChunkPos chunkPos, Layer layer, int level) {
+	public NativeImage getChunkImage(ChunkPos chunkPos, Layers layer, int level) {
 		if (chunkPos.getRegionX() != this.pos.x ||
 			chunkPos.getRegionZ() != this.pos.z) {
 			
@@ -59,7 +60,7 @@ public class MapRegion {
 		return ImageUtil.readTile(getImage(layer, level), imgX, imgY, 16, 16, false);
 	}
 	
-	public NativeImage getImage(Layer layer, int level) {		
+	public NativeImage getImage(Layers layer, int level) {		
 		return getLayer(layer).getImage(level).get();
 	}
 	
@@ -76,7 +77,7 @@ public class MapRegion {
 		return getLayer(currentLayer);
 	}
 	
-	public RegionLayer getLayer(Layer layer) {
+	public RegionLayer getLayer(Layers layer) {
 		if (layers.containsKey(layer)) {
 			return layers.get(layer);
 		}
@@ -111,9 +112,9 @@ public class MapRegion {
 		return imagesDir(currentLayer, currentLevel);
 	}
 	
-	private File imagesDir(Layer layer, int level) {
+	private File imagesDir(Layers layer, int level) {
 		File cacheDir;
-		if (layer.equals(Layer.SURFACE)) {
+		if (layer.equals(Layer.SURFACE.value)) {
 			cacheDir = layerDir(layer);
 		} else {
 			cacheDir = new File(layerDir(layer), String.format("%d/", level));
@@ -126,15 +127,15 @@ public class MapRegion {
 		return cacheDir;
 	}
 	
-	private File layerDir(Layer layer) {
+	private File layerDir(Layers layer) {
 		return new File(StorageUtil.cacheDir(), String.format("%s/", layer.name));
 	}
 	
 	public class RegionLayer {
 		private volatile Map<Integer, RegionImage> images;
-		private final Layer layer;
+		private final Layers layer;
 		
-		private RegionLayer(Layer layer) {
+		private RegionLayer(Layers layer) {
 			this.layer = layer;
 			this.images = new HashMap<>();
 		}
@@ -176,11 +177,11 @@ public class MapRegion {
 		private volatile NativeImage image;
 		private boolean saved = true;
 		
-		private RegionImage(Layer layer, int level) {
+		private RegionImage(Layers layer, int level) {
 			this.image = loadImage(layer, level);
 		}
 		
-		private NativeImage loadImage(Layer layer, int level) {
+		private NativeImage loadImage(Layers layer, int level) {
 			File png = new File(imagesDir(layer, level), String.format("%d.%d.png", pos.x, pos.z));
 			if (png.exists()) {
 				try (FileInputStream fis = new FileInputStream(png)) {

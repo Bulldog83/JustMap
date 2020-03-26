@@ -2,16 +2,23 @@ package ru.bulldog.justmap.map.data;
 
 import java.util.Arrays;
 
-public class Layer {
-	
-	public final static Layer SURFACE = new Layer("surface", 256);
-	public final static Layer CAVES = new Layer("caves", 8);
-	public final static Layer NETHER = new Layer("nether", 16);
+public class Layers {	
+	public enum Layer {
+		SURFACE("surface", 256),
+		CAVES("caves", 8),
+		NETHER("nether", 16);		
+		
+		public final Layers value;
+		
+		Layer(String name, int height) {
+			this.value = new Layers(name, height);
+		}
+	}
 	
 	public final String name;
 	public final int height;
 	
-	private Layer(String name, int height) {
+	private Layers(String name, int height) {
 		this.name = name;
 		this.height = height;
 	}
@@ -24,9 +31,9 @@ public class Layer {
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) return true;
-		if (!(obj instanceof Layer)) return false;
+		if (!(obj instanceof Layers)) return false;
 		
-		Layer layer = (Layer) obj;
+		Layers layer = (Layers) obj;
 		return this.name == layer.name &&
 			   this.height == layer.height;
 	}

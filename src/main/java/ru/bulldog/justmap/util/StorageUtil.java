@@ -9,6 +9,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.storage.VersionedChunkStorage;
+import ru.bulldog.justmap.JustMap;
 
 public class StorageUtil {	
 	
@@ -43,6 +44,16 @@ public class StorageUtil {
 			
 			if (!storageDir.exists()) {
 				storageDir.mkdirs();
+			}
+			
+			if (storage != null) {
+				storage.completeAll();
+				
+				try {
+					storage.close();
+				} catch (IOException ex) {
+					JustMap.LOGGER.catching(ex);
+				}
 			}
 			
 			storage = new VersionedChunkStorage(storageDir, minecraft.getDataFixer());

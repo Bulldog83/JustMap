@@ -82,6 +82,10 @@ public class ChunkLevel {
 		return image;
 	}
 	
+	public boolean isEmpty() {
+		return this.level == -1;
+	}
+	
 	public PalettedContainer<BlockState> getContainer() {
 		return this.container;
 	}

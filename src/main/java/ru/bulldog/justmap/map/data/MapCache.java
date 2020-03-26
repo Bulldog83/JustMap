@@ -3,6 +3,7 @@ package ru.bulldog.justmap.map.data;
 import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.client.config.ClientParams;
+import ru.bulldog.justmap.map.data.Layers.Layer;
 import ru.bulldog.justmap.map.minimap.Minimap;
 import ru.bulldog.justmap.util.Colors;
 import ru.bulldog.justmap.util.ImageUtil;
@@ -24,10 +25,10 @@ public class MapCache {
 	
 	private static Map<Integer, MapCache> dimensions = new HashMap<>();
 	private static World currentWorld;
-	private static Layer currentLayer = Layer.SURFACE;	
+	private static Layers currentLayer = Layer.SURFACE.value;	
 	private static int currentLevel = 0;
 	
-	public static void setCurrentLayer(Layer layer, int y) {
+	public static void setCurrentLayer(Layers layer, int y) {
 		currentLevel =  y / layer.height;
 		currentLayer = layer;
 	}
@@ -73,6 +74,31 @@ public class MapCache {
 		dimensions.put(dimId, data);
 		
 		return data;
+	}
+	
+	public static void saveData() {
+		MapCache data = get();		
+		if (data == null) return;
+		
+		StorageUtil.IO.execute(() -> {
+			data.getRegions().forEach((pos, region) -> {
+				region.saveImage();
+			});
+			data.getChunks().forEach((pos, chunk) -> {
+				storeChunk(chunk);
+			});
+		});
+	}
+	
+	private static void storeChunk(MapChunk chunk) {
+		if (chunk.saveNeeded()) {
+			CompoundTag chunkData = new CompoundTag();
+			chunk.saveToNBT(chunkData);
+			
+			if (!chunkData.isEmpty()) {
+				StorageUtil.saveCache(chunk.getPos(), chunkData);
+			}
+		}
 	}
 	
 	public World world;
@@ -164,6 +190,7 @@ public class MapCache {
 		for (ChunkPos chunkPos : getChunks().keySet()) {
 			MapChunk chunkData = getChunks().get(chunkPos);
 			if (currentTime - chunkData.updated >= 30000) {
+				storeChunk(chunkData);
 				chunks.add(chunkPos);
 				purged++;
 				if (purged >= maxPurged) {
@@ -209,25 +236,6 @@ public class MapCache {
 		});
 	}
 	
-	public static void saveData() {
-		MapCache data = get();		
-		if (data == null) return;
-		
-		StorageUtil.IO.execute(() -> {
-			data.getRegions().forEach((pos, region) -> {
-				region.saveImage();
-			});
-			data.getChunks().forEach((pos, chunk) -> {
-				if (chunk.saveNeeded()) {
-					CompoundTag chunkData = new CompoundTag();
-					chunk.saveToNBT(chunkData);
-					
-					StorageUtil.saveCache(chunk.getPos(), chunkData);
-				}
-			});
-		});
-	}
-	
 	private synchronized Map<ChunkPos, MapChunk> getChunks() {
 		return this.chunks;
 	}
@@ -261,7 +269,7 @@ public class MapCache {
 		return getChunk(currentLayer, currentLevel, posX, posZ, empty);
 	}
 	
-	public synchronized MapChunk getChunk(Layer layer, int level, int posX, int posZ, boolean empty) {
+	public synchronized MapChunk getChunk(Layers layer, int level, int posX, int posZ, boolean empty) {
 		
 		MapChunk mapChunk = getChunk(layer, level, posX, posZ);
 		
@@ -277,7 +285,7 @@ public class MapCache {
 		return mapChunk;
 	}
 	
-	public synchronized MapChunk getChunk(Layer layer, int level, int posX, int posZ) {
+	public synchronized MapChunk getChunk(Layers layer, int level, int posX, int posZ) {
 		ChunkPos chunkPos = new ChunkPos(posX, posZ);
 		
 		if (getChunks().containsKey(chunkPos)) {
