@@ -32,6 +32,7 @@ import ru.bulldog.justmap.map.data.MapChunk;
 import ru.bulldog.justmap.map.icon.WaypointIcon;
 import ru.bulldog.justmap.map.waypoint.Waypoint;
 import ru.bulldog.justmap.map.waypoint.WaypointKeeper;
+import ru.bulldog.justmap.map.waypoint.WaypointsList;
 import ru.bulldog.justmap.util.Colors;
 import ru.bulldog.justmap.util.ImageUtil;
 import ru.bulldog.justmap.util.TaskManager;
@@ -94,9 +95,9 @@ public class Worldmap extends MapScreen implements AbstractMap {
 		int currentDim = player.dimension.getRawId();
 		if (centerPos == null || currentDim != dimension) {
 			this.dimension = currentDim;
-			this.centerPos = client.player.getSenseCenterPos();
+			this.centerPos = client.player.getBlockPos();
 		} else if (playerTracking) {
-			this.centerPos = client.player.getSenseCenterPos();
+			this.centerPos = client.player.getBlockPos();
 		}
 		
 		this.cursorCoords = MathUtil.posToString(centerPos);
@@ -106,7 +107,7 @@ public class Worldmap extends MapScreen implements AbstractMap {
 		waypoints.clear();
 		List<Waypoint> wps = WaypointKeeper.getInstance().getWaypoints(dimension, true);
 		if (wps != null) {
-			Stream<Waypoint> stream = wps.stream().filter(wp -> MathUtil.getDistance(player.getSenseCenterPos(), wp.pos) <= wp.showRange);
+			Stream<Waypoint> stream = wps.stream().filter(wp -> MathUtil.getDistance(player.getBlockPos(), wp.pos) <= wp.showRange);
 			for (Waypoint wp : stream.toArray(Waypoint[]::new)) {
 				WaypointIcon waypoint = new WaypointIcon(this, wp);
 				this.waypoints.add(waypoint);
@@ -126,6 +127,7 @@ public class Worldmap extends MapScreen implements AbstractMap {
 		children.add(new ButtonWidget(width - 24, height / 2 + 1, 20, 20, "-", (b) -> changeScale(+0.25F)));		
 		children.add(new ButtonWidget(width - 24, height - paddingBottom - 22, 20, 20, "\u271C", (b) -> setCenterByPlayer()));
 		children.add(new ButtonWidget(4, paddingTop + 2, 20, 20, "\u2630",(b) -> client.openScreen(ConfigFactory.getConfigScreen(this))));
+		children.add(new ButtonWidget(4, height - paddingBottom - 22, 20, 20, "\u2726",(b) -> client.openScreen(new WaypointsList(this))));
 	}
 	
 	@Override
@@ -147,8 +149,8 @@ public class Worldmap extends MapScreen implements AbstractMap {
 		
 		PlayerEntity player = client.player;
 		
-		int playerX = player.getSenseCenterPos().getX();
-		int playerZ = player.getSenseCenterPos().getZ();
+		int playerX = player.getBlockPos().getX();
+		int playerZ = player.getBlockPos().getZ();
 		double arrowX = MathUtil.screenPos(playerX, startX, endX, width) - shiftW;
 		double arrowY = MathUtil.screenPos(playerZ, startZ, endZ, height) - shiftH;
 		
@@ -280,7 +282,7 @@ public class Worldmap extends MapScreen implements AbstractMap {
 	
 	public void setCenterByPlayer() {
 		this.playerTracking = true;
-		this.centerPos = client.player.getSenseCenterPos();
+		this.centerPos = client.player.getBlockPos();
 		
   		updateMapTexture();
 	}

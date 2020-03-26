@@ -50,11 +50,11 @@ public class EntityIcon extends MapIcon<EntityIcon> {
 				if (icon != null) {
 					icon.draw(pos.x, pos.y, size);
 				} else {
-					DrawHelper.drawOutlineCircle(pos.x, pos.y, size / 2, 0.6, color);
+					DrawHelper.drawOutlineCircle(pos.x, pos.y, size / 3, 0.6, color);
 				}
 			}
 		} else {
-			DrawHelper.drawOutlineCircle(pos.x, pos.y, size / 2, 0.6, color);
+			DrawHelper.drawOutlineCircle(pos.x, pos.y, size / 3, 0.6, color);
 		}
 	}
 }

@@ -148,17 +148,14 @@ public class WaypointsList extends MapScreen {
 		this.center = width / 2;		
 		this.screenWidth = Math.max(400, center);		
 		this.x = center - screenWidth / 2;
-		
 		this.prevDimensionButton = new ButtonWidget(x + 10, 10, 20, 20, "<", (b) -> cycleDimension(-1));
 		this.nextDimensionButton = new ButtonWidget(x + screenWidth - 30, 10, 20, 20, ">", (b) -> cycleDimension(1));
-		
 		this.addButton = new ButtonWidget(center - 62, height - 26, 60, 20, lang("create"), (b) -> add());
 		this.closeButton = new ButtonWidget(center + 2, height - 26, 60, 20, lang("close"), (b) -> onClose());
-	
-		reset();
-		
 		this.currentDim = client.player.dimension.getRawId();
 		this.currentDimIndex = getDimIndex(currentDim);
+		
+		reset();
 	}
 	
 	private void createEntries() {
@@ -246,7 +243,7 @@ public class WaypointsList extends MapScreen {
 		Waypoint waypoint = new Waypoint();
 		waypoint.dimension = currentDim;
 		waypoint.color = RandomUtil.getElement(Waypoint.WAYPOINT_COLORS);
-		waypoint.pos = client.player.getSenseCenterPos();
+		waypoint.pos = client.player.getBlockPos();
 		waypoint.name = "Waypoint";
 		
 		client.openScreen(new WaypointEditor(waypoint, this, keeper::addNew));

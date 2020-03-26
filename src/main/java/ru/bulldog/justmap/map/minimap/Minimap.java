@@ -192,7 +192,7 @@ public class Minimap implements AbstractMap{
 	
 	public void prepareMap(PlayerEntity player) {
 		World world = player.world;
-		BlockPos pos = player.getSenseCenterPos();
+		BlockPos pos = player.getBlockPos();
 		
 		currentBiome = world.getBiome(pos);
 		
@@ -227,7 +227,7 @@ public class Minimap implements AbstractMap{
 					continue;
 				}
 				
-				BlockPos ppos = p.getSenseCenterPos();
+				BlockPos ppos = p.getBlockPos();
 			 
 				int x = ppos.getX();
 				int z = ppos.getZ();
@@ -304,7 +304,7 @@ public class Minimap implements AbstractMap{
 	
 	public void createWaypoint() {
 		PlayerEntity player = minecraftClient.player;
-		createWaypoint(player.world.dimension.getType().getRawId(), player.getSenseCenterPos());
+		createWaypoint(player.world.dimension.getType().getRawId(), player.getBlockPos());
 	}
 	
 	public NativeImage getImage() {

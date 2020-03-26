@@ -171,12 +171,18 @@ public class MapChunk {
 			for (int z = 0; z < 16; z++) {
 				int y = worldChunk.sampleHeightmap(Heightmap.Type.WORLD_SURFACE, x, z);
 				y = MapProcessor.getTopBlockY(this, x, y, z, true);
+				int index = x + (z << 4);
 				if (y != -1) {
-					getHeighmap()[x + (z << 4)] = y;
-				} else if (getHeighmap()[x + (z << 4)] != -1) {
+					getHeighmap()[index] = y;
+				} else if (getHeighmap()[index] != -1) {
 					ChunkLevel chunkLevel = getChunkLevel();
 					chunkLevel.getImage(chunkPos).setPixelRgba(x, z, Colors.BLACK);
-					chunkLevel.clear(x, z);
+					
+					int posX = x + (chunkPos.x << 4);
+					int posZ = z + (chunkPos.z << 4);
+					int posY = getHeighmap()[index];
+					
+					chunkLevel.clear(new BlockPos(posX, posY, posZ), index);
 					
 					updateRegionData();
 					

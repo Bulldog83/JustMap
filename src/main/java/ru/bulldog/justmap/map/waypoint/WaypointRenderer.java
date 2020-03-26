@@ -44,7 +44,7 @@ public class WaypointRenderer {
 		
 			List<Waypoint> wayPoints = WaypointKeeper.getInstance().getWaypoints(client.world.dimension.getType().getRawId(), true);
 			for (Waypoint wp : wayPoints) {
-				int dist = (int) MathUtil.getDistance(wp.pos, client.player.getSenseCenterPos(), false);
+				int dist = (int) MathUtil.getDistance(wp.pos, client.player.getBlockPos(), false);
 				if (wp.tracking && dist < wp.showRange) {
 					renderer.renderHUD(wp, client, delta, fov, dist);
 				}
@@ -98,7 +98,7 @@ public class WaypointRenderer {
 			
 			VertexConsumerProvider.Immediate immediate = client.getBufferBuilders().getEntityVertexConsumers();
 			
-			BlockPos playerPos = client.player.getSenseCenterPos();
+			BlockPos playerPos = client.player.getBlockPos();
 			
 			List<Waypoint> wayPoints = WaypointKeeper.getInstance().getWaypoints(client.world.dimension.getType().getRawId(), true);			
 			for (Waypoint wp : wayPoints) {

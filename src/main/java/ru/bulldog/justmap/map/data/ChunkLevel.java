@@ -7,6 +7,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtHelper;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.chunk.IdListPalette;
 import net.minecraft.world.chunk.Palette;
@@ -51,12 +52,8 @@ public class ChunkLevel {
 		return this.container.setSync(x, y, z, blockState);
 	}
 	
-	public void clear(int x, int z) {
-		int index = x + (z << 4);
-		
-		if (heightmap[index] != -1) {
-			setBlockState(x, heightmap[index], z, StateUtil.AIR);
-		}
+	public void clear(BlockPos pos, int index) {
+		setBlockState(pos.getX() & 15, pos.getY() & 15, pos.getZ() & 15, StateUtil.AIR);
 		
 		this.heightmap[index] = -1;
 		this.colormap[index] = -1;
