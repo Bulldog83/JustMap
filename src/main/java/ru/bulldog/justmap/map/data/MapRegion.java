@@ -3,14 +3,13 @@ package ru.bulldog.justmap.map.data;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.util.math.ChunkPos;
 
 import ru.bulldog.justmap.JustMap;
-import ru.bulldog.justmap.map.data.Layers.Layer;
 import ru.bulldog.justmap.util.Colors;
 import ru.bulldog.justmap.util.ImageUtil;
 import ru.bulldog.justmap.util.StorageUtil;
@@ -19,7 +18,7 @@ public class MapRegion {
 	
 	private final RegionPos pos;
 
-	private Map<Layers, RegionLayer> layers = new HashMap<>();
+	private ConcurrentMap<Layers, RegionLayer> layers = new ConcurrentHashMap<>();
 	private Layers currentLayer;
 	private int currentLevel;
 	
@@ -61,7 +60,7 @@ public class MapRegion {
 	}
 	
 	public NativeImage getImage(Layers layer, int level) {		
-		return getLayer(layer).getImage(level).get();
+		return getLayer(layer).getImage(level).image();
 	}
 	
 	public void saveImage() {
@@ -114,7 +113,7 @@ public class MapRegion {
 	
 	private File imagesDir(Layers layer, int level) {
 		File cacheDir;
-		if (layer.equals(Layer.SURFACE.value)) {
+		if (layer.equals(Layers.Type.SURFACE.value)) {
 			cacheDir = layerDir(layer);
 		} else {
 			cacheDir = new File(layerDir(layer), String.format("%d/", level));
@@ -132,15 +131,15 @@ public class MapRegion {
 	}
 	
 	public class RegionLayer {
-		private volatile Map<Integer, RegionImage> images;
+		private ConcurrentMap<Integer, RegionImage> images;
 		private final Layers layer;
 		
 		private RegionLayer(Layers layer) {
 			this.layer = layer;
-			this.images = new HashMap<>();
+			this.images = new ConcurrentHashMap<>();
 		}
 		
-		private synchronized RegionImage getImage(int level) {
+		private RegionImage getImage(int level) {
 			if (images.containsKey(level)) {
 				return images.get(level);
 			}			
@@ -197,18 +196,20 @@ public class MapRegion {
 			return image;
 		}
 		
-		public synchronized NativeImage get() {
-			return this.image;
+		public NativeImage image() {
+			synchronized (image) {
+				return this.image;
+			}			
 		}
 		
-		public synchronized void write(NativeImage tile, int x, int y) {
-			ImageUtil.writeTile(image, tile, x, y);
+		public void write(NativeImage tile, int x, int y) {
+			ImageUtil.writeTile(image(), tile, x, y);
 			this.saved = false;
 		}
 		
-		public synchronized void save(File png) {
+		public void save(File png) {
 			try {
-				image.writeFile(png);
+				image().writeFile(png);
 				this.saved = true;
 			} catch (IOException ex) {
 				JustMap.LOGGER.catching(ex);

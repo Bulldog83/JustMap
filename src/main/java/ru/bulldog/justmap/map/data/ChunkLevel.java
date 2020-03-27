@@ -7,7 +7,6 @@ import net.minecraft.block.BlockState;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtHelper;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.chunk.IdListPalette;
 import net.minecraft.world.chunk.Palette;
@@ -22,7 +21,7 @@ public class ChunkLevel {
 	private final static Palette<BlockState> palette;
 	
 	private volatile PalettedContainer<BlockState> container;
-	private NativeImage image;
+	private volatile NativeImage image;
 	
 	int[] heightmap;
 	int[] colormap;
@@ -55,23 +54,28 @@ public class ChunkLevel {
 	}
 	
 	public BlockState setBlockState(int x, int y, int z, BlockState blockState) {
-		return container().setSync(x, y, z, blockState);
+		return container().set(x, y, z, blockState);
 	}
 	
-	public void clear(BlockPos pos, int index) {
-		setBlockState(pos.getX() & 15, pos.getY() & 15, pos.getZ() & 15, StateUtil.AIR);
+	public void clear(int x, int z) {
+		int index = x + (z << 4);
+		if (heightmap[index] != -1) {
+			setBlockState(x, heightmap[index] & 15, z, StateUtil.AIR);
+			this.heightmap[index] = -1;
+		}
 		
-		this.heightmap[index] = -1;
 		this.colormap[index] = -1;
 		this.levelmap[index] = 0;
 	}
 	
 	public NativeImage getImage(ChunkPos chunkPos) {
 		if (image == null) {
-			image = loadImage(chunkPos);
+			this.image = loadImage(chunkPos);
 		}
 		
-		return image;
+		synchronized (image) {
+			return this.image;
+		}
 	}
 	
 	private NativeImage loadImage(ChunkPos chunkPos) {

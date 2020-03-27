@@ -2,7 +2,6 @@ package ru.bulldog.justmap.map.data;
 
 import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.client.config.ClientParams;
-import ru.bulldog.justmap.map.data.Layers.Layer;
 import ru.bulldog.justmap.util.ColorUtil;
 import ru.bulldog.justmap.util.Colors;
 import ru.bulldog.justmap.util.StateUtil;
@@ -18,14 +17,14 @@ import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.chunk.WorldChunk;
 
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 public class MapChunk {
 	
 	public final ChunkLevel EMPTY_LEVEL = new ChunkLevel(-1);
 	
-	private volatile Map<Layers, ChunkLevel[]> levels;
+	private volatile ConcurrentMap<Layers, ChunkLevel[]> levels;
 	
 	private WorldChunk worldChunk;
 	private ChunkPos chunkPos;
@@ -47,17 +46,17 @@ public class MapChunk {
 		this.dimension = world.getDimension().getType().getRawId();
 		this.chunkPos = pos;
 		this.layer = layer;
-		this.levels = new HashMap<>();
+		this.levels = new ConcurrentHashMap<>();
 		
 		this.init();
 	}
 	
 	private void init() {
 		if (dimension == -1) {
-			initLayer(Layer.NETHER.value);
+			initLayer(Layers.Type.NETHER.value);
 		} else {
-			initLayer(Layer.SURFACE.value);
-			initLayer(Layer.CAVES.value);
+			initLayer(Layers.Type.SURFACE.value);
+			initLayer(Layers.Type.CAVES.value);
 		}
 		
 		JustMapClient.UPDATER.execute(this::restore);
@@ -77,11 +76,11 @@ public class MapChunk {
 		this.levels.put(layer, new ChunkLevel[levels]);
 	}
 	
-	private synchronized ChunkLevel getChunkLevel() {
+	private ChunkLevel getChunkLevel() {
 		return getChunkLevel(layer, level);
 	}
 	
-	private synchronized ChunkLevel getChunkLevel(Layers layer, int level) {
+	private ChunkLevel getChunkLevel(Layers layer, int level) {
 		if (!levels.containsKey(layer)) {
 			initLayer();
 		}
@@ -129,7 +128,7 @@ public class MapChunk {
 		return this.empty;
 	}
 	
-	public synchronized NativeImage getImage() {
+	public NativeImage getImage() {
 		return getChunkLevel().getImage(chunkPos);
 	}
 	
@@ -141,7 +140,7 @@ public class MapChunk {
 		return level;
 	}
 	
-	public synchronized int[] getHeighmap() {
+	public int[] getHeighmap() {
 		return getChunkLevel().heightmap;
 	}
 	
@@ -173,31 +172,22 @@ public class MapChunk {
 				int y = worldChunk.sampleHeightmap(Heightmap.Type.WORLD_SURFACE, x, z);
 				y = MapProcessor.getTopBlockY(this, x, y + 1, z, true);
 				int index = x + (z << 4);
+				ChunkLevel chunkLevel = getChunkLevel();
 				if (y != -1) {
 					if (getHeighmap()[index] != -1) {
-						clearPosData(getChunkLevel(), x, z);
+						chunkLevel.clear(x, z);
 					}					
 					getHeighmap()[index] = y;
 				} else if (getHeighmap()[index] != -1) {
-					ChunkLevel chunkLevel = getChunkLevel();
-					chunkLevel.getImage(chunkPos).setPixelRgba(x, z, Colors.BLACK);
+					chunkLevel.getImage(chunkPos).setPixelRgba(x, z, Colors.BLACK);					
+					chunkLevel.clear(x, z);
 					
-					clearPosData(chunkLevel, x, z);
 					updateRegionData();
 					
 					this.saved = false;
 				}
 			}
 		}
-	}
-	
-	private void clearPosData(ChunkLevel chunkLevel, int x, int z) {
-		int index = x + (z << 4);		
-		int posX = x + (chunkPos.x << 4);
-		int posZ = z + (chunkPos.z << 4);
-		int posY = getHeighmap()[index];
-		
-		chunkLevel.clear(new BlockPos(posX, posY, posZ), index);
 	}
 	
 	public void update() {
@@ -278,7 +268,7 @@ public class MapChunk {
 	}
 	
 	public void store(CompoundTag data) {
-		levels.forEach((layer, levels) -> {
+		this.levels.forEach((layer, levels) -> {
 			ListTag levelsTag = new ListTag();
 			
 			CompoundTag level;
@@ -309,7 +299,7 @@ public class MapChunk {
 		CompoundTag chunkData = StorageUtil.getCache(chunkPos);
 		if (chunkData.isEmpty()) return;
 		
-		levels.forEach((layer, levels) -> {
+		this.levels.forEach((layer, levels) -> {
 			ListTag listTag = chunkData.getList(layer.name, 10);
 			for(int i = 0; i < listTag.size(); ++i) {
 				CompoundTag level = listTag.getCompound(i);

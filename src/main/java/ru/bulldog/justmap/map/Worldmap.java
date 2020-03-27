@@ -26,7 +26,7 @@ import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.client.MapScreen;
 import ru.bulldog.justmap.client.config.ConfigFactory;
-import ru.bulldog.justmap.map.data.Layers.Layer;
+import ru.bulldog.justmap.map.data.Layers.Type;
 import ru.bulldog.justmap.map.data.MapCache;
 import ru.bulldog.justmap.map.data.MapChunk;
 import ru.bulldog.justmap.map.icon.WaypointIcon;
@@ -219,7 +219,7 @@ public class Worldmap extends MapScreen implements AbstractMap {
 				
 				NativeImage chunkImage;
 				if (dimension != -1) {
-					chunkImage = mapData.getRegion(pos).getChunkImage(pos, Layer.SURFACE.value, 0);
+					chunkImage = mapData.getRegion(pos).getChunkImage(pos, Type.SURFACE.value, 0);
 				} else {
 					chunkImage = mapData.getRegion(pos).getChunkImage(pos);
 				}
@@ -406,7 +406,7 @@ public class Worldmap extends MapScreen implements AbstractMap {
 		
 		MapChunk mapChunk;
 		if (dimension != -1) {
-			mapChunk = MapCache.get().getChunk(Layer.SURFACE.value, 0, chunkX, chunkZ);
+			mapChunk = MapCache.get().getChunk(Type.SURFACE.value, 0, chunkX, chunkZ);
 		} else {
 			mapChunk = MapCache.get().getChunk(chunkX, chunkZ);
 		}

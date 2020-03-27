@@ -1,8 +1,10 @@
-package ru.bulldog.justmap.map.waypoint;
+package ru.bulldog.justmap.client.render;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import ru.bulldog.justmap.client.config.ClientParams;
+import ru.bulldog.justmap.map.waypoint.Waypoint;
+import ru.bulldog.justmap.map.waypoint.WaypointKeeper;
 import ru.bulldog.justmap.map.waypoint.Waypoint.Icon;
 import ru.bulldog.justmap.util.ColorUtil;
 import ru.bulldog.justmap.util.Colors;

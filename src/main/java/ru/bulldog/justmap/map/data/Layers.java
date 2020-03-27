@@ -3,14 +3,14 @@ package ru.bulldog.justmap.map.data;
 import java.util.Arrays;
 
 public class Layers {	
-	public enum Layer {
+	public enum Type {
 		SURFACE("surface", 256),
 		CAVES("caves", 8),
-		NETHER("nether", 16);		
+		NETHER("nether", 16);
 		
 		public final Layers value;
 		
-		Layer(String name, int height) {
+		Type(String name, int height) {
 			this.value = new Layers(name, height);
 		}
 	}
