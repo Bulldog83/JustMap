@@ -22,7 +22,7 @@ import java.util.Map;
 
 public class MapChunk {
 	
-	public final static ChunkLevel EMPTY_LEVEL = new ChunkLevel(-1);
+	public final ChunkLevel EMPTY_LEVEL = new ChunkLevel(-1);
 	
 	private volatile Map<Layers, ChunkLevel[]> levels;
 	
@@ -170,26 +170,33 @@ public class MapChunk {
 		for (int x = 0; x < 16; x++) {
 			for (int z = 0; z < 16; z++) {
 				int y = worldChunk.sampleHeightmap(Heightmap.Type.WORLD_SURFACE, x, z);
-				y = MapProcessor.getTopBlockY(this, x, y, z, true);
+				y = MapProcessor.getTopBlockY(this, x, y + 1, z, true);
 				int index = x + (z << 4);
 				if (y != -1) {
+					if (getHeighmap()[index] != -1) {
+						clearPosData(getChunkLevel(), x, z);
+					}					
 					getHeighmap()[index] = y;
 				} else if (getHeighmap()[index] != -1) {
 					ChunkLevel chunkLevel = getChunkLevel();
 					chunkLevel.getImage(chunkPos).setPixelRgba(x, z, Colors.BLACK);
 					
-					int posX = x + (chunkPos.x << 4);
-					int posZ = z + (chunkPos.z << 4);
-					int posY = getHeighmap()[index];
-					
-					chunkLevel.clear(new BlockPos(posX, posY, posZ), index);
-					
+					clearPosData(chunkLevel, x, z);
 					updateRegionData();
 					
 					this.saved = false;
 				}
 			}
 		}
+	}
+	
+	private void clearPosData(ChunkLevel chunkLevel, int x, int z) {
+		int index = x + (z << 4);		
+		int posX = x + (chunkPos.x << 4);
+		int posZ = z + (chunkPos.z << 4);
+		int posY = getHeighmap()[index];
+		
+		chunkLevel.clear(new BlockPos(posX, posY, posZ), index);
 	}
 	
 	public void update() {

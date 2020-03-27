@@ -21,7 +21,7 @@ public class ChunkLevel {
 	
 	private final static Palette<BlockState> palette;
 	
-	private final PalettedContainer<BlockState> container;
+	private volatile PalettedContainer<BlockState> container;
 	private NativeImage image;
 	
 	int[] heightmap;
@@ -45,11 +45,11 @@ public class ChunkLevel {
 	}
 	
 	public BlockState getBlockState(int x, int y, int z) {
-		return this.container.get(x, y, z);
+		return getContainer().get(x, y, z);
 	}
 	
 	public BlockState setBlockState(int x, int y, int z, BlockState blockState) {
-		return this.container.setSync(x, y, z, blockState);
+		return getContainer().setSync(x, y, z, blockState);
 	}
 	
 	public void clear(BlockPos pos, int index) {
@@ -83,7 +83,7 @@ public class ChunkLevel {
 		return this.level == -1;
 	}
 	
-	public PalettedContainer<BlockState> getContainer() {
+	public synchronized PalettedContainer<BlockState> getContainer() {
 		return this.container;
 	}
 	
