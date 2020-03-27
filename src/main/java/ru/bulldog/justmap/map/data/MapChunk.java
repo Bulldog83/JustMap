@@ -1,5 +1,6 @@
 package ru.bulldog.justmap.map.data;
 
+import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.map.data.Layers.Layer;
 import ru.bulldog.justmap.util.ColorUtil;
@@ -59,7 +60,7 @@ public class MapChunk {
 			initLayer(Layer.CAVES.value);
 		}
 		
-		loadFromNBT();
+		JustMapClient.UPDATER.execute(this::restore);
 	}
 	
 	public void resetChunk() {
@@ -276,7 +277,7 @@ public class MapChunk {
 		return !this.isEmpty() && !this.saved;
 	}
 	
-	public void saveToNBT(CompoundTag data) {
+	public void store(CompoundTag data) {
 		levels.forEach((layer, levels) -> {
 			ListTag levelsTag = new ListTag();
 			
@@ -291,7 +292,7 @@ public class MapChunk {
 		            level = new CompoundTag();
 		            
 		            level.putInt("Level", lvl);
-		            chunkLevel.getContainer().write(level, "Palette", "BlockStates");
+		            chunkLevel.container().write(level, "Palette", "BlockStates");
 		            chunkLevel.store(level);
 
 		            levelsTag.add(level);
@@ -304,7 +305,7 @@ public class MapChunk {
 		this.saved = true;
 	}
 	
-	public void loadFromNBT() {
+	public void restore() {
 		CompoundTag chunkData = StorageUtil.getCache(chunkPos);
 		if (chunkData.isEmpty()) return;
 		
@@ -315,7 +316,7 @@ public class MapChunk {
 				int lvl = level.getInt("Level");
 				if (level.contains("Palette", 9) && level.contains("BlockStates", 12)) {
 					ChunkLevel chunkLevel = new ChunkLevel(lvl);
-					chunkLevel.getContainer().read(level.getList("Palette", 10), level.getLongArray("BlockStates"));
+					chunkLevel.container().read(level.getList("Palette", 10), level.getLongArray("BlockStates"));
 					chunkLevel.load(level);
 					
 					levels[lvl] = chunkLevel;

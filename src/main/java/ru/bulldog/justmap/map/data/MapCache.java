@@ -93,7 +93,7 @@ public class MapCache {
 	private static void storeChunk(MapChunk chunk) {
 		if (chunk.saveNeeded()) {
 			CompoundTag chunkData = new CompoundTag();
-			chunk.saveToNBT(chunkData);
+			chunk.store(chunkData);
 			
 			if (!chunkData.isEmpty()) {
 				StorageUtil.saveCache(chunk.getPos(), chunkData);
@@ -149,7 +149,7 @@ public class MapCache {
 						}
 					}
 					if (!mapChunk.getWorldChunk().isEmpty() || mapChunk.isEmpty()) {
-						updateChunk(mapChunk);
+						JustMapClient.UPDATER.execute(mapChunk::update);
 					}
 				}
 				
@@ -174,12 +174,6 @@ public class MapCache {
 			});
 			lastPurged = currentTime;
 		}
-	}
-	
-	private void updateChunk(MapChunk mapChunk) {
-		JustMapClient.UPDATER.execute(() -> {
-			mapChunk.update();
-		});
 	}
 	
 	private void purge(int maxPurged) {

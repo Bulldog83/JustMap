@@ -44,12 +44,18 @@ public class ChunkLevel {
 		Arrays.fill(levelmap, 0);
 	}
 	
+	public PalettedContainer<BlockState> container() {
+		synchronized (container) {
+			return this.container;
+		}
+	}
+	
 	public BlockState getBlockState(int x, int y, int z) {
-		return getContainer().get(x, y, z);
+		return container().get(x, y, z);
 	}
 	
 	public BlockState setBlockState(int x, int y, int z, BlockState blockState) {
-		return getContainer().setSync(x, y, z, blockState);
+		return container().setSync(x, y, z, blockState);
 	}
 	
 	public void clear(BlockPos pos, int index) {
@@ -81,10 +87,6 @@ public class ChunkLevel {
 	
 	public boolean isEmpty() {
 		return this.level == -1;
-	}
-	
-	public synchronized PalettedContainer<BlockState> getContainer() {
-		return this.container;
 	}
 	
 	public void store(CompoundTag tag) {
