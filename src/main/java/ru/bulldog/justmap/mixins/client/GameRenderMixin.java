@@ -2,7 +2,7 @@ package ru.bulldog.justmap.mixins.client;
 
 import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.GameRenderer;
-import ru.bulldog.justmap.map.waypoint.WaypointRenderer;
+import ru.bulldog.justmap.client.render.WaypointRenderer;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;

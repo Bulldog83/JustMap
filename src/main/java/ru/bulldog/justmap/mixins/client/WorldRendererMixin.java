@@ -14,7 +14,7 @@ import net.minecraft.client.render.LightmapTextureManager;
 import net.minecraft.client.render.WorldRenderer;
 import net.minecraft.client.util.math.Matrix4f;
 import net.minecraft.client.util.math.MatrixStack;
-import ru.bulldog.justmap.map.waypoint.WaypointRenderer;
+import ru.bulldog.justmap.client.render.WaypointRenderer;
 
 @Mixin(WorldRenderer.class)
 public abstract class WorldRendererMixin {

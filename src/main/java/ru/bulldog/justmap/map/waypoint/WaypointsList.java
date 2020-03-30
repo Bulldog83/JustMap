@@ -147,9 +147,9 @@ public class WaypointsList extends MapScreen {
 	protected void init() {
 		this.center = width / 2;		
 		this.screenWidth = Math.max(400, center);		
-		this.x = center - screenWidth / 2;
+		this.x = center - screenWidth / 2;		
 		this.prevDimensionButton = new ButtonWidget(x + 10, 10, 20, 20, "<", (b) -> cycleDimension(-1));
-		this.nextDimensionButton = new ButtonWidget(x + screenWidth - 30, 10, 20, 20, ">", (b) -> cycleDimension(1));
+		this.nextDimensionButton = new ButtonWidget(x + screenWidth - 30, 10, 20, 20, ">", (b) -> cycleDimension(1));		
 		this.addButton = new ButtonWidget(center - 62, height - 26, 60, 20, lang("create"), (b) -> add());
 		this.closeButton = new ButtonWidget(center + 2, height - 26, 60, 20, lang("close"), (b) -> onClose());
 		this.currentDim = client.player.dimension.getRawId();

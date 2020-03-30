@@ -1,7 +1,6 @@
 package ru.bulldog.justmap.map.data;
 
 import ru.bulldog.justmap.client.config.ClientParams;
-import ru.bulldog.justmap.map.data.Layers.Layer;
 import ru.bulldog.justmap.util.StateUtil;
 
 import net.minecraft.block.BlockState;
@@ -23,7 +22,7 @@ public class MapProcessor {
 		boolean plants = !ClientParams.ignorePlants;
 		
 		Layers layer = mapChunk.getLayer();
-		if ((layer.equals(Layer.NETHER.value) || layer.equals(Layer.CAVES.value)) && liquids) {
+		if ((layer.equals(Layers.Type.NETHER.value) || layer.equals(Layers.Type.CAVES.value)) && liquids) {
 			int level = mapChunk.getLevel();
 			int floor = level * layer.height;
 			for (int i = floor + (layer.height - 1); i >= floor; i--) {

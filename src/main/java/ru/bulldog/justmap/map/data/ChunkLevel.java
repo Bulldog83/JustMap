@@ -21,8 +21,8 @@ public class ChunkLevel {
 	
 	private final static Palette<BlockState> palette;
 	
-	private final PalettedContainer<BlockState> container;
-	private NativeImage image;
+	private volatile PalettedContainer<BlockState> container;
+	private volatile NativeImage image;
 	
 	int[] heightmap;
 	int[] colormap;
@@ -44,28 +44,47 @@ public class ChunkLevel {
 		Arrays.fill(levelmap, 0);
 	}
 	
+	public PalettedContainer<BlockState> container() {
+		synchronized (container) {
+			return this.container;
+		}
+	}
+	
 	public BlockState getBlockState(int x, int y, int z) {
-		return this.container.get(x, y, z);
+		return container().get(x, y, z);
 	}
 	
 	public BlockState setBlockState(int x, int y, int z, BlockState blockState) {
-		return this.container.setSync(x, y, z, blockState);
+		return container().set(x, y, z, blockState);
 	}
 	
-	public void clear(BlockPos pos, int index) {
-		setBlockState(pos.getX() & 15, pos.getY() & 15, pos.getZ() & 15, StateUtil.AIR);
+	public void updateHeightmap(int x, int z, int y) {
+		int index = x + (z << 4);
+		if (heightmap[index] != y) {
+			setBlockState(x, heightmap[index] & 15, z, StateUtil.AIR);
+			heightmap[index] = y;
+		}
+	}
+	
+	public void clear(int x, int z) {
+		int index = x + (z << 4);
+		if (heightmap[index] != -1) {
+			setBlockState(x, heightmap[index] & 15, z, StateUtil.AIR);
+			this.heightmap[index] = -1;
+		}
 		
-		this.heightmap[index] = -1;
 		this.colormap[index] = -1;
 		this.levelmap[index] = 0;
 	}
 	
 	public NativeImage getImage(ChunkPos chunkPos) {
 		if (image == null) {
-			image = loadImage(chunkPos);
+			this.image = loadImage(chunkPos);
 		}
 		
-		return image;
+		synchronized (image) {
+			return this.image;
+		}
 	}
 	
 	private NativeImage loadImage(ChunkPos chunkPos) {
@@ -81,10 +100,6 @@ public class ChunkLevel {
 	
 	public boolean isEmpty() {
 		return this.level == -1;
-	}
-	
-	public PalettedContainer<BlockState> getContainer() {
-		return this.container;
 	}
 	
 	public void store(CompoundTag tag) {

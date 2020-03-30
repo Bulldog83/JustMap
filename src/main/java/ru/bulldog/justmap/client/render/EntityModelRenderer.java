@@ -1,4 +1,4 @@
-package ru.bulldog.justmap.map.minimap;
+package ru.bulldog.justmap.client.render;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 

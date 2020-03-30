@@ -1,4 +1,4 @@
-package ru.bulldog.justmap.map.minimap;
+package ru.bulldog.justmap.client.render;
 
 import org.lwjgl.opengl.GL11;
 
@@ -11,10 +11,17 @@ import ru.bulldog.justmap.map.DirectionArrow;
 import ru.bulldog.justmap.map.icon.EntityIcon;
 import ru.bulldog.justmap.map.icon.PlayerIcon;
 import ru.bulldog.justmap.map.icon.WaypointIcon;
+import ru.bulldog.justmap.map.minimap.ChunkGrid;
+import ru.bulldog.justmap.map.minimap.MapPosition;
+import ru.bulldog.justmap.map.minimap.MapSkin;
+import ru.bulldog.justmap.map.minimap.MapText;
+import ru.bulldog.justmap.map.minimap.Minimap;
+import ru.bulldog.justmap.map.minimap.TextManager;
 import ru.bulldog.justmap.util.DrawHelper.TextAlignment;
 import ru.bulldog.justmap.util.math.Line;
 import ru.bulldog.justmap.util.math.Line.Point;
 import ru.bulldog.justmap.util.math.MathUtil;
+
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 

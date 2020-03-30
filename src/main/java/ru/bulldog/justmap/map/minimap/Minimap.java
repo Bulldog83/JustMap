@@ -2,8 +2,9 @@ package ru.bulldog.justmap.map.minimap;
 
 import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.client.config.ClientParams;
+import ru.bulldog.justmap.client.render.MapRenderer;
 import ru.bulldog.justmap.map.AbstractMap;
-import ru.bulldog.justmap.map.data.Layers.Layer;
+import ru.bulldog.justmap.map.data.Layers.Type;
 import ru.bulldog.justmap.map.data.MapCache;
 import ru.bulldog.justmap.map.icon.EntityIcon;
 import ru.bulldog.justmap.map.icon.PlayerIcon;
@@ -201,11 +202,11 @@ public class Minimap implements AbstractMap{
 		double startZ = pos.getZ() - scaled / 2;
 
 		if (world.dimension.isNether()) {
-			MapCache.setCurrentLayer(Layer.NETHER.value, pos.getY());
+			MapCache.setCurrentLayer(Type.NETHER.value, pos.getY());
 		} else if (needRenderCaves(world, player.getBlockPos())) {
-			MapCache.setCurrentLayer(Layer.CAVES.value, pos.getY());
+			MapCache.setCurrentLayer(Type.CAVES.value, pos.getY());
 		} else {
-			MapCache.setCurrentLayer(Layer.SURFACE.value, pos.getY());
+			MapCache.setCurrentLayer(Type.SURFACE.value, pos.getY());
 		}
 		
 		MapCache.get().update(this, scaled, (int) startX, (int) startZ);

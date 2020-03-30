@@ -3,8 +3,8 @@ package ru.bulldog.justmap.map.icon;
 import net.minecraft.entity.Entity;
 
 import ru.bulldog.justmap.client.config.ClientParams;
+import ru.bulldog.justmap.client.render.EntityModelRenderer;
 import ru.bulldog.justmap.map.AbstractMap;
-import ru.bulldog.justmap.map.minimap.EntityModelRenderer;
 import ru.bulldog.justmap.map.minimap.Minimap;
 import ru.bulldog.justmap.util.Colors;
 import ru.bulldog.justmap.util.DrawHelper;
