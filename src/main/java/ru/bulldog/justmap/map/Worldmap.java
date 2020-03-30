@@ -126,8 +126,8 @@ public class Worldmap extends MapScreen implements AbstractMap {
 		children.add(new ButtonWidget(width - 24, height / 2 - 21, 20, 20, "+", (b) -> changeScale(-0.25F)));
 		children.add(new ButtonWidget(width - 24, height / 2 + 1, 20, 20, "-", (b) -> changeScale(+0.25F)));		
 		children.add(new ButtonWidget(width - 24, height - paddingBottom - 22, 20, 20, "\u271C", (b) -> setCenterByPlayer()));
-		children.add(new ButtonWidget(4, paddingTop + 2, 20, 20, "\u2630",(b) -> minecraft.openScreen(ConfigFactory.getConfigScreen(this))));
-		children.add(new ButtonWidget(4, height - paddingBottom - 22, 20, 20, "\u2726",(b) -> minecraft.openScreen(new WaypointsList(this))));
+		children.add(new ButtonWidget(4, paddingTop + 2, 20, 20, "\u2630",(b) -> client.openScreen(ConfigFactory.getConfigScreen(this))));
+		children.add(new ButtonWidget(4, height - paddingBottom - 22, 20, 20, "\u2726",(b) -> client.openScreen(new WaypointsList(this))));
 	}
 	
 	@Override
