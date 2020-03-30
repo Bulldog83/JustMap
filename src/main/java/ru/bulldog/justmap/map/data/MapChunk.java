@@ -174,10 +174,7 @@ public class MapChunk {
 				int index = x + (z << 4);
 				ChunkLevel chunkLevel = getChunkLevel();
 				if (y != -1) {
-					if (getHeighmap()[index] != -1) {
-						chunkLevel.clear(x, z);
-					}					
-					getHeighmap()[index] = y;
+					chunkLevel.updateHeightmap(x, z, y);
 				} else if (getHeighmap()[index] != -1) {
 					chunkLevel.getImage(chunkPos).setPixelRgba(x, z, Colors.BLACK);					
 					chunkLevel.clear(x, z);
@@ -215,6 +212,8 @@ public class MapChunk {
 				int posX = x + (chunkPos.x << 4);
 				int posZ = z + (chunkPos.z << 4);
 				int posY = getHeighmap()[index];
+				
+				if (posY == -1) continue;
 				
 				BlockPos blockPos = new BlockPos(posX, posY, posZ);
 				BlockState blockState = getBlockState(blockPos);

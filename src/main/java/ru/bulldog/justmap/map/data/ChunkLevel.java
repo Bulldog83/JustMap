@@ -57,6 +57,14 @@ public class ChunkLevel {
 		return container().set(x, y, z, blockState);
 	}
 	
+	public void updateHeightmap(int x, int z, int y) {
+		int index = x + (z << 4);
+		if (heightmap[index] != y) {
+			setBlockState(x, heightmap[index] & 15, z, StateUtil.AIR);
+			heightmap[index] = y;
+		}
+	}
+	
 	public void clear(int x, int z) {
 		int index = x + (z << 4);
 		if (heightmap[index] != -1) {

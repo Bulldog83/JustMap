@@ -11,7 +11,7 @@ public class TaskManager implements Executor {
     private volatile boolean isRunning = false;
     
     private String name = JustMap.MODID;
-    private long downtimeLimit = 3000;
+    private long downtimeLimit = 1000;
     private long downtime = 0;
     
     public TaskManager() {}
