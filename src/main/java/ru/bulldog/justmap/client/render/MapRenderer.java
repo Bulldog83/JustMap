@@ -26,7 +26,6 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.screen.ChatScreen;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormats;
@@ -230,12 +229,6 @@ public class MapRenderer {
 	public void draw() {
 		if (!minimap.isMapVisible() || client.player == null) {
 			return;
-		}
-		
-		if (client.currentScreen != null) {
-			if (!(ClientParams.showInChat && client.currentScreen instanceof ChatScreen)) {
-				return;
-			}
 		}
 		
 		updateParams();

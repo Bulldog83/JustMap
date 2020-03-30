@@ -121,9 +121,9 @@ public class MapCache {
 	}
 	
 	public void update(Minimap map, int size, int x, int z) {
-		updatePerCycle = ClientParams.updatePerCycle;
-		purgeDelay = ClientParams.purgeDelay * 1000;
-		purgeAmount = ClientParams.purgeAmount;
+		this.updatePerCycle = ClientParams.updatePerCycle;
+		this.purgeDelay = ClientParams.purgeDelay * 1000;
+		this.purgeAmount = ClientParams.purgeAmount;
 		
 		int chunks = (size >> 4) + 4;
 		int startX = (x >> 4) - 2;
@@ -149,9 +149,7 @@ public class MapCache {
 							mapChunk.setChunk(chunk);
 						}
 					}
-					if (!mapChunk.getWorldChunk().isEmpty() || mapChunk.isEmpty()) {
-						JustMapClient.UPDATER.execute(mapChunk::update);
-					}
+					mapChunk.update();
 				}
 				
 				int imgY = (posY << 4) + offsetZ;

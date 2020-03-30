@@ -191,10 +191,16 @@ public class MapChunk {
 		if (worldChunk.isEmpty()) return;
 		
 		long currentTime = System.currentTimeMillis();
-		if (currentTime - updated < ClientParams.chunkUpdateInterval) return;		
+		if (currentTime - updated < ClientParams.chunkUpdateInterval) return;
 		
+		JustMapClient.UPDATER.execute(this::updateData);
+	}
+	
+	private void updateData() {
 		MapChunk eastChunk = MapCache.get().getChunk(chunkPos.x + 1, chunkPos.z, true);
 		MapChunk southChunk = MapCache.get().getChunk(chunkPos.x, chunkPos.z - 1, true);
+		
+		long currentTime = System.currentTimeMillis();
 		
 		ChunkLevel chunkLevel = getChunkLevel();
 		if (currentTime - chunkLevel.updated > ClientParams.chunkLevelUpdateInterval) {
@@ -202,7 +208,7 @@ public class MapChunk {
 			eastChunk.updateHeighmap();
 			southChunk.updateHeighmap();
 			
-			chunkLevel.updated = currentTime;
+			chunkLevel.updated = currentTime;			
 		}
 		
 		for (int x = 0; x < 16; x++) {

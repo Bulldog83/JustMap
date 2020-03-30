@@ -3,59 +3,51 @@ package ru.bulldog.justmap.util;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executor;
+import java.util.concurrent.locks.LockSupport;
 
 import ru.bulldog.justmap.JustMap;
 
 public class TaskManager implements Executor {
     private final Queue<Runnable> workQueue = new ConcurrentLinkedQueue<>();
-    private volatile boolean isRunning = false;
+    private final Thread thread;
+    private boolean running = true;
     
     private String name = JustMap.MODID;
-    private long downtimeLimit = 1000;
-    private long downtime = 0;
     
-    public TaskManager() {}
+    public TaskManager() {
+    	this.thread = new Thread(this::work, this.name);
+    	thread.start();
+    }
     
     public TaskManager(String name) {
     	this.name += "-" + name;
+    	this.thread = new Thread(this::work, this.name);    	
+    	thread.start();
     }
 
     @Override
     public void execute(Runnable command) {
     	workQueue.offer(command);
-    	if (!isRunning) start();
-    }
-
-    public void start() {
-        isRunning = true;
-        new Thread(new Task(), name).start();
+    	LockSupport.unpark(this.thread);
     }
     
     public void stop() {
-    	isRunning = false;
-    	if (workQueue.size() > 0) workQueue.clear();
+    	this.execute(() -> {
+    		this.running = false;
+    	});    	
     }
     
     public boolean isRunning() {
-    	return isRunning;
+    	return this.running;
     }
 
-    private final class Task implements Runnable {
-        @Override
-        public void run() {
-            while (isRunning) {
-                Runnable nextTask = workQueue.poll();
-                if (nextTask != null) {
-                    nextTask.run();
-                    downtime = 0;
-                } else {
-                	long time = System.currentTimeMillis();
-                	if (downtime == 0) downtime = time;
-                	if (time - downtime > downtimeLimit) {
-                		isRunning = false;
-                		downtime = 0;
-                	}
-                }
+    private void work() {
+    	while (running) {
+            Runnable nextTask = workQueue.poll();
+            if (nextTask != null) {
+                nextTask.run();
+            } else {
+            	LockSupport.park("Tasks waiting...");
             }
         }
     }
