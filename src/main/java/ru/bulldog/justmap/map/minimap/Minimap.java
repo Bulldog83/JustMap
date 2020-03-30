@@ -17,6 +17,7 @@ import ru.bulldog.justmap.util.math.MathUtil;
 import ru.bulldog.justmap.util.math.RandomUtil;
 
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.screen.ChatScreen;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.entity.Entity;
@@ -338,6 +339,11 @@ public class Minimap implements AbstractMap{
 	}
 	
 	public boolean isMapVisible() {
+		if (minecraftClient.currentScreen != null) {
+			return isMapVisible && !minecraftClient.isPaused() &&
+				   ClientParams.showInChat && minecraftClient.currentScreen instanceof ChatScreen;
+		}
+		
 		return isMapVisible;
 	}
 
