@@ -74,16 +74,6 @@ compileJava {
 		def minor = versionProps['VERSION_MINOR'].toInteger()
 		def build = versionProps['VERSION_BUILD'].toInteger() + 1
 
-		if (build > 99) {
-			third += 1
-			build = 1
-			
-			if (third > 99) {
-				minor += 1
-				third = 0
-			}
-		}
-		
 		versionProps['VERSION_MINOR'] = minor.toString()
 		versionProps['VERSION_BUILD'] = build.toString()
 		versionProps.store(versionPropsFile.newWriter(), null)
