@@ -18,7 +18,11 @@ if (versionPropsFile.canRead()) {
 
 	def major = versionProps['VERSION_MAJOR'].toInteger()
 	def minor = versionProps['VERSION_MINOR'].toInteger()
-	def build = versionProps['VERSION_BUILD'].toInteger()
+	def build = versionProps['VERSION_BUILD'].toInteger() + 1
+	
+	versionProps['VERSION_MINOR'] = minor.toString()
+	versionProps['VERSION_BUILD'] = build.toString()
+	versionProps.store(versionPropsFile.newWriter(), null)
 
 	version = "${major}.${minor}.${build}"
 }
@@ -65,21 +69,7 @@ task sourcesJar(type: Jar, dependsOn: classes) {
 }
 
 compileJava {
-	if (versionPropsFile.canRead()) {
-		def Properties versionProps = new Properties()
-
-		versionProps.load(new FileInputStream(versionPropsFile))
-
-		def major = versionProps['VERSION_MAJOR'].toInteger()
-		def minor = versionProps['VERSION_MINOR'].toInteger()
-		def build = versionProps['VERSION_BUILD'].toInteger() + 1
-
-		versionProps['VERSION_MINOR'] = minor.toString()
-		versionProps['VERSION_BUILD'] = build.toString()
-		versionProps.store(versionPropsFile.newWriter(), null)
-
-		version = "${major}.${minor}.${build}-${project.minecraft_version}"
-	}
+	version += "-${project.minecraft_version}"
 }
 
 jar {
