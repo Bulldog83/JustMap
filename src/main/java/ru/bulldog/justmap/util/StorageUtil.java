@@ -56,7 +56,7 @@ public class StorageUtil {
 				}
 			}
 			
-			storage = new VersionedChunkStorage(storageDir, minecraft.getDataFixer());
+			storage = new VersionedChunkStorage(storageDir, minecraft.getDataFixer(), true);
 		}
 	}
 	
@@ -82,7 +82,7 @@ public class StorageUtil {
 		ServerInfo serverInfo = client.getCurrentServerEntry();
 		if (client.isIntegratedServerRunning()) {
 			MinecraftServer server = client.getServer();
-			filesDir = new File(MAP_DIR, String.format("local/%s/", server.getLevelName()));
+			filesDir = new File(MAP_DIR, String.format("local/%s/", server.getServerName()));
 		} else if (serverInfo != null) {
 			filesDir = new File(MAP_DIR, String.format("servers/%s/", serverInfo.name));
 		} else {		

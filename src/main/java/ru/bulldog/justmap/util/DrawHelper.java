@@ -12,10 +12,10 @@ import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.texture.Sprite;
-import net.minecraft.client.util.math.Matrix3f;
-import net.minecraft.client.util.math.Matrix4f;
+import net.minecraft.util.math.Matrix3f;
+import net.minecraft.util.math.Matrix4f;
+import net.minecraft.client.util.math.AffineTransformation;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.client.util.math.Rotation3;
 
 import org.lwjgl.opengl.GL11;
 
@@ -143,7 +143,7 @@ public class DrawHelper extends DrawableHelper {
 	}
 
 	public static void fill(double x, double y, double w, double h, int color) {
-		fill(Rotation3.identity().getMatrix(), x, y, w, h, color);
+		fill(AffineTransformation.identity().getMatrix(), x, y, w, h, color);
 	}
 
 	public static void fill(Matrix4f matrix4f, double x, double y, double w, double h, int color) {
