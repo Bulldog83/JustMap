@@ -41,7 +41,6 @@ import ru.bulldog.justmap.util.math.MathUtil;
 public class Worldmap extends MapScreen implements AbstractMap {
 
 	private final static LiteralText TITLE = new LiteralText("Worldmap");
-	private final static TaskManager processor = new TaskManager("worldmap");
 	
 	private static Worldmap worldmap;
 	
@@ -76,6 +75,7 @@ public class Worldmap extends MapScreen implements AbstractMap {
 	private NativeImageBackedTexture mapTexture;
 	private Identifier textureId;
 	private String cursorCoords;
+	private TaskManager processor;
 	
 	private List<WaypointIcon> waypoints = new ArrayList<>();
 	
@@ -86,6 +86,10 @@ public class Worldmap extends MapScreen implements AbstractMap {
 	@Override
 	public void init() {		
 		super.init();
+		
+		if (processor == null) {
+			this.processor = new TaskManager("worldmap");
+		}
 		
 		this.paddingTop = 8;
 		this.paddingBottom = 8;
@@ -289,7 +293,7 @@ public class Worldmap extends MapScreen implements AbstractMap {
 	
 	private void changeScale(float value) {
 		this.imageScale = MathUtil.clamp(this.imageScale + value, 0.5F, 3F);
-		this.updateInterval = (long) (imageScale > 1 ? 50 * imageScale : 50);
+		this.updateInterval = (long) (imageScale > 1 ? 30 * imageScale : 50);
 	}
 	
 	private void moveMap(Direction direction) {
@@ -453,7 +457,8 @@ public class Worldmap extends MapScreen implements AbstractMap {
 	
 	@Override
 	public void onClose() {
-		processor.stop();
+		this.processor.stop();
+		this.processor = null;
 		if (mapTexture != null) {
 			this.mapTexture.close();
 			this.imageBuffer.close();
