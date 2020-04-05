@@ -317,9 +317,7 @@ public class Worldmap extends MapScreen implements AbstractMap {
 			default: break;
 		}
 		
-		processor.execute(() -> {
-			updateMapTexture();			
-		});
+		processor.execute(this::updateMapTexture);
 
 		this.playerTracking = false;
 		this.updated = time;
@@ -380,9 +378,7 @@ public class Worldmap extends MapScreen implements AbstractMap {
 			
 			this.centerPos = new BlockPos(x, y, z);
 			
-			processor.execute(() -> {
-				updateMapTexture();			
-			});
+			processor.execute(this::updateMapTexture);
 			
 			this.playerTracking = false;
 			this.updated = time;
