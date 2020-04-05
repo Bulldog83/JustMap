@@ -288,7 +288,7 @@ public class Worldmap extends MapScreen implements AbstractMap {
 		this.playerTracking = true;
 		this.centerPos = minecraft.player.getBlockPos();
   		
-		updateMapTexture();
+		processor.execute(this::updateMapTexture);
 	}
 	
 	private void changeScale(float value) {
