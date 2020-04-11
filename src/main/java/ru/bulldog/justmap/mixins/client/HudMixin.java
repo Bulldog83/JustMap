@@ -49,85 +49,89 @@ abstract class HudMixin extends DrawableHelper {
 	@Inject(at = @At("HEAD"), method = "renderStatusEffectOverlay", cancellable = true)
 	protected void renderStatusEffects(CallbackInfo info) {
 		if (ClientParams.moveEffects) {
-			Collection<StatusEffectInstance> collection = this.client.player.getStatusEffects();
-			if (!collection.isEmpty()) {
-				int posX = this.scaledWidth;
-				if (ClientParams.mapPosition == MapPosition.TOP_RIGHT) {
-					posX = MapRenderer.getInstance().getX();
-				}
-				
-				RenderSystem.enableBlend();
-				int i = 0;
-				int j = 0;
-				
-				int size = 24;
-				int hOffset = 6;
-				int vOffset = 10;
-				if (!ClientParams.showEffectTimers) {
-					hOffset = 1;
-					vOffset = 2;
-				}
-				
-				StatusEffectSpriteManager statusEffectSpriteManager = this.client.getStatusEffectSpriteManager();
-				List<Runnable> list = Lists.newArrayListWithExpectedSize(collection.size());
-				List<Runnable> timers = Lists.newArrayListWithExpectedSize(collection.size());
-				this.client.getTextureManager().bindTexture(HandledScreen.BACKGROUND_TEXTURE);
-				Iterator<StatusEffectInstance> var6 = Ordering.natural().reverse().sortedCopy(collection).iterator();
-	
-			 	while(var6.hasNext()) {
-			 		StatusEffectInstance statusEffectInstance = (StatusEffectInstance)var6.next();
-					StatusEffect statusEffect = statusEffectInstance.getEffectType();
-					if (statusEffectInstance.shouldShowIcon()) {
-						int k = posX;
-					   	int l = ClientParams.positionOffset;
-					   	if (this.client.isDemo()) {
-						   l += 15;
-					   	}
-	
-					   	if (statusEffect.isBeneficial()) {
-					   		++i;
-						  	k -= (size + hOffset) * i;
-					   	} else {
-					   		++j;
-						  	k -= (size + hOffset) * j;
-						  	l += size + vOffset;
-					   	}
-	
-				   		int effectDuration = statusEffectInstance.getDuration();
-				   		RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
-				   		float f = 1.0F;
-				   		if (statusEffectInstance.isAmbient()) {
-				   			this.drawTexture(k, l, 165, 166, size, size);
-				   		} else {
-					   		this.drawTexture(k, l, 141, 166, size, size);
-					  		if (effectDuration <= 200) {
-						  		int m = 10 - effectDuration / 20;
-						 		f = MathHelper.clamp((float)effectDuration / 10.0F / 5.0F * 0.5F, 0.0F, 0.5F) + MathHelper.cos((float)effectDuration * 3.1415927F / 5.0F) * MathHelper.clamp((float)m / 10.0F * 0.25F, 0.0F, 0.25F);
-					  		}
-				   		}
-				   		
-				   		Sprite sprite = statusEffectSpriteManager.getSprite(statusEffect);
-				   		final int fk = k, fl = l;
-				   		final float ff = f;
-				   		list.add(() -> {
-				   			this.client.getTextureManager().bindTexture(sprite.getAtlas().getId());
-							RenderSystem.color4f(1.0F, 1.0F, 1.0F, ff);
-							drawSprite(fk + 3, fl + 3, this.getZOffset(), 18, 18, sprite);
-				   		});
-				   		if (ClientParams.showEffectTimers) {
-					   		timers.add(() -> {
-					   			drawCenteredString(client.textRenderer, convertDuration(effectDuration), fk + size / 2, fl + (size + 1), Colors.WHITE);
-					   		});
-				   		}
-					}
-			 	}
-	
-			 	list.forEach(Runnable::run);
-			 	timers.forEach(Runnable::run);
-				
-				info.cancel();
+			int posX = this.scaledWidth;
+			int posY = ClientParams.positionOffset;
+			if (ClientParams.mapPosition == MapPosition.TOP_RIGHT) {
+				posX = MapRenderer.getInstance().getX();
 			}
+			
+			this.drawMovedEffects(posX, posY);			
+			info.cancel();
 		}
+	}
+	
+	private void drawMovedEffects(int screenX, int screenY) {
+		Collection<StatusEffectInstance> statusEffects = this.client.player.getStatusEffects();
+		if (statusEffects.isEmpty()) return;
+		
+		RenderSystem.enableBlend();
+		
+		int size = 24;
+		int hOffset = 6;
+		int vOffset = 10;
+		
+		if (!ClientParams.showEffectTimers) {
+			hOffset = 1;
+			vOffset = 2;
+		}
+		
+		StatusEffectSpriteManager statusEffectSpriteManager = this.client.getStatusEffectSpriteManager();
+		List<Runnable> icons = Lists.newArrayListWithExpectedSize(statusEffects.size());
+		List<Runnable> timers = Lists.newArrayListWithExpectedSize(statusEffects.size());
+		this.client.getTextureManager().bindTexture(HandledScreen.BACKGROUND_TEXTURE);
+		Iterator<StatusEffectInstance> effectsIterator = Ordering.natural().reverse().sortedCopy(statusEffects).iterator();
+
+	 	int i = 0, j = 0;
+		while(effectsIterator.hasNext()) {
+	 		StatusEffectInstance statusEffectInstance = effectsIterator.next();
+			StatusEffect statusEffect = statusEffectInstance.getEffectType();
+			if (statusEffectInstance.shouldShowIcon()) {
+				int x = screenX;
+			   	int y = screenY;
+			   	if (this.client.isDemo()) {
+				   y += 15;
+			   	}
+
+			   	if (statusEffect.isBeneficial()) {
+			   		++i;
+				  	x -= (size + hOffset) * i;
+			   	} else {
+			   		++j;
+				  	x -= (size + hOffset) * j;
+				  	y += size + vOffset;
+			   	}
+
+		   		int effectDuration = statusEffectInstance.getDuration();
+		   		RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+		   		float alpha = 1.0F;
+		   		if (statusEffectInstance.isAmbient()) {
+		   			this.drawTexture(x, y, 165, 166, size, size);
+		   		} else {
+			   		this.drawTexture(x, y, 141, 166, size, size);
+			  		if (effectDuration <= 200) {
+				  		int m = 10 - effectDuration / 20;
+				 		alpha = MathHelper.clamp(effectDuration / 10F / 5F * 0.5F, 0F, 0.5F) + MathHelper.cos((float) (effectDuration * Math.PI) / 5F) * MathHelper.clamp(m / 10F * 0.25F, 0.0F, 0.25F);
+			  		}
+		   		}
+		   		
+		   		Sprite sprite = statusEffectSpriteManager.getSprite(statusEffect);
+		   		final int fx = x, fy = y;
+		   		final float fa = alpha;
+		   		icons.add(() -> {
+		   			this.client.getTextureManager().bindTexture(sprite.getAtlas().getId());
+					RenderSystem.color4f(1.0F, 1.0F, 1.0F, fa);
+					drawSprite(fx + 3, fy + 3, this.getZOffset(), 18, 18, sprite);
+		   		});
+		   		if (ClientParams.showEffectTimers) {
+			   		timers.add(() -> {
+			   			drawCenteredString(client.textRenderer, convertDuration(effectDuration), fx + size / 2, fy + (size + 1), Colors.WHITE);
+			   		});
+		   		}
+			}
+	 	}
+
+	 	icons.forEach(Runnable::run);
+	 	timers.forEach(Runnable::run);
 	}
 	
 	private String convertDuration(int time) {
