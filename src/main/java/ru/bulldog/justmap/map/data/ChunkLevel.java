@@ -28,6 +28,7 @@ public class ChunkLevel {
 	int[] levelmap;
 	
 	long updated = 0;
+	long refreshed = 0;
 	int level;
 	
 	ChunkLevel(int level) {

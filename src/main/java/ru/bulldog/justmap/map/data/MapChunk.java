@@ -224,7 +224,7 @@ public class MapChunk {
 				BlockPos blockPos = new BlockPos(posX, posY, posZ);
 				BlockState blockState = getBlockState(blockPos);
 				BlockState worldState = worldChunk.getBlockState(blockPos);
-				if(StateUtil.isAir(blockState) || !blockState.equals(worldState)) {
+				if(StateUtil.isAir(blockState) || !blockState.equals(worldState) || currentTime - chunkLevel.refreshed > 60000) {
 					int color = ColorUtil.blockColor(worldChunk, blockPos);
 					if (color != -1) {
 						int heightDiff = MapProcessor.heightDifference(this, eastChunk, southChunk, x, posY, z);
@@ -262,6 +262,10 @@ public class MapChunk {
 		
 		this.empty = false;
 		this.updated = currentTime;
+		
+		if (currentTime - chunkLevel.refreshed > 60000) {
+			chunkLevel.refreshed = currentTime;
+		}
 	}
 	
 	private void updateRegionData() {
