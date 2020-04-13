@@ -23,7 +23,7 @@ public class PlayerHeadIcon {
 	
 	private long lastCheck;
 	private int delay = 5000;
-	private boolean succsses = false;
+	private boolean success = false;
 	
 	private Identifier skin;	
 	private PlayerEntity player;
@@ -39,22 +39,16 @@ public class PlayerHeadIcon {
 		if (playerIcons.containsKey(player.getUuid())) {
 			icon = playerIcons.get(player.getUuid());
 			
-			if (!icon.succsses) {
-				JustMap.EXECUTOR.execute(() -> {
-					if (now - icon.lastCheck - icon.delay >= 0) {
-						getPlayerSkin(icon);
-					}
-				});
-			} else if (now - icon.lastCheck >= 300000) {
-				JustMap.EXECUTOR.execute(() -> {
-					getPlayerSkin(icon);
-				});
+			if (!icon.success) {
+				if (now - icon.lastCheck - icon.delay >= 0) {
+					updatePlayerSkin(icon);
+				}
+			} else if (now - icon.lastCheck >= 60000) {
+				updatePlayerSkin(icon);
 			}
 		} else {
 			icon = new PlayerHeadIcon(player);
-			JustMap.EXECUTOR.execute(() -> {
-				registerIcon(icon);
-			});			
+			registerIcon(icon);		
 		}
 
 		return icon;
@@ -70,6 +64,11 @@ public class PlayerHeadIcon {
 		DrawHelper.draw(x, y, size, size);
 	}
 	
+	private static void updatePlayerSkin(PlayerHeadIcon icon) {
+		JustMap.EXECUTOR.execute(() -> {
+			getPlayerSkin(icon);
+		});
+	}	
 	
 	private static void registerIcon(PlayerHeadIcon icon) {
 		getPlayerSkin(icon);
@@ -83,10 +82,10 @@ public class PlayerHeadIcon {
 		
 		if (textures.containsKey(MinecraftProfileTexture.Type.SKIN)) {
 			icon.skin = skinProvider.loadSkin(textures.get(MinecraftProfileTexture.Type.SKIN), MinecraftProfileTexture.Type.SKIN);
-			icon.succsses = true;
+			icon.success = true;
 		} else {
 			icon.skin = DefaultSkinHelper.getTexture(icon.player.getUuid());
-			icon.succsses = false;
+			icon.success = false;
 		}
 	}
 }
