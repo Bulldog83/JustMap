@@ -23,7 +23,7 @@ public class PlayerHeadIcon {
 	
 	private long lastCheck;
 	private int delay = 5000;
-	private boolean succsses = false;
+	private boolean success = false;
 	
 	private Identifier skin;	
 	private PlayerEntity player;
@@ -39,7 +39,7 @@ public class PlayerHeadIcon {
 		if (playerIcons.containsKey(player.getUuid())) {
 			icon = playerIcons.get(player.getUuid());
 			
-			if (!icon.succsses) {
+			if (!icon.success) {
 				if (now - icon.lastCheck - icon.delay >= 0) {
 					updatePlayerSkin(icon);
 				}
@@ -82,10 +82,10 @@ public class PlayerHeadIcon {
 		
 		if (textures.containsKey(MinecraftProfileTexture.Type.SKIN)) {
 			icon.skin = skinProvider.loadSkin(textures.get(MinecraftProfileTexture.Type.SKIN), MinecraftProfileTexture.Type.SKIN);
-			icon.succsses = true;
+			icon.success = true;
 		} else {
 			icon.skin = DefaultSkinHelper.getTexture(icon.player.getUuid());
-			icon.succsses = false;
+			icon.success = false;
 		}
 	}
 }
