@@ -40,21 +40,15 @@ public class PlayerHeadIcon {
 			icon = playerIcons.get(player.getUuid());
 			
 			if (!icon.succsses) {
-				JustMap.EXECUTOR.execute(() -> {
-					if (now - icon.lastCheck - icon.delay >= 0) {
-						getPlayerSkin(icon);
-					}
-				});
+				if (now - icon.lastCheck - icon.delay >= 0) {
+					updatePlayerSkin(icon);
+				}
 			} else if (now - icon.lastCheck >= 300000) {
-				JustMap.EXECUTOR.execute(() -> {
-					getPlayerSkin(icon);
-				});
+				updatePlayerSkin(icon);
 			}
 		} else {
 			icon = new PlayerHeadIcon(player);
-			JustMap.EXECUTOR.execute(() -> {
-				registerIcon(icon);
-			});			
+			registerIcon(icon);			
 		}
 
 		return icon;
@@ -70,6 +64,11 @@ public class PlayerHeadIcon {
 		DrawHelper.draw(x, y, size, size);
 	}
 	
+	private static void updatePlayerSkin(PlayerHeadIcon icon) {
+		JustMap.EXECUTOR.execute(() -> {
+			getPlayerSkin(icon);
+		});
+	}
 	
 	private static void registerIcon(PlayerHeadIcon icon) {
 		getPlayerSkin(icon);
