@@ -1,7 +1,7 @@
 package ru.bulldog.justmap.map.icon;
 
 import ru.bulldog.justmap.client.config.ClientParams;
-import ru.bulldog.justmap.map.AbstractMap;
+import ru.bulldog.justmap.map.IMap;
 import ru.bulldog.justmap.map.waypoint.Waypoint;
 import ru.bulldog.justmap.util.math.MathUtil;
 
@@ -9,7 +9,7 @@ public class WaypointIcon extends MapIcon<WaypointIcon> {
 	
 	public final Waypoint waypoint;
 	
-	public WaypointIcon(AbstractMap map, Waypoint waypoint) {
+	public WaypointIcon(IMap map, Waypoint waypoint) {
 		super(map);
 		this.waypoint = waypoint;
 	}

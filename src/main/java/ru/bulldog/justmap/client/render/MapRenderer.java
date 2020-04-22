@@ -31,6 +31,7 @@ import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.texture.NativeImageBackedTexture;
+import net.minecraft.client.texture.TextureManager;
 import net.minecraft.util.Identifier;
 
 @Environment(EnvType.CLIENT)
@@ -49,9 +50,9 @@ public class MapRenderer {
 
 	private final Minimap minimap;
 	
-	private NativeImage backingImage;
-	private NativeImageBackedTexture texture;
-	private Identifier mapTexture;
+	private NativeImage textureImage;
+	private NativeImageBackedTexture mapTexture;
+	private Identifier textureId;
 	
 	private TextManager textManager;
 	
@@ -92,10 +93,7 @@ public class MapRenderer {
 		return this.border;
 	}
 	
-	public void updateParams() {
-		
-		backingImage = minimap.getImage();		
-		
+	public void updateParams() {		
 		int winW = client.getWindow().getScaledWidth();
 		int winH = client.getWindow().getScaledHeight();
 		
@@ -211,19 +209,27 @@ public class MapRenderer {
 		dir.x = posX; dir.y = posY;
 	}
 	
-	public void markDirty() {
-		NativeImage img = minimap.getImage();
-		if (img != backingImage) {
-			backingImage = img;
-			if (texture != null) {
-				texture.close();
-			}
-			texture = null;
+	private void prepareTexture() {
+		TextureManager manager = client.getTextureManager();
+		
+		int textureSize = minimap.getScaledSize();
+		if (textureImage == null || textureImage.getWidth() != textureSize || textureImage.getHeight() != textureSize) {
+			this.textureImage = new NativeImage(textureSize, textureSize, false);
+			
+			if (mapTexture != null) mapTexture.close();
+			
+			this.mapTexture = new NativeImageBackedTexture(textureImage);
+			this.textureId = manager.registerDynamicTexture(JustMap.MODID + "_minimap_texture", mapTexture);
 		}
 		
-		if (texture != null) {
-			texture.upload();
+		try {
+			this.textureImage.copyFrom(minimap.getImage());
+			this.mapTexture.upload();
+		} catch (Exception ex) {
+			JustMap.LOGGER.catching(ex);
 		}
+		
+		manager.bindTexture(textureId);
 	}
 	
 	public void draw() {
@@ -231,12 +237,7 @@ public class MapRenderer {
 			return;
 		}
 		
-		updateParams();
-		
-		if (texture == null) {
-			texture = new NativeImageBackedTexture(backingImage);
-			mapTexture = client.getTextureManager().registerDynamicTexture(JustMap.MODID + "_map_texture", texture);
-		}
+		this.updateParams();
 		
 		RenderSystem.disableDepthTest();
 		
@@ -255,10 +256,10 @@ public class MapRenderer {
 		GL11.glEnable(GL11.GL_SCISSOR_TEST);
 		GL11.glScissor(scaledX, scaledY, scaledW, scaledH);
 		
-		drawMap();
+		this.drawMap();
 
 		if (ClientParams.drawChunkGrid) {
-			drawChunkGrid();
+			this.drawChunkGrid();
 		}
 		if (Minimap.allowEntityRadar()) {
 			if (Minimap.allowPlayerRadar()) {
@@ -285,7 +286,7 @@ public class MapRenderer {
 		
 		GL11.glDisable(GL11.GL_SCISSOR_TEST);
 		
-		textManager.draw();
+		this.textManager.draw();
 		
 		RenderSystem.enableDepthTest();
 	}
@@ -297,7 +298,7 @@ public class MapRenderer {
 		
 		double z = 0.09;
 		
-		client.getTextureManager().bindTexture(mapTexture);
+		this.prepareTexture();
 		
 		float f1 = 0.0F, f2 = 1.0F;		
 		if (ClientParams.rotateMap) {

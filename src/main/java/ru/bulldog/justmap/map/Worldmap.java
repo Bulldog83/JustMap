@@ -19,14 +19,13 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.text.LiteralText;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.Direction;
 
 import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.client.MapScreen;
 import ru.bulldog.justmap.client.config.ConfigFactory;
-import ru.bulldog.justmap.map.data.Layers;
+import ru.bulldog.justmap.map.data.Layer;
 import ru.bulldog.justmap.map.data.MapCache;
 import ru.bulldog.justmap.map.data.MapChunk;
 import ru.bulldog.justmap.map.icon.WaypointIcon;
@@ -38,7 +37,7 @@ import ru.bulldog.justmap.util.ImageUtil;
 import ru.bulldog.justmap.util.TaskManager;
 import ru.bulldog.justmap.util.math.MathUtil;
 
-public class Worldmap extends MapScreen implements AbstractMap {
+public class Worldmap extends MapScreen implements IMap {
 
 	private final static LiteralText TITLE = new LiteralText("Worldmap");
 	
@@ -88,7 +87,7 @@ public class Worldmap extends MapScreen implements AbstractMap {
 		super.init();
 		
 		if (processor == null) {
-			this.processor = new TaskManager("worldmap");
+			this.processor = TaskManager.getManager("worldmap");
 		}
 		
 		this.paddingTop = 8;
@@ -106,7 +105,8 @@ public class Worldmap extends MapScreen implements AbstractMap {
 		
 		this.cursorCoords = MathUtil.posToString(centerPos);
 		
-		addMapButtons();
+		this.addMapButtons();
+		this.updateScale();
 		
 		waypoints.clear();
 		List<Waypoint> wps = WaypointKeeper.getInstance().getWaypoints(dimension, true);
@@ -117,8 +117,6 @@ public class Worldmap extends MapScreen implements AbstractMap {
 				this.waypoints.add(waypoint);
 			}
 		}
-		
-		this.updateInterval = 50;
 	}
 	
 	private void addMapButtons() {
@@ -169,9 +167,6 @@ public class Worldmap extends MapScreen implements AbstractMap {
 	}
 	
 	private void prepareTexture() {
-		this.scaledWidth = (int) Math.ceil(width * imageScale);
-		this.scaledHeight = (int) Math.ceil(height * imageScale);
-		
 		TextureManager manager = minecraft.getTextureManager();
 		if (mapImage == null || mapImage.getWidth() != scaledWidth || mapImage.getHeight() != scaledHeight) {
 			this.mapImage = new NativeImage(scaledWidth, scaledHeight, false);
@@ -196,7 +191,7 @@ public class Worldmap extends MapScreen implements AbstractMap {
 	}
 	
 	private void updateMapTexture() {
-		calculateShift();
+		this.calculateShift();
 		
 		int centerX = centerPos.getX() >> 4;
 		int centerZ = centerPos.getZ() >> 4;
@@ -219,18 +214,27 @@ public class Worldmap extends MapScreen implements AbstractMap {
 		for (int posX = startX; posX < stopX; posX++) {
 			int picY = 0;
 			for (int posZ = startZ; posZ < stopZ; posZ++) {
-				ChunkPos pos = new ChunkPos(posX, posZ);
 				
-				NativeImage chunkImage;
+				MapChunk mapChunk;
 				if (dimension != -1) {
-					chunkImage = mapData.getRegion(pos).getChunkImage(pos, Layers.Type.SURFACE.value, 0);
+					mapChunk = mapData.getChunk(Layer.Type.SURFACE, 0, posX, posZ);
 				} else {
-					chunkImage = mapData.getRegion(pos).getChunkImage(pos);
+					mapChunk = mapData.getChunk(posX, posZ);
 				}
 				
-				ImageUtil.writeTile(tmpImage, chunkImage, picX, picY);
-				
-				chunkImage.close();
+				for (int x = 0; x < 16; x++) {
+					int px = picX + x;
+					
+					if (px >= mapImage.getWidth()) break;
+					
+					for (int z = 0; z < 16; z++) {
+						int py = picY + z;
+						
+						if (py >= mapImage.getHeight()) break;
+						
+						tmpImage.setPixelRgba(px, py, mapChunk.getBlockColor(x, z));
+					}
+				}
 				picY += 16;
 			}			
 			picX += 16;
@@ -242,13 +246,11 @@ public class Worldmap extends MapScreen implements AbstractMap {
 		tmpImage = ImageUtil.readTile(tmpImage, offX, offY, scaledWidth, scaledHeight, true);
 		
 		if (imageBuffer == null || imageBuffer.getWidth() != scaledWidth || imageBuffer.getHeight() != scaledHeight) {
-			if (imageBuffer != null) imageBuffer.close();
-			
+			if (imageBuffer != null) imageBuffer.close();			
 			this.imageBuffer = new NativeImage(scaledWidth, scaledHeight, false);
-			ImageUtil.fillImage(imageBuffer, Colors.BLACK);
 		}		
 		
-		imageBuffer.copyFrom(tmpImage);
+		this.imageBuffer.copyFrom(tmpImage);
 		tmpImage.close();
 	}
 	
@@ -291,9 +293,23 @@ public class Worldmap extends MapScreen implements AbstractMap {
 		processor.execute(this::updateMapTexture);
 	}
 	
+	private void updateScale() {
+		this.scaledWidth = (int) Math.ceil(width * imageScale);
+		this.scaledHeight = (int) Math.ceil(height * imageScale);
+		
+		if (scaledWidth > 2580) {
+			this.imageScale = 2580F / width;
+			this.updateScale();
+			
+			return;
+		}
+		
+		this.updateInterval = (long) (imageScale > 1 ? 10 * imageScale : 10);
+	}
+	
 	private void changeScale(float value) {
 		this.imageScale = MathUtil.clamp(this.imageScale + value, 0.5F, 3F);
-		this.updateInterval = (long) (imageScale > 1 ? 30 * imageScale : 50);
+		this.updateScale();
 	}
 	
 	private void moveMap(Direction direction) {
@@ -318,7 +334,7 @@ public class Worldmap extends MapScreen implements AbstractMap {
 		}
 		
 		processor.execute(this::updateMapTexture);
-
+		
 		this.playerTracking = false;
 		this.updated = time;
 	}
@@ -373,8 +389,8 @@ public class Worldmap extends MapScreen implements AbstractMap {
 			int y = centerPos.getY();
 			int z = centerPos.getZ();
 			
-			x -= MathUtil.clamp(Math.round((8 * f) * imageScale), -32, 32);
-			z -= MathUtil.clamp(Math.round((8 * g) * imageScale), -32, 32);
+			x -= Math.round(2 * f * imageScale);
+			z -= Math.round(2 * g * imageScale);
 			
 			this.centerPos = new BlockPos(x, y, z);
 			
@@ -406,7 +422,7 @@ public class Worldmap extends MapScreen implements AbstractMap {
 		
 		MapChunk mapChunk;
 		if (dimension != -1) {
-			mapChunk = MapCache.get().getChunk(Layers.Type.SURFACE.value, 0, chunkX, chunkZ);
+			mapChunk = MapCache.get().getChunk(Layer.Type.SURFACE, 0, chunkX, chunkZ);
 		} else {
 			mapChunk = MapCache.get().getChunk(chunkX, chunkZ);
 		}

@@ -4,7 +4,7 @@ import net.minecraft.entity.player.PlayerEntity;
 
 import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.client.render.EntityModelRenderer;
-import ru.bulldog.justmap.map.AbstractMap;
+import ru.bulldog.justmap.map.IMap;
 import ru.bulldog.justmap.util.Colors;
 import ru.bulldog.justmap.util.DrawHelper;
 
@@ -13,7 +13,7 @@ public class PlayerIcon extends MapIcon<PlayerIcon> {
 	protected boolean self;
 	protected PlayerEntity player;
 	
-	public PlayerIcon(AbstractMap map, PlayerEntity player, boolean self) {
+	public PlayerIcon(IMap map, PlayerEntity player, boolean self) {
 		super(map);
 		this.self = self;
 		this.player = player;

@@ -1,5 +1,7 @@
 package ru.bulldog.justmap.util;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executor;
@@ -14,12 +16,32 @@ public class TaskManager implements Executor {
     
     private String name = JustMap.MODID;
     
-    public TaskManager() {
-    	this.thread = new Thread(this::work, this.name);
-    	thread.start();
+    private static Map<String, TaskManager> managers = new HashMap<>();
+    
+    public static TaskManager getManager(String name) {
+    	if (managers.containsKey(name)) {
+    		TaskManager manager = managers.get(name);
+    		if (!manager.isRunning()) {
+    			manager = new TaskManager(name);
+    			managers.replace(name, manager);
+    		}
+    		
+    		return manager;
+    	}
+    	
+    	TaskManager manager = new TaskManager(name);
+    	managers.put(name, manager);
+    	
+    	return manager;
     }
     
-    public TaskManager(String name) {
+    public static void shutdown() {
+    	managers.forEach((name, manager) -> {
+    		if (manager.isRunning()) manager.stop();
+    	});
+    }
+    
+    private TaskManager(String name) {
     	this.name += "-" + name;
     	this.thread = new Thread(this::work, this.name);    	
     	thread.start();

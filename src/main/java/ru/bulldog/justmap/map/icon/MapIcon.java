@@ -1,18 +1,18 @@
 package ru.bulldog.justmap.map.icon;
 
-import ru.bulldog.justmap.map.AbstractMap;
+import ru.bulldog.justmap.map.IMap;
 import ru.bulldog.justmap.util.math.MathUtil;
 
 import net.minecraft.client.MinecraftClient;
 
 public abstract class MapIcon<T extends MapIcon<T>> {
 	
-	protected AbstractMap map;
+	protected IMap map;
 	public double x, y;
 	
 	protected static final MinecraftClient client = MinecraftClient.getInstance();
 	
-	public MapIcon(AbstractMap map) {
+	public MapIcon(IMap map) {
 		this.map = map;
 	}
 	

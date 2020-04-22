@@ -4,7 +4,7 @@ import net.minecraft.entity.Entity;
 
 import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.client.render.EntityModelRenderer;
-import ru.bulldog.justmap.map.AbstractMap;
+import ru.bulldog.justmap.map.IMap;
 import ru.bulldog.justmap.map.minimap.Minimap;
 import ru.bulldog.justmap.util.Colors;
 import ru.bulldog.justmap.util.DrawHelper;
@@ -14,7 +14,7 @@ public class EntityIcon extends MapIcon<EntityIcon> {
 	private final Entity entity;
 	boolean hostile;
 		
-	public EntityIcon(AbstractMap map, Entity entity, boolean hostile) {
+	public EntityIcon(IMap map, Entity entity, boolean hostile) {
 		super(map);
 			
 		this.entity = entity;

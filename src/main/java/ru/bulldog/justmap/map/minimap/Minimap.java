@@ -2,9 +2,8 @@ package ru.bulldog.justmap.map.minimap;
 
 import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.client.config.ClientParams;
-import ru.bulldog.justmap.client.render.MapRenderer;
-import ru.bulldog.justmap.map.AbstractMap;
-import ru.bulldog.justmap.map.data.Layers.Type;
+import ru.bulldog.justmap.map.IMap;
+import ru.bulldog.justmap.map.data.Layer.Type;
 import ru.bulldog.justmap.map.data.MapCache;
 import ru.bulldog.justmap.map.icon.EntityIcon;
 import ru.bulldog.justmap.map.icon.PlayerIcon;
@@ -12,7 +11,9 @@ import ru.bulldog.justmap.map.icon.WaypointIcon;
 import ru.bulldog.justmap.map.waypoint.Waypoint;
 import ru.bulldog.justmap.map.waypoint.WaypointEditor;
 import ru.bulldog.justmap.map.waypoint.WaypointKeeper;
+import ru.bulldog.justmap.util.Colors;
 import ru.bulldog.justmap.util.DrawHelper.TextAlignment;
+import ru.bulldog.justmap.util.ImageUtil;
 import ru.bulldog.justmap.util.math.MathUtil;
 import ru.bulldog.justmap.util.math.RandomUtil;
 
@@ -36,7 +37,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
-public class Minimap implements AbstractMap{
+public class Minimap implements IMap{
 	
 	private static final MinecraftClient minecraftClient = MinecraftClient.getInstance();
 	
@@ -65,17 +66,18 @@ public class Minimap implements AbstractMap{
 	private static boolean isMapVisible = true;
 	private static boolean rotateMap = false;
 	
+	private Object imageLocker = new Object();
+	
 	public Minimap() {
 		this.mapWidth = JustMapClient.CONFIG.getInt("map_size");
 		this.mapHeight = JustMapClient.CONFIG.getInt("map_size");
 		this.mapScale = JustMapClient.CONFIG.getFloat("map_scale");		
 		this.picSize = ClientParams.rotateMap ? (int) (mapWidth * 1.3) : mapWidth;
+		this.textManager = new TextManager(this);
 		
-		int scaledSize = getScaledSize();
-		
-		image = new NativeImage(scaledSize, scaledSize, false);
-		textManager = new TextManager(this);
 		isMapVisible = JustMapClient.CONFIG.getBoolean("map_visible");
+		
+		this.renewMap();
 	}
 	
 	public void update() {
@@ -89,15 +91,20 @@ public class Minimap implements AbstractMap{
 
 			prepareMap(player);
 			updateInfo(player);
-
-			MapRenderer.getInstance().markDirty();
 		} else {
 			locPlayer = null;
 		}
 	}
 	
-	private void resizeMap(int newSize) {
-		image = new NativeImage(newSize, newSize, false);
+	private void renewMap() {
+		synchronized (imageLocker) {
+			if (image != null) {
+				this.image.close();
+			}		
+			int size = getScaledSize();
+			this.image = new NativeImage(size, size, false);
+			ImageUtil.fillImage(this.image, Colors.BLACK);
+		}
 	}
 	
 	public void onConfigChanges() {
@@ -105,16 +112,14 @@ public class Minimap implements AbstractMap{
 		float configScale = JustMapClient.CONFIG.getFloat("map_scale");		
 		boolean needRotate = JustMapClient.CONFIG.getBoolean("rotate_map");
 		
-		if (configSize != mapWidth || configScale != mapScale) {
+		if (configSize != mapWidth || configScale != mapScale || rotateMap != needRotate) {
 			this.mapWidth = configSize;
 			this.mapHeight = configSize;
 			this.mapScale = configScale;
 			
-			resizeMap(getScaledSize());
-		}
-		if (rotateMap != needRotate) {
 			rotateMap = needRotate;
-			resizeMap(getScaledSize());
+			
+			this.renewMap();
 		}
 		
 		isMapVisible = JustMapClient.CONFIG.getBoolean("map_visible");
@@ -203,11 +208,11 @@ public class Minimap implements AbstractMap{
 		double startZ = pos.getZ() - scaled / 2;
 
 		if (world.dimension.isNether()) {
-			MapCache.setCurrentLayer(Type.NETHER.value, pos.getY());
+			MapCache.setCurrentLayer(Type.NETHER, pos.getY());
 		} else if (needRenderCaves(world, player.getBlockPos())) {
-			MapCache.setCurrentLayer(Type.CAVES.value, pos.getY());
+			MapCache.setCurrentLayer(Type.CAVES, pos.getY());
 		} else {
-			MapCache.setCurrentLayer(Type.SURFACE.value, pos.getY());
+			MapCache.setCurrentLayer(Type.SURFACE, pos.getY());
 		}
 		
 		MapCache.get().update(this, scaled, (int) startX, (int) startZ);
@@ -310,7 +315,9 @@ public class Minimap implements AbstractMap{
 	}
 	
 	public NativeImage getImage() {
-		return image;
+		synchronized (imageLocker) {
+			return this.image;
+		}		
 	}
 	
 	public int getPictureSize() {
@@ -359,11 +366,11 @@ public class Minimap implements AbstractMap{
 
 	@Override
 	public int getScaledWidth() {
-		return (int) (this.mapWidth * this.mapScale);
+		return this.getScaledSize();
 	}
 
 	@Override
 	public int getScaledHeight() {
-		return (int) (this.mapHeight * this.mapScale);
+		return this.getScaledSize();
 	}
 }

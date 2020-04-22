@@ -246,7 +246,7 @@ public class ColorUtil {
 		floatBuffer[1] = MathUtil.clamp(floatBuffer[1], 0.0F, 1.0F);
 		floatBuffer[2] += ClientParams.mapBrightness / 100.0F;
 		floatBuffer[2] = MathUtil.clamp(floatBuffer[2], 0.0F, 1.0F);
-		if (ClientParams.showTerrain) {
+		if (ClientParams.showTerrain && heightDiff != 0) {
 			floatBuffer[2] += heightDiff / 10.0F;
 			floatBuffer[2] = MathUtil.clamp(floatBuffer[2], 0.0F, 1.0F);
 		}

@@ -11,14 +11,16 @@ import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.storage.VersionedChunkStorage;
 import ru.bulldog.justmap.JustMap;
 
-public class StorageUtil {	
+public class StorageUtil {
 	
 	private static MinecraftClient minecraft = MinecraftClient.getInstance();
-	private static VersionedChunkStorage storage;
-	private static File storageDir;
 	
 	public final static File MAP_DIR = new File(minecraft.runDirectory, "justmap/");
-	public final static TaskManager IO = new TaskManager("cache-io");
+	public final static TaskManager IO = TaskManager.getManager("cache-io");
+	
+	private static VersionedChunkStorage storage;
+	private static File storageDir;
+	private static File filesDir = new File(MAP_DIR, "undefined/");
 	
 	private static int currentDimId = 0;
 
@@ -27,9 +29,9 @@ public class StorageUtil {
 		try {
 			CompoundTag data = storage.getNbt(pos);
 			return data != null ? data : new CompoundTag();
-		} catch (IOException ex) {}
-		
-		return new CompoundTag();
+		} catch (IOException ex) {
+			return new CompoundTag();
+		}
 	}
 	
 	public static synchronized void saveCache(ChunkPos pos, CompoundTag data) {
@@ -37,7 +39,7 @@ public class StorageUtil {
 		storage.setTagAt(pos, data);
 	}
 	
-	public static void updateCacheStorage() {
+	private static void updateCacheStorage() {
 		File cacheDir = new File(cacheDir(), "chunk-data/");
 		if (storageDir == null || !storageDir.equals(cacheDir)) {		
 			storageDir = cacheDir;
@@ -47,9 +49,8 @@ public class StorageUtil {
 			}
 			
 			if (storage != null) {
-				storage.completeAll();
-				
 				try {
+					storage.completeAll();
 					storage.close();
 				} catch (IOException ex) {
 					JustMap.LOGGER.catching(ex);
@@ -78,15 +79,12 @@ public class StorageUtil {
 	public static File filesDir() {
 		MinecraftClient client = MinecraftClient.getInstance();
 		
-		File filesDir;
 		ServerInfo serverInfo = client.getCurrentServerEntry();
 		if (client.isIntegratedServerRunning()) {
 			MinecraftServer server = client.getServer();
 			filesDir = new File(MAP_DIR, String.format("local/%s/", server.getLevelName()));
 		} else if (serverInfo != null) {
 			filesDir = new File(MAP_DIR, String.format("servers/%s/", serverInfo.name));
-		} else {		
-			filesDir = new File(MAP_DIR, "undefined/");
 		}
 		
 		if (!filesDir.exists()) {

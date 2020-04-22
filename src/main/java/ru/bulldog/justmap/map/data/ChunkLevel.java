@@ -4,16 +4,12 @@ import java.util.Arrays;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
-import net.minecraft.client.texture.NativeImage;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtHelper;
-import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.chunk.IdListPalette;
 import net.minecraft.world.chunk.Palette;
 import net.minecraft.world.chunk.PalettedContainer;
 
-import ru.bulldog.justmap.util.Colors;
-import ru.bulldog.justmap.util.ImageUtil;
 import ru.bulldog.justmap.util.StateUtil;
 
 public class ChunkLevel {
@@ -21,7 +17,6 @@ public class ChunkLevel {
 	private final static Palette<BlockState> palette;
 	
 	private volatile PalettedContainer<BlockState> container;
-	private volatile NativeImage image;
 	
 	int[] heightmap;
 	int[] colormap;
@@ -74,27 +69,6 @@ public class ChunkLevel {
 		
 		this.colormap[index] = -1;
 		this.levelmap[index] = 0;
-	}
-	
-	public NativeImage getImage(ChunkPos chunkPos) {
-		if (image == null) {
-			this.image = loadImage(chunkPos);
-		}
-		
-		synchronized (image) {
-			return this.image;
-		}
-	}
-	
-	private NativeImage loadImage(ChunkPos chunkPos) {
-		MapRegion region = MapCache.get().getRegion(chunkPos);			
-		NativeImage image = region.getChunkImage(chunkPos);
-		if (image == null) {
-			image = new NativeImage(16, 16, false);
-			ImageUtil.fillImage(image, Colors.BLACK);
-		}
-		
-		return image;
 	}
 	
 	public boolean isEmpty() {
