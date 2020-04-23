@@ -188,7 +188,13 @@ public class MapChunk {
 	}
 	
 	public void update() {
-		if (worldChunk.isEmpty()) return;
+		WorldChunk lifeChunk = this.worldChunk.getWorld().getChunk(getX(), getZ());
+		
+		if (lifeChunk.isEmpty()) return;
+		
+		if (worldChunk.isEmpty()) {
+			this.worldChunk = lifeChunk;
+		}
 		
 		long currentTime = System.currentTimeMillis();
 		if (currentTime - updated < ClientParams.chunkUpdateInterval) return;
@@ -301,6 +307,8 @@ public class MapChunk {
 	}
 	
 	public void restore() {
+		if (worldChunk.isEmpty()) return;
+		
 		CompoundTag chunkData = StorageUtil.getCache(chunkPos);
 		if (chunkData.isEmpty()) return;
 		
