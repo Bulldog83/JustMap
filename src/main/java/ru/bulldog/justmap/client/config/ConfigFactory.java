@@ -11,6 +11,7 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
+import net.minecraft.text.TranslatableText;
 import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.config.ConfigKeeper.EnumEntry;
 import ru.bulldog.justmap.map.minimap.MapPosition;
@@ -19,7 +20,7 @@ import ru.bulldog.justmap.map.minimap.MapSkin;
 public final class ConfigFactory {
 	
 	private static Text lang(String key) {
-		return new LiteralText(I18n.translate("justmap.configuration." + key));
+		return new TranslatableText("justmap.configuration." + key);
 	}
 	
 	private static Optional<Text[]> getTooltip(String tooltip, boolean condition) {

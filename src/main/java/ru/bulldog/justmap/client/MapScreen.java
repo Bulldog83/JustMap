@@ -6,10 +6,9 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormats;
-import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
+import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.dimension.DimensionType;
 
@@ -141,6 +140,6 @@ public class MapScreen extends Screen {
 	}
 	
 	public Text lang(String key) {
-		return new LiteralText(I18n.translate("justmap.gui." + key));
+		return new TranslatableText("justmap.gui." + key);
 	}	
 }
