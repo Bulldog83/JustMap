@@ -15,6 +15,7 @@ import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.texture.NativeImageBackedTexture;
 import net.minecraft.client.texture.TextureManager;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.text.LiteralText;
 import net.minecraft.util.Identifier;
@@ -26,7 +27,7 @@ import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.client.MapScreen;
 import ru.bulldog.justmap.client.config.ConfigFactory;
-import ru.bulldog.justmap.map.data.Layers;
+import ru.bulldog.justmap.map.data.Layer;
 import ru.bulldog.justmap.map.data.MapCache;
 import ru.bulldog.justmap.map.data.MapChunk;
 import ru.bulldog.justmap.map.icon.WaypointIcon;
@@ -122,21 +123,21 @@ public class Worldmap extends MapScreen implements AbstractMap {
 	}
 	
 	private void addMapButtons() {
-		children.add(new ButtonWidget(width - 24, 10, 20, 20, "x", (b) -> onClose()));		
-		children.add(new ButtonWidget(width / 2 - 10, height - paddingBottom - 44, 20, 20, "\u2191", (b) -> moveMap(Direction.NORTH)));
-		children.add(new ButtonWidget(width / 2 - 10, height - paddingBottom - 22, 20, 20, "\u2193", (b) -> moveMap(Direction.SOUTH)));
-		children.add(new ButtonWidget(width / 2 - 32, height - paddingBottom - 32, 20, 20, "\u2190", (b) -> moveMap(Direction.WEST)));
-		children.add(new ButtonWidget(width / 2 + 12, height - paddingBottom - 32, 20, 20, "\u2192", (b) -> moveMap(Direction.EAST)));		
-		children.add(new ButtonWidget(width - 24, height / 2 - 21, 20, 20, "+", (b) -> changeScale(-0.25F)));
-		children.add(new ButtonWidget(width - 24, height / 2 + 1, 20, 20, "-", (b) -> changeScale(+0.25F)));		
-		children.add(new ButtonWidget(width - 24, height - paddingBottom - 22, 20, 20, "\u271C", (b) -> setCenterByPlayer()));
-		children.add(new ButtonWidget(4, paddingTop + 2, 20, 20, "\u2630",(b) -> client.openScreen(ConfigFactory.getConfigScreen(this))));
-		children.add(new ButtonWidget(4, height - paddingBottom - 22, 20, 20, "\u2726",(b) -> client.openScreen(new WaypointsList(this))));
+		children.add(new ButtonWidget(width - 24, 10, 20, 20, new LiteralText("x"), (b) -> onClose()));		
+		children.add(new ButtonWidget(width / 2 - 10, height - paddingBottom - 44, 20, 20, new LiteralText("\u2191"), (b) -> moveMap(Direction.NORTH)));
+		children.add(new ButtonWidget(width / 2 - 10, height - paddingBottom - 22, 20, 20, new LiteralText("\u2193"), (b) -> moveMap(Direction.SOUTH)));
+		children.add(new ButtonWidget(width / 2 - 32, height - paddingBottom - 32, 20, 20, new LiteralText("\u2190"), (b) -> moveMap(Direction.WEST)));
+		children.add(new ButtonWidget(width / 2 + 12, height - paddingBottom - 32, 20, 20, new LiteralText("\u2192"), (b) -> moveMap(Direction.EAST)));		
+		children.add(new ButtonWidget(width - 24, height / 2 - 21, 20, 20, new LiteralText("+"), (b) -> changeScale(-0.25F)));
+		children.add(new ButtonWidget(width - 24, height / 2 + 1, 20, 20, new LiteralText("-"), (b) -> changeScale(+0.25F)));		
+		children.add(new ButtonWidget(width - 24, height - paddingBottom - 22, 20, 20, new LiteralText("\u271C"), (b) -> setCenterByPlayer()));
+		children.add(new ButtonWidget(4, paddingTop + 2, 20, 20, new LiteralText("\u2630"), (b) -> client.openScreen(ConfigFactory.getConfigScreen(this))));
+		children.add(new ButtonWidget(4, height - paddingBottom - 22, 20, 20, new LiteralText("\u2726"), (b) -> client.openScreen(new WaypointsList(this))));
 	}
 	
 	@Override
-	public void renderBackground() {
-		fill(x, 0, x + width, height, 0xFF444444);
+	public void renderBackground(MatrixStack matrixStack) {
+		fill(matrixStack, x, 0, x + width, height, 0xFF444444);
 		
 		drawMap();
 		
@@ -162,10 +163,10 @@ public class Worldmap extends MapScreen implements AbstractMap {
 	}
 	
 	@Override
-	public void renderForeground() {
+	public void renderForeground(MatrixStack matrixStack) {
 		drawBorders(paddingTop, paddingBottom);
 		
-		this.drawCenteredString(client.textRenderer, cursorCoords, width / 2, paddingTop + 4, Colors.WHITE);
+		this.drawCenteredString(matrixStack, client.textRenderer, cursorCoords, width / 2, paddingTop + 4, Colors.WHITE);
 	}
 	
 	private void prepareTexture() {
@@ -223,7 +224,7 @@ public class Worldmap extends MapScreen implements AbstractMap {
 				
 				NativeImage chunkImage;
 				if (dimension != -1) {
-					chunkImage = mapData.getRegion(pos).getChunkImage(pos, Layers.Type.SURFACE.value, 0);
+					chunkImage = mapData.getRegion(pos).getChunkImage(pos, Layer.Type.SURFACE.value, 0);
 				} else {
 					chunkImage = mapData.getRegion(pos).getChunkImage(pos);
 				}
@@ -410,7 +411,7 @@ public class Worldmap extends MapScreen implements AbstractMap {
 		
 		MapChunk mapChunk;
 		if (dimension != -1) {
-			mapChunk = MapCache.get().getChunk(Layers.Type.SURFACE.value, 0, chunkX, chunkZ);
+			mapChunk = MapCache.get().getChunk(Layer.Type.SURFACE.value, 0, chunkX, chunkZ);
 		} else {
 			mapChunk = MapCache.get().getChunk(chunkX, chunkZ);
 		}

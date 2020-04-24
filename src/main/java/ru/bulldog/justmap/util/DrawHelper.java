@@ -38,11 +38,11 @@ public class DrawHelper extends DrawableHelper {
 		RenderSystem.enableDepthTest();
 	}
 	
-	public static void drawRightAlignedString(TextRenderer textRenderer, String string, int i, int j, int k) {
-		textRenderer.drawWithShadow(string, (float)(i - textRenderer.getStringWidth(string)), (float)j, k);
+	public static void drawRightAlignedString(MatrixStack matrixStack, TextRenderer textRenderer, String string, int i, int j, int k) {
+		textRenderer.drawWithShadow(matrixStack, string, (float)(i - textRenderer.getStringWidth(string)), (float)j, k);
 	}
 
-	public static void drawBoundedString(TextRenderer textRenderer, String string, int x, int y, int leftBound, int rightBound, int color) {
+	public static void drawBoundedString(MatrixStack matrixStack, TextRenderer textRenderer, String string, int x, int y, int leftBound, int rightBound, int color) {
 		if (string == null) {
 			return;
 		}
@@ -55,7 +55,7 @@ public class DrawHelper extends DrawableHelper {
 			drawX = rightBound - stringWidth;
 		}
 
-		DRAWER.drawString(textRenderer, string, drawX, y, color);
+		DRAWER.drawString(matrixStack, textRenderer, string, drawX, y, color);
 	}
 	
 	public static void drawDiamond(double x, double y, int width, int height, int color) {

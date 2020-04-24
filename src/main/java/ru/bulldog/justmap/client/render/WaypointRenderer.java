@@ -85,7 +85,7 @@ public class WaypointRenderer {
 			DrawHelper.drawDiamond(x, y, size, size, waypoint.color);
 			RenderSystem.popMatrix();
 		}
-		DrawHelper.drawBoundedString(client.textRenderer, (int) dist + "m", x + size / 2, y + size + 2, 0, screenWidth, Colors.WHITE);
+		DrawHelper.drawBoundedString(new MatrixStack(), client.textRenderer, (int) dist + "m", x + size / 2, y + size + 2, 0, screenWidth, Colors.WHITE);
 	}
 	
 	public static void renderWaypoint(MatrixStack matrixStack, MinecraftClient client, Camera camera, float tickDelta) {

@@ -4,7 +4,7 @@ import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.client.render.MapRenderer;
 import ru.bulldog.justmap.map.AbstractMap;
-import ru.bulldog.justmap.map.data.Layers.Type;
+import ru.bulldog.justmap.map.data.Layer.Type;
 import ru.bulldog.justmap.map.data.MapCache;
 import ru.bulldog.justmap.map.icon.EntityIcon;
 import ru.bulldog.justmap.map.icon.PlayerIcon;

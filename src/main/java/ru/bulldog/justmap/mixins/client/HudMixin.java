@@ -15,6 +15,7 @@ import net.minecraft.client.gui.hud.InGameHud;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.texture.Sprite;
 import net.minecraft.client.texture.StatusEffectSpriteManager;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.util.math.MathHelper;
@@ -39,15 +40,15 @@ abstract class HudMixin extends DrawableHelper {
 	private int scaledWidth;
 	
 	@Inject(at = @At("RETURN"), method = "render")
-	public void draw(float delta, CallbackInfo info) {
+	public void draw(MatrixStack matrixStack, float delta, CallbackInfo info) {
 		MapRenderer mapGui = MapRenderer.getInstance();
 		if (mapGui != null) {
-			mapGui.draw();
+			mapGui.draw(matrixStack);
 		}
 	}
 	
 	@Inject(at = @At("HEAD"), method = "renderStatusEffectOverlay", cancellable = true)
-	protected void renderStatusEffects(CallbackInfo info) {
+	protected void renderStatusEffects(MatrixStack matrixStack, CallbackInfo info) {
 		if (ClientParams.moveEffects) {
 			int posX = this.scaledWidth;
 			int posY = ClientParams.positionOffset;
@@ -55,12 +56,12 @@ abstract class HudMixin extends DrawableHelper {
 				posX = MapRenderer.getInstance().getX();
 			}
 			
-			this.drawMovedEffects(posX, posY);			
+			this.drawMovedEffects(matrixStack, posX, posY);			
 			info.cancel();
 		}
 	}
 	
-	private void drawMovedEffects(int screenX, int screenY) {
+	private void drawMovedEffects(MatrixStack matrixStack, int screenX, int screenY) {
 		Collection<StatusEffectInstance> statusEffects = this.client.player.getStatusEffects();
 		if (statusEffects.isEmpty()) return;
 		
@@ -105,9 +106,9 @@ abstract class HudMixin extends DrawableHelper {
 		   		RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
 		   		float alpha = 1.0F;
 		   		if (statusEffectInstance.isAmbient()) {
-		   			this.drawTexture(x, y, 165, 166, size, size);
+		   			this.drawTexture(matrixStack, x, y, 165, 166, size, size);
 		   		} else {
-			   		this.drawTexture(x, y, 141, 166, size, size);
+			   		this.drawTexture(matrixStack, x, y, 141, 166, size, size);
 			  		if (effectDuration <= 200) {
 				  		int m = 10 - effectDuration / 20;
 				 		alpha = MathHelper.clamp(effectDuration / 10F / 5F * 0.5F, 0F, 0.5F) + MathHelper.cos((float) (effectDuration * Math.PI) / 5F) * MathHelper.clamp(m / 10F * 0.25F, 0.0F, 0.25F);
@@ -120,11 +121,11 @@ abstract class HudMixin extends DrawableHelper {
 		   		icons.add(() -> {
 		   			this.client.getTextureManager().bindTexture(sprite.getAtlas().getId());
 					RenderSystem.color4f(1.0F, 1.0F, 1.0F, fa);
-					drawSprite(fx + 3, fy + 3, this.getZOffset(), 18, 18, sprite);
+					drawSprite(matrixStack, fx + 3, fy + 3, this.getZOffset(), 18, 18, sprite);
 		   		});
 		   		if (ClientParams.showEffectTimers) {
 			   		timers.add(() -> {
-			   			drawCenteredString(client.textRenderer, convertDuration(effectDuration), fx + size / 2, fy + (size + 1), Colors.WHITE);
+			   			drawCenteredString(matrixStack, client.textRenderer, convertDuration(effectDuration), fx + size / 2, fy + (size + 1), Colors.WHITE);
 			   		});
 		   		}
 			}

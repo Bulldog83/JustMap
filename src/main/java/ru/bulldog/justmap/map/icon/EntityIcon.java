@@ -1,5 +1,6 @@
 package ru.bulldog.justmap.map.icon;
 
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 
 import ru.bulldog.justmap.client.config.ClientParams;
@@ -22,7 +23,7 @@ public class EntityIcon extends MapIcon<EntityIcon> {
 	}
 	
 	@Override
-	public void draw(int mapX, int mapY, float rotation) {
+	public void draw(MatrixStack matrixStack, int mapX, int mapY, float rotation) {
 		if (!Minimap.allowCreatureRadar() && !hostile) { return; }
 		if (!Minimap.allowHostileRadar() && hostile) { return; }
 		

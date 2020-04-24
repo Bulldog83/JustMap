@@ -21,8 +21,8 @@ public class MapProcessor {
 		
 		boolean plants = !ClientParams.ignorePlants;
 		
-		Layers layer = mapChunk.getLayer();
-		if ((layer.equals(Layers.Type.NETHER.value) || layer.equals(Layers.Type.CAVES.value)) && liquids) {
+		Layer layer = mapChunk.getLayer();
+		if ((layer.equals(Layer.Type.NETHER.value) || layer.equals(Layer.Type.CAVES.value)) && liquids) {
 			int level = mapChunk.getLevel();
 			int floor = level * layer.height;
 			for (int i = floor + (layer.height - 1); i >= floor; i--) {

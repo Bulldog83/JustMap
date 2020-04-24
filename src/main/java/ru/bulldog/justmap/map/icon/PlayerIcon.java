@@ -1,5 +1,6 @@
 package ru.bulldog.justmap.map.icon;
 
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerEntity;
 
 import ru.bulldog.justmap.client.config.ClientParams;
@@ -20,7 +21,7 @@ public class PlayerIcon extends MapIcon<PlayerIcon> {
 	}
 
 	@Override
-	public void draw(int mapX, int mapY, float rotation) {
+	public void draw(MatrixStack matrixStack, int mapX, int mapY, float rotation) {
 		int size = ClientParams.entityIconSize;
 		
 		IconPos pos = new IconPos(mapX + x, mapY + y);
@@ -46,7 +47,7 @@ public class PlayerIcon extends MapIcon<PlayerIcon> {
 		}
 			
 		if (ClientParams.showPlayerNames) {
-			DrawHelper.drawBoundedString(client.textRenderer, player.getName().getString(), (int) pos.x, (int) pos.y + 12, 0, client.getWindow().getScaledWidth(), Colors.WHITE);
+			DrawHelper.drawBoundedString(matrixStack, client.textRenderer, player.getName().getString(), (int) pos.x, (int) pos.y + 12, 0, client.getWindow().getScaledWidth(), Colors.WHITE);
 		}
 	}
 }

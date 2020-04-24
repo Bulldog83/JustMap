@@ -5,6 +5,7 @@ import ru.bulldog.justmap.util.DrawHelper;
 import ru.bulldog.justmap.util.DrawHelper.TextAlignment;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.util.math.MatrixStack;
 
 public class MapText {
 	  protected TextAlignment alignment = TextAlignment.CENTER;
@@ -34,7 +35,7 @@ public class MapText {
 		  this.color = color;
 	  }
 	  
-	  public void draw() {
+	  public void draw(MatrixStack matrixStack) {
 		  TextRenderer textRenderer = client.textRenderer;
 		
 		  int width = client.getWindow().getScaledWidth();
@@ -42,13 +43,13 @@ public class MapText {
 		  switch (alignment) {
 			 default:
 			 case LEFT:
-				 DrawHelper.DRAWER.drawString(textRenderer, text, x, y, color);
+				 DrawHelper.DRAWER.drawString(matrixStack, textRenderer, text, x, y, color);
 			 break;
 			 case CENTER:
-				 DrawHelper.drawBoundedString(textRenderer, text, x, y, 0, width - 2, color);
+				 DrawHelper.drawBoundedString(matrixStack, textRenderer, text, x, y, 0, width - 2, color);
 			 break;
 			 case RIGHT:
-				 DrawHelper.drawRightAlignedString(textRenderer, text, x, y, color);
+				 DrawHelper.drawRightAlignedString(matrixStack, textRenderer, text, x, y, color);
 			 break;
 		  }
 	  }

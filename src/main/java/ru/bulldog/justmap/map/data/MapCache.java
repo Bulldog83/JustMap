@@ -26,10 +26,10 @@ public class MapCache {
 	
 	private static Map<Integer, MapCache> dimensions = new HashMap<>();
 	private static World currentWorld;
-	private static Layers currentLayer = Layers.Type.SURFACE.value;	
+	private static Layer currentLayer = Layer.Type.SURFACE.value;	
 	private static int currentLevel = 0;
 	
-	public static void setCurrentLayer(Layers layer, int y) {
+	public static void setCurrentLayer(Layer layer, int y) {
 		currentLevel =  y / layer.height;
 		currentLayer = layer;
 	}
@@ -262,7 +262,7 @@ public class MapCache {
 		return getChunk(currentLayer, currentLevel, posX, posZ, empty);
 	}
 	
-	public MapChunk getChunk(Layers layer, int level, int posX, int posZ, boolean empty) {
+	public MapChunk getChunk(Layer layer, int level, int posX, int posZ, boolean empty) {
 		
 		MapChunk mapChunk = getChunk(layer, level, posX, posZ);
 		
@@ -278,7 +278,7 @@ public class MapCache {
 		return mapChunk;
 	}
 	
-	public MapChunk getChunk(Layers layer, int level, int posX, int posZ) {
+	public MapChunk getChunk(Layer layer, int level, int posX, int posZ) {
 		ChunkPos chunkPos = new ChunkPos(posX, posZ);
 		
 		if (this.chunks.containsKey(chunkPos)) {

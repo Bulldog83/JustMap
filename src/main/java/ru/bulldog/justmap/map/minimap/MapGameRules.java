@@ -27,7 +27,7 @@ public class MapGameRules {
 	}
 
 	private static GameRules.RuleKey<GameRules.BooleanRule> register(String name, boolean defaultValue) {
-		return GameRulesProcessor.callRegister(name, BooleanRuleProcessor.callCreate(defaultValue));
+		return GameRulesProcessor.callRegister(name, GameRules.class_5198.MISC, BooleanRuleProcessor.callCreate(defaultValue));
 	}
 	
 	private static Map<String, RuleKey<GameRules.BooleanRule>> codes;

@@ -24,11 +24,11 @@ public class MapChunk {
 	
 	public final ChunkLevel EMPTY_LEVEL = new ChunkLevel(-1);
 	
-	private volatile ConcurrentMap<Layers, ChunkLevel[]> levels;
+	private volatile ConcurrentMap<Layer, ChunkLevel[]> levels;
 	
 	private WorldChunk worldChunk;
 	private ChunkPos chunkPos;
-	private Layers layer;
+	private Layer layer;
 	private int dimension;
 	private int level = 0;
 	private boolean empty = true;
@@ -36,12 +36,12 @@ public class MapChunk {
 	
 	public long updated = 0;
 	
-	public MapChunk(World world, ChunkPos pos, Layers layer, int level) {
+	public MapChunk(World world, ChunkPos pos, Layer layer, int level) {
 		this(world, pos, layer);
 		this.level = level > 0 ? level : 0;
 	}
 	
-	public MapChunk(World world, ChunkPos pos, Layers layer) {
+	public MapChunk(World world, ChunkPos pos, Layer layer) {
 		this.worldChunk = world.getChunk(pos.x, pos.z);
 		this.dimension = world.getDimension().getType().getRawId();
 		this.chunkPos = pos;
@@ -53,10 +53,10 @@ public class MapChunk {
 	
 	private void init() {
 		if (dimension == -1) {
-			initLayer(Layers.Type.NETHER.value);
+			initLayer(Layer.Type.NETHER.value);
 		} else {
-			initLayer(Layers.Type.SURFACE.value);
-			initLayer(Layers.Type.CAVES.value);
+			initLayer(Layer.Type.SURFACE.value);
+			initLayer(Layer.Type.CAVES.value);
 		}
 		
 		JustMapClient.UPDATER.execute(this::restore);
@@ -71,7 +71,7 @@ public class MapChunk {
 		initLayer(layer);
 	}
 	
-	private void initLayer(Layers layer) {
+	private void initLayer(Layer layer) {
 		int levels = worldChunk.getHeight() / layer.height;		
 		this.levels.put(layer, new ChunkLevel[levels]);
 	}
@@ -80,7 +80,7 @@ public class MapChunk {
 		return getChunkLevel(layer, level);
 	}
 	
-	private ChunkLevel getChunkLevel(Layers layer, int level) {
+	private ChunkLevel getChunkLevel(Layer layer, int level) {
 		if (!levels.containsKey(layer)) {
 			initLayer();
 		}
@@ -132,7 +132,7 @@ public class MapChunk {
 		return getChunkLevel().getImage(chunkPos);
 	}
 	
-	public Layers getLayer() {
+	public Layer getLayer() {
 		return layer;
 	}
 	
@@ -144,7 +144,7 @@ public class MapChunk {
 		return getChunkLevel().heightmap;
 	}
 	
-	public void setLevel(Layers layer, int level) {
+	public void setLevel(Layer layer, int level) {
 		if (this.layer == layer &&
 			this.level == level) return;
 		
@@ -164,13 +164,18 @@ public class MapChunk {
 		return getChunkLevel().setBlockState(pos.getX() & 15, pos.getY() & 15, pos.getZ() & 15, blockState);
 	}
 	
-	public void updateHeighmap() {
-		if (worldChunk.isEmpty()) return;
-		
+	private void updateHeighmap() {
 		for (int x = 0; x < 16; x++) {
 			for (int z = 0; z < 16; z++) {
-				int y = worldChunk.sampleHeightmap(Heightmap.Type.WORLD_SURFACE, x, z);
-				y = MapProcessor.getTopBlockY(this, x, y + 1, z, true);
+				int worldY = worldChunk.sampleHeightmap(Heightmap.Type.WORLD_SURFACE, x, z);				
+				int y = MapProcessor.getTopBlockY(this, x, worldY + 1, z, true);
+				
+				if (layer.type != Layer.Type.NETHER && layer.type != Layer.Type.CAVES) {
+					if (worldY != y || worldY == -1) {
+						y = MapProcessor.getTopBlockY(this, x, 255, z, true);
+					}
+				}
+				
 				int index = x + (z << 4);
 				ChunkLevel chunkLevel = getChunkLevel();
 				if (y != -1) {
@@ -188,7 +193,12 @@ public class MapChunk {
 	}
 	
 	public void update() {
-		if (worldChunk.isEmpty()) return;
+		WorldChunk lifeChunk = this.worldChunk.getWorld().getChunk(getX(), getZ());
+		if (lifeChunk.isEmpty()) return;
+		
+		if (worldChunk.isEmpty()) {
+			this.worldChunk = lifeChunk;
+		}
 		
 		long currentTime = System.currentTimeMillis();
 		if (currentTime - updated < ClientParams.chunkUpdateInterval) return;
@@ -305,6 +315,8 @@ public class MapChunk {
 	}
 	
 	public void restore() {
+		if (worldChunk.isEmpty()) return;
+		
 		CompoundTag chunkData = StorageUtil.getCache(chunkPos);
 		if (chunkData.isEmpty()) return;
 		

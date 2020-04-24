@@ -82,7 +82,7 @@ public class StorageUtil {
 		ServerInfo serverInfo = client.getCurrentServerEntry();
 		if (client.isIntegratedServerRunning()) {
 			MinecraftServer server = client.getServer();
-			filesDir = new File(MAP_DIR, String.format("local/%s/", server.getServerName()));
+			filesDir = new File(MAP_DIR, String.format("local/%s/", server.method_27728().getLevelName()));
 		} else if (serverInfo != null) {
 			filesDir = new File(MAP_DIR, String.format("servers/%s/", serverInfo.name));
 		} else {		

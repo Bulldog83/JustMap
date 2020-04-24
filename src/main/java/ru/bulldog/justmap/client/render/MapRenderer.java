@@ -31,6 +31,7 @@ import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.texture.NativeImageBackedTexture;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
 
 @Environment(EnvType.CLIENT)
@@ -226,7 +227,7 @@ public class MapRenderer {
 		}
 	}
 	
-	public void draw() {
+	public void draw(MatrixStack matrixStack) {
 		if (!minimap.isMapVisible() || client.player == null) {
 			return;
 		}
@@ -241,7 +242,7 @@ public class MapRenderer {
 		RenderSystem.disableDepthTest();
 		
 		if (ClientParams.useSkins) {
-			mapSkin.draw(posX, posY, mapW + border * 2);
+			mapSkin.draw(matrixStack, posX, posY, mapW + border * 2);
 		}
 
 		int winH = client.getWindow().getFramebufferHeight();
@@ -263,18 +264,18 @@ public class MapRenderer {
 		if (Minimap.allowEntityRadar()) {
 			if (Minimap.allowPlayerRadar()) {
 				for (PlayerIcon player : minimap.getPlayerIcons()) {
-					player.draw(mapX, mapY, rotation);
+					player.draw(matrixStack, mapX, mapY, rotation);
 				}
 			}
 			if (Minimap.allowCreatureRadar() || Minimap.allowHostileRadar()) {
 				for (EntityIcon entity : minimap.getEntities()) {
-					entity.draw(mapX, mapY, rotation);
+					entity.draw(matrixStack, mapX, mapY, rotation);
 				}
 			}
 		}
 		for (WaypointIcon waypoint : minimap.getWaypoints()) {
 			if (!waypoint.isHidden()) {
-				waypoint.draw(mapX, mapY, rotation);
+				waypoint.draw(matrixStack, mapX, mapY, rotation);
 			}
 		}
 		
@@ -285,7 +286,7 @@ public class MapRenderer {
 		
 		GL11.glDisable(GL11.GL_SCISSOR_TEST);
 		
-		textManager.draw();
+		textManager.draw(matrixStack);
 		
 		RenderSystem.enableDepthTest();
 	}

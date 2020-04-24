@@ -15,6 +15,7 @@ import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.resource.language.I18n;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
@@ -56,12 +57,12 @@ public class WaypointsList extends MapScreen {
 			deleteButton.y = y;
 		}		
 		
-		public void render(int mouseX, int mouseY, float delta) {
+		public void render(MatrixStack matrixStack, int mouseX, int mouseY, float delta) {
 			TextRenderer font = minecraft.textRenderer;
 			
 			boolean hover = isMouseOver(mouseX, mouseY);
 			int bgColor = hover ? 0x88AAAAAA : 0x88333333;
-			fill(x, y, x + width, y + height, bgColor);
+			fill(matrixStack, x, y, x + width, y + height, bgColor);
 			
 			int diamondSize = height - 2;
 			Icon icon = waypoint.getIcon();
@@ -75,13 +76,13 @@ public class WaypointsList extends MapScreen {
 			
 			int nameX = x + diamondSize + 2;
 
-			DrawHelper.DRAWER.drawString(font, waypoint.name, nameX, stringY, Colors.WHITE);
+			DrawHelper.DRAWER.drawString(matrixStack, font, waypoint.name, nameX, stringY, Colors.WHITE);
 			
 			int posX = editButton.x - 2;
-			DrawHelper.drawRightAlignedString(font, waypoint.pos.toShortString(), posX, stringY, Colors.WHITE);
+			DrawHelper.drawRightAlignedString(matrixStack, font, waypoint.pos.toShortString(), posX, stringY, Colors.WHITE);
 			
-			editButton.render(mouseX, mouseY, delta);
-			deleteButton.render(mouseX, mouseY, delta);
+			editButton.render(matrixStack, mouseX, mouseY, delta);
+			deleteButton.render(matrixStack, mouseX, mouseY, delta);
 		}
 	
 		@Override
@@ -148,8 +149,8 @@ public class WaypointsList extends MapScreen {
 		this.center = width / 2;		
 		this.screenWidth = Math.max(400, center);		
 		this.x = center - screenWidth / 2;		
-		this.prevDimensionButton = new ButtonWidget(x + 10, 10, 20, 20, "<", (b) -> cycleDimension(-1));
-		this.nextDimensionButton = new ButtonWidget(x + screenWidth - 30, 10, 20, 20, ">", (b) -> cycleDimension(1));		
+		this.prevDimensionButton = new ButtonWidget(x + 10, 10, 20, 20, new LiteralText("<"), (b) -> cycleDimension(-1));
+		this.nextDimensionButton = new ButtonWidget(x + screenWidth - 30, 10, 20, 20, new LiteralText(">"), (b) -> cycleDimension(1));		
 		this.addButton = new ButtonWidget(center - 62, height - 26, 60, 20, lang("create"), (b) -> add());
 		this.closeButton = new ButtonWidget(center + 2, height - 26, 60, 20, lang("close"), (b) -> onClose());
 		this.currentDim = client.player.dimension.getRawId();
@@ -212,13 +213,13 @@ public class WaypointsList extends MapScreen {
 	}
 	
 	@Override
-	public void render(int mouseX, int mouseY, float delta) {
-		super.render(mouseX, mouseY, delta);
+	public void render(MatrixStack matrixStack, int mouseX, int mouseY, float delta) {
+		super.render(matrixStack, mouseX, mouseY, delta);
 		
-		entries.forEach(e -> e.render(mouseX, mouseY, delta));
+		entries.forEach(e -> e.render(matrixStack, mouseX, mouseY, delta));
 		
-		String dimensionName = info == null ? lang("unknown") : I18n.translate(info.getFirst());
-		drawCenteredString(textRenderer, dimensionName, center, 15, Colors.WHITE);
+		String dimensionName = info == null ? lang("unknown").getString() : I18n.translate(info.getFirst());
+		drawCenteredString(matrixStack, textRenderer, dimensionName, center, 15, Colors.WHITE);
 		
 		drawScrollBar();
 	}

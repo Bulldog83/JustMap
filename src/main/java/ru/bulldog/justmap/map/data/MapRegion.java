@@ -18,8 +18,8 @@ public class MapRegion {
 	
 	private final RegionPos pos;
 
-	private ConcurrentMap<Layers, RegionLayer> layers = new ConcurrentHashMap<>();
-	private Layers currentLayer;
+	private ConcurrentMap<Layer, RegionLayer> layers = new ConcurrentHashMap<>();
+	private Layer currentLayer;
 	private int currentLevel;
 	
 	public long updated = 0;
@@ -38,7 +38,7 @@ public class MapRegion {
 		this.currentLevel = level > 0 ? level : 0;
 	}
 	
-	public void setLayer(Layers layer) {
+	public void setLayer(Layer layer) {
 		this.currentLayer = layer;
 	}
 	
@@ -46,7 +46,7 @@ public class MapRegion {
 		return getChunkImage(chunkPos, currentLayer, currentLevel);
 	}
 	
-	public NativeImage getChunkImage(ChunkPos chunkPos, Layers layer, int level) {
+	public NativeImage getChunkImage(ChunkPos chunkPos, Layer layer, int level) {
 		if (chunkPos.getRegionX() != this.pos.x ||
 			chunkPos.getRegionZ() != this.pos.z) {
 			
@@ -59,7 +59,7 @@ public class MapRegion {
 		return ImageUtil.readTile(getImage(layer, level), imgX, imgY, 16, 16, false);
 	}
 	
-	public NativeImage getImage(Layers layer, int level) {		
+	public NativeImage getImage(Layer layer, int level) {		
 		return getLayer(layer).getImage(level).image();
 	}
 	
@@ -76,7 +76,7 @@ public class MapRegion {
 		return getLayer(currentLayer);
 	}
 	
-	public RegionLayer getLayer(Layers layer) {
+	public RegionLayer getLayer(Layer layer) {
 		if (layers.containsKey(layer)) {
 			return layers.get(layer);
 		}
@@ -111,9 +111,9 @@ public class MapRegion {
 		return imagesDir(currentLayer, currentLevel);
 	}
 	
-	private File imagesDir(Layers layer, int level) {
+	private File imagesDir(Layer layer, int level) {
 		File cacheDir;
-		if (layer.equals(Layers.Type.SURFACE.value)) {
+		if (layer.equals(Layer.Type.SURFACE.value)) {
 			cacheDir = layerDir(layer);
 		} else {
 			cacheDir = new File(layerDir(layer), String.format("%d/", level));
@@ -126,15 +126,15 @@ public class MapRegion {
 		return cacheDir;
 	}
 	
-	private File layerDir(Layers layer) {
+	private File layerDir(Layer layer) {
 		return new File(StorageUtil.cacheDir(), String.format("%s/", layer.name));
 	}
 	
 	public class RegionLayer {
 		private ConcurrentMap<Integer, RegionImage> images;
-		private final Layers layer;
+		private final Layer layer;
 		
-		private RegionLayer(Layers layer) {
+		private RegionLayer(Layer layer) {
 			this.layer = layer;
 			this.images = new ConcurrentHashMap<>();
 		}
@@ -176,11 +176,11 @@ public class MapRegion {
 		private volatile NativeImage image;
 		private boolean saved = true;
 		
-		private RegionImage(Layers layer, int level) {
+		private RegionImage(Layer layer, int level) {
 			this.image = loadImage(layer, level);
 		}
 		
-		private NativeImage loadImage(Layers layer, int level) {
+		private NativeImage loadImage(Layer layer, int level) {
 			File png = new File(imagesDir(layer, level), String.format("%d.%d.png", pos.x, pos.z));
 			if (png.exists()) {
 				try (FileInputStream fis = new FileInputStream(png)) {

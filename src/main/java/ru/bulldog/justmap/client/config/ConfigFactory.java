@@ -9,7 +9,8 @@ import me.shedaniel.clothconfig2.impl.builders.EnumSelectorBuilder;
 
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.resource.language.I18n;
-
+import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
 import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.config.ConfigKeeper.EnumEntry;
 import ru.bulldog.justmap.map.minimap.MapPosition;
@@ -17,13 +18,13 @@ import ru.bulldog.justmap.map.minimap.MapSkin;
 
 public final class ConfigFactory {
 	
-	private static String lang(String key) {
-		return I18n.translate("justmap.configuration." + key);
+	private static Text lang(String key) {
+		return new LiteralText(I18n.translate("justmap.configuration." + key));
 	}
 	
-	private static Optional<String[]> getTooltip(String tooltip, boolean condition) {
-		return condition ? Optional.empty() : Optional.ofNullable(new String[] {
-			tooltip
+	private static Optional<Text[]> getTooltip(String tooltip, boolean condition) {
+		return condition ? Optional.empty() : Optional.ofNullable(new Text[] {
+			new LiteralText(I18n.translate("justmap.configuration." + tooltip))
 		});
 	}
 	
@@ -39,7 +40,7 @@ public final class ConfigFactory {
 	}
 	
 	private static void createConfigBuilder() {
-		configBuilder = ConfigBuilder.create().setTitle("Just Map Configuration");
+		configBuilder = ConfigBuilder.create().setTitle(new LiteralText("Just Map Configuration"));
 		ConfigEntryBuilder entryBuilder = ConfigEntryBuilder.create();
 		
 		ConfigCategory general = configBuilder.getOrCreateCategory(lang("category.general"));
@@ -101,13 +102,13 @@ public final class ConfigFactory {
 				.setSaveConsumer(val -> JustMapClient.CONFIG.setRanged("map_saturation", val))
 				.setDefaultValue((int) JustMapClient.CONFIG.getDefault("map_saturation"))
 				.setTooltipSupplier(() -> {
-					return getTooltip(lang("tooltip_color_config"), JustMapClient.CONFIG.getBoolean("alternate_color_render"));
+					return getTooltip("tooltip_color_config", JustMapClient.CONFIG.getBoolean("alternate_color_render"));
 				}).build());
 		mapAppearance.addEntry(entryBuilder.startIntSlider(lang("map_brightness"), JustMapClient.CONFIG.getInt("map_brightness"), -50, 50)
 				.setSaveConsumer(val -> JustMapClient.CONFIG.setRanged("map_brightness", val))
 				.setDefaultValue((int) JustMapClient.CONFIG.getDefault("map_brightness"))
 				.setTooltipSupplier(() -> {
-					return getTooltip(lang("tooltip_color_config"), JustMapClient.CONFIG.getBoolean("alternate_color_render"));
+					return getTooltip("tooltip_color_config", JustMapClient.CONFIG.getBoolean("alternate_color_render"));
 				}).build());
 		mapAppearance.addEntry(entryBuilder.startBooleanToggle(lang("use_skins"), JustMapClient.CONFIG.getBoolean("use_skins"))
 				.setSaveConsumer(val -> JustMapClient.CONFIG.setBoolean("use_skins", val))
