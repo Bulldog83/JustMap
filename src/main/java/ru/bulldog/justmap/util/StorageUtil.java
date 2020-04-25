@@ -14,11 +14,13 @@ import ru.bulldog.justmap.JustMap;
 public class StorageUtil {	
 	
 	private static MinecraftClient minecraft = MinecraftClient.getInstance();
-	private static VersionedChunkStorage storage;
-	private static File storageDir;
 	
 	public final static File MAP_DIR = new File(minecraft.runDirectory, "justmap/");
 	public final static TaskManager IO = new TaskManager("cache-io");
+	
+	private static VersionedChunkStorage storage;
+	private static File storageDir;
+	private static File filesDir = new File(MAP_DIR, "undefined/");
 	
 	private static int currentDimId = 0;
 
@@ -78,15 +80,12 @@ public class StorageUtil {
 	public static File filesDir() {
 		MinecraftClient client = MinecraftClient.getInstance();
 		
-		File filesDir;
 		ServerInfo serverInfo = client.getCurrentServerEntry();
 		if (client.isIntegratedServerRunning()) {
 			MinecraftServer server = client.getServer();
 			filesDir = new File(MAP_DIR, String.format("local/%s/", server.getLevelName()));
 		} else if (serverInfo != null) {
 			filesDir = new File(MAP_DIR, String.format("servers/%s/", serverInfo.name));
-		} else {		
-			filesDir = new File(MAP_DIR, "undefined/");
 		}
 		
 		if (!filesDir.exists()) {

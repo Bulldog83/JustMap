@@ -188,16 +188,15 @@ public class MapChunk {
 	}
 	
 	public void update() {
-		WorldChunk lifeChunk = this.worldChunk.getWorld().getChunk(getX(), getZ());
+		long currentTime = System.currentTimeMillis();
+		if (currentTime - updated < ClientParams.chunkUpdateInterval) return;
 		
+		WorldChunk lifeChunk = this.worldChunk.getWorld().getChunk(getX(), getZ());		
 		if (lifeChunk.isEmpty()) return;
 		
 		if (worldChunk.isEmpty()) {
 			this.worldChunk = lifeChunk;
 		}
-		
-		long currentTime = System.currentTimeMillis();
-		if (currentTime - updated < ClientParams.chunkUpdateInterval) return;
 		
 		JustMapClient.UPDATER.execute(this::updateData);
 	}
