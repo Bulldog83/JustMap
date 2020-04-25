@@ -141,7 +141,7 @@ public class Worldmap extends MapScreen implements AbstractMap {
 		
 		drawMap();
 		
-		int iconSize = MathUtil.clamp((int) (10 / imageScale), 6, 10);
+		int iconSize = MathUtil.clamp((int) (10 / imageScale), 10, 14);
 		for (WaypointIcon icon : waypoints) {
 			if (!icon.isHidden()) {
 				icon.setPosition(

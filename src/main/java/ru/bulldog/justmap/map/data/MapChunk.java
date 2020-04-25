@@ -26,6 +26,7 @@ public class MapChunk {
 	
 	private volatile ConcurrentMap<Layer, ChunkLevel[]> levels;
 	
+	private World world;
 	private WorldChunk worldChunk;
 	private ChunkPos chunkPos;
 	private Layer layer;
@@ -42,6 +43,7 @@ public class MapChunk {
 	}
 	
 	public MapChunk(World world, ChunkPos pos, Layer layer) {
+		this.world = world;
 		this.worldChunk = world.getChunk(pos.x, pos.z);
 		this.dimension = world.getDimension().getType().getRawId();
 		this.chunkPos = pos;
@@ -164,7 +166,18 @@ public class MapChunk {
 		return getChunkLevel().setBlockState(pos.getX() & 15, pos.getY() & 15, pos.getZ() & 15, blockState);
 	}
 	
+	public void update() {		
+		long currentTime = System.currentTimeMillis();
+		if (currentTime - updated < ClientParams.chunkUpdateInterval) return;
+		
+		if (!this.updateWorldChunk()) return;
+		
+		JustMapClient.UPDATER.execute(this::updateData);
+	}
+	
 	private void updateHeighmap() {
+		if (!this.updateWorldChunk()) return;
+		
 		for (int x = 0; x < 16; x++) {
 			for (int z = 0; z < 16; z++) {
 				int worldY = worldChunk.sampleHeightmap(Heightmap.Type.WORLD_SURFACE, x, z);				
@@ -192,20 +205,6 @@ public class MapChunk {
 		}
 	}
 	
-	public void update() {
-		WorldChunk lifeChunk = this.worldChunk.getWorld().getChunk(getX(), getZ());
-		if (lifeChunk.isEmpty()) return;
-		
-		if (worldChunk.isEmpty()) {
-			this.worldChunk = lifeChunk;
-		}
-		
-		long currentTime = System.currentTimeMillis();
-		if (currentTime - updated < ClientParams.chunkUpdateInterval) return;
-		
-		JustMapClient.UPDATER.execute(this::updateData);
-	}
-	
 	private void updateData() {
 		MapChunk eastChunk = MapCache.get().getChunk(chunkPos.x + 1, chunkPos.z, true);
 		MapChunk southChunk = MapCache.get().getChunk(chunkPos.x, chunkPos.z - 1, true);
@@ -223,6 +222,7 @@ public class MapChunk {
 		
 		for (int x = 0; x < 16; x++) {
 			for (int z = 0; z < 16; z++) {
+				
 				int index = x + (z << 4);
 				
 				int posX = x + (chunkPos.x << 4);
@@ -276,6 +276,17 @@ public class MapChunk {
 		if (currentTime - chunkLevel.refreshed > 60000) {
 			chunkLevel.refreshed = currentTime;
 		}
+	}
+	
+	private boolean updateWorldChunk() {
+		WorldChunk lifeChunk = this.world.getChunk(getX(), getZ());
+		
+		if (lifeChunk.isEmpty()) return false;		
+		if (worldChunk.isEmpty()) {
+			this.worldChunk = lifeChunk;
+		}
+		
+		return true;
 	}
 	
 	private void updateRegionData() {

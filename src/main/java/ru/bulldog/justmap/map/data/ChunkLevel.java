@@ -39,8 +39,8 @@ public class ChunkLevel {
 		
 		this.level = level;
 		
-		Arrays.fill(heightmap, -1);
 		Arrays.fill(colormap, -1);
+		Arrays.fill(heightmap, -1);
 		Arrays.fill(levelmap, 0);
 	}
 	

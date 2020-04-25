@@ -269,8 +269,11 @@ public class ColorUtil {
 	}
 	
 	public static int blockColor(WorldChunk worldChunk, BlockPos pos) {
+		
+		if (worldChunk.isEmpty()) return -1;
+		
 		BlockPos overPos = new BlockPos(pos.getX(), pos.getY() + 1, pos.getZ());
-		BlockState overState = worldChunk.getWorld().getBlockState(overPos);
+		BlockState overState = worldChunk.getBlockState(overPos);
 		BlockState blockState = worldChunk.getBlockState(pos);
 		if (ClientParams.ignorePlants && StateUtil.isSeaweed(overState)) {
 			return blockColor(worldChunk.getWorld(), Blocks.WATER.getDefaultState(), pos);
