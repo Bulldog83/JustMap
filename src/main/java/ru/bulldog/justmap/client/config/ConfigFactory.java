@@ -1,5 +1,7 @@
 package ru.bulldog.justmap.client.config;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Optional;
 
 import me.shedaniel.clothconfig2.api.ConfigBuilder;
@@ -56,11 +58,15 @@ public final class ConfigFactory {
 		general.addEntry(entryBuilder.startIntField(lang("map_offset"), JustMapClient.CONFIG.getInt("map_offset"))
 				.setSaveConsumer(val -> JustMapClient.CONFIG.setInt("map_offset", val))
 				.setDefaultValue((int) JustMapClient.CONFIG.getDefault("map_offset"))
-				.build());			
-		general.addEntry(entryBuilder.startIntField(lang("map_size"), JustMapClient.CONFIG.getInt("map_size"))
+				.build());
+		general.addEntry(entryBuilder.startDropdownMenu(lang("map_size"), JustMapClient.CONFIG.getInt("map_size"), (val) -> {
+					if (val.equals("")) return 0;			
+					return Integer.valueOf(val);
+				})
 				.setSaveConsumer(val -> JustMapClient.CONFIG.setRanged("map_size", val))
 				.setDefaultValue((int) JustMapClient.CONFIG.getDefault("map_size"))
-				.setMin(32).setMax(480).build());
+				.setSelections(Arrays.asList(32, 64, 96, 128, 160, 192, 224, 256))
+				.build());
 		general.addEntry(entryBuilder.startBooleanToggle(lang("show_in_chat"), JustMapClient.CONFIG.getBoolean("show_in_chat"))
 				.setSaveConsumer(val -> JustMapClient.CONFIG.setBoolean("show_in_chat", val))
 				.setDefaultValue((boolean) JustMapClient.CONFIG.getDefault("show_in_chat"))
