@@ -167,7 +167,7 @@ public class MapChunk {
 	}
 	
 	public void updateHeighmap() {
-		if (worldChunk.isEmpty()) return;
+		if (!this.updateWorldChunk()) return;
 		
 		for (int x = 0; x < 16; x++) {
 			for (int z = 0; z < 16; z++) {
@@ -187,17 +187,23 @@ public class MapChunk {
 	}
 	
 	public void update() {
-		WorldChunk lifeChunk = world.getChunk(getX(), getZ());
-		if (purged || lifeChunk.isEmpty()) return;
-		
-		if (worldChunk.isEmpty() && !lifeChunk.isEmpty()) {
-			this.worldChunk = lifeChunk;
-		}
-		
 		long currentTime = System.currentTimeMillis();
 		if (currentTime - updated < ClientParams.chunkUpdateInterval) return;
 		
+		if (this.purged || !this.updateWorldChunk()) return;
+		
 		chunkUpdater.execute(this::updateData);
+	}
+	
+	private boolean updateWorldChunk() {
+		WorldChunk lifeChunk = world.getChunk(getX(), getZ());
+		if (lifeChunk.isEmpty()) return false;
+		
+		if (worldChunk.isEmpty()) {
+			this.worldChunk = lifeChunk;
+		}
+		
+		return true;
 	}
 	
 	private void updateData() {
@@ -262,10 +268,10 @@ public class MapChunk {
 		
 		int index = x + (z << 4);
 		int color = chunkLevel.colormap[index];
-		int heightDiff = chunkLevel.levelmap[index];
 		
 		if (color == -1) return ColorUtil.proccessColor(Colors.BLACK, 0);
 		
+		int heightDiff = chunkLevel.levelmap[index];
 		return ColorUtil.proccessColor(color, heightDiff);
 	}
 	
