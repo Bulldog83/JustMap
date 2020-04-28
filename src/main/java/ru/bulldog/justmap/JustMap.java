@@ -8,7 +8,7 @@ import net.fabricmc.api.ModInitializer;
 public class JustMap implements ModInitializer {
 	public static final String MODID = "justmap";
 	public static final Logger LOGGER = Logger.get();
-	public static final TaskManager EXECUTOR = TaskManager.getManager("tasks");
+	public static final TaskManager WORKER = TaskManager.getManager("tasks");
 	
 	@Override
 	public void onInitialize() {}

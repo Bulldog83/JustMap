@@ -30,8 +30,8 @@ public class StorageWorker implements AutoCloseable {
 		this.storage = regionStorage;
 	}
 
-	public CompletableFuture<Void> setResult(ChunkPos chunkPos, CompoundTag compoundTag) {
-		CompletableFuture<Void> future = this.run((completableFuture) -> {
+	public void setResult(ChunkPos chunkPos, CompoundTag compoundTag) {
+		this.run((completableFuture) -> {
 			return () -> {
 				Result result = (Result) this.results.computeIfAbsent(chunkPos, (chunkPosx) -> {
 					return new Result();
@@ -47,8 +47,6 @@ public class StorageWorker implements AutoCloseable {
 			};
 		});
 		this.worker.execute(this::writeResult);
-		
-		return future;
 	}
 
 	public CompoundTag getNbt(ChunkPos chunkPos) throws IOException {

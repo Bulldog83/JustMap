@@ -311,6 +311,6 @@ public class ColorUtil {
 		}
 		blockColor = blockColor != -1 ? blockColor : materialColor;
 		
-		return toABGR(blockColor);
+		return blockColor;
 	}
 }

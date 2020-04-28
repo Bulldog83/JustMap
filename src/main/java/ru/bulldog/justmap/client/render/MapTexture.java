@@ -13,17 +13,16 @@ import net.minecraft.client.texture.TextureUtil;
 
 public class MapTexture extends BufferedImage {
 
-	protected ByteBuffer buffer;
-	protected byte[] bytes;
-	protected int glId = -1;
+	private ByteBuffer buffer;
+	private int glId = -1;
 	
-	protected Object bufferLock = new Object();
+	private Object bufferLock = new Object();
 	
 	public MapTexture(int width, int height) {
 		super(width, height, TYPE_4BYTE_ABGR);
 		
-		this.bytes = ((DataBufferByte) ((DataBufferByte) this.getRaster().getDataBuffer())).getData();
-		this.buffer = ByteBuffer.allocateDirect(this.bytes.length).order(ByteOrder.nativeOrder());
+		byte[] bytes = ((DataBufferByte) ((DataBufferByte) this.getRaster().getDataBuffer())).getData();
+		this.buffer = ByteBuffer.allocateDirect(bytes.length).order(ByteOrder.nativeOrder());
 	}
 	
 	public void upload() {
@@ -45,25 +44,48 @@ public class MapTexture extends BufferedImage {
 		GL11.glTexImage2D(3553, 0, 6408, this.getWidth(), this.getHeight(), 0, 6408, 32821, this.buffer);
 	}
 	
+	public void copyImage(MapTexture image) {
+		synchronized(bufferLock) {
+			this.setData(image.getData());
+		}
+	}
+	
 	@Override
 	public void setRGB(int x, int y, int color) {
-		int index = (x + y * this.getWidth()) * 4;
+		if (x < 0 || x >= this.getWidth()) return;
+		if (y < 0 || y >= this.getHeight()) return;
 		
 		synchronized(bufferLock) {
-			this.bytes[index] = (byte) (color >> 24);
-			this.bytes[index + 1] = (byte) (color >> 0);
-			this.bytes[index + 2] = (byte) (color >> 8);
-			this.bytes[index + 3] = (byte) (color >> 16);
+			super.setRGB(x, y, color);
 		}
+	}
+	
+	public void fill(int color) {
+		int width = this.getWidth();
+		int height = this.getHeight();
 		
-		super.setRGB(x, y, color);
+		synchronized(bufferLock) {
+			for(int x = 0; x < width; x++) {
+				for (int y = 0; y < height; y++) {
+					this.setRGB(x, y, color);
+				}
+			}
+		}
+	}
+	
+	public void close() {
+		synchronized(bufferLock) {
+			this.buffer.clear();
+			this.flush();
+		}
 	}
 	
 	private void refillBuffer() {
 		synchronized(bufferLock) {
+			byte[] bytes = ((DataBufferByte) ((DataBufferByte) this.getRaster().getDataBuffer())).getData();
 			this.buffer.clear();
-			this.buffer.put(this.bytes);
-			this.buffer.position(0).limit(this.bytes.length);
+			this.buffer.put(bytes);
+			this.buffer.position(0).limit(bytes.length);
 		}
 	}
 }

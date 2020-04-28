@@ -3,17 +3,16 @@ package ru.bulldog.justmap.map.data;
 import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.client.config.ClientParams;
+import ru.bulldog.justmap.client.render.MapTexture;
 import ru.bulldog.justmap.map.minimap.Minimap;
 import ru.bulldog.justmap.util.Colors;
-import ru.bulldog.justmap.util.ImageUtil;
 import ru.bulldog.justmap.util.StorageUtil;
 import ru.bulldog.justmap.util.TaskManager;
+
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.texture.NativeImage;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
-import net.minecraft.world.chunk.WorldChunk;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -59,7 +58,7 @@ public class MapCache {
 			data.world = world;
 			data.clear();
 			
-			ImageUtil.fillImage(JustMapClient.MAP.getImage(), Colors.BLACK);
+			JustMapClient.MAP.getImage().fill(Colors.BLACK);
 		}
 		
 		return data;
@@ -83,7 +82,7 @@ public class MapCache {
 		MapCache data = get();		
 		if (data == null) return;
 		
-		StorageUtil.IO.execute(() -> {
+		JustMap.WORKER.execute(() -> {
 			data.getChunks().forEach((pos, chunk) -> {
 				storeChunk(chunk);
 			});
@@ -96,6 +95,7 @@ public class MapCache {
 			chunk.store(chunkData);
 			
 			if (!chunkData.isEmpty()) {
+				chunkData.putInt("version", 2);
 				StorageUtil.saveCache(chunk.getPos(), chunkData);
 			}
 		}
@@ -144,20 +144,14 @@ public class MapCache {
 			for (int chunkZ = startZ; chunkZ < endZ; chunkZ++) {
 				index++;
 
-				MapChunk mapChunk = getChunk(chunkX, chunkZ);				
+				MapChunk mapChunk = this.getCurrentChunk(chunkX, chunkZ);				
 				if (index >= updateIndex && index <= updateIndex + updatePerCycle) {
-					if (mapChunk.getWorldChunk().isEmpty()) {
-						WorldChunk chunk = world.getChunk(chunkX, chunkZ);
-						if (!chunk.isEmpty()) {
-							mapChunk.setChunk(chunk);
-						}
-					}
 					mapChunk.update();
 				}
 				
 				int imgY = (posZ << 4) + offsetZ;
 				
-				NativeImage mapImage = map.getImage();
+				MapTexture mapImage = map.getImage();
 				for (int x = 0; x < 16; x++) {
 					int px = imgX + x;
 					
@@ -170,7 +164,7 @@ public class MapCache {
 						if (py >= mapImage.getHeight()) break;
 						if (py < 0) continue;
 						
-						mapImage.setPixelRgba(px, py, mapChunk.getBlockColor(x, z));
+						mapImage.setRGB(px, py, mapChunk.getBlockColor(x, z));
 					}
 				}
 				
@@ -180,6 +174,8 @@ public class MapCache {
 			posX++;
 		}
 		
+		map.changed = true;
+
 		updateIndex += updatePerCycle;
 		if (updateIndex >= chunks * chunks) {
 			updateIndex = 0;
@@ -187,7 +183,7 @@ public class MapCache {
 		
 		long currentTime = System.currentTimeMillis();
 		if (currentTime - lastPurged > purgeDelay) {
-			JustMap.EXECUTOR.execute(() -> {
+			JustMap.WORKER.execute(() -> {
 				this.purge(purgeAmount);
 			});
 			this.lastPurged = currentTime;
@@ -220,39 +216,23 @@ public class MapCache {
 		return this.chunks;
 	}
 	
-	public MapChunk getChunk(int posX, int posZ) {
-		return getChunk(posX, posZ, false);
-	}
-	
-	public MapChunk getChunk(int posX, int posZ, boolean empty) {
-		return getChunk(currentLayer, currentLevel, posX, posZ, empty);
-	}
-	
-	public MapChunk getChunk(Layer.Type layer, int level, int posX, int posZ, boolean empty) {
-		
-		MapChunk mapChunk = getChunk(layer, level, posX, posZ);
-		
-		ChunkPos chunkPos = new ChunkPos(posX, posZ);
-		if(!mapChunk.getWorldChunk().getPos().equals(chunkPos)) {
-			mapChunk = new MapChunk(world, chunkPos, layer, level);
-			this.chunks.replace(chunkPos, mapChunk);
-		}
-		
-		mapChunk.setLevel(layer, level);
-		mapChunk.setEmpty(empty);
-		mapChunk.requested = System.currentTimeMillis();
-		
-		return mapChunk;
+	public MapChunk getCurrentChunk(int posX, int posZ) {
+		return this.getChunk(currentLayer, currentLevel, posX, posZ);
 	}
 	
 	public MapChunk getChunk(Layer.Type layer, int level, int posX, int posZ) {
 		ChunkPos chunkPos = new ChunkPos(posX, posZ);		
+		
+		MapChunk mapChunk;
 		if (chunks.containsKey(chunkPos)) {
-			return this.chunks.get(chunkPos);
+			mapChunk = this.chunks.get(chunkPos);
+		} else {
+			mapChunk = new MapChunk(world, chunkPos, layer, level);
+			this.chunks.put(chunkPos, mapChunk);
 		}
 		
-		MapChunk mapChunk = new MapChunk(world, chunkPos, layer, level);
-		this.chunks.put(chunkPos, mapChunk);
+		mapChunk.setLevel(layer, level);
+		mapChunk.requested = System.currentTimeMillis();
 		
 		return mapChunk;
 	}

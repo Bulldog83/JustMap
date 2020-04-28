@@ -12,19 +12,15 @@ import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormats;
-import net.minecraft.client.texture.NativeImage;
-import net.minecraft.client.texture.NativeImageBackedTexture;
-import net.minecraft.client.texture.TextureManager;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.text.LiteralText;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 
-import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.client.MapScreen;
 import ru.bulldog.justmap.client.config.ConfigFactory;
+import ru.bulldog.justmap.client.render.MapTexture;
 import ru.bulldog.justmap.map.data.Layer;
 import ru.bulldog.justmap.map.data.MapCache;
 import ru.bulldog.justmap.map.data.MapChunk;
@@ -33,7 +29,6 @@ import ru.bulldog.justmap.map.waypoint.Waypoint;
 import ru.bulldog.justmap.map.waypoint.WaypointKeeper;
 import ru.bulldog.justmap.map.waypoint.WaypointsList;
 import ru.bulldog.justmap.util.Colors;
-import ru.bulldog.justmap.util.ImageUtil;
 import ru.bulldog.justmap.util.TaskManager;
 import ru.bulldog.justmap.util.math.MathUtil;
 
@@ -64,15 +59,14 @@ public class Worldmap extends MapScreen implements IMap {
 	private double shiftH;
 	private float imageScale = 1.0F;
 	private boolean playerTracking = true;
+	private boolean changed = false;
 	
 	private long updateInterval = 50;
 	private long updated = 0;
 	
 	private BlockPos centerPos;
-	private NativeImage mapImage;
-	private NativeImage imageBuffer;
-	private NativeImageBackedTexture mapTexture;
-	private Identifier textureId;
+	private MapTexture mapImage;
+	private MapTexture bufferImage;
 	private String cursorCoords;
 	private TaskManager processor;
 	
@@ -136,7 +130,7 @@ public class Worldmap extends MapScreen implements IMap {
 	public void renderBackground() {
 		fill(x, 0, x + width, height, 0xFF444444);
 		
-		drawMap();
+		this.drawMap();
 		
 		int iconSize = MathUtil.clamp((int) (10 / imageScale), 6, 10);
 		for (WaypointIcon icon : waypoints) {
@@ -161,33 +155,30 @@ public class Worldmap extends MapScreen implements IMap {
 	
 	@Override
 	public void renderForeground() {
-		drawBorders(paddingTop, paddingBottom);
-		
+		this.drawBorders(paddingTop, paddingBottom);
 		this.drawCenteredString(minecraft.textRenderer, cursorCoords, width / 2, paddingTop + 4, Colors.WHITE);
 	}
 	
 	private void prepareTexture() {
-		TextureManager manager = minecraft.getTextureManager();
 		if (mapImage == null || mapImage.getWidth() != scaledWidth || mapImage.getHeight() != scaledHeight) {
-			this.mapImage = new NativeImage(scaledWidth, scaledHeight, false);
-			ImageUtil.fillImage(mapImage, Colors.BLACK);
+			if (this.mapImage != null) {
+				this.bufferImage.close();
+				this.mapImage.close();
+			}
 			
-			updateMapTexture();
+			this.bufferImage = new MapTexture(scaledWidth, scaledHeight);
+			this.mapImage = new MapTexture(scaledWidth, scaledHeight);
+			this.bufferImage.fill(Colors.BLACK);
+			this.mapImage.fill(Colors.BLACK);
 			
-			if (mapTexture != null) mapTexture.close();
-			
-			this.mapTexture = new NativeImageBackedTexture(mapImage);
-			this.textureId = manager.registerDynamicTexture(JustMap.MODID + "_worldmap_texture", mapTexture);
+			this.updateMapTexture();
 		}
 		
-		try {
-			this.mapImage.copyFrom(imageBuffer);
-			this.mapTexture.upload();
-		} catch (Exception ex) {
-			JustMap.LOGGER.catching(ex);
+		if (this.changed) {
+			this.mapImage.copyImage(this.bufferImage);
+			this.changed = false;
 		}
-		
-		manager.bindTexture(textureId);
+		this.mapImage.upload();
 	}
 	
 	private void updateMapTexture() {
@@ -208,31 +199,44 @@ public class Worldmap extends MapScreen implements IMap {
 		int tmpH = (stopZ << 4) - (startZ << 4);
 		
 		MapCache mapData = MapCache.get();
-		NativeImage tmpImage = new NativeImage(tmpW, tmpH, false);
+		
+		int offX = (tmpW / 2 + blockX) - scaledWidth / 2;
+		int offY = (tmpH / 2 + blockZ) - scaledHeight / 2;
 		
 		int picX = 0;
 		for (int posX = startX; posX < stopX; posX++) {
+			
+			if (picX < offX - 16) {
+				picX += 16;
+				continue;
+			}
+			
 			int picY = 0;
 			for (int posZ = startZ; posZ < stopZ; posZ++) {
+				
+				if (picY < offY - 16) {
+					picY += 16;
+					continue;
+				}
 				
 				MapChunk mapChunk;
 				if (dimension != -1) {
 					mapChunk = mapData.getChunk(Layer.Type.SURFACE, 0, posX, posZ);
 				} else {
-					mapChunk = mapData.getChunk(posX, posZ);
+					mapChunk = mapData.getCurrentChunk(posX, posZ);
 				}
 				
 				for (int x = 0; x < 16; x++) {
-					int px = picX + x;
-					
-					if (px >= mapImage.getWidth()) break;
+					int px = picX + x - offX;					
+					if (px >= scaledWidth) break;
+					if (px < 0) continue;
 					
 					for (int z = 0; z < 16; z++) {
-						int py = picY + z;
+						int py = picY + z - offY;						
+						if (py >= scaledHeight) break;
+						if (py < 0) continue;
 						
-						if (py >= mapImage.getHeight()) break;
-						
-						tmpImage.setPixelRgba(px, py, mapChunk.getBlockColor(x, z));
+						this.bufferImage.setRGB(px, py, mapChunk.getBlockColor(x, z));
 					}
 				}
 				picY += 16;
@@ -240,22 +244,11 @@ public class Worldmap extends MapScreen implements IMap {
 			picX += 16;
 		}
 		
-		int offX = (tmpW / 2 + blockX) - scaledWidth / 2;
-		int offY = (tmpH / 2 + blockZ) - scaledHeight / 2;
-		
-		tmpImage = ImageUtil.readTile(tmpImage, offX, offY, scaledWidth, scaledHeight, true);
-		
-		if (imageBuffer == null || imageBuffer.getWidth() != scaledWidth || imageBuffer.getHeight() != scaledHeight) {
-			if (imageBuffer != null) imageBuffer.close();			
-			this.imageBuffer = new NativeImage(scaledWidth, scaledHeight, false);
-		}		
-		
-		this.imageBuffer.copyFrom(tmpImage);
-		tmpImage.close();
+		this.changed = true;
 	}
 	
 	private void drawMap() {
-		prepareTexture();
+		this.prepareTexture();
 		
 		RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
 		
@@ -424,7 +417,7 @@ public class Worldmap extends MapScreen implements IMap {
 		if (dimension != -1) {
 			mapChunk = MapCache.get().getChunk(Layer.Type.SURFACE, 0, chunkX, chunkZ);
 		} else {
-			mapChunk = MapCache.get().getChunk(chunkX, chunkZ);
+			mapChunk = MapCache.get().getCurrentChunk(chunkX, chunkZ);
 		}
 		
 		int cx = posX - (chunkX << 4);
@@ -471,13 +464,6 @@ public class Worldmap extends MapScreen implements IMap {
 	public void onClose() {
 		this.processor.stop();
 		this.processor = null;
-		if (mapTexture != null) {
-			this.mapTexture.close();
-			this.imageBuffer.close();
-			this.imageBuffer = null;
-			this.mapTexture = null;
-			this.mapImage = null;
-		}
 		
 		super.onClose();
 	}

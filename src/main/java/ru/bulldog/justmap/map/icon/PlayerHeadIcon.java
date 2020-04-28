@@ -65,7 +65,7 @@ public class PlayerHeadIcon {
 	}
 	
 	private static void updatePlayerSkin(PlayerHeadIcon icon) {
-		JustMap.EXECUTOR.execute(() -> {
+		JustMap.WORKER.execute(() -> {
 			getPlayerSkin(icon);
 		});
 	}	

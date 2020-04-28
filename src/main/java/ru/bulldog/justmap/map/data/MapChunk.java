@@ -22,10 +22,9 @@ import java.util.concurrent.ConcurrentMap;
 
 public class MapChunk {
 	
-	private final static TaskManager chunkUpdater = TaskManager.getManager("chunk-data");
-	
 	public final ChunkLevel EMPTY_LEVEL = new ChunkLevel(-1);
 	
+	private final static TaskManager chunkUpdater = TaskManager.getManager("chunk-data");
 	private volatile ConcurrentMap<Layer, ChunkLevel[]> levels;
 	
 	private World world;
@@ -34,7 +33,7 @@ public class MapChunk {
 	private Layer.Type layer;
 	private int dimension;
 	private int level = 0;
-	private boolean empty = true;
+	
 	private boolean saved = true;
 	private boolean purged = false;
 	
@@ -106,10 +105,6 @@ public class MapChunk {
 		}
 	}
 	
-	public void setChunk(WorldChunk chunk) {
-		this.worldChunk = chunk;
-	}
-	
 	public void setPos(ChunkPos chunkPos) {
 		this.chunkPos = chunkPos;
 	}
@@ -124,14 +119,6 @@ public class MapChunk {
 	
 	public int getZ() {
 		return this.chunkPos.z;
-	}
-	
-	public void setEmpty(boolean empty) {
-		this.empty = empty;
-	}
-	
-	public boolean isEmpty() {
-		return this.empty;
 	}
 	
 	public Layer.Type getLayer() {
@@ -207,8 +194,8 @@ public class MapChunk {
 	}
 	
 	private void updateData() {
-		MapChunk eastChunk = MapCache.get().getChunk(chunkPos.x + 1, chunkPos.z, true);
-		MapChunk southChunk = MapCache.get().getChunk(chunkPos.x, chunkPos.z - 1, true);
+		MapChunk eastChunk = MapCache.get().getCurrentChunk(chunkPos.x + 1, chunkPos.z);
+		MapChunk southChunk = MapCache.get().getCurrentChunk(chunkPos.x, chunkPos.z - 1);
 		
 		long currentTime = System.currentTimeMillis();
 		
@@ -218,7 +205,7 @@ public class MapChunk {
 			eastChunk.updateHeighmap();
 			southChunk.updateHeighmap();
 			
-			chunkLevel.updated = currentTime;			
+			chunkLevel.updated = currentTime;
 		}
 		
 		for (int x = 0; x < 16; x++) {
@@ -232,14 +219,14 @@ public class MapChunk {
 				if (posY == -1) continue;
 				
 				BlockPos blockPos = new BlockPos(posX, posY, posZ);
-				BlockState blockState = getBlockState(blockPos);
+				BlockState blockState = this.getBlockState(blockPos);
 				BlockState worldState = worldChunk.getBlockState(blockPos);
 				if(StateUtil.isAir(blockState) || !blockState.equals(worldState)) {
 					int color = ColorUtil.blockColor(worldChunk, blockPos);
 					if (color != -1) {
 						int heightDiff = MapProcessor.heightDifference(this, eastChunk, southChunk, x, posY, z);
 						
-						setBlockState(blockPos, worldState);
+						this.setBlockState(blockPos, worldState);
 						
 						chunkLevel.colormap[index] = color;
 						chunkLevel.levelmap[index] = heightDiff;
@@ -259,7 +246,6 @@ public class MapChunk {
 			}
 		}
 		
-		this.empty = false;
 		this.updated = currentTime;
 	}
 	
@@ -269,14 +255,14 @@ public class MapChunk {
 		int index = x + (z << 4);
 		int color = chunkLevel.colormap[index];
 		
-		if (color == -1) return ColorUtil.proccessColor(Colors.BLACK, 0);
+		if (color == -1) return Colors.BLACK;
 		
 		int heightDiff = chunkLevel.levelmap[index];
 		return ColorUtil.proccessColor(color, heightDiff);
 	}
 	
 	public boolean saveNeeded() {
-		return !this.isEmpty() && !this.saved;
+		return !this.saved;
 	}
 	
 	public void store(CompoundTag data) {
@@ -308,11 +294,10 @@ public class MapChunk {
 	}
 	
 	public void restore() {
-		if (worldChunk.isEmpty()) return;
-		
 		CompoundTag chunkData = StorageUtil.getCache(chunkPos);
 		if (chunkData.isEmpty()) return;
 		
+		final int dataVer = chunkData.contains("version") ? chunkData.getInt("version") : -1;
 		this.levels.forEach((layer, levels) -> {
 			ListTag listTag = chunkData.getList(layer.name, 10);
 			for(int i = 0; i < listTag.size(); ++i) {
@@ -324,6 +309,16 @@ public class MapChunk {
 					
 					chunkLevel.container().read(level.getList("Palette", 10), level.getLongArray("BlockStates"));
 					chunkLevel.load(level);
+					
+					if (dataVer == -1) {
+						for (int j = 0; j < chunkLevel.colormap.length; j++) {
+							int color = chunkLevel.colormap[j];
+							if (color != -1) {
+								chunkLevel.colormap[j] = ColorUtil.ABGRtoARGB(color);
+							}
+						}
+						this.saved = false;
+					}
 				}
 			}			
 		});

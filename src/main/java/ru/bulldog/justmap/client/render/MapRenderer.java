@@ -4,7 +4,6 @@ import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
-import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.map.DirectionArrow;
@@ -29,10 +28,6 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormats;
-import net.minecraft.client.texture.NativeImage;
-import net.minecraft.client.texture.NativeImageBackedTexture;
-import net.minecraft.client.texture.TextureManager;
-import net.minecraft.util.Identifier;
 
 @Environment(EnvType.CLIENT)
 public class MapRenderer {
@@ -50,9 +45,7 @@ public class MapRenderer {
 
 	private final Minimap minimap;
 	
-	private NativeImage textureImage;
-	private NativeImageBackedTexture mapTexture;
-	private Identifier textureId;
+	private MapTexture mapTexture;
 	
 	private TextManager textManager;
 	
@@ -210,26 +203,16 @@ public class MapRenderer {
 	}
 	
 	private void prepareTexture() {
-		TextureManager manager = client.getTextureManager();
-		
 		int textureSize = minimap.getScaledSize();
-		if (textureImage == null || textureImage.getWidth() != textureSize || textureImage.getHeight() != textureSize) {
-			this.textureImage = new NativeImage(textureSize, textureSize, false);
-			
-			if (mapTexture != null) mapTexture.close();
-			
-			this.mapTexture = new NativeImageBackedTexture(textureImage);
-			this.textureId = manager.registerDynamicTexture(JustMap.MODID + "_minimap_texture", mapTexture);
+		if (mapTexture == null || mapTexture.getWidth() != textureSize || mapTexture.getHeight() != textureSize) {
+			if (mapTexture != null) this.mapTexture.close();			
+			this.mapTexture = new MapTexture(textureSize, textureSize);
+		}		
+		if (minimap.changed) {
+			this.mapTexture.copyImage(minimap.getImage());
+			this.minimap.changed = false;
 		}
-		
-		try {
-			this.textureImage.copyFrom(minimap.getImage());
-			this.mapTexture.upload();
-		} catch (Exception ex) {
-			JustMap.LOGGER.catching(ex);
-		}
-		
-		manager.bindTexture(textureId);
+		this.mapTexture.upload();
 	}
 	
 	public void draw() {

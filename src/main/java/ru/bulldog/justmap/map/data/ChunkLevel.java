@@ -14,8 +14,7 @@ import ru.bulldog.justmap.util.StateUtil;
 
 public class ChunkLevel {
 	
-	private final static Palette<BlockState> palette;
-	
+	private final static Palette<BlockState> palette;	
 	private volatile PalettedContainer<BlockState> container;
 	
 	int[] heightmap;

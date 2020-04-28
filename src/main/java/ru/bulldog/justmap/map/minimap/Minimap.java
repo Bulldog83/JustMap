@@ -2,6 +2,7 @@ package ru.bulldog.justmap.map.minimap;
 
 import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.client.config.ClientParams;
+import ru.bulldog.justmap.client.render.MapTexture;
 import ru.bulldog.justmap.map.IMap;
 import ru.bulldog.justmap.map.data.Layer.Type;
 import ru.bulldog.justmap.map.data.MapCache;
@@ -13,14 +14,12 @@ import ru.bulldog.justmap.map.waypoint.WaypointEditor;
 import ru.bulldog.justmap.map.waypoint.WaypointKeeper;
 import ru.bulldog.justmap.util.Colors;
 import ru.bulldog.justmap.util.DrawHelper.TextAlignment;
-import ru.bulldog.justmap.util.ImageUtil;
 import ru.bulldog.justmap.util.math.MathUtil;
 import ru.bulldog.justmap.util.math.RandomUtil;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ChatScreen;
 import net.minecraft.client.resource.language.I18n;
-import net.minecraft.client.texture.NativeImage;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.mob.HostileEntity;
@@ -53,15 +52,16 @@ public class Minimap implements IMap{
 	private float mapScale;
 	private int picSize;
 	
-	private Biome currentBiome;
-	
-	private NativeImage image;
+	private Biome currentBiome;	
+	private MapTexture image;
 	
 	private List<WaypointIcon> waypoints = new ArrayList<>();
 	private List<PlayerIcon> players = new ArrayList<>();
 	private List<EntityIcon> entities = new ArrayList<>();
 	
 	private PlayerEntity locPlayer = null;
+	
+	public boolean changed = false;
 	
 	private static boolean isMapVisible = true;
 	private static boolean rotateMap = false;
@@ -101,9 +101,9 @@ public class Minimap implements IMap{
 			if (image != null) {
 				this.image.close();
 			}		
-			int size = getScaledSize();
-			this.image = new NativeImage(size, size, false);
-			ImageUtil.fillImage(this.image, Colors.BLACK);
+			int size = this.getScaledSize();
+			this.image = new MapTexture(size, size);
+			this.image.fill(Colors.BLACK);
 		}
 	}
 	
@@ -203,7 +203,7 @@ public class Minimap implements IMap{
 		
 		currentBiome = world.getBiome(pos);
 		
-		int scaled = getScaledSize();
+		int scaled = this.getScaledSize();
 		double startX = pos.getX() - scaled / 2;
 		double startZ = pos.getZ() - scaled / 2;
 
@@ -314,7 +314,7 @@ public class Minimap implements IMap{
 		createWaypoint(player.world.dimension.getType().getRawId(), player.getBlockPos());
 	}
 	
-	public NativeImage getImage() {
+	public MapTexture getImage() {
 		synchronized (imageLocker) {
 			return this.image;
 		}		
