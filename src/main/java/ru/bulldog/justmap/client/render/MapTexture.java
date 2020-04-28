@@ -4,6 +4,7 @@ import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.util.Arrays;
 
 import org.lwjgl.opengl.GL11;
 
@@ -14,6 +15,7 @@ import net.minecraft.client.texture.TextureUtil;
 public class MapTexture extends BufferedImage {
 
 	private ByteBuffer buffer;
+	private byte[] bytes;
 	private int glId = -1;
 	
 	private Object bufferLock = new Object();
@@ -21,7 +23,7 @@ public class MapTexture extends BufferedImage {
 	public MapTexture(int width, int height) {
 		super(width, height, TYPE_4BYTE_ABGR);
 		
-		byte[] bytes = ((DataBufferByte) ((DataBufferByte) this.getRaster().getDataBuffer())).getData();
+		this.bytes = ((DataBufferByte) ((DataBufferByte) this.getRaster().getDataBuffer())).getData();
 		this.buffer = ByteBuffer.allocateDirect(bytes.length).order(ByteOrder.nativeOrder());
 	}
 	
@@ -44,9 +46,15 @@ public class MapTexture extends BufferedImage {
 		GL11.glTexImage2D(3553, 0, 6408, this.getWidth(), this.getHeight(), 0, 6408, 32821, this.buffer);
 	}
 	
+	private byte[] getBytes() {
+		synchronized(bufferLock) {
+			return Arrays.copyOf(this.bytes, this.bytes.length);
+		}
+	}
+	
 	public void copyImage(MapTexture image) {
 		synchronized(bufferLock) {
-			this.setData(image.getData());
+			this.bytes = image.getBytes();
 		}
 	}
 	
@@ -55,8 +63,12 @@ public class MapTexture extends BufferedImage {
 		if (x < 0 || x >= this.getWidth()) return;
 		if (y < 0 || y >= this.getHeight()) return;
 		
+		int index = (x + y * this.getWidth()) * 4;
 		synchronized(bufferLock) {
-			super.setRGB(x, y, color);
+			this.bytes[index] = (byte) (color >> 24);
+			this.bytes[index + 1] = (byte) (color >> 0);
+			this.bytes[index + 2] = (byte) (color >> 8);
+			this.bytes[index + 3] = (byte) (color >> 16);
 		}
 	}
 	
@@ -74,7 +86,13 @@ public class MapTexture extends BufferedImage {
 	}
 	
 	public void close() {
+		if (this.glId != -1) {
+			TextureUtil.releaseTextureId(this.glId);
+			this.glId = -1;
+		}
+		
 		synchronized(bufferLock) {
+			Arrays.fill(this.bytes, (byte) 0);
 			this.buffer.clear();
 			this.flush();
 		}
@@ -82,9 +100,8 @@ public class MapTexture extends BufferedImage {
 	
 	private void refillBuffer() {
 		synchronized(bufferLock) {
-			byte[] bytes = ((DataBufferByte) ((DataBufferByte) this.getRaster().getDataBuffer())).getData();
 			this.buffer.clear();
-			this.buffer.put(bytes);
+			this.buffer.put(this.bytes);
 			this.buffer.position(0).limit(bytes.length);
 		}
 	}
