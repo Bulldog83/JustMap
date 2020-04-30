@@ -72,6 +72,8 @@ public class MapRenderer {
 		this.offset = ClientParams.positionOffset;
 		this.mapPosition = ClientParams.mapPosition;
 		this.textManager = this.minimap.getTextManager();
+		
+		RenderUtil.setupFrameBuffer();
 	}
 	
 	public int getX() {
@@ -90,17 +92,17 @@ public class MapRenderer {
 		int winW = client.getWindow().getScaledWidth();
 		int winH = client.getWindow().getScaledHeight();
 		
-		offset = ClientParams.positionOffset;
-		mapPosition = ClientParams.mapPosition;
+		this.offset = ClientParams.positionOffset;
+		this.mapPosition = ClientParams.mapPosition;
 		
-		mapW = minimap.getWidth();
-		mapH = minimap.getHeight();
-		posX = offset;
-		posY = offset;
-		mapX = posX + border;
-		mapY = posY + border;
+		this.mapW = minimap.getWidth();
+		this.mapH = minimap.getHeight();
+		this.posX = offset;
+		this.posY = offset;
+		this.mapX = posX + border;
+		this.mapY = posY + border;
 		
-		rotation = client.player.headYaw;
+		this.rotation = client.player.headYaw;
 		
 		TextManager.TextPosition textPos = TextManager.TextPosition.UNDER;
 		
@@ -108,44 +110,44 @@ public class MapRenderer {
 			case TOP_LEFT:
 				break;
 			case TOP_CENTER:
-				mapX = winW / 2 - mapW / 2;
-				posX = mapX - border;
+				this.mapX = winW / 2 - mapW / 2;
+				this.posX = mapX - border;
 				break;
 			case TOP_RIGHT:
-				mapX = winW - offset - mapW - border;
-				posX = mapX - border;
+				this.mapX = winW - offset - mapW - border;
+				this.posX = mapX - border;
 				break;
 			case MIDDLE_RIGHT:
-				mapX = winW - offset - mapW - border;
-				mapY = winH / 2 - mapH / 2;
-				posX = mapX - border;
-				posY = mapY - border;
+				this.mapX = winW - offset - mapW - border;
+				this.mapY = winH / 2 - mapH / 2;
+				this.posX = mapX - border;
+				this.posY = mapY - border;
 				break;
 			case MIDDLE_LEFT:
-				mapY = winH / 2 - mapH / 2;
-				posY = mapY - border;
+				this.mapY = winH / 2 - mapH / 2;
+				this.posY = mapY - border;
 				break;
 			case BOTTOM_LEFT:
 				textPos = TextManager.TextPosition.ABOVE;
-				mapY = winH - offset - mapH - border;
-				posY = mapY - border;
+				this.mapY = winH - offset - mapH - border;
+				this.posY = mapY - border;
 				break;
 			case BOTTOM_RIGHT:
 				textPos = TextManager.TextPosition.ABOVE;
-				mapX = winW - offset - mapW - border;
-				posX = mapX - border;
-				mapY = winH - offset - mapH - border;
-				posY = mapY - border;
+				this.mapX = winW - offset - mapW - border;
+				this.posX = mapX - border;
+				this.mapY = winH - offset - mapH - border;
+				this.posY = mapY - border;
 				break;
 		}
 		
-		textManager.setPosition(
+		this.textManager.setPosition(
 			mapX, mapY + (textPos == TextManager.TextPosition.UNDER && minimap.isMapVisible() ?
 				mapH + border + 3 :
 				-(border + 3))
 		);
-		textManager.setDirection(textPos);
-		textManager.setSpacing(12);
+		this.textManager.setDirection(textPos);
+		this.textManager.setSpacing(12);
 		
 		int centerX = mapX + mapW / 2;
 		int centerY = mapY + mapH / 2;
@@ -179,15 +181,15 @@ public class MapRenderer {
 			calculatePos(center, pointW, mapR, mapB, angle);
 		}
 		
-		textManager.add(dirN, pointN.x, pointN.y - 5);
-		textManager.add(dirS, pointS.x, pointS.y - 5);
-		textManager.add(dirE, pointE.x, pointE.y - 5);
-		textManager.add(dirW, pointW.x, pointW.y - 5);
+		this.textManager.add(dirN, pointN.x, pointN.y - 5);
+		this.textManager.add(dirS, pointS.x, pointS.y - 5);
+		this.textManager.add(dirE, pointE.x, pointE.y - 5);
+		this.textManager.add(dirW, pointW.x, pointW.y - 5);
 		
 		if (ClientParams.useSkins) {
-			mapSkin = MapSkin.getSkin(ClientParams.currentSkin);
+			this.mapSkin = MapSkin.getSkin(ClientParams.currentSkin);
 			
-			border = mapSkin.resizable ?
+			this.border = mapSkin.resizable ?
 						  (int) (mapW * ((float)(mapSkin.border) / mapSkin.getWidth())) :
 						  mapSkin.border;
 		}
@@ -222,12 +224,6 @@ public class MapRenderer {
 		
 		this.updateParams();
 		
-		RenderSystem.disableDepthTest();
-		
-		if (ClientParams.useSkins) {
-			mapSkin.draw(posX, posY, mapW + border * 2);
-		}
-
 		int winH = client.getWindow().getFramebufferHeight();
 		double scale = client.getWindow().getScaleFactor();
 		
@@ -236,8 +232,18 @@ public class MapRenderer {
 		int scaledW = (int) (mapW * scale);
 		int scaledH = (int) (mapH * scale);
 		
+		RenderSystem.enableBlend();
+		RenderSystem.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ZERO);
+		RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+		
+		if (ClientParams.useSkins) {
+			mapSkin.draw(posX, posY, mapW + border * 2);
+		}
+		
 		GL11.glEnable(GL11.GL_SCISSOR_TEST);
 		GL11.glScissor(scaledX, scaledY, scaledW, scaledH);
+		
+		RenderSystem.disableDepthTest();
 		
 		this.drawMap();
 
@@ -275,28 +281,84 @@ public class MapRenderer {
 	}
 	
 	private void drawMap() {		
+		double z = 0.09;		
+		float f1 = 0.0F, f2 = 1.0F;
+		
+		if (RenderUtil.hasAlphaBits) {
+			RenderSystem.colorMask(false, false, false, true);
+			RenderSystem.clearColor(0.0F, 0.0F, 0.0F, 0.0F);
+			RenderSystem.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+			RenderSystem.colorMask(true, true, true, true);			
+			RenderSystem.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_DST_ALPHA);
+			
+			this.prepareTexture();
+			
+			if (minimap.getScale() > 1) {
+				RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
+				RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
+			} else {
+				RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_NEAREST);
+				RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST);
+			}
+			
+			if (ClientParams.rotateMap) {
+				f1 = 0.15F;
+				f2 = 0.85F;
+				
+				RenderSystem.enableTexture();
+				RenderSystem.matrixMode(GL11.GL_TEXTURE);
+				RenderSystem.pushMatrix();
+				RenderSystem.translatef(0.5F, 0.5F, 0);
+				RenderSystem.rotatef(rotation + 180, 0, 0, 1.0F);
+				RenderSystem.translatef(-0.5F, -0.5F, 0);
+			}
+		} else {
+			RenderSystem.bindTexture(GL11.GL_ZERO);
+			GL11.glPushAttrib(GL11.GL_TRANSFORM_BIT);
+			
+			RenderUtil.bindFrameBuffer();
+			
+			RenderSystem.clearColor(0.0F, 0.0F, 0.0F, 0.0F);
+			RenderSystem.clear(GL11.GL_COLOR_BUFFER_BIT, MinecraftClient.IS_SYSTEM_MAC);
+			
+			if (ClientParams.useSkins) {
+				RenderSystem.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ZERO);
+				this.mapSkin.draw(posX, posY, mapW + border * 2);
+			}
+			
+			RenderSystem.clearColor(GL11.GL_ONE, GL11.GL_ZERO, GL11.GL_DST_COLOR, GL11.GL_ZERO);
+			
+			this.prepareTexture();
+			
+			if (minimap.getScale() > 1) {
+				RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
+				RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
+			} else {
+				RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_NEAREST);
+				RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST);
+			}
+			
+			if (ClientParams.rotateMap) {
+				f1 = 0.15F;
+				f2 = 0.85F;
+				
+				RenderSystem.enableTexture();
+				RenderSystem.matrixMode(GL11.GL_TEXTURE);
+				RenderSystem.pushMatrix();
+				RenderSystem.translatef(0.5F, 0.5F, 0);
+				RenderSystem.rotatef(rotation + 180, 0, 0, 1.0F);
+				RenderSystem.translatef(-0.5F, -0.5F, 0);
+			}
+			
+			RenderUtil.unbindFrameBuffer();
+			
+			RenderSystem.popAttributes();
+		}
+		
 		Tessellator tessellator = Tessellator.getInstance();
 		BufferBuilder builder = tessellator.getBuffer();
 		builder.begin(7, VertexFormats.POSITION_TEXTURE);
 		
-		double z = 0.09;
-		
-		this.prepareTexture();
-		
-		float f1 = 0.0F, f2 = 1.0F;		
-		if (ClientParams.rotateMap) {
-			f1 = 0.15F;
-			f2 = 0.85F;
-			
-			RenderSystem.enableTexture();
-			RenderSystem.matrixMode(GL11.GL_TEXTURE);
-			RenderSystem.pushMatrix();
-			RenderSystem.translatef(0.5F, 0.5F, 0);
-			RenderSystem.rotatef(rotation + 180, 0, 0, 1.0F);
-			RenderSystem.translatef(-0.5F, -0.5F, 0);
-		}
-		
-		RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);		
 		builder.vertex(mapX, mapY, z).texture(f1, f1).next();
 		builder.vertex(mapX, mapY + mapH, z).texture(f1, f2).next();
 		builder.vertex(mapX + mapW, mapY + mapH, z).texture(f2, f2).next();

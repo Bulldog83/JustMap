@@ -47,7 +47,7 @@ public class WaypointRenderer {
 			List<Waypoint> wayPoints = WaypointKeeper.getInstance().getWaypoints(client.world.dimension.getType().getRawId(), true);
 			for (Waypoint wp : wayPoints) {
 				int dist = (int) MathUtil.getDistance(wp.pos, client.player.getBlockPos(), false);
-				if (wp.tracking && dist < wp.showRange) {
+				if (wp.tracking && dist <= wp.showRange) {
 					renderer.renderHUD(wp, client, delta, fov, dist);
 				}
 			}
@@ -94,8 +94,7 @@ public class WaypointRenderer {
 				renderer = new WaypointRenderer();
 			}
 			
-			long time = client.player.world.getTime();
-			
+			long time = client.player.world.getTime();			
 			float tick = (float) Math.floorMod(time, 125L) + tickDelta;
 			
 			VertexConsumerProvider.Immediate immediate = client.getBufferBuilders().getEntityVertexConsumers();
@@ -130,7 +129,7 @@ public class WaypointRenderer {
 		matrixStack.translate((double) wpX - camX, (double) wpY - camY, (double) wpZ - camZ);
 		matrixStack.translate(0.5D, 1.5D, 0.5D);
 		if (ClientParams.renderLightBeam) {
-			renderLightBeam(matrixStack, immediate, waypoint, BEAM_TEX, tick, -wpY, 512 - wpY, colors, alpha, 0.15F, 0.2F);
+			renderLightBeam(matrixStack, immediate, BEAM_TEX, tick, -wpY, 512 - wpY, colors, alpha, 0.15F, 0.2F);
 		}
 		
 		if (ClientParams.renderAnimation) {
@@ -146,7 +145,7 @@ public class WaypointRenderer {
 		matrixStack.pop();
 	}
 	
-	private void renderLightBeam(MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, Waypoint waypoint, Identifier identifier, float tick, int i, int j, float[] colors, float alpha, float h, float k) {
+	private void renderLightBeam(MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, Identifier identifier, float tick, int i, int j, float[] colors, float alpha, float h, float k) {
 		int m = i + j;
 		matrixStack.push();
 		float o = j < 0 ? tick : -tick;

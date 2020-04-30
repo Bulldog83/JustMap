@@ -92,7 +92,6 @@ public class MapTexture extends BufferedImage {
 		}
 		
 		synchronized(bufferLock) {
-			Arrays.fill(this.bytes, (byte) 0);
 			this.buffer.clear();
 			this.flush();
 		}

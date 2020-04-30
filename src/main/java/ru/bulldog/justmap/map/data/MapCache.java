@@ -112,8 +112,7 @@ public class MapCache {
 	private int purgeAmount = 500;
 	
 	private MapCache(World world) {
-		this.world = world;
-		
+		this.world = world;		
 		this.chunks = new ConcurrentHashMap<>();
 	}
 	
@@ -138,6 +137,7 @@ public class MapCache {
 		int offsetZ = (startZ << 4) - top;
 		
 		int index = 0, posX = 0;
+		MapTexture mapImage = map.getImage();
 		for (int chunkX = startX; chunkX < endX; chunkX++) {
 			int posZ = 0;
 			int imgX = (posX << 4) + offsetX;
@@ -150,8 +150,6 @@ public class MapCache {
 				}
 				
 				int imgY = (posZ << 4) + offsetZ;
-				
-				MapTexture mapImage = map.getImage();
 				for (int x = 0; x < 16; x++) {
 					int px = imgX + x;
 					
@@ -166,11 +164,9 @@ public class MapCache {
 						
 						mapImage.setRGB(px, py, mapChunk.getBlockColor(x, z));
 					}
-				}
-				
+				}				
 				posZ++;
-			}
-			
+			}			
 			posX++;
 		}
 		
