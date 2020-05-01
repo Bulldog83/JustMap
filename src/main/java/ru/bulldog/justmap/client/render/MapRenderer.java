@@ -46,6 +46,8 @@ public class MapRenderer {
 	private final Minimap minimap;
 	
 	private MapTexture mapTexture;
+	private Tessellator tessellator = Tessellator.getInstance();
+	private BufferBuilder builder = tessellator.getBuffer();
 	
 	private TextManager textManager;
 	
@@ -291,8 +293,12 @@ public class MapRenderer {
 			RenderSystem.colorMask(true, true, true, true);			
 			RenderSystem.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_DST_ALPHA);
 			
-			this.prepareTexture();
+			if (this.mapTexture == null || this.minimap.changed) {
+				this.prepareTexture();
+				minimap.changed = false;
+			}
 			
+			RenderSystem.bindTexture(mapTexture.getId());
 			if (minimap.getScale() > 1) {
 				RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
 				RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
@@ -312,6 +318,14 @@ public class MapRenderer {
 				RenderSystem.rotatef(rotation + 180, 0, 0, 1.0F);
 				RenderSystem.translatef(-0.5F, -0.5F, 0);
 			}
+			
+			this.builder.begin(7, VertexFormats.POSITION_TEXTURE);		
+			this.builder.vertex(mapX, mapY, z).texture(f1, f1).next();
+			this.builder.vertex(mapX, mapY + mapH, z).texture(f1, f2).next();
+			this.builder.vertex(mapX + mapW, mapY + mapH, z).texture(f2, f2).next();
+			this.builder.vertex(mapX + mapW, mapY, z).texture(f2, f1).next();
+			
+			this.tessellator.draw();
 		} else {
 			RenderSystem.bindTexture(GL11.GL_ZERO);
 			GL11.glPushAttrib(GL11.GL_TRANSFORM_BIT);
@@ -320,16 +334,14 @@ public class MapRenderer {
 			
 			RenderSystem.clearColor(0.0F, 0.0F, 0.0F, 0.0F);
 			RenderSystem.clear(GL11.GL_COLOR_BUFFER_BIT, MinecraftClient.IS_SYSTEM_MAC);
-			
-			if (ClientParams.useSkins) {
-				RenderSystem.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ZERO);
-				this.mapSkin.draw(posX, posY, mapW + border * 2);
-			}
-			
 			RenderSystem.clearColor(GL11.GL_ONE, GL11.GL_ZERO, GL11.GL_DST_COLOR, GL11.GL_ZERO);
 			
-			this.prepareTexture();
+			if (this.mapTexture == null || this.minimap.changed) {
+				this.prepareTexture();
+				minimap.changed = false;
+			}
 			
+			RenderSystem.bindTexture(mapTexture.getId());
 			if (minimap.getScale() > 1) {
 				RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
 				RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
@@ -350,21 +362,20 @@ public class MapRenderer {
 				RenderSystem.translatef(-0.5F, -0.5F, 0);
 			}
 			
-			RenderUtil.unbindFrameBuffer();
+			this.builder.begin(7, VertexFormats.POSITION_TEXTURE);		
+			this.builder.vertex(mapX, mapY, z).texture(f1, f1).next();
+			this.builder.vertex(mapX, mapY + mapH, z).texture(f1, f2).next();
+			this.builder.vertex(mapX + mapW, mapY + mapH, z).texture(f2, f2).next();
+			this.builder.vertex(mapX + mapW, mapY, z).texture(f2, f1).next();
 			
+			this.tessellator.draw();
+			
+			RenderUtil.unbindFrameBuffer();			
 			RenderSystem.popAttributes();
+			RenderSystem.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ZERO);
+            RenderSystem.enableAlphaTest();
+            RenderSystem.bindTexture(RenderUtil.fboTextureID);
 		}
-		
-		Tessellator tessellator = Tessellator.getInstance();
-		BufferBuilder builder = tessellator.getBuffer();
-		builder.begin(7, VertexFormats.POSITION_TEXTURE);
-		
-		builder.vertex(mapX, mapY, z).texture(f1, f1).next();
-		builder.vertex(mapX, mapY + mapH, z).texture(f1, f2).next();
-		builder.vertex(mapX + mapW, mapY + mapH, z).texture(f2, f2).next();
-		builder.vertex(mapX + mapW, mapY, z).texture(f2, f1).next();
-		
-		tessellator.draw();
 		
 		if (ClientParams.rotateMap) {		
 			RenderSystem.popMatrix();

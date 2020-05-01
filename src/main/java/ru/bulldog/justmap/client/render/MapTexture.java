@@ -11,6 +11,7 @@ import org.lwjgl.opengl.GL11;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.texture.TextureUtil;
+import ru.bulldog.justmap.util.Colors;
 
 public class MapTexture extends BufferedImage {
 
@@ -23,8 +24,12 @@ public class MapTexture extends BufferedImage {
 	public MapTexture(int width, int height) {
 		super(width, height, TYPE_4BYTE_ABGR);
 		
-		this.bytes = ((DataBufferByte) ((DataBufferByte) this.getRaster().getDataBuffer())).getData();
+		this.bytes = ((DataBufferByte) this.getRaster().getDataBuffer()).getData();
 		this.buffer = ByteBuffer.allocateDirect(bytes.length).order(ByteOrder.nativeOrder());
+	}
+	
+	public int getId() {
+		return this.glId;
 	}
 	
 	public void upload() {
@@ -47,14 +52,34 @@ public class MapTexture extends BufferedImage {
 	}
 	
 	private byte[] getBytes() {
-		synchronized(bufferLock) {
+		Object lock = this.bufferLock;
+		synchronized(lock) {
 			return Arrays.copyOf(this.bytes, this.bytes.length);
 		}
 	}
 	
 	public void copyImage(MapTexture image) {
-		synchronized(bufferLock) {
+		Object lock = this.bufferLock;
+		synchronized(lock) {
 			this.bytes = image.getBytes();
+		}
+	}
+	
+	public void writeChunkData(int x, int y, int[] colorData) {
+		for (int i = 0; i < 16; i++) {
+			int px = i + x;
+			
+			if (px >= this.getWidth()) break;
+			if (px < 0) continue;
+			
+			for (int j = 0; j < 16; j++) {
+				int py = j + y;
+				
+				if (py >= this.getHeight()) break;
+				if (py < 0) continue;
+				
+				this.setRGB(px, py, colorData[i + (j << 4)]);
+			}
 		}
 	}
 	
@@ -64,7 +89,9 @@ public class MapTexture extends BufferedImage {
 		if (y < 0 || y >= this.getHeight()) return;
 		
 		int index = (x + y * this.getWidth()) * 4;
-		synchronized(bufferLock) {
+		
+		Object lock = this.bufferLock;
+		synchronized(lock) {
 			this.bytes[index] = (byte) (color >> 24);
 			this.bytes[index + 1] = (byte) (color >> 0);
 			this.bytes[index + 2] = (byte) (color >> 8);
@@ -76,7 +103,8 @@ public class MapTexture extends BufferedImage {
 		int width = this.getWidth();
 		int height = this.getHeight();
 		
-		synchronized(bufferLock) {
+		Object lock = this.bufferLock;
+		synchronized(lock) {
 			for(int x = 0; x < width; x++) {
 				for (int y = 0; y < height; y++) {
 					this.setRGB(x, y, color);
@@ -85,23 +113,52 @@ public class MapTexture extends BufferedImage {
 		}
 	}
 	
+	public void clear() {
+		this.fill(Colors.BLACK);
+		this.upload();
+	}
+	
 	public void close() {
 		if (this.glId != -1) {
 			TextureUtil.releaseTextureId(this.glId);
 			this.glId = -1;
 		}
 		
-		synchronized(bufferLock) {
+		Object lock = this.bufferLock;
+		synchronized(lock) {
 			this.buffer.clear();
 			this.flush();
 		}
 	}
 	
 	private void refillBuffer() {
-		synchronized(bufferLock) {
+		Object lock = this.bufferLock;
+		synchronized(lock) {
 			this.buffer.clear();
 			this.buffer.put(this.bytes);
 			this.buffer.position(0).limit(bytes.length);
 		}
 	}
+
+	public void offsetX(int offset) {
+    	Object lock = this.bufferLock;
+        synchronized (lock) {
+        	if (offset > 0) {
+            	System.arraycopy(this.bytes, offset * 4, this.bytes, 0, this.bytes.length - offset * 4);
+            } else if (offset < 0) {
+            	System.arraycopy(this.bytes, 0, this.bytes, -offset * 4, this.bytes.length + offset * 4);
+            }
+        }
+    }
+
+    public void offsetY(int offset) {
+    	Object lock = this.bufferLock;
+        synchronized (lock) {
+        	if (offset > 0) {
+            	System.arraycopy(this.bytes, offset * this.getWidth() * 4, this.bytes, 0, this.bytes.length - offset * this.getWidth() * 4);
+            } else if (offset < 0) {
+            	System.arraycopy(this.bytes, 0, this.bytes, -offset * this.getWidth() * 4, this.bytes.length + offset * this.getWidth() * 4);
+            }
+        }
+    }
 }

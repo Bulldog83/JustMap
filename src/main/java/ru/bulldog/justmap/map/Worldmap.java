@@ -60,6 +60,8 @@ public class Worldmap extends MapScreen implements IMap {
 	private float imageScale = 1.0F;
 	private boolean playerTracking = true;
 	private boolean changed = false;
+	private int lastX = 0;
+	private int lastZ = 0;
 	
 	private long updateInterval = 50;
 	private long updated = 0;
@@ -226,19 +228,7 @@ public class Worldmap extends MapScreen implements IMap {
 					mapChunk = mapData.getCurrentChunk(posX, posZ);
 				}
 				
-				for (int x = 0; x < 16; x++) {
-					int px = picX + x - offX;					
-					if (px >= scaledWidth) break;
-					if (px < 0) continue;
-					
-					for (int z = 0; z < 16; z++) {
-						int py = picY + z - offY;						
-						if (py >= scaledHeight) break;
-						if (py < 0) continue;
-						
-						this.bufferImage.setRGB(px, py, mapChunk.getBlockColor(x, z));
-					}
-				}
+				this.bufferImage.writeChunkData(picX - offX, picY - offY, mapChunk.getColorData());
 				picY += 16;
 			}			
 			picX += 16;

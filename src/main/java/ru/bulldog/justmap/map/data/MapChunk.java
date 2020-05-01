@@ -2,7 +2,6 @@ package ru.bulldog.justmap.map.data;
 
 import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.util.ColorUtil;
-import ru.bulldog.justmap.util.Colors;
 import ru.bulldog.justmap.util.StateUtil;
 import ru.bulldog.justmap.util.StorageUtil;
 import ru.bulldog.justmap.util.TaskManager;
@@ -40,6 +39,8 @@ public class MapChunk {
 	public long updated = 0;
 	public long requested = 0;
 	
+	private Object levelLock = new Object();
+	
 	public MapChunk(World world, ChunkPos pos, Layer.Type layer, int level) {
 		this(world, pos, layer);
 		this.level = level > 0 ? level : 0;
@@ -64,7 +65,7 @@ public class MapChunk {
 			initLayer(Layer.Type.CAVES);
 		}
 		
-		chunkUpdater.execute(this::restore);
+		this.restore();
 	}
 	
 	public void resetChunk() {
@@ -90,18 +91,21 @@ public class MapChunk {
 			initLayer();
 		}
 		
+		ChunkLevel chunkLevel;
 		try {
-			ChunkLevel chunkLevel;
 			if (this.levels.get(layer.value)[level] == null) {
 				chunkLevel = new ChunkLevel(level);
 				this.levels.get(layer.value)[level] = chunkLevel;
 			} else {
 				chunkLevel = this.levels.get(layer.value)[level];
-			}
+			}			
 			
-			return chunkLevel;
 		} catch (ArrayIndexOutOfBoundsException ex) {
-			return EMPTY_LEVEL;
+			chunkLevel = EMPTY_LEVEL;
+		}
+		
+		synchronized (levelLock) {
+			return chunkLevel;
 		}
 	}
 	
@@ -230,6 +234,7 @@ public class MapChunk {
 						
 						chunkLevel.colormap[index] = color;
 						chunkLevel.levelmap[index] = heightDiff;
+						chunkLevel.colordata[index] = ColorUtil.proccessColor(color, heightDiff);
 						
 						this.saved = false;
 					}
@@ -238,7 +243,8 @@ public class MapChunk {
 					if (color != -1) {
 						int heightDiff = MapProcessor.heightDifference(this, eastChunk, southChunk, x, posY, z);
 						if (chunkLevel.levelmap[index] != heightDiff) {
-							chunkLevel.levelmap[index] = heightDiff;							
+							chunkLevel.levelmap[index] = heightDiff;
+							chunkLevel.colordata[index] = ColorUtil.proccessColor(color, heightDiff);
 							this.saved = false;
 						}
 					}
@@ -249,16 +255,15 @@ public class MapChunk {
 		this.updated = currentTime;
 	}
 	
-	public int getBlockColor(int x, int z) {
+	public int[] getColorData() {
 		ChunkLevel chunkLevel = getChunkLevel();
-		
+		return Arrays.copyOf(chunkLevel.colordata, 256);
+	}
+	
+	public int getBlockColor(int x, int z) {
 		int index = x + (z << 4);
-		int color = chunkLevel.colormap[index];
-		
-		if (color == -1) return Colors.BLACK;
-		
-		int heightDiff = chunkLevel.levelmap[index];
-		return ColorUtil.proccessColor(color, heightDiff);
+		ChunkLevel chunkLevel = getChunkLevel();
+		return chunkLevel.colordata[index];
 	}
 	
 	public boolean saveNeeded() {

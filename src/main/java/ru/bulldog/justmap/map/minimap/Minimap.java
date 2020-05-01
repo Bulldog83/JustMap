@@ -61,10 +61,12 @@ public class Minimap implements IMap{
 	
 	private PlayerEntity locPlayer = null;
 	
-	public boolean changed = false;
-	
 	private static boolean isMapVisible = true;
 	private static boolean rotateMap = false;
+	
+	public boolean changed = false;
+	public int lastX = 0;
+	public int lastZ = 0;
 	
 	private Object imageLocker = new Object();
 	
@@ -105,6 +107,9 @@ public class Minimap implements IMap{
 			this.image = new MapTexture(size, size);
 			this.image.fill(Colors.BLACK);
 		}
+		
+		MapCache.renewNeeded = true;		
+		this.changed = true;
 	}
 	
 	public void onConfigChanges() {
@@ -216,6 +221,9 @@ public class Minimap implements IMap{
 		}
 		
 		MapCache.get().update(this, scaled, (int) startX, (int) startZ);
+		
+		this.lastX = pos.getX();
+		this.lastZ = pos.getZ();
 		
 		if (ClientParams.rotateMap) {
 			scaled = (int) (mapWidth * mapScale);
