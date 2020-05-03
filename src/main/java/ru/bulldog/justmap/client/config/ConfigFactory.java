@@ -1,6 +1,5 @@
 package ru.bulldog.justmap.client.config;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Optional;
 
@@ -10,10 +9,10 @@ import me.shedaniel.clothconfig2.api.ConfigEntryBuilder;
 import me.shedaniel.clothconfig2.impl.builders.EnumSelectorBuilder;
 
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.resource.language.I18n;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
+
 import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.config.ConfigKeeper.EnumEntry;
 import ru.bulldog.justmap.map.minimap.MapPosition;
@@ -27,7 +26,7 @@ public final class ConfigFactory {
 	
 	private static Optional<Text[]> getTooltip(String tooltip, boolean condition) {
 		return condition ? Optional.empty() : Optional.ofNullable(new Text[] {
-			new LiteralText(I18n.translate("justmap.configuration." + tooltip))
+			new TranslatableText("justmap.configuration." + tooltip)
 		});
 	}
 	

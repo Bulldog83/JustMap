@@ -6,32 +6,34 @@ import ru.bulldog.justmap.util.DrawHelper.TextAlignment;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
 
 public class MapText {
 	  protected TextAlignment alignment = TextAlignment.CENTER;
-	  protected String text;
+	  protected Text text;
 	  protected int color = Colors.WHITE;
 	  protected int x, y;
   
 	  public static final MinecraftClient client = MinecraftClient.getInstance();
 	  
 	  public MapText(String text) {
-		  this.text = text;
+		  this.text = new LiteralText(text);
 	  }
   
 	  public MapText(TextAlignment alignment, String text) {
-		  this.alignment = alignment;
-		this.text = text;
+		this.alignment = alignment;
+		this.text = new LiteralText(text);
 	  }
   
 	  public MapText(String text, int color) {
-		  this.text = text;
+		  this.text = new LiteralText(text);
 		  this.color = color;
 	  }
 	  
 	  public MapText(TextAlignment alignment, String text, int color) {
 		  this.alignment = alignment;
-		  this.text = text;
+		  this.text = new LiteralText(text);
 		  this.color = color;
 	  }
 	  
@@ -43,7 +45,7 @@ public class MapText {
 		  switch (alignment) {
 			 default:
 			 case LEFT:
-				 DrawHelper.DRAWER.drawString(matrixStack, textRenderer, text, x, y, color);
+				 DrawHelper.DRAWER.drawString(matrixStack, textRenderer, text.getString(), x, y, color);
 			 break;
 			 case CENTER:
 				 DrawHelper.drawBoundedString(matrixStack, textRenderer, text, x, y, 0, width - 2, color);
@@ -60,7 +62,7 @@ public class MapText {
 	  }
 	  
 	  public MapText setText(String text) {
-		  this.text = text;
+		  this.text = new LiteralText(text);
 		  return this;
 	  }
 	  

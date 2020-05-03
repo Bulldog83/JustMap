@@ -22,6 +22,7 @@ import net.minecraft.util.math.Matrix3f;
 import net.minecraft.util.math.Matrix4f;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.client.util.math.Vector3f;
+import net.minecraft.text.LiteralText;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
@@ -85,7 +86,7 @@ public class WaypointRenderer {
 			DrawHelper.drawDiamond(x, y, size, size, waypoint.color);
 			RenderSystem.popMatrix();
 		}
-		DrawHelper.drawBoundedString(new MatrixStack(), client.textRenderer, (int) dist + "m", x + size / 2, y + size + 2, 0, screenWidth, Colors.WHITE);
+		DrawHelper.drawBoundedString(new MatrixStack(), client.textRenderer, new LiteralText(dist + "m"), x + size / 2, y + size + 2, 0, screenWidth, Colors.WHITE);
 	}
 	
 	public static void renderWaypoint(MatrixStack matrixStack, MinecraftClient client, Camera camera, float tickDelta) {

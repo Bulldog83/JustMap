@@ -9,7 +9,7 @@ import net.minecraft.client.gui.widget.AbstractButtonWidget;
 
 public class TitledWidget<W extends AbstractButtonWidget> extends AbstractButtonWidget {
 	public final W widget;
-	public final String title;
+	public final LiteralText title;
 	private final TextRenderer font;
 	
 	private int spacing = 3;
@@ -17,7 +17,7 @@ public class TitledWidget<W extends AbstractButtonWidget> extends AbstractButton
 	public TitledWidget(TextRenderer font, W widget, int x, int y, int width, int height, String message, String title) {
 		super(x, y, width, height, new LiteralText(message));
 		this.widget = widget;
-		this.title = title;
+		this.title = new LiteralText(title);
 		this.font = font;
 		
 		update();
@@ -38,7 +38,7 @@ public class TitledWidget<W extends AbstractButtonWidget> extends AbstractButton
 	
 	@Override
 	public void render(MatrixStack matrixStack, int int_1, int int_2, float float_1) {
-		drawString(matrixStack, font, title, x, y, 0xffffffff);
+		drawString(matrixStack, font, title.getString(), x, y, 0xffffffff);
 		widget.render(matrixStack, int_1, int_2, float_1);
 	}
 	

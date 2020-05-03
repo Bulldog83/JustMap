@@ -79,7 +79,7 @@ public class WaypointsList extends MapScreen {
 			DrawHelper.DRAWER.drawString(matrixStack, font, waypoint.name, nameX, stringY, Colors.WHITE);
 			
 			int posX = editButton.x - 2;
-			DrawHelper.drawRightAlignedString(matrixStack, font, waypoint.pos.toShortString(), posX, stringY, Colors.WHITE);
+			DrawHelper.drawRightAlignedString(matrixStack, font, new LiteralText(waypoint.pos.toShortString()), posX, stringY, Colors.WHITE);
 			
 			editButton.render(matrixStack, mouseX, mouseY, delta);
 			deleteButton.render(matrixStack, mouseX, mouseY, delta);

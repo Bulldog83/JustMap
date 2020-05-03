@@ -16,6 +16,7 @@ import net.minecraft.util.math.Matrix3f;
 import net.minecraft.util.math.Matrix4f;
 import net.minecraft.client.util.math.AffineTransformation;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.text.Text;
 
 import org.lwjgl.opengl.GL11;
 
@@ -38,16 +39,14 @@ public class DrawHelper extends DrawableHelper {
 		RenderSystem.enableDepthTest();
 	}
 	
-	public static void drawRightAlignedString(MatrixStack matrixStack, TextRenderer textRenderer, String string, int i, int j, int k) {
-		textRenderer.drawWithShadow(matrixStack, string, (float)(i - textRenderer.getStringWidth(string)), (float)j, k);
+	public static void drawRightAlignedString(MatrixStack matrixStack, TextRenderer textRenderer, Text text, int i, int j, int k) {
+		textRenderer.drawWithShadow(matrixStack, text.getString(), (float)(i - textRenderer.getStringWidth(text)), (float)j, k);
 	}
 
-	public static void drawBoundedString(MatrixStack matrixStack, TextRenderer textRenderer, String string, int x, int y, int leftBound, int rightBound, int color) {
-		if (string == null) {
-			return;
-		}
+	public static void drawBoundedString(MatrixStack matrixStack, TextRenderer textRenderer, Text text, int x, int y, int leftBound, int rightBound, int color) {
+		if (text == null) return;
 		
-		int stringWidth = textRenderer.getStringWidth(string);
+		int stringWidth = textRenderer.getStringWidth(text);
 		int drawX = x - stringWidth / 2;
 		if (drawX < leftBound) {
 			drawX = leftBound;
@@ -55,7 +54,7 @@ public class DrawHelper extends DrawableHelper {
 			drawX = rightBound - stringWidth;
 		}
 
-		DRAWER.drawString(matrixStack, textRenderer, string, drawX, y, color);
+		DRAWER.drawString(matrixStack, textRenderer, text.getString(), drawX, y, color);
 	}
 	
 	public static void drawDiamond(double x, double y, int width, int height, int color) {
