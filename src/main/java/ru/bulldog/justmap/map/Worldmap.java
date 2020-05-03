@@ -60,8 +60,6 @@ public class Worldmap extends MapScreen implements IMap {
 	private float imageScale = 1.0F;
 	private boolean playerTracking = true;
 	private boolean changed = false;
-	private int lastX = 0;
-	private int lastZ = 0;
 	
 	private long updateInterval = 50;
 	private long updated = 0;
@@ -71,6 +69,9 @@ public class Worldmap extends MapScreen implements IMap {
 	private MapTexture bufferImage;
 	private String cursorCoords;
 	private TaskManager processor;
+	
+	private Tessellator tessellator = Tessellator.getInstance();
+	private BufferBuilder builder = tessellator.getBuffer();
 	
 	private List<WaypointIcon> waypoints = new ArrayList<>();
 	
@@ -241,9 +242,6 @@ public class Worldmap extends MapScreen implements IMap {
 		this.prepareTexture();
 		
 		RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
-		
-		Tessellator tessellator = Tessellator.getInstance();
-		BufferBuilder builder = tessellator.getBuffer();
 		
 		builder.begin(7, VertexFormats.POSITION_TEXTURE);			
 		builder.vertex(0, 0, 0).texture(0F, 0F).next();

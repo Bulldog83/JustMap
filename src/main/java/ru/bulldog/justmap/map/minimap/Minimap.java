@@ -65,8 +65,6 @@ public class Minimap implements IMap{
 	private static boolean rotateMap = false;
 	
 	public boolean changed = false;
-	public int lastX = 0;
-	public int lastZ = 0;
 	
 	private Object imageLocker = new Object();
 	
@@ -208,9 +206,11 @@ public class Minimap implements IMap{
 		
 		currentBiome = world.getBiome(pos);
 		
+		int centerX = pos.getX();
+		int centerZ = pos.getZ();
 		int scaled = this.getScaledSize();
-		double startX = pos.getX() - scaled / 2;
-		double startZ = pos.getZ() - scaled / 2;
+		double startX = centerX - scaled / 2;
+		double startZ = centerZ - scaled / 2;
 
 		if (world.dimension.isNether()) {
 			MapCache.setCurrentLayer(Type.NETHER, pos.getY());
@@ -220,15 +220,12 @@ public class Minimap implements IMap{
 			MapCache.setCurrentLayer(Type.SURFACE, pos.getY());
 		}
 		
-		MapCache.get().update(this, scaled, (int) startX, (int) startZ);
-		
-		this.lastX = pos.getX();
-		this.lastZ = pos.getZ();
+		MapCache.get().update(this, scaled, centerX, centerZ);
 		
 		if (ClientParams.rotateMap) {
 			scaled = (int) (mapWidth * mapScale);
-			startX = pos.getX() - scaled / 2;
-			startZ = pos.getZ() - scaled / 2;
+			startX = centerX - scaled / 2;
+			startZ = centerZ - scaled / 2;
 		}		
 		
 		double endX = startX + scaled;

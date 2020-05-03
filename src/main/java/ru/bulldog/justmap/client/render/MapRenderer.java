@@ -74,8 +74,6 @@ public class MapRenderer {
 		this.offset = ClientParams.positionOffset;
 		this.mapPosition = ClientParams.mapPosition;
 		this.textManager = this.minimap.getTextManager();
-		
-		RenderUtil.setupFrameBuffer();
 	}
 	
 	public int getX() {
@@ -286,96 +284,38 @@ public class MapRenderer {
 		double z = 0.09;		
 		float f1 = 0.0F, f2 = 1.0F;
 		
-		if (RenderUtil.hasAlphaBits) {
-			RenderSystem.colorMask(false, false, false, true);
-			RenderSystem.clearColor(0.0F, 0.0F, 0.0F, 0.0F);
-			RenderSystem.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-			RenderSystem.colorMask(true, true, true, true);			
-			RenderSystem.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_DST_ALPHA);
-			
-			if (this.mapTexture == null || this.minimap.changed) {
-				this.prepareTexture();
-				minimap.changed = false;
-			}
-			
-			RenderSystem.bindTexture(mapTexture.getId());
-			if (minimap.getScale() > 1) {
-				RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
-				RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
-			} else {
-				RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_NEAREST);
-				RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST);
-			}
-			
-			if (ClientParams.rotateMap) {
-				f1 = 0.15F;
-				f2 = 0.85F;
-				
-				RenderSystem.enableTexture();
-				RenderSystem.matrixMode(GL11.GL_TEXTURE);
-				RenderSystem.pushMatrix();
-				RenderSystem.translatef(0.5F, 0.5F, 0);
-				RenderSystem.rotatef(rotation + 180, 0, 0, 1.0F);
-				RenderSystem.translatef(-0.5F, -0.5F, 0);
-			}
-			
-			this.builder.begin(7, VertexFormats.POSITION_TEXTURE);		
-			this.builder.vertex(mapX, mapY, z).texture(f1, f1).next();
-			this.builder.vertex(mapX, mapY + mapH, z).texture(f1, f2).next();
-			this.builder.vertex(mapX + mapW, mapY + mapH, z).texture(f2, f2).next();
-			this.builder.vertex(mapX + mapW, mapY, z).texture(f2, f1).next();
-			
-			this.tessellator.draw();
-		} else {
-			RenderSystem.bindTexture(GL11.GL_ZERO);
-			GL11.glPushAttrib(GL11.GL_TRANSFORM_BIT);
-			
-			RenderUtil.bindFrameBuffer();
-			
-			RenderSystem.clearColor(0.0F, 0.0F, 0.0F, 0.0F);
-			RenderSystem.clear(GL11.GL_COLOR_BUFFER_BIT, MinecraftClient.IS_SYSTEM_MAC);
-			RenderSystem.clearColor(GL11.GL_ONE, GL11.GL_ZERO, GL11.GL_DST_COLOR, GL11.GL_ZERO);
-			
-			if (this.mapTexture == null || this.minimap.changed) {
-				this.prepareTexture();
-				minimap.changed = false;
-			}
-			
-			RenderSystem.bindTexture(mapTexture.getId());
-			if (minimap.getScale() > 1) {
-				RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
-				RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
-			} else {
-				RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_NEAREST);
-				RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST);
-			}
-			
-			if (ClientParams.rotateMap) {
-				f1 = 0.15F;
-				f2 = 0.85F;
-				
-				RenderSystem.enableTexture();
-				RenderSystem.matrixMode(GL11.GL_TEXTURE);
-				RenderSystem.pushMatrix();
-				RenderSystem.translatef(0.5F, 0.5F, 0);
-				RenderSystem.rotatef(rotation + 180, 0, 0, 1.0F);
-				RenderSystem.translatef(-0.5F, -0.5F, 0);
-			}
-			
-			this.builder.begin(7, VertexFormats.POSITION_TEXTURE);		
-			this.builder.vertex(mapX, mapY, z).texture(f1, f1).next();
-			this.builder.vertex(mapX, mapY + mapH, z).texture(f1, f2).next();
-			this.builder.vertex(mapX + mapW, mapY + mapH, z).texture(f2, f2).next();
-			this.builder.vertex(mapX + mapW, mapY, z).texture(f2, f1).next();
-			
-			this.tessellator.draw();
-			
-			RenderUtil.unbindFrameBuffer();			
-			RenderSystem.popAttributes();
-			RenderSystem.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ZERO);
-            RenderSystem.enableAlphaTest();
-            RenderSystem.bindTexture(RenderUtil.fboTextureID);
+		if (this.mapTexture == null || this.minimap.changed) {
+			this.prepareTexture();
 		}
+		
+		RenderSystem.bindTexture(mapTexture.getId());
+		if (minimap.getScale() > 1) {
+			RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
+			RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
+		} else {
+			RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_NEAREST);
+			RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST);
+		}
+		
+		if (ClientParams.rotateMap) {
+			f1 = 0.15F;
+			f2 = 0.85F;
+			
+			RenderSystem.enableTexture();
+			RenderSystem.matrixMode(GL11.GL_TEXTURE);
+			RenderSystem.pushMatrix();
+			RenderSystem.translatef(0.5F, 0.5F, 0);
+			RenderSystem.rotatef(rotation + 180, 0, 0, 1.0F);
+			RenderSystem.translatef(-0.5F, -0.5F, 0);
+		}
+		
+		this.builder.begin(7, VertexFormats.POSITION_TEXTURE);		
+		this.builder.vertex(mapX, mapY, z).texture(f1, f1).next();
+		this.builder.vertex(mapX, mapY + mapH, z).texture(f1, f2).next();
+		this.builder.vertex(mapX + mapW, mapY + mapH, z).texture(f2, f2).next();
+		this.builder.vertex(mapX + mapW, mapY, z).texture(f2, f1).next();
+		
+		this.tessellator.draw();
 		
 		if (ClientParams.rotateMap) {		
 			RenderSystem.popMatrix();

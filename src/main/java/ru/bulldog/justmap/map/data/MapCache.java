@@ -130,121 +130,46 @@ public class MapCache {
 		});
 	}
 	
-	public void updateChunk(MapChunk mapChunk) {
-		mapUpdater.execute(() -> {
-			Minimap map = JustMapClient.MAP;
-			MapTexture mapImage = map.getImage();
-			
-			int size = map.getScaledSize();
-			int startX = map.lastX;
-			int startZ = map.lastZ;
-			
-			int left = Math.max(0, (mapChunk.getX() << 4) - (startX -= size / 2) - 1);
-			int right = Math.min(size - 1, (mapChunk.getX() << 4) + 15 - startX + 1);
-			int top = Math.max(0, (mapChunk.getZ() << 4) - (startZ -= size / 2) - 1);
-			int bottom = Math.min(size - 1, (mapChunk.getZ() << 4) + 15 - startZ + 1);
-			
-			for (int imgX = left; imgX <= right; imgX++) {
-				for (int imgY = top; imgY <= bottom; imgY++) {
-				}
-			}
-			
-			map.changed = true;
-		});
-	}
-	
-	public void updateMap(Minimap map, int size, int left, int top) {
+	public void updateMap(Minimap map, int size, int centerX, int centerZ) {
 		this.updatePerCycle = ClientParams.updatePerCycle;
 		this.purgeDelay = ClientParams.purgeDelay * 1000;
 		this.purgeAmount = ClientParams.purgeAmount;
+		
+		int left = centerX - size / 2;
+		int top = centerZ - size / 2;
 		
 		MapTexture mapImage = map.getImage();
 		
 		int chunks = (size >> 4) + 4;
 		
-		if (renewNeeded) {			
-			int startX = (left >> 4) - 2;
-			int startZ = (top >> 4) - 2;
-			int endX = startX + chunks;
-			int endZ = startZ + chunks;
+		int startX = (left >> 4) - 2;
+		int startZ = (top >> 4) - 2;
+		int endX = startX + chunks;
+		int endZ = startZ + chunks;
 
-			int offsetX = (startX << 4) - left;
-			int offsetZ = (startZ << 4) - top;
-			
-			int index = 0, posX = 0;		
-			for (int chunkX = startX; chunkX < endX; chunkX++) {
-				int posZ = 0;
-				int imgX = (posX << 4) + offsetX;
-				for (int chunkZ = startZ; chunkZ < endZ; chunkZ++) {
-					index++;
-	
-					MapChunk mapChunk = this.getCurrentChunk(chunkX, chunkZ);
-					if (index >= updateIndex && index <= updateIndex + updatePerCycle) {
-						mapChunk.update();
-					}
-					
-					int imgY = (posZ << 4) + offsetZ;
-					mapImage.writeChunkData(imgX, imgY, mapChunk.getColorData());
-					posZ++;
-				}			
-				posX++;
-			}
-			
-			renewNeeded = false;
-			map.changed = true;
-		} else {
-			int offsetX = left - map.lastX;
-			int offsetZ = top - map.lastZ;
-			
-			MapChunk mapChunk = null;
-			ChunkPos lastPos = null;
-			
-			int index = 0;
-			if (offsetX != 0) {
-				mapImage.offsetX(offsetX);
-				for (int imgX = offsetX > 0 ? size - offsetX : 0; imgX < (offsetX > 0 ? size : -offsetX); imgX++) {
-					for (int imgY = 0; imgY < size; imgY++) {
-						ChunkPos chunkPos = new ChunkPos((left + imgX) >> 4, (top + imgY) >> 4);
-						if (mapChunk == null || !chunkPos.equals(lastPos)) {
-							mapChunk = this.getCurrentChunk(chunkPos);
-							if (index >= updateIndex && index <= updateIndex + updatePerCycle) {
-								mapChunk.update();
-							}
-							lastPos = chunkPos;
-						}
-						
-						int x = left + imgX - (chunkPos.x << 4);
-						int z = top + imgY - (chunkPos.z << 4);
-						
-						mapImage.setRGB(imgX, imgY, mapChunk.getBlockColor(x, z));
-					}
+		int offsetX = (startX << 4) - left;
+		int offsetZ = (startZ << 4) - top;
+		
+		int index = 0, posX = 0;		
+		for (int chunkX = startX; chunkX < endX; chunkX++) {
+			int posZ = 0;
+			int imgX = (posX << 4) + offsetX;
+			for (int chunkZ = startZ; chunkZ < endZ; chunkZ++) {
+				index++;
+
+				MapChunk mapChunk = this.getCurrentChunk(chunkX, chunkZ);
+				if (index >= updateIndex && index <= updateIndex + updatePerCycle) {
+					mapChunk.update();
 				}
 				
-				map.changed = true;
-			}
-			if (offsetZ != 0) {
-				mapImage.offsetY(offsetZ);
-				for (int imgX = 0; imgX < size; imgX++) {
-					for (int imgY = offsetZ > 0 ? size - offsetZ : 0; imgY < (offsetZ > 0 ? size : -offsetZ); imgY++) {
-						ChunkPos chunkPos = new ChunkPos((left + imgX) >> 4, (top + imgY) >> 4);
-						if (mapChunk == null || !chunkPos.equals(lastPos)) {
-							mapChunk = this.getCurrentChunk(chunkPos);
-							if (index >= updateIndex && index <= updateIndex + updatePerCycle) {
-								mapChunk.update();
-							}
-							lastPos = chunkPos;
-						}
-						
-						int x = left + imgX - (chunkPos.x << 4);
-						int z = top + imgY - (chunkPos.z << 4);
-						
-						mapImage.setRGB(imgX, imgY, mapChunk.getBlockColor(x, z));
-					}
-				}
-				
-				map.changed = true;
-			}
+				int imgY = (posZ << 4) + offsetZ;
+				mapImage.writeChunkData(imgX, imgY, mapChunk.getColorData());
+				posZ++;
+			}			
+			posX++;
 		}
+		
+		map.changed = true;
 
 		updateIndex += updatePerCycle;
 		if (updateIndex >= chunks * chunks) {
