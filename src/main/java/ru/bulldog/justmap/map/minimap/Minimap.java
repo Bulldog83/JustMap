@@ -70,11 +70,8 @@ public class Minimap implements AbstractMap{
 		this.mapHeight = JustMapClient.CONFIG.getInt("map_size");
 		this.mapScale = JustMapClient.CONFIG.getFloat("map_scale");		
 		this.picSize = ClientParams.rotateMap ? (int) (mapWidth * 1.3) : mapWidth;
+		this.textManager = new TextManager(this);
 		
-		int scaledSize = getScaledSize();
-		
-		image = new NativeImage(scaledSize, scaledSize, false);
-		textManager = new TextManager(this);
 		isMapVisible = JustMapClient.CONFIG.getBoolean("map_visible");
 	}
 	
@@ -97,7 +94,10 @@ public class Minimap implements AbstractMap{
 	}
 	
 	private void resizeMap(int newSize) {
-		image = new NativeImage(newSize, newSize, false);
+		if (this.image != null) {
+			this.image.close();
+		}		
+		this.image = new NativeImage(newSize, newSize, false);
 	}
 	
 	public void onConfigChanges() {
@@ -310,7 +310,12 @@ public class Minimap implements AbstractMap{
 	}
 	
 	public NativeImage getImage() {
-		return image;
+		if (image == null) {
+			int scaledSize = this.getScaledSize();			
+			this.image = new NativeImage(scaledSize, scaledSize, false);
+		}
+		
+		return this.image;
 	}
 	
 	public int getPictureSize() {
