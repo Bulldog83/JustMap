@@ -309,7 +309,7 @@ public class MapRenderer {
 			RenderSystem.translatef(-0.5F, -0.5F, 0);
 		}
 		
-		this.builder.begin(7, VertexFormats.POSITION_TEXTURE);		
+		this.builder.begin(GL11.GL_QUADS, VertexFormats.POSITION_TEXTURE);		
 		this.builder.vertex(mapX, mapY, z).texture(f1, f1).next();
 		this.builder.vertex(mapX, mapY + mapH, z).texture(f1, f2).next();
 		this.builder.vertex(mapX + mapW, mapY + mapH, z).texture(f2, f2).next();
