@@ -7,6 +7,8 @@ import java.nio.ByteOrder;
 import java.util.Arrays;
 
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL12;
+import org.lwjgl.opengl.GL14;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
@@ -40,15 +42,16 @@ public class MapTexture extends BufferedImage {
 		this.refillBuffer();
 		
 		RenderSystem.bindTexture(this.glId);
-		RenderSystem.texParameter(3553, 10241, 9728);
-		RenderSystem.texParameter(3553, 10240, 9728);
-		RenderSystem.texParameter(3553, 10242, 33071);
-		RenderSystem.texParameter(3553, 10243, 33071);
-		RenderSystem.pixelStore(3314, 0);
-		RenderSystem.pixelStore(3316, 0);
-		RenderSystem.pixelStore(3315, 0);
+		RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_NEAREST);
+		RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST);
+		RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, GL12.GL_CLAMP_TO_EDGE);
+		RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, GL12.GL_CLAMP_TO_EDGE);
+		RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL14.GL_GENERATE_MIPMAP, GL11.GL_ONE);
+		RenderSystem.pixelStore(GL11.GL_UNPACK_ROW_LENGTH, GL11.GL_ZERO);
+		RenderSystem.pixelStore(GL11.GL_UNPACK_SKIP_PIXELS, GL11.GL_ZERO);
+		RenderSystem.pixelStore(GL11.GL_UNPACK_SKIP_ROWS, GL11.GL_ZERO);
 		
-		GL11.glTexImage2D(3553, 0, 6408, this.getWidth(), this.getHeight(), 0, 6408, 32821, this.buffer);
+		GL11.glTexImage2D(GL11.GL_TEXTURE_2D, GL11.GL_ZERO, GL11.GL_RGBA, this.getWidth(), this.getHeight(), GL11.GL_ZERO, GL11.GL_RGBA, GL12.GL_UNSIGNED_INT_8_8_8_8, this.buffer);
 	}
 	
 	private byte[] getBytes() {

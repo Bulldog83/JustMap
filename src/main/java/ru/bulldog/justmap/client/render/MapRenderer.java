@@ -1,6 +1,8 @@
 package ru.bulldog.justmap.client.render;
 
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL14;
+import org.lwjgl.opengl.GL30;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
@@ -286,16 +288,12 @@ public class MapRenderer {
 		
 		if (this.mapTexture == null || this.minimap.changed) {
 			this.prepareTexture();
-		}
-		
-		RenderSystem.bindTexture(mapTexture.getId());
-		if (minimap.getScale() > 1) {
-			RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
-			RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
 		} else {
-			RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_NEAREST);
-			RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST);
+			RenderSystem.bindTexture(mapTexture.getId());
 		}
+
+		RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_NEAREST_MIPMAP_LINEAR);
+		RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST);
 		
 		if (ClientParams.rotateMap) {
 			f1 = 0.15F;
