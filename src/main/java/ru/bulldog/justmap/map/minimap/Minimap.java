@@ -2,7 +2,6 @@ package ru.bulldog.justmap.map.minimap;
 
 import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.client.config.ClientParams;
-import ru.bulldog.justmap.client.render.MapRenderer;
 import ru.bulldog.justmap.map.AbstractMap;
 import ru.bulldog.justmap.map.data.Layers.Type;
 import ru.bulldog.justmap.map.data.MapCache;
@@ -65,6 +64,8 @@ public class Minimap implements AbstractMap{
 	private static boolean isMapVisible = true;
 	private static boolean rotateMap = false;
 	
+	private Object imageLock = new Object();
+	
 	public Minimap() {
 		this.mapWidth = JustMapClient.CONFIG.getInt("map_size");
 		this.mapHeight = JustMapClient.CONFIG.getInt("map_size");
@@ -86,18 +87,19 @@ public class Minimap implements AbstractMap{
 
 			prepareMap(player);
 			updateInfo(player);
-
-			MapRenderer.getInstance().markDirty();
 		} else {
 			locPlayer = null;
 		}
 	}
 	
 	private void resizeMap(int newSize) {
-		if (this.image != null) {
-			this.image.close();
-		}		
-		this.image = new NativeImage(newSize, newSize, false);
+		Object lock = this.imageLock;
+		synchronized (lock) {
+			if (this.image != null) {
+				this.image.close();
+			}
+			this.image = new NativeImage(newSize, newSize, false);
+		}
 	}
 	
 	public void onConfigChanges() {
@@ -315,7 +317,10 @@ public class Minimap implements AbstractMap{
 			this.image = new NativeImage(scaledSize, scaledSize, false);
 		}
 		
-		return this.image;
+		Object lock = this.imageLock;
+		synchronized (lock) {
+			return this.image;
+		}		
 	}
 	
 	public int getPictureSize() {
