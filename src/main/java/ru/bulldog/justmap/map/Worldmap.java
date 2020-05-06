@@ -294,7 +294,7 @@ public class Worldmap extends MapScreen implements AbstractMap {
 	
 	private void changeScale(float value) {
 		this.imageScale = MathUtil.clamp(this.imageScale + value, 0.5F, 3F);
-		this.updateInterval = (long) (imageScale > 1 ? 50 * imageScale : 50);
+		this.updateInterval = (long) (imageScale > 1 ? 30 * imageScale : 50);
 	}
 	
 	private void moveMap(Direction direction) {
@@ -318,9 +318,7 @@ public class Worldmap extends MapScreen implements AbstractMap {
 			default: break;
 		}
 		
-		processor.execute(() -> {
-			updateMapTexture();			
-		});
+		processor.execute(this::updateMapTexture);
 
 		this.playerTracking = false;
 		this.updated = time;
@@ -381,9 +379,7 @@ public class Worldmap extends MapScreen implements AbstractMap {
 			
 			this.centerPos = new BlockPos(x, y, z);
 			
-			processor.execute(() -> {
-				updateMapTexture();			
-			});
+			processor.execute(this::updateMapTexture);
 			
 			this.playerTracking = false;
 			this.updated = time;
@@ -460,7 +456,6 @@ public class Worldmap extends MapScreen implements AbstractMap {
 	public void onClose() {
 		this.processor.stop();
 		this.processor = null;
-		
 		if (mapTexture != null) {
 			this.mapTexture.close();
 			this.imageBuffer.close();

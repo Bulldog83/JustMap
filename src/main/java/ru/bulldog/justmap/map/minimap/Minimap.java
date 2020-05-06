@@ -2,7 +2,6 @@ package ru.bulldog.justmap.map.minimap;
 
 import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.client.config.ClientParams;
-import ru.bulldog.justmap.client.render.MapRenderer;
 import ru.bulldog.justmap.map.AbstractMap;
 import ru.bulldog.justmap.map.data.Layer.Type;
 import ru.bulldog.justmap.map.data.MapCache;
@@ -65,16 +64,15 @@ public class Minimap implements AbstractMap{
 	private static boolean isMapVisible = true;
 	private static boolean rotateMap = false;
 	
+	private Object imageLock = new Object();
+	
 	public Minimap() {
 		this.mapWidth = JustMapClient.CONFIG.getInt("map_size");
 		this.mapHeight = JustMapClient.CONFIG.getInt("map_size");
 		this.mapScale = JustMapClient.CONFIG.getFloat("map_scale");		
 		this.picSize = ClientParams.rotateMap ? (int) (mapWidth * 1.3) : mapWidth;
+		this.textManager = new TextManager(this);
 		
-		int scaledSize = getScaledSize();
-		
-		image = new NativeImage(scaledSize, scaledSize, false);
-		textManager = new TextManager(this);
 		isMapVisible = JustMapClient.CONFIG.getBoolean("map_visible");
 	}
 	
@@ -89,15 +87,19 @@ public class Minimap implements AbstractMap{
 
 			prepareMap(player);
 			updateInfo(player);
-
-			MapRenderer.getInstance().markDirty();
 		} else {
 			locPlayer = null;
 		}
 	}
 	
 	private void resizeMap(int newSize) {
-		image = new NativeImage(newSize, newSize, false);
+		Object lock = this.imageLock;
+		synchronized (lock) {
+			if (this.image != null) {
+				this.image.close();
+			}
+			this.image = new NativeImage(newSize, newSize, false);
+		}
 	}
 	
 	public void onConfigChanges() {
@@ -310,7 +312,15 @@ public class Minimap implements AbstractMap{
 	}
 	
 	public NativeImage getImage() {
-		return image;
+		if (image == null) {
+			int scaledSize = this.getScaledSize();			
+			this.image = new NativeImage(scaledSize, scaledSize, false);
+		}
+		
+		Object lock = this.imageLock;
+		synchronized (lock) {
+			return this.image;
+		}		
 	}
 	
 	public int getPictureSize() {

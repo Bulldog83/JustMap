@@ -94,9 +94,6 @@ public class MapRenderer {
 	}
 	
 	public void updateParams() {
-		
-		backingImage = minimap.getImage();		
-		
 		int winW = client.getWindow().getScaledWidth();
 		int winH = client.getWindow().getScaledHeight();
 		
@@ -212,19 +209,18 @@ public class MapRenderer {
 		dir.x = posX; dir.y = posY;
 	}
 	
-	public void markDirty() {
-		NativeImage img = minimap.getImage();
-		if (img != backingImage) {
-			backingImage = img;
+	public void updateTexture() {
+		int size = minimap.getScaledSize();
+		if (backingImage == null || backingImage.getWidth() != size || backingImage.getHeight() != size) {
+			this.backingImage = new NativeImage(size, size, false);
 			if (texture != null) {
-				texture.close();
+				this.texture.close();
 			}
-			texture = null;
+			this.texture = new NativeImageBackedTexture(backingImage);
+			this.mapTexture = client.getTextureManager().registerDynamicTexture(JustMap.MODID + "_map_texture", texture);
 		}
-		
-		if (texture != null) {
-			texture.upload();
-		}
+		this.backingImage.copyFrom(minimap.getImage());
+		this.texture.upload();
 	}
 	
 	public void draw(MatrixStack matrixStack) {
@@ -232,12 +228,8 @@ public class MapRenderer {
 			return;
 		}
 		
-		updateParams();
-		
-		if (texture == null) {
-			texture = new NativeImageBackedTexture(backingImage);
-			mapTexture = client.getTextureManager().registerDynamicTexture(JustMap.MODID + "_map_texture", texture);
-		}
+		this.updateParams();
+		this.updateTexture();
 		
 		RenderSystem.disableDepthTest();
 		

@@ -43,12 +43,12 @@ public class PlayerHeadIcon {
 				if (now - icon.lastCheck - icon.delay >= 0) {
 					updatePlayerSkin(icon);
 				}
-			} else if (now - icon.lastCheck >= 300000) {
+			} else if (now - icon.lastCheck >= 60000) {
 				updatePlayerSkin(icon);
 			}
 		} else {
 			icon = new PlayerHeadIcon(player);
-			registerIcon(icon);			
+			registerIcon(icon);		
 		}
 
 		return icon;
@@ -68,7 +68,7 @@ public class PlayerHeadIcon {
 		JustMap.EXECUTOR.execute(() -> {
 			getPlayerSkin(icon);
 		});
-	}
+	}	
 	
 	private static void registerIcon(PlayerHeadIcon icon) {
 		getPlayerSkin(icon);
