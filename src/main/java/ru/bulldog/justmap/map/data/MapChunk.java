@@ -205,20 +205,6 @@ public class MapChunk {
 		}
 	}
 	
-	public void update() {
-		long currentTime = System.currentTimeMillis();
-		if (currentTime - updated < ClientParams.chunkUpdateInterval) return;
-		
-		WorldChunk lifeChunk = this.worldChunk.getWorld().getChunk(getX(), getZ());		
-		if (lifeChunk.isEmpty()) return;
-		
-		if (worldChunk.isEmpty()) {
-			this.worldChunk = lifeChunk;
-		}
-		
-		JustMapClient.UPDATER.execute(this::updateData);
-	}
-	
 	private void updateData() {
 		MapChunk eastChunk = MapCache.get().getChunk(chunkPos.x + 1, chunkPos.z, true);
 		MapChunk southChunk = MapCache.get().getChunk(chunkPos.x, chunkPos.z - 1, true);
