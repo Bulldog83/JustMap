@@ -83,5 +83,11 @@
   "justmap.gui.chat": "聊天",
   "justmap.gui.wp_hidden": "隐藏",
   "justmap.gui.wp_tracking": "屏幕边缘",
-  "justmap.gui.wp_render": "在游戏里"
+  "justmap.gui.wp_render": "在游戏里",
+  
+  "gamerule.allowCavesMap": "(Just Map) Caves mapping",
+  "gamerule.allowEntityRadar": "(Just Map) Entities radar",
+  "gamerule.allowPlayerRadar": "(Just Map) Players radar",
+  "gamerule.allowCreatureRadar": "(Just Map) Creatures radar",
+  "gamerule.allowHostileRadar": "(Just Map) Hostile radar"
 }

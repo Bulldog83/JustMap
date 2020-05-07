@@ -83,5 +83,11 @@
   "justmap.gui.chat": "Чат",
   "justmap.gui.wp_hidden": "Скрыть",
   "justmap.gui.wp_tracking": "Отслеживать",
-  "justmap.gui.wp_render": "Отображать в мире"
+  "justmap.gui.wp_render": "Отображать в мире",
+  
+  "gamerule.allowCavesMap": "(Just Map) Маппинг пещер",
+  "gamerule.allowEntityRadar": "(Just Map) Радар сущностей",
+  "gamerule.allowPlayerRadar": "(Just Map) Радар игроков",
+  "gamerule.allowCreatureRadar": "(Just Map) Радар пассивных существ",
+  "gamerule.allowHostileRadar": "(Just Map) Радар враждебных мобов"
 }
