@@ -45,7 +45,7 @@ public class MapText {
 		  switch (alignment) {
 			 default:
 			 case LEFT:
-				 DrawHelper.DRAWER.drawString(matrixStack, textRenderer, text.getString(), x, y, color);
+				 DrawHelper.DRAWER.drawStringWithShadow(matrixStack, textRenderer, text.getString(), x, y, color);
 			 break;
 			 case CENTER:
 				 DrawHelper.drawBoundedString(matrixStack, textRenderer, text, x, y, 0, width - 2, color);

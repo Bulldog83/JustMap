@@ -38,7 +38,7 @@ public class TitledWidget<W extends AbstractButtonWidget> extends AbstractButton
 	
 	@Override
 	public void render(MatrixStack matrixStack, int int_1, int int_2, float float_1) {
-		drawString(matrixStack, font, title.getString(), x, y, 0xffffffff);
+		this.drawStringWithShadow(matrixStack, font, title.getString(), x, y, 0xFFFFFFFF);
 		widget.render(matrixStack, int_1, int_2, float_1);
 	}
 	

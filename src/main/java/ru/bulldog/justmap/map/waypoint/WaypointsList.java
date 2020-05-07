@@ -76,7 +76,7 @@ public class WaypointsList extends MapScreen {
 			
 			int nameX = x + diamondSize + 2;
 
-			DrawHelper.DRAWER.drawString(matrixStack, font, waypoint.name, nameX, stringY, Colors.WHITE);
+			DrawHelper.DRAWER.drawStringWithShadow(matrixStack, font, waypoint.name, nameX, stringY, Colors.WHITE);
 			
 			int posX = editButton.x - 2;
 			DrawHelper.drawRightAlignedString(matrixStack, font, new LiteralText(waypoint.pos.toShortString()), posX, stringY, Colors.WHITE);

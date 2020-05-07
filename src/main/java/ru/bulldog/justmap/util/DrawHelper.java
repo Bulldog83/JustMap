@@ -54,7 +54,7 @@ public class DrawHelper extends DrawableHelper {
 			drawX = rightBound - stringWidth;
 		}
 
-		DRAWER.drawString(matrixStack, textRenderer, text.getString(), drawX, y, color);
+		DRAWER.drawStringWithShadow(matrixStack, textRenderer, text.getString(), drawX, y, color);
 	}
 	
 	public static void drawDiamond(double x, double y, int width, int height, int color) {

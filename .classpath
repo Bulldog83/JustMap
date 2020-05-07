@@ -244,172 +244,172 @@
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry sourcepath="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-api-0.10.2+build.337-1.16@net.fabricmc.yarn.20w19a.20w19a+build.4-sources.jar" kind="lib" path="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-api-0.10.2+build.337-1.16@net.fabricmc.yarn.20w19a.20w19a+build.4.jar">
+	<classpathentry sourcepath="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-api-0.10.5+build.341-1.16@net.fabricmc.yarn.20w19a.20w19a+build.4-sources.jar" kind="lib" path="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-api-0.10.5+build.341-1.16@net.fabricmc.yarn.20w19a.20w19a+build.4.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry sourcepath="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-api-base-0.1.3+12a8474ce8@net.fabricmc.yarn.20w19a.20w19a+build.4-sources.jar" kind="lib" path="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-api-base-0.1.3+12a8474ce8@net.fabricmc.yarn.20w19a.20w19a+build.4.jar">
+	<classpathentry sourcepath="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-api-base-0.1.3+12a8474cd2@net.fabricmc.yarn.20w19a.20w19a+build.4-sources.jar" kind="lib" path="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-api-base-0.1.3+12a8474cd2@net.fabricmc.yarn.20w19a.20w19a+build.4.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry sourcepath="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-biomes-v1-0.2.2+2fd224cae8@net.fabricmc.yarn.20w19a.20w19a+build.4-sources.jar" kind="lib" path="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-biomes-v1-0.2.2+2fd224cae8@net.fabricmc.yarn.20w19a.20w19a+build.4.jar">
+	<classpathentry sourcepath="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-biomes-v1-0.2.2+2fd224cad2@net.fabricmc.yarn.20w19a.20w19a+build.4-sources.jar" kind="lib" path="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-biomes-v1-0.2.2+2fd224cad2@net.fabricmc.yarn.20w19a.20w19a+build.4.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry sourcepath="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-blockrenderlayer-v1-1.1.4+c6a8ea89e8@net.fabricmc.yarn.20w19a.20w19a+build.4-sources.jar" kind="lib" path="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-blockrenderlayer-v1-1.1.4+c6a8ea89e8@net.fabricmc.yarn.20w19a.20w19a+build.4.jar">
+	<classpathentry sourcepath="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-blockrenderlayer-v1-1.1.4+c6a8ea89d2@net.fabricmc.yarn.20w19a.20w19a+build.4-sources.jar" kind="lib" path="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-blockrenderlayer-v1-1.1.4+c6a8ea89d2@net.fabricmc.yarn.20w19a.20w19a+build.4.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry sourcepath="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-command-api-v1-1.0.1+fcb6b9aae8@net.fabricmc.yarn.20w19a.20w19a+build.4-sources.jar" kind="lib" path="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-command-api-v1-1.0.1+fcb6b9aae8@net.fabricmc.yarn.20w19a.20w19a+build.4.jar">
+	<classpathentry sourcepath="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-command-api-v1-1.0.1+fcb6b9aad2@net.fabricmc.yarn.20w19a.20w19a+build.4-sources.jar" kind="lib" path="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-command-api-v1-1.0.1+fcb6b9aad2@net.fabricmc.yarn.20w19a.20w19a+build.4.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry sourcepath="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-commands-v0-0.2.0+52d30836e8@net.fabricmc.yarn.20w19a.20w19a+build.4-sources.jar" kind="lib" path="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-commands-v0-0.2.0+52d30836e8@net.fabricmc.yarn.20w19a.20w19a+build.4.jar">
+	<classpathentry sourcepath="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-commands-v0-0.2.0+52d30836d2@net.fabricmc.yarn.20w19a.20w19a+build.4-sources.jar" kind="lib" path="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-commands-v0-0.2.0+52d30836d2@net.fabricmc.yarn.20w19a.20w19a+build.4.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry sourcepath="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-containers-v0-0.1.7+d249f7b6e8@net.fabricmc.yarn.20w19a.20w19a+build.4-sources.jar" kind="lib" path="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-containers-v0-0.1.7+d249f7b6e8@net.fabricmc.yarn.20w19a.20w19a+build.4.jar">
+	<classpathentry sourcepath="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-containers-v0-0.1.7+d249f7b6d2@net.fabricmc.yarn.20w19a.20w19a+build.4-sources.jar" kind="lib" path="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-containers-v0-0.1.7+d249f7b6d2@net.fabricmc.yarn.20w19a.20w19a+build.4.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry sourcepath="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-content-registries-v0-0.1.5+88afe607e8@net.fabricmc.yarn.20w19a.20w19a+build.4-sources.jar" kind="lib" path="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-content-registries-v0-0.1.5+88afe607e8@net.fabricmc.yarn.20w19a.20w19a+build.4.jar">
+	<classpathentry sourcepath="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-content-registries-v0-0.1.5+88afe607d2@net.fabricmc.yarn.20w19a.20w19a+build.4-sources.jar" kind="lib" path="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-content-registries-v0-0.1.5+88afe607d2@net.fabricmc.yarn.20w19a.20w19a+build.4.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry sourcepath="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-crash-report-info-v1-0.1.2+b7f9825de8@net.fabricmc.yarn.20w19a.20w19a+build.4-sources.jar" kind="lib" path="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-crash-report-info-v1-0.1.2+b7f9825de8@net.fabricmc.yarn.20w19a.20w19a+build.4.jar">
+	<classpathentry sourcepath="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-crash-report-info-v1-0.1.2+b7f9825dd2@net.fabricmc.yarn.20w19a.20w19a+build.4-sources.jar" kind="lib" path="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-crash-report-info-v1-0.1.2+b7f9825dd2@net.fabricmc.yarn.20w19a.20w19a+build.4.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry sourcepath="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-dimensions-v1-0.4.1+686e6e57e8@net.fabricmc.yarn.20w19a.20w19a+build.4-sources.jar" kind="lib" path="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-dimensions-v1-0.4.1+686e6e57e8@net.fabricmc.yarn.20w19a.20w19a+build.4.jar">
+	<classpathentry sourcepath="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-dimensions-v1-0.4.1+686e6e57d2@net.fabricmc.yarn.20w19a.20w19a+build.4-sources.jar" kind="lib" path="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-dimensions-v1-0.4.1+686e6e57d2@net.fabricmc.yarn.20w19a.20w19a+build.4.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry sourcepath="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-events-interaction-v0-0.3.0+04b99794e8@net.fabricmc.yarn.20w19a.20w19a+build.4-sources.jar" kind="lib" path="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-events-interaction-v0-0.3.0+04b99794e8@net.fabricmc.yarn.20w19a.20w19a+build.4.jar">
+	<classpathentry sourcepath="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-events-interaction-v0-0.3.0+04b99794d2@net.fabricmc.yarn.20w19a.20w19a+build.4-sources.jar" kind="lib" path="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-events-interaction-v0-0.3.0+04b99794d2@net.fabricmc.yarn.20w19a.20w19a+build.4.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry sourcepath="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-events-lifecycle-v0-0.1.2+1a47cd78e8@net.fabricmc.yarn.20w19a.20w19a+build.4-sources.jar" kind="lib" path="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-events-lifecycle-v0-0.1.2+1a47cd78e8@net.fabricmc.yarn.20w19a.20w19a+build.4.jar">
+	<classpathentry sourcepath="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-events-lifecycle-v0-0.1.2+1a47cd78d2@net.fabricmc.yarn.20w19a.20w19a+build.4-sources.jar" kind="lib" path="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-events-lifecycle-v0-0.1.2+1a47cd78d2@net.fabricmc.yarn.20w19a.20w19a+build.4.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry sourcepath="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-item-groups-v0-0.1.12+2fd224cae8@net.fabricmc.yarn.20w19a.20w19a+build.4-sources.jar" kind="lib" path="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-item-groups-v0-0.1.12+2fd224cae8@net.fabricmc.yarn.20w19a.20w19a+build.4.jar">
+	<classpathentry sourcepath="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-item-groups-v0-0.1.12+63435d4bd2@net.fabricmc.yarn.20w19a.20w19a+build.4-sources.jar" kind="lib" path="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-item-groups-v0-0.1.12+63435d4bd2@net.fabricmc.yarn.20w19a.20w19a+build.4.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry sourcepath="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-keybindings-v0-0.1.1+dfdb52d6e8@net.fabricmc.yarn.20w19a.20w19a+build.4-sources.jar" kind="lib" path="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-keybindings-v0-0.1.1+dfdb52d6e8@net.fabricmc.yarn.20w19a.20w19a+build.4.jar">
+	<classpathentry sourcepath="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-keybindings-v0-0.1.1+dfdb52d6d2@net.fabricmc.yarn.20w19a.20w19a+build.4-sources.jar" kind="lib" path="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-keybindings-v0-0.1.1+dfdb52d6d2@net.fabricmc.yarn.20w19a.20w19a+build.4.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry sourcepath="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-loot-tables-v1-0.1.6+2f56dff2e8@net.fabricmc.yarn.20w19a.20w19a+build.4-sources.jar" kind="lib" path="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-loot-tables-v1-0.1.6+2f56dff2e8@net.fabricmc.yarn.20w19a.20w19a+build.4.jar">
+	<classpathentry sourcepath="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-loot-tables-v1-0.1.6+2f56dff2d2@net.fabricmc.yarn.20w19a.20w19a+build.4-sources.jar" kind="lib" path="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-loot-tables-v1-0.1.6+2f56dff2d2@net.fabricmc.yarn.20w19a.20w19a+build.4.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry sourcepath="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-mining-levels-v0-0.1.2+b764ce99e8@net.fabricmc.yarn.20w19a.20w19a+build.4-sources.jar" kind="lib" path="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-mining-levels-v0-0.1.2+b764ce99e8@net.fabricmc.yarn.20w19a.20w19a+build.4.jar">
+	<classpathentry sourcepath="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-mining-levels-v0-0.1.2+b764ce99d2@net.fabricmc.yarn.20w19a.20w19a+build.4-sources.jar" kind="lib" path="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-mining-levels-v0-0.1.2+b764ce99d2@net.fabricmc.yarn.20w19a.20w19a+build.4.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry sourcepath="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-models-v0-0.1.0+dfdb52d6e8@net.fabricmc.yarn.20w19a.20w19a+build.4-sources.jar" kind="lib" path="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-models-v0-0.1.0+dfdb52d6e8@net.fabricmc.yarn.20w19a.20w19a+build.4.jar">
+	<classpathentry sourcepath="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-models-v0-0.1.0+dfdb52d6d2@net.fabricmc.yarn.20w19a.20w19a+build.4-sources.jar" kind="lib" path="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-models-v0-0.1.0+dfdb52d6d2@net.fabricmc.yarn.20w19a.20w19a+build.4.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry sourcepath="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-networking-blockentity-v0-0.2.5+b50ffc7be8@net.fabricmc.yarn.20w19a.20w19a+build.4-sources.jar" kind="lib" path="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-networking-blockentity-v0-0.2.5+b50ffc7be8@net.fabricmc.yarn.20w19a.20w19a+build.4.jar">
+	<classpathentry sourcepath="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-networking-blockentity-v0-0.2.5+b50ffc7bd2@net.fabricmc.yarn.20w19a.20w19a+build.4-sources.jar" kind="lib" path="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-networking-blockentity-v0-0.2.5+b50ffc7bd2@net.fabricmc.yarn.20w19a.20w19a+build.4.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry sourcepath="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-networking-v0-0.1.9+1a47cd78e8@net.fabricmc.yarn.20w19a.20w19a+build.4-sources.jar" kind="lib" path="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-networking-v0-0.1.9+1a47cd78e8@net.fabricmc.yarn.20w19a.20w19a+build.4.jar">
+	<classpathentry sourcepath="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-networking-v0-0.1.9+1a47cd78d2@net.fabricmc.yarn.20w19a.20w19a+build.4-sources.jar" kind="lib" path="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-networking-v0-0.1.9+1a47cd78d2@net.fabricmc.yarn.20w19a.20w19a+build.4.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry sourcepath="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-object-builder-api-v1-1.0.1+bf7c167ae8@net.fabricmc.yarn.20w19a.20w19a+build.4-sources.jar" kind="lib" path="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-object-builder-api-v1-1.0.1+bf7c167ae8@net.fabricmc.yarn.20w19a.20w19a+build.4.jar">
+	<classpathentry sourcepath="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-object-builder-api-v1-1.1.0+84cce57fd2@net.fabricmc.yarn.20w19a.20w19a+build.4-sources.jar" kind="lib" path="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-object-builder-api-v1-1.1.0+84cce57fd2@net.fabricmc.yarn.20w19a.20w19a+build.4.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry sourcepath="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-object-builders-v0-0.5.0+bf7c167ae8@net.fabricmc.yarn.20w19a.20w19a+build.4-sources.jar" kind="lib" path="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-object-builders-v0-0.5.0+bf7c167ae8@net.fabricmc.yarn.20w19a.20w19a+build.4.jar">
+	<classpathentry sourcepath="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-object-builders-v0-0.5.0+bf7c167ad2@net.fabricmc.yarn.20w19a.20w19a+build.4-sources.jar" kind="lib" path="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-object-builders-v0-0.5.0+bf7c167ad2@net.fabricmc.yarn.20w19a.20w19a+build.4.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry sourcepath="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-particles-v1-0.1.2+12a8474ce8@net.fabricmc.yarn.20w19a.20w19a+build.4-sources.jar" kind="lib" path="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-particles-v1-0.1.2+12a8474ce8@net.fabricmc.yarn.20w19a.20w19a+build.4.jar">
+	<classpathentry sourcepath="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-particles-v1-0.1.2+12a8474cd2@net.fabricmc.yarn.20w19a.20w19a+build.4-sources.jar" kind="lib" path="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-particles-v1-0.1.2+12a8474cd2@net.fabricmc.yarn.20w19a.20w19a+build.4.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry sourcepath="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-registry-sync-v0-0.3.1+686e6e57e8@net.fabricmc.yarn.20w19a.20w19a+build.4-sources.jar" kind="lib" path="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-registry-sync-v0-0.3.1+686e6e57e8@net.fabricmc.yarn.20w19a.20w19a+build.4.jar">
+	<classpathentry sourcepath="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-registry-sync-v0-0.3.1+686e6e57d2@net.fabricmc.yarn.20w19a.20w19a+build.4-sources.jar" kind="lib" path="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-registry-sync-v0-0.3.1+686e6e57d2@net.fabricmc.yarn.20w19a.20w19a+build.4.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry sourcepath="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-renderer-api-v1-0.2.12+12a8474ce8@net.fabricmc.yarn.20w19a.20w19a+build.4-sources.jar" kind="lib" path="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-renderer-api-v1-0.2.12+12a8474ce8@net.fabricmc.yarn.20w19a.20w19a+build.4.jar">
+	<classpathentry sourcepath="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-renderer-api-v1-0.2.13+84cce57fd2@net.fabricmc.yarn.20w19a.20w19a+build.4-sources.jar" kind="lib" path="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-renderer-api-v1-0.2.13+84cce57fd2@net.fabricmc.yarn.20w19a.20w19a+build.4.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry sourcepath="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-renderer-indigo-0.2.29+6c0e72dfe8@net.fabricmc.yarn.20w19a.20w19a+build.4-sources.jar" kind="lib" path="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-renderer-indigo-0.2.29+6c0e72dfe8@net.fabricmc.yarn.20w19a.20w19a+build.4.jar">
+	<classpathentry sourcepath="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-renderer-indigo-0.2.29+6c0e72dfd2@net.fabricmc.yarn.20w19a.20w19a+build.4-sources.jar" kind="lib" path="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-renderer-indigo-0.2.29+6c0e72dfd2@net.fabricmc.yarn.20w19a.20w19a+build.4.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry sourcepath="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-renderer-registries-v1-2.0.1+5a0f9a60e8@net.fabricmc.yarn.20w19a.20w19a+build.4-sources.jar" kind="lib" path="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-renderer-registries-v1-2.0.1+5a0f9a60e8@net.fabricmc.yarn.20w19a.20w19a+build.4.jar">
+	<classpathentry sourcepath="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-renderer-registries-v1-2.0.1+5a0f9a60d2@net.fabricmc.yarn.20w19a.20w19a+build.4-sources.jar" kind="lib" path="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-renderer-registries-v1-2.0.1+5a0f9a60d2@net.fabricmc.yarn.20w19a.20w19a+build.4.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry sourcepath="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-rendering-data-attachment-v1-0.1.3+b7f9825de8@net.fabricmc.yarn.20w19a.20w19a+build.4-sources.jar" kind="lib" path="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-rendering-data-attachment-v1-0.1.3+b7f9825de8@net.fabricmc.yarn.20w19a.20w19a+build.4.jar">
+	<classpathentry sourcepath="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-rendering-data-attachment-v1-0.1.3+b7f9825dd2@net.fabricmc.yarn.20w19a.20w19a+build.4-sources.jar" kind="lib" path="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-rendering-data-attachment-v1-0.1.3+b7f9825dd2@net.fabricmc.yarn.20w19a.20w19a+build.4.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry sourcepath="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-rendering-fluids-v1-0.1.7+12a8474ce8@net.fabricmc.yarn.20w19a.20w19a+build.4-sources.jar" kind="lib" path="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-rendering-fluids-v1-0.1.7+12a8474ce8@net.fabricmc.yarn.20w19a.20w19a+build.4.jar">
+	<classpathentry sourcepath="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-rendering-fluids-v1-0.1.7+12a8474cd2@net.fabricmc.yarn.20w19a.20w19a+build.4-sources.jar" kind="lib" path="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-rendering-fluids-v1-0.1.7+12a8474cd2@net.fabricmc.yarn.20w19a.20w19a+build.4.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry sourcepath="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-rendering-v0-1.1.0+53410490e8@net.fabricmc.yarn.20w19a.20w19a+build.4-sources.jar" kind="lib" path="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-rendering-v0-1.1.0+53410490e8@net.fabricmc.yarn.20w19a.20w19a+build.4.jar">
+	<classpathentry sourcepath="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-rendering-v0-1.1.0+53410490d2@net.fabricmc.yarn.20w19a.20w19a+build.4-sources.jar" kind="lib" path="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-rendering-v0-1.1.0+53410490d2@net.fabricmc.yarn.20w19a.20w19a+build.4.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry sourcepath="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-rendering-v1-1.1.0+304e48ebe8@net.fabricmc.yarn.20w19a.20w19a+build.4-sources.jar" kind="lib" path="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-rendering-v1-1.1.0+304e48ebe8@net.fabricmc.yarn.20w19a.20w19a+build.4.jar">
+	<classpathentry sourcepath="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-rendering-v1-1.1.0+304e48ebd2@net.fabricmc.yarn.20w19a.20w19a+build.4-sources.jar" kind="lib" path="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-rendering-v1-1.1.0+304e48ebd2@net.fabricmc.yarn.20w19a.20w19a+build.4.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry sourcepath="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-resource-loader-v0-0.1.14+2fd224cae8@net.fabricmc.yarn.20w19a.20w19a+build.4-sources.jar" kind="lib" path="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-resource-loader-v0-0.1.14+2fd224cae8@net.fabricmc.yarn.20w19a.20w19a+build.4.jar">
+	<classpathentry sourcepath="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-resource-loader-v0-0.1.14+2fd224cad2@net.fabricmc.yarn.20w19a.20w19a+build.4-sources.jar" kind="lib" path="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-resource-loader-v0-0.1.14+2fd224cad2@net.fabricmc.yarn.20w19a.20w19a+build.4.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry sourcepath="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-tag-extensions-v0-0.2.4+2fd224cae8@net.fabricmc.yarn.20w19a.20w19a+build.4-sources.jar" kind="lib" path="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-tag-extensions-v0-0.2.4+2fd224cae8@net.fabricmc.yarn.20w19a.20w19a+build.4.jar">
+	<classpathentry sourcepath="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-tag-extensions-v0-0.2.4+2fd224cad2@net.fabricmc.yarn.20w19a.20w19a+build.4-sources.jar" kind="lib" path="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-tag-extensions-v0-0.2.4+2fd224cad2@net.fabricmc.yarn.20w19a.20w19a+build.4.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry sourcepath="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-textures-v0-1.0.4+821cdba7e8@net.fabricmc.yarn.20w19a.20w19a+build.4-sources.jar" kind="lib" path="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-textures-v0-1.0.4+821cdba7e8@net.fabricmc.yarn.20w19a.20w19a+build.4.jar">
+	<classpathentry sourcepath="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-textures-v0-1.0.4+821cdba7d2@net.fabricmc.yarn.20w19a.20w19a+build.4-sources.jar" kind="lib" path="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-textures-v0-1.0.4+821cdba7d2@net.fabricmc.yarn.20w19a.20w19a+build.4.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry sourcepath="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-tool-attribute-api-v1-1.0.3+686e6e57e8@net.fabricmc.yarn.20w19a.20w19a+build.4-sources.jar" kind="lib" path="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-tool-attribute-api-v1-1.0.3+686e6e57e8@net.fabricmc.yarn.20w19a.20w19a+build.4.jar">
+	<classpathentry sourcepath="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-tool-attribute-api-v1-1.0.4+fa840743d2@net.fabricmc.yarn.20w19a.20w19a+build.4-sources.jar" kind="lib" path="D:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-tool-attribute-api-v1-1.0.4+fa840743d2@net.fabricmc.yarn.20w19a.20w19a+build.4.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
