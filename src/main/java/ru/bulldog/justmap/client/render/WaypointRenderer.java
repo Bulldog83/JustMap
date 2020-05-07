@@ -1,7 +1,5 @@
 package ru.bulldog.justmap.client.render;
 
-import com.mojang.blaze3d.systems.RenderSystem;
-
 import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.map.waypoint.Waypoint;
 import ru.bulldog.justmap.map.waypoint.WaypointKeeper;
@@ -81,9 +79,7 @@ public class WaypointRenderer {
 		if (icon != null) {
 			icon.draw(x, y);
 		} else {
-			RenderSystem.pushMatrix();
 			DrawHelper.drawDiamond(x, y, size, size, waypoint.color);
-			RenderSystem.popMatrix();
 		}
 		DrawHelper.drawBoundedString(client.textRenderer, (int) dist + "m", x + size / 2, y + size + 2, 0, screenWidth, Colors.WHITE);
 	}
@@ -129,7 +125,7 @@ public class WaypointRenderer {
 		matrixStack.translate((double) wpX - camX, (double) wpY - camY, (double) wpZ - camZ);
 		matrixStack.translate(0.5D, 1.5D, 0.5D);
 		if (ClientParams.renderLightBeam) {
-			renderLightBeam(matrixStack, immediate, BEAM_TEX, tick, -wpY, 512 - wpY, colors, alpha, 0.15F, 0.2F);
+			this.renderLightBeam(matrixStack, immediate, BEAM_TEX, tick, -wpY, 512 - wpY, colors, alpha, 0.15F, 0.2F);
 		}
 		
 		if (ClientParams.renderAnimation) {
@@ -140,7 +136,7 @@ public class WaypointRenderer {
 		if (ClientParams.renderMarkers) {
 			matrixStack.multiply(camera.getRotation());
    	 		matrixStack.multiply(Vector3f.POSITIVE_Y.getDegreesQuaternion(180.0F));
-   	 		renderIcon(matrixStack, immediate.getBuffer(RenderLayer.getEntityTranslucent(waypoint.getIcon().getTexture())), colors, alpha, waypoint.getIcon().getWidth());
+   	 		this.renderIcon(matrixStack, immediate.getBuffer(RenderLayer.getEntityTranslucent(waypoint.getIcon().getTexture())), colors, alpha, waypoint.getIcon().getWidth());
 		}
 		matrixStack.pop();
 	}
@@ -161,7 +157,7 @@ public class WaypointRenderer {
 		float aa = -h;
 		float ap = -1.0F + p;
 		float aq = (float) j * (0.5F / h) + ap;
-		renderBeam(matrixStack, vertexConsumerProvider.getBuffer(RenderLayer.getBeaconBeam(identifier, true)), red, green, blue, alpha, i, m, 0.0F, h, h, 0.0F, aj, 0.0F, 0.0F, aa, 0.0F, 1.0F, aq, ap);
+		this.renderBeam(matrixStack, vertexConsumerProvider.getBuffer(RenderLayer.getBeaconBeam(identifier, true)), red, green, blue, alpha, i, m, 0.0F, h, h, 0.0F, aj, 0.0F, 0.0F, aa, 0.0F, 1.0F, aq, ap);
 		matrixStack.pop();		
 		af = -k;
 		float ag = -k;
@@ -169,7 +165,7 @@ public class WaypointRenderer {
 		aj = -k;
 		ap = -1.0F + p;
 		aq = (float) j + ap;
-		renderBeam(matrixStack, vertexConsumerProvider.getBuffer(RenderLayer.getBeaconBeam(identifier, true)), red, green, blue, alpha, i, m, af, ag, k, ai, aj, k, k, k, 0.0F, 1.0F, aq, ap);
+		this.renderBeam(matrixStack, vertexConsumerProvider.getBuffer(RenderLayer.getBeaconBeam(identifier, true)), red, green, blue, alpha, i, m, af, ag, k, ai, aj, k, k, k, 0.0F, 1.0F, aq, ap);
 		matrixStack.pop();
 	 }
 	
@@ -187,10 +183,10 @@ public class WaypointRenderer {
 		 
 		 matrixStack.push();		
 		 
-		 addVertex(matrix4f, matrix3f, vertexConsumer, colors[0], colors[1], colors[2], a, -0.5F, -0.5F, 0, l, k);
-		 addVertex(matrix4f, matrix3f, vertexConsumer, colors[0], colors[1], colors[2], a, -0.5F, 0.5F, 0, m, k);
-		 addVertex(matrix4f, matrix3f, vertexConsumer, colors[0], colors[1], colors[2], a, 0.5F, 0.5F, 0, m, h);
-		 addVertex(matrix4f, matrix3f, vertexConsumer, colors[0], colors[1], colors[2], a, 0.5F, -0.5F, 0, l, h);
+		 this.addVertex(matrix4f, matrix3f, vertexConsumer, colors[0], colors[1], colors[2], a, -0.5F, -0.5F, 0, l, k);
+		 this.addVertex(matrix4f, matrix3f, vertexConsumer, colors[0], colors[1], colors[2], a, -0.5F, 0.5F, 0, m, k);
+		 this.addVertex(matrix4f, matrix3f, vertexConsumer, colors[0], colors[1], colors[2], a, 0.5F, 0.5F, 0, m, h);
+		 this.addVertex(matrix4f, matrix3f, vertexConsumer, colors[0], colors[1], colors[2], a, 0.5F, -0.5F, 0, l, h);
 		 
 		 matrixStack.pop();
 	 }
@@ -199,17 +195,17 @@ public class WaypointRenderer {
 		MatrixStack.Entry entry = matrixStack.peek();
 		Matrix4f matrix4f = entry.getModel();
 		Matrix3f matrix3f = entry.getNormal();		
-		renderBeam(matrix4f, matrix3f, vertexConsumer, red, green, blue, alpha, j, k, l, m, n, o, t, u, v, w);
-		renderBeam(matrix4f, matrix3f, vertexConsumer, red, green, blue, alpha, j, k, r, s, p, q, t, u, v, w);
-		renderBeam(matrix4f, matrix3f, vertexConsumer, red, green, blue, alpha, j, k, n, o, r, s, t, u, v, w);
-		renderBeam(matrix4f, matrix3f, vertexConsumer, red, green, blue, alpha, j, k, p, q, l, m, t, u, v, w);
+		this.renderBeam(matrix4f, matrix3f, vertexConsumer, red, green, blue, alpha, j, k, l, m, n, o, t, u, v, w);
+		this.renderBeam(matrix4f, matrix3f, vertexConsumer, red, green, blue, alpha, j, k, r, s, p, q, t, u, v, w);
+		this.renderBeam(matrix4f, matrix3f, vertexConsumer, red, green, blue, alpha, j, k, n, o, r, s, t, u, v, w);
+		this.renderBeam(matrix4f, matrix3f, vertexConsumer, red, green, blue, alpha, j, k, p, q, l, m, t, u, v, w);
 	 }
 
 	 private void renderBeam(Matrix4f matrix4f, Matrix3f matrix3f, VertexConsumer vertexConsumer, float red, float green, float blue, float alpha, int j, int k, float l, float m, float n, float o, float p, float q, float r, float s) {
-		addVertex(matrix4f, matrix3f, vertexConsumer, red, green, blue, alpha, k, l, m, q, r);
-		addVertex(matrix4f, matrix3f, vertexConsumer, red, green, blue, alpha, j, l, m, q, s);
-		addVertex(matrix4f, matrix3f, vertexConsumer, red, green, blue, alpha, j, n, o, p, s);
-		addVertex(matrix4f, matrix3f, vertexConsumer, red, green, blue, alpha, k, n, o, p, r);
+		this.addVertex(matrix4f, matrix3f, vertexConsumer, red, green, blue, alpha, k, l, m, q, r);
+		this.addVertex(matrix4f, matrix3f, vertexConsumer, red, green, blue, alpha, j, l, m, q, s);
+		this.addVertex(matrix4f, matrix3f, vertexConsumer, red, green, blue, alpha, j, n, o, p, s);
+		this.addVertex(matrix4f, matrix3f, vertexConsumer, red, green, blue, alpha, k, n, o, p, r);
 	 }
 
 	 private void addVertex(Matrix4f matrix4f, Matrix3f matrix3f, VertexConsumer vertexConsumer, float red, float green, float blue, float alpha, float y, float x, float l, float m, float n) {

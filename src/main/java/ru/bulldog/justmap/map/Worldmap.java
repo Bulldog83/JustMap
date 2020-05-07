@@ -92,18 +92,21 @@ public class Worldmap extends MapScreen implements IMap {
 		
 		PlayerEntity player = minecraft.player;
 		
+		this.addMapButtons();
+		this.updateScale();
+		
 		int currentDim = player.dimension.getRawId();
 		if (centerPos == null || currentDim != dimension) {
 			this.dimension = currentDim;
 			this.centerPos = minecraft.player.getBlockPos();
+			if (mapImage != null) {
+				this.updateMapTexture();
+			}
 		} else if (playerTracking) {
 			this.centerPos = minecraft.player.getBlockPos();
 		}
 		
 		this.cursorCoords = MathUtil.posToString(centerPos);
-		
-		this.addMapButtons();
-		this.updateScale();
 		
 		waypoints.clear();
 		List<Waypoint> wps = WaypointKeeper.getInstance().getWaypoints(dimension, true);
