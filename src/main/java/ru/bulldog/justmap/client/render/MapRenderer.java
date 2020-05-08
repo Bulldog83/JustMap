@@ -74,8 +74,6 @@ public class MapRenderer {
 		this.offset = ClientParams.positionOffset;
 		this.mapPosition = ClientParams.mapPosition;
 		this.textManager = this.minimap.getTextManager();
-		
-		RenderUtil.setupFrameBuffer();
 	}
 	
 	public int getX() {
@@ -246,7 +244,7 @@ public class MapRenderer {
 		GL11.glEnable(GL11.GL_SCISSOR_TEST);
 		GL11.glScissor(scaledX, scaledY, scaledW, scaledH);
 		
-		this.drawMap(scaledX, scaledY, scaledW, scaledH);
+		this.drawMap();
 
 		if (ClientParams.drawChunkGrid) {
 			this.drawChunkGrid();
@@ -281,35 +279,18 @@ public class MapRenderer {
 		RenderSystem.enableDepthTest();
 	}
 	
-	private void drawMap(int x, int y, int w, int h) {		
+	private void drawMap() {		
 		double z = 0.09;		
 		float f1 = 0.0F, f2 = 1.0F;
-		
-		RenderSystem.bindTexture(GL11.GL_ZERO);
-		GL11.glPushAttrib(GL11.GL_TRANSFORM_BIT);
-		RenderSystem.viewport(x, y, w, h);
-		RenderSystem.matrixMode(GL11.GL_PROJECTION);
-		RenderSystem.pushMatrix();
-		RenderSystem.loadIdentity();
-		RenderSystem.ortho(0.0, mapW, mapH, 0.0, 1000.0, 3000.0);
-		RenderSystem.matrixMode(GL11.GL_MODELVIEW);
-		RenderSystem.pushMatrix();
-		RenderSystem.loadIdentity();
-		RenderSystem.translatef(0.0F, 0.0F, -2000.0F);
-		//RenderUtil.bindFrameBuffer();
-		RenderSystem.depthMask(false);
-		RenderSystem.clearColor(0.0F, 0.0F, 0.0F, 0.0F);
-		RenderSystem.clear(GL11.GL_COLOR_BUFFER_BIT, MinecraftClient.IS_SYSTEM_MAC);
-		
+
 		if (this.mapTexture == null || this.minimap.changed) {
 			this.prepareTexture();
 		} else {
 			RenderSystem.bindTexture(mapTexture.getId());
 		}
-
 		RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_NEAREST_MIPMAP_LINEAR);
 		RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST);
-
+		
 		if (ClientParams.rotateMap) {
 			f1 = 0.15F;
 			f2 = 0.85F;
@@ -323,30 +304,17 @@ public class MapRenderer {
 		}
 		
 		this.builder.begin(GL11.GL_QUADS, VertexFormats.POSITION_TEXTURE);		
-//		this.builder.vertex(mapX, mapY, z).texture(f1, f1).next();
-//		this.builder.vertex(mapX, mapY + mapH, z).texture(f1, f2).next();
-//		this.builder.vertex(mapX + mapW, mapY + mapH, z).texture(f2, f2).next();
-//		this.builder.vertex(mapX + mapW, mapY, z).texture(f2, f1).next();
-		this.builder.vertex(0, 0, z).texture(f1, f1).next();
-		this.builder.vertex(0, mapH, z).texture(f1, f2).next();
-		this.builder.vertex(mapW, mapH, z).texture(f2, f2).next();
-		this.builder.vertex(mapW, 0, z).texture(f2, f1).next();
+		this.builder.vertex(mapX, mapY, z).texture(f1, f1).next();
+		this.builder.vertex(mapX, mapY + mapH, z).texture(f1, f2).next();
+		this.builder.vertex(mapX + mapW, mapY + mapH, z).texture(f2, f2).next();
+		this.builder.vertex(mapX + mapW, mapY, z).texture(f2, f1).next();
 		
 		this.tessellator.draw();
 		
 		if (ClientParams.rotateMap) {		
 			RenderSystem.popMatrix();
-			//RenderSystem.matrixMode(GL11.GL_MODELVIEW);
+			RenderSystem.matrixMode(GL11.GL_MODELVIEW);
 		}
-		
-		RenderSystem.depthMask(true);
-		//RenderUtil.unbindFrameBuffer();
-		RenderSystem.matrixMode(GL11.GL_MODELVIEW);
-		RenderSystem.popMatrix();
-		RenderSystem.matrixMode(GL11.GL_PROJECTION);
-		RenderSystem.popMatrix();
-		RenderSystem.popAttributes();
-		RenderSystem.viewport(0, 0, this.client.getWindow().getFramebufferWidth(), this.client.getWindow().getFramebufferHeight());
 	}
 	
 	private void drawChunkGrid() {

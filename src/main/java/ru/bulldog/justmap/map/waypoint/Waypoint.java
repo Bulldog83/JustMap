@@ -202,9 +202,13 @@ public class Waypoint {
 			return icon;
 		}
 		
+		public void bindTexture() {
+			textureManager.bindTexture(this.getTexture());
+		}
+		
 		@Override
 		public void draw(double x, double y, int w, int h) {
-			textureManager.bindTexture(this.getTexture());			
+			this.bindTexture();
 			this.draw(x, y, (float) w, (float) h);
 		}
 		

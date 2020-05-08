@@ -22,8 +22,13 @@ public abstract class WorldRendererMixin {
 	@Shadow
 	private MinecraftClient client;
 	
-	@Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/BufferBuilderStorage;getEntityVertexConsumers()Lnet/minecraft/client/render/VertexConsumerProvider$Immediate;", shift = Shift.AFTER))
+//	@Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/BufferBuilderStorage;getEntityVertexConsumers()Lnet/minecraft/client/render/VertexConsumerProvider$Immediate;", shift = Shift.AFTER))
+//	public void renderBeam(MatrixStack matrixStack, float f, long l, boolean bl, Camera camera, GameRenderer gameRenderer, LightmapTextureManager lightmapTextureManager, Matrix4f matrix4f, CallbackInfo ci) {
+//		WaypointRenderer.renderWaypoint(matrixStack, client, camera, f);
+//	}
+	
+	@Inject(at = @At("RETURN"), method = "render")
 	public void renderBeam(MatrixStack matrixStack, float f, long l, boolean bl, Camera camera, GameRenderer gameRenderer, LightmapTextureManager lightmapTextureManager, Matrix4f matrix4f, CallbackInfo ci) {
-		WaypointRenderer.renderWaypoint(matrixStack, client, camera, f);
+		WaypointRenderer.renderWaypoints(matrixStack, client, camera, f);
 	}
 }
