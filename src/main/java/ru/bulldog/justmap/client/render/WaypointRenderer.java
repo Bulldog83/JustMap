@@ -8,18 +8,17 @@ import ru.bulldog.justmap.util.ColorUtil;
 import ru.bulldog.justmap.util.Colors;
 import ru.bulldog.justmap.util.DrawHelper;
 import ru.bulldog.justmap.util.math.MathUtil;
+
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.OverlayTexture;
-import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.VertexFormats;
-import net.minecraft.client.texture.TextureManager;
 import net.minecraft.client.util.math.Matrix3f;
 import net.minecraft.client.util.math.Matrix4f;
 import net.minecraft.client.util.math.MatrixStack;
@@ -27,8 +26,8 @@ import net.minecraft.client.util.math.Vector3f;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Quaternion;
 import net.minecraft.util.math.Vec3d;
+
 import java.util.List;
 
 import org.lwjgl.opengl.GL11;
@@ -134,17 +133,13 @@ public class WaypointRenderer {
 		float[] colors = ColorUtil.toFloatArray(waypoint.color);
 		float alpha = MathUtil.clamp(0.125F * ((float) dist / 10), 0.025F, 0.275F);
 		
-		VertexConsumerProvider.Immediate immediate = client.getBufferBuilders().getEntityVertexConsumers();
-		
 		RenderSystem.enableBlend();
 		RenderSystem.defaultBlendFunc();
+		RenderSystem.depthMask(false);
 		
 		matrixStack.push();
 		matrixStack.translate((double) wpX - camX, (double) wpY - camY, (double) wpZ - camZ);
-		matrixStack.translate(0.5D, 0.5D, 0.5D);
-		if (ClientParams.renderLightBeam) {
-			this.renderLightBeam(matrixStack, immediate, tick, -wpY, 512 - wpY, colors, alpha, 0.15F, 0.2F);
-		}
+		matrixStack.translate(0.5D, 1.5D, 0.5D);
 		if (ClientParams.renderMarkers) {
 			matrixStack.push();
 			if (ClientParams.renderAnimation) {
@@ -161,7 +156,13 @@ public class WaypointRenderer {
    	 		
    	 		matrixStack.pop();
 		}
+		if (ClientParams.renderLightBeam) {
+			this.renderLightBeam(matrixStack, tick, -wpY, 4096 - wpY, colors, alpha, 0.15F, 0.2F);
+		}
 		matrixStack.pop();
+		
+		RenderSystem.depthMask(true);
+		RenderSystem.disableBlend();
 	}
 	
 	private void renderIcon(MatrixStack matrixStack, VertexConsumer vertexConsumer, float[] colors, float alpha, int size) {
@@ -182,10 +183,8 @@ public class WaypointRenderer {
 		this.addVertex(matrix4f, matrix3f, vertexConsumer, colors[0], colors[1], colors[2], a, 0.5F, -0.5F, 0.0F, l, h);
 	}
 	
-	private void renderLightBeam(MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, float tick, int i, int j, float[] colors, float alpha, float h, float k) {
+	private void renderLightBeam(MatrixStack matrixStack, float tick, int i, int j, float[] colors, float alpha, float h, float k) {
 		int m = i + j;
-		
-		matrixStack.push();
 		
 		float o = j < 0 ? tick : -tick;
 		float p = MathHelper.fractionalPart(o * 0.2F - (float) MathHelper.floor(o * 0.1F));
@@ -202,9 +201,11 @@ public class WaypointRenderer {
 		float ap = -1.0F + p;
 		float aq = (float) j * (0.5F / h) + ap;
 		
-		VertexConsumer vertexConsumer = vertexConsumerProvider.getBuffer(RenderLayer.getBeaconBeam(BEAM_TEX, true));		
-		this.renderBeam(matrixStack, vertexConsumer, red, green, blue, alpha, i, m, 0.0F, h, h, 0.0F, aj, 0.0F, 0.0F, aa, 0.0F, 1.0F, aq, ap);
-		matrixStack.pop();		
+		initBuffer();
+		
+		MinecraftClient.getInstance().getTextureManager().bindTexture(BEAM_TEX);
+		this.renderBeam(matrixStack, builder, red, green, blue, alpha, i, m, 0.0F, h, h, 0.0F, aj, 0.0F, 0.0F, aa, 0.0F, 1.0F, aq, ap);
+		matrixStack.pop();
 		
 		af = -k;
 		float ag = -k;
@@ -212,8 +213,9 @@ public class WaypointRenderer {
 		aj = -k;
 		ap = -1.0F + p;
 		aq = (float) j + ap;
-		this.renderBeam(matrixStack, vertexConsumer, red, green, blue, alpha, i, m, af, ag, k, ai, aj, k, k, k, 0.0F, 1.0F, aq, ap);
-		matrixStack.pop();
+		this.renderBeam(matrixStack, builder, red, green, blue, alpha, i, m, af, ag, k, ai, aj, k, k, k, 0.0F, 1.0F, aq, ap);
+		
+		tessellator.draw();
 	}
 
 	private void renderBeam(MatrixStack matrixStack, VertexConsumer vertexConsumer, float red, float green, float blue, float alpha, int j, int k, float l, float m, float n, float o, float p, float q, float r, float s, float t, float u, float v, float w) {
