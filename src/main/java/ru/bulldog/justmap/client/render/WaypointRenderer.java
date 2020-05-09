@@ -75,19 +75,16 @@ public class WaypointRenderer {
 		int size = icon != null ? icon.getWidth() : 18;
 		int screenWidth = client.getWindow().getScaledWidth();
 		
-		int dx = (int) client.player.getX() - wpX;
-		int dy = wpZ - (int) client.player.getZ();
+		double dx = client.player.getX() - wpX;
+		double dy = wpZ - client.player.getZ();		
+		double wfi = correctAngle((float) (Math.atan2(dx, dy) * (180 / Math.PI)));		
+		double pfi = correctAngle(client.player.getYaw(delta) % 360);		
+		double a0 = pfi - fov / 2;
+		double a1 = pfi + fov / 2;		
+		double ax = correctAngle((float) (2 * pfi - wfi));		
+		double scale = (MathUtil.clamp(ax, a0, a1) - a0) / fov;
 		
-		int wpFi = correctAngle((int) (Math.atan2(dx, dy) * (180 / Math.PI)));		
-		int pFi = correctAngle((int) (client.player.getYaw(delta) % 360));
-		
-		int a0 = pFi - (int) fov / 2;
-		int a1 = pFi + (int) fov / 2;		
-		int ax = correctAngle(2 * pFi - wpFi);
-		
-		float scale = (MathUtil.clamp(ax, a0, a1) - a0) / fov;
-		
-		int x = (int) MathUtil.clamp((screenWidth - screenWidth * scale) - size / 2, 0, screenWidth - size);
+		int x = (int) Math.round(MathUtil.clamp((screenWidth - screenWidth * scale) - size / 2, 0, screenWidth - size));
 		int y = ClientParams.positionOffset;
 		
 		if (icon != null) {
@@ -157,7 +154,7 @@ public class WaypointRenderer {
    	 		matrixStack.pop();
 		}
 		if (ClientParams.renderLightBeam) {
-			this.renderLightBeam(matrixStack, tick, -wpY, 4096 - wpY, colors, alpha, 0.15F, 0.2F);
+			this.renderLightBeam(matrixStack, tick, -wpY, 1024 - wpY, colors, alpha, 0.15F, 0.2F);
 		}
 		matrixStack.pop();
 		
@@ -239,7 +236,7 @@ public class WaypointRenderer {
 		vertexConsumer.vertex(matrix4f, x, y, l).color(red, green, blue, alpha).texture(m, n).overlay(OverlayTexture.DEFAULT_UV).light(Colors.LIGHT).normal(matrix3f, 0.0F, 1.0F, 0.0F).next();
 	}
 	 
-	private int correctAngle(int fi) {
-		return fi < -180 ? fi += 360 : fi > 180 ? fi -= 360 : fi;
+	private double correctAngle(float angle) {
+		return angle < 0 ? angle += 360.0D : angle >= 360.0D ? angle -= 360.0D : angle;
 	}
 }
