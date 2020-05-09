@@ -329,11 +329,11 @@ public class MapRenderer {
 			int centerX = mapX + mapW / 2;
 			int centerY = mapY + mapH / 2;
 			
-			chunkGrid = new ChunkGrid(px, pz, picX, picY, picW, picH);
-			chunkGrid.draw(centerX, centerY, rotation);
+			this.chunkGrid = new ChunkGrid(px, pz, picX, picY, picW, picH);
+			this.chunkGrid.draw(centerX, centerY, rotation);
 		} else {		
-			chunkGrid = new ChunkGrid(px, pz, mapX, mapY, mapW, mapH);
-			chunkGrid.draw();
+			this.chunkGrid = new ChunkGrid(px, pz, mapX, mapY, mapW, mapH);
+			this.chunkGrid.draw();
 		}
 	}
 }

@@ -177,7 +177,7 @@ public class Worldmap extends MapScreen implements IMap {
 			this.bufferImage.fill(Colors.BLACK);
 			this.mapImage.fill(Colors.BLACK);
 			
-			this.updateMapTexture();
+			this.processor.execute(this::updateMapTexture);
 		}
 		
 		if (this.changed) {
@@ -274,7 +274,7 @@ public class Worldmap extends MapScreen implements IMap {
 		this.playerTracking = true;
 		this.centerPos = minecraft.player.getBlockPos();
   		
-		processor.execute(this::updateMapTexture);
+		this.processor.execute(this::updateMapTexture);
 	}
 	
 	private void updateScale() {
@@ -317,7 +317,7 @@ public class Worldmap extends MapScreen implements IMap {
 			default: break;
 		}
 		
-		processor.execute(this::updateMapTexture);
+		this.processor.execute(this::updateMapTexture);
 		
 		this.playerTracking = false;
 		this.updated = time;
@@ -378,7 +378,7 @@ public class Worldmap extends MapScreen implements IMap {
 			
 			this.centerPos = new BlockPos(x, y, z);
 			
-			processor.execute(this::updateMapTexture);
+			this.processor.execute(this::updateMapTexture);
 			
 			this.playerTracking = false;
 			this.updated = time;

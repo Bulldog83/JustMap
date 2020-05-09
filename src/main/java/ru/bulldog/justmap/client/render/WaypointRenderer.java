@@ -128,7 +128,7 @@ public class WaypointRenderer {
 		double camZ = vec3d.getZ();
 		
 		float[] colors = ColorUtil.toFloatArray(waypoint.color);
-		float alpha = MathUtil.clamp(0.125F * ((float) dist / 10), 0.025F, 0.275F);
+		float alpha = MathUtil.clamp(0.125F * ((float) dist / 10), 0.11F, 0.275F);
 		
 		RenderSystem.enableBlend();
 		RenderSystem.defaultBlendFunc();
@@ -137,6 +137,9 @@ public class WaypointRenderer {
 		matrixStack.push();
 		matrixStack.translate((double) wpX - camX, (double) wpY - camY, (double) wpZ - camZ);
 		matrixStack.translate(0.5D, 1.5D, 0.5D);
+		if (ClientParams.renderLightBeam) {
+			this.renderLightBeam(matrixStack, tick, -wpY, 1024 - wpY, colors, alpha, 0.15F, 0.2F);
+		}
 		if (ClientParams.renderMarkers) {
 			matrixStack.push();
 			if (ClientParams.renderAnimation) {
@@ -146,15 +149,14 @@ public class WaypointRenderer {
 			matrixStack.multiply(camera.getRotation());
    	 		matrixStack.multiply(Vector3f.POSITIVE_Y.getDegreesQuaternion(180.0F));
    	 		
+   	 		alpha = MathUtil.clamp(alpha * 3, 0.0F, 1.0F);
+   	 		
    	 		initBuffer();
    	 		waypoint.getIcon().bindTexture();
    	 		this.renderIcon(matrixStack, builder, colors, alpha, waypoint.getIcon().getWidth());
    	 		tessellator.draw();
    	 		
    	 		matrixStack.pop();
-		}
-		if (ClientParams.renderLightBeam) {
-			this.renderLightBeam(matrixStack, tick, -wpY, 1024 - wpY, colors, alpha, 0.15F, 0.2F);
 		}
 		matrixStack.pop();
 		
@@ -172,12 +174,10 @@ public class WaypointRenderer {
 		float k = (size % 4 * 16 + 16) / 16.0F;
 		float m = (size / 4 * 16 + 16) / 16.0F;		 
 		 
-		float a = MathUtil.clamp(alpha * 5, 0.0F, 1.0F);
-		 
-		this.addVertex(matrix4f, matrix3f, vertexConsumer, colors[0], colors[1], colors[2], a, -0.5F, -0.5F, 0.0F, l, k);
-		this.addVertex(matrix4f, matrix3f, vertexConsumer, colors[0], colors[1], colors[2], a, -0.5F, 0.5F, 0.0F, m, k);
-		this.addVertex(matrix4f, matrix3f, vertexConsumer, colors[0], colors[1], colors[2], a, 0.5F, 0.5F, 0.0F, m, h);
-		this.addVertex(matrix4f, matrix3f, vertexConsumer, colors[0], colors[1], colors[2], a, 0.5F, -0.5F, 0.0F, l, h);
+		this.addVertex(matrix4f, matrix3f, vertexConsumer, colors[0], colors[1], colors[2], alpha, -0.5F, -0.5F, 0.0F, l, k);
+		this.addVertex(matrix4f, matrix3f, vertexConsumer, colors[0], colors[1], colors[2], alpha, -0.5F, 0.5F, 0.0F, m, k);
+		this.addVertex(matrix4f, matrix3f, vertexConsumer, colors[0], colors[1], colors[2], alpha, 0.5F, 0.5F, 0.0F, m, h);
+		this.addVertex(matrix4f, matrix3f, vertexConsumer, colors[0], colors[1], colors[2], alpha, 0.5F, -0.5F, 0.0F, l, h);
 	}
 	
 	private void renderLightBeam(MatrixStack matrixStack, float tick, int i, int j, float[] colors, float alpha, float h, float k) {
