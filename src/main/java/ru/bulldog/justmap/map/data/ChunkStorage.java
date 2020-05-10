@@ -10,40 +10,68 @@ import net.minecraft.util.math.ChunkPos;
 
 public class ChunkStorage implements AutoCloseable {
 	
-	private final Map<ChunkPos, CompoundTag> cashedChunks;
-	private final StorageWorker worker;
+	private Map<File, ChunksCache> chunksCache;
+	private StorageWorker worker;
 	
-	public ChunkStorage(File file) {
-		this.worker = new StorageWorker(new RegionStorage(file));
-		this.cashedChunks = new HashMap<>();
+	public ChunkStorage() {
+		this.worker = new StorageWorker();
+		this.chunksCache = new HashMap<>();
 	}
 	
-	public CompoundTag getNbt(ChunkPos chunkPos) throws IOException {
-		if(cashedChunks.containsKey(chunkPos)) {
-			return cashedChunks.get(chunkPos);
+	public CompoundTag getNbt(File dir, ChunkPos chunkPos) throws IOException {
+		if(chunksCache.containsKey(dir)) {
+			ChunksCache cache = chunksCache.get(dir);
+			if (cache.contains(chunkPos)) {
+				return cache.get(chunkPos);
+			}
+			CompoundTag chunkTag = this.worker.getNbt(dir, chunkPos);
+			cache.put(chunkPos, chunkTag);
+			
+			return chunkTag;
 		}
 		
-		CompoundTag chunkTag = this.worker.getNbt(chunkPos);
-		cashedChunks.put(chunkPos, chunkTag);
+		ChunksCache cache = new ChunksCache();
+		CompoundTag chunkTag = this.worker.getNbt(dir, chunkPos);
+		cache.put(chunkPos, chunkTag);
+		this.chunksCache.put(dir, cache);
 		
 		return chunkTag;
 	}
 
-	public void setTagAt(ChunkPos chunkPos, CompoundTag compoundTag) {
-		if (cashedChunks.containsKey(chunkPos)) {
-			cashedChunks.replace(chunkPos, compoundTag);
-		}
-		
-		this.worker.setResult(chunkPos, compoundTag);
-	}
-
-	public void completeAll() {
-		this.worker.completeAll().join();
+	public void setTagAt(File dir, ChunkPos chunkPos, CompoundTag compoundTag) {
+		if(chunksCache.containsKey(dir)) {			
+			this.chunksCache.get(dir).replace(chunkPos, compoundTag);
+		}		
+		this.worker.setResult(dir, chunkPos, compoundTag);
 	}
 
 	@Override
 	public void close() throws Exception {
-		this.cashedChunks.clear();
+		this.chunksCache.clear();
 		this.worker.close();
+	}
+	
+	private class ChunksCache {
+		Map<ChunkPos, CompoundTag> cachedChunks;
+		
+		ChunksCache() {
+			this.cachedChunks = new HashMap<>();
+		}
+		
+		CompoundTag get(ChunkPos pos) {
+			return this.cachedChunks.get(pos);
+		}
+		
+		void put(ChunkPos pos, CompoundTag tag) {
+			this.cachedChunks.put(pos, tag);
+		}
+		
+		void replace(ChunkPos pos, CompoundTag tag) {
+			this.cachedChunks.replace(pos, tag);
+		}
+		
+		boolean contains(ChunkPos pos) {
+			return this.cachedChunks.containsKey(pos);
+		}
 	}
 }

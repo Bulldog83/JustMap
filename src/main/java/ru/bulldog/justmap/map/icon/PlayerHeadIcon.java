@@ -55,7 +55,7 @@ public class PlayerHeadIcon {
 	}
 	
 	public void draw(double x, double y) {
-		int size = ClientParams.entityIconSize;
+		int size = 64;//ClientParams.entityIconSize;
 		if (ClientParams.showIconsOutline) {
 			DrawHelper.fill(x - 1, y - 1, x + size + 1, y + size + 1, 0xFF444444);
 		}

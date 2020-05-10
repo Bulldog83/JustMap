@@ -1,6 +1,8 @@
 package ru.bulldog.justmap.map.data;
 
+import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -19,23 +21,35 @@ import ru.bulldog.justmap.util.TaskManager;
 
 public class StorageWorker implements AutoCloseable {
 
-	private final RegionStorage storage;
+	private final Map<File, RegionStorage> storages;
 	private final Map<ChunkPos, Result> results = Maps.newLinkedHashMap();
 	private final TaskManager worker = TaskManager.getManager("chunks-io");
 	private final AtomicBoolean closed = new AtomicBoolean();
 	
 	private CompletableFuture<Void> future = new CompletableFuture<>();
 	
-	StorageWorker(RegionStorage regionStorage) {
-		this.storage = regionStorage;
+	StorageWorker() {
+		this.storages = new HashMap<>();
+	}
+	
+	private RegionStorage getStorage(File dir) {
+		if (storages.containsKey(dir)) {
+			return storages.get(dir);
+		}
+		
+		RegionStorage storage = new RegionStorage(dir);
+		storages.put(dir, storage);
+		
+		return storage;
 	}
 
-	public void setResult(ChunkPos chunkPos, CompoundTag compoundTag) {
+	public void setResult(File dir, ChunkPos chunkPos, CompoundTag compoundTag) {
 		this.run((completableFuture) -> {
 			return () -> {
 				Result result = (Result) this.results.computeIfAbsent(chunkPos, (chunkPosx) -> {
 					return new Result();
 				});
+				result.dir = dir;
 				result.nbt = compoundTag;
 				result.future.whenComplete((var1, throwable) -> {
 					if (throwable != null) {
@@ -49,7 +63,7 @@ public class StorageWorker implements AutoCloseable {
 		this.worker.execute(this::writeResult);
 	}
 
-	public CompoundTag getNbt(ChunkPos chunkPos) throws IOException {
+	public CompoundTag getNbt(File dir, ChunkPos chunkPos) throws IOException {
 		CompletableFuture<?> completableFuture = this.run((completableFuturex) -> {
 			return () -> {
 				Result result = (Result) this.results.get(chunkPos);
@@ -57,7 +71,7 @@ public class StorageWorker implements AutoCloseable {
 					completableFuturex.complete(result.nbt);
 				} else {
 					try {
-						CompoundTag compoundTag = this.storage.getTagAt(chunkPos);
+						CompoundTag compoundTag = this.getStorage(dir).getTagAt(chunkPos);
 						completableFuturex.complete(compoundTag);
 					} catch (Exception ex) {
 						JustMap.LOGGER.logWarning("Failed to read chunk {}", chunkPos, ex);
@@ -130,7 +144,7 @@ public class StorageWorker implements AutoCloseable {
 
 	private void write(ChunkPos chunkPos, Result result) {
 		try {
-			this.storage.write(chunkPos, result.nbt);
+			this.getStorage(result.dir).write(chunkPos, result.nbt);
 			result.future.complete(null);
 		} catch (Exception ex) {
 			JustMap.LOGGER.logError("Failed to store chunk {}", chunkPos, ex);
@@ -139,12 +153,19 @@ public class StorageWorker implements AutoCloseable {
 	}
 
 	private void finish() {
-		try {
-			this.storage.close();
+		Exception error = new Exception();
+		this.storages.forEach((dir, storage) -> {
+			try {
+				storage.close();
+			} catch (Exception ex) {
+				JustMap.LOGGER.logError("Failed to close storage", ex);
+				error.addSuppressed(ex);
+			}
+		});		
+		if (error.getSuppressed().length > 0) {
+			this.future.completeExceptionally(error);
+		} else {
 			this.future.complete(null);
-		} catch (Exception ex) {
-			JustMap.LOGGER.logError("Failed to close storage", ex);
-			this.future.completeExceptionally(ex);
 		}
 	}
 	
@@ -164,6 +185,7 @@ public class StorageWorker implements AutoCloseable {
 	}
 	
 	private static class Result {
+		private File dir;
 		private CompoundTag nbt;
 		private final CompletableFuture<Void> future;
 

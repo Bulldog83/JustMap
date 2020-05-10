@@ -8,7 +8,6 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.ChunkPos;
 
-import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.map.data.ChunkStorage;
 
 public class StorageUtil {
@@ -21,13 +20,12 @@ public class StorageUtil {
 	private static File filesDir = new File(MAP_DIR, "undefined/");
 	
 	private static int currentDimId = 0;
-	private static boolean dimChanged = false;
 	
 	public static synchronized CompoundTag getCache(ChunkPos pos) {
-		if (storageDir == null || dimChanged) updateCacheStorage();
+		if (storage == null) updateCacheStorage();
 		
 		try {
-			CompoundTag data = storage.getNbt(pos);
+			CompoundTag data = storage.getNbt(storageDir, pos);
 			return data != null ? data : new CompoundTag();
 		} catch (Exception ex) {
 			return new CompoundTag();
@@ -35,28 +33,18 @@ public class StorageUtil {
 	}
 	
 	public static synchronized void saveCache(ChunkPos pos, CompoundTag data) {
-		if (storageDir == null || dimChanged) updateCacheStorage();
-		storage.setTagAt(pos, data);
+		if (storage == null) updateCacheStorage();
+		storage.setTagAt(storageDir, pos, data);
 	}
 	
-	private static void updateCacheStorage() {
+	public static void updateCacheStorage() {
 		storageDir = new File(cacheDir(), "chunk-data/");
-		
+
 		if (!storageDir.exists()) {
 			storageDir.mkdirs();
-		}
+		}		
 		
-		if (storage != null) {
-			try {
-				storage.completeAll();
-				storage.close();
-			} catch (Exception ex) {
-				JustMap.LOGGER.catching(ex);
-			}
-		}
-		
-		storage = new ChunkStorage(storageDir);
-		dimChanged = false;
+		if (storage == null) storage = new ChunkStorage();
 	}
 	
 	public static File cacheDir() {
@@ -64,7 +52,6 @@ public class StorageUtil {
 			int dimension = minecraft.world.getDimension().getType().getRawId();
 			if (currentDimId != dimension) {
 				currentDimId = dimension;
-				dimChanged = true;
 			}
 		}
 		

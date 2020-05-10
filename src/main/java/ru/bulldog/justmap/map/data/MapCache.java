@@ -52,6 +52,7 @@ public class MapCache {
 		
 		int dimId = currentWorld.dimension.getType().getRawId();
 		if(currentDimension != dimId) {
+			StorageUtil.updateCacheStorage();
 			currentDimension = dimId;
 		}
 		
