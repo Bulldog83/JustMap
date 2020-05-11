@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import org.lwjgl.glfw.GLFW;
+import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
@@ -19,6 +20,7 @@ import net.minecraft.util.math.Direction;
 
 import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.client.MapScreen;
+import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.client.config.ConfigFactory;
 import ru.bulldog.justmap.client.render.MapTexture;
 import ru.bulldog.justmap.map.data.Layer;
@@ -140,7 +142,7 @@ public class Worldmap extends MapScreen implements IMap {
 		
 		this.drawMap();
 		
-		int iconSize = MathUtil.clamp((int) (10 / imageScale), 8, 14);
+		int iconSize = MathUtil.clamp((int) (10 / imageScale), 8, 12);
 		for (WaypointIcon icon : waypoints) {
 			if (!icon.isHidden()) {
 				icon.setPosition(
@@ -153,15 +155,15 @@ public class Worldmap extends MapScreen implements IMap {
 		
 		PlayerEntity player = minecraft.player;
 		
-		int size = 12;
-		
 		int playerX = player.getBlockPos().getX();
 		int playerZ = player.getBlockPos().getZ();
-		double arrowX = MathUtil.screenPos(playerX, startX, endX, width) - shiftW - size / 2;
-		double arrowY = MathUtil.screenPos(playerZ, startZ, endZ, height) - shiftH - size / 2;
+		double arrowX = MathUtil.screenPos(playerX, startX, endX, width) - shiftW - iconSize / 2;
+		double arrowY = MathUtil.screenPos(playerZ, startZ, endZ, height) - shiftH - iconSize / 2;
 		
-		DrawHelper.fill(arrowX - 0.5, arrowY - 0.5, arrowX + size + 0.5, arrowY + size + 0.5, 0xFFBBBBBB);
-		PlayerHeadIcon.getIcon(player).draw(arrowX, arrowY, size);
+		if (!ClientParams.showIconsOutline) {
+			DrawHelper.fill(arrowX - 0.5, arrowY - 0.5, arrowX + iconSize + 0.5, arrowY + iconSize + 0.5, Colors.LIGHT_GRAY);
+		}
+		PlayerHeadIcon.getIcon(player).draw(arrowX, arrowY, iconSize);
 	}
 	
 	@Override
@@ -247,11 +249,14 @@ public class Worldmap extends MapScreen implements IMap {
 	}
 	
 	private void drawMap() {
-		this.prepareTexture();
-		
 		RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
 		
-		builder.begin(7, VertexFormats.POSITION_TEXTURE);			
+		this.prepareTexture();
+		
+		RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_NEAREST_MIPMAP_LINEAR);
+		RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST);
+		
+		builder.begin(GL11.GL_QUADS, VertexFormats.POSITION_TEXTURE);			
 		builder.vertex(0, 0, 0).texture(0F, 0F).next();
 		builder.vertex(0, height, 0).texture(0F, 1F).next();
 		builder.vertex(width, height, 0).texture(1F, 1F).next();
@@ -277,8 +282,7 @@ public class Worldmap extends MapScreen implements IMap {
 	
 	public void setCenterByPlayer() {
 		this.playerTracking = true;
-		this.centerPos = minecraft.player.getBlockPos();
-  		
+		this.centerPos = minecraft.player.getBlockPos();  		
 		this.processor.execute(this::updateMapTexture);
 	}
 	
@@ -459,7 +463,11 @@ public class Worldmap extends MapScreen implements IMap {
 	@Override
 	public void onClose() {
 		this.processor.stop();
+		this.bufferImage.close();
+		this.mapImage.close();
 		this.processor = null;
+		this.bufferImage = null;
+		this.mapImage = null;
 		
 		super.onClose();
 	}

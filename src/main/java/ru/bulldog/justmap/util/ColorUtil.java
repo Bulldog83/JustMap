@@ -253,7 +253,7 @@ public class ColorUtil {
 		return HSBtoRGB(floatBuffer[0], floatBuffer[1], floatBuffer[2]);
 	}
 	
-	private static int operateColor(int blockColor, int textureColor, int defaultColor) {
+	private static int proccessColor(int blockColor, int textureColor, int defaultColor) {
 		blockColor = blockColor == -1 ? defaultColor : blockColor;		
 		if (blockColor != -1) {
 			return ColorHelper.multiplyColor(textureColor, blockColor);
@@ -275,8 +275,7 @@ public class ColorUtil {
 		if (ClientParams.ignorePlants && StateUtil.isSeaweed(overState)) {
 			return blockColor(worldChunk.getWorld(), Blocks.WATER.getDefaultState(), pos);
 		} else if (!StateUtil.isAir(blockState) && (StateUtil.isAir(overState) || 
-			ClientParams.ignorePlants && StateUtil.isPlant(overState))) {
-			
+			ClientParams.ignorePlants && StateUtil.isPlant(overState))) {			
 			return blockColor(worldChunk.getWorld(), blockState, pos);
 		}
 	
@@ -293,21 +292,20 @@ public class ColorUtil {
 			
 			Block block = state.getBlock();
 			if (block instanceof GrassBlock || block instanceof FernBlock || block instanceof TallPlantBlock) {				
-				blockColor = operateColor(blockColor, textureColor, BiomeColors.getGrassColor(world, pos));
+				blockColor = proccessColor(blockColor, textureColor, BiomeColors.getGrassColor(world, pos));
 			} else if (block instanceof LeavesBlock || block instanceof VineBlock) {
-				blockColor = operateColor(blockColor, textureColor, BiomeColors.getFoliageColor(world, pos));
+				blockColor = proccessColor(blockColor, textureColor, BiomeColors.getFoliageColor(world, pos));
 			} else if (block instanceof LilyPadBlock || block instanceof StemBlock || block instanceof AttachedStemBlock) {
-				blockColor = operateColor(blockColor, textureColor, materialColor);
+				blockColor = proccessColor(blockColor, textureColor, materialColor);
 			} else if (block instanceof FluidBlock) {
 				FluidState fluidState = block.getFluidState(state);
 				if (fluidState.matches(FluidTags.WATER)) {
-					blockColor = operateColor(blockColor, textureColor, BiomeColors.getWaterColor(world, pos));
+					blockColor = proccessColor(blockColor, textureColor, BiomeColors.getWaterColor(world, pos));
 				} else {
 					blockColor = fluidColor(world, state, pos, textureColor);
 				}
 			}
 			blockColor = blockColor != -1 ? blockColor : textureColor;
-
 		}
 		blockColor = blockColor != -1 ? blockColor : materialColor;
 		

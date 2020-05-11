@@ -9,6 +9,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.Identifier;
 import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.client.config.ClientParams;
+import ru.bulldog.justmap.util.Colors;
 import ru.bulldog.justmap.util.DrawHelper;
 
 import java.util.Map;
@@ -61,7 +62,7 @@ public class PlayerHeadIcon {
 	
 	public void draw(double x, double y, int size) {		
 		if (ClientParams.showIconsOutline) {
-			DrawHelper.fill(x - 1, y - 1, x + size + 1, y + size + 1, 0xFF444444);
+			DrawHelper.fill(x - 0.5, y - 0.5, x + size + 0.5, y + size + 0.5, Colors.LIGHT_GRAY);
 		}
 		textureManager.bindTexture(this.skin);		
 		DrawHelper.blit((int) x, (int) y, size, size, size, size, size * 8, size * 8);

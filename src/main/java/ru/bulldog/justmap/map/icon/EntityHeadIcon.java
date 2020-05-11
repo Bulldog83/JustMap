@@ -6,6 +6,7 @@ import java.util.Map;
 import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.util.ImageUtil;
 import ru.bulldog.justmap.util.SpriteAtlas;
+import ru.bulldog.justmap.util.Colors;
 import ru.bulldog.justmap.util.DrawHelper;
 
 import net.minecraft.client.resource.metadata.AnimationResourceMetadata;
@@ -39,7 +40,7 @@ public class EntityHeadIcon extends AbstractIcon {
 	@Override
 	public void draw(double x, double y, int w, int h) {
 		if (ClientParams.showIconsOutline) {
-			DrawHelper.fill(x - 1, y - 1, x + w + 1, y + h + 1, 0xFF444444);
+			DrawHelper.fill(x - 0.5, y - 0.5, x + w + 0.5, y + h + 0.5, Colors.LIGHT_GRAY);
 		}
 		textureManager.bindTexture(this.getId());
 		

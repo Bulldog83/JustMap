@@ -193,7 +193,7 @@ public class MapCache {
 		List<ChunkPos> chunks = new ArrayList<>();
 		for (ChunkPos chunkPos : this.chunks.keySet()) {
 			MapChunk chunkData = this.chunks.get(chunkPos);
-			if (currentTime - chunkData.requested >= 30000) {
+			if (currentTime - chunkData.requested >= 60000) {
 				storeChunk(chunkData);
 				chunks.add(chunkPos);
 				purged++;
