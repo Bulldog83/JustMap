@@ -31,7 +31,9 @@ public class DrawHelper extends DrawableHelper {
 	public final static DrawHelper DRAWER = new DrawHelper();
 	
 	private final static VertexFormat vertexFormat = new VertexFormat(ImmutableList.of(VertexFormats.POSITION_ELEMENT, VertexFormats.TEXTURE_ELEMENT, VertexFormats.NORMAL_ELEMENT, VertexFormats.PADDING_ELEMENT));
-	
+	private final static Tessellator tessellator = Tessellator.getInstance();
+	private final static BufferBuilder builder = tessellator.getBuffer();
+
 	public void fillNoDepth(int x, int y, int right, int left, int color) {
 		RenderSystem.disableDepthTest();
 		fill(x, y, right, left, color);
@@ -71,8 +73,6 @@ public class DrawHelper extends DrawableHelper {
 		float g = (float)(color >> 8 & 255) / 255.0F;
 		float b = (float)(color & 255) / 255.0F;
 	
-		Tessellator tessellator = Tessellator.getInstance();
-		BufferBuilder builder = tessellator.getBuffer();
 		RenderSystem.disableTexture();
 		RenderSystem.color4f(r, g, b, a);
 		builder.begin(GL11.GL_TRIANGLES, VertexFormats.POSITION);
@@ -89,8 +89,6 @@ public class DrawHelper extends DrawableHelper {
 		float g = (float)(color >> 8 & 255) / 255.0F;
 		float b = (float)(color & 255) / 255.0F;
 	
-		Tessellator tessellator = Tessellator.getInstance();
-		BufferBuilder builder = tessellator.getBuffer();
 		RenderSystem.disableTexture();
 		RenderSystem.color4f(r, g, b, a);
 		builder.begin(GL11.GL_LINES, VertexFormats.POSITION);
@@ -114,10 +112,7 @@ public class DrawHelper extends DrawableHelper {
 		float g = (float)(color >> 8 & 255) / 255.0F;
 		float b = (float)(color & 255) / 255.0F;
 		
-		Tessellator tessellator = Tessellator.getInstance();
-		BufferBuilder builder = tessellator.getBuffer();
-		
-	    RenderSystem.enableBlend();
+		RenderSystem.enableBlend();
 	    RenderSystem.disableTexture();
 	    RenderSystem.defaultBlendFunc();
 		RenderSystem.color4f(r, g, b, a);
@@ -161,41 +156,35 @@ public class DrawHelper extends DrawableHelper {
 		float g = (float)(color >> 8 & 255) / 255.0F;
 		float b = (float)(color & 255) / 255.0F;
       
-		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
 		RenderSystem.enableBlend();
 		RenderSystem.disableTexture();
 		RenderSystem.defaultBlendFunc();
-		bufferBuilder.begin(7, VertexFormats.POSITION_COLOR);
-		bufferBuilder.vertex(matrix4f, (float) x, (float) h, 0.0F).color(r, g, b, a).next();
-		bufferBuilder.vertex(matrix4f, (float) w, (float) h, 0.0F).color(r, g, b, a).next();
-		bufferBuilder.vertex(matrix4f, (float) w, (float) y, 0.0F).color(r, g, b, a).next();
-		bufferBuilder.vertex(matrix4f, (float) x, (float) y, 0.0F).color(r, g, b, a).next();
-		bufferBuilder.end();
-		BufferRenderer.draw(bufferBuilder);
+		builder.begin(GL11.GL_QUADS, VertexFormats.POSITION_COLOR);
+		builder.vertex(matrix4f, (float) x, (float) h, 0.0F).color(r, g, b, a).next();
+		builder.vertex(matrix4f, (float) w, (float) h, 0.0F).color(r, g, b, a).next();
+		builder.vertex(matrix4f, (float) w, (float) y, 0.0F).color(r, g, b, a).next();
+		builder.vertex(matrix4f, (float) x, (float) y, 0.0F).color(r, g, b, a).next();
+		builder.end();
+		BufferRenderer.draw(builder);
 		RenderSystem.enableTexture();
 		RenderSystem.disableBlend();
 	}
 	
 	public static void draw(double x, double y, float w, float h) {
-		MatrixStack matrix = new MatrixStack();
-		Tessellator tessellator = Tessellator.getInstance();
-		BufferBuilder builder = tessellator.getBuffer();
-		
-		builder.begin(7, vertexFormat);		
+		MatrixStack matrix = new MatrixStack();		
+		builder.begin(GL11.GL_QUADS, vertexFormat);		
 		draw(matrix, builder, x, y, w, h);
 		tessellator.draw();		
 	}
 	
 	public static void drawSprite(Sprite sprite, double x, double y, float w, float h) {
 		MatrixStack matrix = new MatrixStack();
-		Tessellator tessellator = Tessellator.getInstance();
-		BufferBuilder builder = tessellator.getBuffer();
 		
 		RenderSystem.enableBlend();
 		RenderSystem.enableAlphaTest();		
 		RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
 		
-		builder.begin(7, vertexFormat);
+		builder.begin(GL11.GL_QUADS, vertexFormat);
 		
 		VertexConsumer vertexConsumer = sprite.getTextureSpecificVertexConsumer(builder);
 		

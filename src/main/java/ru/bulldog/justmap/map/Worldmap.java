@@ -30,6 +30,7 @@ import ru.bulldog.justmap.map.waypoint.Waypoint;
 import ru.bulldog.justmap.map.waypoint.WaypointKeeper;
 import ru.bulldog.justmap.map.waypoint.WaypointsList;
 import ru.bulldog.justmap.util.Colors;
+import ru.bulldog.justmap.util.DrawHelper;
 import ru.bulldog.justmap.util.TaskManager;
 import ru.bulldog.justmap.util.math.MathUtil;
 
@@ -152,13 +153,15 @@ public class Worldmap extends MapScreen implements IMap {
 		
 		PlayerEntity player = minecraft.player;
 		
+		int size = 12;
+		
 		int playerX = player.getBlockPos().getX();
 		int playerZ = player.getBlockPos().getZ();
-		double arrowX = MathUtil.screenPos(playerX, startX, endX, width) - shiftW;
-		double arrowY = MathUtil.screenPos(playerZ, startZ, endZ, height) - shiftH;
+		double arrowX = MathUtil.screenPos(playerX, startX, endX, width) - shiftW - size / 2;
+		double arrowY = MathUtil.screenPos(playerZ, startZ, endZ, height) - shiftH - size / 2;
 		
-		PlayerHeadIcon.getIcon(player).draw(arrowX, arrowY);
-		//DirectionArrow.draw(arrowX, arrowY, iconSize, player.headYaw);
+		DrawHelper.fill(arrowX - 0.5, arrowY - 0.5, arrowX + size + 0.5, arrowY + size + 0.5, 0xFFBBBBBB);
+		PlayerHeadIcon.getIcon(player).draw(arrowX, arrowY, size);
 	}
 	
 	@Override
