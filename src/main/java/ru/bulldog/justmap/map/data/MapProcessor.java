@@ -19,7 +19,7 @@ public class MapProcessor {
 		int posX = x + (chunkPos.x << 4);
 		int posZ = z + (chunkPos.z << 4);
 		
-		boolean plants = !ClientParams.ignorePlants;
+		boolean plants = !ClientParams.hidePlants;
 		
 		Layer layer = mapChunk.getLayer().value;
 		if ((layer.equals(Layer.Type.NETHER.value) || layer.equals(Layer.Type.CAVES.value)) && liquids) {
@@ -28,14 +28,14 @@ public class MapProcessor {
 			for (int i = floor + (layer.height - 1); i >= floor; i--) {
 				BlockPos worldPos = loopPos(worldChunk, new BlockPos(posX, i, posZ), 0, liquids, plants);
 				BlockPos overPos = new BlockPos(posX, worldPos.getY() + 1, posZ);
-				if (checkBlockState(worldChunk.getBlockState(overPos), liquids, plants)) {
+				if (StateUtil.checkState(worldChunk.getBlockState(overPos), liquids, plants)) {
 					return worldPos.getY();
 				}
 			}
 		} else {
 			BlockPos worldPos = loopPos(worldChunk, new BlockPos(posX, y, posZ), 0, liquids, plants);
 			BlockState overState = worldChunk.getBlockState(new BlockPos(posX, worldPos.getY() + 1, posZ));
-			if (checkBlockState(overState, liquids, plants)) {
+			if (StateUtil.checkState(overState, liquids, plants)) {
 				return worldPos.getY();
 			}
 		}
@@ -46,16 +46,12 @@ public class MapProcessor {
 	private static BlockPos loopPos(WorldChunk worldChunk, BlockPos pos, int stop, boolean liquids, boolean plants) {
 		boolean loop = false;		
 		do {
-			loop = checkBlockState(worldChunk.getBlockState(pos), liquids, plants);			
+			loop = StateUtil.checkState(worldChunk.getBlockState(pos), liquids, plants);			
 			loop &= pos.getY() > stop;
 			if (loop) pos = pos.down();
 		} while (loop);
 		
 		return pos;
-	}
-	
-	private static boolean checkBlockState(BlockState state, boolean liquids, boolean plants) {
-		return StateUtil.isAir(state) || (!liquids && StateUtil.isUnderwater(state)) || (!plants && StateUtil.isPlant(state));
 	}
 	
 	private static int checkLiquids(MapChunk mapChunk, int x, int y, int z) {

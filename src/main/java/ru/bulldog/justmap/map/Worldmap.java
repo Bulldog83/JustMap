@@ -20,7 +20,6 @@ import net.minecraft.util.math.Direction;
 
 import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.client.MapScreen;
-import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.client.config.ConfigFactory;
 import ru.bulldog.justmap.client.render.MapTexture;
 import ru.bulldog.justmap.map.data.Layer;
@@ -32,7 +31,6 @@ import ru.bulldog.justmap.map.waypoint.Waypoint;
 import ru.bulldog.justmap.map.waypoint.WaypointKeeper;
 import ru.bulldog.justmap.map.waypoint.WaypointsList;
 import ru.bulldog.justmap.util.Colors;
-import ru.bulldog.justmap.util.DrawHelper;
 import ru.bulldog.justmap.util.TaskManager;
 import ru.bulldog.justmap.util.math.MathUtil;
 
@@ -142,7 +140,9 @@ public class Worldmap extends MapScreen implements IMap {
 		
 		this.drawMap();
 		
-		int iconSize = MathUtil.clamp((int) (10 / imageScale), 8, 12);
+		int iconSize = (int) (12 / imageScale);
+		iconSize = iconSize % 2 != 0 ? iconSize + 1 : iconSize;
+		iconSize = MathUtil.clamp(iconSize, 8, 12);
 		for (WaypointIcon icon : waypoints) {
 			if (!icon.isHidden()) {
 				icon.setPosition(
@@ -155,15 +155,12 @@ public class Worldmap extends MapScreen implements IMap {
 		
 		PlayerEntity player = minecraft.player;
 		
-		int playerX = player.getBlockPos().getX();
-		int playerZ = player.getBlockPos().getZ();
+		double playerX = player.getX();
+		double playerZ = player.getZ();
 		double arrowX = MathUtil.screenPos(playerX, startX, endX, width) - shiftW - iconSize / 2;
 		double arrowY = MathUtil.screenPos(playerZ, startZ, endZ, height) - shiftH - iconSize / 2;
 		
-		if (!ClientParams.showIconsOutline) {
-			DrawHelper.fill(arrowX - 0.5, arrowY - 0.5, arrowX + iconSize + 0.5, arrowY + iconSize + 0.5, Colors.LIGHT_GRAY);
-		}
-		PlayerHeadIcon.getIcon(player).draw(arrowX, arrowY, iconSize);
+		PlayerHeadIcon.getIcon(player).draw(arrowX, arrowY, iconSize, true);
 	}
 	
 	@Override

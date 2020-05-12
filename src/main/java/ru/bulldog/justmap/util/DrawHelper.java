@@ -173,7 +173,18 @@ public class DrawHelper extends DrawableHelper {
 	public static void draw(double x, double y, float w, float h) {
 		MatrixStack matrix = new MatrixStack();		
 		builder.begin(GL11.GL_QUADS, vertexFormat);		
-		draw(matrix, builder, x, y, w, h);
+		draw(matrix, builder, x, y, w, h, 0.0F, 0.0F, 1.0F, 1.0F);
+		tessellator.draw();		
+	}
+	
+	public static void draw(double x, double y, float w, float h, float su, float sv) {
+		float pw = su * w;
+		float ph = sv * h;
+		float minU = w / pw;
+		float minV = h / ph;
+		MatrixStack matrix = new MatrixStack();
+		builder.begin(GL11.GL_QUADS, vertexFormat);
+		draw(matrix, builder, x, y, w, h, minU, minV, 2 * minU, 2 * minV);
 		tessellator.draw();		
 	}
 	
@@ -188,11 +199,11 @@ public class DrawHelper extends DrawableHelper {
 		
 		VertexConsumer vertexConsumer = sprite.getTextureSpecificVertexConsumer(builder);
 		
-		draw(matrix, vertexConsumer, x, y, w, h);
+		draw(matrix, vertexConsumer, x, y, w, h, sprite.getMinU(), sprite.getMinV(), sprite.getMaxU(), sprite.getMaxV());
 		tessellator.draw();
 	}
 	
-	private static void draw(MatrixStack matrixStack, VertexConsumer vertexConsumer, double x, double y, float w, float h) {
+	private static void draw(MatrixStack matrixStack, VertexConsumer vertexConsumer, double x, double y, float w, float h, float minU, float minV, float maxU, float maxV) {
 		RenderSystem.enableBlend();
 		RenderSystem.enableAlphaTest();
 		RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
@@ -203,15 +214,23 @@ public class DrawHelper extends DrawableHelper {
 		Matrix4f m4f = matrixStack.peek().getModel();
 		Matrix3f m3f = matrixStack.peek().getNormal();
 		
-		addVertices(m4f, m3f, vertexConsumer, w, h);
+		addVertices(m4f, m3f, vertexConsumer, w, h, minU, minV, maxU, maxV);
 		
 		matrixStack.pop();
 	}
 	
-	private static void addVertices(Matrix4f m4f, Matrix3f m3f, VertexConsumer vertexConsumer, float w, float h) {
-		vertexConsumer.vertex(m4f, 0, 0, 0.0F).texture(0.0F, 0.0F).normal(m3f, 0.0F, 1.0F, 0.0F).next();
-		vertexConsumer.vertex(m4f, 0, h, 0.0F).texture(0.0F, 1.0F).normal(m3f, 0.0F, 1.0F, 0.0F).next();
-		vertexConsumer.vertex(m4f, w, h, 0.0F).texture(1.0F, 1.0F).normal(m3f, 0.0F, 1.0F, 0.0F).next();
-		vertexConsumer.vertex(m4f, w, 0, 0.0F).texture(1.0F, 0.0F).normal(m3f, 0.0F, 1.0F, 0.0F).next();
+	private static void addVertices(Matrix4f m4f, Matrix3f m3f, VertexConsumer vertexConsumer, float w, float h, float minU, float minV, float maxU, float maxV) {
+		addVertices(m4f, m3f, vertexConsumer, 0, w, 0, h, minU, minV, maxU, maxV);
+	}
+	
+	private static void addVertices(Matrix4f m4f, Matrix3f m3f, VertexConsumer vertexConsumer, float minX, float maxX, float minY, float maxY, float minU, float minV, float maxU, float maxV) {
+		addVertex(m4f, m3f, vertexConsumer, minX, minY, 0.0F, minU, minV);
+		addVertex(m4f, m3f, vertexConsumer, minX, maxY, 0.0F, minU, maxV);
+		addVertex(m4f, m3f, vertexConsumer, maxX, maxY, 0.0F, maxU, maxV);
+		addVertex(m4f, m3f, vertexConsumer, maxX, minY, 0.0F, maxU, minV);
+	}
+	
+	private static void addVertex(Matrix4f m4f, Matrix3f m3f, VertexConsumer vertexConsumer, float x, float y, float z, float u, float v) {
+		vertexConsumer.vertex(m4f, x, y, z).texture(u, v).normal(m3f, 0.0F, 1.0F, 0.0F).next();
 	}
 }

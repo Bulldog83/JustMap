@@ -32,7 +32,8 @@ public class MapChunk {
 	private Layer.Type layer;
 	private int dimension;
 	private int level = 0;
-	
+	private boolean hideWater = false;
+	private boolean waterTint = true;
 	private boolean saved = true;
 	private boolean purged = false;
 	
@@ -160,10 +161,11 @@ public class MapChunk {
 	public void updateHeighmap() {
 		if (!this.updateWorldChunk()) return;
 		
+		boolean skipWater = !(ClientParams.hideWater || ClientParams.waterTint);
 		for (int x = 0; x < 16; x++) {
 			for (int z = 0; z < 16; z++) {
 				int y = worldChunk.sampleHeightmap(Heightmap.Type.WORLD_SURFACE, x, z);
-				y = MapProcessor.getTopBlockY(this, x, y + 1, z, true);
+				y = MapProcessor.getTopBlockY(this, x, y + 1, z, skipWater);
 				
 				int index = x + (z << 4);
 				ChunkLevel chunkLevel = getChunkLevel();
@@ -212,6 +214,16 @@ public class MapChunk {
 			chunkLevel.updated = currentTime;
 		}
 		
+		boolean needUpdate = false;
+		if (ClientParams.hideWater != hideWater) {
+			this.hideWater = ClientParams.hideWater;
+			needUpdate = true;
+		}
+		if (ClientParams.waterTint != waterTint) {
+			this.waterTint = ClientParams.waterTint;
+			needUpdate = true;
+		}
+		
 		for (int x = 0; x < 16; x++) {
 			for (int z = 0; z < 16; z++) {
 				int index = x + (z << 4);
@@ -225,7 +237,7 @@ public class MapChunk {
 				BlockPos blockPos = new BlockPos(posX, posY, posZ);
 				BlockState blockState = this.getBlockState(blockPos);
 				BlockState worldState = worldChunk.getBlockState(blockPos);
-				if(StateUtil.isAir(blockState) || !blockState.equals(worldState)) {
+				if(StateUtil.isAir(blockState) || !blockState.equals(worldState) || needUpdate) {
 					int color = ColorUtil.blockColor(worldChunk, blockPos);
 					if (color != -1) {
 						int heightDiff = MapProcessor.heightDifference(this, eastChunk, southChunk, x, posY, z);

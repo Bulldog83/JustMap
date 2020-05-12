@@ -170,7 +170,7 @@ public class Minimap implements IMap{
 	}
 	
 	private boolean needRenderCaves(World world, BlockPos playerPos) {
-		boolean allowCaves = isAllowed(ClientParams.showCaves, MapGameRules.ALLOW_CAVES_MAP);
+		boolean allowCaves = isAllowed(ClientParams.drawCaves, MapGameRules.ALLOW_CAVES_MAP);
 		
 		DimensionType dimType = world.getDimension().getType();
 		if (dimType.hasSkyLight()) {

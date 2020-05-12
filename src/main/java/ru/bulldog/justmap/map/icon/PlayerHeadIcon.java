@@ -57,15 +57,15 @@ public class PlayerHeadIcon {
 	
 	public void draw(double x, double y) {
 		int size = ClientParams.entityIconSize;
-		this.draw(x, y, size);
+		this.draw(x, y, size, false);
 	}
 	
-	public void draw(double x, double y, int size) {		
-		if (ClientParams.showIconsOutline) {
+	public void draw(double x, double y, int size, boolean outline) {		
+		if (outline || ClientParams.showIconsOutline) {
 			DrawHelper.fill(x - 0.5, y - 0.5, x + size + 0.5, y + size + 0.5, Colors.LIGHT_GRAY);
 		}
 		textureManager.bindTexture(this.skin);		
-		DrawHelper.blit((int) x, (int) y, size, size, size, size, size * 8, size * 8);
+		DrawHelper.draw(x, y, size, size, 8, 8);
 	}
 	
 	private static void updatePlayerSkin(PlayerHeadIcon icon) {

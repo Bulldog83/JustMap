@@ -246,7 +246,7 @@ public class MapRenderer {
 		
 		this.drawMap();
 
-		if (ClientParams.drawChunkGrid) {
+		if (ClientParams.showGrid) {
 			this.drawChunkGrid();
 		}
 		if (Minimap.allowEntityRadar()) {

@@ -9,15 +9,22 @@ public class ClientParams {
 	public static int mapSize = 128;
 	public static float mapScale = 1.0F;
 	public static boolean mapVisible = true;
-	public static boolean showCaves = true;
-	public static boolean ignorePlants = false;
 	public static boolean moveEffects = true;
 	public static boolean showEffectTimers = true;
 	public static boolean rotateMap = false;
+	public static boolean showInChat = false;
+
+	public static boolean drawCaves = true;
+	public static boolean hidePlants = false;
+	public static boolean hideWater = false;
+	public static boolean showGrid = false;
+	public static boolean showTerrain = true;
+	public static int terrainStrength = 4;
 
 	public static boolean useSkins = true;
 	public static int currentSkin = 0;
 	public static boolean alternateColorRender = true;
+	public static boolean waterTint = true;
 	public static int mapSaturation = 0;
 	public static int mapBrightness = 0;
 	public static boolean simpleArrow = false;
@@ -52,9 +59,4 @@ public class ClientParams {
 	public static boolean renderAnimation = true;
 	public static int minRenderDist = 1;
 	public static int maxRenderDist = 1000;
-	
-	public static boolean showTerrain = true;
-	public static int terrainStrength = 4;
-	public static boolean drawChunkGrid = false;
-	public static boolean showInChat = false;
 }
