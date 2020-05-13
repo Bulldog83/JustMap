@@ -404,8 +404,8 @@ public class Worldmap extends MapScreen implements IMap {
 	
 	private BlockPos cursorBlockPos(double x, double y) {
 		
-		int posX = pixelToPos(x, centerPos.getX(), width, scaledWidth);
-		int posZ = pixelToPos(y, centerPos.getZ(), height, scaledHeight);
+		int posX = this.pixelToPos(x, centerPos.getX(), width, scaledWidth);
+		int posZ = this.pixelToPos(y, centerPos.getZ(), height, scaledHeight);
 		
 		int chunkX = posX >> 4;
 		int chunkZ = posZ >> 4;
@@ -471,7 +471,7 @@ public class Worldmap extends MapScreen implements IMap {
 	
 	@Override
 	public boolean mouseScrolled(double d, double e, double f) {
-		changeScale(f > 0 ? -0.25F : 0.25F);
+		this.changeScale(f > 0 ? -0.25F : 0.25F);
 		return true;
 	}
 
