@@ -204,7 +204,7 @@ public class Minimap implements AbstractMap{
 		double startX = pos.getX() - scaled / 2;
 		double startZ = pos.getZ() - scaled / 2;
 
-		if (world.dimension.isNether()) {
+		if (player.dimension.equals(DimensionType.THE_NETHER)) {
 			MapCache.setCurrentLayer(Type.NETHER.value, pos.getY());
 		} else if (needRenderCaves(world, player.getBlockPos())) {
 			MapCache.setCurrentLayer(Type.CAVES.value, pos.getY());
@@ -278,7 +278,7 @@ public class Minimap implements AbstractMap{
 		}
 		
 		waypoints.clear();
-		List<Waypoint> wps = WaypointKeeper.getInstance().getWaypoints(world.dimension.getType().getRawId(), true);
+		List<Waypoint> wps = WaypointKeeper.getInstance().getWaypoints(player.dimension.getRawId(), true);
 		if (wps != null) {
 			Stream<Waypoint> stream = wps.stream().filter(wp -> MathUtil.getDistance(pos, wp.pos, false) <= wp.showRange);
 			for (Waypoint wp : stream.toArray(Waypoint[]::new)) {
@@ -308,7 +308,7 @@ public class Minimap implements AbstractMap{
 	
 	public void createWaypoint() {
 		PlayerEntity player = minecraftClient.player;
-		createWaypoint(player.world.dimension.getType().getRawId(), player.getBlockPos());
+		createWaypoint(player.dimension.getRawId(), player.getBlockPos());
 	}
 	
 	public NativeImage getImage() {

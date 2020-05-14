@@ -66,7 +66,7 @@ public class MapCache {
 	private static MapCache getDimensionData(World world) {		
 		if (world == null) return null;
 		
-		int dimId = world.dimension.getType().getRawId();
+		int dimId = world.getDimension().getType().getRawId();
 		if (dimensions.containsKey(dimId)) {
 			return dimensions.get(dimId);
 		}

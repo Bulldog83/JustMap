@@ -45,7 +45,7 @@ public class WaypointRenderer {
 				return;
 			}
 		
-			List<Waypoint> wayPoints = WaypointKeeper.getInstance().getWaypoints(client.world.dimension.getType().getRawId(), true);
+			List<Waypoint> wayPoints = WaypointKeeper.getInstance().getWaypoints(client.player.dimension.getRawId(), true);
 			for (Waypoint wp : wayPoints) {
 				int dist = (int) MathUtil.getDistance(wp.pos, client.player.getBlockPos(), false);
 				if (wp.tracking && dist < wp.showRange) {
@@ -103,7 +103,7 @@ public class WaypointRenderer {
 			
 			BlockPos playerPos = client.player.getBlockPos();
 			
-			List<Waypoint> wayPoints = WaypointKeeper.getInstance().getWaypoints(client.world.dimension.getType().getRawId(), true);			
+			List<Waypoint> wayPoints = WaypointKeeper.getInstance().getWaypoints(client.player.dimension.getRawId(), true);			
 			for (Waypoint wp : wayPoints) {
 				int dist = (int) MathUtil.getDistance(wp.pos, playerPos, false);
 				if (wp.render && dist > ClientParams.minRenderDist && dist < ClientParams.maxRenderDist) {

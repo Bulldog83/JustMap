@@ -24,7 +24,7 @@ public class TitledWidget<W extends AbstractButtonWidget> extends AbstractButton
 	}
 	
 	private void update() {
-		int titleWidth = font.getStringWidth(title);
+		int titleWidth = font.getWidth(title);
 		int widgetWidth = widget.getWidth();
 		int wx = x + width - widgetWidth;
 		if (x + titleWidth + spacing > wx) {

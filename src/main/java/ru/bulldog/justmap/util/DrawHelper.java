@@ -40,13 +40,13 @@ public class DrawHelper extends DrawableHelper {
 	}
 	
 	public static void drawRightAlignedString(MatrixStack matrixStack, TextRenderer textRenderer, Text text, int i, int j, int k) {
-		textRenderer.drawWithShadow(matrixStack, text.getString(), (float)(i - textRenderer.getStringWidth(text)), (float)j, k);
+		textRenderer.drawWithShadow(matrixStack, text.getString(), (float)(i - textRenderer.getWidth(text)), (float)j, k);
 	}
 
 	public static void drawBoundedString(MatrixStack matrixStack, TextRenderer textRenderer, Text text, int x, int y, int leftBound, int rightBound, int color) {
 		if (text == null) return;
 		
-		int stringWidth = textRenderer.getStringWidth(text);
+		int stringWidth = textRenderer.getWidth(text);
 		int drawX = x - stringWidth / 2;
 		if (drawX < leftBound) {
 			drawX = leftBound;
