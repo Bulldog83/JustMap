@@ -84,6 +84,7 @@
   "justmap.gui.create": "创建",
   "justmap.gui.name": "名字",
   "justmap.gui.chat": "聊天",
+  "justmap.gui.teleport": "Jump",
   "justmap.gui.wp_hidden": "隐藏",
   "justmap.gui.wp_tracking": "屏幕边缘",
   "justmap.gui.wp_render": "在游戏里"

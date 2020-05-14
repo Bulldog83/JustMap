@@ -84,6 +84,7 @@
   "justmap.gui.create": "Create",
   "justmap.gui.name": "Name",
   "justmap.gui.chat": "Chat",
+  "justmap.gui.teleport": "Jump",
   "justmap.gui.wp_hidden": "Hidden",
   "justmap.gui.wp_tracking": "Screen Edge",
   "justmap.gui.wp_render": "In World"

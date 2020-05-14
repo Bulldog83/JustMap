@@ -84,6 +84,7 @@
   "justmap.gui.create": "Создать",
   "justmap.gui.name": "Имя",
   "justmap.gui.chat": "Чат",
+  "justmap.gui.teleport": "Скачек",
   "justmap.gui.wp_hidden": "Скрыть",
   "justmap.gui.wp_tracking": "Отслеживать",
   "justmap.gui.wp_render": "Отображать в мире"

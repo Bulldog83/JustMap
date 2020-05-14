@@ -279,9 +279,9 @@ public class MapRenderer {
 		RenderSystem.enableDepthTest();
 	}
 	
-	private void drawMap() {		
-		double z = 0.09;		
-		float f1 = 0.0F, f2 = 1.0F;
+	private void drawMap() {
+		float f1 = 0.0F, f2 = 1.0F;		
+		double z = 0.09;
 
 		if (this.mapTexture == null || this.minimap.changed) {
 			this.prepareTexture();
