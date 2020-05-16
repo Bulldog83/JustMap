@@ -285,9 +285,8 @@ public class MapRenderer {
 	private void drawMap() {		
 		Tessellator tessellator = Tessellator.getInstance();
 		BufferBuilder builder = tessellator.getBuffer();
-		builder.begin(7, VertexFormats.POSITION_TEXTURE);
 		
-		double z = 0.09;
+		double z = 1.0;
 		
 		client.getTextureManager().bindTexture(mapTexture);
 		
@@ -305,6 +304,7 @@ public class MapRenderer {
 		}
 		
 		RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);		
+		builder.begin(GL11.GL_QUADS, VertexFormats.POSITION_TEXTURE);
 		builder.vertex(mapX, mapY, z).texture(f1, f1).next();
 		builder.vertex(mapX, mapY + mapH, z).texture(f1, f2).next();
 		builder.vertex(mapX + mapW, mapY + mapH, z).texture(f2, f2).next();
