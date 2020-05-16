@@ -142,26 +142,4 @@ public class MapTexture extends BufferedImage {
 			this.buffer.position(0).limit(bytes.length);
 		}
 	}
-
-	public void offsetX(int offset) {
-    	Object lock = this.bufferLock;
-        synchronized (lock) {
-        	if (offset > 0) {
-            	System.arraycopy(this.bytes, offset * 4, this.bytes, 0, this.bytes.length - offset * 4);
-            } else if (offset < 0) {
-            	System.arraycopy(this.bytes, 0, this.bytes, -offset * 4, this.bytes.length + offset * 4);
-            }
-        }
-    }
-
-    public void offsetY(int offset) {
-    	Object lock = this.bufferLock;
-        synchronized (lock) {
-        	if (offset > 0) {
-            	System.arraycopy(this.bytes, offset * this.getWidth() * 4, this.bytes, 0, this.bytes.length - offset * this.getWidth() * 4);
-            } else if (offset < 0) {
-            	System.arraycopy(this.bytes, 0, this.bytes, -offset * this.getWidth() * 4, this.bytes.length + offset * this.getWidth() * 4);
-            }
-        }
-    }
 }

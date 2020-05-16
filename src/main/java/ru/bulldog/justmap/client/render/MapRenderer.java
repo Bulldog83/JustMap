@@ -17,6 +17,7 @@ import ru.bulldog.justmap.map.minimap.MapText;
 import ru.bulldog.justmap.map.minimap.Minimap;
 import ru.bulldog.justmap.map.minimap.TextManager;
 import ru.bulldog.justmap.util.DrawHelper.TextAlignment;
+import ru.bulldog.justmap.util.PosUtil;
 import ru.bulldog.justmap.util.math.Line;
 import ru.bulldog.justmap.util.math.Line.Point;
 import ru.bulldog.justmap.util.math.MathUtil;
@@ -41,7 +42,9 @@ public class MapRenderer {
 	private int posX, posY;
 	private int mapX, mapY;
 	private int mapW, mapH;
-	private float rotation;
+	private float rotation;	
+	private double lastPlayerX;
+	private double lastPlayerZ;
 
 	private final Minimap minimap;
 	
@@ -212,6 +215,8 @@ public class MapRenderer {
 		}		
 		if (minimap.changed) {
 			this.mapTexture.copyImage(minimap.getImage());
+			this.lastPlayerX = PosUtil.doubleCoordX();
+			this.lastPlayerZ = PosUtil.doubleCoordZ();
 			this.minimap.changed = false;
 		}
 		this.mapTexture.upload();
@@ -244,6 +249,13 @@ public class MapRenderer {
 		GL11.glEnable(GL11.GL_SCISSOR_TEST);
 		GL11.glScissor(scaledX, scaledY, scaledW, scaledH);
 		
+		float mult = 1 / minimap.getScale();		
+		float offX = (float) (PosUtil.doubleCoordX() - this.lastPlayerX) * mult;
+		float offZ = (float) (PosUtil.doubleCoordZ() - this.lastPlayerZ) * mult;
+		
+		RenderSystem.pushMatrix();
+		RenderSystem.translatef(-offX, -offZ, 0.0F);
+		
 		this.drawMap();
 
 		if (ClientParams.showGrid) {
@@ -267,12 +279,13 @@ public class MapRenderer {
 			}
 		}
 		
+		RenderSystem.popMatrix();
+		GL11.glDisable(GL11.GL_SCISSOR_TEST);
+		
 		int arrowX = mapX + mapW / 2;
 		int arrowY = mapY + mapH / 2;
 		
 		DirectionArrow.draw(arrowX, arrowY, ClientParams.rotateMap ? 180 : rotation);
-		
-		GL11.glDisable(GL11.GL_SCISSOR_TEST);
 		
 		this.textManager.draw();
 		
@@ -280,9 +293,6 @@ public class MapRenderer {
 	}
 	
 	private void drawMap() {
-		float f1 = 0.0F, f2 = 1.0F;		
-		double z = 0.09;
-
 		if (this.mapTexture == null || this.minimap.changed) {
 			this.prepareTexture();
 		} else {
@@ -291,6 +301,7 @@ public class MapRenderer {
 		RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_NEAREST_MIPMAP_LINEAR);
 		RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST);
 		
+		float f1 = 0.0F, f2 = 1.0F;
 		if (ClientParams.rotateMap) {
 			f1 = 0.15F;
 			f2 = 0.85F;
@@ -304,14 +315,14 @@ public class MapRenderer {
 		}
 		
 		this.builder.begin(GL11.GL_QUADS, VertexFormats.POSITION_TEXTURE);		
-		this.builder.vertex(mapX, mapY, z).texture(f1, f1).next();
-		this.builder.vertex(mapX, mapY + mapH, z).texture(f1, f2).next();
-		this.builder.vertex(mapX + mapW, mapY + mapH, z).texture(f2, f2).next();
-		this.builder.vertex(mapX + mapW, mapY, z).texture(f2, f1).next();
+		this.builder.vertex(mapX - 4, mapY - 4, 1.0).texture(f1, f1).next();
+		this.builder.vertex(mapX - 4, mapY + mapH + 4, 1.0).texture(f1, f2).next();
+		this.builder.vertex(mapX + mapW + 4, mapY + mapH + 4, 1.0).texture(f2, f2).next();
+		this.builder.vertex(mapX + mapW + 4, mapY - 4, 1.0).texture(f2, f1).next();
 		
 		this.tessellator.draw();
 		
-		if (ClientParams.rotateMap) {		
+		if (ClientParams.rotateMap) {
 			RenderSystem.popMatrix();
 			RenderSystem.matrixMode(GL11.GL_MODELVIEW);
 		}

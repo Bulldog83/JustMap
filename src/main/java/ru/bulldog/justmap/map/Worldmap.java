@@ -31,6 +31,7 @@ import ru.bulldog.justmap.map.waypoint.Waypoint;
 import ru.bulldog.justmap.map.waypoint.WaypointKeeper;
 import ru.bulldog.justmap.map.waypoint.WaypointsList;
 import ru.bulldog.justmap.util.Colors;
+import ru.bulldog.justmap.util.PosUtil;
 import ru.bulldog.justmap.util.TaskManager;
 import ru.bulldog.justmap.util.math.MathUtil;
 
@@ -100,15 +101,15 @@ public class Worldmap extends MapScreen implements IMap {
 		int currentDim = player.dimension.getRawId();
 		if (centerPos == null || currentDim != dimension) {
 			this.dimension = currentDim;
-			this.centerPos = minecraft.player.getBlockPos();
+			this.centerPos = PosUtil.currentPos();
 			if (mapImage != null) {
 				this.updateMapTexture();
 			}
 		} else if (playerTracking) {
-			this.centerPos = minecraft.player.getBlockPos();
+			this.centerPos = PosUtil.currentPos();
 		}
 		
-		this.cursorCoords = MathUtil.posToString(centerPos);
+		this.cursorCoords = PosUtil.posToString(centerPos);
 		
 		waypoints.clear();
 		List<Waypoint> wps = WaypointKeeper.getInstance().getWaypoints(dimension, true);
@@ -279,7 +280,7 @@ public class Worldmap extends MapScreen implements IMap {
 	
 	public void setCenterByPlayer() {
 		this.playerTracking = true;
-		this.centerPos = minecraft.player.getBlockPos();  		
+		this.centerPos = PosUtil.currentPos();  		
 		this.processor.execute(this::updateMapTexture);
 	}
 	
@@ -428,7 +429,7 @@ public class Worldmap extends MapScreen implements IMap {
 	
 	@Override
 	public void mouseMoved(double d, double e) {		
-		this.cursorCoords = MathUtil.posToString(cursorBlockPos(d, e));
+		this.cursorCoords = PosUtil.posToString(cursorBlockPos(d, e));
 	}
 	
 	private int clicks = 0;

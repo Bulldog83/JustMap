@@ -14,6 +14,7 @@ import ru.bulldog.justmap.map.waypoint.WaypointEditor;
 import ru.bulldog.justmap.map.waypoint.WaypointKeeper;
 import ru.bulldog.justmap.util.Colors;
 import ru.bulldog.justmap.util.DrawHelper.TextAlignment;
+import ru.bulldog.justmap.util.PosUtil;
 import ru.bulldog.justmap.util.math.MathUtil;
 import ru.bulldog.justmap.util.math.RandomUtil;
 
@@ -51,6 +52,8 @@ public class Minimap implements IMap{
 	private int mapHeight;
 	private float mapScale;
 	private int picSize;
+	private int lastCenterX = 0;
+	private int lastCenterZ = 0;
 	
 	private Biome currentBiome;	
 	private MapTexture image;
@@ -133,7 +136,7 @@ public class Minimap implements IMap{
 		
 		if (ClientParams.showPosition) {
 			Entity camera = minecraftClient.cameraEntity;
-			txtCoords.setText(MathUtil.posToString(camera.getX(), camera.getY(), camera.getZ()));
+			txtCoords.setText(PosUtil.posToString(camera.getX(), camera.getY(), camera.getZ()));
 			textManager.add(txtCoords);
 		}		
 		if (ClientParams.showBiome) {
@@ -202,30 +205,35 @@ public class Minimap implements IMap{
 	
 	public void prepareMap(PlayerEntity player) {
 		World world = player.world;
-		BlockPos pos = player.getBlockPos();
+		BlockPos pos = PosUtil.currentPos();
 		
 		currentBiome = world.getBiome(pos);
 		
-		int centerX = pos.getX();
-		int centerZ = pos.getZ();
+		int posX = pos.getX();
+		int posZ = pos.getZ();
+		int posY = pos.getY();
 		int scaled = this.getScaledSize();
-		double startX = centerX - scaled / 2;
-		double startZ = centerZ - scaled / 2;
+		double startX = posX - scaled / 2;
+		double startZ = posZ - scaled / 2;
 
 		if (world.dimension.isNether()) {
-			MapCache.setCurrentLayer(Type.NETHER, pos.getY());
-		} else if (needRenderCaves(world, player.getBlockPos())) {
-			MapCache.setCurrentLayer(Type.CAVES, pos.getY());
+			MapCache.setCurrentLayer(Type.NETHER, posY);
+		} else if (needRenderCaves(world, pos)) {
+			MapCache.setCurrentLayer(Type.CAVES, posY);
 		} else {
-			MapCache.setCurrentLayer(Type.SURFACE, pos.getY());
+			MapCache.setCurrentLayer(Type.SURFACE, posY);
 		}
 		
-		MapCache.get().update(this, scaled, centerX, centerZ);
+		if (changed || lastCenterX != posX || lastCenterZ != posZ) { 
+			MapCache.get().update(this, scaled, posX, posZ);
+			this.lastCenterX = posX;
+			this.lastCenterZ = posZ;
+		}
 		
 		if (ClientParams.rotateMap) {
 			scaled = (int) (mapWidth * mapScale);
-			startX = centerX - scaled / 2;
-			startZ = centerZ - scaled / 2;
+			startX = posX - scaled / 2;
+			startZ = posZ - scaled / 2;
 		}		
 		
 		double endX = startX + scaled;
@@ -257,8 +265,8 @@ public class Minimap implements IMap{
 			entities.clear();
 			
 			int checkHeight = 24;
-			BlockPos start = new BlockPos(startX, player.getY() - checkHeight / 2, startZ);
-			BlockPos end = new BlockPos(endX, player.getY() + checkHeight / 2, endZ);
+			BlockPos start = new BlockPos(startX, posY - checkHeight / 2, startZ);
+			BlockPos end = new BlockPos(endX, posY + checkHeight / 2, endZ);
 			List<Entity> entities = world.getEntities((Entity) null, new Box(start, end));
 		
 			int amount = 0;
@@ -331,7 +339,7 @@ public class Minimap implements IMap{
 	
 	public int getScaledSize() {
 		this.picSize = ClientParams.rotateMap ? (int) (mapWidth * 1.3) : mapWidth;
-		return (int) (picSize * mapScale);
+		return (int) (picSize * mapScale) + 8;
 	}
 	
 	public float getScale() {

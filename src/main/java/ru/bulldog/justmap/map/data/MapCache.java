@@ -131,20 +131,21 @@ public class MapCache {
 		});
 	}
 	
-	public void updateMap(Minimap map, int size, int centerX, int centerZ) {
+	public void updateMap(Minimap map, int size, int currentX, int currentZ) {
 		this.updatePerCycle = ClientParams.updatePerCycle;
 		this.purgeDelay = ClientParams.purgeDelay * 1000;
 		this.purgeAmount = ClientParams.purgeAmount;
 		
-		int left = centerX - size / 2;
-		int top = centerZ - size / 2;
+		int left = currentX - size / 2;
+		int top = currentZ - size / 2;
 		
 		MapTexture mapImage = map.getImage();
 		
-		int chunks = (size >> 4) + 4;
-		
-		int startX = (left >> 4) - 2;
-		int startZ = (top >> 4) - 2;
+		int centerX = currentX >> 4;
+		int centerZ = currentZ >> 4;
+		int chunks = (int) Math.ceil(size / 16.0) + 2;
+		int startX = centerX - chunks / 2;
+		int startZ = centerZ - chunks / 2;
 		int endX = startX + chunks;
 		int endZ = startZ + chunks;
 
