@@ -2,4 +2,4 @@
 
 A minimap mod for Minecraft with Fabric launcher.
 
-CurceForge Page: https://www.curseforge.com/minecraft/mc-mods/just-map
+Page on CurceForge: https://www.curseforge.com/minecraft/mc-mods/just-map
