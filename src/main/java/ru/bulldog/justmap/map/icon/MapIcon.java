@@ -25,13 +25,12 @@ public abstract class MapIcon<T extends MapIcon<T>> {
 	}
 	
 	protected void rotatePos(IconPos pos, int mapW, int mapH, int mapX, int mapY, float rotation) {
-		double centerX = mapX + mapW / 2;
-		double centerY = mapY + mapH / 2;
+		double centerX = mapX + mapW / 2.0;
+		double centerY = mapY + mapH / 2.0;
 		
 		rotation = MathUtil.correctAngle(rotation) + 180;
 		
-		double angle = Math.toRadians(-rotation);
-		
+		double angle = Math.toRadians(-rotation);		
 		double posX = centerX + (pos.x - centerX) * Math.cos(angle) - (pos.y - centerY) * Math.sin(angle);
 		double posY = centerY + (pos.y - centerY) * Math.cos(angle) + (pos.x - centerX) * Math.sin(angle);
 		

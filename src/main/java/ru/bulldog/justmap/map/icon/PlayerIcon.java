@@ -25,10 +25,6 @@ public class PlayerIcon extends MapIcon<PlayerIcon> {
 		
 		IconPos pos = new IconPos(mapX + x, mapY + y);
 		
-		if (ClientParams.rotateMap) {
-			this.rotatePos(pos, map.getWidth(), map.getHeight(), mapX, mapY, rotation);
-		}
-		
 		pos.x -= size / 2;
 		pos.y -= size / 2;
 		

@@ -50,10 +50,10 @@ public class Minimap implements IMap{
 	
 	private int mapWidth;
 	private int mapHeight;
+	private int scaledSize;
 	private float mapScale;
-	private int picSize;
-	private int lastCenterX = 0;
-	private int lastCenterZ = 0;
+	private int lastPosX = 0;
+	private int lastPosZ = 0;
 	
 	private Biome currentBiome;	
 	private MapTexture image;
@@ -72,15 +72,8 @@ public class Minimap implements IMap{
 	private Object imageLocker = new Object();
 	
 	public Minimap() {
-		this.mapWidth = JustMapClient.CONFIG.getInt("map_size");
-		this.mapHeight = JustMapClient.CONFIG.getInt("map_size");
-		this.mapScale = JustMapClient.CONFIG.getFloat("map_scale");		
-		this.picSize = ClientParams.rotateMap ? (int) (mapWidth * 1.3) : mapWidth;
 		this.textManager = new TextManager(this);
-		
-		isMapVisible = JustMapClient.CONFIG.getBoolean("map_visible");
-		
-		this.renewMap();
+		this.updateMapParams();
 	}
 	
 	public void update() {
@@ -113,7 +106,7 @@ public class Minimap implements IMap{
 		this.changed = true;
 	}
 	
-	public void onConfigChanges() {
+	public void updateMapParams() {
 		int configSize = JustMapClient.CONFIG.getInt("map_size");
 		float configScale = JustMapClient.CONFIG.getFloat("map_scale");		
 		boolean needRotate = JustMapClient.CONFIG.getBoolean("rotate_map");
@@ -124,6 +117,11 @@ public class Minimap implements IMap{
 			this.mapScale = configScale;
 			
 			rotateMap = needRotate;
+			if (rotateMap) {
+				this.scaledSize = (int) ((mapWidth * mapScale) * 1.42 + 8);
+			} else {
+				this.scaledSize = (int) ((mapWidth * mapScale) + 8);
+			}
 			
 			this.renewMap();
 		}
@@ -148,12 +146,12 @@ public class Minimap implements IMap{
 			textManager.add(txtFPS);
 		}		
 		if (ClientParams.showTime) {
-			txtTime.setText(getTimeString(minecraftClient.world.getTimeOfDay()));
+			txtTime.setText(this.timeString(minecraftClient.world.getTimeOfDay()));
 			textManager.add(txtTime);
 		}
 	}
 	
-	private String getTimeString(long time) {
+	private String timeString(long time) {
 		time = time > 24000 ? time % 24000 : time;
 	
 		int h = (int) time / 1000 + 6;
@@ -224,10 +222,10 @@ public class Minimap implements IMap{
 			MapCache.setCurrentLayer(Type.SURFACE, posY);
 		}
 		
-		if (changed || lastCenterX != posX || lastCenterZ != posZ) { 
+		if (changed || lastPosX != posX || lastPosZ != posZ) { 
 			MapCache.get().update(this, scaled, posX, posZ);
-			this.lastCenterX = posX;
-			this.lastCenterZ = posZ;
+			this.lastPosX = posX;
+			this.lastPosZ = posZ;
 		}
 		
 		if (ClientParams.rotateMap) {
@@ -301,7 +299,7 @@ public class Minimap implements IMap{
 				WaypointIcon waypoint = new WaypointIcon(this, wp);
 				waypoint.setPosition(
 					MathUtil.screenPos(wp.pos.getX(), startX, endX, mapWidth),
-					MathUtil.screenPos(wp.pos.getZ(), startZ, endZ, mapWidth)
+					MathUtil.screenPos(wp.pos.getZ(), startZ, endZ, mapHeight)
 				);
 				this.waypoints.add(waypoint);
 			}
@@ -333,13 +331,8 @@ public class Minimap implements IMap{
 		}		
 	}
 	
-	public int getPictureSize() {
-		return this.picSize;
-	}
-	
 	public int getScaledSize() {
-		this.picSize = ClientParams.rotateMap ? (int) (mapWidth * 1.3) : mapWidth;
-		return (int) (picSize * mapScale) + 8;
+		return this.scaledSize;
 	}
 	
 	public float getScale() {
@@ -365,6 +358,14 @@ public class Minimap implements IMap{
 		}
 		
 		return isMapVisible;
+	}
+	
+	public int getLasX() {
+		return this.lastPosX;
+	}
+	
+	public int getLastZ() {
+		return this.lastPosZ;
 	}
 
 	@Override

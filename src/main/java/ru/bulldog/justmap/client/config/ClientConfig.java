@@ -86,6 +86,6 @@ public class ClientConfig extends Config{
 	@Override
 	public void saveChanges()  {
 		ConfigWriter.save(KEEPER.toJson());
-		JustMapClient.MAP.onConfigChanges();
+		JustMapClient.MAP.updateMapParams();
 	}
 }

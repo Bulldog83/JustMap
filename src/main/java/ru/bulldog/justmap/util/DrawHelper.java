@@ -188,9 +188,7 @@ public class DrawHelper extends DrawableHelper {
 		tessellator.draw();		
 	}
 	
-	public static void drawSprite(Sprite sprite, double x, double y, float w, float h) {
-		MatrixStack matrix = new MatrixStack();
-		
+	public static void drawSprite(MatrixStack matrix, Sprite sprite, double x, double y, float w, float h) {
 		RenderSystem.enableBlend();
 		RenderSystem.enableAlphaTest();		
 		RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
@@ -224,10 +222,10 @@ public class DrawHelper extends DrawableHelper {
 	}
 	
 	private static void addVertices(Matrix4f m4f, Matrix3f m3f, VertexConsumer vertexConsumer, float minX, float maxX, float minY, float maxY, float minU, float minV, float maxU, float maxV) {
-		addVertex(m4f, m3f, vertexConsumer, minX, minY, 0.0F, minU, minV);
-		addVertex(m4f, m3f, vertexConsumer, minX, maxY, 0.0F, minU, maxV);
-		addVertex(m4f, m3f, vertexConsumer, maxX, maxY, 0.0F, maxU, maxV);
-		addVertex(m4f, m3f, vertexConsumer, maxX, minY, 0.0F, maxU, minV);
+		addVertex(m4f, m3f, vertexConsumer, minX, minY, 1.0F, minU, minV);
+		addVertex(m4f, m3f, vertexConsumer, minX, maxY, 1.0F, minU, maxV);
+		addVertex(m4f, m3f, vertexConsumer, maxX, maxY, 1.0F, maxU, maxV);
+		addVertex(m4f, m3f, vertexConsumer, maxX, minY, 1.0F, maxU, minV);
 	}
 	
 	private static void addVertex(Matrix4f m4f, Matrix3f m3f, VertexConsumer vertexConsumer, float x, float y, float z, float u, float v) {

@@ -11,6 +11,7 @@ import ru.bulldog.justmap.util.DrawHelper;
 
 import net.minecraft.client.resource.metadata.AnimationResourceMetadata;
 import net.minecraft.client.texture.Sprite;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.util.Identifier;
@@ -36,15 +37,21 @@ public class EntityHeadIcon extends AbstractIcon {
 		
 		return null;
 	}
-	
+
 	@Override
 	public void draw(double x, double y, int w, int h) {
+		MatrixStack matrix = new MatrixStack();
+		this.draw(matrix, x, y, (float) w, (float) h);
+	}
+	
+	@Override
+	public void draw(MatrixStack matrix, double x, double y, int w, int h) {
 		if (ClientParams.showIconsOutline) {
 			DrawHelper.fill(x - 0.5, y - 0.5, x + w + 0.5, y + h + 0.5, Colors.LIGHT_GRAY);
 		}
 		textureManager.bindTexture(this.getId());
 		
-		this.draw(x, y, (float) w, (float) h);
+		this.draw(matrix, x, y, (float) w, (float) h);
 	}
 	
 	private static Identifier iconId(Identifier id) {
