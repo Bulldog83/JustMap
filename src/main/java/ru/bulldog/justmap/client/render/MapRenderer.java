@@ -10,7 +10,6 @@ import ru.bulldog.justmap.map.DirectionArrow;
 import ru.bulldog.justmap.map.icon.EntityIcon;
 import ru.bulldog.justmap.map.icon.PlayerIcon;
 import ru.bulldog.justmap.map.icon.WaypointIcon;
-import ru.bulldog.justmap.map.minimap.ChunkGrid;
 import ru.bulldog.justmap.map.minimap.MapPosition;
 import ru.bulldog.justmap.map.minimap.MapSkin;
 import ru.bulldog.justmap.map.minimap.MapText;
@@ -64,7 +63,6 @@ public class MapRenderer {
 	private final MinecraftClient client = MinecraftClient.getInstance();
 	
 	private MapSkin mapSkin;
-	private ChunkGrid chunkGrid;
 	
 	public static MapRenderer getInstance() {
 		if (instance == null) {
@@ -283,9 +281,6 @@ public class MapRenderer {
 		
 		this.drawMap();
 
-		if (ClientParams.showGrid) {
-			this.drawChunkGrid();
-		}
 		if (Minimap.allowEntityRadar()) {
 			if (Minimap.allowPlayerRadar()) {
 				for (PlayerIcon player : minimap.getPlayerIcons()) {
@@ -334,12 +329,5 @@ public class MapRenderer {
 		this.builder.vertex(imgX + imgW + 4, imgY - 4, 1.0).texture(1.0F, 0.0F).next();
 		
 		this.tessellator.draw();
-	}
-	
-	private void drawChunkGrid() {
-		int px = client.player.getBlockPos().getX();
-		int pz = client.player.getBlockPos().getZ();
-		this.chunkGrid = new ChunkGrid(px, pz, imgX, imgY, imgW, imgH);
-		this.chunkGrid.draw();
 	}
 }

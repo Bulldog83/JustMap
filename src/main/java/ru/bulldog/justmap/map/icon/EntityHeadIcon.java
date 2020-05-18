@@ -47,10 +47,9 @@ public class EntityHeadIcon extends AbstractIcon {
 	@Override
 	public void draw(MatrixStack matrix, double x, double y, int w, int h) {
 		if (ClientParams.showIconsOutline) {
-			DrawHelper.fill(x - 0.5, y - 0.5, x + w + 0.5, y + h + 0.5, Colors.LIGHT_GRAY);
+			DrawHelper.fill(matrix, x - 0.5, y - 0.5, x + w + 0.5, y + h + 0.5, Colors.LIGHT_GRAY);
 		}
-		textureManager.bindTexture(this.getId());
-		
+		textureManager.bindTexture(this.getId());		
 		this.draw(matrix, x, y, (float) w, (float) h);
 	}
 	

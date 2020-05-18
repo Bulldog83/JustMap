@@ -39,17 +39,6 @@ public class EntityIcon extends MapIcon<EntityIcon> {
 		if (pos.x < mapX || pos.x > (mapX + map.getWidth()) - size ||
 			pos.y < mapY || pos.y > (mapY + map.getHeight()) - size) return;
 		
-		MatrixStack matrix = new MatrixStack();
-		
-		matrix.push();
-		if (ClientParams.rotateMap) {
-			double moveX = pos.x + size / 2;
-			double moveY = pos.y + size / 2;
-			matrix.translate(moveX, moveY, 0.0);
-			matrix.multiply(Vector3f.POSITIVE_Z.getDegreesQuaternion(rotation + 180));
-			matrix.translate(-moveX, -moveY, 0.0);
-		}
-		
 		EntityHeadIcon icon = null;
 		if (ClientParams.showEntityHeads) {
 			if (ClientParams.renderEntityModel) {
@@ -57,7 +46,17 @@ public class EntityIcon extends MapIcon<EntityIcon> {
 			} else {
 				icon = EntityHeadIcon.getIcon(entity);
 				if (icon != null) {
+					MatrixStack matrix = new MatrixStack();					
+					matrix.push();
+					if (ClientParams.rotateMap) {
+						double moveX = pos.x + size / 2;
+						double moveY = pos.y + size / 2;
+						matrix.translate(moveX, moveY, 0.0);
+						matrix.multiply(Vector3f.POSITIVE_Z.getDegreesQuaternion(rotation + 180));
+						matrix.translate(-moveX, -moveY, 0.0);
+					}					
 					icon.draw(matrix, pos.x, pos.y, size);
+					matrix.pop();
 				} else {
 					DrawHelper.drawOutlineCircle(pos.x, pos.y, size / 3, 0.6, color);
 				}
@@ -65,7 +64,5 @@ public class EntityIcon extends MapIcon<EntityIcon> {
 		} else {
 			DrawHelper.drawOutlineCircle(pos.x, pos.y, size / 3, 0.6, color);
 		}
-		
-		matrix.pop();
 	}
 }

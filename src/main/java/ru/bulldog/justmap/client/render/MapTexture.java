@@ -13,6 +13,8 @@ import org.lwjgl.opengl.GL14;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.texture.TextureUtil;
+import ru.bulldog.justmap.client.config.ClientParams;
+import ru.bulldog.justmap.util.ColorUtil;
 import ru.bulldog.justmap.util.Colors;
 
 public class MapTexture extends BufferedImage {
@@ -81,7 +83,11 @@ public class MapTexture extends BufferedImage {
 				if (py >= this.getHeight()) break;
 				if (py < 0) continue;
 				
-				this.setRGB(px, py, colorData[i + (j << 4)]);
+				int color = colorData[i + (j << 4)];
+				if (ClientParams.showGrid && (i == 0 || j == 0)) {
+					color = ColorUtil.applyTint(color, 0x66333333);
+				}
+				this.setRGB(px, py, color);
 			}
 		}
 	}

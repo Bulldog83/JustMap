@@ -136,6 +136,10 @@ public class DrawHelper extends DrawableHelper {
 	public static void fill(double x, double y, double w, double h, int color) {
 		fill(Rotation3.identity().getMatrix(), x, y, w, h, color);
 	}
+	
+	public static void fill(MatrixStack matrix, double x, double y, double w, double h, int color) {
+		fill(matrix.peek().getModel(), x, y, w, h, color);
+	}
 
 	public static void fill(Matrix4f matrix4f, double x, double y, double w, double h, int color) {
 		double o;
@@ -144,7 +148,6 @@ public class DrawHelper extends DrawableHelper {
 			x = w;
 			w = o;
 		}
-
 		if (y < h) {
 			o = y;
 			y = h;
@@ -177,12 +180,11 @@ public class DrawHelper extends DrawableHelper {
 		tessellator.draw();		
 	}
 	
-	public static void draw(double x, double y, float w, float h, float su, float sv) {
+	public static void draw(MatrixStack matrix, double x, double y, float w, float h, float su, float sv) {
 		float pw = su * w;
 		float ph = sv * h;
 		float minU = w / pw;
 		float minV = h / ph;
-		MatrixStack matrix = new MatrixStack();
 		builder.begin(GL11.GL_QUADS, vertexFormat);
 		draw(matrix, builder, x, y, w, h, minU, minV, 2 * minU, 2 * minV);
 		tessellator.draw();		

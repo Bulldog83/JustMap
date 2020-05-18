@@ -1,5 +1,7 @@
 package ru.bulldog.justmap.map.icon;
 
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.client.util.math.Vector3f;
 import net.minecraft.entity.player.PlayerEntity;
 
 import ru.bulldog.justmap.client.config.ClientParams;
@@ -35,7 +37,17 @@ public class PlayerIcon extends MapIcon<PlayerIcon> {
 			if (ClientParams.renderEntityModel) {
 				EntityModelRenderer.renderModel(player, pos.x, pos.y);
 			} else {
-				PlayerHeadIcon.getIcon(player).draw(pos.x, pos.y);
+				MatrixStack matrix = new MatrixStack();			
+				matrix.push();
+				if (ClientParams.rotateMap) {
+					double moveX = pos.x + size / 2;
+					double moveY = pos.y + size / 2;
+					matrix.translate(moveX, moveY, 0.0);
+					matrix.multiply(Vector3f.POSITIVE_Z.getDegreesQuaternion(rotation + 180));
+					matrix.translate(-moveX, -moveY, 0.0);
+				}
+				PlayerHeadIcon.getIcon(player).draw(matrix, pos.x, pos.y);
+				matrix.pop();
 			}
 		} else {
 			DrawHelper.fill(pos.x, pos.y, pos.x, pos.y, Colors.GREEN);

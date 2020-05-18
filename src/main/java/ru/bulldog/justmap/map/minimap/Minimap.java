@@ -66,6 +66,7 @@ public class Minimap implements IMap{
 	
 	private static boolean isMapVisible = true;
 	private static boolean rotateMap = false;
+	private static boolean showChunkGrid = false;
 	
 	public boolean changed = false;
 	
@@ -110,12 +111,16 @@ public class Minimap implements IMap{
 		int configSize = JustMapClient.CONFIG.getInt("map_size");
 		float configScale = JustMapClient.CONFIG.getFloat("map_scale");		
 		boolean needRotate = JustMapClient.CONFIG.getBoolean("rotate_map");
+		boolean showGrid = JustMapClient.CONFIG.getBoolean("draw_chunk_grid");
 		
-		if (configSize != mapWidth || configScale != mapScale || rotateMap != needRotate) {
+		if (configSize != mapWidth || configScale != mapScale ||
+			rotateMap != needRotate || showChunkGrid != showGrid) {
+			
 			this.mapWidth = configSize;
 			this.mapHeight = configSize;
 			this.mapScale = configScale;
 			
+			showChunkGrid = showGrid;
 			rotateMap = needRotate;
 			if (rotateMap) {
 				this.scaledSize = (int) ((mapWidth * mapScale) * 1.42 + 8);
@@ -236,6 +241,8 @@ public class Minimap implements IMap{
 		
 		double endX = startX + scaled;
 		double endZ = startZ + scaled;
+		double shiftX = (PosUtil.doubleCoordX() - lastPosX) / this.mapScale;
+		double shiftZ = (PosUtil.doubleCoordZ() - lastPosZ) / this.mapScale;
 		
 		if (allowPlayerRadar()) {
 			players.clear();			
@@ -248,12 +255,11 @@ public class Minimap implements IMap{
 				BlockPos ppos = p.getBlockPos();
 			 
 				int x = ppos.getX();
-				int z = ppos.getZ();
-				
+				int z = ppos.getZ();				
 				if (x >= startX && x <= endX && z >= startZ && z <= endZ) {
 					PlayerIcon playerIcon = new PlayerIcon(this, p, false);
 					playerIcon.setPosition(MathUtil.screenPos(x, startX, endX, mapWidth),
-										   MathUtil.screenPos(z, startZ, endZ, mapWidth));
+										   MathUtil.screenPos(z, startZ, endZ, mapHeight));
 					this.players.add(playerIcon);
 				}
 			}
@@ -267,22 +273,21 @@ public class Minimap implements IMap{
 			BlockPos end = new BlockPos(endX, posY + checkHeight / 2, endZ);
 			List<Entity> entities = world.getEntities((Entity) null, new Box(start, end));
 		
-			int amount = 0;
-				
+			int amount = 0;				
 			for (Entity entity : entities) {
 				if (entity instanceof LivingEntity && !(entity instanceof PlayerEntity)) {
 					LivingEntity livingEntity = (LivingEntity) entity;
 					boolean hostile = livingEntity instanceof HostileEntity;
+					double entX = MathUtil.screenPos(entity.getX(), startX, endX, mapWidth);
+					double entZ = MathUtil.screenPos(entity.getZ(), startZ, endZ, mapHeight);
 					if (hostile && allowHostileRadar()) {
-						EntityIcon entIcon = new EntityIcon(this, entity, hostile);						
-						entIcon.setPosition(MathUtil.screenPos((int) entity.getX(), startX, endX, mapWidth),
-											MathUtil.screenPos((int) entity.getZ(), startZ, endZ, mapWidth));
+						EntityIcon entIcon = new EntityIcon(this, entity, hostile);	
+						entIcon.setPosition(entX, entZ);
 						this.entities.add(entIcon);
 						amount++;
 					} else if (!hostile && allowCreatureRadar()) {
-						EntityIcon entIcon = new EntityIcon(this, entity, hostile);						
-						entIcon.setPosition(MathUtil.screenPos((int) entity.getX(), startX, endX, mapWidth),
-											MathUtil.screenPos((int) entity.getZ(), startZ, endZ, mapWidth));
+						EntityIcon entIcon = new EntityIcon(this, entity, hostile);	
+						entIcon.setPosition(entX, entZ);
 						this.entities.add(entIcon);
 						amount++;
 					}
@@ -298,8 +303,8 @@ public class Minimap implements IMap{
 			for (Waypoint wp : stream.toArray(Waypoint[]::new)) {
 				WaypointIcon waypoint = new WaypointIcon(this, wp);
 				waypoint.setPosition(
-					MathUtil.screenPos(wp.pos.getX(), startX, endX, mapWidth),
-					MathUtil.screenPos(wp.pos.getZ(), startZ, endZ, mapHeight)
+					MathUtil.screenPos(wp.pos.getX(), startX, endX, mapWidth) - shiftX,
+					MathUtil.screenPos(wp.pos.getZ(), startZ, endZ, mapHeight) - shiftZ
 				);
 				this.waypoints.add(waypoint);
 			}
