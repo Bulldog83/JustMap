@@ -84,9 +84,9 @@ public class MapTexture extends BufferedImage {
 				if (py < 0) continue;
 				
 				int color = colorData[i + (j << 4)];
-				if (ClientParams.showGrid && (i == 0 || j == 0)) {
-					color = ColorUtil.applyTint(color, 0x66333333);
-				}
+//				if (ClientParams.showGrid && (i == 0 || j == 0)) {
+//					color = ColorUtil.applyTint(color, 0x66333333);
+//				}
 				this.setRGB(px, py, color);
 			}
 		}

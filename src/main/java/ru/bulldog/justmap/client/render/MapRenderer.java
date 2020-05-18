@@ -10,6 +10,7 @@ import ru.bulldog.justmap.map.DirectionArrow;
 import ru.bulldog.justmap.map.icon.EntityIcon;
 import ru.bulldog.justmap.map.icon.PlayerIcon;
 import ru.bulldog.justmap.map.icon.WaypointIcon;
+import ru.bulldog.justmap.map.minimap.ChunkGrid;
 import ru.bulldog.justmap.map.minimap.MapPosition;
 import ru.bulldog.justmap.map.minimap.MapSkin;
 import ru.bulldog.justmap.map.minimap.MapText;
@@ -63,6 +64,7 @@ public class MapRenderer {
 	private final MinecraftClient client = MinecraftClient.getInstance();
 	
 	private MapSkin mapSkin;
+	private ChunkGrid chunkGrid;
 	
 	public static MapRenderer getInstance() {
 		if (instance == null) {
@@ -249,8 +251,6 @@ public class MapRenderer {
 		int scaledW = (int) (mapW * scale);
 		int scaledH = (int) (mapH * scale);
 		
-		RenderSystem.enableBlend();
-		RenderSystem.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ZERO);
 		RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
 		RenderSystem.disableDepthTest();
 		
@@ -281,6 +281,9 @@ public class MapRenderer {
 		
 		this.drawMap();
 
+		if (ClientParams.showGrid) {
+			this.drawChunkGrid();
+		}
 		if (Minimap.allowEntityRadar()) {
 			if (Minimap.allowPlayerRadar()) {
 				for (PlayerIcon player : minimap.getPlayerIcons()) {
@@ -323,11 +326,18 @@ public class MapRenderer {
 		}
 		
 		this.builder.begin(GL11.GL_QUADS, VertexFormats.POSITION_TEXTURE);		
-		this.builder.vertex(imgX - 4, imgY - 4, 1.0).texture(0.0F, 0.0F).next();
-		this.builder.vertex(imgX - 4, imgY + imgH + 4, 1.0).texture(0.0F, 1.0F).next();
+		this.builder.vertex(imgX, imgY - 4, 1.0).texture(0.0F, 0.0F).next();
+		this.builder.vertex(imgX, imgY + imgH + 4, 1.0).texture(0.0F, 1.0F).next();
 		this.builder.vertex(imgX + imgW + 4, imgY + imgH + 4, 1.0).texture(1.0F, 1.0F).next();
 		this.builder.vertex(imgX + imgW + 4, imgY - 4, 1.0).texture(1.0F, 0.0F).next();
 		
 		this.tessellator.draw();
+	}
+	
+	private void drawChunkGrid() {
+		int px = minimap.getLasX();
+		int pz = minimap.getLastZ();
+		this.chunkGrid = new ChunkGrid(px, pz, mapX, mapY, mapW, mapH);
+		this.chunkGrid.draw();
 	}
 }
