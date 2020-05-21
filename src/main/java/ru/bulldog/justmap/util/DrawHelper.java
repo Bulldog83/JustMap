@@ -3,6 +3,7 @@ package ru.bulldog.justmap.util;
 import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.systems.RenderSystem;
 
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.render.BufferBuilder;
@@ -30,9 +31,10 @@ public class DrawHelper extends DrawableHelper {
 	
 	public final static DrawHelper DRAWER = new DrawHelper();
 	
-	private final static VertexFormat vertexFormat = new VertexFormat(ImmutableList.of(VertexFormats.POSITION_ELEMENT, VertexFormats.TEXTURE_ELEMENT, VertexFormats.NORMAL_ELEMENT, VertexFormats.PADDING_ELEMENT));
+	private final static VertexFormat VF_POS_TEX_NORMAL = new VertexFormat(ImmutableList.of(VertexFormats.POSITION_ELEMENT, VertexFormats.TEXTURE_ELEMENT, VertexFormats.NORMAL_ELEMENT, VertexFormats.PADDING_ELEMENT));
 	private final static Tessellator tessellator = Tessellator.getInstance();
 	private final static BufferBuilder builder = tessellator.getBuffer();
+	private final static TextRenderer textRenderer = MinecraftClient.getInstance().textRenderer;
 
 	public void fillNoDepth(int x, int y, int right, int left, int color) {
 		RenderSystem.disableDepthTest();
@@ -40,7 +42,12 @@ public class DrawHelper extends DrawableHelper {
 		RenderSystem.enableDepthTest();
 	}
 	
-	public static void drawBoundedString(TextRenderer textRenderer, String string, int x, int y, int leftBound, int rightBound, int color) {
+	public static void drawCenteredString(String string, int x, int y, int color) {
+		System.out.println("Drawing: '" + string + "', at: " + x + ":" + y);
+		textRenderer.drawWithShadow(string, (float) (x - textRenderer.getStringWidth(string) / 2), (float) y, color);
+	}
+	
+	public static void drawBoundedString(String string, int x, int y, int leftBound, int rightBound, int color) {
 		if (string == null) {
 			return;
 		}
@@ -175,7 +182,7 @@ public class DrawHelper extends DrawableHelper {
 	
 	public static void draw(double x, double y, float w, float h) {
 		MatrixStack matrix = new MatrixStack();		
-		builder.begin(GL11.GL_QUADS, vertexFormat);		
+		builder.begin(GL11.GL_QUADS, VF_POS_TEX_NORMAL);		
 		draw(matrix, builder, x, y, w, h, 0.0F, 0.0F, 1.0F, 1.0F);
 		tessellator.draw();		
 	}
@@ -185,7 +192,7 @@ public class DrawHelper extends DrawableHelper {
 		float ph = sv * h;
 		float minU = w / pw;
 		float minV = h / ph;
-		builder.begin(GL11.GL_QUADS, vertexFormat);
+		builder.begin(GL11.GL_QUADS, VF_POS_TEX_NORMAL);
 		draw(matrix, builder, x, y, w, h, minU, minV, 2 * minU, 2 * minV);
 		tessellator.draw();		
 	}
@@ -195,7 +202,7 @@ public class DrawHelper extends DrawableHelper {
 		RenderSystem.enableAlphaTest();		
 		RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
 		
-		builder.begin(GL11.GL_QUADS, vertexFormat);
+		builder.begin(GL11.GL_QUADS, VF_POS_TEX_NORMAL);
 		
 		VertexConsumer vertexConsumer = sprite.getTextureSpecificVertexConsumer(builder);
 		

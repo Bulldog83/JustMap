@@ -54,7 +54,7 @@ public class PlayerIcon extends MapIcon<PlayerIcon> {
 		}
 			
 		if (ClientParams.showPlayerNames) {
-			DrawHelper.drawBoundedString(client.textRenderer, player.getName().getString(), (int) pos.x, (int) pos.y + 12, 0, client.getWindow().getScaledWidth(), Colors.WHITE);
+			DrawHelper.drawBoundedString(player.getName().getString(), (int) pos.x, (int) pos.y + 12, 0, client.getWindow().getScaledWidth(), Colors.WHITE);
 		}
 	}
 }

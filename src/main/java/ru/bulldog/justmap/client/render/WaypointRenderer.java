@@ -92,7 +92,7 @@ public class WaypointRenderer {
 		} else {
 			DrawHelper.drawDiamond(x, y, size, size, waypoint.color);
 		}
-		DrawHelper.drawBoundedString(client.textRenderer, (int) dist + "m", x + size / 2, y + size + 2, 0, screenWidth, Colors.WHITE);
+		DrawHelper.drawBoundedString((int) dist + "m", x + size / 2, y + size + 2, 0, screenWidth, Colors.WHITE);
 	}
 	
 	public static void renderWaypoints(MatrixStack matrixStack, MinecraftClient client, Camera camera, float tickDelta) {

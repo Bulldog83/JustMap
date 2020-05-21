@@ -10,13 +10,15 @@ import ru.bulldog.justmap.map.DirectionArrow;
 import ru.bulldog.justmap.map.icon.EntityIcon;
 import ru.bulldog.justmap.map.icon.PlayerIcon;
 import ru.bulldog.justmap.map.icon.WaypointIcon;
-import ru.bulldog.justmap.map.minimap.ChunkGrid;
+//import ru.bulldog.justmap.map.minimap.ChunkGrid;
 import ru.bulldog.justmap.map.minimap.MapPosition;
 import ru.bulldog.justmap.map.minimap.MapSkin;
 import ru.bulldog.justmap.map.minimap.MapText;
 import ru.bulldog.justmap.map.minimap.Minimap;
 import ru.bulldog.justmap.map.minimap.TextManager;
 import ru.bulldog.justmap.util.DrawHelper.TextAlignment;
+import ru.bulldog.justmap.util.Colors;
+import ru.bulldog.justmap.util.DrawHelper;
 import ru.bulldog.justmap.util.PosUtil;
 import ru.bulldog.justmap.util.math.Line;
 import ru.bulldog.justmap.util.math.Line.Point;
@@ -44,7 +46,7 @@ public class MapRenderer {
 	private int mapW, mapH;
 	private int imgX, imgY;
 	private int imgW, imgH;
-	private float rotation;	
+	private float rotation;
 	private int lastX;
 	private int lastZ;
 
@@ -64,7 +66,7 @@ public class MapRenderer {
 	private final MinecraftClient client = MinecraftClient.getInstance();
 	
 	private MapSkin mapSkin;
-	private ChunkGrid chunkGrid;
+	//private ChunkGrid chunkGrid;
 	
 	public static MapRenderer getInstance() {
 		if (instance == null) {
@@ -226,6 +228,7 @@ public class MapRenderer {
 		if (mapTexture == null || mapTexture.getWidth() != textureSize || mapTexture.getHeight() != textureSize) {
 			if (mapTexture != null) this.mapTexture.close();			
 			this.mapTexture = new MapTexture(textureSize, textureSize);
+			//this.chunkGrid = new ChunkGrid(mapX, mapY, mapW, mapH);
 		}		
 		if (minimap.changed) {
 			this.mapTexture.copyImage(minimap.getImage());
@@ -281,9 +284,10 @@ public class MapRenderer {
 		
 		this.drawMap();
 
-		if (ClientParams.showGrid) {
-			this.drawChunkGrid();
-		}
+		//if (ClientParams.showGrid) {
+		//	this.chunkGrid.update(lastX, lastZ);
+		//	this.chunkGrid.draw();
+		//}
 		if (Minimap.allowEntityRadar()) {
 			if (Minimap.allowPlayerRadar()) {
 				for (PlayerIcon player : minimap.getPlayerIcons()) {
@@ -297,6 +301,10 @@ public class MapRenderer {
 			}
 		}		
 		RenderSystem.popMatrix();
+		
+		DrawHelper.DRAWER.drawRightAlignedString(
+				client.textRenderer, Float.toString(minimap.getScale()),
+				mapX + mapW - 3, mapY + mapH - 10, Colors.WHITE);
 		
 		for (WaypointIcon waypoint : minimap.getWaypoints()) {
 			if (!waypoint.isHidden()) {
@@ -317,7 +325,7 @@ public class MapRenderer {
 	
 	private void drawMap() {
 		RenderSystem.bindTexture(mapTexture.getId());
-		if (minimap.getScale() > 1) {
+		if (minimap.getScale() >= 0.75) {
 			RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR_MIPMAP_LINEAR);
 			RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
 		} else {
@@ -332,12 +340,5 @@ public class MapRenderer {
 		this.builder.vertex(imgX + imgW + 4, imgY - 4, 1.0).texture(1.0F, 0.0F).next();
 		
 		this.tessellator.draw();
-	}
-	
-	private void drawChunkGrid() {
-		int px = minimap.getLasX();
-		int pz = minimap.getLastZ();
-		this.chunkGrid = new ChunkGrid(px, pz, mapX, mapY, mapW, mapH);
-		this.chunkGrid.draw();
 	}
 }
