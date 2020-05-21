@@ -240,10 +240,6 @@ public final class ConfigFactory {
 				.setSaveConsumer(val -> JustMapClient.CONFIG.setRanged("chunk_level_update_interval", val))
 				.setDefaultValue((int) JustMapClient.CONFIG.getDefault("chunk_level_update_interval"))
 				.setMin(500).setMax(10000).build());
-		optimization.addEntry(entryBuilder.startIntField(lang("update_cycle"), JustMapClient.CONFIG.getInt("update_per_cycle"))
-				.setSaveConsumer(val -> JustMapClient.CONFIG.setRanged("update_per_cycle", val))
-				.setDefaultValue((int) JustMapClient.CONFIG.getDefault("update_per_cycle"))
-				.setMin(1).setMax(1000).build());
 		optimization.addEntry(entryBuilder.startIntField(lang("purge_delay"), JustMapClient.CONFIG.getInt("purge_delay"))
 				.setSaveConsumer(val -> JustMapClient.CONFIG.setRanged("purge_delay", val))
 				.setDefaultValue((int) JustMapClient.CONFIG.getDefault("purge_delay"))

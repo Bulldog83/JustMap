@@ -47,7 +47,6 @@ public class ClientConfig extends Config{
 		KEEPER.registerEntry("use_skins", new BooleanEntry(ClientParams.useSkins, (b) -> ClientParams.useSkins = b, () -> ClientParams.useSkins));
 		KEEPER.registerEntry("simple_direction_arrow", new BooleanEntry(ClientParams.simpleArrow, (b) -> ClientParams.simpleArrow = b, () -> ClientParams.simpleArrow));
 		KEEPER.registerEntry("current_skin", new IntegerEntry(ClientParams.currentSkin, (i) -> ClientParams.currentSkin = i, () -> ClientParams.currentSkin));
-		KEEPER.registerEntry("update_per_cycle", new IntegerRange(ClientParams.updatePerCycle, (i) -> ClientParams.updatePerCycle = i, () -> ClientParams.updatePerCycle, 1, 500));
 		KEEPER.registerEntry("chunk_update_interval", new IntegerRange(ClientParams.chunkUpdateInterval, (i) -> ClientParams.chunkUpdateInterval = i, () -> ClientParams.chunkUpdateInterval, 500, 5000));
 		KEEPER.registerEntry("chunk_level_update_interval", new IntegerRange(ClientParams.chunkLevelUpdateInterval, (i) -> ClientParams.chunkLevelUpdateInterval = i, () -> ClientParams.chunkLevelUpdateInterval, 500, 10000));
 		KEEPER.registerEntry("purge_delay", new IntegerRange(ClientParams.purgeDelay, (i) -> ClientParams.purgeDelay = i, () -> ClientParams.purgeDelay, 1, 600));

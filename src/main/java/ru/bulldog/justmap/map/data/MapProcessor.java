@@ -21,11 +21,11 @@ public class MapProcessor {
 		
 		boolean plants = !ClientParams.hidePlants;
 		
-		Layer layer = mapChunk.getLayer().value;
-		if ((layer.equals(Layer.Type.NETHER.value) || layer.equals(Layer.Type.CAVES.value)) && liquids) {
-			int level = mapChunk.getLevel();
-			int floor = level * layer.height;
-			for (int i = floor + (layer.height - 1); i >= floor; i--) {
+		Layer.Type layer = mapChunk.getLayer();
+		if ((layer.equals(Layer.Type.NETHER) || layer.equals(Layer.Type.CAVES))) {
+			int level = mapChunk.currentLevel();
+			int floor = level * layer.value.height;
+			for (int i = floor + (layer.value.height - 1); i >= floor; i--) {
 				BlockPos worldPos = loopPos(worldChunk, new BlockPos(posX, i, posZ), 0, liquids, plants);
 				BlockPos overPos = new BlockPos(posX, worldPos.getY() + 1, posZ);
 				if (StateUtil.checkState(worldChunk.getBlockState(overPos), liquids, plants)) {

@@ -30,8 +30,6 @@ public class MapCache {
 	private static int currentLevel = 0;
 	private static int currentDimension = 0;
 	
-	public static boolean renewNeeded = false;
-	
 	public static void setCurrentLayer(Layer.Type layer, int y) {
 		currentLevel =  y / layer.value.height;
 		currentLayer = layer;
@@ -114,8 +112,6 @@ public class MapCache {
 	
 	private ConcurrentMap<ChunkPos, MapChunk> chunks;
 	
-	private int updateIndex = 0;
-	private int updatePerCycle = 10;
 	private long lastPurged = 0;
 	private long purgeDelay = 1000;
 	private int purgeAmount = 500;
@@ -132,7 +128,6 @@ public class MapCache {
 	}
 	
 	public void updateMap(Minimap map, int size, int currentX, int currentZ) {
-		this.updatePerCycle = ClientParams.updatePerCycle;
 		this.purgeDelay = ClientParams.purgeDelay * 1000;
 		this.purgeAmount = ClientParams.purgeAmount;
 		
@@ -152,17 +147,13 @@ public class MapCache {
 		int offsetX = (startX << 4) - left;
 		int offsetZ = (startZ << 4) - top;
 		
-		int index = 0, posX = 0;		
+		int posX = 0;		
 		for (int chunkX = startX; chunkX < endX; chunkX++) {
 			int posZ = 0;
 			int imgX = (posX << 4) + offsetX;
 			for (int chunkZ = startZ; chunkZ < endZ; chunkZ++) {
-				index++;
-
 				MapChunk mapChunk = this.getCurrentChunk(chunkX, chunkZ);
-				if (index >= updateIndex && index <= updateIndex + updatePerCycle) {
-					mapChunk.update();
-				}
+				mapChunk.update();
 				
 				int imgY = (posZ << 4) + offsetZ;
 				mapImage.writeChunkData(imgX, imgY, mapChunk.getColorData());
@@ -171,13 +162,9 @@ public class MapCache {
 			posX++;
 		}
 		
+		map.needUpdate = false;
 		map.changed = true;
 
-		updateIndex += updatePerCycle;
-		if (updateIndex >= chunks * chunks) {
-			updateIndex = 0;
-		}
-		
 		long currentTime = System.currentTimeMillis();
 		if (currentTime - lastPurged > purgeDelay) {
 			JustMap.WORKER.execute(() -> {

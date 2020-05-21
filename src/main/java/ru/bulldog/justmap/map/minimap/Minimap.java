@@ -54,6 +54,7 @@ public class Minimap implements IMap{
 	private float mapScale;
 	private int lastPosX = 0;
 	private int lastPosZ = 0;
+	private long updated = 0;
 	
 	private Biome currentBiome;	
 	private MapTexture image;
@@ -64,15 +65,18 @@ public class Minimap implements IMap{
 	
 	private PlayerEntity locPlayer = null;
 	
-	private static boolean isMapVisible = true;
-	private static boolean rotateMap = false;
-	private static boolean showChunkGrid = false;
-	
+	private boolean isMapVisible = true;
+	private boolean rotateMap = false;
+	private boolean showGrid = false;	
+	private boolean hidePlants = false;
+	private boolean hideWater = false;
+	private boolean waterTint = true;
+	private boolean showTerrain = true;
+
+	public boolean needUpdate = false;
 	public boolean changed = false;
 	
 	private Object imageLocker = new Object();
-	
-	private Object imageLock = new Object();
 	
 	public Minimap() {
 		this.textManager = new TextManager(this);
@@ -81,6 +85,12 @@ public class Minimap implements IMap{
 	
 	public void update() {
 		if (!this.isMapVisible()) { return; }
+		
+		long time = System.currentTimeMillis();
+		if (time - updated > 1000) {
+			this.needUpdate = true;
+			this.updated = time;
+		}
 	
 		PlayerEntity player = minecraftClient.player;
 		if (player != null) {
@@ -105,25 +115,22 @@ public class Minimap implements IMap{
 			this.image.fill(Colors.BLACK);
 		}
 		
-		MapCache.renewNeeded = true;		
-		this.changed = true;
+		this.needUpdate = true;
 	}
 	
 	public void updateMapParams() {
 		int configSize = JustMapClient.CONFIG.getInt("map_size");
 		float configScale = JustMapClient.CONFIG.getFloat("map_scale");		
 		boolean needRotate = JustMapClient.CONFIG.getBoolean("rotate_map");
-		boolean showGrid = JustMapClient.CONFIG.getBoolean("draw_chunk_grid");
 		
 		if (configSize != mapWidth || configScale != mapScale ||
-			rotateMap != needRotate || showChunkGrid != showGrid) {
+			this.rotateMap != needRotate) {
 			
 			this.mapWidth = configSize;
 			this.mapHeight = configSize;
 			this.mapScale = configScale;
+			this.rotateMap = needRotate;
 			
-			showChunkGrid = showGrid;
-			rotateMap = needRotate;
 			if (rotateMap) {
 				this.scaledSize = (int) ((mapWidth * mapScale) * 1.42 + 8);
 			} else {
@@ -133,7 +140,26 @@ public class Minimap implements IMap{
 			this.renewMap();
 		}
 		
-		isMapVisible = JustMapClient.CONFIG.getBoolean("map_visible");
+		boolean showGrid = JustMapClient.CONFIG.getBoolean("draw_chunk_grid");
+		boolean hidePlants = JustMapClient.CONFIG.getBoolean("hide_plants");
+		boolean hideWater = JustMapClient.CONFIG.getBoolean("hide_water");
+		boolean waterTint = JustMapClient.CONFIG.getBoolean("water_tint");
+		boolean showTerrain = JustMapClient.CONFIG.getBoolean("show_terrain");
+		
+		if (this.showGrid != showGrid || this.hidePlants != hidePlants ||
+			this.hideWater != hideWater || this.showTerrain != showTerrain ||
+			this.waterTint != waterTint) {
+			
+			this.showGrid = showGrid;
+			this.hidePlants = hidePlants;
+			this.hideWater = hideWater;
+			this.showTerrain = showTerrain;
+			this.waterTint = waterTint;
+			
+			this.needUpdate = true;
+		}
+		
+		this.isMapVisible = JustMapClient.CONFIG.getBoolean("map_visible");
 	}
 	
 	private void updateInfo(PlayerEntity player) {
@@ -229,7 +255,7 @@ public class Minimap implements IMap{
 			MapCache.setCurrentLayer(Type.SURFACE, posY);
 		}
 		
-		if (changed || lastPosX != posX || lastPosZ != posZ) { 
+		if (needUpdate || lastPosX != posX || lastPosZ != posZ) { 
 			MapCache.get().update(this, scaled, posX, posZ);
 			this.lastPosX = posX;
 			this.lastPosZ = posZ;
@@ -360,11 +386,11 @@ public class Minimap implements IMap{
 	
 	public boolean isMapVisible() {
 		if (minecraftClient.currentScreen != null) {
-			return isMapVisible && !minecraftClient.isPaused() &&
+			return this.isMapVisible && !minecraftClient.isPaused() &&
 				   ClientParams.showInChat && minecraftClient.currentScreen instanceof ChatScreen;
 		}
 		
-		return isMapVisible;
+		return this.isMapVisible;
 	}
 	
 	public int getLasX() {

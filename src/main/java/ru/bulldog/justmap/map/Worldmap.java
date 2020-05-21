@@ -17,6 +17,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.text.LiteralText;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.world.dimension.DimensionType;
 
 import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.client.MapScreen;
@@ -49,7 +50,6 @@ public class Worldmap extends MapScreen implements IMap {
 		return worldmap;
 	}
 	
-	private int dimension;
 	private int scaledWidth;
 	private int scaledHeight;
 	private double centerX;
@@ -62,11 +62,11 @@ public class Worldmap extends MapScreen implements IMap {
 	private double shiftH;
 	private float imageScale = 1.0F;
 	private boolean playerTracking = true;
-	private boolean changed = false;
-	
+	private boolean changed = false;	
 	private long updateInterval = 50;
 	private long updated = 0;
 	
+	private DimensionType dimension;
 	private BlockPos centerPos;
 	private MapTexture mapImage;
 	private MapTexture bufferImage;
@@ -98,9 +98,8 @@ public class Worldmap extends MapScreen implements IMap {
 		this.addMapButtons();
 		this.updateScale();
 		
-		int currentDim = player.dimension.getRawId();
-		if (centerPos == null || currentDim != dimension) {
-			this.dimension = currentDim;
+		if (centerPos == null || player.dimension != dimension) {
+			this.dimension = player.dimension;
 			this.centerPos = PosUtil.currentPos();
 			if (mapImage != null) {
 				this.updateMapTexture();
@@ -112,7 +111,7 @@ public class Worldmap extends MapScreen implements IMap {
 		this.cursorCoords = PosUtil.posToString(centerPos);
 		
 		waypoints.clear();
-		List<Waypoint> wps = WaypointKeeper.getInstance().getWaypoints(dimension, true);
+		List<Waypoint> wps = WaypointKeeper.getInstance().getWaypoints(dimension.getRawId(), true);
 		if (wps != null) {
 			Stream<Waypoint> stream = wps.stream().filter(wp -> MathUtil.getDistance(player.getBlockPos(), wp.pos) <= wp.showRange);
 			for (Waypoint wp : stream.toArray(Waypoint[]::new)) {
@@ -171,6 +170,7 @@ public class Worldmap extends MapScreen implements IMap {
 	}
 	
 	private void prepareTexture() {
+		long time = System.currentTimeMillis();
 		if (mapImage == null || mapImage.getWidth() != scaledWidth || mapImage.getHeight() != scaledHeight) {
 			if (this.mapImage != null) {
 				this.bufferImage.close();
@@ -183,6 +183,10 @@ public class Worldmap extends MapScreen implements IMap {
 			this.mapImage.fill(Colors.BLACK);
 			
 			this.processor.execute(this::updateMapTexture);
+			this.updated = time;
+		} else if (time - updated > 3000) {
+			this.processor.execute(this::updateMapTexture);
+			this.updated = time;
 		}
 		
 		if (this.changed) {
@@ -231,11 +235,12 @@ public class Worldmap extends MapScreen implements IMap {
 				}
 				
 				MapChunk mapChunk;
-				if (dimension != -1) {
-					mapChunk = mapData.getChunk(Layer.Type.SURFACE, 0, posX, posZ);
-				} else {
+				if (dimension == DimensionType.THE_NETHER) {
 					mapChunk = mapData.getCurrentChunk(posX, posZ);
+				} else {
+					mapChunk = mapData.getChunk(Layer.Type.SURFACE, 0, posX, posZ);
 				}
+				mapChunk.update();
 				
 				this.bufferImage.writeChunkData(picX - offX, picY - offY, mapChunk.getColorData());
 				picY += 16;
@@ -305,9 +310,7 @@ public class Worldmap extends MapScreen implements IMap {
 	
 	private void moveMap(Direction direction) {
 		long time = System.currentTimeMillis();
-		
-		if (time - updated < updateInterval) return;
-		
+		if (time - updated < updateInterval) return;		
 		switch (direction) {
 			case NORTH:
 				this.centerPos = centerPos.add(0, 0, -16);
@@ -322,10 +325,8 @@ public class Worldmap extends MapScreen implements IMap {
 				this.centerPos = centerPos.add(-16, 0, 0);
 				break;
 			default: break;
-		}
-		
-		this.processor.execute(this::updateMapTexture);
-		
+		}		
+		this.processor.execute(this::updateMapTexture);		
 		this.playerTracking = false;
 		this.updated = time;
 	}
@@ -383,10 +384,8 @@ public class Worldmap extends MapScreen implements IMap {
 			x -= Math.round(2 * f * imageScale);
 			z -= Math.round(2 * g * imageScale);
 			
-			this.centerPos = new BlockPos(x, y, z);
-			
-			this.processor.execute(this::updateMapTexture);
-			
+			this.centerPos = new BlockPos(x, y, z);			
+			this.processor.execute(this::updateMapTexture);			
 			this.playerTracking = false;
 			this.updated = time;
 		
@@ -412,10 +411,10 @@ public class Worldmap extends MapScreen implements IMap {
 		int chunkZ = posZ >> 4;
 		
 		MapChunk mapChunk;
-		if (dimension != -1) {
-			mapChunk = MapCache.get().getChunk(Layer.Type.SURFACE, 0, chunkX, chunkZ);
-		} else {
+		if (dimension == DimensionType.THE_NETHER) {
 			mapChunk = MapCache.get().getCurrentChunk(chunkX, chunkZ);
+		} else {
+			mapChunk = MapCache.get().getChunk(Layer.Type.SURFACE, 0, chunkX, chunkZ);
 		}
 		
 		int cx = posX - (chunkX << 4);
@@ -444,7 +443,7 @@ public class Worldmap extends MapScreen implements IMap {
 			if (time - clicked > 500) clicks = 0;
 			
 			if (++clicks == 2) {			
-				JustMapClient.MAP.createWaypoint(dimension, cursorBlockPos(d, e));
+				JustMapClient.MAP.createWaypoint(dimension.getRawId(), cursorBlockPos(d, e));
 				
 				clicked = 0;
 				clicks = 0;

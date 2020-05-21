@@ -2,7 +2,6 @@ package ru.bulldog.justmap.map.data;
 
 import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.util.ColorUtil;
-import ru.bulldog.justmap.util.StateUtil;
 import ru.bulldog.justmap.util.StorageUtil;
 import ru.bulldog.justmap.util.TaskManager;
 
@@ -75,7 +74,7 @@ public class MapChunk {
 	}
 	
 	private void initLayer() {
-		initLayer(layer);
+		this.initLayer(layer);
 	}
 	
 	private void initLayer(Layer.Type layer) {
@@ -84,7 +83,7 @@ public class MapChunk {
 	}
 	
 	private ChunkLevel getChunkLevel() {
-		return getChunkLevel(layer, level);
+		return this.getChunkLevel(layer, level);
 	}
 	
 	private ChunkLevel getChunkLevel(Layer.Type layer, int level) {
@@ -130,7 +129,7 @@ public class MapChunk {
 		return layer;
 	}
 	
-	public int getLevel() {
+	public int currentLevel() {
 		return level;
 	}
 	
@@ -237,7 +236,7 @@ public class MapChunk {
 				BlockPos blockPos = new BlockPos(posX, posY, posZ);
 				BlockState blockState = this.getBlockState(blockPos);
 				BlockState worldState = worldChunk.getBlockState(blockPos);
-				if(StateUtil.isAir(blockState) || !blockState.equals(worldState) || needUpdate) {
+				if(!blockState.equals(worldState) || needUpdate) {
 					int color = ColorUtil.blockColor(worldChunk, blockPos);
 					if (color != -1) {
 						int heightDiff = MapProcessor.heightDifference(this, eastChunk, southChunk, x, posY, z);
@@ -311,8 +310,6 @@ public class MapChunk {
 	}
 	
 	public void restore() {
-		if (worldChunk.isEmpty()) return;
-		
 		CompoundTag chunkData = StorageUtil.getCache(chunkPos);
 		if (chunkData.isEmpty()) return;
 		

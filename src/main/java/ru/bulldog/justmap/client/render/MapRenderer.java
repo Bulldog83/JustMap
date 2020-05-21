@@ -1,7 +1,6 @@
 package ru.bulldog.justmap.client.render;
 
 import org.lwjgl.opengl.GL11;
-
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import ru.bulldog.justmap.client.JustMapClient;
@@ -237,8 +236,6 @@ public class MapRenderer {
 			this.lastZ = minimap.getLastZ();
 			this.minimap.changed = false;
 		}
-		this.backingImage.copyFrom(minimap.getImage());
-		this.texture.upload();
 	}
 	
 	public void draw() {

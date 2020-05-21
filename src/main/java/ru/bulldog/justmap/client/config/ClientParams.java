@@ -48,7 +48,6 @@ public class ClientParams {
 	
 	public static int chunkUpdateInterval = 1000;
 	public static int chunkLevelUpdateInterval = 3000;
-	public static int updatePerCycle = 10;
 	public static int purgeDelay = 60;
 	public static int purgeAmount = 1500;
 	
