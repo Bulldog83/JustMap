@@ -4,27 +4,23 @@ import java.util.Arrays;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
-import net.minecraft.client.texture.NativeImage;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtHelper;
-import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.chunk.IdListPalette;
 import net.minecraft.world.chunk.Palette;
 import net.minecraft.world.chunk.PalettedContainer;
-
+import ru.bulldog.justmap.util.ColorUtil;
 import ru.bulldog.justmap.util.Colors;
-import ru.bulldog.justmap.util.ImageUtil;
 import ru.bulldog.justmap.util.StateUtil;
 
 public class ChunkLevel {
 	
-	private final static Palette<BlockState> palette;
-	
+	private final static Palette<BlockState> palette;	
 	private volatile PalettedContainer<BlockState> container;
-	private volatile NativeImage image;
 	
 	int[] heightmap;
 	int[] colormap;
+	int[] colordata;
 	int[] levelmap;
 	
 	long updated = 0;
@@ -34,6 +30,7 @@ public class ChunkLevel {
 		this.container = new PalettedContainer<>(palette, Block.STATE_IDS, NbtHelper::toBlockState, NbtHelper::fromBlockState, StateUtil.AIR);		
 		this.heightmap = new int[256];
 		this.colormap = new int[256];
+		this.colordata = new int[256];
 		this.levelmap = new int[256];
 		
 		this.level = level;
@@ -41,6 +38,7 @@ public class ChunkLevel {
 		Arrays.fill(heightmap, -1);
 		Arrays.fill(colormap, -1);
 		Arrays.fill(levelmap, 0);
+		Arrays.fill(colordata, Colors.BLACK);
 	}
 	
 	public PalettedContainer<BlockState> container() {
@@ -74,27 +72,7 @@ public class ChunkLevel {
 		
 		this.colormap[index] = -1;
 		this.levelmap[index] = 0;
-	}
-	
-	public NativeImage getImage(ChunkPos chunkPos) {
-		if (image == null) {
-			this.image = loadImage(chunkPos);
-		}
-		
-		synchronized (image) {
-			return this.image;
-		}
-	}
-	
-	private NativeImage loadImage(ChunkPos chunkPos) {
-		MapRegion region = MapCache.get().getRegion(chunkPos);			
-		NativeImage image = region.getChunkImage(chunkPos);
-		if (image == null) {
-			image = new NativeImage(16, 16, false);
-			ImageUtil.fillImage(image, Colors.BLACK);
-		}
-		
-		return image;
+		this.colordata[index] = Colors.BLACK;
 	}
 	
 	public boolean isEmpty() {
@@ -113,6 +91,14 @@ public class ChunkLevel {
 		this.heightmap = tag.getIntArray("Heightmap");
 		this.colormap = tag.getIntArray("Colormap");
 		this.levelmap = tag.getIntArray("Levelmap");
+		
+		for (int i = 0; i < 256; i++) {
+			int color = this.colormap[i];
+			if (color != -1) {
+				int level = this.levelmap[i];
+				this.colordata[i] = ColorUtil.proccessColor(color, level);
+			}			
+		}
 	}
 	
 	static {

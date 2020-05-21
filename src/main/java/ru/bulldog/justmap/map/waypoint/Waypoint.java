@@ -17,6 +17,7 @@ import net.minecraft.client.resource.metadata.AnimationResourceMetadata;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.texture.NativeImageBackedTexture;
 import net.minecraft.client.texture.Sprite;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.JsonHelper;
 import net.minecraft.util.math.BlockPos;
@@ -202,10 +203,20 @@ public class Waypoint {
 			return icon;
 		}
 		
+		public void bindTexture() {
+			textureManager.bindTexture(this.getTexture());
+		}
+		
 		@Override
 		public void draw(double x, double y, int w, int h) {
-			textureManager.bindTexture(this.getTexture());			
-			this.draw(x, y, (float) w, (float) h);
+			MatrixStack matrix = new MatrixStack();
+			this.draw(matrix, x, y, w, h);
+		}
+		
+		@Override
+		public void draw(MatrixStack matrix, double x, double y, int w, int h) {
+			this.bindTexture();
+			this.draw(matrix, x, y, (float) w, (float) h);
 		}
 		
 		private Identifier getColoredTexture() {

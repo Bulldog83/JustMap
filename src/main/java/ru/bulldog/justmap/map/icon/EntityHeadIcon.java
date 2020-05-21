@@ -6,10 +6,12 @@ import java.util.Map;
 import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.util.ImageUtil;
 import ru.bulldog.justmap.util.SpriteAtlas;
+import ru.bulldog.justmap.util.Colors;
 import ru.bulldog.justmap.util.DrawHelper;
 
 import net.minecraft.client.resource.metadata.AnimationResourceMetadata;
 import net.minecraft.client.texture.Sprite;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.util.Identifier;
@@ -35,15 +37,20 @@ public class EntityHeadIcon extends AbstractIcon {
 		
 		return null;
 	}
-	
+
 	@Override
 	public void draw(double x, double y, int w, int h) {
+		MatrixStack matrix = new MatrixStack();
+		this.draw(matrix, x, y, (float) w, (float) h);
+	}
+	
+	@Override
+	public void draw(MatrixStack matrix, double x, double y, int w, int h) {
 		if (ClientParams.showIconsOutline) {
-			DrawHelper.fill(x - 1, y - 1, x + w + 1, y + h + 1, 0xFF444444);
+			DrawHelper.fill(matrix, x - 0.5, y - 0.5, x + w + 0.5, y + h + 0.5, Colors.LIGHT_GRAY);
 		}
-		textureManager.bindTexture(this.getId());
-		
-		this.draw(x, y, (float) w, (float) h);
+		textureManager.bindTexture(this.getId());		
+		this.draw(matrix, x, y, (float) w, (float) h);
 	}
 	
 	private static Identifier iconId(Identifier id) {

@@ -4,12 +4,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import com.mojang.blaze3d.systems.RenderSystem;
-
 import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.util.ImageUtil;
 import ru.bulldog.justmap.util.DrawHelper;
+
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 
@@ -88,8 +87,6 @@ public class MapSkin extends Sprite {
 		} else {
 			bindPavedTexture(w, h);
 		}
-		RenderSystem.enableAlphaTest();
-		RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
 		DrawHelper.blit(x, y, 0, w, h, this);
 	}
 	

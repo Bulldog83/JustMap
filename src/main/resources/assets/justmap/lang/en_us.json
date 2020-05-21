@@ -16,6 +16,7 @@
   "justmap.configuration.category.appearance": "Map Appearance",
   "justmap.configuration.category.waypoints": "Waypoints",
   "justmap.configuration.category.entity_radar": "Entity Radar",
+  "justmap.configuration.category.details": "Map Details",
 
   "justmap.configuration.map_offset": "Offset",
   "justmap.configuration.map_position": "Map Position",
@@ -27,7 +28,8 @@
   "justmap.configuration.show_in_chat": "Show map while in chat",
   "justmap.configuration.show_terrain": "Show Terrain",
   "justmap.configuration.show_caves": "Show Caves",
-  "justmap.configuration.ignore_plants": "Ignore Plants",
+  "justmap.configuration.hide_plants": "Hide Plants",
+  "justmap.configuration.hide_water": "Hide Water",
   "justmap.configuration.terrain_strength": "Terrain Strength",
   "justmap.configuration.show_grid": "Show Grid Lines",
   "justmap.configuration.show_position": "Show Position",
@@ -39,6 +41,7 @@
   "justmap.configuration.show_effect_timers": "Show status effect timers",
   "justmap.configuration.rotate_map": "Orient the map by player",
   "justmap.configuration.alternate_color_render": "Alternate map colors rendering",
+  "justmap.configuration.water_tint": "Water Tint",
   "justmap.configuration.use_skins": "Use map skins",
   "justmap.configuration.current_skin": "Current Skin",
   "justmap.configuration.simple_arrow": "Simple Direction Arrow",
@@ -81,6 +84,7 @@
   "justmap.gui.create": "Create",
   "justmap.gui.name": "Name",
   "justmap.gui.chat": "Chat",
+  "justmap.gui.teleport": "Jump",
   "justmap.gui.wp_hidden": "Hidden",
   "justmap.gui.wp_tracking": "Screen Edge",
   "justmap.gui.wp_render": "In World"

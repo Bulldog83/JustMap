@@ -1,10 +1,12 @@
 package ru.bulldog.justmap.util;
 
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 
 import ru.bulldog.justmap.JustMap;
 
 import net.fabricmc.fabric.impl.client.indigo.renderer.helper.ColorHelper;
+
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.resource.Resource;
@@ -14,13 +16,26 @@ import net.minecraft.util.Identifier;
 public class ImageUtil {
 	private ImageUtil() {}	
 
-	private static ResourceManager resourceManager = MinecraftClient.getInstance().getResourceManager();
+	private static ResourceManager resourceManager;
+	
+	private static void checkResourceManager() {
+		if (resourceManager == null) resourceManager = MinecraftClient.getInstance().getResourceManager();
+	}
 	
 	public static boolean imageExists(Identifier image) {
-		return resourceManager.containsResource(image);
+		if (image == null) return false;
+		
+		try {
+			return resourceManager.containsResource(image);
+		} catch(Exception ex) {
+			JustMap.LOGGER.catching(ex);
+			return false;
+		}
 	}
 	
 	public static NativeImage loadImage(Identifier image, int w, int h) {
+		checkResourceManager();
+		
 		if (imageExists(image)) {
 			try (Resource resource = resourceManager.getResource(image)) {
 				return NativeImage.read(resource.getInputStream());			
@@ -87,10 +102,18 @@ public class ImageUtil {
 				int yp = y + j;
 				if (yp < 0) continue;
 				
-				image.setPixelRgba(xp, yp, tile.getPixelRgba(i, j));
+				try {
+					image.setPixelRgba(xp, yp, tile.getPixelRgba(i, j));
+				} catch(Exception ex) {
+					return null;
+				}
 			}
 		}
 		
 		return image;
+	}
+	
+	public static NativeImage fromBufferedImage(BufferedImage image) {
+		return null;
 	}
 }

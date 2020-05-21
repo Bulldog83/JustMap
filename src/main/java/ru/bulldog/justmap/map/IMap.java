@@ -1,6 +1,6 @@
 package ru.bulldog.justmap.map;
 
-public interface AbstractMap {
+public interface IMap {
 	abstract int getWidth();	
 	abstract int getHeight();	
 	abstract int getScaledWidth();	

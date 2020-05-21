@@ -17,6 +17,7 @@ public final class Colors {
 	public static final int PINK = 0xFFFFC0CB;
 	public static final int MAGENTA = 0xFFFF00FF;
 	public static final int PURPLE = 0xFF6A0DAD;
+	public static final int LIGHT_GRAY = 0xFFBBBBBB;
 	public static final int GRAY = 0xFF676676;
 	
 	public static final int LIGHT = 15728880;

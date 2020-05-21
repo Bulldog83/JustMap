@@ -2,8 +2,9 @@ package ru.bulldog.justmap.map.minimap;
 
 import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.client.config.ClientParams;
-import ru.bulldog.justmap.map.AbstractMap;
-import ru.bulldog.justmap.map.data.Layers.Type;
+import ru.bulldog.justmap.client.render.MapTexture;
+import ru.bulldog.justmap.map.IMap;
+import ru.bulldog.justmap.map.data.Layer.Type;
 import ru.bulldog.justmap.map.data.MapCache;
 import ru.bulldog.justmap.map.icon.EntityIcon;
 import ru.bulldog.justmap.map.icon.PlayerIcon;
@@ -11,14 +12,15 @@ import ru.bulldog.justmap.map.icon.WaypointIcon;
 import ru.bulldog.justmap.map.waypoint.Waypoint;
 import ru.bulldog.justmap.map.waypoint.WaypointEditor;
 import ru.bulldog.justmap.map.waypoint.WaypointKeeper;
+import ru.bulldog.justmap.util.Colors;
 import ru.bulldog.justmap.util.DrawHelper.TextAlignment;
+import ru.bulldog.justmap.util.PosUtil;
 import ru.bulldog.justmap.util.math.MathUtil;
 import ru.bulldog.justmap.util.math.RandomUtil;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ChatScreen;
 import net.minecraft.client.resource.language.I18n;
-import net.minecraft.client.texture.NativeImage;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.mob.HostileEntity;
@@ -35,7 +37,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
-public class Minimap implements AbstractMap{
+public class Minimap implements IMap{
 	
 	private static final MinecraftClient minecraftClient = MinecraftClient.getInstance();
 	
@@ -48,12 +50,13 @@ public class Minimap implements AbstractMap{
 	
 	private int mapWidth;
 	private int mapHeight;
+	private int scaledSize;
 	private float mapScale;
-	private int picSize;
+	private int lastPosX = 0;
+	private int lastPosZ = 0;
 	
-	private Biome currentBiome;
-	
-	private NativeImage image;
+	private Biome currentBiome;	
+	private MapTexture image;
 	
 	private List<WaypointIcon> waypoints = new ArrayList<>();
 	private List<PlayerIcon> players = new ArrayList<>();
@@ -63,17 +66,17 @@ public class Minimap implements AbstractMap{
 	
 	private static boolean isMapVisible = true;
 	private static boolean rotateMap = false;
+	private static boolean showChunkGrid = false;
+	
+	public boolean changed = false;
+	
+	private Object imageLocker = new Object();
 	
 	private Object imageLock = new Object();
 	
 	public Minimap() {
-		this.mapWidth = JustMapClient.CONFIG.getInt("map_size");
-		this.mapHeight = JustMapClient.CONFIG.getInt("map_size");
-		this.mapScale = JustMapClient.CONFIG.getFloat("map_scale");		
-		this.picSize = ClientParams.rotateMap ? (int) (mapWidth * 1.3) : mapWidth;
 		this.textManager = new TextManager(this);
-		
-		isMapVisible = JustMapClient.CONFIG.getBoolean("map_visible");
+		this.updateMapParams();
 	}
 	
 	public void update() {
@@ -92,31 +95,42 @@ public class Minimap implements AbstractMap{
 		}
 	}
 	
-	private void resizeMap(int newSize) {
-		Object lock = this.imageLock;
-		synchronized (lock) {
-			if (this.image != null) {
+	private void renewMap() {
+		synchronized (imageLocker) {
+			if (image != null) {
 				this.image.close();
-			}
-			this.image = new NativeImage(newSize, newSize, false);
+			}		
+			int size = this.getScaledSize();
+			this.image = new MapTexture(size, size);
+			this.image.fill(Colors.BLACK);
 		}
+		
+		MapCache.renewNeeded = true;		
+		this.changed = true;
 	}
 	
-	public void onConfigChanges() {
+	public void updateMapParams() {
 		int configSize = JustMapClient.CONFIG.getInt("map_size");
 		float configScale = JustMapClient.CONFIG.getFloat("map_scale");		
 		boolean needRotate = JustMapClient.CONFIG.getBoolean("rotate_map");
+		boolean showGrid = JustMapClient.CONFIG.getBoolean("draw_chunk_grid");
 		
-		if (configSize != mapWidth || configScale != mapScale) {
+		if (configSize != mapWidth || configScale != mapScale ||
+			rotateMap != needRotate || showChunkGrid != showGrid) {
+			
 			this.mapWidth = configSize;
 			this.mapHeight = configSize;
 			this.mapScale = configScale;
 			
-			resizeMap(getScaledSize());
-		}
-		if (rotateMap != needRotate) {
+			showChunkGrid = showGrid;
 			rotateMap = needRotate;
-			resizeMap(getScaledSize());
+			if (rotateMap) {
+				this.scaledSize = (int) ((mapWidth * mapScale) * 1.42 + 8);
+			} else {
+				this.scaledSize = (int) ((mapWidth * mapScale) + 8);
+			}
+			
+			this.renewMap();
 		}
 		
 		isMapVisible = JustMapClient.CONFIG.getBoolean("map_visible");
@@ -127,7 +141,7 @@ public class Minimap implements AbstractMap{
 		
 		if (ClientParams.showPosition) {
 			Entity camera = minecraftClient.cameraEntity;
-			txtCoords.setText(MathUtil.posToString(camera.getX(), camera.getY(), camera.getZ()));
+			txtCoords.setText(PosUtil.posToString(camera.getX(), camera.getY(), camera.getZ()));
 			textManager.add(txtCoords);
 		}		
 		if (ClientParams.showBiome) {
@@ -139,12 +153,12 @@ public class Minimap implements AbstractMap{
 			textManager.add(txtFPS);
 		}		
 		if (ClientParams.showTime) {
-			txtTime.setText(getTimeString(minecraftClient.world.getTimeOfDay()));
+			txtTime.setText(this.timeString(minecraftClient.world.getTimeOfDay()));
 			textManager.add(txtTime);
 		}
 	}
 	
-	private String getTimeString(long time) {
+	private String timeString(long time) {
 		time = time > 24000 ? time % 24000 : time;
 	
 		int h = (int) time / 1000 + 6;
@@ -164,7 +178,7 @@ public class Minimap implements AbstractMap{
 	}
 	
 	private boolean needRenderCaves(World world, BlockPos playerPos) {
-		boolean allowCaves = isAllowed(ClientParams.showCaves, MapGameRules.ALLOW_CAVES_MAP);
+		boolean allowCaves = isAllowed(ClientParams.drawCaves, MapGameRules.ALLOW_CAVES_MAP);
 		
 		DimensionType dimType = world.getDimension().getType();
 		if (dimType.hasSkyLight()) {
@@ -196,32 +210,41 @@ public class Minimap implements AbstractMap{
 	
 	public void prepareMap(PlayerEntity player) {
 		World world = player.world;
-		BlockPos pos = player.getBlockPos();
+		BlockPos pos = PosUtil.currentPos();
 		
 		currentBiome = world.getBiome(pos);
 		
-		int scaled = getScaledSize();
-		double startX = pos.getX() - scaled / 2;
-		double startZ = pos.getZ() - scaled / 2;
+		int posX = pos.getX();
+		int posZ = pos.getZ();
+		int posY = pos.getY();
+		int scaled = this.getScaledSize();
+		double startX = posX - scaled / 2;
+		double startZ = posZ - scaled / 2;
 
 		if (world.dimension.isNether()) {
-			MapCache.setCurrentLayer(Type.NETHER.value, pos.getY());
-		} else if (needRenderCaves(world, player.getBlockPos())) {
-			MapCache.setCurrentLayer(Type.CAVES.value, pos.getY());
+			MapCache.setCurrentLayer(Type.NETHER, posY);
+		} else if (needRenderCaves(world, pos)) {
+			MapCache.setCurrentLayer(Type.CAVES, posY);
 		} else {
-			MapCache.setCurrentLayer(Type.SURFACE.value, pos.getY());
+			MapCache.setCurrentLayer(Type.SURFACE, posY);
 		}
 		
-		MapCache.get().update(this, scaled, (int) startX, (int) startZ);
+		if (changed || lastPosX != posX || lastPosZ != posZ) { 
+			MapCache.get().update(this, scaled, posX, posZ);
+			this.lastPosX = posX;
+			this.lastPosZ = posZ;
+		}
 		
 		if (ClientParams.rotateMap) {
 			scaled = (int) (mapWidth * mapScale);
-			startX = pos.getX() - scaled / 2;
-			startZ = pos.getZ() - scaled / 2;
+			startX = posX - scaled / 2;
+			startZ = posZ - scaled / 2;
 		}		
 		
 		double endX = startX + scaled;
 		double endZ = startZ + scaled;
+		double shiftX = (PosUtil.doubleCoordX() - lastPosX) / this.mapScale;
+		double shiftZ = (PosUtil.doubleCoordZ() - lastPosZ) / this.mapScale;
 		
 		if (allowPlayerRadar()) {
 			players.clear();			
@@ -234,12 +257,11 @@ public class Minimap implements AbstractMap{
 				BlockPos ppos = p.getBlockPos();
 			 
 				int x = ppos.getX();
-				int z = ppos.getZ();
-				
+				int z = ppos.getZ();				
 				if (x >= startX && x <= endX && z >= startZ && z <= endZ) {
 					PlayerIcon playerIcon = new PlayerIcon(this, p, false);
 					playerIcon.setPosition(MathUtil.screenPos(x, startX, endX, mapWidth),
-										   MathUtil.screenPos(z, startZ, endZ, mapWidth));
+										   MathUtil.screenPos(z, startZ, endZ, mapHeight));
 					this.players.add(playerIcon);
 				}
 			}
@@ -249,26 +271,25 @@ public class Minimap implements AbstractMap{
 			entities.clear();
 			
 			int checkHeight = 24;
-			BlockPos start = new BlockPos(startX, player.getY() - checkHeight / 2, startZ);
-			BlockPos end = new BlockPos(endX, player.getY() + checkHeight / 2, endZ);
+			BlockPos start = new BlockPos(startX, posY - checkHeight / 2, startZ);
+			BlockPos end = new BlockPos(endX, posY + checkHeight / 2, endZ);
 			List<Entity> entities = world.getEntities((Entity) null, new Box(start, end));
 		
-			int amount = 0;
-				
+			int amount = 0;				
 			for (Entity entity : entities) {
 				if (entity instanceof LivingEntity && !(entity instanceof PlayerEntity)) {
 					LivingEntity livingEntity = (LivingEntity) entity;
 					boolean hostile = livingEntity instanceof HostileEntity;
+					double entX = MathUtil.screenPos(entity.getX(), startX, endX, mapWidth);
+					double entZ = MathUtil.screenPos(entity.getZ(), startZ, endZ, mapHeight);
 					if (hostile && allowHostileRadar()) {
-						EntityIcon entIcon = new EntityIcon(this, entity, hostile);						
-						entIcon.setPosition(MathUtil.screenPos((int) entity.getX(), startX, endX, mapWidth),
-											MathUtil.screenPos((int) entity.getZ(), startZ, endZ, mapWidth));
+						EntityIcon entIcon = new EntityIcon(this, entity, hostile);	
+						entIcon.setPosition(entX, entZ);
 						this.entities.add(entIcon);
 						amount++;
 					} else if (!hostile && allowCreatureRadar()) {
-						EntityIcon entIcon = new EntityIcon(this, entity, hostile);						
-						entIcon.setPosition(MathUtil.screenPos((int) entity.getX(), startX, endX, mapWidth),
-											MathUtil.screenPos((int) entity.getZ(), startZ, endZ, mapWidth));
+						EntityIcon entIcon = new EntityIcon(this, entity, hostile);	
+						entIcon.setPosition(entX, entZ);
 						this.entities.add(entIcon);
 						amount++;
 					}
@@ -284,8 +305,8 @@ public class Minimap implements AbstractMap{
 			for (Waypoint wp : stream.toArray(Waypoint[]::new)) {
 				WaypointIcon waypoint = new WaypointIcon(this, wp);
 				waypoint.setPosition(
-					MathUtil.screenPos(wp.pos.getX(), startX, endX, mapWidth),
-					MathUtil.screenPos(wp.pos.getZ(), startZ, endZ, mapWidth)
+					MathUtil.screenPos(wp.pos.getX(), startX, endX, mapWidth) - shiftX,
+					MathUtil.screenPos(wp.pos.getZ(), startZ, endZ, mapHeight) - shiftZ
 				);
 				this.waypoints.add(waypoint);
 			}
@@ -311,25 +332,14 @@ public class Minimap implements AbstractMap{
 		createWaypoint(player.world.dimension.getType().getRawId(), player.getBlockPos());
 	}
 	
-	public NativeImage getImage() {
-		if (image == null) {
-			int scaledSize = this.getScaledSize();			
-			this.image = new NativeImage(scaledSize, scaledSize, false);
-		}
-		
-		Object lock = this.imageLock;
-		synchronized (lock) {
+	public MapTexture getImage() {
+		synchronized (imageLocker) {
 			return this.image;
 		}		
 	}
 	
-	public int getPictureSize() {
-		return this.picSize;
-	}
-	
 	public int getScaledSize() {
-		this.picSize = ClientParams.rotateMap ? (int) (mapWidth * 1.3) : mapWidth;
-		return (int) (picSize * mapScale);
+		return this.scaledSize;
 	}
 	
 	public float getScale() {
@@ -356,6 +366,14 @@ public class Minimap implements AbstractMap{
 		
 		return isMapVisible;
 	}
+	
+	public int getLasX() {
+		return this.lastPosX;
+	}
+	
+	public int getLastZ() {
+		return this.lastPosZ;
+	}
 
 	@Override
 	public int getWidth() {
@@ -369,11 +387,11 @@ public class Minimap implements AbstractMap{
 
 	@Override
 	public int getScaledWidth() {
-		return (int) (this.mapWidth * this.mapScale);
+		return this.getScaledSize();
 	}
 
 	@Override
 	public int getScaledHeight() {
-		return (int) (this.mapHeight * this.mapScale);
+		return this.getScaledSize();
 	}
 }

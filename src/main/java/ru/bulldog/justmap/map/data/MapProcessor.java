@@ -6,7 +6,6 @@ import ru.bulldog.justmap.util.StateUtil;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
-import net.minecraft.world.World;
 import net.minecraft.world.chunk.WorldChunk;
 
 public class MapProcessor {
@@ -15,26 +14,28 @@ public class MapProcessor {
 		WorldChunk worldChunk = mapChunk.getWorldChunk();
 		ChunkPos chunkPos = worldChunk.getPos();		
 		
+		if (worldChunk.isEmpty()) return -1;
+		
 		int posX = x + (chunkPos.x << 4);
 		int posZ = z + (chunkPos.z << 4);
 		
-		boolean plants = !ClientParams.ignorePlants;
+		boolean plants = !ClientParams.hidePlants;
 		
-		Layers layer = mapChunk.getLayer();
-		if ((layer.equals(Layers.Type.NETHER.value) || layer.equals(Layers.Type.CAVES.value)) && liquids) {
+		Layer layer = mapChunk.getLayer().value;
+		if ((layer.equals(Layer.Type.NETHER.value) || layer.equals(Layer.Type.CAVES.value)) && liquids) {
 			int level = mapChunk.getLevel();
 			int floor = level * layer.height;
 			for (int i = floor + (layer.height - 1); i >= floor; i--) {
 				BlockPos worldPos = loopPos(worldChunk, new BlockPos(posX, i, posZ), 0, liquids, plants);
 				BlockPos overPos = new BlockPos(posX, worldPos.getY() + 1, posZ);
-				if (checkBlockState(worldChunk.getBlockState(overPos), liquids, plants)) {
+				if (StateUtil.checkState(worldChunk.getBlockState(overPos), liquids, plants)) {
 					return worldPos.getY();
 				}
 			}
 		} else {
 			BlockPos worldPos = loopPos(worldChunk, new BlockPos(posX, y, posZ), 0, liquids, plants);
 			BlockState overState = worldChunk.getBlockState(new BlockPos(posX, worldPos.getY() + 1, posZ));
-			if (checkBlockState(overState, liquids, plants)) {
+			if (StateUtil.checkState(overState, liquids, plants)) {
 				return worldPos.getY();
 			}
 		}
@@ -45,7 +46,7 @@ public class MapProcessor {
 	private static BlockPos loopPos(WorldChunk worldChunk, BlockPos pos, int stop, boolean liquids, boolean plants) {
 		boolean loop = false;		
 		do {
-			loop = checkBlockState(worldChunk.getBlockState(pos), liquids, plants);			
+			loop = StateUtil.checkState(worldChunk.getBlockState(pos), liquids, plants);			
 			loop &= pos.getY() > stop;
 			if (loop) pos = pos.down();
 		} while (loop);
@@ -53,17 +54,12 @@ public class MapProcessor {
 		return pos;
 	}
 	
-	private static boolean checkBlockState(BlockState state, boolean liquids, boolean plants) {
-		return StateUtil.isAir(state) || (!liquids && StateUtil.isUnderwater(state)) || (!plants && StateUtil.isPlant(state));
-	}
-	
 	private static int checkLiquids(MapChunk mapChunk, int x, int y, int z) {
 		WorldChunk worldChunk = mapChunk.getWorldChunk();
 		if (worldChunk.isEmpty() || y == -1) return 0;
 		
-		World world = mapChunk.getWorldChunk().getWorld();
 		BlockPos pos = new BlockPos(x + (mapChunk.getX() << 4), y, z + (mapChunk.getZ() << 4));
-		BlockState state = world.getBlockState(pos);
+		BlockState state = worldChunk.getBlockState(pos);
 		if (StateUtil.isLiquid(state, false)) {
 			y = getTopBlockY(mapChunk, x, y, z, false);
 		}

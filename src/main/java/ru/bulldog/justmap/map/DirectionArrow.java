@@ -36,7 +36,7 @@ public class DirectionArrow extends Sprite {
 	}
 	
 	public static void draw(int x, int y, float rotation) {
-		draw(x, y, 10, rotation);
+		draw(x, y, 14, rotation);
 	}
 	
 	public static void draw(double x, double y, int size, float rotation) {		
