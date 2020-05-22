@@ -24,7 +24,7 @@ public abstract class PlayerEntityMixin extends LivingEntity {
 	@Inject(at = @At("RETURN"), method = "dropInventory")
 	public void onDropInventory(CallbackInfo ci) {
 		Waypoint waypoint = new Waypoint();
-		waypoint.dimension = this.dimension.getRawId();
+		waypoint.dimension = this.world.method_27983().getValue();
 		waypoint.name = "Player Death";
 		waypoint.pos = this.getBlockPos();
 		waypoint.setIcon(Waypoint.getIcon(Waypoint.Icons.CROSS), Colors.RED);

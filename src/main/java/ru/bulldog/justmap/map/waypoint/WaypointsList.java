@@ -83,11 +83,11 @@ public class WaypointsList extends MapScreen {
 			DrawHelper.DRAWER.drawStringWithShadow(matrixStack, font, waypoint.name, nameX, stringY, Colors.WHITE);
 			
 			int posX = tpButton.x - 5;
-			DrawHelper.DRAWER.drawRightAlignedString(font, waypoint.pos.toShortString(), posX, stringY, Colors.WHITE);
+			DrawHelper.drawRightAlignedString(waypoint.pos.toShortString(), posX, stringY, Colors.WHITE);
 			
-			editButton.render(mouseX, mouseY, delta);
-			tpButton.render(mouseX, mouseY, delta);
-			deleteButton.render(mouseX, mouseY, delta);
+			editButton.render(matrixStack, mouseX, mouseY, delta);
+			tpButton.render(matrixStack, mouseX, mouseY, delta);
+			deleteButton.render(matrixStack, mouseX, mouseY, delta);
 		}
 	
 		@Override
@@ -121,9 +121,9 @@ public class WaypointsList extends MapScreen {
 	private static final Text title = new LiteralText("Waypoints");
 	
 	private WaypointKeeper keeper = WaypointKeeper.getInstance();
-	private int currentDim = 0;
+	private Identifier currentDim;
 	private int currentDimIndex = 0;
-	private List<Integer> dimensions;
+	private List<Identifier> dimensions;
 	private List<Waypoint> wayPoints;
 	private List<Entry> entries = new ArrayList<>();
 
@@ -137,11 +137,11 @@ public class WaypointsList extends MapScreen {
 	public WaypointsList(Screen parent) {
 		super(title, parent);
 		
-		dimensions = keeper.getDimensions();
+		this.dimensions = keeper.getDimensions();
 		
-		int overworld = DimensionType.OVERWORLD.getRawId();
-		int nether = DimensionType.THE_NETHER.getRawId();
-		int theEnd = DimensionType.THE_END.getRawId();
+		Identifier overworld = DimensionType.OVERWORLD_REGISTRY_KEY.getValue();
+		Identifier nether = DimensionType.THE_NETHER_REGISTRY_KEY.getValue();
+		Identifier theEnd = DimensionType.THE_END_REGISTRY_KEY.getValue();
 		if (!dimensions.contains(overworld)) {
 			dimensions.add(overworld);
 		}		
@@ -162,7 +162,7 @@ public class WaypointsList extends MapScreen {
 		this.nextDimensionButton = new ButtonWidget(x + screenWidth - 30, 10, 20, 20, new LiteralText(">"), (b) -> cycleDimension(1));		
 		this.addButton = new ButtonWidget(center - 62, height - 26, 60, 20, lang("create"), (b) -> add());
 		this.closeButton = new ButtonWidget(center + 2, height - 26, 60, 20, lang("close"), (b) -> onClose());
-		this.currentDim = client.player.dimension.getRawId();
+		this.currentDim = client.world.method_27983().getValue();
 		this.currentDimIndex = getDimIndex(currentDim);
 		
 		reset();
@@ -202,12 +202,12 @@ public class WaypointsList extends MapScreen {
 		reset();
 	}
 	
-	private int getDimIndex(int dim) {
+	private int getDimIndex(Identifier dim) {
 		return dimensions.indexOf(dim);
 	}
 	
 	public void reset() {
-		this.info = getDimensionInfo(currentDim);
+		this.info = this.getDimensionInfo(currentDim);
 		
 		this.wayPoints = keeper.getWaypoints(currentDim, false);
 		createEntries();
@@ -233,13 +233,11 @@ public class WaypointsList extends MapScreen {
 		drawScrollBar();
 	}
 	
-	private Pair<String, Identifier> getDimensionInfo(int dim) {
-		DimensionType type = DimensionType.byRawId(dim);
+	private Pair<String, Identifier> getDimensionInfo(Identifier dim) {
 		String key = "unknown";
-		if (type != null) {
-			 key = type.toString();
-		}
-		
+		if (dim != null) {
+			 key = dim.toString();
+		}		
 		return DIMENSION_INFO.getOrDefault(key, null);
 	}
 	
@@ -266,11 +264,11 @@ public class WaypointsList extends MapScreen {
 	}
 	
 	public void teleport(Waypoint waypoint) {
-		if (minecraft.player.dimension.getRawId() != currentDim) return;
-		int y = waypoint.pos.getY() > 0 ? waypoint.pos.getY() : (this.minecraft.player.dimension != DimensionType.THE_NETHER ? 128 : 64);
-		this.minecraft.player.sendChatMessage("/tp " + this.minecraft.player.getName().asString() + " " + waypoint.pos.getX() + " " + y + " " + waypoint.pos.getZ());
-		if (!this.minecraft.isIntegratedServerRunning()) {
-			this.minecraft.player.sendChatMessage("/tppos " + waypoint.pos.getX() + " " + y + " " + waypoint.pos.getZ());
+		if (!client.world.method_27983().getValue().equals(currentDim)) return;
+		int y = waypoint.pos.getY() > 0 ? waypoint.pos.getY() : (this.client.world.getDimension().isNether() ? 128 : 64);
+		this.client.player.sendChatMessage("/tp " + this.client.player.getName().asString() + " " + waypoint.pos.getX() + " " + y + " " + waypoint.pos.getZ());
+		if (!this.client.isIntegratedServerRunning()) {
+			this.client.player.sendChatMessage("/tppos " + waypoint.pos.getX() + " " + y + " " + waypoint.pos.getZ());
 		}
 		this.onClose();
 	}

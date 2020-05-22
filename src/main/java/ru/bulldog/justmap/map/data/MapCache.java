@@ -10,8 +10,10 @@ import ru.bulldog.justmap.util.TaskManager;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
+import net.minecraft.world.dimension.DimensionType;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -24,11 +26,11 @@ public class MapCache {
 	private final static MinecraftClient minecraft = MinecraftClient.getInstance();
 	private final static TaskManager mapUpdater = TaskManager.getManager("cache-data");
 	
-	private static Map<Integer, MapCache> dimensions = new HashMap<>();
+	private static Map<Identifier, MapCache> dimensions = new HashMap<>();
 	private static World currentWorld;
-	private static Layer.Type currentLayer = Layer.Type.SURFACE;	
+	private static Layer.Type currentLayer = Layer.Type.SURFACE;
+	private static Identifier currentDimension = DimensionType.OVERWORLD_REGISTRY_KEY.getValue();
 	private static int currentLevel = 0;
-	private static int currentDimension = 0;
 	
 	public static void setCurrentLayer(Layer.Type layer, int y) {
 		currentLevel =  y / layer.value.height;
@@ -48,7 +50,7 @@ public class MapCache {
 		
 		if (currentWorld == null) return null;
 		
-		int dimId = currentWorld.dimension.getType().getRawId();
+		Identifier dimId = currentWorld.method_27983().getValue();
 		if(currentDimension != dimId) {
 			StorageUtil.updateCacheStorage();
 			currentDimension = dimId;
@@ -57,7 +59,7 @@ public class MapCache {
 		return get(currentWorld, currentDimension);
 	}
 	
-	public static MapCache get(World world, int dimension) {	
+	public static MapCache get(World world, Identifier dimension) {	
 		MapCache data = getData(world, dimension);
 		
 		if (data == null) return null;
@@ -72,7 +74,7 @@ public class MapCache {
 		return data;
 	}
 	
-	private static MapCache getData(World world, int dimendion) {
+	private static MapCache getData(World world, Identifier dimendion) {
 		if (world == null) return null;
 		
 		if (dimensions.containsKey(dimendion)) {

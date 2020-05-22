@@ -21,7 +21,6 @@ import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.client.util.math.Vector3f;
-import net.minecraft.text.LiteralText;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
@@ -57,7 +56,7 @@ public class WaypointRenderer {
 				return;
 			}
 		
-			List<Waypoint> wayPoints = WaypointKeeper.getInstance().getWaypoints(client.player.dimension.getRawId(), true);
+			List<Waypoint> wayPoints = WaypointKeeper.getInstance().getWaypoints(client.world.method_27983().getValue(), true);
 			for (Waypoint wp : wayPoints) {
 				int dist = (int) MathUtil.getDistance(wp.pos, client.player.getBlockPos(), false);
 				if (wp.tracking && dist <= wp.showRange) {
@@ -107,7 +106,7 @@ public class WaypointRenderer {
 			
 			BlockPos playerPos = client.player.getBlockPos();
 			
-			List<Waypoint> wayPoints = WaypointKeeper.getInstance().getWaypoints(client.player.dimension.getRawId(), true);			
+			List<Waypoint> wayPoints = WaypointKeeper.getInstance().getWaypoints(client.world.method_27983().getValue(), true);			
 			for (Waypoint wp : wayPoints) {
 				int dist = (int) MathUtil.getDistance(wp.pos, playerPos, false);
 				if (wp.render && dist > ClientParams.minRenderDist && dist < ClientParams.maxRenderDist) {

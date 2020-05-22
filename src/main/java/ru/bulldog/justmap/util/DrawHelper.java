@@ -62,9 +62,9 @@ public class DrawHelper extends DrawableHelper {
 		DRAWER.drawStringWithShadow(matrix, textRenderer, string, drawX, y, color);
 	}
 
-	public static void drawRightAlignedString(String string, int i, int j, int white) {
-		int stringWidth = textRenderer.getWidth(string);
-		
+	public static void drawRightAlignedString(String string, int x, int y, int color) {
+		MatrixStack matrix = new MatrixStack();
+		textRenderer.drawWithShadow(matrix, string, x - textRenderer.getWidth(string), y, color);
 	}
 	
 	public static void drawDiamond(double x, double y, int width, int height, int color) {

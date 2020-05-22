@@ -302,8 +302,8 @@ public class MapRenderer {
 		}		
 		RenderSystem.popMatrix();
 		
-		DrawHelper.DRAWER.drawRightAlignedString(
-				client.textRenderer, Float.toString(minimap.getScale()),
+		DrawHelper.drawRightAlignedString(
+				Float.toString(minimap.getScale()),
 				mapX + mapW - 3, mapY + mapH - 10, Colors.WHITE);
 		
 		for (WaypointIcon waypoint : minimap.getWaypoints()) {
@@ -318,7 +318,8 @@ public class MapRenderer {
 		
 		DirectionArrow.draw(arrowX, arrowY, ClientParams.rotateMap ? 180 : rotation);
 		
-		this.textManager.draw();
+		MatrixStack matrix = new MatrixStack();
+		this.textManager.draw(matrix);
 		
 		RenderSystem.enableDepthTest();
 	}

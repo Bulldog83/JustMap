@@ -12,12 +12,13 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
+import net.minecraft.util.Identifier;
 import ru.bulldog.justmap.util.JsonFactory;
 import ru.bulldog.justmap.util.StorageUtil;
 
 public class WaypointKeeper extends JsonFactory {
 	
-	private static Map<Integer, List<Waypoint>> waypoints;	
+	private static Map<Identifier, List<Waypoint>> waypoints;	
 	
 	private static WaypointKeeper instance;
 	private static File currentStorage;
@@ -54,7 +55,7 @@ public class WaypointKeeper extends JsonFactory {
 	
 	public void saveWaypoints() {
 		JsonArray waypointArray = new JsonArray();
-		for (Entry<Integer, List<Waypoint>> entry : waypoints.entrySet()) {
+		for (Entry<Identifier, List<Waypoint>> entry : waypoints.entrySet()) {
 			List<Waypoint> list = entry.getValue();			
 			for (Waypoint wp : list) {
 				waypointArray.add(wp.toJson());
@@ -76,7 +77,7 @@ public class WaypointKeeper extends JsonFactory {
 		getWaypoints(waypoint.dimension, false).remove(waypoint);
 	}
 	
-	public List<Waypoint> getWaypoints(int dimension, boolean hiddenFilter) {
+	public List<Waypoint> getWaypoints(Identifier dimension, boolean hiddenFilter) {
 		List<Waypoint> list;
 		if (waypoints.get(dimension) == null) {
 			list = new ArrayList<>();
@@ -93,7 +94,7 @@ public class WaypointKeeper extends JsonFactory {
 		return list;
 	}
 	
-	public List<Integer> getDimensions() {
+	public List<Identifier> getDimensions() {
 		return new ArrayList<>(waypoints.keySet());
 	}
 }

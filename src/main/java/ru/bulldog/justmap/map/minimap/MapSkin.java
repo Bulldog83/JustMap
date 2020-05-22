@@ -90,7 +90,7 @@ public class MapSkin extends Sprite {
 		} else {
 			bindPavedTexture(w, h);
 		}
-		DrawHelper.blit(x, y, 0, w, h, this);
+		DrawHelper.drawSprite(matrixStack, x, y, 0, w, h, this);
 	}
 	
 	public void draw(MatrixStack matrixStack, int x, int y, int size) {

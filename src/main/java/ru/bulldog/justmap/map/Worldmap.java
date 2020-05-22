@@ -13,8 +13,10 @@ import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormats;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.text.LiteralText;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.dimension.DimensionType;
@@ -66,7 +68,7 @@ public class Worldmap extends MapScreen implements IMap {
 	private long updateInterval = 50;
 	private long updated = 0;
 	
-	private DimensionType dimension;
+	private Identifier dimension;
 	private BlockPos centerPos;
 	private MapTexture mapImage;
 	private MapTexture bufferImage;
@@ -98,8 +100,9 @@ public class Worldmap extends MapScreen implements IMap {
 		this.addMapButtons();
 		this.updateScale();
 		
-		if (centerPos == null || player.dimension != dimension) {
-			this.dimension = player.dimension;
+		Identifier dimId = client.world.method_27983().getValue();
+		if (centerPos == null || !dimId.equals(dimension)) {
+			this.dimension = dimId;
 			this.centerPos = PosUtil.currentPos();
 			if (mapImage != null) {
 				this.updateMapTexture();
@@ -111,7 +114,7 @@ public class Worldmap extends MapScreen implements IMap {
 		this.cursorCoords = PosUtil.posToString(centerPos);
 		
 		waypoints.clear();
-		List<Waypoint> wps = WaypointKeeper.getInstance().getWaypoints(dimension.getRawId(), true);
+		List<Waypoint> wps = WaypointKeeper.getInstance().getWaypoints(dimension, true);
 		if (wps != null) {
 			Stream<Waypoint> stream = wps.stream().filter(wp -> MathUtil.getDistance(player.getBlockPos(), wp.pos) <= wp.showRange);
 			for (Waypoint wp : stream.toArray(Waypoint[]::new)) {
@@ -164,9 +167,9 @@ public class Worldmap extends MapScreen implements IMap {
 	}
 	
 	@Override
-	public void renderForeground() {
+	public void renderForeground(MatrixStack matrixStack) {
 		this.drawBorders(paddingTop, paddingBottom);
-		this.drawCenteredString(minecraft.textRenderer, cursorCoords, width / 2, paddingTop + 4, Colors.WHITE);
+		this.drawCenteredString(matrixStack, client.textRenderer, cursorCoords, width / 2, paddingTop + 4, Colors.WHITE);
 	}
 	
 	private void prepareTexture() {
@@ -235,7 +238,7 @@ public class Worldmap extends MapScreen implements IMap {
 				}
 				
 				MapChunk mapChunk;
-				if (dimension == DimensionType.THE_NETHER) {
+				if (dimension.equals(DimensionType.THE_NETHER_REGISTRY_KEY.getValue())) {
 					mapChunk = mapData.getCurrentChunk(posX, posZ);
 				} else {
 					mapChunk = mapData.getChunk(Layer.Type.SURFACE, 0, posX, posZ);
@@ -411,7 +414,7 @@ public class Worldmap extends MapScreen implements IMap {
 		int chunkZ = posZ >> 4;
 		
 		MapChunk mapChunk;
-		if (dimension == DimensionType.THE_NETHER) {
+		if (dimension.equals(DimensionType.THE_NETHER_REGISTRY_KEY.getValue())) {
 			mapChunk = MapCache.get().getCurrentChunk(chunkX, chunkZ);
 		} else {
 			mapChunk = MapCache.get().getChunk(Layer.Type.SURFACE, 0, chunkX, chunkZ);
@@ -443,7 +446,7 @@ public class Worldmap extends MapScreen implements IMap {
 			if (time - clicked > 500) clicks = 0;
 			
 			if (++clicks == 2) {			
-				JustMapClient.MAP.createWaypoint(dimension.getRawId(), cursorBlockPos(d, e));
+				JustMapClient.MAP.createWaypoint(dimension, cursorBlockPos(d, e));
 				
 				clicked = 0;
 				clicks = 0;

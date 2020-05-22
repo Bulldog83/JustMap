@@ -48,10 +48,10 @@ public class MapText {
 				 DrawHelper.DRAWER.drawStringWithShadow(matrixStack, textRenderer, text.getString(), x, y, color);
 			 break;
 			 case CENTER:
-				 DrawHelper.drawBoundedString(text, x, y, 0, width - 2, color);
+				 DrawHelper.drawBoundedString(text.getString(), x, y, 0, width - 2, color);
 			 break;
 			 case RIGHT:
-				 DrawHelper.drawRightAlignedString(matrixStack, textRenderer, text, x, y, color);
+				 DrawHelper.drawRightAlignedString(text.getString(), x, y, color);
 			 break;
 		  }
 	  }
