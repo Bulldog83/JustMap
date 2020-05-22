@@ -78,6 +78,6 @@ public abstract class PlayerManagerMixin {
 	}
 	
 	private void sendCommand(ServerPlayerEntity serverPlayerEntity, Text command) {
-		serverPlayerEntity.networkHandler.sendPacket(new GameMessageS2CPacket(command, MessageType.SYSTEM));
+		serverPlayerEntity.networkHandler.sendPacket(new GameMessageS2CPacket(command, MessageType.SYSTEM, serverPlayerEntity.getUuid()));
 	}
 }
