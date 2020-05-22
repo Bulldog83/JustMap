@@ -5,7 +5,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.util.Colors;
-
+import ru.bulldog.justmap.util.math.MathUtil;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.DiffuseLighting;
 import net.minecraft.client.render.VertexConsumerProvider;
@@ -46,7 +46,12 @@ public class EntityModelRenderer {
 		matrixStack.push();
 		matrixStack.translate(x, y, 0);
 		matrixStack.translate(modelSize / 4, modelSize / 2, 0);
-		matrixStack.multiply(Vector3f.POSITIVE_X.getDegreesQuaternion(180.0F));
+		if (ClientParams.rotateMap) {
+			float rotation = MathUtil.correctAngle(minecraftClient.player.headYaw);
+			matrixStack.multiply(Vector3f.POSITIVE_Z.getDegreesQuaternion(rotation));
+		} else {
+			matrixStack.multiply(Vector3f.POSITIVE_X.getDegreesQuaternion(180.0F));
+		}		
 		matrixStack.push();
 		matrixStack.scale(scale, scale, scale);
 		

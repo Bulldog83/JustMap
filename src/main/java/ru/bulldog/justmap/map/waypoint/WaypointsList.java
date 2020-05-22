@@ -30,31 +30,36 @@ public class WaypointsList extends MapScreen {
 	
 		private int x, y, width, height;
 		
-		private ButtonWidget editButton, deleteButton;
+		private ButtonWidget editButton;
+		private ButtonWidget deleteButton;
+		private ButtonWidget tpButton;
 		private Waypoint waypoint;
 	
 		public Entry(WaypointsList wayPointListEditor, int x, int y, int width, int height, Waypoint waypoint) {
 			this.width = width;
-			this.height = height;
+			this.height = height + 2;
 			this.waypoint = waypoint;
 			
-			minecraft = MinecraftClient.getInstance();
+			this.minecraft = MinecraftClient.getInstance();
 			
-			editButton = new ButtonWidget(0, 0, 40, height, wayPointListEditor.lang("edit"), (b) -> wayPointListEditor.edit(waypoint));
-			deleteButton = new ButtonWidget(0, 0, 40, height, wayPointListEditor.lang("delete"), (b) -> wayPointListEditor.delete(waypoint));
+			this.editButton = new ButtonWidget(0, 0, 40, height, wayPointListEditor.lang("edit"), (b) -> wayPointListEditor.edit(waypoint));
+			this.deleteButton = new ButtonWidget(0, 0, 40, height, wayPointListEditor.lang("delete"), (b) -> wayPointListEditor.delete(waypoint));
+			this.tpButton = new ButtonWidget(0, 0, 40, height, wayPointListEditor.lang("teleport"), (b) -> wayPointListEditor.teleport(waypoint));
 			
-			setPosition(x, y);
+			this.setPosition(x, y);
 		}
 	
 		public void setPosition(int x, int y) {
 			this.x = x;
 			this.y = y;
 			
-			rightAlign(deleteButton, x + width);
-			rightAlign(editButton, deleteButton);
+			this.rightAlign(deleteButton, x + width - 2);
+			this.rightAlign(editButton, deleteButton);
+			this.rightAlign(tpButton, editButton);
 			
-			editButton.y = y;
-			deleteButton.y = y;
+			editButton.y = y + 1;
+			tpButton.y = y + 1;
+			deleteButton.y = y + 1;
 		}		
 		
 		public void render(MatrixStack matrixStack, int mouseX, int mouseY, float delta) {
@@ -64,35 +69,39 @@ public class WaypointsList extends MapScreen {
 			int bgColor = hover ? 0x88AAAAAA : 0x88333333;
 			fill(matrixStack, x, y, x + width, y + height, bgColor);
 			
-			int diamondSize = height - 2;
+			int iconSize = height - 2;
 			Icon icon = waypoint.getIcon();
 			if (icon != null) {
-				icon.draw(x, y + 1, diamondSize, diamondSize);
+				icon.draw(x, y + 1, iconSize, iconSize);
 			} else {
-				DrawHelper.drawDiamond(x, y + 1, diamondSize, diamondSize, waypoint.color);
+				DrawHelper.drawDiamond(x, y + 1, iconSize, iconSize, waypoint.color);
 			}
 			
-			int stringY = y + 6;
-			
-			int nameX = x + diamondSize + 2;
+			int stringY = y + 7;			
+			int nameX = x + iconSize + 2;
 
 			DrawHelper.DRAWER.drawStringWithShadow(matrixStack, font, waypoint.name, nameX, stringY, Colors.WHITE);
 			
-			int posX = editButton.x - 2;
-			DrawHelper.drawRightAlignedString(matrixStack, font, new LiteralText(waypoint.pos.toShortString()), posX, stringY, Colors.WHITE);
+			int posX = tpButton.x - 5;
+			DrawHelper.DRAWER.drawRightAlignedString(font, waypoint.pos.toShortString(), posX, stringY, Colors.WHITE);
 			
-			editButton.render(matrixStack, mouseX, mouseY, delta);
-			deleteButton.render(matrixStack, mouseX, mouseY, delta);
+			editButton.render(mouseX, mouseY, delta);
+			tpButton.render(mouseX, mouseY, delta);
+			deleteButton.render(mouseX, mouseY, delta);
 		}
 	
 		@Override
 		public boolean mouseClicked(double double_1, double double_2, int int_1) {
-			return editButton.mouseClicked(double_1, double_2, int_1) || deleteButton.mouseClicked(double_1, double_2, int_1);
+			return editButton.mouseClicked(double_1, double_2, int_1) ||
+				   deleteButton.mouseClicked(double_1, double_2, int_1) ||
+				   tpButton.mouseClicked(double_1, double_2, int_1);
 		}
 	
 		@Override
 		public boolean mouseReleased(double double_1, double double_2, int int_1) {
-			return editButton.mouseReleased(double_1, double_2, int_1) || deleteButton.mouseReleased(double_1, double_2, int_1);
+			return editButton.mouseReleased(double_1, double_2, int_1) ||
+				   deleteButton.mouseReleased(double_1, double_2, int_1) ||
+				   tpButton.mouseReleased(double_1, double_2, int_1);
 		}
 	
 		@Override
@@ -101,7 +110,7 @@ public class WaypointsList extends MapScreen {
 		}
 	
 		private void rightAlign(ButtonWidget toAlign, ButtonWidget from) {
-			toAlign.x = from.x - toAlign.getWidth();
+			toAlign.x = from.x - toAlign.getWidth() - 1;
 		}
 	
 		private void rightAlign(ButtonWidget toAlign, int right) {
@@ -143,11 +152,11 @@ public class WaypointsList extends MapScreen {
 			dimensions.add(theEnd);
 		}
 	}
-	
+
 	@Override
 	protected void init() {
 		this.center = width / 2;		
-		this.screenWidth = Math.max(400, center);		
+		this.screenWidth = Math.max(480, center);		
 		this.x = center - screenWidth / 2;		
 		this.prevDimensionButton = new ButtonWidget(x + 10, 10, 20, 20, new LiteralText("<"), (b) -> cycleDimension(-1));
 		this.nextDimensionButton = new ButtonWidget(x + screenWidth - 30, 10, 20, 20, new LiteralText(">"), (b) -> cycleDimension(1));		
@@ -254,6 +263,16 @@ public class WaypointsList extends MapScreen {
 		keeper.remove(waypoint);
 		keeper.saveWaypoints();
 		reset();
+	}
+	
+	public void teleport(Waypoint waypoint) {
+		if (minecraft.player.dimension.getRawId() != currentDim) return;
+		int y = waypoint.pos.getY() > 0 ? waypoint.pos.getY() : (this.minecraft.player.dimension != DimensionType.THE_NETHER ? 128 : 64);
+		this.minecraft.player.sendChatMessage("/tp " + this.minecraft.player.getName().asString() + " " + waypoint.pos.getX() + " " + y + " " + waypoint.pos.getZ());
+		if (!this.minecraft.isIntegratedServerRunning()) {
+			this.minecraft.player.sendChatMessage("/tppos " + waypoint.pos.getX() + " " + y + " " + waypoint.pos.getZ());
+		}
+		this.onClose();
 	}
 	
 	@Override

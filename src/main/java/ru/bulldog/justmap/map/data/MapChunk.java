@@ -1,15 +1,13 @@
 package ru.bulldog.justmap.map.data;
 
-import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.util.ColorUtil;
-import ru.bulldog.justmap.util.Colors;
-import ru.bulldog.justmap.util.StateUtil;
 import ru.bulldog.justmap.util.StorageUtil;
+import ru.bulldog.justmap.util.TaskManager;
+
 import net.minecraft.world.Heightmap;
 import net.minecraft.world.World;
 import net.minecraft.block.BlockState;
-import net.minecraft.client.texture.NativeImage;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.util.math.BlockPos;
@@ -24,25 +22,31 @@ public class MapChunk {
 	
 	public final ChunkLevel EMPTY_LEVEL = new ChunkLevel(-1);
 	
+	private final static TaskManager chunkUpdater = TaskManager.getManager("chunk-data");
 	private volatile ConcurrentMap<Layer, ChunkLevel[]> levels;
 	
 	private World world;
 	private WorldChunk worldChunk;
 	private ChunkPos chunkPos;
-	private Layer layer;
+	private Layer.Type layer;
 	private int dimension;
 	private int level = 0;
-	private boolean empty = true;
+	private boolean hideWater = false;
+	private boolean waterTint = true;
 	private boolean saved = true;
+	private boolean purged = false;
 	
 	public long updated = 0;
+	public long requested = 0;
 	
-	public MapChunk(World world, ChunkPos pos, Layer layer, int level) {
+	private Object levelLock = new Object();
+	
+	public MapChunk(World world, ChunkPos pos, Layer.Type layer, int level) {
 		this(world, pos, layer);
 		this.level = level > 0 ? level : 0;
 	}
 	
-	public MapChunk(World world, ChunkPos pos, Layer layer) {
+	public MapChunk(World world, ChunkPos pos, Layer.Type layer) {
 		this.world = world;
 		this.worldChunk = world.getChunk(pos.x, pos.z);
 		this.dimension = world.getDimension().getType().getRawId();
@@ -55,13 +59,13 @@ public class MapChunk {
 	
 	private void init() {
 		if (dimension == -1) {
-			initLayer(Layer.Type.NETHER.value);
+			initLayer(Layer.Type.NETHER);
 		} else {
-			initLayer(Layer.Type.SURFACE.value);
-			initLayer(Layer.Type.CAVES.value);
+			initLayer(Layer.Type.SURFACE);
+			initLayer(Layer.Type.CAVES);
 		}
 		
-		JustMapClient.UPDATER.execute(this::restore);
+		this.restore();
 	}
 	
 	public void resetChunk() {
@@ -70,40 +74,39 @@ public class MapChunk {
 	}
 	
 	private void initLayer() {
-		initLayer(layer);
+		this.initLayer(layer);
 	}
 	
-	private void initLayer(Layer layer) {
-		int levels = worldChunk.getHeight() / layer.height;		
-		this.levels.put(layer, new ChunkLevel[levels]);
+	private void initLayer(Layer.Type layer) {
+		int levels = worldChunk.getHeight() / layer.value.height;		
+		this.levels.put(layer.value, new ChunkLevel[levels]);
 	}
 	
 	private ChunkLevel getChunkLevel() {
-		return getChunkLevel(layer, level);
+		return this.getChunkLevel(layer, level);
 	}
 	
-	private ChunkLevel getChunkLevel(Layer layer, int level) {
-		if (!levels.containsKey(layer)) {
+	private ChunkLevel getChunkLevel(Layer.Type layer, int level) {
+		if (!levels.containsKey(layer.value)) {
 			initLayer();
 		}
 		
+		ChunkLevel chunkLevel;
 		try {
-			ChunkLevel chunkLevel;
-			if (this.levels.get(layer)[level] == null) {
+			if (this.levels.get(layer.value)[level] == null) {
 				chunkLevel = new ChunkLevel(level);
-				this.levels.get(layer)[level] = chunkLevel;
+				this.levels.get(layer.value)[level] = chunkLevel;
 			} else {
-				chunkLevel = this.levels.get(layer)[level];
-			}
+				chunkLevel = this.levels.get(layer.value)[level];
+			}			
 			
-			return chunkLevel;
 		} catch (ArrayIndexOutOfBoundsException ex) {
-			return EMPTY_LEVEL;
+			chunkLevel = EMPTY_LEVEL;
 		}
-	}
-	
-	public void setChunk(WorldChunk chunk) {
-		this.worldChunk = chunk;
+		
+		synchronized (levelLock) {
+			return chunkLevel;
+		}
 	}
 	
 	public void setPos(ChunkPos chunkPos) {
@@ -122,23 +125,11 @@ public class MapChunk {
 		return this.chunkPos.z;
 	}
 	
-	public void setEmpty(boolean empty) {
-		this.empty = empty;
-	}
-	
-	public boolean isEmpty() {
-		return this.empty;
-	}
-	
-	public NativeImage getImage() {
-		return getChunkLevel().getImage(chunkPos);
-	}
-	
-	public Layer getLayer() {
+	public Layer.Type getLayer() {
 		return layer;
 	}
 	
-	public int getLevel() {
+	public int currentLevel() {
 		return level;
 	}
 	
@@ -146,7 +137,7 @@ public class MapChunk {
 		return getChunkLevel().heightmap;
 	}
 	
-	public void setLevel(Layer layer, int level) {
+	public void setLevel(Layer.Type layer, int level) {
 		if (this.layer == layer &&
 			this.level == level) return;
 		
@@ -166,48 +157,50 @@ public class MapChunk {
 		return getChunkLevel().setBlockState(pos.getX() & 15, pos.getY() & 15, pos.getZ() & 15, blockState);
 	}
 	
-	public void update() {		
-		long currentTime = System.currentTimeMillis();
-		if (currentTime - updated < ClientParams.chunkUpdateInterval) return;
-		
+	public void updateHeighmap() {
 		if (!this.updateWorldChunk()) return;
 		
-		JustMapClient.UPDATER.execute(this::updateData);
-	}
-	
-	private void updateHeighmap() {
-		if (!this.updateWorldChunk()) return;
-		
+		boolean skipWater = !(ClientParams.hideWater || ClientParams.waterTint);
 		for (int x = 0; x < 16; x++) {
 			for (int z = 0; z < 16; z++) {
-				int worldY = worldChunk.sampleHeightmap(Heightmap.Type.WORLD_SURFACE, x, z);				
-				int y = MapProcessor.getTopBlockY(this, x, worldY + 1, z, true);
-				
-				if (layer.type != Layer.Type.NETHER && layer.type != Layer.Type.CAVES) {
-					if (worldY != y || worldY == -1) {
-						y = MapProcessor.getTopBlockY(this, x, 255, z, true);
-					}
-				}
+				int y = worldChunk.sampleHeightmap(Heightmap.Type.WORLD_SURFACE, x, z);
+				y = MapProcessor.getTopBlockY(this, x, y + 1, z, skipWater);
 				
 				int index = x + (z << 4);
 				ChunkLevel chunkLevel = getChunkLevel();
 				if (y != -1) {
 					chunkLevel.updateHeightmap(x, z, y);
 				} else if (getHeighmap()[index] != -1) {
-					chunkLevel.getImage(chunkPos).setPixelRgba(x, z, Colors.BLACK);					
-					chunkLevel.clear(x, z);
-					
-					updateRegionData();
-					
+					chunkLevel.clear(x, z);					
 					this.saved = false;
 				}
 			}
 		}
 	}
 	
+	public void update() {
+		long currentTime = System.currentTimeMillis();
+		if (currentTime - updated < ClientParams.chunkUpdateInterval) return;
+		
+		if (this.purged || !this.updateWorldChunk()) return;
+		
+		chunkUpdater.execute(this::updateData);
+	}
+	
+	private boolean updateWorldChunk() {
+		WorldChunk lifeChunk = world.getChunk(getX(), getZ());
+		if (lifeChunk.isEmpty()) return false;
+		
+		if (worldChunk.isEmpty()) {
+			this.worldChunk = lifeChunk;
+		}
+		
+		return true;
+	}
+	
 	private void updateData() {
-		MapChunk eastChunk = MapCache.get().getChunk(chunkPos.x + 1, chunkPos.z, true);
-		MapChunk southChunk = MapCache.get().getChunk(chunkPos.x, chunkPos.z - 1, true);
+		MapChunk eastChunk = MapCache.get().getCurrentChunk(chunkPos.x + 1, chunkPos.z);
+		MapChunk southChunk = MapCache.get().getCurrentChunk(chunkPos.x, chunkPos.z - 1);
 		
 		long currentTime = System.currentTimeMillis();
 		
@@ -217,7 +210,17 @@ public class MapChunk {
 			eastChunk.updateHeighmap();
 			southChunk.updateHeighmap();
 			
-			chunkLevel.updated = currentTime;			
+			chunkLevel.updated = currentTime;
+		}
+		
+		boolean needUpdate = false;
+		if (ClientParams.hideWater != hideWater) {
+			this.hideWater = ClientParams.hideWater;
+			needUpdate = true;
+		}
+		if (ClientParams.waterTint != waterTint) {
+			this.waterTint = ClientParams.waterTint;
+			needUpdate = true;
 		}
 		
 		for (int x = 0; x < 16; x++) {
@@ -232,37 +235,28 @@ public class MapChunk {
 				if (posY == -1) continue;
 				
 				BlockPos blockPos = new BlockPos(posX, posY, posZ);
-				BlockState blockState = getBlockState(blockPos);
+				BlockState blockState = this.getBlockState(blockPos);
 				BlockState worldState = worldChunk.getBlockState(blockPos);
-				if(StateUtil.isAir(blockState) || !blockState.equals(worldState) || currentTime - chunkLevel.refreshed > 60000) {
+				if(!blockState.equals(worldState) || needUpdate) {
 					int color = ColorUtil.blockColor(worldChunk, blockPos);
 					if (color != -1) {
 						int heightDiff = MapProcessor.heightDifference(this, eastChunk, southChunk, x, posY, z);
 						
-						setBlockState(blockPos, worldState);
+						this.setBlockState(blockPos, worldState);
 						
 						chunkLevel.colormap[index] = color;
 						chunkLevel.levelmap[index] = heightDiff;
-						
-						color = ColorUtil.proccessColor(color, heightDiff);
-						chunkLevel.getImage(chunkPos).setPixelRgba(x, z, color);
-					
-						updateRegionData();
+						chunkLevel.colordata[index] = ColorUtil.proccessColor(color, heightDiff);
 						
 						this.saved = false;
 					}
 				} else {				
-					int color = chunkLevel.colormap[index];					
+					int color = chunkLevel.colormap[index];
 					if (color != -1) {
 						int heightDiff = MapProcessor.heightDifference(this, eastChunk, southChunk, x, posY, z);
 						if (chunkLevel.levelmap[index] != heightDiff) {
 							chunkLevel.levelmap[index] = heightDiff;
-						
-							color = ColorUtil.proccessColor(color, heightDiff);
-							chunkLevel.getImage(chunkPos).setPixelRgba(x, z, color);
-						
-							updateRegionData();
-							
+							chunkLevel.colordata[index] = ColorUtil.proccessColor(color, heightDiff);
 							this.saved = false;
 						}
 					}
@@ -270,7 +264,6 @@ public class MapChunk {
 			}
 		}
 		
-		this.empty = false;
 		this.updated = currentTime;
 		
 		if (currentTime - chunkLevel.refreshed > 60000) {
@@ -289,12 +282,19 @@ public class MapChunk {
 		return true;
 	}
 	
-	private void updateRegionData() {
-		MapCache.get().getRegion(chunkPos).storeChunk(this);
+	public int[] getColorData() {
+		ChunkLevel chunkLevel = getChunkLevel();
+		return Arrays.copyOf(chunkLevel.colordata, 256);
+	}
+	
+	public int getBlockColor(int x, int z) {
+		int index = x + (z << 4);
+		ChunkLevel chunkLevel = getChunkLevel();
+		return chunkLevel.colordata[index];
 	}
 	
 	public boolean saveNeeded() {
-		return !this.isEmpty() && !this.saved;
+		return !this.saved;
 	}
 	
 	public void store(CompoundTag data) {
@@ -308,40 +308,49 @@ public class MapChunk {
 					return levelx != null && levelx.level == lvl;
 				}).findFirst().orElse(EMPTY_LEVEL);
 		         
-				if (chunkLevel != EMPTY_LEVEL) {
-		            level = new CompoundTag();
-		            
-		            level.putInt("Level", lvl);
-		            chunkLevel.container().write(level, "Palette", "BlockStates");
-		            chunkLevel.store(level);
+				if (chunkLevel.isEmpty()) continue;
+	            
+				level = new CompoundTag();
+	            
+	            level.putInt("Level", lvl);
+	            chunkLevel.container().write(level, "Palette", "BlockStates");
+	            chunkLevel.store(level);
 
-		            levelsTag.add(level);
-				}
+	            levelsTag.add(level);
 			}
 			
-			data.put(layer.name, levelsTag);
+			if (!levelsTag.isEmpty()) data.put(layer.name, levelsTag);
 		});
 		
 		this.saved = true;
 	}
 	
 	public void restore() {
-		if (worldChunk.isEmpty()) return;
-		
 		CompoundTag chunkData = StorageUtil.getCache(chunkPos);
 		if (chunkData.isEmpty()) return;
 		
+		final int dataVer = chunkData.contains("version") ? chunkData.getInt("version") : -1;
 		this.levels.forEach((layer, levels) -> {
 			ListTag listTag = chunkData.getList(layer.name, 10);
 			for(int i = 0; i < listTag.size(); ++i) {
 				CompoundTag level = listTag.getCompound(i);
 				int lvl = level.getInt("Level");
 				if (level.contains("Palette", 9) && level.contains("BlockStates", 12)) {
-					ChunkLevel chunkLevel = new ChunkLevel(lvl);
+					ChunkLevel chunkLevel = this.getChunkLevel(layer.type, lvl);
+					if (chunkLevel.isEmpty()) continue;
+					
 					chunkLevel.container().read(level.getList("Palette", 10), level.getLongArray("BlockStates"));
 					chunkLevel.load(level);
 					
-					levels[lvl] = chunkLevel;
+					if (dataVer == -1) {
+						for (int j = 0; j < chunkLevel.colormap.length; j++) {
+							int color = chunkLevel.colormap[j];
+							if (color != -1) {
+								chunkLevel.colormap[j] = ColorUtil.ABGRtoARGB(color);
+							}
+						}
+						this.saved = false;
+					}
 				}
 			}			
 		});

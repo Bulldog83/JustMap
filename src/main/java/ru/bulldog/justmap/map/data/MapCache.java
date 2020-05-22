@@ -3,16 +3,15 @@ package ru.bulldog.justmap.map.data;
 import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.client.config.ClientParams;
+import ru.bulldog.justmap.client.render.MapTexture;
 import ru.bulldog.justmap.map.minimap.Minimap;
-import ru.bulldog.justmap.util.Colors;
-import ru.bulldog.justmap.util.ImageUtil;
 import ru.bulldog.justmap.util.StorageUtil;
+import ru.bulldog.justmap.util.TaskManager;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
-import net.minecraft.world.chunk.WorldChunk;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -23,14 +22,16 @@ import java.util.concurrent.ConcurrentMap;
 
 public class MapCache {
 	private final static MinecraftClient minecraft = MinecraftClient.getInstance();
+	private final static TaskManager mapUpdater = TaskManager.getManager("cache-data");
 	
 	private static Map<Integer, MapCache> dimensions = new HashMap<>();
 	private static World currentWorld;
-	private static Layer currentLayer = Layer.Type.SURFACE.value;	
+	private static Layer.Type currentLayer = Layer.Type.SURFACE;	
 	private static int currentLevel = 0;
+	private static int currentDimension = 0;
 	
-	public static void setCurrentLayer(Layer layer, int y) {
-		currentLevel =  y / layer.height;
+	public static void setCurrentLayer(Layer.Type layer, int y) {
+		currentLevel =  y / layer.value.height;
 		currentLayer = layer;
 	}
 	
@@ -45,11 +46,19 @@ public class MapCache {
 			currentWorld = minecraft.world;
 		}
 		
-		return get(currentWorld);
+		if (currentWorld == null) return null;
+		
+		int dimId = currentWorld.dimension.getType().getRawId();
+		if(currentDimension != dimId) {
+			StorageUtil.updateCacheStorage();
+			currentDimension = dimId;
+		}
+		
+		return get(currentWorld, currentDimension);
 	}
 	
-	public static MapCache get(World world) {
-		MapCache data = getDimensionData(world);
+	public static MapCache get(World world, int dimension) {	
+		MapCache data = getData(world, dimension);
 		
 		if (data == null) return null;
 		
@@ -57,34 +66,30 @@ public class MapCache {
 			data.world = world;
 			data.clear();
 			
-			ImageUtil.fillImage(JustMapClient.MAP.getImage(), Colors.BLACK);		   
+			JustMapClient.MAP.getImage().clear();
 		}
 		
 		return data;
 	}
 	
-	private static MapCache getDimensionData(World world) {		
+	private static MapCache getData(World world, int dimendion) {
 		if (world == null) return null;
 		
-		int dimId = world.getDimension().getType().getRawId();
-		if (dimensions.containsKey(dimId)) {
-			return dimensions.get(dimId);
+		if (dimensions.containsKey(dimendion)) {
+			return dimensions.get(dimendion);
 		}
 		
 		MapCache data = new MapCache(world);
-		dimensions.put(dimId, data);
+		dimensions.put(dimendion, data);
 		
 		return data;
 	}
 	
 	public static void saveData() {
-		MapCache data = get();		
+		MapCache data = get();
 		if (data == null) return;
 		
-		StorageUtil.IO.execute(() -> {
-			data.getRegions().forEach((pos, region) -> {
-				region.saveImage();
-			});
+		JustMap.WORKER.execute(() -> {
 			data.getChunks().forEach((pos, chunk) -> {
 				storeChunk(chunk);
 			});
@@ -97,6 +102,7 @@ public class MapCache {
 			chunk.store(chunkData);
 			
 			if (!chunkData.isEmpty()) {
+				chunkData.putInt("version", 2);
 				StorageUtil.saveCache(chunk.getPos(), chunkData);
 			}
 		}
@@ -105,73 +111,66 @@ public class MapCache {
 	public World world;
 	
 	private ConcurrentMap<ChunkPos, MapChunk> chunks;
-	private ConcurrentMap<RegionPos, MapRegion> regions;
 	
-	private int updateIndex = 0;
-	private int updatePerCycle = 10;
 	private long lastPurged = 0;
 	private long purgeDelay = 1000;
 	private int purgeAmount = 500;
 	
 	private MapCache(World world) {
-		this.world = world;
-		
+		this.world = world;		
 		this.chunks = new ConcurrentHashMap<>();
-		this.regions = new ConcurrentHashMap<>();
 	}
 	
 	public void update(Minimap map, int size, int x, int z) {
-		this.updatePerCycle = ClientParams.updatePerCycle;
+		mapUpdater.execute(() -> {
+			this.updateMap(map, size, x, z);
+		});
+	}
+	
+	public void updateMap(Minimap map, int size, int currentX, int currentZ) {
 		this.purgeDelay = ClientParams.purgeDelay * 1000;
 		this.purgeAmount = ClientParams.purgeAmount;
 		
-		int chunks = (size >> 4) + 4;
-		int startX = (x >> 4) - 2;
-		int startZ = (z >> 4) - 2;
+		int left = currentX - size / 2;
+		int top = currentZ - size / 2;
+		
+		MapTexture mapImage = map.getImage();
+		
+		int centerX = currentX >> 4;
+		int centerZ = currentZ >> 4;
+		int chunks = (int) Math.ceil(size / 16.0) + 2;
+		int startX = centerX - chunks / 2;
+		int startZ = centerZ - chunks / 2;
 		int endX = startX + chunks;
 		int endZ = startZ + chunks;
 
-		int offsetX = (startX << 4) - x;
-		int offsetZ = (startZ << 4) - z;
+		int offsetX = (startX << 4) - left;
+		int offsetZ = (startZ << 4) - top;
 		
-		int index = 0, posX = 0;
+		int posX = 0;		
 		for (int chunkX = startX; chunkX < endX; chunkX++) {
-			int posY = 0;
+			int posZ = 0;
 			int imgX = (posX << 4) + offsetX;
 			for (int chunkZ = startZ; chunkZ < endZ; chunkZ++) {
-				index++;
-
-				MapChunk mapChunk = getChunk(chunkX, chunkZ);				
-				if (index >= updateIndex && index <= updateIndex + updatePerCycle) {
-					if (mapChunk.getWorldChunk().isEmpty()) {
-						WorldChunk chunk = world.getChunk(chunkX, chunkZ);
-						if (!chunk.isEmpty()) {
-							mapChunk.setChunk(chunk);
-						}
-					}
-					mapChunk.update();
-				}
+				MapChunk mapChunk = this.getCurrentChunk(chunkX, chunkZ);
+				mapChunk.update();
 				
-				int imgY = (posY << 4) + offsetZ;
-				ImageUtil.writeTile(map.getImage(), mapChunk.getImage(), imgX, imgY);
-				
-				posY++;
-			}
-			
+				int imgY = (posZ << 4) + offsetZ;
+				mapImage.writeChunkData(imgX, imgY, mapChunk.getColorData());
+				posZ++;
+			}			
 			posX++;
 		}
 		
-		updateIndex += updatePerCycle;
-		if (updateIndex >= chunks * chunks) {
-			updateIndex = 0;
-		}
-		
+		map.needUpdate = false;
+		map.changed = true;
+
 		long currentTime = System.currentTimeMillis();
 		if (currentTime - lastPurged > purgeDelay) {
-			JustMap.EXECUTOR.execute(() -> {
-				purge(purgeAmount);
+			JustMap.WORKER.execute(() -> {
+				this.purge(purgeAmount);
 			});
-			lastPurged = currentTime;
+			this.lastPurged = currentTime;
 		}
 	}
 	
@@ -182,7 +181,7 @@ public class MapCache {
 		List<ChunkPos> chunks = new ArrayList<>();
 		for (ChunkPos chunkPos : this.chunks.keySet()) {
 			MapChunk chunkData = this.chunks.get(chunkPos);
-			if (currentTime - chunkData.updated >= 30000) {
+			if (currentTime - chunkData.requested >= 60000) {
 				storeChunk(chunkData);
 				chunks.add(chunkPos);
 				purged++;
@@ -195,104 +194,38 @@ public class MapCache {
 		for (ChunkPos chunkPos : chunks) {
 			this.chunks.remove(chunkPos);
 		}
-		
-		maxPurged = maxPurged >> 5;
-		
-		List<RegionPos> regions = new ArrayList<>();
-		for (RegionPos regionPos : this.regions.keySet()) {
-			MapRegion region = this.regions.get(regionPos);
-			if (currentTime - region.updated >= 30000) {
-				regions.add(regionPos);
-				purged++;
-				if (purged >= maxPurged) {
-					break;
-				}
-			}
-		}
-	
-		for (RegionPos regionPos : regions) {
-			this.regions.remove(regionPos);
-		}
-	}
-	
-	public static void saveImages() {
-		MapCache data = get();		
-		if (data == null) return;
-		
-		long time = System.currentTimeMillis();
-		StorageUtil.IO.execute(() -> {
-			data.getRegions().forEach((pos, region) -> {
-				if (time - region.saved > 30000) {
-					region.saveImage();
-				}
-			});
-		});
 	}
 	
 	private Map<ChunkPos, MapChunk> getChunks() {
 		return this.chunks;
 	}
 	
-	public Map<RegionPos, MapRegion> getRegions() {
-		return this.regions;
+	public MapChunk getCurrentChunk(ChunkPos chunkPos) {
+		return this.getChunk(currentLayer, currentLevel, chunkPos.x, chunkPos.z);
 	}
 	
-	public MapRegion getRegion(ChunkPos chunkPos) {
-		RegionPos pos = new RegionPos(chunkPos);
+	public MapChunk getCurrentChunk(int posX, int posZ) {
+		return this.getChunk(currentLayer, currentLevel, posX, posZ);
+	}
+	
+	public MapChunk getChunk(Layer.Type layer, int level, int posX, int posZ) {
+		ChunkPos chunkPos = new ChunkPos(posX, posZ);		
 		
-		MapRegion region;
-		if (regions.containsKey(pos)) {
-			region = regions.get(pos);
+		MapChunk mapChunk;
+		if (chunks.containsKey(chunkPos)) {
+			mapChunk = this.chunks.get(chunkPos);
 		} else {
-			region = new MapRegion(chunkPos);
-			regions.put(pos, region);
-		}
-		
-		region.setLayer(currentLayer);
-		region.setLevel(currentLevel);
-		
-		return region;
-	}
-	
-	public MapChunk getChunk(int posX, int posZ) {
-		return getChunk(posX, posZ, false);
-	}
-	
-	public MapChunk getChunk(int posX, int posZ, boolean empty) {
-		return getChunk(currentLayer, currentLevel, posX, posZ, empty);
-	}
-	
-	public MapChunk getChunk(Layer layer, int level, int posX, int posZ, boolean empty) {
-		
-		MapChunk mapChunk = getChunk(layer, level, posX, posZ);
-		
-		ChunkPos chunkPos = new ChunkPos(posX, posZ);
-		if(!mapChunk.getWorldChunk().getPos().equals(chunkPos)) {
 			mapChunk = new MapChunk(world, chunkPos, layer, level);
 			this.chunks.put(chunkPos, mapChunk);
 		}
 		
 		mapChunk.setLevel(layer, level);
-		mapChunk.setEmpty(empty);
-		
-		return mapChunk;
-	}
-	
-	public MapChunk getChunk(Layer layer, int level, int posX, int posZ) {
-		ChunkPos chunkPos = new ChunkPos(posX, posZ);
-		
-		if (this.chunks.containsKey(chunkPos)) {
-			return this.chunks.get(chunkPos);
-		}
-		
-		MapChunk mapChunk = new MapChunk(world, chunkPos, layer, level);
-		this.chunks.put(chunkPos, mapChunk);
+		mapChunk.requested = System.currentTimeMillis();
 		
 		return mapChunk;
 	}
 	
 	private void clear() {
 		this.chunks.clear();
-		this.regions.clear();
 	}
 }

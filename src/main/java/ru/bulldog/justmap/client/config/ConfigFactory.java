@@ -70,22 +70,6 @@ public final class ConfigFactory {
 				.setSaveConsumer(val -> JustMapClient.CONFIG.setBoolean("show_in_chat", val))
 				.setDefaultValue((boolean) JustMapClient.CONFIG.getDefault("show_in_chat"))
 				.build());
-		general.addEntry(entryBuilder.startBooleanToggle(lang("show_caves"), JustMapClient.CONFIG.getBoolean("show_caves"))
-				.setSaveConsumer(val -> JustMapClient.CONFIG.setBoolean("show_caves", val))
-				.setDefaultValue((boolean) JustMapClient.CONFIG.getDefault("show_caves"))
-				.build());
-		general.addEntry(entryBuilder.startBooleanToggle(lang("ignore_plants"), JustMapClient.CONFIG.getBoolean("ignore_plants"))
-				.setSaveConsumer(val -> JustMapClient.CONFIG.setBoolean("ignore_plants", val))
-				.setDefaultValue((boolean) JustMapClient.CONFIG.getDefault("ignore_plants"))
-				.build());
-		general.addEntry(entryBuilder.startBooleanToggle(lang("show_terrain"), JustMapClient.CONFIG.getBoolean("show_terrain"))
-				.setSaveConsumer(val -> JustMapClient.CONFIG.setBoolean("show_terrain", val))
-				.setDefaultValue((boolean) JustMapClient.CONFIG.getDefault("show_terrain"))
-				.build());
-		general.addEntry(entryBuilder.startIntSlider(lang("terrain_strength"), JustMapClient.CONFIG.getInt("terrain_strength"), 2, 9)
-				.setSaveConsumer(val -> JustMapClient.CONFIG.setRanged("terrain_strength", val))
-				.setDefaultValue((int) JustMapClient.CONFIG.getDefault("terrain_strength"))
-				.build());
 		general.addEntry(entryBuilder.startBooleanToggle(lang("move_effects"), JustMapClient.CONFIG.getBoolean("move_effects"))
 				.setSaveConsumer(val -> JustMapClient.CONFIG.setBoolean("move_effects", val))
 				.setDefaultValue((boolean) JustMapClient.CONFIG.getDefault("move_effects"))
@@ -97,6 +81,32 @@ public final class ConfigFactory {
 		general.addEntry(entryBuilder.startBooleanToggle(lang("rotate_map"), JustMapClient.CONFIG.getBoolean("rotate_map"))
 				.setSaveConsumer(val -> JustMapClient.CONFIG.setBoolean("rotate_map", val))
 				.setDefaultValue((boolean) JustMapClient.CONFIG.getDefault("rotate_map"))
+				.build());
+		
+		ConfigCategory mapDetails = configBuilder.getOrCreateCategory(lang("category.details"));
+		mapDetails.addEntry(entryBuilder.startBooleanToggle(lang("show_caves"), JustMapClient.CONFIG.getBoolean("show_caves"))
+				.setSaveConsumer(val -> JustMapClient.CONFIG.setBoolean("show_caves", val))
+				.setDefaultValue((boolean) JustMapClient.CONFIG.getDefault("show_caves"))
+				.build());
+		mapDetails.addEntry(entryBuilder.startBooleanToggle(lang("show_terrain"), JustMapClient.CONFIG.getBoolean("show_terrain"))
+				.setSaveConsumer(val -> JustMapClient.CONFIG.setBoolean("show_terrain", val))
+				.setDefaultValue((boolean) JustMapClient.CONFIG.getDefault("show_terrain"))
+				.build());
+		mapDetails.addEntry(entryBuilder.startIntSlider(lang("terrain_strength"), JustMapClient.CONFIG.getInt("terrain_strength"), 2, 9)
+				.setSaveConsumer(val -> JustMapClient.CONFIG.setRanged("terrain_strength", val))
+				.setDefaultValue((int) JustMapClient.CONFIG.getDefault("terrain_strength"))
+				.build());
+		mapDetails.addEntry(entryBuilder.startBooleanToggle(lang("show_grid"), JustMapClient.CONFIG.getBoolean("draw_chunk_grid"))
+				.setSaveConsumer(val -> JustMapClient.CONFIG.setBoolean("draw_chunk_grid", val))
+				.setDefaultValue((boolean) JustMapClient.CONFIG.getDefault("draw_chunk_grid"))
+				.build());
+		mapDetails.addEntry(entryBuilder.startBooleanToggle(lang("hide_plants"), JustMapClient.CONFIG.getBoolean("hide_plants"))
+				.setSaveConsumer(val -> JustMapClient.CONFIG.setBoolean("hide_plants", val))
+				.setDefaultValue((boolean) JustMapClient.CONFIG.getDefault("hide_plants"))
+				.build());
+		mapDetails.addEntry(entryBuilder.startBooleanToggle(lang("hide_water"), JustMapClient.CONFIG.getBoolean("hide_water"))
+				.setSaveConsumer(val -> JustMapClient.CONFIG.setBoolean("hide_water", val))
+				.setDefaultValue((boolean) JustMapClient.CONFIG.getDefault("hide_water"))
 				.build());
 		
 		ConfigCategory mapAppearance = configBuilder.getOrCreateCategory(lang("category.appearance"));
@@ -116,6 +126,10 @@ public final class ConfigFactory {
 				.setTooltipSupplier(() -> {
 					return getTooltip("tooltip_color_config", JustMapClient.CONFIG.getBoolean("alternate_color_render"));
 				}).build());
+		mapAppearance.addEntry(entryBuilder.startBooleanToggle(lang("water_tint"), JustMapClient.CONFIG.getBoolean("water_tint"))
+				.setSaveConsumer(val -> JustMapClient.CONFIG.setBoolean("water_tint", val))
+				.setDefaultValue((boolean) JustMapClient.CONFIG.getDefault("water_tint"))
+				.build());
 		mapAppearance.addEntry(entryBuilder.startBooleanToggle(lang("use_skins"), JustMapClient.CONFIG.getBoolean("use_skins"))
 				.setSaveConsumer(val -> JustMapClient.CONFIG.setBoolean("use_skins", val))
 				.setDefaultValue((boolean) JustMapClient.CONFIG.getDefault("use_skins"))
@@ -207,10 +221,6 @@ public final class ConfigFactory {
 				.build());
 		
 		ConfigCategory mapInfo = configBuilder.getOrCreateCategory(lang("category.info"));
-		mapInfo.addEntry(entryBuilder.startBooleanToggle(lang("show_grid"), JustMapClient.CONFIG.getBoolean("draw_chunk_grid"))
-				.setSaveConsumer(val -> JustMapClient.CONFIG.setBoolean("draw_chunk_grid", val))
-				.setDefaultValue((boolean) JustMapClient.CONFIG.getDefault("draw_chunk_grid"))
-				.build());
 		mapInfo.addEntry(entryBuilder.startBooleanToggle(lang("show_position"), JustMapClient.CONFIG.getBoolean("show_position"))
 				.setSaveConsumer(val -> JustMapClient.CONFIG.setBoolean("show_position", val))
 				.setDefaultValue((boolean) JustMapClient.CONFIG.getDefault("show_position"))
@@ -237,10 +247,6 @@ public final class ConfigFactory {
 				.setSaveConsumer(val -> JustMapClient.CONFIG.setRanged("chunk_level_update_interval", val))
 				.setDefaultValue((int) JustMapClient.CONFIG.getDefault("chunk_level_update_interval"))
 				.setMin(500).setMax(10000).build());
-		optimization.addEntry(entryBuilder.startIntField(lang("update_cycle"), JustMapClient.CONFIG.getInt("update_per_cycle"))
-				.setSaveConsumer(val -> JustMapClient.CONFIG.setRanged("update_per_cycle", val))
-				.setDefaultValue((int) JustMapClient.CONFIG.getDefault("update_per_cycle"))
-				.setMin(1).setMax(1000).build());
 		optimization.addEntry(entryBuilder.startIntField(lang("purge_delay"), JustMapClient.CONFIG.getInt("purge_delay"))
 				.setSaveConsumer(val -> JustMapClient.CONFIG.setRanged("purge_delay", val))
 				.setDefaultValue((int) JustMapClient.CONFIG.getDefault("purge_delay"))

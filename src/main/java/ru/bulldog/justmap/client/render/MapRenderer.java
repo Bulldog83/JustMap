@@ -1,23 +1,24 @@
 package ru.bulldog.justmap.client.render;
 
 import org.lwjgl.opengl.GL11;
-
 import com.mojang.blaze3d.systems.RenderSystem;
 
-import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.map.DirectionArrow;
 import ru.bulldog.justmap.map.icon.EntityIcon;
 import ru.bulldog.justmap.map.icon.PlayerIcon;
 import ru.bulldog.justmap.map.icon.WaypointIcon;
-import ru.bulldog.justmap.map.minimap.ChunkGrid;
+//import ru.bulldog.justmap.map.minimap.ChunkGrid;
 import ru.bulldog.justmap.map.minimap.MapPosition;
 import ru.bulldog.justmap.map.minimap.MapSkin;
 import ru.bulldog.justmap.map.minimap.MapText;
 import ru.bulldog.justmap.map.minimap.Minimap;
 import ru.bulldog.justmap.map.minimap.TextManager;
 import ru.bulldog.justmap.util.DrawHelper.TextAlignment;
+import ru.bulldog.justmap.util.Colors;
+import ru.bulldog.justmap.util.DrawHelper;
+import ru.bulldog.justmap.util.PosUtil;
 import ru.bulldog.justmap.util.math.Line;
 import ru.bulldog.justmap.util.math.Line.Point;
 import ru.bulldog.justmap.util.math.MathUtil;
@@ -29,10 +30,6 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormats;
-import net.minecraft.client.texture.NativeImage;
-import net.minecraft.client.texture.NativeImageBackedTexture;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.Identifier;
 
 @Environment(EnvType.CLIENT)
 public class MapRenderer {
@@ -46,13 +43,17 @@ public class MapRenderer {
 	private int posX, posY;
 	private int mapX, mapY;
 	private int mapW, mapH;
+	private int imgX, imgY;
+	private int imgW, imgH;
 	private float rotation;
+	private int lastX;
+	private int lastZ;
 
 	private final Minimap minimap;
 	
-	private NativeImage backingImage;
-	private NativeImageBackedTexture texture;
-	private Identifier mapTexture;
+	private MapTexture mapTexture;
+	private Tessellator tessellator = Tessellator.getInstance();
+	private BufferBuilder builder = tessellator.getBuffer();
 	
 	private TextManager textManager;
 	
@@ -64,7 +65,7 @@ public class MapRenderer {
 	private final MinecraftClient client = MinecraftClient.getInstance();
 	
 	private MapSkin mapSkin;
-	private ChunkGrid chunkGrid;
+	//private ChunkGrid chunkGrid;
 	
 	public static MapRenderer getInstance() {
 		if (instance == null) {
@@ -93,21 +94,21 @@ public class MapRenderer {
 		return this.border;
 	}
 	
-	public void updateParams() {
+	public void updateParams() {		
 		int winW = client.getWindow().getScaledWidth();
 		int winH = client.getWindow().getScaledHeight();
 		
-		offset = ClientParams.positionOffset;
-		mapPosition = ClientParams.mapPosition;
+		this.offset = ClientParams.positionOffset;
+		this.mapPosition = ClientParams.mapPosition;
 		
-		mapW = minimap.getWidth();
-		mapH = minimap.getHeight();
-		posX = offset;
-		posY = offset;
-		mapX = posX + border;
-		mapY = posY + border;
+		this.mapW = minimap.getWidth();
+		this.mapH = minimap.getHeight();
+		this.posX = offset;
+		this.posY = offset;
+		this.mapX = posX + border;
+		this.mapY = posY + border;
 		
-		rotation = client.player.headYaw;
+		this.rotation = client.player.headYaw;
 		
 		TextManager.TextPosition textPos = TextManager.TextPosition.UNDER;
 		
@@ -115,44 +116,56 @@ public class MapRenderer {
 			case TOP_LEFT:
 				break;
 			case TOP_CENTER:
-				mapX = winW / 2 - mapW / 2;
-				posX = mapX - border;
+				this.mapX = winW / 2 - mapW / 2;
+				this.posX = mapX - border;
 				break;
 			case TOP_RIGHT:
-				mapX = winW - offset - mapW - border;
-				posX = mapX - border;
+				this.mapX = winW - offset - mapW - border;
+				this.posX = mapX - border;
 				break;
 			case MIDDLE_RIGHT:
-				mapX = winW - offset - mapW - border;
-				mapY = winH / 2 - mapH / 2;
-				posX = mapX - border;
-				posY = mapY - border;
+				this.mapX = winW - offset - mapW - border;
+				this.mapY = winH / 2 - mapH / 2;
+				this.posX = mapX - border;
+				this.posY = mapY - border;
 				break;
 			case MIDDLE_LEFT:
-				mapY = winH / 2 - mapH / 2;
-				posY = mapY - border;
+				this.mapY = winH / 2 - mapH / 2;
+				this.posY = mapY - border;
 				break;
 			case BOTTOM_LEFT:
 				textPos = TextManager.TextPosition.ABOVE;
-				mapY = winH - offset - mapH - border;
-				posY = mapY - border;
+				this.mapY = winH - offset - mapH - border;
+				this.posY = mapY - border;
 				break;
 			case BOTTOM_RIGHT:
 				textPos = TextManager.TextPosition.ABOVE;
-				mapX = winW - offset - mapW - border;
-				posX = mapX - border;
-				mapY = winH - offset - mapH - border;
-				posY = mapY - border;
+				this.mapX = winW - offset - mapW - border;
+				this.posX = mapX - border;
+				this.mapY = winH - offset - mapH - border;
+				this.posY = mapY - border;
 				break;
 		}
 		
-		textManager.setPosition(
+		if (ClientParams.rotateMap) {
+			this.imgW = (int) (mapW * 1.42);
+			this.imgH = (int) (mapH * 1.42);
+			this.imgX = mapX - (imgW - mapW) / 2;
+			this.imgY = mapY - (imgH - mapH) / 2;
+		} else {
+			this.imgW = this.mapW;
+			this.imgH = this.mapH;
+			this.imgX = this.mapX;
+			this.imgY = this.mapY;
+		}
+		
+		this.textManager.setPosition(
 			mapX, mapY + (textPos == TextManager.TextPosition.UNDER && minimap.isMapVisible() ?
 				mapH + border + 3 :
 				-(border + 3))
 		);
-		textManager.setDirection(textPos);
-		textManager.setSpacing(12);
+		this.textManager.setDirection(textPos);
+		this.textManager.setSpacing(12);
 		
 		int centerX = mapX + mapW / 2;
 		int centerY = mapY + mapH / 2;
@@ -186,15 +199,15 @@ public class MapRenderer {
 			calculatePos(center, pointW, mapR, mapB, angle);
 		}
 		
-		textManager.add(dirN, pointN.x, pointN.y - 5);
-		textManager.add(dirS, pointS.x, pointS.y - 5);
-		textManager.add(dirE, pointE.x, pointE.y - 5);
-		textManager.add(dirW, pointW.x, pointW.y - 5);
+		this.textManager.add(dirN, pointN.x, pointN.y - 5);
+		this.textManager.add(dirS, pointS.x, pointS.y - 5);
+		this.textManager.add(dirE, pointE.x, pointE.y - 5);
+		this.textManager.add(dirW, pointW.x, pointW.y - 5);
 		
 		if (ClientParams.useSkins) {
-			mapSkin = MapSkin.getSkin(ClientParams.currentSkin);
+			this.mapSkin = MapSkin.getSkin(ClientParams.currentSkin);
 			
-			border = mapSkin.resizable ?
+			this.border = mapSkin.resizable ?
 						  (int) (mapW * ((float)(mapSkin.border) / mapSkin.getWidth())) :
 						  mapSkin.border;
 		}
@@ -209,18 +222,20 @@ public class MapRenderer {
 		dir.x = posX; dir.y = posY;
 	}
 	
-	public void updateTexture() {
-		int size = minimap.getScaledSize();
-		if (backingImage == null || backingImage.getWidth() != size || backingImage.getHeight() != size) {
-			this.backingImage = new NativeImage(size, size, false);
-			if (texture != null) {
-				this.texture.close();
-			}
-			this.texture = new NativeImageBackedTexture(backingImage);
-			this.mapTexture = client.getTextureManager().registerDynamicTexture(JustMap.MODID + "_map_texture", texture);
+	private void prepareTexture() {
+		int textureSize = minimap.getScaledSize();
+		if (mapTexture == null || mapTexture.getWidth() != textureSize || mapTexture.getHeight() != textureSize) {
+			if (mapTexture != null) this.mapTexture.close();			
+			this.mapTexture = new MapTexture(textureSize, textureSize);
+			//this.chunkGrid = new ChunkGrid(mapX, mapY, mapW, mapH);
+		}		
+		if (minimap.changed) {
+			this.mapTexture.copyImage(minimap.getImage());
+			this.mapTexture.upload();
+			this.lastX = minimap.getLasX();
+			this.lastZ = minimap.getLastZ();
+			this.minimap.changed = false;
 		}
-		this.backingImage.copyFrom(minimap.getImage());
-		this.texture.upload();
 	}
 	
 	public void draw(MatrixStack matrixStack) {
@@ -229,14 +244,7 @@ public class MapRenderer {
 		}
 		
 		this.updateParams();
-		this.updateTexture();
 		
-		RenderSystem.disableDepthTest();
-		
-		if (ClientParams.useSkins) {
-			mapSkin.draw(matrixStack, posX, posY, mapW + border * 2);
-		}
-
 		int winH = client.getWindow().getFramebufferHeight();
 		double scale = client.getWindow().getScaleFactor();
 		
@@ -245,14 +253,40 @@ public class MapRenderer {
 		int scaledW = (int) (mapW * scale);
 		int scaledH = (int) (mapH * scale);
 		
+		RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+		RenderSystem.disableDepthTest();
+		
+		if (ClientParams.useSkins) {
+			mapSkin.draw(posX, posY, mapW + border * 2);
+		}
+		
+		if (this.mapTexture == null || this.minimap.changed) {
+			this.prepareTexture();
+		}
+		
 		GL11.glEnable(GL11.GL_SCISSOR_TEST);
 		GL11.glScissor(scaledX, scaledY, scaledW, scaledH);
 		
-		drawMap();
-
-		if (ClientParams.drawChunkGrid) {
-			drawChunkGrid();
+		float mult = 1 / minimap.getScale();		
+		float offX = (float) (PosUtil.doubleCoordX() - this.lastX) * mult;
+		float offZ = (float) (PosUtil.doubleCoordZ() - this.lastZ) * mult;
+		
+		RenderSystem.pushMatrix();
+		if (ClientParams.rotateMap) {
+			float moveX = imgX + imgW / 2;
+			float moveY = imgY + imgH / 2;
+			RenderSystem.translatef(moveX, moveY, 0.0F);
+			RenderSystem.rotatef(-rotation + 180, 0, 0, 1.0F);
+			RenderSystem.translatef(-moveX, -moveY, 0.0F);
 		}
+		RenderSystem.translatef(-offX, -offZ, 0.0F);
+		
+		this.drawMap();
+
+		//if (ClientParams.showGrid) {
+		//	this.chunkGrid.update(lastX, lastZ);
+		//	this.chunkGrid.draw();
+		//}
 		if (Minimap.allowEntityRadar()) {
 			if (Minimap.allowPlayerRadar()) {
 				for (PlayerIcon player : minimap.getPlayerIcons()) {
@@ -264,78 +298,46 @@ public class MapRenderer {
 					entity.draw(matrixStack, mapX, mapY, rotation);
 				}
 			}
-		}
+		}		
+		RenderSystem.popMatrix();
+		
+		DrawHelper.DRAWER.drawRightAlignedString(
+				client.textRenderer, Float.toString(minimap.getScale()),
+				mapX + mapW - 3, mapY + mapH - 10, Colors.WHITE);
+		
 		for (WaypointIcon waypoint : minimap.getWaypoints()) {
 			if (!waypoint.isHidden()) {
 				waypoint.draw(matrixStack, mapX, mapY, rotation);
 			}
 		}
+		GL11.glDisable(GL11.GL_SCISSOR_TEST);
 		
 		int arrowX = mapX + mapW / 2;
 		int arrowY = mapY + mapH / 2;
 		
 		DirectionArrow.draw(arrowX, arrowY, ClientParams.rotateMap ? 180 : rotation);
 		
-		GL11.glDisable(GL11.GL_SCISSOR_TEST);
-		
-		textManager.draw(matrixStack);
+		this.textManager.draw();
 		
 		RenderSystem.enableDepthTest();
 	}
 	
-	private void drawMap() {		
-		Tessellator tessellator = Tessellator.getInstance();
-		BufferBuilder builder = tessellator.getBuffer();
-		builder.begin(7, VertexFormats.POSITION_TEXTURE);
-		
-		double z = 0.09;
-		
-		client.getTextureManager().bindTexture(mapTexture);
-		
-		float f1 = 0.0F, f2 = 1.0F;		
-		if (ClientParams.rotateMap) {
-			f1 = 0.15F;
-			f2 = 0.85F;
-			
-			RenderSystem.enableTexture();
-			RenderSystem.matrixMode(GL11.GL_TEXTURE);
-			RenderSystem.pushMatrix();
-			RenderSystem.translatef(0.5F, 0.5F, 0);
-			RenderSystem.rotatef(rotation + 180, 0, 0, 1.0F);
-			RenderSystem.translatef(-0.5F, -0.5F, 0);
+	private void drawMap() {
+		RenderSystem.bindTexture(mapTexture.getId());
+		if (minimap.getScale() >= 0.75) {
+			RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR_MIPMAP_LINEAR);
+			RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
+		} else {
+			RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_NEAREST_MIPMAP_LINEAR);
+			RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST);
 		}
 		
-		RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);		
-		builder.vertex(mapX, mapY, z).texture(f1, f1).next();
-		builder.vertex(mapX, mapY + mapH, z).texture(f1, f2).next();
-		builder.vertex(mapX + mapW, mapY + mapH, z).texture(f2, f2).next();
-		builder.vertex(mapX + mapW, mapY, z).texture(f2, f1).next();
+		this.builder.begin(GL11.GL_QUADS, VertexFormats.POSITION_TEXTURE);		
+		this.builder.vertex(imgX, imgY - 4, 1.0).texture(0.0F, 0.0F).next();
+		this.builder.vertex(imgX, imgY + imgH + 4, 1.0).texture(0.0F, 1.0F).next();
+		this.builder.vertex(imgX + imgW + 4, imgY + imgH + 4, 1.0).texture(1.0F, 1.0F).next();
+		this.builder.vertex(imgX + imgW + 4, imgY - 4, 1.0).texture(1.0F, 0.0F).next();
 		
-		tessellator.draw();
-		
-		if (ClientParams.rotateMap) {		
-			RenderSystem.popMatrix();
-			RenderSystem.matrixMode(GL11.GL_MODELVIEW);
-		}
-	}
-	
-	private void drawChunkGrid() {
-		int px = (int) client.player.getPos().getX();
-		int pz = (int) client.player.getPos().getZ();
-		
-		if (ClientParams.rotateMap) {
-			int picW = (int) (mapW * 1.5);
-			int picH = (int) (mapH * 1.5);
-			int picX = mapX - (picW - mapW) / 2;
-			int picY = mapY - (picH - mapH) / 2;			
-			int centerX = mapX + mapW / 2;
-			int centerY = mapY + mapH / 2;
-			
-			chunkGrid = new ChunkGrid(px, pz, picX, picY, picW, picH);
-			chunkGrid.draw(centerX, centerY, rotation);
-		} else {		
-			chunkGrid = new ChunkGrid(px, pz, mapX, mapY, mapW, mapH);
-			chunkGrid.draw();
-		}
+		this.tessellator.draw();
 	}
 }

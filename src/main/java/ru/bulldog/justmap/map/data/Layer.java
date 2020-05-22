@@ -15,6 +15,7 @@ public class Layer {
 		}
 	}
 	
+	public final Type type;
 	public final String name;
 	public final int height;
 	public final Type type;

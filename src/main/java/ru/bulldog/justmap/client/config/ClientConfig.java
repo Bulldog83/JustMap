@@ -33,8 +33,9 @@ public class ClientConfig extends Config{
 		KEEPER.registerEntry("map_saturation", new IntegerRange(ClientParams.mapSaturation, (i) -> ClientParams.mapSaturation = i, () -> ClientParams.mapSaturation, -50, 50));
 		KEEPER.registerEntry("map_brightness", new IntegerRange(ClientParams.mapBrightness, (i) -> ClientParams.mapBrightness = i, () -> ClientParams.mapBrightness, -50, 50));
 		KEEPER.registerEntry("rotate_map", new BooleanEntry(ClientParams.rotateMap, (b) -> ClientParams.rotateMap = b, () -> ClientParams.rotateMap));
-		KEEPER.registerEntry("show_caves", new BooleanEntry(ClientParams.showCaves, (b) -> ClientParams.showCaves = b, () -> ClientParams.showCaves));
-		KEEPER.registerEntry("ignore_plants", new BooleanEntry(ClientParams.ignorePlants, (b) -> ClientParams.ignorePlants = b, () -> ClientParams.ignorePlants));
+		KEEPER.registerEntry("show_caves", new BooleanEntry(ClientParams.drawCaves, (b) -> ClientParams.drawCaves = b, () -> ClientParams.drawCaves));
+		KEEPER.registerEntry("hide_plants", new BooleanEntry(ClientParams.hidePlants, (b) -> ClientParams.hidePlants = b, () -> ClientParams.hidePlants));
+		KEEPER.registerEntry("hide_water", new BooleanEntry(ClientParams.hideWater, (b) -> ClientParams.hideWater = b, () -> ClientParams.hideWater));
 		KEEPER.registerEntry("show_position", new BooleanEntry(ClientParams.showPosition, (b) -> ClientParams.showPosition = b, () -> ClientParams.showPosition));
 		KEEPER.registerEntry("show_FPS", new BooleanEntry(ClientParams.showFPS, (b) -> ClientParams.showFPS = b, () -> ClientParams.showFPS));
 		KEEPER.registerEntry("show_biome", new BooleanEntry(ClientParams.showBiome, (b) -> ClientParams.showBiome = b, () -> ClientParams.showBiome));
@@ -42,17 +43,17 @@ public class ClientConfig extends Config{
 		KEEPER.registerEntry("move_effects", new BooleanEntry(ClientParams.moveEffects, (b) -> ClientParams.moveEffects = b, () -> ClientParams.moveEffects));
 		KEEPER.registerEntry("show_effect_timers", new BooleanEntry(ClientParams.showEffectTimers, (b) -> ClientParams.showEffectTimers = b, () -> ClientParams.showEffectTimers));
 		KEEPER.registerEntry("alternate_color_render", new BooleanEntry(ClientParams.alternateColorRender, (b) -> ClientParams.alternateColorRender = b, () -> ClientParams.alternateColorRender));
+		KEEPER.registerEntry("water_tint", new BooleanEntry(ClientParams.waterTint, (b) -> ClientParams.waterTint = b, () -> ClientParams.waterTint));
 		KEEPER.registerEntry("use_skins", new BooleanEntry(ClientParams.useSkins, (b) -> ClientParams.useSkins = b, () -> ClientParams.useSkins));
 		KEEPER.registerEntry("simple_direction_arrow", new BooleanEntry(ClientParams.simpleArrow, (b) -> ClientParams.simpleArrow = b, () -> ClientParams.simpleArrow));
 		KEEPER.registerEntry("current_skin", new IntegerEntry(ClientParams.currentSkin, (i) -> ClientParams.currentSkin = i, () -> ClientParams.currentSkin));
-		KEEPER.registerEntry("update_per_cycle", new IntegerRange(ClientParams.updatePerCycle, (i) -> ClientParams.updatePerCycle = i, () -> ClientParams.updatePerCycle, 1, 500));
 		KEEPER.registerEntry("chunk_update_interval", new IntegerRange(ClientParams.chunkUpdateInterval, (i) -> ClientParams.chunkUpdateInterval = i, () -> ClientParams.chunkUpdateInterval, 500, 5000));
 		KEEPER.registerEntry("chunk_level_update_interval", new IntegerRange(ClientParams.chunkLevelUpdateInterval, (i) -> ClientParams.chunkLevelUpdateInterval = i, () -> ClientParams.chunkLevelUpdateInterval, 500, 10000));
 		KEEPER.registerEntry("purge_delay", new IntegerRange(ClientParams.purgeDelay, (i) -> ClientParams.purgeDelay = i, () -> ClientParams.purgeDelay, 1, 600));
 		KEEPER.registerEntry("purge_amount", new IntegerRange(ClientParams.purgeAmount, (i) -> ClientParams.purgeAmount = i, () -> ClientParams.purgeAmount, 100, 50000));
 		KEEPER.registerEntry("show_terrain", new BooleanEntry(ClientParams.showTerrain, (b) -> ClientParams.showTerrain = b, () -> ClientParams.showTerrain));
 		KEEPER.registerEntry("terrain_strength", new IntegerRange(ClientParams.terrainStrength, (i) -> ClientParams.terrainStrength = i, () -> ClientParams.terrainStrength, 2, 9));
-		KEEPER.registerEntry("draw_chunk_grid", new BooleanEntry(ClientParams.drawChunkGrid, (b) -> ClientParams.drawChunkGrid = b, () -> ClientParams.drawChunkGrid));
+		KEEPER.registerEntry("draw_chunk_grid", new BooleanEntry(ClientParams.showGrid, (b) -> ClientParams.showGrid = b, () -> ClientParams.showGrid));
 		KEEPER.registerEntry("show_in_chat", new BooleanEntry(ClientParams.showInChat, (b) -> ClientParams.showInChat = b, () -> ClientParams.showInChat));
 		KEEPER.registerEntry("waypoints_tracking", new BooleanEntry(ClientParams.waypointsTracking, (b) -> ClientParams.waypointsTracking = b, () -> ClientParams.waypointsTracking));
 		KEEPER.registerEntry("waypoints_world_render", new BooleanEntry(ClientParams.waypointsWorldRender, (b) -> ClientParams.waypointsWorldRender = b, () -> ClientParams.waypointsWorldRender));
@@ -84,6 +85,6 @@ public class ClientConfig extends Config{
 	@Override
 	public void saveChanges()  {
 		ConfigWriter.save(KEEPER.toJson());
-		JustMapClient.MAP.onConfigChanges();
+		JustMapClient.MAP.updateMapParams();
 	}
 }

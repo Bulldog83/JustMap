@@ -1,71 +1,58 @@
 package ru.bulldog.justmap.util;
 
 import java.io.File;
-import java.io.IOException;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ServerInfo;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.ChunkPos;
-import net.minecraft.world.storage.VersionedChunkStorage;
-import ru.bulldog.justmap.JustMap;
 
-public class StorageUtil {	
+import ru.bulldog.justmap.map.data.ChunkStorage;
+
+public class StorageUtil {
 	
-	private static MinecraftClient minecraft = MinecraftClient.getInstance();
-	
+	private static MinecraftClient minecraft = MinecraftClient.getInstance();	
 	public final static File MAP_DIR = new File(minecraft.runDirectory, "justmap/");
-	public final static TaskManager IO = new TaskManager("cache-io");
 	
-	private static VersionedChunkStorage storage;
+	private static ChunkStorage storage;
 	private static File storageDir;
 	private static File filesDir = new File(MAP_DIR, "undefined/");
 	
 	private static int currentDimId = 0;
-
+	
 	public static synchronized CompoundTag getCache(ChunkPos pos) {
-		updateCacheStorage();
-		try {
-			CompoundTag data = storage.getNbt(pos);
-			return data != null ? data : new CompoundTag();
-		} catch (IOException ex) {}
+		if (storage == null) updateCacheStorage();
 		
-		return new CompoundTag();
+		try {
+			CompoundTag data = storage.getNbt(storageDir, pos);
+			return data != null ? data : new CompoundTag();
+		} catch (Exception ex) {
+			return new CompoundTag();
+		}		
 	}
 	
 	public static synchronized void saveCache(ChunkPos pos, CompoundTag data) {
-		updateCacheStorage();
-		storage.setTagAt(pos, data);
+		if (storage == null) updateCacheStorage();
+		storage.setTagAt(storageDir, pos, data);
 	}
 	
 	public static void updateCacheStorage() {
-		File cacheDir = new File(cacheDir(), "chunk-data/");
-		if (storageDir == null || !storageDir.equals(cacheDir)) {		
-			storageDir = cacheDir;
-			
-			if (!storageDir.exists()) {
-				storageDir.mkdirs();
-			}
-			
-			if (storage != null) {
-				storage.completeAll();
-				
-				try {
-					storage.close();
-				} catch (IOException ex) {
-					JustMap.LOGGER.catching(ex);
-				}
-			}
-			
-			storage = new VersionedChunkStorage(storageDir, minecraft.getDataFixer(), true);
-		}
+		storageDir = new File(cacheDir(), "chunk-data/");
+
+		if (!storageDir.exists()) {
+			storageDir.mkdirs();
+		}		
+		
+		if (storage == null) storage = new ChunkStorage();
 	}
 	
 	public static File cacheDir() {
 		if (minecraft.world != null) {
 			int dimension = minecraft.world.getDimension().getType().getRawId();
-			currentDimId = currentDimId != dimension ? dimension : currentDimId;
+			if (currentDimId != dimension) {
+				currentDimId = dimension;
+			}
 		}
 		
 		File cacheDir = new File(filesDir(), String.format("cache/DIM%d/", currentDimId));
