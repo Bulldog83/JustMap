@@ -10,6 +10,7 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.dimension.DimensionType;
 
 import java.util.HashMap;
@@ -49,8 +50,8 @@ public class MapScreen extends Screen {
 	
 	@Override
 	protected void init() {
-		int dimension = client.player.dimension.getRawId();
-		this.info = DIMENSION_INFO.getOrDefault(DimensionType.byRawId(dimension).toString(), null);
+		RegistryKey<DimensionType> dimKey = client.world.method_27983();
+		this.info = DIMENSION_INFO.getOrDefault(dimKey.getValue().toString(), null);
 	}
 	
 	@Override

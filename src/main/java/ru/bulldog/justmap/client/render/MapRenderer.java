@@ -30,6 +30,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormats;
+import net.minecraft.client.util.math.MatrixStack;
 
 @Environment(EnvType.CLIENT)
 public class MapRenderer {
@@ -257,7 +258,7 @@ public class MapRenderer {
 		RenderSystem.disableDepthTest();
 		
 		if (ClientParams.useSkins) {
-			mapSkin.draw(posX, posY, mapW + border * 2);
+			mapSkin.draw(matrixStack, posX, posY, mapW + border * 2);
 		}
 		
 		if (this.mapTexture == null || this.minimap.changed) {
