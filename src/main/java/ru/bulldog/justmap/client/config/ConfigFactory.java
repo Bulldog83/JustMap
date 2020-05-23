@@ -26,7 +26,7 @@ public final class ConfigFactory {
 	
 	private static Optional<Text[]> getTooltip(String tooltip, boolean condition) {
 		return condition ? Optional.empty() : Optional.ofNullable(new Text[] {
-			new TranslatableText("justmap.configuration." + tooltip)
+			lang("justmap.configuration." + tooltip)
 		});
 	}
 	
@@ -34,14 +34,14 @@ public final class ConfigFactory {
 	
 	public static Screen getConfigScreen(Screen parent) {
 		if (configBuilder == null) {
-			createConfigBuilder();
+			initConfigBuilder();
 		}		
 		configBuilder.setParentScreen(parent);
 		
 		return configBuilder.build();
 	}
 	
-	private static void createConfigBuilder() {
+	private static void initConfigBuilder() {
 		configBuilder = ConfigBuilder.create().setTitle(new LiteralText("Just Map Configuration"));
 		ConfigEntryBuilder entryBuilder = ConfigEntryBuilder.create();
 		
@@ -257,7 +257,7 @@ public final class ConfigFactory {
 				.setMin(100).setMax(5000).build());
 		
 		configBuilder.setDoesConfirmSave(false);
-		configBuilder.setTransparentBackground(true);
+		configBuilder.transparentBackground();
 		configBuilder.setSavingRunnable(JustMapClient.CONFIG::saveChanges);
 	}
 }
