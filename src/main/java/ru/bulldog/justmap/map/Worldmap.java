@@ -110,7 +110,7 @@ public class Worldmap extends MapScreen implements IMap {
 		
 		this.cursorCoords = PosUtil.posToString(centerPos);
 		
-		waypoints.clear();
+		this.waypoints.clear();
 		List<Waypoint> wps = WaypointKeeper.getInstance().getWaypoints(dimension.getRawId(), true);
 		if (wps != null) {
 			Stream<Waypoint> stream = wps.stream().filter(wp -> MathUtil.getDistance(player.getBlockPos(), wp.pos) <= wp.showRange);
@@ -122,16 +122,16 @@ public class Worldmap extends MapScreen implements IMap {
 	}
 	
 	private void addMapButtons() {
-		children.add(new ButtonWidget(width - 24, 10, 20, 20, "x", (b) -> onClose()));		
-		children.add(new ButtonWidget(width / 2 - 10, height - paddingBottom - 44, 20, 20, "\u2191", (b) -> moveMap(Direction.NORTH)));
-		children.add(new ButtonWidget(width / 2 - 10, height - paddingBottom - 22, 20, 20, "\u2193", (b) -> moveMap(Direction.SOUTH)));
-		children.add(new ButtonWidget(width / 2 - 32, height - paddingBottom - 32, 20, 20, "\u2190", (b) -> moveMap(Direction.WEST)));
-		children.add(new ButtonWidget(width / 2 + 12, height - paddingBottom - 32, 20, 20, "\u2192", (b) -> moveMap(Direction.EAST)));		
-		children.add(new ButtonWidget(width - 24, height / 2 - 21, 20, 20, "+", (b) -> changeScale(-0.25F)));
-		children.add(new ButtonWidget(width - 24, height / 2 + 1, 20, 20, "-", (b) -> changeScale(+0.25F)));		
-		children.add(new ButtonWidget(width - 24, height - paddingBottom - 22, 20, 20, "\u271C", (b) -> setCenterByPlayer()));
-		children.add(new ButtonWidget(4, paddingTop + 2, 20, 20, "\u2630",(b) -> minecraft.openScreen(ConfigFactory.getConfigScreen(this))));
-		children.add(new ButtonWidget(4, height - paddingBottom - 22, 20, 20, "\u2726",(b) -> minecraft.openScreen(new WaypointsList(this))));
+		this.children.add(new ButtonWidget(width - 24, 10, 20, 20, "x", (b) -> onClose()));		
+		this.children.add(new ButtonWidget(width / 2 - 10, height - paddingBottom - 44, 20, 20, "\u2191", (b) -> moveMap(Direction.NORTH)));
+		this.children.add(new ButtonWidget(width / 2 - 10, height - paddingBottom - 22, 20, 20, "\u2193", (b) -> moveMap(Direction.SOUTH)));
+		this.children.add(new ButtonWidget(width / 2 - 32, height - paddingBottom - 32, 20, 20, "\u2190", (b) -> moveMap(Direction.WEST)));
+		this.children.add(new ButtonWidget(width / 2 + 12, height - paddingBottom - 32, 20, 20, "\u2192", (b) -> moveMap(Direction.EAST)));		
+		this.children.add(new ButtonWidget(width - 24, height / 2 - 21, 20, 20, "+", (b) -> changeScale(-0.25F)));
+		this.children.add(new ButtonWidget(width - 24, height / 2 + 1, 20, 20, "-", (b) -> changeScale(+0.25F)));		
+		this.children.add(new ButtonWidget(width - 24, height - paddingBottom - 22, 20, 20, "\u271C", (b) -> setCenterByPlayer()));
+		this.children.add(new ButtonWidget(4, paddingTop + 2, 20, 20, "\u2630",(b) -> minecraft.openScreen(ConfigFactory.getConfigScreen(this))));
+		this.children.add(new ButtonWidget(4, height - paddingBottom - 22, 20, 20, "\u2726",(b) -> minecraft.openScreen(new WaypointsList(this))));
 	}
 	
 	@Override
