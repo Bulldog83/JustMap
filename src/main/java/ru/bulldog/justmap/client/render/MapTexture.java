@@ -1,7 +1,5 @@
 package ru.bulldog.justmap.client.render;
 
-import java.awt.image.BufferedImage;
-import java.awt.image.DataBufferByte;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Arrays;
@@ -17,19 +15,22 @@ import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.util.ColorUtil;
 import ru.bulldog.justmap.util.Colors;
 
-public class MapTexture extends BufferedImage {
+public class MapTexture {
 
 	private ByteBuffer buffer;
 	private byte[] bytes;
 	private int glId = -1;
+	private final int width;
+	private final int height;
 	
 	private Object bufferLock = new Object();
 	
 	public MapTexture(int width, int height) {
-		super(width, height, TYPE_4BYTE_ABGR);
-		
-		this.bytes = ((DataBufferByte) this.getRaster().getDataBuffer()).getData();
+		int size = 4 * width * (height - 1) + 4 * width;		
+		this.bytes = new byte[size];
 		this.buffer = ByteBuffer.allocateDirect(bytes.length).order(ByteOrder.nativeOrder());
+		this.width = width;
+		this.height = height;
 	}
 	
 	public int getId() {
@@ -56,6 +57,14 @@ public class MapTexture extends BufferedImage {
 		GL11.glTexImage2D(GL11.GL_TEXTURE_2D, GL11.GL_ZERO, GL11.GL_RGBA, this.getWidth(), this.getHeight(), GL11.GL_ZERO, GL11.GL_RGBA, GL12.GL_UNSIGNED_INT_8_8_8_8, this.buffer);
 	}
 	
+	public int getHeight() {
+		return this.height;
+	}
+
+	public int getWidth() {
+		return this.width;
+	}
+
 	private byte[] getBytes() {
 		Object lock = this.bufferLock;
 		synchronized(lock) {
@@ -63,7 +72,7 @@ public class MapTexture extends BufferedImage {
 		}
 	}
 	
-	public void copyImage(MapTexture image) {
+	public void copyData(MapTexture image) {
 		Object lock = this.bufferLock;
 		synchronized(lock) {
 			this.bytes = image.getBytes();
@@ -92,7 +101,6 @@ public class MapTexture extends BufferedImage {
 		}
 	}
 	
-	@Override
 	public void setRGB(int x, int y, int color) {
 		if (x < 0 || x >= this.getWidth()) return;
 		if (y < 0 || y >= this.getHeight()) return;
@@ -136,7 +144,6 @@ public class MapTexture extends BufferedImage {
 		Object lock = this.bufferLock;
 		synchronized(lock) {
 			this.buffer.clear();
-			this.flush();
 		}
 	}
 	

@@ -231,7 +231,7 @@ public class MapRenderer {
 			//this.chunkGrid = new ChunkGrid(mapX, mapY, mapW, mapH);
 		}		
 		if (minimap.changed) {
-			this.mapTexture.copyImage(minimap.getImage());
+			this.mapTexture.copyData(minimap.getImage());
 			this.mapTexture.upload();
 			this.lastX = minimap.getLasX();
 			this.lastZ = minimap.getLastZ();
