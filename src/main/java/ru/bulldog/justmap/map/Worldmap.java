@@ -190,7 +190,7 @@ public class Worldmap extends MapScreen implements IMap {
 		}
 		
 		if (this.changed) {
-			this.mapImage.copyImage(this.bufferImage);
+			this.mapImage.copyData(this.bufferImage);
 			this.changed = false;
 		}
 		this.mapImage.upload();
