@@ -29,6 +29,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.BlockPos;
 
 @Environment(EnvType.CLIENT)
@@ -217,7 +218,7 @@ public class MapRenderer {
 		dir.x = posX; dir.y = posY;
 	}
 	
-	public void draw() {
+	public void draw(MatrixStack matrixStack) {
 		if (!minimap.isMapVisible() || client.player == null) {
 			return;
 		}

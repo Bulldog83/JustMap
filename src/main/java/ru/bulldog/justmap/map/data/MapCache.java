@@ -6,6 +6,7 @@ import ru.bulldog.justmap.util.StorageUtil;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
@@ -83,10 +84,6 @@ public class MapCache {
 		dimensions.put(dimendion, data);
 		
 		return data;
-	}
-	
-	public static DimensionType getDimension() {
-		return DimensionType.byRawId(currentDimension);
 	}
 	
 	public static void saveData() {
