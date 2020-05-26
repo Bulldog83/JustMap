@@ -55,14 +55,14 @@ public class MapScreen extends Screen {
 	}
 	
 	@Override
-	public void render(MatrixStack matrixStack, int int_1, int int_2, float float_1) {
-		renderBackground(matrixStack);
+	public void render(int int_1, int int_2, float float_1) {
+		this.renderBackground();
+		this.renderForeground();
 		for (Element e : children) {
 			if (e instanceof Drawable) {
 				((Drawable) e).render(matrixStack, int_1, int_2, float_1);
 			}
 		}
-		renderForeground(matrixStack);
 	}
 	
 	public void renderBackground(MatrixStack matrixStack) {

@@ -70,9 +70,11 @@ public class MapChunk {
 		this.restore();
 	}
 	
-	public void resetChunk() {
+	public MapChunk resetChunk() {
 		this.levels.clear();
 		this.updated = 0;
+		
+		return this;
 	}
 	
 	private void initLayer() {
@@ -111,8 +113,9 @@ public class MapChunk {
 		}
 	}
 	
-	public void setPos(ChunkPos chunkPos) {
+	public MapChunk setPos(ChunkPos chunkPos) {
 		this.chunkPos = chunkPos;
+		return this;
 	}
 	
 	public ChunkPos getPos() {
@@ -139,12 +142,14 @@ public class MapChunk {
 		return getChunkLevel().heightmap;
 	}
 	
-	public void setLevel(Layer.Type layer, int level) {
+	public MapChunk setLevel(Layer.Type layer, int level) {
 		if (this.layer == layer &&
-			this.level == level) return;
+			this.level == level) return this;
 		
-		this.level = level;		
+		this.level = level;
 		this.layer = layer;
+		
+		return this;
 	}
 	
 	public WorldChunk getWorldChunk() {
@@ -159,8 +164,8 @@ public class MapChunk {
 		return getChunkLevel().setBlockState(pos.getX() & 15, pos.getY() & 15, pos.getZ() & 15, blockState);
 	}
 	
-	public void updateHeighmap() {
-		if (!this.updateWorldChunk()) return;
+	public MapChunk updateHeighmap() {
+		if (!this.updateWorldChunk()) return this;
 		
 		boolean skipWater = !(ClientParams.hideWater || ClientParams.waterTint);
 		for (int x = 0; x < 16; x++) {
@@ -178,15 +183,18 @@ public class MapChunk {
 				}
 			}
 		}
+		
+		return this;
 	}
 	
-	public void update() {
+	public MapChunk update() {
 		long currentTime = System.currentTimeMillis();
-		if (currentTime - updated < ClientParams.chunkUpdateInterval) return;
-		
-		if (this.purged || !this.updateWorldChunk()) return;
+		if (currentTime - updated < ClientParams.chunkUpdateInterval) return this;		
+		if (this.purged || !this.updateWorldChunk()) return this;
 		
 		chunkUpdater.execute(this::updateData);
+		
+		return this;
 	}
 	
 	private boolean updateWorldChunk() {
@@ -316,7 +324,7 @@ public class MapChunk {
 		this.saved = true;
 	}
 	
-	public void restore() {
+	private void restore() {
 		CompoundTag chunkData = StorageUtil.getCache(chunkPos);
 		if (chunkData.isEmpty()) return;
 		

@@ -15,6 +15,7 @@ import net.minecraft.text.TranslatableText;
 
 import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.config.ConfigKeeper.EnumEntry;
+import ru.bulldog.justmap.map.DirectionArrow;
 import ru.bulldog.justmap.map.minimap.MapPosition;
 import ru.bulldog.justmap.map.minimap.MapSkin;
 
@@ -49,10 +50,10 @@ public final class ConfigFactory {
 		
 		@SuppressWarnings("unchecked")
 		EnumEntry<MapPosition> drawPosConfig = (EnumEntry<MapPosition>) JustMapClient.CONFIG.getEntry("map_position");
-		
 		EnumSelectorBuilder<MapPosition> drawPosEntry = entryBuilder.startEnumSelector(lang("map_position"), MapPosition.class, drawPosConfig.getValue());
 		drawPosEntry.setSaveConsumer(val -> drawPosConfig.setValue(val))
 					.setDefaultValue(drawPosConfig.getDefault());
+		
 		general.addEntry(drawPosEntry.build());
 		general.addEntry(entryBuilder.startIntField(lang("map_offset"), JustMapClient.CONFIG.getInt("map_offset"))
 				.setSaveConsumer(val -> JustMapClient.CONFIG.setInt("map_offset", val))
@@ -109,7 +110,14 @@ public final class ConfigFactory {
 				.setDefaultValue((boolean) JustMapClient.CONFIG.getDefault("hide_water"))
 				.build());
 		
+		@SuppressWarnings("unchecked")
+		EnumEntry<DirectionArrow.Type> arrowTypeConfig = (EnumEntry<DirectionArrow.Type>) JustMapClient.CONFIG.getEntry("arrow_type");
+		EnumSelectorBuilder<DirectionArrow.Type> arrowTypeEntry = entryBuilder.startEnumSelector(lang("arrow_type"), DirectionArrow.Type.class, arrowTypeConfig.getValue());
+		arrowTypeEntry.setSaveConsumer(val -> arrowTypeConfig.setValue(val))
+					  .setDefaultValue(arrowTypeConfig.getDefault());
+		
 		ConfigCategory mapAppearance = configBuilder.getOrCreateCategory(lang("category.appearance"));
+		mapAppearance.addEntry(arrowTypeEntry.build());
 		mapAppearance.addEntry(entryBuilder.startBooleanToggle(lang("alternate_color_render"), JustMapClient.CONFIG.getBoolean("alternate_color_render"))
 				.setSaveConsumer(val -> JustMapClient.CONFIG.setBoolean("alternate_color_render", val))
 				.setDefaultValue((boolean) JustMapClient.CONFIG.getDefault("alternate_color_render"))
@@ -142,6 +150,10 @@ public final class ConfigFactory {
 		mapAppearance.addEntry(entryBuilder.startBooleanToggle(lang("simple_arrow"), JustMapClient.CONFIG.getBoolean("simple_direction_arrow"))
 				.setSaveConsumer(val -> JustMapClient.CONFIG.setBoolean("simple_direction_arrow", val))
 				.setDefaultValue((boolean) JustMapClient.CONFIG.getDefault("simple_direction_arrow"))
+				.build());
+		mapAppearance.addEntry(entryBuilder.startBooleanToggle(lang("texture_filter"), JustMapClient.CONFIG.getBoolean("texture_filter"))
+				.setSaveConsumer(val -> JustMapClient.CONFIG.setBoolean("texture_filter", val))
+				.setDefaultValue((boolean) JustMapClient.CONFIG.getDefault("texture_filter"))
 				.build());
 		
 		ConfigCategory waypoints = configBuilder.getOrCreateCategory(lang("category.waypoints"));

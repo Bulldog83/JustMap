@@ -2,7 +2,6 @@ package ru.bulldog.justmap.map.minimap;
 
 import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.client.config.ClientParams;
-import ru.bulldog.justmap.client.render.MapTexture;
 import ru.bulldog.justmap.map.IMap;
 import ru.bulldog.justmap.map.data.Layer.Type;
 import ru.bulldog.justmap.map.data.MapCache;
@@ -12,7 +11,6 @@ import ru.bulldog.justmap.map.icon.WaypointIcon;
 import ru.bulldog.justmap.map.waypoint.Waypoint;
 import ru.bulldog.justmap.map.waypoint.WaypointEditor;
 import ru.bulldog.justmap.map.waypoint.WaypointKeeper;
-import ru.bulldog.justmap.util.Colors;
 import ru.bulldog.justmap.util.DrawHelper.TextAlignment;
 import ru.bulldog.justmap.util.PosUtil;
 import ru.bulldog.justmap.util.math.MathUtil;
@@ -55,29 +53,18 @@ public class Minimap implements IMap{
 	private float mapScale;
 	private int lastPosX = 0;
 	private int lastPosZ = 0;
-	private long updated = 0;
 	
 	private Biome currentBiome;	
-	private MapTexture image;
 	
 	private List<WaypointIcon> waypoints = new ArrayList<>();
 	private List<PlayerIcon> players = new ArrayList<>();
-	private List<EntityIcon> entities = new ArrayList<>();
-	
+	private List<EntityIcon> entities = new ArrayList<>();	
 	private PlayerEntity locPlayer = null;
 	
 	private boolean isMapVisible = true;
 	private boolean rotateMap = false;
-	private boolean showGrid = false;	
-	private boolean hidePlants = false;
-	private boolean hideWater = false;
-	private boolean waterTint = true;
-	private boolean showTerrain = true;
 
-	public boolean needUpdate = false;
-	public boolean changed = false;
-	
-	private Object imageLocker = new Object();
+	public boolean posChanged = false;
 	
 	public Minimap() {
 		this.textManager = new TextManager(this);
@@ -86,12 +73,6 @@ public class Minimap implements IMap{
 	
 	public void update() {
 		if (!this.isMapVisible()) { return; }
-		
-		long time = System.currentTimeMillis();
-		if (time - updated > 1000) {
-			this.needUpdate = true;
-			this.updated = time;
-		}
 	
 		PlayerEntity player = minecraftClient.player;
 		if (player != null) {
@@ -104,19 +85,6 @@ public class Minimap implements IMap{
 		} else {
 			locPlayer = null;
 		}
-	}
-	
-	private void renewMap() {
-		synchronized (imageLocker) {
-			if (image != null) {
-				this.image.close();
-			}		
-			int size = this.getScaledSize();
-			this.image = new MapTexture(size, size);
-			this.image.fill(Colors.BLACK);
-		}
-		
-		this.needUpdate = true;
 	}
 	
 	public void updateMapParams() {
@@ -137,27 +105,6 @@ public class Minimap implements IMap{
 			} else {
 				this.scaledSize = (int) ((mapWidth * mapScale) + 8);
 			}
-			
-			this.renewMap();
-		}
-		
-		boolean showGrid = JustMapClient.CONFIG.getBoolean("draw_chunk_grid");
-		boolean hidePlants = JustMapClient.CONFIG.getBoolean("hide_plants");
-		boolean hideWater = JustMapClient.CONFIG.getBoolean("hide_water");
-		boolean waterTint = JustMapClient.CONFIG.getBoolean("water_tint");
-		boolean showTerrain = JustMapClient.CONFIG.getBoolean("show_terrain");
-		
-		if (this.showGrid != showGrid || this.hidePlants != hidePlants ||
-			this.hideWater != hideWater || this.showTerrain != showTerrain ||
-			this.waterTint != waterTint) {
-			
-			this.showGrid = showGrid;
-			this.hidePlants = hidePlants;
-			this.hideWater = hideWater;
-			this.showTerrain = showTerrain;
-			this.waterTint = waterTint;
-			
-			this.needUpdate = true;
 		}
 		
 		this.isMapVisible = JustMapClient.CONFIG.getBoolean("map_visible");
@@ -256,10 +203,10 @@ public class Minimap implements IMap{
 			MapCache.setCurrentLayer(Type.SURFACE, posY);
 		}
 		
-		if (needUpdate || lastPosX != posX || lastPosZ != posZ) { 
-			MapCache.get().update(this, scaled, posX, posZ);
+		if (lastPosX != posX || lastPosZ != posZ) { 
 			this.lastPosX = posX;
 			this.lastPosZ = posZ;
+			this.posChanged = true;
 		}
 		
 		if (ClientParams.rotateMap) {
@@ -357,12 +304,6 @@ public class Minimap implements IMap{
 	public void createWaypoint() {
 		World world = minecraftClient.world;
 		createWaypoint(world.method_27983().getValue(), PosUtil.currentPos());
-	}
-	
-	public MapTexture getImage() {
-		synchronized (imageLocker) {
-			return this.image;
-		}		
 	}
 	
 	public int getScaledSize() {
