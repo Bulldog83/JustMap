@@ -20,6 +20,7 @@
 
   "justmap.configuration.map_offset": "Смещение",
   "justmap.configuration.map_position": "Позиция карты",
+  "justmap.configuration.arrow_type": "Вид стрелки",
   "justmap.configuration.map_size": "Размер карты",
   "justmap.configuration.chunk_level_size": "Высота уровня чанка (блоков)",
   "justmap.configuration.map_scale": "Масштаб карты",
@@ -41,6 +42,7 @@
   "justmap.configuration.show_effect_timers": "Отображать таймеры эффектов статуса",
   "justmap.configuration.rotate_map": "Ориентировать карту по игроку",
   "justmap.configuration.alternate_color_render": "Альренативный цветовой рендер карты",
+  "justmap.configuration.texture_filter": "Фильтрация текстур",
   "justmap.configuration.water_tint": "Тонирование блоков под водой",
   "justmap.configuration.use_skins": "Использовать скины",
   "justmap.configuration.current_skin": "Текущий скин",

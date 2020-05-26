@@ -20,6 +20,7 @@
 
   "justmap.configuration.map_offset": "Offset",
   "justmap.configuration.map_position": "Map Position",
+  "justmap.configuration.arrow_type": "Arrow Type",
   "justmap.configuration.map_size": "Map Size",
   "justmap.configuration.chunk_level_size": "Chunk Level Size (blocks)",
   "justmap.configuration.map_scale": "Map Scale",
@@ -41,6 +42,7 @@
   "justmap.configuration.show_effect_timers": "Show status effect timers",
   "justmap.configuration.rotate_map": "Orient the map by player",
   "justmap.configuration.alternate_color_render": "Alternate map colors rendering",
+  "justmap.configuration.texture_filter": "Textures filter",
   "justmap.configuration.water_tint": "Water Tint",
   "justmap.configuration.use_skins": "Use map skins",
   "justmap.configuration.current_skin": "Current Skin",
