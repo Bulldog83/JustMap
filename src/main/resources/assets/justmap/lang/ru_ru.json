@@ -41,7 +41,7 @@
   "justmap.configuration.move_effects": "Переместить иконки эффектов статуса",
   "justmap.configuration.show_effect_timers": "Отображать таймеры эффектов статуса",
   "justmap.configuration.rotate_map": "Ориентировать карту по игроку",
-  "justmap.configuration.alternate_color_render": "Альренативный цветовой рендер карты",
+  "justmap.configuration.alternate_color_render": "Альтернативный цветовой рендер карты",
   "justmap.configuration.texture_filter": "Фильтрация текстур",
   "justmap.configuration.water_tint": "Тонирование блоков под водой",
   "justmap.configuration.use_skins": "Использовать скины",
@@ -89,11 +89,5 @@
   "justmap.gui.teleport": "Скачек",
   "justmap.gui.wp_hidden": "Скрыть",
   "justmap.gui.wp_tracking": "Отслеживать",
-  "justmap.gui.wp_render": "Отображать в мире",
-  
-  "gamerule.allowCavesMap": "(Just Map) Маппинг пещер",
-  "gamerule.allowEntityRadar": "(Just Map) Радар сущностей",
-  "gamerule.allowPlayerRadar": "(Just Map) Радар игроков",
-  "gamerule.allowCreatureRadar": "(Just Map) Радар пассивных существ",
-  "gamerule.allowHostileRadar": "(Just Map) Радар враждебных мобов"
+  "justmap.gui.wp_render": "Отображать в мире"
 }
