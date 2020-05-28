@@ -54,13 +54,13 @@ public class MapScreen extends Screen {
 	
 	@Override
 	public void render(int int_1, int int_2, float float_1) {
-		renderBackground();
+		this.renderBackground();
+		this.renderForeground();
 		for (Element e : children) {
 			if (e instanceof Drawable) {
 				((Drawable) e).render(int_1, int_2, float_1);
 			}
 		}
-		renderForeground();
 	}
 	
 	public void renderBackground() {
