@@ -207,12 +207,12 @@ public class Minimap implements IMap{
 		boolean allowCaves = isAllowed(ClientParams.drawCaves, MapGameRules.ALLOW_CAVES_MAP);
 		
 		DimensionType dimType = world.getDimension().getType();
+		if (dimType == DimensionType.THE_END) {
+			return false;
+		}
 		if (dimType.hasSkyLight()) {
 			return allowCaves && !world.isSkyVisibleAllowingSea(playerPos) &&
 				   world.getLightLevel(LightType.SKY, playerPos) == 0;
-		}
-		if (dimType == DimensionType.THE_END) {
-			return false;
 		}
 		
 		return allowCaves;
@@ -269,53 +269,40 @@ public class Minimap implements IMap{
 		
 		double endX = startX + scaled;
 		double endZ = startZ + scaled;
-		double shiftX = (PosUtil.doubleCoordX() - lastPosX) / this.mapScale;
-		double shiftZ = (PosUtil.doubleCoordZ() - lastPosZ) / this.mapScale;
-		
-		if (allowPlayerRadar()) {
-			players.clear();			
-			List<? extends PlayerEntity> players = world.getPlayers();
-			for (PlayerEntity p : players) {
-				if (p == player || p.isSpectator()) {
-					continue;
-				}
-				
-				BlockPos ppos = p.getBlockPos();
-			 
-				int x = ppos.getX();
-				int z = ppos.getZ();				
-				if (x >= startX && x <= endX && z >= startZ && z <= endZ) {
-					PlayerIcon playerIcon = new PlayerIcon(this, p, false);
-					playerIcon.setPosition(MathUtil.screenPos(x, startX, endX, mapWidth),
-										   MathUtil.screenPos(z, startZ, endZ, mapHeight));
-					this.players.add(playerIcon);
-				}
-			}
-		}
 		
 		if (allowEntityRadar()) {
-			entities.clear();
+			this.players.clear();
+			this.entities.clear();
 			
 			int checkHeight = 24;
 			BlockPos start = new BlockPos(startX, posY - checkHeight / 2, startZ);
 			BlockPos end = new BlockPos(endX, posY + checkHeight / 2, endZ);
-			List<Entity> entities = world.getEntities((Entity) null, new Box(start, end));
+			List<Entity> entities = world.getEntities(null, new Box(start, end));
 		
 			int amount = 0;				
 			for (Entity entity : entities) {
-				if (entity instanceof LivingEntity && !(entity instanceof PlayerEntity)) {
+				float tick = minecraftClient.getTickDelta();
+				double entX = entity.prevX + (entity.getX() - entity.prevX) * tick;
+				double entZ = entity.prevZ + (entity.getZ() - entity.prevZ) * tick;
+				double iconX = MathUtil.screenPos(entX, startX, endX, mapWidth);
+				double iconY = MathUtil.screenPos(entZ, startZ, endZ, mapHeight);
+				if (entity instanceof PlayerEntity && allowPlayerRadar()) {
+					PlayerEntity pEntity  = (PlayerEntity) entity;
+					if (pEntity == player) continue;
+					PlayerIcon playerIcon = new PlayerIcon(this, pEntity, false);
+					playerIcon.setPosition(iconX, iconY);
+					this.players.add(playerIcon);
+				} else if (entity instanceof LivingEntity && !(entity instanceof PlayerEntity)) {
 					LivingEntity livingEntity = (LivingEntity) entity;
 					boolean hostile = livingEntity instanceof HostileEntity;
-					double entX = MathUtil.screenPos(entity.getX(), startX, endX, mapWidth);
-					double entZ = MathUtil.screenPos(entity.getZ(), startZ, endZ, mapHeight);
 					if (hostile && allowHostileRadar()) {
 						EntityIcon entIcon = new EntityIcon(this, entity, hostile);	
-						entIcon.setPosition(entX, entZ);
+						entIcon.setPosition(iconX, iconY);
 						this.entities.add(entIcon);
 						amount++;
 					} else if (!hostile && allowCreatureRadar()) {
 						EntityIcon entIcon = new EntityIcon(this, entity, hostile);	
-						entIcon.setPosition(entX, entZ);
+						entIcon.setPosition(iconX, iconY);
 						this.entities.add(entIcon);
 						amount++;
 					}
@@ -331,8 +318,8 @@ public class Minimap implements IMap{
 			for (Waypoint wp : stream.toArray(Waypoint[]::new)) {
 				WaypointIcon waypoint = new WaypointIcon(this, wp);
 				waypoint.setPosition(
-					MathUtil.screenPos(wp.pos.getX(), startX, endX, mapWidth) - shiftX,
-					MathUtil.screenPos(wp.pos.getZ(), startZ, endZ, mapHeight) - shiftZ
+					MathUtil.screenPos(wp.pos.getX(), startX, endX, mapWidth),
+					MathUtil.screenPos(wp.pos.getZ(), startZ, endZ, mapHeight)
 				);
 				this.waypoints.add(waypoint);
 			}

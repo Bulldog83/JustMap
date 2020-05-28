@@ -40,10 +40,11 @@ public class MapCache {
 	}
 	
 	public static MapCache get() {
-		if (currentWorld == null || (minecraft.world != null &&
-									 minecraft.world != currentWorld)) {
+		World world = minecraft.world;;
+		if (currentWorld == null || (world != null &&
+									 world != currentWorld)) {
 			
-			currentWorld = minecraft.world;
+			currentWorld = world;
 		}
 		
 		if (currentWorld == null) return null;

@@ -66,15 +66,13 @@ public class MapTexture {
 	}
 
 	private byte[] getBytes() {
-		Object lock = this.bufferLock;
-		synchronized(lock) {
+		synchronized(bufferLock) {
 			return Arrays.copyOf(this.bytes, this.bytes.length);
 		}
 	}
 	
 	public void copyData(MapTexture image) {
-		Object lock = this.bufferLock;
-		synchronized(lock) {
+		synchronized(bufferLock) {
 			this.bytes = image.getBytes();
 		}
 	}
@@ -107,8 +105,7 @@ public class MapTexture {
 		
 		int index = (x + y * this.getWidth()) * 4;
 		
-		Object lock = this.bufferLock;
-		synchronized(lock) {
+		synchronized(bufferLock) {
 			this.bytes[index] = (byte) (color >> 24);
 			this.bytes[index + 1] = (byte) (color >> 0);
 			this.bytes[index + 2] = (byte) (color >> 8);
@@ -120,8 +117,7 @@ public class MapTexture {
 		int width = this.getWidth();
 		int height = this.getHeight();
 		
-		Object lock = this.bufferLock;
-		synchronized(lock) {
+		synchronized(bufferLock) {
 			for(int x = 0; x < width; x++) {
 				for (int y = 0; y < height; y++) {
 					this.setRGB(x, y, color);
@@ -139,17 +135,14 @@ public class MapTexture {
 		if (this.glId != -1) {
 			TextureUtil.releaseTextureId(this.glId);
 			this.glId = -1;
-		}
-		
-		Object lock = this.bufferLock;
-		synchronized(lock) {
+		}		
+		synchronized(bufferLock) {
 			this.buffer.clear();
 		}
 	}
 	
 	private void refillBuffer() {
-		Object lock = this.bufferLock;
-		synchronized(lock) {
+		synchronized(bufferLock) {
 			this.buffer.clear();
 			this.buffer.put(this.bytes);
 			this.buffer.position(0).limit(bytes.length);

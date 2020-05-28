@@ -9,7 +9,6 @@ import ru.bulldog.justmap.map.DirectionArrow;
 import ru.bulldog.justmap.map.icon.EntityIcon;
 import ru.bulldog.justmap.map.icon.PlayerIcon;
 import ru.bulldog.justmap.map.icon.WaypointIcon;
-//import ru.bulldog.justmap.map.minimap.ChunkGrid;
 import ru.bulldog.justmap.map.minimap.MapPosition;
 import ru.bulldog.justmap.map.minimap.MapSkin;
 import ru.bulldog.justmap.map.minimap.MapText;
@@ -65,7 +64,6 @@ public class MapRenderer {
 	private final MinecraftClient client = MinecraftClient.getInstance();
 	
 	private MapSkin mapSkin;
-	//private ChunkGrid chunkGrid;
 	
 	public static MapRenderer getInstance() {
 		if (instance == null) {
@@ -227,7 +225,6 @@ public class MapRenderer {
 		if (mapTexture == null || mapTexture.getWidth() != textureSize || mapTexture.getHeight() != textureSize) {
 			if (mapTexture != null) this.mapTexture.close();			
 			this.mapTexture = new MapTexture(textureSize, textureSize);
-			//this.chunkGrid = new ChunkGrid(mapX, mapY, mapW, mapH);
 		}		
 		if (minimap.changed) {
 			this.mapTexture.copyData(minimap.getImage());
@@ -269,7 +266,7 @@ public class MapRenderer {
 		
 		float mult = 1 / minimap.getScale();		
 		float offX = (float) (PosUtil.doubleCoordX() - this.lastX) * mult;
-		float offZ = (float) (PosUtil.doubleCoordZ() - this.lastZ) * mult;
+		float offY = (float) (PosUtil.doubleCoordZ() - this.lastZ) * mult;
 		
 		RenderSystem.pushMatrix();
 		if (ClientParams.rotateMap) {
@@ -279,27 +276,23 @@ public class MapRenderer {
 			RenderSystem.rotatef(-rotation + 180, 0, 0, 1.0F);
 			RenderSystem.translatef(-moveX, -moveY, 0.0F);
 		}
-		RenderSystem.translatef(-offX, -offZ, 0.0F);
+		RenderSystem.translatef(-offX, -offY, 0.0F);
 		
 		this.drawMap();
 
-		//if (ClientParams.showGrid) {
-		//	this.chunkGrid.update(lastX, lastZ);
-		//	this.chunkGrid.draw();
-		//}
+		RenderSystem.popMatrix();
 		if (Minimap.allowEntityRadar()) {
 			if (Minimap.allowPlayerRadar()) {
 				for (PlayerIcon player : minimap.getPlayerIcons()) {
-					player.draw(mapX, mapY, rotation);
+					player.draw(mapX, mapY, offX, offY, rotation);
 				}
 			}
 			if (Minimap.allowCreatureRadar() || Minimap.allowHostileRadar()) {
 				for (EntityIcon entity : minimap.getEntities()) {
-					entity.draw(mapX, mapY, rotation);
+					entity.draw(mapX, mapY, offX, offY, rotation);
 				}
 			}
-		}		
-		RenderSystem.popMatrix();
+		}
 		
 		DrawHelper.DRAWER.drawRightAlignedString(
 				client.textRenderer, Float.toString(minimap.getScale()),
@@ -307,7 +300,7 @@ public class MapRenderer {
 		
 		for (WaypointIcon waypoint : minimap.getWaypoints()) {
 			if (!waypoint.isHidden()) {
-				waypoint.draw(mapX, mapY, rotation);
+				waypoint.draw(mapX, mapY, offX, offY, rotation);
 			}
 		}
 		GL11.glDisable(GL11.GL_SCISSOR_TEST);
