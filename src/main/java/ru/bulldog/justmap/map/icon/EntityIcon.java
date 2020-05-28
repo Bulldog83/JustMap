@@ -24,7 +24,7 @@ public class EntityIcon extends MapIcon<EntityIcon> {
 	}
 	
 	@Override
-	public void draw(int mapX, int mapY, float rotation) {
+	public void draw(int mapX, int mapY, double offX, double offY, float rotation) {
 		if (!Minimap.allowCreatureRadar() && !hostile) { return; }
 		if (!Minimap.allowHostileRadar() && hostile) { return; }
 		
@@ -33,8 +33,8 @@ public class EntityIcon extends MapIcon<EntityIcon> {
 		
 		IconPos pos = new IconPos(mapX + x, mapY + y);
 		
-		pos.x -= size / 2;
-		pos.y -= size / 2;
+		pos.x -= size / 2 + offX;
+		pos.y -= size / 2 + offY;
 		
 		if (pos.x < mapX || pos.x > (mapX + map.getWidth()) - size ||
 			pos.y < mapY || pos.y > (mapY + map.getHeight()) - size) return;

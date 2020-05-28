@@ -250,7 +250,7 @@ public class MapRenderer {
 		
 		float mult = 1 / minimap.getScale();		
 		float offX = (float) (PosUtil.doubleCoordX() - this.lastX) * mult;
-		float offZ = (float) (PosUtil.doubleCoordZ() - this.lastZ) * mult;
+		float offY = (float) (PosUtil.doubleCoordZ() - this.lastZ) * mult;
 		
 		RenderSystem.pushMatrix();
 		if (ClientParams.rotateMap) {
@@ -260,23 +260,23 @@ public class MapRenderer {
 			RenderSystem.rotatef(-rotation + 180, 0, 0, 1.0F);
 			RenderSystem.translatef(-moveX, -moveY, 0.0F);
 		}
-		RenderSystem.translatef(-offX, -offZ, 0.0F);
+		RenderSystem.translatef(-offX, -offY, 0.0F);
 		
 		this.drawMap();
 
+		RenderSystem.popMatrix();
 		if (Minimap.allowEntityRadar()) {
 			if (Minimap.allowPlayerRadar()) {
 				for (PlayerIcon player : minimap.getPlayerIcons()) {
-					player.draw(mapX, mapY, rotation);
+					player.draw(mapX, mapY, offX, offY, rotation);
 				}
 			}
 			if (Minimap.allowCreatureRadar() || Minimap.allowHostileRadar()) {
 				for (EntityIcon entity : minimap.getEntities()) {
-					entity.draw(mapX, mapY, rotation);
+					entity.draw(mapX, mapY, offX, offY, rotation);
 				}
 			}
-		}		
-		RenderSystem.popMatrix();
+		}
 		
 		DrawHelper.DRAWER.drawRightAlignedString(
 				client.textRenderer, Float.toString(minimap.getScale()),
@@ -284,7 +284,7 @@ public class MapRenderer {
 		
 		for (WaypointIcon waypoint : minimap.getWaypoints()) {
 			if (!waypoint.isHidden()) {
-				waypoint.draw(mapX, mapY, rotation);
+				waypoint.draw(mapX, mapY, offX, offY, rotation);
 			}
 		}
 		GL11.glDisable(GL11.GL_SCISSOR_TEST);

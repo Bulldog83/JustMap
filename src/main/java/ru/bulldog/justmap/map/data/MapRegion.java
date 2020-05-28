@@ -19,6 +19,7 @@ public class MapRegion {
 	private static Tessellator tessellator = Tessellator.getInstance();
 	private static BufferBuilder builder = tessellator.getBuffer();
 	private static TaskManager worker = TaskManager.getManager("region-data");
+	private static MapCache mapData;
 	
 	private final RegionPos pos;
 	private final MapTexture image;
@@ -32,6 +33,7 @@ public class MapRegion {
 		this.pos = new RegionPos(blockPos);
 		this.image = new MapTexture(512, 512);
 		this.image.fill(Colors.BLACK);
+		this.updateMapData();
 		this.updateImage();
 	}
 	
@@ -44,13 +46,17 @@ public class MapRegion {
 	}
 	
 	public void updateTexture() {
+		this.updateMapData();
 		worker.execute(this::updateImage);
+	}
+	
+	private void updateMapData() {
+		mapData = MapCache.get();
 	}
 	
 	private void updateImage() {
 		int regX = this.pos.x << 9;
 		int regZ = this.pos.z << 9;		
-		MapCache mapData = MapCache.get();
 		for (int x = 0; x < 512; x += 16) {
 			int chunkX = (regX + x) >> 4;
 			for (int y = 0; y < 512; y += 16) {
@@ -75,7 +81,10 @@ public class MapRegion {
 	public void draw(double x, double y, int imgX, int imgY, int width, int height, float scale) {
 		if (width <= 0 || height <= 0) return;
 		
-		if (changed) this.image.upload();
+		if (changed) {
+			this.image.upload();
+			this.changed = false;
+		}
 		RenderSystem.bindTexture(image.getId());
 		if (ClientParams.textureFilter) {
 			RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR_MIPMAP_LINEAR);
