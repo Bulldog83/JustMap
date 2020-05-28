@@ -10,11 +10,9 @@ import net.minecraft.world.World;
 import net.minecraft.block.BlockState;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.chunk.WorldChunk;
-import net.minecraft.world.dimension.DimensionType;
 
 import java.util.Arrays;
 import java.util.concurrent.ConcurrentHashMap;
@@ -31,7 +29,7 @@ public class MapChunk {
 	private WorldChunk worldChunk;
 	private ChunkPos chunkPos;
 	private Layer.Type layer;
-	private Identifier dimension;
+	private int dimension;
 	private int level = 0;
 	private boolean hideWater = false;
 	private boolean waterTint = true;
@@ -51,7 +49,7 @@ public class MapChunk {
 	public MapChunk(World world, ChunkPos pos, Layer.Type layer) {
 		this.world = world;
 		this.worldChunk = world.getChunk(pos.x, pos.z);
-		this.dimension = world.method_27983().getValue();
+		this.dimension = world.getDimension().getType().getRawId();
 		this.chunkPos = pos;
 		this.layer = layer;
 		this.levels = new ConcurrentHashMap<>();
@@ -60,7 +58,7 @@ public class MapChunk {
 	}
 	
 	private void init() {
-		if (dimension.equals(DimensionType.THE_NETHER_REGISTRY_KEY.getValue())) {
+		if (dimension == -1) {
 			initLayer(Layer.Type.NETHER);
 		} else {
 			initLayer(Layer.Type.SURFACE);
@@ -70,11 +68,9 @@ public class MapChunk {
 		this.restore();
 	}
 	
-	public MapChunk resetChunk() {
+	public void resetChunk() {
 		this.levels.clear();
 		this.updated = 0;
-		
-		return this;
 	}
 	
 	private void initLayer() {
@@ -113,9 +109,8 @@ public class MapChunk {
 		}
 	}
 	
-	public MapChunk setPos(ChunkPos chunkPos) {
+	public void setPos(ChunkPos chunkPos) {
 		this.chunkPos = chunkPos;
-		return this;
 	}
 	
 	public ChunkPos getPos() {
@@ -142,14 +137,12 @@ public class MapChunk {
 		return getChunkLevel().heightmap;
 	}
 	
-	public MapChunk setLevel(Layer.Type layer, int level) {
+	public void setLevel(Layer.Type layer, int level) {
 		if (this.layer == layer &&
-			this.level == level) return this;
+			this.level == level) return;
 		
-		this.level = level;
+		this.level = level;		
 		this.layer = layer;
-		
-		return this;
 	}
 	
 	public WorldChunk getWorldChunk() {
@@ -164,8 +157,8 @@ public class MapChunk {
 		return getChunkLevel().setBlockState(pos.getX() & 15, pos.getY() & 15, pos.getZ() & 15, blockState);
 	}
 	
-	public MapChunk updateHeighmap() {
-		if (!this.updateWorldChunk()) return this;
+	public void updateHeighmap() {
+		if (!this.updateWorldChunk()) return;
 		
 		boolean skipWater = !(ClientParams.hideWater || ClientParams.waterTint);
 		for (int x = 0; x < 16; x++) {
@@ -183,18 +176,15 @@ public class MapChunk {
 				}
 			}
 		}
-		
-		return this;
 	}
 	
-	public MapChunk update() {
+	public void update() {
 		long currentTime = System.currentTimeMillis();
-		if (currentTime - updated < ClientParams.chunkUpdateInterval) return this;		
-		if (this.purged || !this.updateWorldChunk()) return this;
+		if (currentTime - updated < ClientParams.chunkUpdateInterval) return;
+		
+		if (this.purged || !this.updateWorldChunk()) return;
 		
 		chunkUpdater.execute(this::updateData);
-		
-		return this;
 	}
 	
 	private boolean updateWorldChunk() {
@@ -235,7 +225,6 @@ public class MapChunk {
 		
 		for (int x = 0; x < 16; x++) {
 			for (int z = 0; z < 16; z++) {
-				
 				int index = x + (z << 4);
 				
 				int posX = x + (chunkPos.x << 4);
@@ -275,10 +264,6 @@ public class MapChunk {
 		}
 		
 		this.updated = currentTime;
-		
-		if (currentTime - chunkLevel.refreshed > 60000) {
-			chunkLevel.refreshed = currentTime;
-		}
 	}
 	
 	public int[] getColorData() {
@@ -324,7 +309,7 @@ public class MapChunk {
 		this.saved = true;
 	}
 	
-	private void restore() {
+	public void restore() {
 		CompoundTag chunkData = StorageUtil.getCache(chunkPos);
 		if (chunkData.isEmpty()) return;
 		

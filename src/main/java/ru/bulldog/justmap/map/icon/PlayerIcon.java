@@ -22,7 +22,7 @@ public class PlayerIcon extends MapIcon<PlayerIcon> {
 	}
 
 	@Override
-	public void draw(MatrixStack matrixStack, int mapX, int mapY, float rotation) {
+	public void draw(int mapX, int mapY, float rotation) {
 		int size = ClientParams.entityIconSize;
 		
 		IconPos pos = new IconPos(mapX + x, mapY + y);

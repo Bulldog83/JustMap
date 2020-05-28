@@ -19,9 +19,6 @@ import net.minecraft.client.texture.NativeImageBackedTexture;
 import net.minecraft.client.texture.Sprite;
 import net.minecraft.client.texture.SpriteAtlasTexture;
 import net.minecraft.client.texture.TextureManager;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.LiteralText;
-import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
 @Environment(EnvType.CLIENT)
@@ -84,26 +81,26 @@ public class MapSkin extends Sprite {
 		textureManager.bindTexture(id);
 	}
 	
-	public void draw(MatrixStack matrixStack, int x, int y, int w, int h) {
+	public void draw(int x, int y, int w, int h) {
 		if (this.resizable) {
 			textureManager.bindTexture(this.getTexture());
 		} else {
 			bindPavedTexture(w, h);
 		}
-		DrawHelper.drawSprite(matrixStack, x, y, 0, w, h, this);
+		DrawHelper.blit(x, y, 0, w, h, this);
 	}
 	
-	public void draw(MatrixStack matrixStack, int x, int y, int size) {
-		this.draw(matrixStack, x, y, size, size);
+	public void draw(int x, int y, int size) {
+		this.draw(x, y, size, size);
 	}
 	
-	public Text getName() {
-		return new LiteralText(this.name);
+	public String getName() {
+		return this.name;
 	}
 	
 	@Override
 	public String toString() {
-		return this.getName().asString();
+		return this.getName();
 	}
 	
 	public static MapSkin getSkinByName(String name) {

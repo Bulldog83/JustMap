@@ -10,7 +10,6 @@ import ru.bulldog.justmap.config.ConfigKeeper.EnumEntry;
 import ru.bulldog.justmap.config.ConfigKeeper.FloatRange;
 import ru.bulldog.justmap.config.ConfigKeeper.IntegerEntry;
 import ru.bulldog.justmap.config.ConfigKeeper.IntegerRange;
-import ru.bulldog.justmap.map.DirectionArrow;
 import ru.bulldog.justmap.map.minimap.MapPosition;
 
 public class ClientConfig extends Config{
@@ -28,7 +27,6 @@ public class ClientConfig extends Config{
 	private ClientConfig() {
 		KEEPER.registerEntry("map_visible", new BooleanEntry(ClientParams.mapVisible, (b) -> ClientParams.mapVisible = b, () -> ClientParams.mapVisible));
 		KEEPER.registerEntry("map_position", new EnumEntry<MapPosition>(ClientParams.mapPosition, (e) -> ClientParams.mapPosition = e, () -> ClientParams.mapPosition));
-		KEEPER.registerEntry("arrow_type", new EnumEntry<DirectionArrow.Type>(ClientParams.arrowType, (e) -> ClientParams.arrowType = e, () -> ClientParams.arrowType));
 		KEEPER.registerEntry("map_offset", new IntegerEntry(ClientParams.positionOffset, (i) -> ClientParams.positionOffset = i, () -> ClientParams.positionOffset));
 		KEEPER.registerEntry("map_size", new IntegerRange(ClientParams.mapSize, (i) -> ClientParams.mapSize = i, () -> ClientParams.mapSize, 16, 256));
 		KEEPER.registerEntry("map_scale", new FloatRange(ClientParams.mapScale, (f) -> ClientParams.mapScale = f, () -> ClientParams.mapScale, 0.25F, 2.0F));
@@ -45,7 +43,6 @@ public class ClientConfig extends Config{
 		KEEPER.registerEntry("move_effects", new BooleanEntry(ClientParams.moveEffects, (b) -> ClientParams.moveEffects = b, () -> ClientParams.moveEffects));
 		KEEPER.registerEntry("show_effect_timers", new BooleanEntry(ClientParams.showEffectTimers, (b) -> ClientParams.showEffectTimers = b, () -> ClientParams.showEffectTimers));
 		KEEPER.registerEntry("alternate_color_render", new BooleanEntry(ClientParams.alternateColorRender, (b) -> ClientParams.alternateColorRender = b, () -> ClientParams.alternateColorRender));
-		KEEPER.registerEntry("texture_filter", new BooleanEntry(ClientParams.textureFilter, (b) -> ClientParams.textureFilter = b, () -> ClientParams.textureFilter));
 		KEEPER.registerEntry("water_tint", new BooleanEntry(ClientParams.waterTint, (b) -> ClientParams.waterTint = b, () -> ClientParams.waterTint));
 		KEEPER.registerEntry("use_skins", new BooleanEntry(ClientParams.useSkins, (b) -> ClientParams.useSkins = b, () -> ClientParams.useSkins));
 		KEEPER.registerEntry("simple_direction_arrow", new BooleanEntry(ClientParams.simpleArrow, (b) -> ClientParams.simpleArrow = b, () -> ClientParams.simpleArrow));

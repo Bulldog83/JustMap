@@ -1,15 +1,12 @@
 package ru.bulldog.justmap.map.data;
 
-import net.minecraft.util.math.BlockPos;
+import java.util.Arrays;
+
 import net.minecraft.util.math.ChunkPos;
 
 public class RegionPos {
 	public final int x;
 	public final int z;
-	
-	public RegionPos(BlockPos blockPos) {
-		this(new ChunkPos(blockPos));
-	}
 	
 	public RegionPos(ChunkPos pos) {
 		this(pos.getRegionX(),
@@ -28,7 +25,7 @@ public class RegionPos {
 	
 	@Override
 	public int hashCode() {
-		return ((x & 65535) << 16) | (z & 65535);
+		return Arrays.hashCode(new int[]{x, z});
 	}
 	
 	@Override

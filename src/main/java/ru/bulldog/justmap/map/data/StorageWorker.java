@@ -23,7 +23,7 @@ public class StorageWorker implements AutoCloseable {
 
 	private final Map<File, RegionStorage> storages;
 	private final Map<ChunkPos, Result> results = Maps.newLinkedHashMap();
-	private final TaskManager worker = TaskManager.getManager("chunk-io");
+	private final TaskManager worker = TaskManager.getManager("chunks-io");
 	private final AtomicBoolean closed = new AtomicBoolean();
 	
 	private CompletableFuture<Void> future = new CompletableFuture<>();

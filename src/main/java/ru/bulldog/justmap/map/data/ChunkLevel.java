@@ -24,7 +24,6 @@ public class ChunkLevel {
 	int[] levelmap;
 	
 	long updated = 0;
-	long refreshed = 0;
 	int level;
 	
 	ChunkLevel(int level) {
@@ -36,8 +35,8 @@ public class ChunkLevel {
 		
 		this.level = level;
 		
-		Arrays.fill(colormap, -1);
 		Arrays.fill(heightmap, -1);
+		Arrays.fill(colormap, -1);
 		Arrays.fill(levelmap, 0);
 		Arrays.fill(colordata, Colors.BLACK);
 	}

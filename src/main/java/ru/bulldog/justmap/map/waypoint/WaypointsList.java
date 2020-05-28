@@ -15,7 +15,6 @@ import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.resource.language.I18n;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
@@ -62,12 +61,12 @@ public class WaypointsList extends MapScreen {
 			deleteButton.y = y + 1;
 		}		
 		
-		public void render(MatrixStack matrixStack, int mouseX, int mouseY, float delta) {
+		public void render(int mouseX, int mouseY, float delta) {
 			TextRenderer font = minecraft.textRenderer;
 			
 			boolean hover = isMouseOver(mouseX, mouseY);
 			int bgColor = hover ? 0x88AAAAAA : 0x88333333;
-			fill(matrixStack, x, y, x + width, y + height, bgColor);
+			fill(x, y, x + width, y + height, bgColor);
 			
 			int iconSize = height - 2;
 			Icon icon = waypoint.getIcon();
@@ -80,14 +79,14 @@ public class WaypointsList extends MapScreen {
 			int stringY = y + 7;			
 			int nameX = x + iconSize + 2;
 
-			DrawHelper.DRAWER.drawStringWithShadow(matrixStack, font, waypoint.name, nameX, stringY, Colors.WHITE);
+			DrawHelper.DRAWER.drawString(font, waypoint.name, nameX, stringY, Colors.WHITE);
 			
 			int posX = tpButton.x - 5;
-			DrawHelper.drawRightAlignedString(waypoint.pos.toShortString(), posX, stringY, Colors.WHITE);
+			DrawHelper.DRAWER.drawRightAlignedString(font, waypoint.pos.toShortString(), posX, stringY, Colors.WHITE);
 			
-			editButton.render(matrixStack, mouseX, mouseY, delta);
-			tpButton.render(matrixStack, mouseX, mouseY, delta);
-			deleteButton.render(matrixStack, mouseX, mouseY, delta);
+			editButton.render(mouseX, mouseY, delta);
+			tpButton.render(mouseX, mouseY, delta);
+			deleteButton.render(mouseX, mouseY, delta);
 		}
 	
 		@Override
@@ -121,9 +120,9 @@ public class WaypointsList extends MapScreen {
 	private static final Text title = new LiteralText("Waypoints");
 	
 	private WaypointKeeper keeper = WaypointKeeper.getInstance();
-	private Identifier currentDim;
+	private int currentDim = 0;
 	private int currentDimIndex = 0;
-	private List<Identifier> dimensions;
+	private List<Integer> dimensions;
 	private List<Waypoint> wayPoints;
 	private List<Entry> entries = new ArrayList<>();
 
@@ -136,12 +135,15 @@ public class WaypointsList extends MapScreen {
 	
 	public WaypointsList(Screen parent) {
 		super(title, parent);
+		if (minecraft == null) {
+			minecraft = MinecraftClient.getInstance();
+		}
 		
-		this.dimensions = keeper.getDimensions();
+		dimensions = keeper.getDimensions();
 		
-		Identifier overworld = DimensionType.OVERWORLD_REGISTRY_KEY.getValue();
-		Identifier nether = DimensionType.THE_NETHER_REGISTRY_KEY.getValue();
-		Identifier theEnd = DimensionType.THE_END_REGISTRY_KEY.getValue();
+		int overworld = DimensionType.OVERWORLD.getRawId();
+		int nether = DimensionType.THE_NETHER.getRawId();
+		int theEnd = DimensionType.THE_END.getRawId();
 		if (!dimensions.contains(overworld)) {
 			dimensions.add(overworld);
 		}		
@@ -150,7 +152,10 @@ public class WaypointsList extends MapScreen {
 		}		
 		if (!dimensions.contains(theEnd)) {
 			dimensions.add(theEnd);
-		}
+		}		
+		
+		currentDim = minecraft.player.dimension.getRawId();
+		currentDimIndex = getDimIndex(currentDim);
 	}
 
 	@Override
@@ -158,13 +163,11 @@ public class WaypointsList extends MapScreen {
 		this.center = width / 2;		
 		this.screenWidth = Math.max(480, center);		
 		this.x = center - screenWidth / 2;		
-		this.prevDimensionButton = new ButtonWidget(x + 10, 10, 20, 20, new LiteralText("<"), (b) -> cycleDimension(-1));
-		this.nextDimensionButton = new ButtonWidget(x + screenWidth - 30, 10, 20, 20, new LiteralText(">"), (b) -> cycleDimension(1));		
+		this.prevDimensionButton = new ButtonWidget(x + 10, 10, 20, 20, "<", (b) -> cycleDimension(-1));
+		this.nextDimensionButton = new ButtonWidget(x + screenWidth - 30, 10, 20, 20, ">", (b) -> cycleDimension(1));		
 		this.addButton = new ButtonWidget(center - 62, height - 26, 60, 20, lang("create"), (b) -> add());
 		this.closeButton = new ButtonWidget(center + 2, height - 26, 60, 20, lang("close"), (b) -> onClose());
-		this.currentDim = client.world.method_27983().getValue();
-		this.currentDimIndex = getDimIndex(currentDim);
-		
+	
 		reset();
 	}
 	
@@ -202,59 +205,61 @@ public class WaypointsList extends MapScreen {
 		reset();
 	}
 	
-	private int getDimIndex(Identifier dim) {
+	private int getDimIndex(int dim) {
 		return dimensions.indexOf(dim);
 	}
 	
 	public void reset() {
-		this.info = this.getDimensionInfo(currentDim);
+		info = getDimensionInfo(currentDim);
 		
-		this.wayPoints = keeper.getWaypoints(currentDim, false);
+		wayPoints = keeper.getWaypoints(currentDim, false);
 		createEntries();
-		this.maxScroll = wayPoints.size() * 20;
+		maxScroll = wayPoints.size() * 20;
 		
-		this.children.clear();
-		this.children.addAll(entries);
-		this.children.add(addButton);
-		this.children.add(closeButton);
-		this.children.add(prevDimensionButton);
-		this.children.add(nextDimensionButton);
+		children.clear();
+		children.addAll(entries);
+		children.add(addButton);
+		children.add(closeButton);
+		children.add(prevDimensionButton);
+		children.add(nextDimensionButton);
 	}
 	
 	@Override
-	public void render(MatrixStack matrixStack, int mouseX, int mouseY, float delta) {
-		super.render(matrixStack, mouseX, mouseY, delta);
+	public void render(int mouseX, int mouseY, float delta) {
+		super.render(mouseX, mouseY, delta);
 		
-		entries.forEach(e -> e.render(matrixStack, mouseX, mouseY, delta));
+		entries.forEach(e -> e.render(mouseX, mouseY, delta));
 		
-		String dimensionName = info == null ? lang("unknown").getString() : I18n.translate(info.getFirst());
-		drawCenteredString(matrixStack, textRenderer, dimensionName, center, 15, Colors.WHITE);
+		String dimensionName = info == null ? lang("unknown") : I18n.translate(info.getFirst());
+		drawCenteredString(font, dimensionName, center, 15, Colors.WHITE);
 		
 		drawScrollBar();
 	}
 	
-	private Pair<String, Identifier> getDimensionInfo(Identifier dim) {
+	private Pair<String, Identifier> getDimensionInfo(int dim) {
+		DimensionType type = DimensionType.byRawId(dim);
 		String key = "unknown";
-		if (dim != null) {
-			 key = dim.toString();
-		}		
+		if (type != null) {
+			 key = type.toString();
+		}
+		
 		return DIMENSION_INFO.getOrDefault(key, null);
 	}
 	
 	private void drawScrollBar() {}
 	
 	private void edit(Waypoint waypoint) {
-		client.openScreen(new WaypointEditor(waypoint, this, null));
+		minecraft.openScreen(new WaypointEditor(waypoint, this, null));
 	}
 	
 	private void add() {
 		Waypoint waypoint = new Waypoint();
 		waypoint.dimension = currentDim;
 		waypoint.color = RandomUtil.getElement(Waypoint.WAYPOINT_COLORS);
-		waypoint.pos = client.player.getBlockPos();
+		waypoint.pos = minecraft.player.getBlockPos();
 		waypoint.name = "Waypoint";
 		
-		client.openScreen(new WaypointEditor(waypoint, this, keeper::addNew));
+		minecraft.openScreen(new WaypointEditor(waypoint, this, keeper::addNew));
 	}
 	
 	private void delete(Waypoint waypoint) {
@@ -264,11 +269,11 @@ public class WaypointsList extends MapScreen {
 	}
 	
 	public void teleport(Waypoint waypoint) {
-		if (!client.world.method_27983().getValue().equals(currentDim)) return;
-		int y = waypoint.pos.getY() > 0 ? waypoint.pos.getY() : (this.client.world.getDimension().isNether() ? 128 : 64);
-		this.client.player.sendChatMessage("/tp " + this.client.player.getName().asString() + " " + waypoint.pos.getX() + " " + y + " " + waypoint.pos.getZ());
-		if (!this.client.isIntegratedServerRunning()) {
-			this.client.player.sendChatMessage("/tppos " + waypoint.pos.getX() + " " + y + " " + waypoint.pos.getZ());
+		if (minecraft.player.dimension.getRawId() != currentDim) return;
+		int y = waypoint.pos.getY() > 0 ? waypoint.pos.getY() : (this.minecraft.player.dimension != DimensionType.THE_NETHER ? 128 : 64);
+		this.minecraft.player.sendChatMessage("/tp " + this.minecraft.player.getName().asString() + " " + waypoint.pos.getX() + " " + y + " " + waypoint.pos.getZ());
+		if (!this.minecraft.isIntegratedServerRunning()) {
+			this.minecraft.player.sendChatMessage("/tppos " + waypoint.pos.getX() + " " + y + " " + waypoint.pos.getZ());
 		}
 		this.onClose();
 	}

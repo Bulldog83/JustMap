@@ -5,39 +5,36 @@ import ru.bulldog.justmap.util.DrawHelper;
 import ru.bulldog.justmap.util.DrawHelper.TextAlignment;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.LiteralText;
-import net.minecraft.text.Text;
 
 public class MapText {
 	  protected TextAlignment alignment = TextAlignment.CENTER;
-	  protected Text text;
+	  protected String text;
 	  protected int color = Colors.WHITE;
 	  protected int x, y;
   
 	  public static final MinecraftClient client = MinecraftClient.getInstance();
 	  
 	  public MapText(String text) {
-		  this.text = new LiteralText(text);
+		  this.text = text;
 	  }
   
 	  public MapText(TextAlignment alignment, String text) {
-		this.alignment = alignment;
-		this.text = new LiteralText(text);
+		  this.alignment = alignment;
+		this.text = text;
 	  }
   
 	  public MapText(String text, int color) {
-		  this.text = new LiteralText(text);
+		  this.text = text;
 		  this.color = color;
 	  }
 	  
 	  public MapText(TextAlignment alignment, String text, int color) {
 		  this.alignment = alignment;
-		  this.text = new LiteralText(text);
+		  this.text = text;
 		  this.color = color;
 	  }
 	  
-	  public void draw(MatrixStack matrixStack) {
+	  public void draw() {
 		  TextRenderer textRenderer = client.textRenderer;
 		
 		  int width = client.getWindow().getScaledWidth();
@@ -45,13 +42,13 @@ public class MapText {
 		  switch (alignment) {
 			 default:
 			 case LEFT:
-				 DrawHelper.DRAWER.drawStringWithShadow(matrixStack, textRenderer, text.getString(), x, y, color);
+				 DrawHelper.DRAWER.drawString(textRenderer, text, x, y, color);
 			 break;
 			 case CENTER:
-				 DrawHelper.drawBoundedString(text.getString(), x, y, 0, width - 2, color);
+				 DrawHelper.drawBoundedString(text, x, y, 0, width - 2, color);
 			 break;
 			 case RIGHT:
-				 DrawHelper.drawRightAlignedString(text.getString(), x, y, color);
+				 DrawHelper.DRAWER.drawRightAlignedString(textRenderer, text, x, y, color);
 			 break;
 		  }
 	  }
@@ -62,7 +59,7 @@ public class MapText {
 	  }
 	  
 	  public MapText setText(String text) {
-		  this.text = new LiteralText(text);
+		  this.text = text;
 		  return this;
 	  }
 	  

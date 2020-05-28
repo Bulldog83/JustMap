@@ -7,13 +7,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.mojang.brigadier.context.CommandContext;
 
-import net.minecraft.network.MessageType;
-import net.minecraft.network.packet.s2c.play.GameMessageS2CPacket;
 import net.minecraft.server.command.GameRuleCommand;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
-import net.minecraft.util.Util;
 import net.minecraft.world.GameRules;
 import net.minecraft.world.GameRules.BooleanRule;
 import ru.bulldog.justmap.server.config.ServerParams;
@@ -34,28 +31,23 @@ public abstract class GameRuleCommandMixin {
 				switch (ruleKey.getName()) {
 					case "allowCavesMap":
 						command = new LiteralText(String.format("§0§0§a%s§f§f", val));
-						serverCommandSource.getMinecraftServer().getPlayerManager().sendToAll(
-								new GameMessageS2CPacket(command, MessageType.SYSTEM, Util.field_25140));
+						serverCommandSource.getMinecraftServer().getPlayerManager().sendToAll(command);
 						break;
 					case "allowEntityRadar":
 						command = new LiteralText(String.format("§0§0§b%s§f§f", val));
-						serverCommandSource.getMinecraftServer().getPlayerManager().sendToAll(
-								new GameMessageS2CPacket(command, MessageType.SYSTEM, Util.field_25140));
+						serverCommandSource.getMinecraftServer().getPlayerManager().sendToAll(command);
 						break;
 					case "allowPlayerRadar":
 						command = new LiteralText(String.format("§0§0§c%s§f§f", val));
-						serverCommandSource.getMinecraftServer().getPlayerManager().sendToAll(
-								new GameMessageS2CPacket(command, MessageType.SYSTEM, Util.field_25140));
+						serverCommandSource.getMinecraftServer().getPlayerManager().sendToAll(command);
 						break;
 					case "allowCreatureRadar":
 						command = new LiteralText(String.format("§0§0§d%s§f§f", val));
-						serverCommandSource.getMinecraftServer().getPlayerManager().sendToAll(
-								new GameMessageS2CPacket(command, MessageType.SYSTEM, Util.field_25140));
+						serverCommandSource.getMinecraftServer().getPlayerManager().sendToAll(command);
 						break;
 					case "allowHostileRadar":
 						command = new LiteralText(String.format("§0§0§e%s§f§f", val));
-						serverCommandSource.getMinecraftServer().getPlayerManager().sendToAll(
-								new GameMessageS2CPacket(command, MessageType.SYSTEM, Util.field_25140));
+						serverCommandSource.getMinecraftServer().getPlayerManager().sendToAll(command);
 						break;
 				}
 			}

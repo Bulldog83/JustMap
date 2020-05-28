@@ -3,8 +3,6 @@ package ru.bulldog.justmap.map.minimap;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.minecraft.client.util.math.MatrixStack;
-
 public class TextManager {
 	public enum TextPosition {
 		ABOVE,
@@ -32,7 +30,7 @@ public class TextManager {
 		this.mapElements.clear();
 	}
   
-	public void draw(MatrixStack matrixStack) {
+	public void draw() {
 		spacing = 10;
 		int yp = y;
 		
@@ -48,13 +46,13 @@ public class TextManager {
 			}
 		  
 			line.y = yp;
-			line.draw(matrixStack);
+			line.draw();
 		  
 			yp += spacing;
 		}
 		
 		for (MapText elem : mapElements) {
-			elem.draw(matrixStack);
+			elem.draw();
 		}
 	}
   
