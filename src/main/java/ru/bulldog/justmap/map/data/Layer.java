@@ -27,7 +27,7 @@ public class Layer {
 	
 	@Override
 	public int hashCode() {
-		return Arrays.hashCode(new int[] {name.hashCode(), height});
+		return Arrays.hashCode(new int[] { name.hashCode(), height });
 	}
 	
 	@Override

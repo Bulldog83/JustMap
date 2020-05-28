@@ -1,5 +1,6 @@
 package ru.bulldog.justmap.client.config;
 
+import java.util.Arrays;
 import java.util.Optional;
 
 import me.shedaniel.clothconfig2.api.ConfigBuilder;
@@ -8,22 +9,25 @@ import me.shedaniel.clothconfig2.api.ConfigEntryBuilder;
 import me.shedaniel.clothconfig2.impl.builders.EnumSelectorBuilder;
 
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.resource.language.I18n;
+import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
+import net.minecraft.text.TranslatableText;
 
 import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.config.ConfigKeeper.EnumEntry;
+import ru.bulldog.justmap.map.DirectionArrow;
 import ru.bulldog.justmap.map.minimap.MapPosition;
 import ru.bulldog.justmap.map.minimap.MapSkin;
 
 public final class ConfigFactory {
 	
-	private static String lang(String key) {
-		return I18n.translate("justmap.configuration." + key);
+	private static Text lang(String key) {
+		return new TranslatableText("justmap.configuration." + key);
 	}
 	
-	private static Optional<String[]> getTooltip(String tooltip, boolean condition) {
-		return condition ? Optional.empty() : Optional.ofNullable(new String[] {
-			tooltip
+	private static Optional<Text[]> getTooltip(String tooltip, boolean condition) {
+		return condition ? Optional.empty() : Optional.ofNullable(new Text[] {
+			lang("justmap.configuration." + tooltip)
 		});
 	}
 	
@@ -31,34 +35,38 @@ public final class ConfigFactory {
 	
 	public static Screen getConfigScreen(Screen parent) {
 		if (configBuilder == null) {
-			createConfigBuilder();
+			initConfigBuilder();
 		}		
 		configBuilder.setParentScreen(parent);
 		
 		return configBuilder.build();
 	}
 	
-	private static void createConfigBuilder() {
-		configBuilder = ConfigBuilder.create().setTitle("Just Map Configuration");
+	private static void initConfigBuilder() {
+		configBuilder = ConfigBuilder.create().setTitle(new LiteralText("Just Map Configuration"));
 		ConfigEntryBuilder entryBuilder = ConfigEntryBuilder.create();
 		
 		ConfigCategory general = configBuilder.getOrCreateCategory(lang("category.general"));
 		
 		@SuppressWarnings("unchecked")
 		EnumEntry<MapPosition> drawPosConfig = (EnumEntry<MapPosition>) JustMapClient.CONFIG.getEntry("map_position");
-		
 		EnumSelectorBuilder<MapPosition> drawPosEntry = entryBuilder.startEnumSelector(lang("map_position"), MapPosition.class, drawPosConfig.getValue());
 		drawPosEntry.setSaveConsumer(val -> drawPosConfig.setValue(val))
 					.setDefaultValue(drawPosConfig.getDefault());
+		
 		general.addEntry(drawPosEntry.build());
 		general.addEntry(entryBuilder.startIntField(lang("map_offset"), JustMapClient.CONFIG.getInt("map_offset"))
 				.setSaveConsumer(val -> JustMapClient.CONFIG.setInt("map_offset", val))
 				.setDefaultValue((int) JustMapClient.CONFIG.getDefault("map_offset"))
-				.build());			
-		general.addEntry(entryBuilder.startIntField(lang("map_size"), JustMapClient.CONFIG.getInt("map_size"))
+				.build());
+		general.addEntry(entryBuilder.startDropdownMenu(lang("map_size"), JustMapClient.CONFIG.getInt("map_size"), (val) -> {
+					if (val.equals("")) return 0;			
+					return Integer.valueOf(val);
+				})
 				.setSaveConsumer(val -> JustMapClient.CONFIG.setRanged("map_size", val))
 				.setDefaultValue((int) JustMapClient.CONFIG.getDefault("map_size"))
-				.setMin(32).setMax(480).build());
+				.setSelections(Arrays.asList(32, 64, 96, 128, 160, 192, 224, 256))
+				.build());
 		general.addEntry(entryBuilder.startBooleanToggle(lang("show_in_chat"), JustMapClient.CONFIG.getBoolean("show_in_chat"))
 				.setSaveConsumer(val -> JustMapClient.CONFIG.setBoolean("show_in_chat", val))
 				.setDefaultValue((boolean) JustMapClient.CONFIG.getDefault("show_in_chat"))
@@ -102,7 +110,14 @@ public final class ConfigFactory {
 				.setDefaultValue((boolean) JustMapClient.CONFIG.getDefault("hide_water"))
 				.build());
 		
+		@SuppressWarnings("unchecked")
+		EnumEntry<DirectionArrow.Type> arrowTypeConfig = (EnumEntry<DirectionArrow.Type>) JustMapClient.CONFIG.getEntry("arrow_type");
+		EnumSelectorBuilder<DirectionArrow.Type> arrowTypeEntry = entryBuilder.startEnumSelector(lang("arrow_type"), DirectionArrow.Type.class, arrowTypeConfig.getValue());
+		arrowTypeEntry.setSaveConsumer(val -> arrowTypeConfig.setValue(val))
+					  .setDefaultValue(arrowTypeConfig.getDefault());
+		
 		ConfigCategory mapAppearance = configBuilder.getOrCreateCategory(lang("category.appearance"));
+		mapAppearance.addEntry(arrowTypeEntry.build());
 		mapAppearance.addEntry(entryBuilder.startBooleanToggle(lang("alternate_color_render"), JustMapClient.CONFIG.getBoolean("alternate_color_render"))
 				.setSaveConsumer(val -> JustMapClient.CONFIG.setBoolean("alternate_color_render", val))
 				.setDefaultValue((boolean) JustMapClient.CONFIG.getDefault("alternate_color_render"))
@@ -111,13 +126,13 @@ public final class ConfigFactory {
 				.setSaveConsumer(val -> JustMapClient.CONFIG.setRanged("map_saturation", val))
 				.setDefaultValue((int) JustMapClient.CONFIG.getDefault("map_saturation"))
 				.setTooltipSupplier(() -> {
-					return getTooltip(lang("tooltip_color_config"), JustMapClient.CONFIG.getBoolean("alternate_color_render"));
+					return getTooltip("tooltip_color_config", JustMapClient.CONFIG.getBoolean("alternate_color_render"));
 				}).build());
 		mapAppearance.addEntry(entryBuilder.startIntSlider(lang("map_brightness"), JustMapClient.CONFIG.getInt("map_brightness"), -50, 50)
 				.setSaveConsumer(val -> JustMapClient.CONFIG.setRanged("map_brightness", val))
 				.setDefaultValue((int) JustMapClient.CONFIG.getDefault("map_brightness"))
 				.setTooltipSupplier(() -> {
-					return getTooltip(lang("tooltip_color_config"), JustMapClient.CONFIG.getBoolean("alternate_color_render"));
+					return getTooltip("tooltip_color_config", JustMapClient.CONFIG.getBoolean("alternate_color_render"));
 				}).build());
 		mapAppearance.addEntry(entryBuilder.startBooleanToggle(lang("water_tint"), JustMapClient.CONFIG.getBoolean("water_tint"))
 				.setSaveConsumer(val -> JustMapClient.CONFIG.setBoolean("water_tint", val))
@@ -135,6 +150,10 @@ public final class ConfigFactory {
 		mapAppearance.addEntry(entryBuilder.startBooleanToggle(lang("simple_arrow"), JustMapClient.CONFIG.getBoolean("simple_direction_arrow"))
 				.setSaveConsumer(val -> JustMapClient.CONFIG.setBoolean("simple_direction_arrow", val))
 				.setDefaultValue((boolean) JustMapClient.CONFIG.getDefault("simple_direction_arrow"))
+				.build());
+		mapAppearance.addEntry(entryBuilder.startBooleanToggle(lang("texture_filter"), JustMapClient.CONFIG.getBoolean("texture_filter"))
+				.setSaveConsumer(val -> JustMapClient.CONFIG.setBoolean("texture_filter", val))
+				.setDefaultValue((boolean) JustMapClient.CONFIG.getDefault("texture_filter"))
 				.build());
 		
 		ConfigCategory waypoints = configBuilder.getOrCreateCategory(lang("category.waypoints"));
@@ -250,7 +269,7 @@ public final class ConfigFactory {
 				.setMin(100).setMax(5000).build());
 		
 		configBuilder.setDoesConfirmSave(false);
-		configBuilder.setTransparentBackground(true);
+		configBuilder.transparentBackground();
 		configBuilder.setSavingRunnable(JustMapClient.CONFIG::saveChanges);
 	}
 }

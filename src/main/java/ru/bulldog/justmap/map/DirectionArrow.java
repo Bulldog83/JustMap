@@ -12,8 +12,8 @@ import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.resource.metadata.AnimationResourceMetadata;
 import net.minecraft.client.texture.Sprite;
 import net.minecraft.client.texture.TextureManager;
-import net.minecraft.client.util.math.Matrix3f;
-import net.minecraft.client.util.math.Matrix4f;
+import net.minecraft.util.math.Matrix3f;
+import net.minecraft.util.math.Matrix4f;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.client.util.math.Vector3f;
 import net.minecraft.util.Identifier;
@@ -25,6 +25,10 @@ import ru.bulldog.justmap.util.ImageUtil;
 import ru.bulldog.justmap.util.SpriteAtlas;
 
 public class DirectionArrow extends Sprite {
+	public static enum Type {
+		DIRECTION_ARROW,
+		PLAYER_HEAD
+	}
 	
 	private final static TextureManager textureManager = MinecraftClient.getInstance().getTextureManager();
 	private final static VertexFormat vertexFormat = new VertexFormat(ImmutableList.of(VertexFormats.POSITION_ELEMENT, VertexFormats.TEXTURE_ELEMENT, VertexFormats.NORMAL_ELEMENT, VertexFormats.PADDING_ELEMENT));

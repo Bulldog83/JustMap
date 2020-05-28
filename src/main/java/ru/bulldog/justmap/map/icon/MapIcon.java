@@ -4,6 +4,7 @@ import ru.bulldog.justmap.map.IMap;
 import ru.bulldog.justmap.util.math.MathUtil;
 
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.util.math.MatrixStack;
 
 public abstract class MapIcon<T extends MapIcon<T>> {
 	
@@ -38,7 +39,7 @@ public abstract class MapIcon<T extends MapIcon<T>> {
 		pos.y = posY;
 	}
 	
-	public abstract void draw(int mapX, int mapY, float rotation);
+	public abstract void draw(MatrixStack matrixStack, int mapX, int mapY, float rotation);
 	
 	protected class IconPos {
 		protected double x;

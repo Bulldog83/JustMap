@@ -39,7 +39,7 @@ public class MapTexture {
 	
 	public void upload() {
 		if (this.glId == -1) {
-			this.glId = TextureUtil.generateTextureId();
+			this.glId = TextureUtil.method_24956();
 		}
 		
 		this.refillBuffer();
@@ -137,7 +137,7 @@ public class MapTexture {
 	
 	public void close() {
 		if (this.glId != -1) {
-			TextureUtil.releaseTextureId(this.glId);
+			TextureUtil.method_24957(this.glId);
 			this.glId = -1;
 		}
 		

@@ -24,7 +24,7 @@ public class EntityIcon extends MapIcon<EntityIcon> {
 	}
 	
 	@Override
-	public void draw(int mapX, int mapY, float rotation) {
+	public void draw(MatrixStack matrixStack, int mapX, int mapY, float rotation) {
 		if (!Minimap.allowCreatureRadar() && !hostile) { return; }
 		if (!Minimap.allowHostileRadar() && hostile) { return; }
 		

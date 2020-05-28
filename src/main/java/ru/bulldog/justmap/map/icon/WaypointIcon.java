@@ -1,7 +1,6 @@
 package ru.bulldog.justmap.map.icon;
 
 import net.minecraft.client.util.math.MatrixStack;
-
 import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.map.IMap;
 import ru.bulldog.justmap.map.waypoint.Waypoint;
@@ -27,7 +26,7 @@ public class WaypointIcon extends MapIcon<WaypointIcon> {
 	}
 	
 	@Override
-	public void draw(int mapX, int mapY, float rotation) {
+	public void draw(MatrixStack matrixStack, int mapX, int mapY, float rotation) {
 		int size = 8;
 		
 		IconPos pos = new IconPos(mapX + x, mapY + y);

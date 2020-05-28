@@ -68,11 +68,12 @@ public class MapProcessor {
 	}
 	
 	public static int heightDifference(MapChunk mapChunk, MapChunk eastChunk, MapChunk southChunk, int x, int y, int z) {
+		
 		int ex = x + 1;
 		int sz = z - 1;
 		
 		int east, south;
-		if (ex > 15) {
+		if (ex > 15) {			
 			ex -= 16;
 			east = eastChunk.getHeighmap()[ex + (z << 4)];			
 			east = checkLiquids(eastChunk, ex, east, z);
@@ -80,7 +81,7 @@ public class MapProcessor {
 			east = mapChunk.getHeighmap()[ex + (z << 4)];
 			east = checkLiquids(mapChunk, ex, east, z);
 		}
-		if (sz < 0) {
+		if (sz < 0) {			
 			sz += 16;
 			south = southChunk.getHeighmap()[x + (sz << 4)];
 			south = checkLiquids(southChunk, x, south, sz);

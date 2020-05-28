@@ -6,10 +6,12 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.map.DirectionArrow;
+import ru.bulldog.justmap.map.data.MapCache;
+import ru.bulldog.justmap.map.data.MapRegion;
 import ru.bulldog.justmap.map.icon.EntityIcon;
+import ru.bulldog.justmap.map.icon.PlayerHeadIcon;
 import ru.bulldog.justmap.map.icon.PlayerIcon;
 import ru.bulldog.justmap.map.icon.WaypointIcon;
-//import ru.bulldog.justmap.map.minimap.ChunkGrid;
 import ru.bulldog.justmap.map.minimap.MapPosition;
 import ru.bulldog.justmap.map.minimap.MapSkin;
 import ru.bulldog.justmap.map.minimap.MapText;
@@ -27,9 +29,8 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.Tessellator;
-import net.minecraft.client.render.VertexFormats;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.util.math.BlockPos;
 
 @Environment(EnvType.CLIENT)
 public class MapRenderer {
@@ -51,10 +52,6 @@ public class MapRenderer {
 
 	private final Minimap minimap;
 	
-	private MapTexture mapTexture;
-	private Tessellator tessellator = Tessellator.getInstance();
-	private BufferBuilder builder = tessellator.getBuffer();
-	
 	private TextManager textManager;
 	
 	private MapText dirN = new MapText(TextAlignment.CENTER, "N");
@@ -65,7 +62,6 @@ public class MapRenderer {
 	private final MinecraftClient client = MinecraftClient.getInstance();
 	
 	private MapSkin mapSkin;
-	//private ChunkGrid chunkGrid;
 	
 	public static MapRenderer getInstance() {
 		if (instance == null) {
@@ -222,23 +218,7 @@ public class MapRenderer {
 		dir.x = posX; dir.y = posY;
 	}
 	
-	private void prepareTexture() {
-		int textureSize = minimap.getScaledSize();
-		if (mapTexture == null || mapTexture.getWidth() != textureSize || mapTexture.getHeight() != textureSize) {
-			if (mapTexture != null) this.mapTexture.close();			
-			this.mapTexture = new MapTexture(textureSize, textureSize);
-			//this.chunkGrid = new ChunkGrid(mapX, mapY, mapW, mapH);
-		}		
-		if (minimap.changed) {
-			this.mapTexture.copyData(minimap.getImage());
-			this.mapTexture.upload();
-			this.lastX = minimap.getLasX();
-			this.lastZ = minimap.getLastZ();
-			this.minimap.changed = false;
-		}
-	}
-	
-	public void draw() {
+	public void draw(MatrixStack matrixStack) {
 		if (!minimap.isMapVisible() || client.player == null) {
 			return;
 		}
@@ -257,11 +237,13 @@ public class MapRenderer {
 		RenderSystem.disableDepthTest();
 		
 		if (ClientParams.useSkins) {
-			mapSkin.draw(posX, posY, mapW + border * 2);
+			mapSkin.draw(matrixStack, posX, posY, mapW + border * 2);
 		}
 		
-		if (this.mapTexture == null || this.minimap.changed) {
-			this.prepareTexture();
+		if (this.minimap.posChanged) {
+			this.lastX = minimap.getLasX();
+			this.lastZ = minimap.getLastZ();
+			this.minimap.posChanged = false;
 		}
 		
 		GL11.glEnable(GL11.GL_SCISSOR_TEST);
@@ -283,61 +265,92 @@ public class MapRenderer {
 		
 		this.drawMap();
 
-		//if (ClientParams.showGrid) {
-		//	this.chunkGrid.update(lastX, lastZ);
-		//	this.chunkGrid.draw();
-		//}
 		if (Minimap.allowEntityRadar()) {
 			if (Minimap.allowPlayerRadar()) {
 				for (PlayerIcon player : minimap.getPlayerIcons()) {
-					player.draw(mapX, mapY, rotation);
+					player.draw(matrixStack, mapX, mapY, rotation);
 				}
 			}
 			if (Minimap.allowCreatureRadar() || Minimap.allowHostileRadar()) {
 				for (EntityIcon entity : minimap.getEntities()) {
-					entity.draw(mapX, mapY, rotation);
+					entity.draw(matrixStack, mapX, mapY, rotation);
 				}
 			}
 		}		
 		RenderSystem.popMatrix();
 		
-		DrawHelper.DRAWER.drawRightAlignedString(
-				client.textRenderer, Float.toString(minimap.getScale()),
+		DrawHelper.drawRightAlignedString(
+				Float.toString(minimap.getScale()),
 				mapX + mapW - 3, mapY + mapH - 10, Colors.WHITE);
 		
 		for (WaypointIcon waypoint : minimap.getWaypoints()) {
 			if (!waypoint.isHidden()) {
-				waypoint.draw(mapX, mapY, rotation);
+				waypoint.draw(matrixStack, mapX, mapY, rotation);
 			}
 		}
 		GL11.glDisable(GL11.GL_SCISSOR_TEST);
 		
-		int arrowX = mapX + mapW / 2;
-		int arrowY = mapY + mapH / 2;
+		int centerX = mapX + mapW / 2;
+		int centerY = mapY + mapH / 2;
 		
-		DirectionArrow.draw(arrowX, arrowY, ClientParams.rotateMap ? 180 : rotation);
+		if (ClientParams.arrowType == DirectionArrow.Type.DIRECTION_ARROW) {
+			DirectionArrow.draw(centerX, centerY, ClientParams.rotateMap ? 180 : rotation);
+		} else {
+			PlayerHeadIcon.getIcon(client.player).draw(centerX, centerY, 12, true);
+		}
 		
-		this.textManager.draw();
+		MatrixStack matrix = new MatrixStack();
+		this.textManager.draw(matrix);
 		
 		RenderSystem.enableDepthTest();
 	}
 	
 	private void drawMap() {
-		RenderSystem.bindTexture(mapTexture.getId());
-		if (minimap.getScale() >= 0.75) {
-			RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR_MIPMAP_LINEAR);
-			RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
+		MapCache mapData = MapCache.get();
+		
+		int scaledW = minimap.getScaledWidth();
+		int scaledH = minimap.getScaledHeight();
+		int cornerX = PosUtil.coordX() - scaledW / 2;
+		int cornerZ = PosUtil.coordZ() - scaledH / 2;		
+		int right = this.imgX + scaledW;
+		
+		int bottom;
+		if (ClientParams.rotateMap) {
+			bottom = (int) (this.imgY + scaledH * 1.42);
 		} else {
-			RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_NEAREST_MIPMAP_LINEAR);
-			RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST);
+			bottom = this.imgY + scaledH;
 		}
 		
-		this.builder.begin(GL11.GL_QUADS, VertexFormats.POSITION_TEXTURE);		
-		this.builder.vertex(imgX, imgY - 4, 1.0).texture(0.0F, 0.0F).next();
-		this.builder.vertex(imgX, imgY + imgH + 4, 1.0).texture(0.0F, 1.0F).next();
-		this.builder.vertex(imgX + imgW + 4, imgY + imgH + 4, 1.0).texture(1.0F, 1.0F).next();
-		this.builder.vertex(imgX + imgW + 4, imgY - 4, 1.0).texture(1.0F, 0.0F).next();
+		float scale = minimap.getScale();
 		
-		this.tessellator.draw();
+		int picX = 0, picW = 0;
+		while(picX <= scaledW) {
+			int cX = cornerX + picX;
+			int picY = 0, picH = 0;
+			while (picY <= scaledH ) {				
+				int cZ = cornerZ + picY;
+				
+				MapRegion region = mapData.getRegion(new BlockPos(cX, 0, cZ));
+				
+				picW = 512;
+				picH = 512;
+				int imgX = cX - (region.getX() << 9);
+				int imgY = cZ - (region.getZ() << 9);
+				
+				if (picX + picW >= right) picW = right - picX;
+				if (picY + picH >= bottom) picH = bottom - picY;
+				if (imgX + picW >= 512) picW = 512 - imgX;
+				if (imgY + picH >= 512) picH = 512 - imgY;
+				
+				double scX = (picX - 4) / scale;
+				double scY = (picY - 4) / scale;
+				
+				region.draw(this.imgX + scX, this.imgY + scY, imgX, imgY, picW, picH, scale);
+				
+				picY += picH > 0 ? picH : 512;
+			}
+			
+			picX += picW > 0 ? picW : 512;
+		}
 	}
 }

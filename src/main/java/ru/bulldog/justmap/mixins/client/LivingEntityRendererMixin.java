@@ -49,7 +49,7 @@ public abstract class LivingEntityRendererMixin<T extends LivingEntity, M extend
 	protected abstract void scale(T livingEntity, MatrixStack matrixStack, float f);
 	
 	@Shadow
-	protected abstract float getWhiteOverlayProgress(T livingEntity, float f);
+	protected abstract float getAnimationCounter(T livingEntity, float f);
 	
 	@Inject(at = @At("HEAD"), method = "render", cancellable = true)
 	public void renderStatic(T livingEntity, float f, float g, MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int i, CallbackInfo ci) {
@@ -106,7 +106,7 @@ public abstract class LivingEntityRendererMixin<T extends LivingEntity, M extend
 			RenderLayer renderLayer = this.model.getLayer(this.getTexture(livingEntity));
 			if (renderLayer != null) {
 				VertexConsumer vertexConsumer = vertexConsumerProvider.getBuffer(renderLayer);
-				int r = getOverlay(livingEntity, this.getWhiteOverlayProgress(livingEntity, g));
+				int r = getOverlay(livingEntity, this.getAnimationCounter(livingEntity, g));
 				this.model.render(matrixStack, vertexConsumer, i, r, 1.0F, 1.0F, 1.0F, 1.0F);					
 			}
 	
