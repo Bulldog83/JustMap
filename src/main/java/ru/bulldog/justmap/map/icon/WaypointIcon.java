@@ -26,7 +26,7 @@ public class WaypointIcon extends MapIcon<WaypointIcon> {
 	}
 	
 	@Override
-	public void draw(MatrixStack matrixStack, int mapX, int mapY, float rotation) {
+	public void draw(MatrixStack matrixStack, int mapX, int mapY, double offX, double offY, float rotation) {
 		int size = 8;
 		
 		IconPos pos = new IconPos(mapX + x, mapY + y);
@@ -35,8 +35,8 @@ public class WaypointIcon extends MapIcon<WaypointIcon> {
 			this.rotatePos(pos, map.getWidth(), map.getHeight(), mapX, mapY, rotation);
 		}
 		
-		pos.x -= size / 2;
-		pos.y -= size / 2;
+		pos.x -= size / 2 + offX;
+		pos.y -= size / 2 + offY;
 		
 		pos.x = MathUtil.clamp(pos.x, mapX, (mapX + map.getWidth()) - size);
 		pos.y = MathUtil.clamp(pos.y, mapY, (mapY + map.getHeight()) - size);

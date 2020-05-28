@@ -191,14 +191,29 @@ public class DrawHelper extends DrawableHelper {
 		tessellator.draw();		
 	}
 	
-	public static void draw(MatrixStack matrix, double x, double y, float w, float h, float su, float sv) {
-		float pw = su * w;
-		float ph = sv * h;
-		float minU = w / pw;
-		float minV = h / ph;
+	public static void drawPlayerHead(MatrixStack matrix, double x, double y, int w, int h) {
+		RenderSystem.enableBlend();
+		RenderSystem.defaultBlendFunc();
+		RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
 		builder.begin(GL11.GL_QUADS, VF_POS_TEX_NORMAL);
-		draw(matrix, builder, x, y, w, h, minU, minV, 2 * minU, 2 * minV);
-		tessellator.draw();		
+		draw(matrix, builder, x, y, w, h, 0.125F, 0.125F, 0.25F, 0.25F);
+		draw(matrix, builder, x, y, w, h, 0.625F, 0.125F, 0.75F, 0.25F);
+		tessellator.draw();
+	}
+	
+	public static void draw(MatrixStack matrix, double x, double y, int size, int isize, int ix, int iy, int tw, int th) {
+		draw(matrix, x, y, size, size, ix, iy, isize, isize, tw, th);
+	}
+	
+	public static void draw(MatrixStack matrix, double x, double y, int w, int h, int ix, int iy, int iw, int ih, int tw, int th) {
+		float minU = (float) ix / tw;
+		float minV = (float) iy / th;
+		float maxU = (float) (ix + iw) / tw;
+		float maxV = (float) (iy + ih) / th;
+		
+		builder.begin(GL11.GL_QUADS, VF_POS_TEX_NORMAL);
+		draw(matrix, builder, x, y, w, h, minU, minV, maxU, maxV);
+		tessellator.draw();
 	}
 	
 	public static void drawSprite(MatrixStack matrix, Sprite sprite, double x, double y, float w, float h) {

@@ -58,7 +58,7 @@ public class PlayerHeadIcon {
 	
 	public void draw(MatrixStack matrix, double x, double y) {
 		int size = ClientParams.entityIconSize;
-		this.draw(matrix, x, y, size, false);
+		this.draw(matrix, x, y, size, ClientParams.showIconsOutline);
 	}
 	
 	public void draw(double x, double y, int size, boolean outline) {
@@ -70,11 +70,11 @@ public class PlayerHeadIcon {
 		double drawX = x - size / 2;
 		double drawY = y - size / 2;
 		y -= size / 2;
-		if (outline || ClientParams.showIconsOutline) {
+		if (outline) {
 			DrawHelper.fill(drawX - 0.5, drawY - 0.5, drawX + size + 0.5, drawY + size + 0.5, Colors.LIGHT_GRAY);
 		}
 		textureManager.bindTexture(this.skin);		
-		DrawHelper.draw(matrix, drawX, drawY, size, size, 8, 8);
+		DrawHelper.drawPlayerHead(matrix, drawX, drawY, size, size);
 	}
 	
 	private static void updatePlayerSkin(PlayerHeadIcon icon) {

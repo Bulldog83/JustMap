@@ -22,13 +22,13 @@ public class PlayerIcon extends MapIcon<PlayerIcon> {
 	}
 
 	@Override
-	public void draw(MatrixStack matrixStack, int mapX, int mapY, float rotation) {
+	public void draw(MatrixStack matrixStack, int mapX, int mapY, double offX, double offY, float rotation) {
 		int size = ClientParams.entityIconSize;
 		
 		IconPos pos = new IconPos(mapX + x, mapY + y);
 		
-		pos.x -= size / 2;
-		pos.y -= size / 2;
+		pos.x -= size / 2 + offX;
+		pos.y -= size / 2 + offY;
 		
 		if (pos.x < mapX + size || pos.x > (mapX + map.getWidth()) - size ||
 			pos.y < mapY + size || pos.y > (mapY + map.getHeight()) - size) return;

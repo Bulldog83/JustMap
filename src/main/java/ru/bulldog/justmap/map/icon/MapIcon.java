@@ -39,7 +39,7 @@ public abstract class MapIcon<T extends MapIcon<T>> {
 		pos.y = posY;
 	}
 	
-	public abstract void draw(MatrixStack matrixStack, int mapX, int mapY, float rotation);
+	public abstract void draw(MatrixStack matrixStack, int mapX, int mapY, double offX, double offY, float rotation);
 	
 	protected class IconPos {
 		protected double x;

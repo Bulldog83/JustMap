@@ -198,13 +198,12 @@ public class MapChunk {
 	}
 	
 	private boolean updateWorldChunk() {
-		WorldChunk lifeChunk = world.getChunk(getX(), getZ());
-		if (lifeChunk.isEmpty()) return false;
-		
 		if (worldChunk.isEmpty()) {
+			WorldChunk lifeChunk = world.getChunk(getX(), getZ());
+			if (lifeChunk.isEmpty()) return false;
 			this.worldChunk = lifeChunk;
+			return true;
 		}
-		
 		return true;
 	}
 	
