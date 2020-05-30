@@ -39,10 +39,6 @@ public class DirectionArrow extends Sprite {
 		super(SpriteAtlas.MAP_ICONS, new Sprite.Info(texture, w, h, AnimationResourceMetadata.EMPTY), 0, w, h, 0, 0, ImageUtil.loadImage(texture, w, h));
 	}
 	
-	public static void draw(int x, int y, float rotation) {
-		draw(x, y, 14, rotation);
-	}
-	
 	public static void draw(double x, double y, int size, float rotation) {		
 		if (!ClientParams.simpleArrow) {
 			if (ARROW == null) {

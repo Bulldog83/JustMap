@@ -1,5 +1,7 @@
 package ru.bulldog.justmap.map.icon;
 
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.util.Window;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.client.util.math.Vector3f;
 import net.minecraft.entity.player.PlayerEntity;
@@ -33,11 +35,11 @@ public class PlayerIcon extends MapIcon<PlayerIcon> {
 		if (pos.x < mapX + size || pos.x > (mapX + map.getWidth()) - size ||
 			pos.y < mapY + size || pos.y > (mapY + map.getHeight()) - size) return;
 		
+		MatrixStack matrix = new MatrixStack();
 		if (ClientParams.showPlayerHeads) {
 			if (ClientParams.renderEntityModel) {
 				EntityModelRenderer.renderModel(player, pos.x, pos.y);
 			} else {
-				MatrixStack matrix = new MatrixStack();			
 				matrix.push();
 				if (ClientParams.rotateMap) {
 					double moveX = pos.x + size / 2;
@@ -54,7 +56,17 @@ public class PlayerIcon extends MapIcon<PlayerIcon> {
 		}
 			
 		if (ClientParams.showPlayerNames) {
-			DrawHelper.drawBoundedString(player.getName().getString(), (int) pos.x, (int) pos.y + 12, 0, client.getWindow().getScaledWidth(), Colors.WHITE);
+			MinecraftClient client = MinecraftClient.getInstance();
+			Window window = client.getWindow();
+			double sf = window.getScaleFactor();
+			float scale = (float) (1.0 / sf);
+			matrix.push();
+			if (sf > 1.0 && !client.options.forceUnicodeFont) {
+				matrix.scale(scale, scale, 1.0F);
+				matrix.translate(pos.x * (sf - 1), pos.y * (sf - 1), 0.0);
+			}
+			DrawHelper.drawCenteredText(matrix, player.getName(), pos.x, pos.y + 12, Colors.WHITE);
+			matrix.pop();
 		}
 	}
 }

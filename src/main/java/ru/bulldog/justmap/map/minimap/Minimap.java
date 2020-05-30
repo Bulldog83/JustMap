@@ -143,7 +143,7 @@ public class Minimap implements IMap{
 		return String.format("%02d:%02d", h, m);
 	}
 	
-	private static boolean isAllowed(boolean param, GameRules.RuleKey<GameRules.BooleanRule> rule) {
+	private static boolean isAllowed(boolean param, GameRules.Key<GameRules.BooleanRule> rule) {
 		if (param) {
 			return minecraftClient.isInSingleplayer() || MapGameRules.isAllowed(rule);
 		}

@@ -22,16 +22,16 @@ import ru.bulldog.justmap.server.config.ServerParams;
 public abstract class GameRuleCommandMixin {
 	
 	@Inject(method = "executeSet", at = @At("RETURN"))
-	private static <T extends GameRules.Rule<T>> void executeSet(CommandContext<ServerCommandSource> commandContext, GameRules.RuleKey<T> ruleKey, CallbackInfoReturnable<Integer> cir) {
+	private static <T extends GameRules.Rule<T>> void executeSet(CommandContext<ServerCommandSource> commandContext, GameRules.Key<T> Key, CallbackInfoReturnable<Integer> cir) {
 		if (ServerParams.useGameRules) {
 			ServerCommandSource serverCommandSource = (ServerCommandSource)commandContext.getSource();
-			T rule = serverCommandSource.getMinecraftServer().getGameRules().get(ruleKey);
+			T rule = serverCommandSource.getMinecraftServer().getGameRules().get(Key);
 			
 			if (rule instanceof BooleanRule) {
 				Text command;
 				
 				String val = ((BooleanRule) rule).get() ? "§1" : "§0";
-				switch (ruleKey.getName()) {
+				switch (Key.getName()) {
 					case "allowCavesMap":
 						command = new LiteralText(String.format("§0§0§a%s§f§f", val));
 						serverCommandSource.getMinecraftServer().getPlayerManager().sendToAll(

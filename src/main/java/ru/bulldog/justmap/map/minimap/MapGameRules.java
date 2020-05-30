@@ -10,15 +10,15 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.world.GameRules;
-import net.minecraft.world.GameRules.RuleKey;
+import net.minecraft.world.GameRules.Key;
 
 public class MapGameRules {
 
-	public final static GameRules.RuleKey<GameRules.BooleanRule> ALLOW_CAVES_MAP = register("allowCavesMap", false);
-	public final static GameRules.RuleKey<GameRules.BooleanRule> ALLOW_ENTITY_RADAR = register("allowEntityRadar", false);
-	public final static GameRules.RuleKey<GameRules.BooleanRule> ALLOW_PLAYER_RADAR = register("allowPlayerRadar", false);
-	public final static GameRules.RuleKey<GameRules.BooleanRule> ALLOW_CREATURE_RADAR = register("allowCreatureRadar", true);
-	public final static GameRules.RuleKey<GameRules.BooleanRule> ALLOW_HOSTILE_RADAR = register("allowHostileRadar", true);
+	public final static GameRules.Key<GameRules.BooleanRule> ALLOW_CAVES_MAP = register("allowCavesMap", false);
+	public final static GameRules.Key<GameRules.BooleanRule> ALLOW_ENTITY_RADAR = register("allowEntityRadar", false);
+	public final static GameRules.Key<GameRules.BooleanRule> ALLOW_PLAYER_RADAR = register("allowPlayerRadar", false);
+	public final static GameRules.Key<GameRules.BooleanRule> ALLOW_CREATURE_RADAR = register("allowCreatureRadar", true);
+	public final static GameRules.Key<GameRules.BooleanRule> ALLOW_HOSTILE_RADAR = register("allowHostileRadar", true);
 	
 	private MapGameRules() {}
 	
@@ -26,11 +26,11 @@ public class MapGameRules {
 		JustMap.LOGGER.logInfo("Map gamerules loaded.");
 	}
 
-	private static GameRules.RuleKey<GameRules.BooleanRule> register(String name, boolean defaultValue) {
-		return GameRulesProcessor.callRegister(name, GameRules.RuleCategory.MISC, BooleanRuleProcessor.callCreate(defaultValue));
+	private static GameRules.Key<GameRules.BooleanRule> register(String name, boolean defaultValue) {
+		return GameRulesProcessor.callRegister(name, GameRules.Category.MISC, BooleanRuleProcessor.callCreate(defaultValue));
 	}
 	
-	private static Map<String, RuleKey<GameRules.BooleanRule>> codes;
+	private static Map<String, Key<GameRules.BooleanRule>> codes;
 	
 	static {
 		codes = new HashMap<>();
@@ -70,7 +70,7 @@ public class MapGameRules {
 	}
 	
 	@Environment(EnvType.CLIENT)
-	public static boolean isAllowed(GameRules.RuleKey<GameRules.BooleanRule> rule) {
+	public static boolean isAllowed(GameRules.Key<GameRules.BooleanRule> rule) {
 		MinecraftClient client = MinecraftClient.getInstance();
 		
 		boolean allow = true;

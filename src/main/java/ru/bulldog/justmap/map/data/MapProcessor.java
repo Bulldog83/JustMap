@@ -68,7 +68,6 @@ public class MapProcessor {
 	}
 	
 	public static int heightDifference(MapChunk mapChunk, MapChunk eastChunk, MapChunk southChunk, int x, int y, int z) {
-		
 		int ex = x + 1;
 		int sz = z - 1;
 		
@@ -95,7 +94,7 @@ public class MapProcessor {
 		east = east > 0 ? east - y : 0;
 		south = south > 0 ? south - y : 0;
 
-		int diff = east - south;		
+		int diff = east - south;
 		if (diff == 0) return 0;
 		
 		int maxDiff = ClientParams.terrainStrength;

@@ -50,7 +50,7 @@ public class StorageUtil {
 	public static File cacheDir() {
 		RegistryKey<DimensionType> dimKey = null;
 		if (minecraft.world != null) {
-			dimKey = minecraft.world.method_27983();			
+			dimKey = minecraft.world.method_29287();			
 			String dimension = dimKey.getValue().getPath();
 			if (!currentDim.equals(dimension)) {
 				currentDim = dimension;

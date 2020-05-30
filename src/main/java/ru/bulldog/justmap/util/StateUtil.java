@@ -3,7 +3,8 @@ package ru.bulldog.justmap.util;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.Material;
-import net.minecraft.fluid.FluidState;
+import net.minecraft.block.Waterloggable;
+import net.minecraft.state.property.Properties;
 import net.minecraft.tag.FluidTags;
 
 public class StateUtil {
@@ -12,7 +13,7 @@ public class StateUtil {
 	public static final BlockState VOID_AIR = Blocks.VOID_AIR.getDefaultState();
 	
 	public static boolean checkState(BlockState state, boolean liquids, boolean plants) {
-		return StateUtil.isAir(state) || (!liquids && isUnderwater(state)) || (!plants && isPlant(state));
+		return StateUtil.isAir(state) || (!liquids && isLiquid(state, false)) || (!plants && isPlant(state));
 	}
 	
 	public static boolean isAir(BlockState state) {
@@ -25,12 +26,7 @@ public class StateUtil {
 	}
 	
 	public static boolean isWater(BlockState state) {
-		FluidState fluidState = state.getFluidState();
-		return fluidState.matches(FluidTags.WATER);
-	}
-	
-	public static boolean isUnderwater(BlockState state) {
-		return isLiquid(state, false) || state.getMaterial() == Material.UNDERWATER_PLANT;
+		return !isSeaweed(state) && state.getFluidState().matches(FluidTags.WATER);
 	}
 	
 	public static boolean isPlant(BlockState state) {
@@ -42,5 +38,12 @@ public class StateUtil {
 	public static boolean isSeaweed(BlockState state) {
 		Material material = state.getMaterial();
 		return material == Material.UNDERWATER_PLANT || material == Material.REPLACEABLE_UNDERWATER_PLANT;
+	}
+	
+	public static boolean isWaterlogged(BlockState state) {
+		if (state.getBlock() instanceof Waterloggable)
+			return state.get(Properties.WATERLOGGED);
+		
+		return isSeaweed(state);
 	}
 }

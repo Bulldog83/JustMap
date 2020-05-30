@@ -33,6 +33,7 @@ public class MapChunk {
 	private Layer.Type layer;
 	private Identifier dimension;
 	private int level = 0;
+	private boolean alternateRender = true;
 	private boolean hideWater = false;
 	private boolean waterTint = true;
 	private boolean saved = true;
@@ -167,7 +168,8 @@ public class MapChunk {
 	public MapChunk updateHeighmap() {
 		if (!this.updateWorldChunk()) return this;
 		
-		boolean skipWater = !(ClientParams.hideWater || ClientParams.waterTint);
+		boolean waterTint = ClientParams.alternateColorRender && ClientParams.waterTint;
+		boolean skipWater = !(ClientParams.hideWater || waterTint);
 		for (int x = 0; x < 16; x++) {
 			for (int z = 0; z < 16; z++) {
 				int y = worldChunk.sampleHeightmap(Heightmap.Type.WORLD_SURFACE, x, z);
@@ -199,7 +201,7 @@ public class MapChunk {
 	
 	private boolean updateWorldChunk() {
 		if (worldChunk.isEmpty()) {
-			WorldChunk lifeChunk = world.getChunk(getX(), getZ());
+			WorldChunk lifeChunk = (WorldChunk) world.getChunk(getX(), getZ());
 			if (lifeChunk.isEmpty()) return false;
 			this.worldChunk = lifeChunk;
 			return true;
@@ -229,6 +231,10 @@ public class MapChunk {
 		}
 		if (ClientParams.waterTint != waterTint) {
 			this.waterTint = ClientParams.waterTint;
+			needUpdate = true;
+		}
+		if (ClientParams.alternateColorRender != alternateRender) {
+			this.alternateRender = ClientParams.alternateColorRender;
 			needUpdate = true;
 		}
 		

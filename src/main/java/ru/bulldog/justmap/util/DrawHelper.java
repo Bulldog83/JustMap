@@ -17,6 +17,7 @@ import net.minecraft.util.math.Matrix3f;
 import net.minecraft.util.math.Matrix4f;
 import net.minecraft.client.util.math.AffineTransformation;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.text.Text;
 
 import org.lwjgl.opengl.GL11;
 
@@ -36,18 +37,39 @@ public class DrawHelper extends DrawableHelper {
 	private final static BufferBuilder builder = tessellator.getBuffer();
 	private final static TextRenderer textRenderer = MinecraftClient.getInstance().textRenderer;
 
+	public static int getWidth(Text text) {
+		return textRenderer.getWidth(text);
+	}
+
+	public static int getWidth(String string) {
+		return textRenderer.getWidth(string);
+	}
+	
 	public void fillNoDepth(int x, int y, int right, int left, int color) {
 		RenderSystem.disableDepthTest();
 		fill(x, y, right, left, color);
 		RenderSystem.enableDepthTest();
 	}
 	
-	public static void drawCenteredString(String string, int x, int y, int color) {
+	public static void drawCenteredString(String string, double x, double y, int color) {
 		MatrixStack matrix = new MatrixStack();
+		drawCenteredString(matrix, string, x, y, color);
+	}
+	
+	public static void drawCenteredString(MatrixStack matrix, String string, double x, double y, int color) {
 		textRenderer.drawWithShadow(matrix, string, (float) (x - textRenderer.getWidth(string) / 2), (float) y, color);
 	}
 	
+	public static void drawCenteredText(MatrixStack matrix, Text text, double x, double y, int color) {
+		textRenderer.drawWithShadow(matrix, text, (float) (x - textRenderer.getWidth(text) / 2), (float) y, color);
+	}
+	
 	public static void drawBoundedString(String string, int x, int y, int leftBound, int rightBound, int color) {
+		MatrixStack matrix = new MatrixStack();
+		drawBoundedString(matrix, string, x, y, leftBound, rightBound, color);
+	}
+	
+	public static void drawBoundedString(MatrixStack matrix, String string, int x, int y, int leftBound, int rightBound, int color) {
 		if (string == null) return;
 		
 		int stringWidth = textRenderer.getWidth(string);
@@ -58,7 +80,6 @@ public class DrawHelper extends DrawableHelper {
 			drawX = rightBound - stringWidth;
 		}
 
-		MatrixStack matrix = new MatrixStack();
 		DRAWER.drawStringWithShadow(matrix, textRenderer, string, drawX, y, color);
 	}
 

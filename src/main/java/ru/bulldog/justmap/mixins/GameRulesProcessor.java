@@ -8,7 +8,7 @@ import net.minecraft.world.GameRules;
 @Mixin(GameRules.class)
 public interface GameRulesProcessor {
 	@Invoker
-	static <T extends GameRules.Rule<T>> GameRules.RuleKey<T> callRegister(String name, GameRules.RuleCategory category, GameRules.RuleType<T> type) {
+	static <T extends GameRules.Rule<T>> GameRules.Key<T> callRegister(String name, GameRules.Category category, GameRules.Type<T> type) {
 		throw new AssertionError("@Invoker dummy body called");
 	}
 }

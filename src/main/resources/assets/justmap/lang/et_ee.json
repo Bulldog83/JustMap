@@ -18,6 +18,7 @@
   "justmap.configuration.map_offset": "Nihe",
   "justmap.configuration.map_position": "Kaardi asukoht",
   "justmap.configuration.arrow_type": "Nooletüüp",
+  "justmap.configuration.arrow_size": "Arrow Icon Size",
   "justmap.configuration.map_size": "Kaardi suurus",
   "justmap.configuration.chunk_level_size": "Kamakataseme suurus (plokkides)",
   "justmap.configuration.map_scale": "Kaardi mõõtkava",
