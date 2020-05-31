@@ -38,7 +38,7 @@ abstract class HudMixin extends DrawableHelper {
 	@Shadow
 	private int scaledWidth;
 	
-	@Inject(at = @At("RETURN"), method = "render")
+	@Inject(at = @At("HEAD"), method = "render")
 	public void draw(float delta, CallbackInfo info) {
 		MapRenderer mapGui = MapRenderer.getInstance();
 		if (mapGui != null) {
