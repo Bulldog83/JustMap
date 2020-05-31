@@ -20,11 +20,14 @@
 
   "justmap.configuration.map_offset": "Offset",
   "justmap.configuration.map_position": "Map Position",
-  "justmap.configuration.arrow_type": "Arrow Type",
+  "justmap.configuration.arrow_type": "Arrow Icon Type",
+  "justmap.configuration.arrow_size": "Arrow Icon Size",
+  "justmap.configuration.worldmap_icon_size": "Worldmap Icon Size",
+  "justmap.configuration.simple_arrow": "Simple Direction Arrow",
   "justmap.configuration.map_size": "Map Size",
   "justmap.configuration.chunk_level_size": "Chunk Level Size (blocks)",
   "justmap.configuration.map_scale": "Map Scale",
-  "justmap.configuration.map_saturation": "Saturation of map colors",
+  "justmap.configuration.map_saturation": "Map Saturation",
   "justmap.configuration.map_brightness": "Map Brightness",
   "justmap.configuration.show_in_chat": "Show map while in chat",
   "justmap.configuration.show_terrain": "Show Terrain",
@@ -46,7 +49,6 @@
   "justmap.configuration.water_tint": "Water Tint",
   "justmap.configuration.use_skins": "Use map skins",
   "justmap.configuration.current_skin": "Current Skin",
-  "justmap.configuration.simple_arrow": "Simple Direction Arrow",
   "justmap.configuration.waypoints_tracking": "Waypoints tracking",
   "justmap.configuration.waypoints_render": "Render waypoints in the world",
   "justmap.configuration.render_light_beam": "Render light beam",
@@ -89,5 +91,11 @@
   "justmap.gui.teleport": "Jump",
   "justmap.gui.wp_hidden": "Hidden",
   "justmap.gui.wp_tracking": "Screen Edge",
-  "justmap.gui.wp_render": "In World"
+  "justmap.gui.wp_render": "In World",
+  
+  "gamerule.allowCavesMap": "(Just Map) Caves mapping",
+  "gamerule.allowEntityRadar": "(Just Map) Entities radar",
+  "gamerule.allowPlayerRadar": "(Just Map) Players radar",
+  "gamerule.allowCreatureRadar": "(Just Map) Creatures radar",
+  "gamerule.allowHostileRadar": "(Just Map) Hostile radar"
 }

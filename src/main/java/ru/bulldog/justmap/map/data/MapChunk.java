@@ -31,8 +31,6 @@ public class MapChunk {
 	private Layer.Type layer;
 	private int dimension;
 	private int level = 0;
-	private boolean hideWater = false;
-	private boolean waterTint = true;
 	private boolean saved = true;
 	private boolean purged = false;
 	
@@ -165,14 +163,15 @@ public class MapChunk {
 	public MapChunk updateHeighmap() {
 		if (!this.updateWorldChunk()) return this;
 		
-		boolean skipWater = !(ClientParams.hideWater || ClientParams.waterTint);
+		boolean waterTint = ClientParams.alternateColorRender && ClientParams.waterTint;
+		boolean skipWater = !(ClientParams.hideWater || waterTint);
 		for (int x = 0; x < 16; x++) {
 			for (int z = 0; z < 16; z++) {
 				int y = worldChunk.sampleHeightmap(Heightmap.Type.WORLD_SURFACE, x, z);
 				y = MapProcessor.getTopBlockY(this, x, y + 1, z, skipWater);
 				
 				int index = x + (z << 4);
-				ChunkLevel chunkLevel = getChunkLevel();
+				ChunkLevel chunkLevel = this.getChunkLevel();
 				if (y != -1) {
 					chunkLevel.updateHeightmap(x, z, y);
 				} else if (getHeighmap()[index] != -1) {
@@ -185,12 +184,12 @@ public class MapChunk {
 		return this;
 	}
 	
-	public MapChunk update() {
+	public MapChunk update(boolean forceUpdate) {
 		long currentTime = System.currentTimeMillis();
 		if (currentTime - updated < ClientParams.chunkUpdateInterval) return this;		
 		if (this.purged || !this.updateWorldChunk()) return this;
 		
-		chunkUpdater.execute(this::updateData);
+		chunkUpdater.execute(() -> this.updateData(forceUpdate));
 		
 		return this;
 	}
@@ -205,7 +204,7 @@ public class MapChunk {
 		return true;
 	}
 	
-	private void updateData() {
+	private void updateData(boolean forceUpdate) {
 		MapChunk eastChunk = MapCache.get().getCurrentChunk(chunkPos.x + 1, chunkPos.z);
 		MapChunk southChunk = MapCache.get().getCurrentChunk(chunkPos.x, chunkPos.z - 1);
 		
@@ -218,16 +217,6 @@ public class MapChunk {
 			southChunk.updateHeighmap();
 			
 			chunkLevel.updated = currentTime;
-		}
-		
-		boolean needUpdate = false;
-		if (ClientParams.hideWater != hideWater) {
-			this.hideWater = ClientParams.hideWater;
-			needUpdate = true;
-		}
-		if (ClientParams.waterTint != waterTint) {
-			this.waterTint = ClientParams.waterTint;
-			needUpdate = true;
 		}
 		
 		for (int x = 0; x < 16; x++) {
@@ -243,7 +232,7 @@ public class MapChunk {
 				BlockPos blockPos = new BlockPos(posX, posY, posZ);
 				BlockState blockState = this.getBlockState(blockPos);
 				BlockState worldState = worldChunk.getBlockState(blockPos);
-				if(!blockState.equals(worldState) || needUpdate) {
+				if(!blockState.equals(worldState) || forceUpdate) {
 					int color = ColorUtil.blockColor(worldChunk, blockPos);
 					if (color != -1) {
 						int heightDiff = MapProcessor.heightDifference(this, eastChunk, southChunk, x, posY, z);

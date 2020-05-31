@@ -17,6 +17,7 @@ import net.minecraft.world.dimension.DimensionType;
 
 import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.client.MapScreen;
+import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.client.config.ConfigFactory;
 import ru.bulldog.justmap.map.data.Layer;
 import ru.bulldog.justmap.map.data.MapCache;
@@ -123,9 +124,9 @@ public class Worldmap extends MapScreen implements IMap {
 	@Override
 	public void renderForeground() {
 		RenderSystem.disableDepthTest();
-		int iconSize = (int) (12 / imageScale);
+		int iconSize = (int) (ClientParams.worldmapIconSize / imageScale);
 		iconSize = iconSize % 2 != 0 ? iconSize + 1 : iconSize;
-		iconSize = MathUtil.clamp(iconSize, 8, 12);
+		iconSize = MathUtil.clamp(iconSize, 6, (int) (ClientParams.worldmapIconSize * 1.2));
 		for (WaypointIcon icon : waypoints) {
 			icon.setPosition(
 				MathUtil.screenPos(icon.waypoint.pos.getX(), startX, endX, width) - shiftW,

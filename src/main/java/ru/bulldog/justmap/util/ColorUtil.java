@@ -276,9 +276,10 @@ public class ColorUtil {
 		BlockState overState = worldChunk.getWorld().getBlockState(overPos);
 		BlockState blockState = worldChunk.getBlockState(pos);
 		
-		boolean skipWater = !(ClientParams.hideWater || ClientParams.waterTint);
+		boolean waterTint = ClientParams.alternateColorRender && ClientParams.waterTint;
+		boolean skipWater = !(ClientParams.hideWater || waterTint);
 		if (!ClientParams.hideWater && ClientParams.hidePlants && StateUtil.isSeaweed(overState)) {
-			if (ClientParams.waterTint) {
+			if (waterTint) {
 				int color = blockColor(world, blockState, pos);
 				return applyTint(color, BiomeColors.getWaterColor(world, pos));
 			}
@@ -287,7 +288,7 @@ public class ColorUtil {
 		} else if (!StateUtil.isAir(blockState) && StateUtil.checkState(overState, skipWater, !ClientParams.hidePlants)) {			
 			int color = blockColor(world, blockState, pos);
 			if (ClientParams.hideWater) return color;
-			if (ClientParams.waterTint && StateUtil.isWater(overState)) {
+			if (waterTint && (StateUtil.isWater(overState) || StateUtil.isWaterlogged(blockState))) {
 				return applyTint(color, BiomeColors.getWaterColor(world, pos));
 			}
 			return color;

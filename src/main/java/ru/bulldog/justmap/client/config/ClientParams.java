@@ -5,7 +5,7 @@ import ru.bulldog.justmap.map.minimap.MapPosition;
 
 public class ClientParams {
 	public static MapPosition mapPosition = MapPosition.TOP_RIGHT;
-	public static DirectionArrow.Type arrowType = DirectionArrow.Type.DIRECTION_ARROW;
+	public static DirectionArrow.Type arrowIconType = DirectionArrow.Type.DIRECTION_ARROW;
 	
 	public static int positionOffset = 4;
 	public static int mapSize = 128;
@@ -24,13 +24,15 @@ public class ClientParams {
 	public static int terrainStrength = 4;
 
 	public static boolean useSkins = true;
-	public static int currentSkin = 0;
 	public static boolean alternateColorRender = true;
 	public static boolean waterTint = true;
-	public static int mapSaturation = 0;
-	public static int mapBrightness = 0;
 	public static boolean simpleArrow = false;
 	public static boolean textureFilter = false;
+	public static int currentSkin = 0;
+	public static int mapSaturation = 0;
+	public static int mapBrightness = 0;
+	public static int arrowIconSize = 12;
+	public static int worldmapIconSize = 12;
 	
 	public static boolean showPosition = true;
 	public static boolean showFPS = false;

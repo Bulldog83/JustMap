@@ -291,11 +291,12 @@ public class MapRenderer {
 		
 		int centerX = mapX + mapW / 2;
 		int centerY = mapY + mapH / 2;
-		
-		if (ClientParams.arrowType == DirectionArrow.Type.DIRECTION_ARROW) {
-			DirectionArrow.draw(centerX, centerY, ClientParams.rotateMap ? 180 : rotation);
+		int iconSize = ClientParams.arrowIconSize;
+		if (ClientParams.arrowIconType == DirectionArrow.Type.DIRECTION_ARROW) {
+			float direction = ClientParams.rotateMap ? 180 : rotation;
+			DirectionArrow.draw(centerX, centerY, iconSize, direction);
 		} else {
-			PlayerHeadIcon.getIcon(client.player).draw(centerX, centerY, 12, true);
+			PlayerHeadIcon.getIcon(client.player).draw(centerX, centerY, iconSize, true);
 		}
 		
 		this.textManager.draw();

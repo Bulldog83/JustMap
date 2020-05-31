@@ -23,7 +23,11 @@ public class MapRegion {
 	
 	private final RegionPos pos;
 	private final MapTexture image;
-	
+
+	private boolean hideWater = false;
+	private boolean waterTint = true;
+	private boolean alternateRender = true;
+	private boolean needUpdate = false;
 	private boolean changed = false;
 	public boolean surfaceOnly = false;
 	
@@ -52,6 +56,19 @@ public class MapRegion {
 	
 	private void updateMapData() {
 		mapData = MapCache.get();
+		
+		if (ClientParams.hideWater != hideWater) {
+			this.hideWater = ClientParams.hideWater;
+			this.needUpdate = true;
+		}
+		if (ClientParams.waterTint != waterTint) {
+			this.waterTint = ClientParams.waterTint;
+			this.needUpdate = true;
+		}
+		if (ClientParams.alternateColorRender != alternateRender) {
+			this.alternateRender = ClientParams.alternateColorRender;
+			this.needUpdate = true;
+		}
 	}
 	
 	private void updateImage() {
@@ -66,15 +83,16 @@ public class MapRegion {
 				if (surfaceOnly) {
 					mapChunk = mapData.getChunk(Layer.Type.SURFACE, 0, chunkX, chunkZ);
 					if (MapCache.currentLayer() == Layer.Type.SURFACE) {
-						mapChunk.update();
+						mapChunk.update(needUpdate);
 					}
 				} else {
-					mapChunk = mapData.getCurrentChunk(chunkX, chunkZ).update();
+					mapChunk = mapData.getCurrentChunk(chunkX, chunkZ).update(needUpdate);
 				}				
 				this.image.writeChunkData(x, y, mapChunk.getColorData());
 			}
 		}		
 		this.updated = System.currentTimeMillis();
+		this.needUpdate = false;
 		this.changed = true;
 	}
 	
