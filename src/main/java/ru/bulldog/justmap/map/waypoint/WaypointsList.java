@@ -272,9 +272,6 @@ public class WaypointsList extends MapScreen {
 		if (minecraft.player.dimension.getRawId() != currentDim) return;
 		int y = waypoint.pos.getY() > 0 ? waypoint.pos.getY() : (this.minecraft.player.dimension != DimensionType.THE_NETHER ? 128 : 64);
 		this.minecraft.player.sendChatMessage("/tp " + this.minecraft.player.getName().asString() + " " + waypoint.pos.getX() + " " + y + " " + waypoint.pos.getZ());
-		if (!this.minecraft.isIntegratedServerRunning()) {
-			this.minecraft.player.sendChatMessage("/tppos " + waypoint.pos.getX() + " " + y + " " + waypoint.pos.getZ());
-		}
 		this.onClose();
 	}
 	

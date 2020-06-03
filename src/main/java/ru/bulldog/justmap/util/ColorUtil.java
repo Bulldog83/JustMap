@@ -14,8 +14,6 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.FernBlock;
 import net.minecraft.block.FluidBlock;
-import net.minecraft.block.GrassBlock;
-import net.minecraft.block.LeavesBlock;
 import net.minecraft.block.LilyPadBlock;
 import net.minecraft.block.StemBlock;
 import net.minecraft.block.TallPlantBlock;
@@ -298,18 +296,16 @@ public class ColorUtil {
 	}
 	
 	public static int blockColor(World world, BlockState state, BlockPos pos) {
-		int blockColor = -1;
 		int materialColor = state.getTopMaterialColor(world, pos).color;
 		if (ClientParams.alternateColorRender) {
+			int blockColor = minecraft.getBlockColorMap().getColor(state, world, pos, Colors.LIGHT);
 			int textureColor = getStateColor(state);
 			
-			blockColor = minecraft.getBlockColorMap().getColor(state, world, pos, Colors.LIGHT);
-			
 			Block block = state.getBlock();
-			if (block instanceof GrassBlock || block instanceof FernBlock || block instanceof TallPlantBlock) {				
-				blockColor = proccessColor(blockColor, textureColor, BiomeColors.getGrassColor(world, pos));
-			} else if (block instanceof LeavesBlock || block instanceof VineBlock) {
+			if (block instanceof VineBlock) {
 				blockColor = proccessColor(blockColor, textureColor, BiomeColors.getFoliageColor(world, pos));
+			} else if (block instanceof FernBlock || block instanceof TallPlantBlock) {				
+				blockColor = proccessColor(blockColor, textureColor, BiomeColors.getGrassColor(world, pos));
 			} else if (block instanceof LilyPadBlock || block instanceof StemBlock || block instanceof AttachedStemBlock) {
 				blockColor = proccessColor(blockColor, textureColor, materialColor);
 			} else if (block instanceof FluidBlock) {
@@ -318,11 +314,15 @@ public class ColorUtil {
 				} else {
 					blockColor = fluidColor(world, state, pos, textureColor);
 				}
+			} else if (blockColor != -1){
+				blockColor = ColorHelper.multiplyColor(textureColor, blockColor);
+			} else {
+				blockColor = textureColor != -1 ? textureColor : materialColor;
 			}
-			blockColor = blockColor != -1 ? blockColor : textureColor;
+			
+			return blockColor;
 		}
-		blockColor = blockColor != -1 ? blockColor : materialColor;
 		
-		return blockColor;
+		return materialColor;
 	}
 }

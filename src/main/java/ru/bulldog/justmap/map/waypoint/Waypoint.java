@@ -13,6 +13,7 @@ import ru.bulldog.justmap.util.Colors;
 import ru.bulldog.justmap.util.ImageUtil;
 import ru.bulldog.justmap.util.SpriteAtlas;
 import ru.bulldog.justmap.util.math.RandomUtil;
+
 import net.minecraft.client.resource.metadata.AnimationResourceMetadata;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.texture.NativeImageBackedTexture;
@@ -72,6 +73,35 @@ public class Waypoint {
 		Colors.PURPLE
 	};
 	
+	public static void createOnDeath(int dimension, BlockPos pos) {
+		Waypoint waypoint = new Waypoint();
+		waypoint.dimension = dimension;
+		waypoint.name = "Player Death";
+		waypoint.pos = pos;
+		waypoint.setIcon(Waypoint.getIcon(Icons.CROSS), Colors.RED);
+		
+		JustMap.LOGGER.logInfo("Created Death waypoint at " + waypoint.pos.toString());
+		
+		WaypointKeeper.getInstance().addNew(waypoint);
+		WaypointKeeper.getInstance().saveWaypoints();
+	}
+	
+	public static Icon getIcon(int id) {
+		if (id > 0 && id < WAYPOINT_ICONS.length) {
+			return WAYPOINT_ICONS[id];
+		}
+		
+		return null;
+	}
+	
+	public static Icon getColoredIcon(int color) {
+		return Icon.coloredIcon(color);
+	}
+	
+	public static int amountIcons() {
+		return WAYPOINT_ICONS.length - 1;
+	}
+	
 	public String name = "";
 	public BlockPos pos = new BlockPos(0, 0, 0);
 	public int dimension;
@@ -103,22 +133,6 @@ public class Waypoint {
 		}
 		
 		return Icon.coloredIcon(this.color);
-	}
-	
-	public static Icon getIcon(int id) {
-		if (id > 0 && id < WAYPOINT_ICONS.length) {
-			return WAYPOINT_ICONS[id];
-		}
-		
-		return null;
-	}
-	
-	public static Icon getColoredIcon(int color) {
-		return Icon.coloredIcon(color);
-	}
-	
-	public static int amountIcons() {
-		return WAYPOINT_ICONS.length - 1;
 	}
 	
 	public JsonElement toJson() {

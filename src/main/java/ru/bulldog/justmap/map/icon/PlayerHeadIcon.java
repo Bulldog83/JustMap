@@ -1,40 +1,37 @@
 package ru.bulldog.justmap.map.icon;
 
-import com.mojang.authlib.minecraft.MinecraftProfileTexture;
-
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.texture.*;
 import net.minecraft.client.util.DefaultSkinHelper;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.Identifier;
+
 import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.util.Colors;
 import ru.bulldog.justmap.util.DrawHelper;
 
 import java.util.Map;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.UUID;
 
 public class PlayerHeadIcon {
-	private static PlayerSkinProvider skinProvider = MinecraftClient.getInstance().getSkinProvider();
-	private static TextureManager textureManager = MinecraftClient.getInstance().getTextureManager();
-	
 	private static Map<UUID, PlayerHeadIcon> playerIcons = new HashMap<>();
 	
 	private long lastCheck;
 	private int delay = 5000;
 	private boolean success = false;
 	
-	private Identifier skin;	
-	private PlayerEntity player;
+	private ResourceTexture playerSkin;
+	private ClientPlayerEntity player;
 	
-	private PlayerHeadIcon(PlayerEntity player) {
+	private PlayerHeadIcon(ClientPlayerEntity player) {
 		this.player = player;
 	}
 	
-	public static PlayerHeadIcon getIcon(PlayerEntity player) {
+	public static PlayerHeadIcon getIcon(ClientPlayerEntity player) {
 		PlayerHeadIcon icon;
 		long now = System.currentTimeMillis();
 		
@@ -45,7 +42,7 @@ public class PlayerHeadIcon {
 				if (now - icon.lastCheck - icon.delay >= 0) {
 					updatePlayerSkin(icon);
 				}
-			} else if (now - icon.lastCheck >= 60000) {
+			} else if (now - icon.lastCheck >= 300000) {
 				updatePlayerSkin(icon);
 			}
 		} else {
@@ -73,7 +70,7 @@ public class PlayerHeadIcon {
 		if (outline) {
 			DrawHelper.fill(drawX - 0.5, drawY - 0.5, drawX + size + 0.5, drawY + size + 0.5, Colors.LIGHT_GRAY);
 		}
-		textureManager.bindTexture(this.skin);		
+		this.playerSkin.bindTexture();
 		DrawHelper.drawPlayerHead(matrix, drawX, drawY, size, size);
 	}
 	
@@ -89,16 +86,33 @@ public class PlayerHeadIcon {
 	}
 	
 	private static void getPlayerSkin(PlayerHeadIcon icon) {
-		Map<MinecraftProfileTexture.Type, MinecraftProfileTexture> textures = skinProvider.getTextures(icon.player.getGameProfile());
-	
 		icon.lastCheck = System.currentTimeMillis();
 		
-		if (textures.containsKey(MinecraftProfileTexture.Type.SKIN)) {
-			icon.skin = skinProvider.loadSkin(textures.get(MinecraftProfileTexture.Type.SKIN), MinecraftProfileTexture.Type.SKIN);
-			icon.success = true;
-		} else {
-			icon.skin = DefaultSkinHelper.getTexture(icon.player.getUuid());
+		Identifier defaultSkin = DefaultSkinHelper.getTexture(icon.player.getUuid());
+		if (!icon.player.getSkinTexture().equals(defaultSkin)) {
+			PlayerSkinTexture skinTexture = ClientPlayerEntity.loadSkin(icon.player.getSkinTexture(), icon.player.getName().getString());
+			if (skinTexture != icon.playerSkin) {
+				if (icon.playerSkin != null) {
+					icon.playerSkin.clearGlId();
+				}
+				icon.playerSkin = skinTexture;
+
+				try {
+					icon.playerSkin.load(MinecraftClient.getInstance().getResourceManager());
+				} catch (IOException ex) {
+					JustMap.LOGGER.logWarning(ex.getLocalizedMessage());
+				}
+				icon.success = true;
+			}
+		} else if (icon.playerSkin == null) {
+			icon.playerSkin = new ResourceTexture(defaultSkin);
 			icon.success = false;
+			
+			try {
+				icon.playerSkin.load(MinecraftClient.getInstance().getResourceManager());
+			} catch (IOException ex) {
+				JustMap.LOGGER.logWarning(ex.getLocalizedMessage());
+			}
 		}
 	}
 }

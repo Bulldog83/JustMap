@@ -23,6 +23,7 @@ public class MapChunk {
 	public final ChunkLevel EMPTY_LEVEL = new ChunkLevel(-1);
 	
 	private final static TaskManager chunkUpdater = TaskManager.getManager("chunk-data");
+	private static MapCache mapData;
 	private volatile ConcurrentMap<Layer, ChunkLevel[]> levels;
 	
 	private World world;
@@ -189,24 +190,24 @@ public class MapChunk {
 		if (currentTime - updated < ClientParams.chunkUpdateInterval) return this;		
 		if (this.purged || !this.updateWorldChunk()) return this;
 		
-		chunkUpdater.execute(() -> this.updateData(forceUpdate));
+		mapData = MapCache.get();
+		chunkUpdater.execute(() -> this.updateChunkData(forceUpdate));
 		
 		return this;
 	}
 	
 	private boolean updateWorldChunk() {
-		if (worldChunk.isEmpty()) {
-			WorldChunk lifeChunk = world.getChunk(getX(), getZ());
-			if (lifeChunk.isEmpty()) return false;
+		WorldChunk lifeChunk = world.getChunk(getX(), getZ());
+		if (lifeChunk.isEmpty()) return false;
+		if (worldChunk.isEmpty()) {			
 			this.worldChunk = lifeChunk;
-			return true;
 		}
 		return true;
 	}
 	
-	private void updateData(boolean forceUpdate) {
-		MapChunk eastChunk = MapCache.get().getCurrentChunk(chunkPos.x + 1, chunkPos.z);
-		MapChunk southChunk = MapCache.get().getCurrentChunk(chunkPos.x, chunkPos.z - 1);
+	private void updateChunkData(boolean forceUpdate) {
+		MapChunk eastChunk = mapData.getCurrentChunk(chunkPos.x + 1, chunkPos.z);
+		MapChunk southChunk = mapData.getCurrentChunk(chunkPos.x, chunkPos.z - 1);
 		
 		long currentTime = System.currentTimeMillis();
 		

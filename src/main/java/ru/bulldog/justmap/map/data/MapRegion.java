@@ -61,8 +61,9 @@ public class MapRegion {
 			this.hideWater = ClientParams.hideWater;
 			this.needUpdate = true;
 		}
-		if (ClientParams.waterTint != waterTint) {
-			this.waterTint = ClientParams.waterTint;
+		boolean waterTint = ClientParams.alternateColorRender && ClientParams.waterTint;
+		if (this.waterTint != waterTint) {
+			this.waterTint = waterTint;
 			this.needUpdate = true;
 		}
 		if (ClientParams.alternateColorRender != alternateRender) {

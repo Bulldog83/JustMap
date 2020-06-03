@@ -9,6 +9,7 @@ import org.lwjgl.glfw.GLFW;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.text.LiteralText;
 import net.minecraft.util.math.BlockPos;
@@ -135,7 +136,7 @@ public class Worldmap extends MapScreen implements IMap {
 			icon.draw(iconSize);
 		}
 		
-		PlayerEntity player = minecraft.player;
+		ClientPlayerEntity player = minecraft.player;
 		
 		double playerX = player.getX();
 		double playerZ = player.getZ();
