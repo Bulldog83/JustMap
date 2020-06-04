@@ -8,7 +8,7 @@ import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.util.math.BlockPos;
-
+import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.client.render.MapTexture;
 import ru.bulldog.justmap.util.Colors;
@@ -19,7 +19,6 @@ public class MapRegion {
 	private static Tessellator tessellator = Tessellator.getInstance();
 	private static BufferBuilder builder = tessellator.getBuffer();
 	private static TaskManager worker = TaskManager.getManager("region-data");
-	private static MapCache mapData;
 	
 	private final RegionPos pos;
 	private final MapTexture image;
@@ -55,8 +54,6 @@ public class MapRegion {
 	}
 	
 	private void updateMapData() {
-		mapData = MapCache.get();
-		
 		if (ClientParams.hideWater != hideWater) {
 			this.hideWater = ClientParams.hideWater;
 			this.needUpdate = true;
@@ -73,6 +70,10 @@ public class MapRegion {
 	}
 	
 	private void updateImage() {
+		JustMap.LOGGER.debug("Updatintg region: " + this.pos);
+		
+		MapCache mapData = MapCache.get();
+		
 		int regX = this.pos.x << 9;
 		int regZ = this.pos.z << 9;		
 		for (int x = 0; x < 512; x += 16) {
