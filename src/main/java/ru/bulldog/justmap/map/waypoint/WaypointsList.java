@@ -162,7 +162,7 @@ public class WaypointsList extends MapScreen {
 		this.nextDimensionButton = new ButtonWidget(x + screenWidth - 30, 10, 20, 20, new LiteralText(">"), (b) -> cycleDimension(1));		
 		this.addButton = new ButtonWidget(center - 62, height - 26, 60, 20, lang("create"), (b) -> add());
 		this.closeButton = new ButtonWidget(center + 2, height - 26, 60, 20, lang("close"), (b) -> onClose());
-		this.currentDim = client.world.method_27983().getValue();
+		this.currentDim = client.world.getDimensionRegistryKey().getValue();
 		this.currentDimIndex = getDimIndex(currentDim);
 		
 		reset();
@@ -264,12 +264,9 @@ public class WaypointsList extends MapScreen {
 	}
 	
 	public void teleport(Waypoint waypoint) {
-		if (!client.world.method_27983().getValue().equals(currentDim)) return;
+		if (!client.world.getDimensionRegistryKey().getValue().equals(currentDim)) return;
 		int y = waypoint.pos.getY() > 0 ? waypoint.pos.getY() : (this.client.world.getDimension().isNether() ? 128 : 64);
 		this.client.player.sendChatMessage("/tp " + this.client.player.getName().asString() + " " + waypoint.pos.getX() + " " + y + " " + waypoint.pos.getZ());
-		if (!this.client.isIntegratedServerRunning()) {
-			this.client.player.sendChatMessage("/tppos " + waypoint.pos.getX() + " " + y + " " + waypoint.pos.getZ());
-		}
 		this.onClose();
 	}
 	

@@ -18,6 +18,7 @@ import ru.bulldog.justmap.util.math.RandomUtil;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ChatScreen;
+import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
@@ -235,7 +236,7 @@ public class Minimap implements IMap{
 				double iconX = MathUtil.screenPos(entX, startX, endX, mapWidth);
 				double iconY = MathUtil.screenPos(entZ, startZ, endZ, mapHeight);
 				if (entity instanceof PlayerEntity && allowPlayerRadar()) {
-					PlayerEntity pEntity  = (PlayerEntity) entity;
+					ClientPlayerEntity pEntity  = (ClientPlayerEntity) entity;
 					if (pEntity == player) continue;
 					PlayerIcon playerIcon = new PlayerIcon(this, pEntity, false);
 					playerIcon.setPosition(iconX, iconY);
@@ -260,7 +261,7 @@ public class Minimap implements IMap{
 		}
 		
 		waypoints.clear();
-		List<Waypoint> wps = WaypointKeeper.getInstance().getWaypoints(world.method_27983().getValue(), true);
+		List<Waypoint> wps = WaypointKeeper.getInstance().getWaypoints(world.getDimensionRegistryKey().getValue(), true);
 		if (wps != null) {
 			Stream<Waypoint> stream = wps.stream().filter(wp -> MathUtil.getDistance(pos, wp.pos, false) <= wp.showRange);
 			for (Waypoint wp : stream.toArray(Waypoint[]::new)) {
@@ -290,7 +291,7 @@ public class Minimap implements IMap{
 	
 	public void createWaypoint() {
 		World world = minecraftClient.world;
-		createWaypoint(world.method_27983().getValue(), PosUtil.currentPos());
+		createWaypoint(world.getDimensionRegistryKey().getValue(), PosUtil.currentPos());
 	}
 	
 	public int getScaledSize() {

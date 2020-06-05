@@ -1,10 +1,9 @@
 package ru.bulldog.justmap.map.icon;
 
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.util.Window;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.client.util.math.Vector3f;
-import net.minecraft.entity.player.PlayerEntity;
 
 import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.client.render.EntityModelRenderer;
@@ -15,9 +14,9 @@ import ru.bulldog.justmap.util.DrawHelper;
 public class PlayerIcon extends MapIcon<PlayerIcon> {
 	
 	protected boolean self;
-	protected PlayerEntity player;
+	protected ClientPlayerEntity player;
 	
-	public PlayerIcon(IMap map, PlayerEntity player, boolean self) {
+	public PlayerIcon(IMap map, ClientPlayerEntity player, boolean self) {
 		super(map);
 		this.self = self;
 		this.player = player;
@@ -28,6 +27,10 @@ public class PlayerIcon extends MapIcon<PlayerIcon> {
 		int size = ClientParams.entityIconSize;
 		
 		IconPos pos = new IconPos(mapX + x, mapY + y);
+		
+		if (ClientParams.rotateMap) {
+			this.rotatePos(pos, map.getWidth(), map.getHeight(), mapX, mapY, rotation);
+		}
 		
 		pos.x -= size / 2 + offX;
 		pos.y -= size / 2 + offY;
@@ -40,16 +43,7 @@ public class PlayerIcon extends MapIcon<PlayerIcon> {
 			if (ClientParams.renderEntityModel) {
 				EntityModelRenderer.renderModel(player, pos.x, pos.y);
 			} else {
-				matrix.push();
-				if (ClientParams.rotateMap) {
-					double moveX = pos.x + size / 2;
-					double moveY = pos.y + size / 2;
-					matrix.translate(moveX, moveY, 0.0);
-					matrix.multiply(Vector3f.POSITIVE_Z.getDegreesQuaternion(rotation + 180));
-					matrix.translate(-moveX, -moveY, 0.0);
-				}
 				PlayerHeadIcon.getIcon(player).draw(matrix, pos.x, pos.y);
-				matrix.pop();
 			}
 		} else {
 			DrawHelper.fill(pos.x, pos.y, pos.x, pos.y, Colors.GREEN);

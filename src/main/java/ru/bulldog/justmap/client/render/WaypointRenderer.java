@@ -56,7 +56,7 @@ public class WaypointRenderer {
 				return;
 			}
 		
-			List<Waypoint> wayPoints = WaypointKeeper.getInstance().getWaypoints(client.world.method_27983().getValue(), true);
+			List<Waypoint> wayPoints = WaypointKeeper.getInstance().getWaypoints(client.world.getDimensionRegistryKey().getValue(), true);
 			for (Waypoint wp : wayPoints) {
 				int dist = (int) MathUtil.getDistance(wp.pos, client.player.getBlockPos(), false);
 				if (wp.tracking && dist <= wp.showRange) {
@@ -101,18 +101,26 @@ public class WaypointRenderer {
 				renderer = new WaypointRenderer();
 			}
 			
-			long time = client.player.world.getTime();			
+			long time = client.player.world.getTime();
 			float tick = (float) Math.floorMod(time, 125L) + tickDelta;
 			
 			BlockPos playerPos = client.player.getBlockPos();
 			
-			List<Waypoint> wayPoints = WaypointKeeper.getInstance().getWaypoints(client.world.method_27983().getValue(), true);			
+			RenderSystem.enableBlend();
+			RenderSystem.defaultBlendFunc();
+			RenderSystem.enableDepthTest();
+			RenderSystem.depthMask(false);
+			
+			List<Waypoint> wayPoints = WaypointKeeper.getInstance().getWaypoints(client.world.getDimensionRegistryKey().getValue(), true);
 			for (Waypoint wp : wayPoints) {
 				int dist = (int) MathUtil.getDistance(wp.pos, playerPos, false);
 				if (wp.render && dist > ClientParams.minRenderDist && dist < ClientParams.maxRenderDist) {
 					renderer.renderWaypoint(matrixStack, wp, client, camera, tick, dist);
 				}
-			}			
+			}
+			
+			RenderSystem.depthMask(true);
+			RenderSystem.disableBlend();
 		}
 	}
 	
@@ -130,10 +138,6 @@ public class WaypointRenderer {
 		float[] colors = ColorUtil.toFloatArray(waypoint.color);
 		float alpha = MathUtil.clamp(0.125F * ((float) dist / 10), 0.11F, 0.275F);
 		
-		RenderSystem.enableBlend();
-		RenderSystem.defaultBlendFunc();
-		RenderSystem.depthMask(false);
-		
 		matrixStack.push();
 		matrixStack.translate((double) wpX - camX, (double) wpY - camY, (double) wpZ - camZ);
 		matrixStack.translate(0.5, 0.5, 0.5);
@@ -144,7 +148,7 @@ public class WaypointRenderer {
 			matrixStack.push();
 			matrixStack.translate(0.0, 1.0, 0.0);
 			if (ClientParams.renderAnimation) {
-				double swing = 0.25 * Math.sin((tick * 2.25 - 45.0) / 15.0);		
+				double swing = 0.25 * Math.sin((tick * 2.25 - 45.0) / 15.0);
 				matrixStack.translate(0.0, swing, 0.0);
 			}
 			matrixStack.multiply(camera.getRotation());
@@ -161,9 +165,6 @@ public class WaypointRenderer {
    	 		matrixStack.pop();
 		}
 		matrixStack.pop();
-		
-		RenderSystem.depthMask(true);
-		RenderSystem.disableBlend();
 	}
 	
 	private void renderIcon(MatrixStack matrixStack, VertexConsumer vertexConsumer, float[] colors, float alpha, int size) {

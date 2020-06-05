@@ -22,6 +22,7 @@
   "justmap.configuration.map_position": "Map Position",
   "justmap.configuration.arrow_type": "Arrow Icon Type",
   "justmap.configuration.arrow_size": "Arrow Icon Size",
+  "justmap.configuration.worldmap_icon_size": "Worldmap Icon Size",
   "justmap.configuration.simple_arrow": "Simple Direction Arrow",
   "justmap.configuration.map_size": "Map Size",
   "justmap.configuration.chunk_level_size": "Chunk Level Size (blocks)",

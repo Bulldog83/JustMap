@@ -128,6 +128,10 @@ public final class ConfigFactory {
 				.setSaveConsumer(val -> JustMapClient.CONFIG.setRanged("arrow_size", val))
 				.setDefaultValue((int) JustMapClient.CONFIG.getDefault("arrow_size"))
 				.build());
+		mapAppearance.addEntry(entryBuilder.startIntSlider(lang("worldmap_icon_size"), JustMapClient.CONFIG.getInt("worldmap_icon_size"), 8, 16)
+				.setSaveConsumer(val -> JustMapClient.CONFIG.setRanged("worldmap_icon_size", val))
+				.setDefaultValue((int) JustMapClient.CONFIG.getDefault("worldmap_icon_size"))
+				.build());
 		mapAppearance.addEntry(entryBuilder.startBooleanToggle(lang("alternate_color_render"), JustMapClient.CONFIG.getBoolean("alternate_color_render"))
 				.setSaveConsumer(val -> JustMapClient.CONFIG.setBoolean("alternate_color_render", val))
 				.setDefaultValue((boolean) JustMapClient.CONFIG.getDefault("alternate_color_render"))

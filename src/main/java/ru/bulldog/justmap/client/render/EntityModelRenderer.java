@@ -46,12 +46,7 @@ public class EntityModelRenderer {
 		matrixStack.push();
 		matrixStack.translate(x, y, 0);
 		matrixStack.translate(modelSize / 4, modelSize / 2, 0);
-		if (ClientParams.rotateMap) {
-			float rotation = MathUtil.correctAngle(minecraftClient.player.headYaw);
-			matrixStack.multiply(Vector3f.POSITIVE_Z.getDegreesQuaternion(rotation));
-		} else {
-			matrixStack.multiply(Vector3f.POSITIVE_X.getDegreesQuaternion(180.0F));
-		}		
+		matrixStack.multiply(Vector3f.POSITIVE_X.getDegreesQuaternion(180.0F));		
 		matrixStack.push();
 		matrixStack.scale(scale, scale, scale);
 		

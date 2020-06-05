@@ -6,7 +6,6 @@
 	    "HudMixin",
 	    "GameRenderMixin",
 	    "WorldRendererMixin",
-	    "PlayerEntityMixin",
 		"BakedQuadMixin",
 		"BufferBuilderMixin",
 		"ClientPlayNetworkHandlerMixin",

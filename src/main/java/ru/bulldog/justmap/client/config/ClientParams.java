@@ -32,6 +32,7 @@ public class ClientParams {
 	public static int mapSaturation = 0;
 	public static int mapBrightness = 0;
 	public static int arrowIconSize = 12;
+	public static int worldmapIconSize = 12;
 	
 	public static boolean showPosition = true;
 	public static boolean showFPS = false;

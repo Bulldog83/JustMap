@@ -85,6 +85,19 @@ public class Waypoint {
 	
 	private int icon = -1;
 	
+	public static void createOnDeath(Identifier dimension, BlockPos pos) {
+		Waypoint waypoint = new Waypoint();
+		waypoint.dimension = dimension;
+		waypoint.name = "Player Death";
+		waypoint.pos = pos;
+		waypoint.setIcon(Waypoint.getIcon(Icons.CROSS), Colors.RED);
+		
+		JustMap.LOGGER.logInfo("Created Death waypoint at " + waypoint.pos.toString());
+		
+		WaypointKeeper.getInstance().addNew(waypoint);
+		WaypointKeeper.getInstance().saveWaypoints();
+	}
+	
 	public boolean isVisible() {
 		return !hidden || showAlways;
 	}

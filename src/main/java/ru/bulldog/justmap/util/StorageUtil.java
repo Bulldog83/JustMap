@@ -50,7 +50,7 @@ public class StorageUtil {
 	public static File cacheDir() {
 		RegistryKey<DimensionType> dimKey = null;
 		if (minecraft.world != null) {
-			dimKey = minecraft.world.method_29287();			
+			dimKey = minecraft.world.getDimensionRegistryKey();			
 			String dimension = dimKey.getValue().getPath();
 			if (!currentDim.equals(dimension)) {
 				currentDim = dimension;
@@ -81,7 +81,7 @@ public class StorageUtil {
 		ServerInfo serverInfo = client.getCurrentServerEntry();
 		if (client.isIntegratedServerRunning()) {
 			MinecraftServer server = client.getServer();
-			filesDir = new File(MAP_DIR, String.format("local/%s/", server.method_27728().getLevelName()));
+			filesDir = new File(MAP_DIR, String.format("local/%s/", server.getSaveProperties().getLevelName()));
 		} else if (serverInfo != null) {
 			filesDir = new File(MAP_DIR, String.format("servers/%s/", serverInfo.name));
 		}

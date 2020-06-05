@@ -35,27 +35,27 @@ public abstract class GameRuleCommandMixin {
 					case "allowCavesMap":
 						command = new LiteralText(String.format("§0§0§a%s§f§f", val));
 						serverCommandSource.getMinecraftServer().getPlayerManager().sendToAll(
-								new GameMessageS2CPacket(command, MessageType.SYSTEM, Util.field_25140));
+								new GameMessageS2CPacket(command, MessageType.SYSTEM, Util.NIL_UUID));
 						break;
 					case "allowEntityRadar":
 						command = new LiteralText(String.format("§0§0§b%s§f§f", val));
 						serverCommandSource.getMinecraftServer().getPlayerManager().sendToAll(
-								new GameMessageS2CPacket(command, MessageType.SYSTEM, Util.field_25140));
+								new GameMessageS2CPacket(command, MessageType.SYSTEM, Util.NIL_UUID));
 						break;
 					case "allowPlayerRadar":
 						command = new LiteralText(String.format("§0§0§c%s§f§f", val));
 						serverCommandSource.getMinecraftServer().getPlayerManager().sendToAll(
-								new GameMessageS2CPacket(command, MessageType.SYSTEM, Util.field_25140));
+								new GameMessageS2CPacket(command, MessageType.SYSTEM, Util.NIL_UUID));
 						break;
 					case "allowCreatureRadar":
 						command = new LiteralText(String.format("§0§0§d%s§f§f", val));
 						serverCommandSource.getMinecraftServer().getPlayerManager().sendToAll(
-								new GameMessageS2CPacket(command, MessageType.SYSTEM, Util.field_25140));
+								new GameMessageS2CPacket(command, MessageType.SYSTEM, Util.NIL_UUID));
 						break;
 					case "allowHostileRadar":
 						command = new LiteralText(String.format("§0§0§e%s§f§f", val));
 						serverCommandSource.getMinecraftServer().getPlayerManager().sendToAll(
-								new GameMessageS2CPacket(command, MessageType.SYSTEM, Util.field_25140));
+								new GameMessageS2CPacket(command, MessageType.SYSTEM, Util.NIL_UUID));
 						break;
 				}
 			}

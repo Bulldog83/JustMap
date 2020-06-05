@@ -132,12 +132,23 @@ public class MapTexture {
 	}
 	
 	public void close() {
-		if (this.glId != -1) {
-			TextureUtil.method_24957(this.glId);
-			this.glId = -1;
-		}		
+		this.clearId();		
 		synchronized(bufferLock) {
 			this.buffer.clear();
+		}
+	}
+	
+	private void clearId() {
+		if (!RenderSystem.isOnRenderThread()) {
+			RenderSystem.recordRenderCall(() -> {
+				if (this.glId != -1) {
+					TextureUtil.method_24957(this.glId);
+					this.glId = -1;
+				}
+			});
+		} else if (this.glId != -1) {
+			TextureUtil.method_24957(this.glId);
+			this.glId = -1;
 		}
 	}
 	

@@ -19,11 +19,14 @@ public class MapRegion {
 	private static Tessellator tessellator = Tessellator.getInstance();
 	private static BufferBuilder builder = tessellator.getBuffer();
 	private static TaskManager worker = TaskManager.getManager("region-data");
-	private static MapCache mapData;
 	
 	private final RegionPos pos;
 	private final MapTexture image;
 	
+	private boolean hideWater = false;
+	private boolean waterTint = true;
+	private boolean alternateRender = true;
+	private boolean needUpdate = false;
 	private boolean changed = false;
 	public boolean surfaceOnly = false;
 	
@@ -33,7 +36,7 @@ public class MapRegion {
 		this.pos = new RegionPos(blockPos);
 		this.image = new MapTexture(512, 512);
 		this.image.fill(Colors.BLACK);
-		this.updateMapData();
+		this.updateMapParams();
 		this.updateImage();
 	}
 	
@@ -46,15 +49,29 @@ public class MapRegion {
 	}
 	
 	public void updateTexture() {
-		this.updateMapData();
+		this.updateMapParams();
 		worker.execute(this::updateImage);
 	}
 	
-	private void updateMapData() {
-		mapData = MapCache.get();
+	private void updateMapParams() {
+		if (ClientParams.hideWater != hideWater) {
+			this.hideWater = ClientParams.hideWater;
+			this.needUpdate = true;
+		}
+		boolean waterTint = ClientParams.alternateColorRender && ClientParams.waterTint;
+		if (this.waterTint != waterTint) {
+			this.waterTint = waterTint;
+			this.needUpdate = true;
+		}
+		if (ClientParams.alternateColorRender != alternateRender) {
+			this.alternateRender = ClientParams.alternateColorRender;
+			this.needUpdate = true;
+		}
 	}
 	
 	private void updateImage() {
+		MapCache mapData = MapCache.get();
+		
 		int regX = this.pos.x << 9;
 		int regZ = this.pos.z << 9;		
 		for (int x = 0; x < 512; x += 16) {
@@ -66,15 +83,16 @@ public class MapRegion {
 				if (surfaceOnly) {
 					mapChunk = mapData.getChunk(Layer.Type.SURFACE, 0, chunkX, chunkZ);
 					if (MapCache.currentLayer() == Layer.Type.SURFACE) {
-						mapChunk.update();
+						mapChunk.update(needUpdate);
 					}
 				} else {
-					mapChunk = mapData.getCurrentChunk(chunkX, chunkZ).update();
+					mapChunk = mapData.getCurrentChunk(chunkX, chunkZ).update(needUpdate);
 				}				
 				this.image.writeChunkData(x, y, mapChunk.getColorData());
 			}
-		}		
+		}
 		this.updated = System.currentTimeMillis();
+		this.needUpdate = false;
 		this.changed = true;
 	}
 	

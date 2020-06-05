@@ -50,7 +50,7 @@ public class MapScreen extends Screen {
 	
 	@Override
 	protected void init() {
-		RegistryKey<DimensionType> dimKey = client.world.method_29287();
+		RegistryKey<DimensionType> dimKey = client.world.getDimensionRegistryKey();
 		this.info = DIMENSION_INFO.getOrDefault(dimKey.getValue().toString(), null);
 	}
 	

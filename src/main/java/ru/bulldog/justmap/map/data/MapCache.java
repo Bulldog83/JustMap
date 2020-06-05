@@ -50,7 +50,7 @@ public class MapCache {
 		
 		if (currentWorld == null) return null;
 		
-		Identifier dimId = currentWorld.method_27983().getValue();
+		Identifier dimId = currentWorld.getDimensionRegistryKey().getValue();
 		if(currentDimension != dimId) {
 			StorageUtil.updateCacheStorage();
 			currentDimension = dimId;
@@ -145,7 +145,7 @@ public class MapCache {
 		List<ChunkPos> chunks = new ArrayList<>();
 		for (ChunkPos chunkPos : this.chunks.keySet()) {
 			MapChunk chunkData = this.chunks.get(chunkPos);
-			if (currentTime - chunkData.requested >= 60000) {
+			if (currentTime - chunkData.requested >= 5000) {
 				storeChunk(chunkData);
 				chunks.add(chunkPos);
 				purged++;

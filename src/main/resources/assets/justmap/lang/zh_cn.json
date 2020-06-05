@@ -19,6 +19,7 @@
   "justmap.configuration.map_position": "地图位置",
   "justmap.configuration.arrow_type": "箭头图标类型",
   "justmap.configuration.arrow_size": "箭头图标尺寸",
+  "justmap.configuration.worldmap_icon_size": "世界地图图标尺寸",
   "justmap.configuration.simple_arrow": "简单的方向箭头",
   "justmap.configuration.map_size": "地图尺寸",
   "justmap.configuration.chunk_level_size": "区块等级尺寸(方块)",

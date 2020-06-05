@@ -22,6 +22,7 @@
   "justmap.configuration.map_position": "Позиция карты",
   "justmap.configuration.arrow_type": "Вид стрелки",
   "justmap.configuration.arrow_size": "Размер иконки стрелки",
+  "justmap.configuration.worldmap_icon_size": "Размер иконки на карте мира",
   "justmap.configuration.simple_arrow": "Прострая стрелка направления",
   "justmap.configuration.map_size": "Размер карты",
   "justmap.configuration.chunk_level_size": "Высота уровня чанка (блоков)",

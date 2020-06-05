@@ -9,6 +9,7 @@ import org.lwjgl.glfw.GLFW;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.text.LiteralText;
@@ -19,6 +20,7 @@ import net.minecraft.world.dimension.DimensionType;
 
 import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.client.MapScreen;
+import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.client.config.ConfigFactory;
 import ru.bulldog.justmap.map.data.Layer;
 import ru.bulldog.justmap.map.data.MapCache;
@@ -81,7 +83,7 @@ public class Worldmap extends MapScreen implements IMap {
 		
 		PlayerEntity player = client.player;
 
-		Identifier dimId = client.world.method_27983().getValue();
+		Identifier dimId = client.world.getDimensionRegistryKey().getValue();
 		if (centerPos == null || !dimId.equals(dimension)) {
 			this.dimension = dimId;
 			this.centerPos = PosUtil.currentPos();
@@ -126,7 +128,7 @@ public class Worldmap extends MapScreen implements IMap {
 	@Override
 	public void renderForeground(MatrixStack matrixStack) {
 		RenderSystem.disableDepthTest();
-		int iconSize = (int) (12 / imageScale);
+		int iconSize = (int) (ClientParams.worldmapIconSize / imageScale);
 		iconSize = iconSize % 2 != 0 ? iconSize + 1 : iconSize;
 		iconSize = MathUtil.clamp(iconSize, 8, 12);
 		for (WaypointIcon icon : waypoints) {
@@ -137,7 +139,7 @@ public class Worldmap extends MapScreen implements IMap {
 			icon.draw(iconSize);
 		}
 		
-		PlayerEntity player = client.player;
+		ClientPlayerEntity player = client.player;
 		
 		double playerX = player.getX();
 		double playerZ = player.getZ();
