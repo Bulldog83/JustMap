@@ -28,6 +28,7 @@ public class MapRegion {
 	private boolean alternateRender = true;
 	private boolean needUpdate = false;
 	private boolean changed = false;
+	private boolean updating = false;
 	public boolean surfaceOnly = false;
 	
 	public long updated = 0;
@@ -49,8 +50,10 @@ public class MapRegion {
 	}
 	
 	public void updateTexture() {
+		if (updating) return;
 		this.updateMapData();
 		worker.execute(this::updateImage);
+		this.updating = true;
 	}
 	
 	private void updateMapData() {
@@ -70,8 +73,6 @@ public class MapRegion {
 	}
 	
 	private void updateImage() {
-		JustMap.LOGGER.debug("Updatintg region: " + this.pos);
-		
 		MapCache mapData = MapCache.get();
 		
 		int regX = this.pos.x << 9;
@@ -86,9 +87,11 @@ public class MapRegion {
 					mapChunk = mapData.getChunk(Layer.Type.SURFACE, 0, chunkX, chunkZ);
 					if (MapCache.currentLayer() == Layer.Type.SURFACE) {
 						mapChunk.update(needUpdate);
+						this.saveChunk(mapChunk);
 					}
 				} else {
 					mapChunk = mapData.getCurrentChunk(chunkX, chunkZ).update(needUpdate);
+					this.saveChunk(mapChunk);
 				}				
 				this.image.writeChunkData(x, y, mapChunk.getColorData());
 			}
@@ -96,6 +99,12 @@ public class MapRegion {
 		this.updated = System.currentTimeMillis();
 		this.needUpdate = false;
 		this.changed = true;
+		this.updating = false;
+	}
+	
+	private void saveChunk(MapChunk mapChunk) {
+		if (mapChunk.saving) return;
+		JustMap.WORKER.execute(() -> MapCache.storeChunk(mapChunk));
 	}
 	
 	public void draw(double x, double y, int imgX, int imgY, int width, int height, float scale) {

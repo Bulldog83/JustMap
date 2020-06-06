@@ -278,7 +278,7 @@ public class WaypointsList extends MapScreen {
 	@Override
 	public boolean mouseScrolled(double double_1, double double_2, double double_3) {
 		scrollAmount = MathUtil.clamp(scrollAmount + (int) (double_3 * 12), -maxScroll + 80, 0);
-		updateEntries();
+		this.updateEntries();
 		
 		return true;
 	}

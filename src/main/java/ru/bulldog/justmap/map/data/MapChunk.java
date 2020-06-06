@@ -8,6 +8,7 @@ import ru.bulldog.justmap.util.TaskManager;
 import net.minecraft.world.Heightmap;
 import net.minecraft.world.World;
 import net.minecraft.block.BlockState;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.util.math.BlockPos;
@@ -15,15 +16,16 @@ import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.chunk.WorldChunk;
 
 import java.util.Arrays;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 
 public class MapChunk {
 	
 	public final ChunkLevel EMPTY_LEVEL = new ChunkLevel(-1);
 	
 	private final static TaskManager chunkUpdater = TaskManager.getManager("chunk-data");
-	private volatile ConcurrentMap<Layer, ChunkLevel[]> levels;
+	private volatile Map<Layer, ChunkLevel[]> levels;
+	private static MinecraftClient client = MinecraftClient.getInstance();
 	
 	private World world;
 	private WorldChunk worldChunk;
@@ -31,9 +33,12 @@ public class MapChunk {
 	private Layer.Type layer;
 	private int dimension;
 	private int level = 0;
+	private boolean outdated = false;
+	private boolean updating = false;
 	private boolean saved = true;
 	private boolean purged = false;
 	
+	public boolean saving = false;
 	public long updated = 0;
 	public long requested = 0;
 	
@@ -46,7 +51,7 @@ public class MapChunk {
 	
 	public MapChunk(World world, ChunkPos pos, Layer.Type layer) {
 		this.world = world;
-		this.worldChunk = world.getChunk(pos.x, pos.z);
+		this.worldChunk = client.world.getChunk(pos.x, pos.z);
 		this.dimension = world.getDimension().getType().getRawId();
 		this.chunkPos = pos;
 		this.layer = layer;
@@ -185,27 +190,31 @@ public class MapChunk {
 	}
 	
 	public MapChunk update(boolean forceUpdate) {
-		long currentTime = System.currentTimeMillis();
-		if (currentTime - updated < ClientParams.chunkUpdateInterval) return this;		
-		if (this.purged || !this.updateWorldChunk()) return this;
+		if (updating) return this;		
+		if (!outdated && forceUpdate) {
+			this.outdated = forceUpdate;
+		}
 		
-		chunkUpdater.execute(() -> this.updateChunkData(forceUpdate));
+		long currentTime = System.currentTimeMillis();
+		if (!outdated && currentTime - updated < ClientParams.chunkUpdateInterval) return this;
+		if (purged || !this.updateWorldChunk()) return this;
+		
+		chunkUpdater.execute(this::updateChunkData);
+		this.updating = true;
 		
 		return this;
 	}
 	
 	private boolean updateWorldChunk() {
 		if(worldChunk.isEmpty()) {
-			WorldChunk lifeChunk = world.getChunk(getX(), getZ());
-			if (lifeChunk.isEmpty()) return false;
-			if (lifeChunk != worldChunk) {			
-				this.worldChunk = lifeChunk;
-			}
+			WorldChunk lifeChunk = world.getChunkManager().getWorldChunk(getX(), getZ(), false);
+			if (lifeChunk == null || lifeChunk.isEmpty()) return false;
+			this.worldChunk = lifeChunk;
 		}
 		return true;
 	}
 	
-	private void updateChunkData(boolean forceUpdate) {
+	private void updateChunkData() {
 		MapCache mapData = MapCache.get();
 		MapChunk eastChunk = mapData.getCurrentChunk(chunkPos.x + 1, chunkPos.z);
 		MapChunk southChunk = mapData.getCurrentChunk(chunkPos.x, chunkPos.z - 1);
@@ -234,7 +243,7 @@ public class MapChunk {
 				BlockPos blockPos = new BlockPos(posX, posY, posZ);
 				BlockState blockState = this.getBlockState(blockPos);
 				BlockState worldState = worldChunk.getBlockState(blockPos);
-				if(!blockState.equals(worldState) || forceUpdate) {
+				if(outdated || !blockState.equals(worldState)) {
 					int color = ColorUtil.blockColor(worldChunk, blockPos);
 					if (color != -1) {
 						int heightDiff = MapProcessor.heightDifference(this, eastChunk, southChunk, x, posY, z);
@@ -261,7 +270,9 @@ public class MapChunk {
 			}
 		}
 		
+		this.outdated = false;
 		this.updated = currentTime;
+		this.updating = false;
 	}
 	
 	public int[] getColorData() {

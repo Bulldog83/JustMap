@@ -40,7 +40,10 @@ public class MapCache {
 	}
 	
 	public static MapCache get() {
-		World world = minecraft.world;;
+		World world = minecraft.world;
+		if (minecraft.isIntegratedServerRunning() && world != null) {
+			world = minecraft.getServer().getWorld(minecraft.player.dimension);
+		}
 		if (currentWorld == null || (world != null &&
 									 world != currentWorld)) {
 			
@@ -101,8 +104,10 @@ public class MapCache {
 		});
 	}
 	
-	private static void storeChunk(MapChunk chunk) {
-		if (chunk.saveNeeded()) {
+	public static void storeChunk(MapChunk chunk) {
+		if (!chunk.saving && chunk.saveNeeded()) {
+			chunk.saving = true;
+			
 			CompoundTag chunkData = new CompoundTag();
 			chunk.store(chunkData);
 			
@@ -110,6 +115,7 @@ public class MapCache {
 				chunkData.putInt("version", 2);
 				StorageUtil.saveCache(chunk.getPos(), chunkData);
 			}
+			chunk.saving = false;
 		}
 	}
 	
