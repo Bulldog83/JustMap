@@ -3,7 +3,6 @@ package ru.bulldog.justmap.client;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.keybinding.KeyBindingRegistry;
 import net.fabricmc.fabric.api.event.client.ClientTickCallback;
-import net.minecraft.client.MinecraftClient;
 
 import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.client.config.ClientConfig;
@@ -26,7 +25,8 @@ public class JustMapClient implements ClientModInitializer {
 			MAP.update();
 			
 			boolean paused = this.paused;
-			this.paused = MinecraftClient.getInstance().isPaused();
+			this.paused = client.isPaused() || client.overlay != null && client.overlay.pausesGame() ||
+					client.currentScreen != null && client.currentScreen.isPauseScreen();
 			if (!paused && this.paused) {
 				JustMap.LOGGER.logInfo("Saving chunks data...");
 				MapCache.saveData();

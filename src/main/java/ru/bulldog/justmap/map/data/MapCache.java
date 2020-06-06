@@ -41,7 +41,10 @@ public class MapCache {
 	}
 	
 	public static MapCache get() {
-		World world = minecraft.world;;
+		World world = minecraft.world;
+		if (minecraft.isIntegratedServerRunning() && world != null) {
+			world = minecraft.getServer().getWorld(minecraft.world.getRegistryKey());
+		}
 		if (currentWorld == null || (world != null &&
 									 world != currentWorld)) {
 			
@@ -74,15 +77,15 @@ public class MapCache {
 		return data;
 	}
 	
-	private static MapCache getData(World world, Identifier dimendion) {
+	private static MapCache getData(World world, Identifier dimension) {
 		if (world == null) return null;
 		
-		if (dimensions.containsKey(dimendion)) {
-			return dimensions.get(dimendion);
+		if (dimensions.containsKey(dimension)) {
+			return dimensions.get(dimension);
 		}
 		
 		MapCache data = new MapCache(world);
-		dimensions.put(dimendion, data);
+		dimensions.put(dimension, data);
 		
 		return data;
 	}
@@ -98,8 +101,10 @@ public class MapCache {
 		});
 	}
 	
-	private static void storeChunk(MapChunk chunk) {
-		if (chunk.saveNeeded()) {
+	public static void storeChunk(MapChunk chunk) {
+		if (!chunk.saving && chunk.saveNeeded()) {
+			chunk.saving = true;
+			
 			CompoundTag chunkData = new CompoundTag();
 			chunk.store(chunkData);
 			
@@ -107,6 +112,7 @@ public class MapCache {
 				chunkData.putInt("version", 2);
 				StorageUtil.saveCache(chunk.getPos(), chunkData);
 			}
+			chunk.saving = false;
 		}
 	}
 	

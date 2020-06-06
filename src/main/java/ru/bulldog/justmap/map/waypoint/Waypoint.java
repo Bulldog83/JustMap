@@ -14,6 +14,7 @@ import ru.bulldog.justmap.util.Dimension;
 import ru.bulldog.justmap.util.ImageUtil;
 import ru.bulldog.justmap.util.SpriteAtlas;
 import ru.bulldog.justmap.util.math.RandomUtil;
+
 import net.minecraft.client.resource.metadata.AnimationResourceMetadata;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.texture.NativeImageBackedTexture;
@@ -92,7 +93,7 @@ public class Waypoint {
 		waypoint.pos = pos;
 		waypoint.setIcon(Waypoint.getIcon(Icons.CROSS), Colors.RED);
 		
-		JustMap.LOGGER.logInfo("Created Death waypoint at " + waypoint.pos.toString());
+		JustMap.LOGGER.logInfo("Created Death waypoint at " + waypoint.pos.toShortString());
 		
 		WaypointKeeper.getInstance().addNew(waypoint);
 		WaypointKeeper.getInstance().saveWaypoints();

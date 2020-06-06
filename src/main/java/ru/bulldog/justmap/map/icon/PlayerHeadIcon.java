@@ -43,7 +43,7 @@ public class PlayerHeadIcon {
 				if (now - icon.lastCheck - icon.delay >= 0) {
 					updatePlayerSkin(icon);
 				}
-			} else if (now - icon.lastCheck >= 60000) {
+			} else if (now - icon.lastCheck >= 300000) {
 				updatePlayerSkin(icon);
 			}
 		} else {

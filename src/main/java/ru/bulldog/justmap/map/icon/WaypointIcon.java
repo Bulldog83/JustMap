@@ -1,6 +1,7 @@
 package ru.bulldog.justmap.map.icon;
 
 import net.minecraft.client.util.math.MatrixStack;
+
 import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.map.IMap;
 import ru.bulldog.justmap.map.waypoint.Waypoint;

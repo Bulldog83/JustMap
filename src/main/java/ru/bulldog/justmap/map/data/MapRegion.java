@@ -8,7 +8,7 @@ import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.util.math.BlockPos;
-
+import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.client.render.MapTexture;
 import ru.bulldog.justmap.util.Colors;
@@ -22,12 +22,13 @@ public class MapRegion {
 	
 	private final RegionPos pos;
 	private final MapTexture image;
-	
+
 	private boolean hideWater = false;
 	private boolean waterTint = true;
 	private boolean alternateRender = true;
 	private boolean needUpdate = false;
 	private boolean changed = false;
+	private boolean updating = false;
 	public boolean surfaceOnly = false;
 	
 	public long updated = 0;
@@ -49,8 +50,10 @@ public class MapRegion {
 	}
 	
 	public void updateTexture() {
+		if (updating) return;
 		this.updateMapParams();
 		worker.execute(this::updateImage);
+		this.updating = true;
 	}
 	
 	private void updateMapParams() {
@@ -84,9 +87,11 @@ public class MapRegion {
 					mapChunk = mapData.getChunk(Layer.Type.SURFACE, 0, chunkX, chunkZ);
 					if (MapCache.currentLayer() == Layer.Type.SURFACE) {
 						mapChunk.update(needUpdate);
+						this.saveChunk(mapChunk);
 					}
 				} else {
 					mapChunk = mapData.getCurrentChunk(chunkX, chunkZ).update(needUpdate);
+					this.saveChunk(mapChunk);
 				}				
 				this.image.writeChunkData(x, y, mapChunk.getColorData());
 			}
@@ -94,6 +99,12 @@ public class MapRegion {
 		this.updated = System.currentTimeMillis();
 		this.needUpdate = false;
 		this.changed = true;
+		this.updating = false;
+	}
+	
+	private void saveChunk(MapChunk mapChunk) {
+		if (mapChunk.saving) return;
+		JustMap.WORKER.execute(() -> MapCache.storeChunk(mapChunk));
 	}
 	
 	public void draw(double x, double y, int imgX, int imgY, int width, int height, float scale) {

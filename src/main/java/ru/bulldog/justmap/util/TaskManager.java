@@ -11,7 +11,7 @@ import ru.bulldog.justmap.JustMap;
 
 public class TaskManager implements Executor {
     private final Queue<Runnable> workQueue = new ConcurrentLinkedQueue<>();
-    private final Thread thread;
+    private final Thread worker;
     private boolean running = true;
     
     private String name = JustMap.MODID;
@@ -43,20 +43,24 @@ public class TaskManager implements Executor {
     
     private TaskManager(String name) {
     	this.name += "-" + name;
-    	this.thread = new Thread(this::work, this.name);    	
-    	thread.start();
+    	this.worker = new Thread(this::work, this.name);
+    	this.worker.start();
     }
 
     @Override
     public void execute(Runnable command) {
-    	workQueue.offer(command);
-    	LockSupport.unpark(this.thread);
+    	this.workQueue.offer(command);
+    	LockSupport.unpark(this.worker);
     }
     
     public void stop() {
     	this.execute(() -> {
     		this.running = false;
     	});    	
+    }
+    
+    public int queueSize() {
+    	return this.workQueue.size();
     }
     
     public boolean isRunning() {
