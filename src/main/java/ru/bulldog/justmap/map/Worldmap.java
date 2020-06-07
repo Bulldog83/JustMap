@@ -10,8 +10,10 @@ import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.text.LiteralText;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.dimension.DimensionType;
@@ -62,7 +64,7 @@ public class Worldmap extends MapScreen implements IMap {
 	private long updateInterval = 50;
 	private long updated = 0;
 	
-	private DimensionType dimension;
+	private Identifier dimension;
 	private BlockPos centerPos;
 	private String cursorCoords;
 	
@@ -79,10 +81,11 @@ public class Worldmap extends MapScreen implements IMap {
 		this.paddingTop = 8;
 		this.paddingBottom = 8;
 		
-		PlayerEntity player = minecraft.player;
+		PlayerEntity player = client.player;
 
-		if (centerPos == null || player.dimension != dimension) {
-			this.dimension = player.dimension;
+		Identifier dimId = client.world.getDimensionRegistryKey().getValue();
+		if (centerPos == null || !dimId.equals(dimension)) {
+			this.dimension = dimId;
 			this.centerPos = PosUtil.currentPos();
 		} else if (playerTracking) {
 			this.centerPos = PosUtil.currentPos();
@@ -93,7 +96,7 @@ public class Worldmap extends MapScreen implements IMap {
 		this.updateScale();
 
 		this.waypoints.clear();
-		List<Waypoint> wps = WaypointKeeper.getInstance().getWaypoints(dimension.getRawId(), true);
+		List<Waypoint> wps = WaypointKeeper.getInstance().getWaypoints(dimension, true);
 		if (wps != null) {
 			Stream<Waypoint> stream = wps.stream().filter(wp -> MathUtil.getDistance(player.getBlockPos(), wp.pos) <= wp.showRange);
 			for (Waypoint wp : stream.toArray(Waypoint[]::new)) {
@@ -104,30 +107,30 @@ public class Worldmap extends MapScreen implements IMap {
 	}
 	
 	private void addMapButtons() {
-		this.children.add(new ButtonWidget(width - 24, 10, 20, 20, "x", (b) -> onClose()));		
-		this.children.add(new ButtonWidget(width / 2 - 10, height - paddingBottom - 44, 20, 20, "\u2191", (b) -> moveMap(Direction.NORTH)));
-		this.children.add(new ButtonWidget(width / 2 - 10, height - paddingBottom - 22, 20, 20, "\u2193", (b) -> moveMap(Direction.SOUTH)));
-		this.children.add(new ButtonWidget(width / 2 - 32, height - paddingBottom - 32, 20, 20, "\u2190", (b) -> moveMap(Direction.WEST)));
-		this.children.add(new ButtonWidget(width / 2 + 12, height - paddingBottom - 32, 20, 20, "\u2192", (b) -> moveMap(Direction.EAST)));		
-		this.children.add(new ButtonWidget(width - 24, height / 2 - 21, 20, 20, "+", (b) -> changeScale(-0.25F)));
-		this.children.add(new ButtonWidget(width - 24, height / 2 + 1, 20, 20, "-", (b) -> changeScale(+0.25F)));		
-		this.children.add(new ButtonWidget(width - 24, height - paddingBottom - 22, 20, 20, "\u271C", (b) -> setCenterByPlayer()));
-		this.children.add(new ButtonWidget(4, paddingTop + 2, 20, 20, "\u2630",(b) -> minecraft.openScreen(ConfigFactory.getConfigScreen(this))));
-		this.children.add(new ButtonWidget(4, height - paddingBottom - 22, 20, 20, "\u2726",(b) -> minecraft.openScreen(new WaypointsList(this))));
+		children.add(new ButtonWidget(width - 24, 10, 20, 20, new LiteralText("x"), (b) -> onClose()));		
+		children.add(new ButtonWidget(width / 2 - 10, height - paddingBottom - 44, 20, 20, new LiteralText("\u2191"), (b) -> moveMap(Direction.NORTH)));
+		children.add(new ButtonWidget(width / 2 - 10, height - paddingBottom - 22, 20, 20, new LiteralText("\u2193"), (b) -> moveMap(Direction.SOUTH)));
+		children.add(new ButtonWidget(width / 2 - 32, height - paddingBottom - 32, 20, 20, new LiteralText("\u2190"), (b) -> moveMap(Direction.WEST)));
+		children.add(new ButtonWidget(width / 2 + 12, height - paddingBottom - 32, 20, 20, new LiteralText("\u2192"), (b) -> moveMap(Direction.EAST)));		
+		children.add(new ButtonWidget(width - 24, height / 2 - 21, 20, 20, new LiteralText("+"), (b) -> changeScale(-0.25F)));
+		children.add(new ButtonWidget(width - 24, height / 2 + 1, 20, 20, new LiteralText("-"), (b) -> changeScale(+0.25F)));		
+		children.add(new ButtonWidget(width - 24, height - paddingBottom - 22, 20, 20, new LiteralText("\u271C"), (b) -> setCenterByPlayer()));
+		children.add(new ButtonWidget(4, paddingTop + 2, 20, 20, new LiteralText("\u2630"), (b) -> client.openScreen(ConfigFactory.getConfigScreen(this))));
+		children.add(new ButtonWidget(4, height - paddingBottom - 22, 20, 20, new LiteralText("\u2726"), (b) -> client.openScreen(new WaypointsList(this))));
 	}
 	
 	@Override
-	public void renderBackground() {
-		fill(x, 0, x + width, height, 0xFF444444);		
+	public void renderBackground(MatrixStack matrixStack) {
+		fill(matrixStack, x, 0, x + width, height, 0xFF444444);		
 		this.drawMap();
 	}
 	
 	@Override
-	public void renderForeground() {
+	public void renderForeground(MatrixStack matrixStack) {
 		RenderSystem.disableDepthTest();
 		int iconSize = (int) (ClientParams.worldmapIconSize / imageScale);
 		iconSize = iconSize % 2 != 0 ? iconSize + 1 : iconSize;
-		iconSize = MathUtil.clamp(iconSize, 6, (int) (ClientParams.worldmapIconSize * 1.2));
+		iconSize = MathUtil.clamp(iconSize, 8, 12);
 		for (WaypointIcon icon : waypoints) {
 			icon.setPosition(
 				MathUtil.screenPos(icon.waypoint.pos.getX(), startX, endX, width) - shiftW,
@@ -136,7 +139,7 @@ public class Worldmap extends MapScreen implements IMap {
 			icon.draw(iconSize);
 		}
 		
-		ClientPlayerEntity player = minecraft.player;
+		ClientPlayerEntity player = client.player;
 		
 		double playerX = player.getX();
 		double playerZ = player.getZ();
@@ -146,14 +149,14 @@ public class Worldmap extends MapScreen implements IMap {
 		PlayerHeadIcon.getIcon(player).draw(arrowX, arrowY, iconSize, true);
 		
 		this.drawBorders(paddingTop, paddingBottom);
-		this.drawCenteredString(minecraft.textRenderer, cursorCoords, width / 2, paddingTop + 4, Colors.WHITE);
+		this.drawCenteredString(matrixStack, client.textRenderer, cursorCoords, width / 2, paddingTop + 4, Colors.WHITE);
 		RenderSystem.enableDepthTest();
 	}
 	
 	private void drawMap() {		
 		MapCache mapData = MapCache.get();
 		
-		boolean surfaceOnly = !dimension.equals(DimensionType.THE_NETHER);
+		boolean surfaceOnly = !DimensionType.THE_NETHER_REGISTRY_KEY.getValue().equals(dimension);
 		
 		int cornerX = centerPos.getX() - scaledWidth / 2;
 		int cornerZ = centerPos.getZ() - scaledHeight / 2;
@@ -331,7 +334,7 @@ public class Worldmap extends MapScreen implements IMap {
 		int chunkZ = posZ >> 4;
 		
 		MapChunk mapChunk;
-		if (dimension == DimensionType.THE_NETHER) {
+		if (dimension.equals(DimensionType.THE_NETHER_REGISTRY_KEY.getValue())) {
 			mapChunk = MapCache.get().getCurrentChunk(chunkX, chunkZ);
 		} else {
 			mapChunk = MapCache.get().getChunk(Layer.Type.SURFACE, 0, chunkX, chunkZ);
@@ -363,7 +366,7 @@ public class Worldmap extends MapScreen implements IMap {
 			if (time - clicked > 500) clicks = 0;
 			
 			if (++clicks == 2) {			
-				JustMapClient.MAP.createWaypoint(dimension.getRawId(), cursorBlockPos(d, e));
+				JustMapClient.MAP.createWaypoint(dimension, cursorBlockPos(d, e));
 				
 				clicked = 0;
 				clicks = 0;

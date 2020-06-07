@@ -10,6 +10,7 @@ import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.map.icon.AbstractIcon;
 import ru.bulldog.justmap.util.ColorUtil;
 import ru.bulldog.justmap.util.Colors;
+import ru.bulldog.justmap.util.Dimension;
 import ru.bulldog.justmap.util.ImageUtil;
 import ru.bulldog.justmap.util.SpriteAtlas;
 import ru.bulldog.justmap.util.math.RandomUtil;
@@ -73,7 +74,19 @@ public class Waypoint {
 		Colors.PURPLE
 	};
 	
-	public static void createOnDeath(int dimension, BlockPos pos) {
+	public String name = "";
+	public BlockPos pos = new BlockPos(0, 0, 0);
+	public Identifier dimension;
+	public int color;
+	public boolean showAlways;
+	public boolean hidden = false;
+	public boolean tracking = true;
+	public boolean render = true;
+	public int showRange = 1000;
+	
+	private int icon = -1;
+	
+	public static void createOnDeath(Identifier dimension, BlockPos pos) {
 		Waypoint waypoint = new Waypoint();
 		waypoint.dimension = dimension;
 		waypoint.name = "Player Death";
@@ -85,34 +98,6 @@ public class Waypoint {
 		WaypointKeeper.getInstance().addNew(waypoint);
 		WaypointKeeper.getInstance().saveWaypoints();
 	}
-	
-	public static Icon getIcon(int id) {
-		if (id > 0 && id < WAYPOINT_ICONS.length) {
-			return WAYPOINT_ICONS[id];
-		}
-		
-		return null;
-	}
-	
-	public static Icon getColoredIcon(int color) {
-		return Icon.coloredIcon(color);
-	}
-	
-	public static int amountIcons() {
-		return WAYPOINT_ICONS.length - 1;
-	}
-	
-	public String name = "";
-	public BlockPos pos = new BlockPos(0, 0, 0);
-	public int dimension;
-	public int color;
-	public boolean showAlways;
-	public boolean hidden = false;
-	public boolean tracking = true;
-	public boolean render = true;
-	public int showRange = 1000;
-	
-	private int icon = -1;
 	
 	public boolean isVisible() {
 		return !hidden || showAlways;
@@ -135,11 +120,27 @@ public class Waypoint {
 		return Icon.coloredIcon(this.color);
 	}
 	
+	public static Icon getIcon(int id) {
+		if (id > 0 && id < WAYPOINT_ICONS.length) {
+			return WAYPOINT_ICONS[id];
+		}
+		
+		return null;
+	}
+	
+	public static Icon getColoredIcon(int color) {
+		return Icon.coloredIcon(color);
+	}
+	
+	public static int amountIcons() {
+		return WAYPOINT_ICONS.length - 1;
+	}
+	
 	public JsonElement toJson() {
 		JsonObject waypoint = new JsonObject();
 		
 		waypoint.addProperty("name", this.name);
-		waypoint.addProperty("dimension", this.dimension);
+		waypoint.addProperty("dimension", this.dimension.toString());
 		waypoint.addProperty("show_always", this.showAlways);
 		waypoint.addProperty("hidden", this.hidden);
 		waypoint.addProperty("tracking", this.tracking);
@@ -166,7 +167,6 @@ public class Waypoint {
 									JsonHelper.getInt(position, "y", 0),
 									JsonHelper.getInt(position, "z", 0));
 		waypoint.name = JsonHelper.getString(jsonObject, "name", "Waypoint");
-		waypoint.dimension = JsonHelper.getInt(jsonObject, "dimension", 0);
 		waypoint.showAlways = JsonHelper.getBoolean(jsonObject, "show_always", false);
 		waypoint.hidden = JsonHelper.getBoolean(jsonObject, "hidden", false);
 		waypoint.tracking = JsonHelper.getBoolean(jsonObject, "tracking", true);
@@ -175,6 +175,12 @@ public class Waypoint {
 		waypoint.color = ColorUtil.parseHex(JsonHelper.getString(jsonObject, "color",
 											Integer.toHexString(RandomUtil.getElement(WAYPOINT_COLORS))));
 		waypoint.icon = JsonHelper.getInt(jsonObject, "icon", -1);
+		
+		try {
+			waypoint.dimension = Dimension.fromId(JsonHelper.getInt(jsonObject, "dimension", 0));
+		} catch (Exception ex) {
+			waypoint.dimension = new Identifier(JsonHelper.getString(jsonObject, "dimension", "unknown"));
+		}
 		
 		return waypoint;
 	}

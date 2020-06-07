@@ -27,7 +27,7 @@ public class WaypointIcon extends MapIcon<WaypointIcon> {
 	}
 	
 	@Override
-	public void draw(int mapX, int mapY, double offX, double offY, float rotation) {
+	public void draw(MatrixStack matrixStack, int mapX, int mapY, double offX, double offY, float rotation) {
 		int size = 8;
 		
 		IconPos pos = new IconPos(mapX + x, mapY + y);

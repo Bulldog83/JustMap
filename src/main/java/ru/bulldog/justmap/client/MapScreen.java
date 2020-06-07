@@ -6,9 +6,11 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormats;
-import net.minecraft.client.resource.language.I18n;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
+import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.dimension.DimensionType;
 
 import java.util.HashMap;
@@ -48,31 +50,31 @@ public class MapScreen extends Screen {
 	
 	@Override
 	protected void init() {
-		int dimension = minecraft.player.dimension.getRawId();
-		this.info = DIMENSION_INFO.getOrDefault(DimensionType.byRawId(dimension).toString(), null);
+		RegistryKey<DimensionType> dimKey = client.world.getDimensionRegistryKey();
+		this.info = DIMENSION_INFO.getOrDefault(dimKey.getValue().toString(), null);
 	}
 	
 	@Override
-	public void render(int int_1, int int_2, float float_1) {
-		this.renderBackground();
-		this.renderForeground();
+	public void render(MatrixStack matrixStack, int int_1, int int_2, float float_1) {
+		this.renderBackground(matrixStack);
+		this.renderForeground(matrixStack);
 		for (Element e : children) {
 			if (e instanceof Drawable) {
-				((Drawable) e).render(int_1, int_2, float_1);
+				((Drawable) e).render(matrixStack, int_1, int_2, float_1);
 			}
 		}
 	}
 	
-	public void renderBackground() {
-		fill(0, 0, width, height, 0x88444444);		
+	public void renderBackground(MatrixStack matrixStack) {
+		fill(matrixStack, 0, 0, width, height, 0x88444444);		
 		drawBorders();
 	}
 	
-	public void renderForeground() {}
+	public void renderForeground(MatrixStack matrixStack) {}
 	
 	@Override
 	public void onClose() {
-		minecraft.openScreen(parent);
+		client.openScreen(parent);
 	}
 	
 	public void renderTexture(int x, int y, int width, int height, String id) {
@@ -82,7 +84,7 @@ public class MapScreen extends Screen {
 	public void renderTexture(int x, int y, int width, int height, Identifier id) {
 		Tessellator tessellator = Tessellator.getInstance();
 		BufferBuilder builder = tessellator.getBuffer();
-		minecraft.getTextureManager().bindTexture(id);
+		client.getTextureManager().bindTexture(id);
 		RenderSystem.color4f(1, 1, 1, 1);
 		builder.begin(GL11.GL_QUADS, VertexFormats.POSITION_TEXTURE_COLOR);
 		
@@ -97,7 +99,7 @@ public class MapScreen extends Screen {
 	public void renderTexture(int x, int y, int width, int height, float u, float v, int r, int g, int b, int a, Identifier id) {
 		Tessellator tessellator = Tessellator.getInstance();
 		BufferBuilder builder = tessellator.getBuffer();
-		minecraft.getTextureManager().bindTexture(id);
+		client.getTextureManager().bindTexture(id);
 		RenderSystem.color4f(1, 1, 1, 1);
 		builder.begin(GL11.GL_QUADS, VertexFormats.POSITION_TEXTURE_COLOR);
 	
@@ -138,7 +140,7 @@ public class MapScreen extends Screen {
 		renderTextureRepeating(0, height - bottom, width, bottom, 16, 16, id);		
 	}
 	
-	public String lang(String key) {
-		return I18n.translate("justmap.gui." + key);
+	public Text lang(String key) {
+		return new TranslatableText("justmap.gui." + key);
 	}	
 }

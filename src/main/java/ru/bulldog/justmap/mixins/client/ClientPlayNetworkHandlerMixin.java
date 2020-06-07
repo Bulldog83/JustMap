@@ -8,8 +8,9 @@ import org.spongepowered.asm.mixin.injection.At;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
-import net.minecraft.network.packet.s2c.play.ChatMessageS2CPacket;
+import net.minecraft.network.packet.s2c.play.GameMessageS2CPacket;
 import net.minecraft.network.packet.s2c.play.HealthUpdateS2CPacket;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.network.MessageType;
 
@@ -22,11 +23,11 @@ public abstract class ClientPlayNetworkHandlerMixin {
 	@Shadow
 	private MinecraftClient client;
 	
-	@Inject(method = "onChatMessage", at = @At("HEAD"), cancellable = true)
-	public void onChatMessage(ChatMessageS2CPacket chatMessageS2CPacket, CallbackInfo ci) {
-		if (chatMessageS2CPacket.getLocation() == MessageType.SYSTEM) {
+	@Inject(method = "onGameMessage", at = @At("HEAD"), cancellable = true)
+	public void onGameMessage(GameMessageS2CPacket gameMessageS2CPacket, CallbackInfo ci) {
+		if (gameMessageS2CPacket.getLocation() == MessageType.SYSTEM) {
 			String pref = "§0§0", suff = "§f§f";
-			String message = chatMessageS2CPacket.getMessage().getString();
+			String message = gameMessageS2CPacket.getMessage().getString();
 			
 			if (message.contains(pref) && message.contains(suff)) {
 				int start = message.indexOf(pref) + 4;
@@ -45,7 +46,7 @@ public abstract class ClientPlayNetworkHandlerMixin {
 	public void onHealthUpdate(HealthUpdateS2CPacket healthUpdateS2CPacket, CallbackInfo ci) {
 		float health = healthUpdateS2CPacket.getHealth();
 		if (health <= 0.0F) {
-	    	int dimension = this.client.player.dimension.getRawId();
+	    	Identifier dimension = this.client.world.getDimensionRegistryKey().getValue();
 	    	BlockPos playerPos = this.client.player.getBlockPos();
 	    	Waypoint.createOnDeath(dimension, playerPos);
 	    }

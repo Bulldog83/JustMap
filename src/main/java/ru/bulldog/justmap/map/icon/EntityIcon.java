@@ -1,7 +1,6 @@
 package ru.bulldog.justmap.map.icon;
 
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.client.util.math.Vector3f;
 import net.minecraft.entity.Entity;
 
 import ru.bulldog.justmap.client.config.ClientParams;
@@ -24,7 +23,7 @@ public class EntityIcon extends MapIcon<EntityIcon> {
 	}
 	
 	@Override
-	public void draw(int mapX, int mapY, double offX, double offY, float rotation) {
+	public void draw(MatrixStack matrixStack, int mapX, int mapY, double offX, double offY, float rotation) {
 		if (!Minimap.allowCreatureRadar() && !hostile) { return; }
 		if (!Minimap.allowHostileRadar() && hostile) { return; }
 		
@@ -32,6 +31,10 @@ public class EntityIcon extends MapIcon<EntityIcon> {
 		int color = (hostile) ? Colors.DARK_RED : Colors.YELLOW;
 		
 		IconPos pos = new IconPos(mapX + x, mapY + y);
+		
+		if (ClientParams.rotateMap) {
+			this.rotatePos(pos, map.getWidth(), map.getHeight(), mapX, mapY, rotation);
+		}
 		
 		pos.x -= size / 2 + offX;
 		pos.y -= size / 2 + offY;
@@ -47,16 +50,7 @@ public class EntityIcon extends MapIcon<EntityIcon> {
 				icon = EntityHeadIcon.getIcon(entity);
 				if (icon != null) {
 					MatrixStack matrix = new MatrixStack();					
-					matrix.push();
-					if (ClientParams.rotateMap) {
-						double moveX = pos.x + size / 2;
-						double moveY = pos.y + size / 2;
-						matrix.translate(moveX, moveY, 0.0);
-						matrix.multiply(Vector3f.POSITIVE_Z.getDegreesQuaternion(rotation + 180));
-						matrix.translate(-moveX, -moveY, 0.0);
-					}					
 					icon.draw(matrix, pos.x, pos.y, size);
-					matrix.pop();
 				} else {
 					DrawHelper.drawOutlineCircle(pos.x, pos.y, size / 3, 0.6, color);
 				}

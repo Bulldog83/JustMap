@@ -37,7 +37,7 @@ public class MapRegion {
 		this.pos = new RegionPos(blockPos);
 		this.image = new MapTexture(512, 512);
 		this.image.fill(Colors.BLACK);
-		this.updateMapData();
+		this.updateMapParams();
 		this.updateImage();
 	}
 	
@@ -51,12 +51,12 @@ public class MapRegion {
 	
 	public void updateTexture() {
 		if (updating) return;
-		this.updateMapData();
+		this.updateMapParams();
 		worker.execute(this::updateImage);
 		this.updating = true;
 	}
 	
-	private void updateMapData() {
+	private void updateMapParams() {
 		if (ClientParams.hideWater != hideWater) {
 			this.hideWater = ClientParams.hideWater;
 			this.needUpdate = true;
@@ -95,7 +95,7 @@ public class MapRegion {
 				}				
 				this.image.writeChunkData(x, y, mapChunk.getColorData());
 			}
-		}		
+		}
 		this.updated = System.currentTimeMillis();
 		this.needUpdate = false;
 		this.changed = true;

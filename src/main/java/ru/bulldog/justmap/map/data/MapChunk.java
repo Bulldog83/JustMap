@@ -11,9 +11,11 @@ import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.chunk.WorldChunk;
+import net.minecraft.world.dimension.DimensionType;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -31,7 +33,7 @@ public class MapChunk {
 	private WorldChunk worldChunk;
 	private ChunkPos chunkPos;
 	private Layer.Type layer;
-	private int dimension;
+	private Identifier dimension;
 	private int level = 0;
 	private boolean outdated = false;
 	private boolean updating = false;
@@ -52,7 +54,7 @@ public class MapChunk {
 	public MapChunk(World world, ChunkPos pos, Layer.Type layer) {
 		this.world = world;
 		this.worldChunk = client.world.getChunk(pos.x, pos.z);
-		this.dimension = world.getDimension().getType().getRawId();
+		this.dimension = world.getDimensionRegistryKey().getValue();
 		this.chunkPos = pos;
 		this.layer = layer;
 		this.levels = new ConcurrentHashMap<>();
@@ -61,7 +63,7 @@ public class MapChunk {
 	}
 	
 	private void init() {
-		if (dimension == -1) {
+		if (dimension.equals(DimensionType.THE_NETHER_REGISTRY_KEY.getValue())) {
 			initLayer(Layer.Type.NETHER);
 		} else {
 			initLayer(Layer.Type.SURFACE);

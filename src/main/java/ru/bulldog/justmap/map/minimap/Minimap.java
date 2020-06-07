@@ -24,6 +24,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.world.GameRules;
@@ -143,7 +144,7 @@ public class Minimap implements IMap{
 		return String.format("%02d:%02d", h, m);
 	}
 	
-	private static boolean isAllowed(boolean param, GameRules.RuleKey<GameRules.BooleanRule> rule) {
+	private static boolean isAllowed(boolean param, GameRules.Key<GameRules.BooleanRule> rule) {
 		if (param) {
 			return minecraftClient.isInSingleplayer() || MapGameRules.isAllowed(rule);
 		}
@@ -154,11 +155,11 @@ public class Minimap implements IMap{
 	private boolean needRenderCaves(World world, BlockPos playerPos) {
 		boolean allowCaves = isAllowed(ClientParams.drawCaves, MapGameRules.ALLOW_CAVES_MAP);
 		
-		DimensionType dimType = world.getDimension().getType();
-		if (dimType == DimensionType.THE_END) {
+		DimensionType dimType = world.getDimension();
+		if (dimType.isEnd()) {
 			return false;
 		}
-		if (dimType.hasSkyLight()) {
+		if (!dimType.hasCeiling() && dimType.hasSkyLight()) {
 			return allowCaves && !world.isSkyVisibleAllowingSea(playerPos) &&
 				   world.getLightLevel(LightType.SKY, playerPos) == 0;
 		}
@@ -195,7 +196,7 @@ public class Minimap implements IMap{
 		double startX = posX - scaled / 2;
 		double startZ = posZ - scaled / 2;
 
-		if (world.dimension.isNether()) {
+		if (world.getDimension().isNether()) {
 			MapCache.setCurrentLayer(Type.NETHER, posY);
 		} else if (needRenderCaves(world, pos)) {
 			MapCache.setCurrentLayer(Type.CAVES, posY);
@@ -234,7 +235,7 @@ public class Minimap implements IMap{
 				double entZ = entity.prevZ + (entity.getZ() - entity.prevZ) * tick;
 				double iconX = MathUtil.screenPos(entX, startX, endX, mapWidth);
 				double iconY = MathUtil.screenPos(entZ, startZ, endZ, mapHeight);
-				if (entity instanceof ClientPlayerEntity && allowPlayerRadar()) {
+				if (entity instanceof PlayerEntity && allowPlayerRadar()) {
 					ClientPlayerEntity pEntity  = (ClientPlayerEntity) entity;
 					if (pEntity == player) continue;
 					PlayerIcon playerIcon = new PlayerIcon(this, pEntity, false);
@@ -260,7 +261,7 @@ public class Minimap implements IMap{
 		}
 		
 		waypoints.clear();
-		List<Waypoint> wps = WaypointKeeper.getInstance().getWaypoints(world.dimension.getType().getRawId(), true);
+		List<Waypoint> wps = WaypointKeeper.getInstance().getWaypoints(world.getDimensionRegistryKey().getValue(), true);
 		if (wps != null) {
 			Stream<Waypoint> stream = wps.stream().filter(wp -> MathUtil.getDistance(pos, wp.pos, false) <= wp.showRange);
 			for (Waypoint wp : stream.toArray(Waypoint[]::new)) {
@@ -278,7 +279,7 @@ public class Minimap implements IMap{
 		return waypoints;
 	}
 	
-	public void createWaypoint(int dimension, BlockPos pos) {
+	public void createWaypoint(Identifier dimension, BlockPos pos) {
 		Waypoint waypoint = new Waypoint();
 		waypoint.dimension = dimension;
 		waypoint.name = "Waypoint";
@@ -289,8 +290,8 @@ public class Minimap implements IMap{
 	}
 	
 	public void createWaypoint() {
-		PlayerEntity player = minecraftClient.player;
-		createWaypoint(player.world.dimension.getType().getRawId(), player.getBlockPos());
+		World world = minecraftClient.world;
+		createWaypoint(world.getDimensionRegistryKey().getValue(), PosUtil.currentPos());
 	}
 	
 	public int getScaledSize() {
