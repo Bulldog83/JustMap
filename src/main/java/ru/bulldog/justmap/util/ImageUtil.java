@@ -52,8 +52,8 @@ public class ImageUtil {
 		for (int i = 0; i < image.getWidth(); i++) {
 			for (int j = 0; j < image.getHeight(); j++) {
 				if (image.getPixelOpacity(i, j) == -1) {
-					int newColor = ColorHelper.multiplyColor(image.getPixelRgba(i, j), color);
-					image.setPixelRgba(i, j, ColorUtil.toABGR(newColor));
+					int newColor = ColorHelper.multiplyColor(image.getPixelColor(i, j), color);
+					image.setPixelColor(i, j, ColorUtil.toABGR(newColor));
 				}
 			}
 		}
@@ -70,7 +70,7 @@ public class ImageUtil {
 		
 		for(int i = 0; i < w; i++) {
 			for(int j = 0; j < h; j++) {
-				tile.setPixelRgba(i, j, source.getPixelRgba(x + i, y + j));
+				tile.setPixelColor(i, j, source.getPixelColor(x + i, y + j));
 			}
 		}
 		
@@ -103,7 +103,7 @@ public class ImageUtil {
 				if (yp < 0) continue;
 				
 				try {
-					image.setPixelRgba(xp, yp, tile.getPixelRgba(i, j));
+					image.setPixelColor(xp, yp, tile.getPixelColor(i, j));
 				} catch(Exception ex) {
 					return null;
 				}

@@ -36,6 +36,10 @@ public class MapCache {
 		return currentLayer;
 	}
 	
+	public static int currentLevel() {
+		return currentLevel;
+	}
+	
 	public static void setLayerLevel(int level) {
 		currentLevel = level > 0 ? level : 0;
 	}
@@ -184,7 +188,14 @@ public class MapCache {
 		long time = System.currentTimeMillis();
 		if (region.surfaceOnly != surfaceOnly) {
 			region.surfaceOnly = surfaceOnly;
-			region.updateTexture();
+			Layer.Type layer = surfaceOnly ? Layer.Type.SURFACE : currentLayer;
+			if (layer != region.getLayer()) {
+				region.swapLayer(layer);
+			} else {
+				region.updateTexture();
+			}
+		} else if (currentLayer != region.getLayer()) {
+			region.swapLayer(currentLayer);
 		} else if (time - region.updated > 1000) {
 			region.updateTexture();
 		}

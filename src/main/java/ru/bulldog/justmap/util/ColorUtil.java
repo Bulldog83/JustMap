@@ -215,7 +215,7 @@ public class ColorUtil {
 		int pixels = 0;
 		for (int i = 0; i < image.getWidth(); i++) {
 			for (int j = 0; j < image.getHeight(); j++) {
-				int col = image.getPixelRgba(i, j);
+				int col = image.getPixelColor(i, j);
 				if ((int) (col >> 24 & 255) > 0) {
 					b += (col >> 16) & 255;
 					g += (col >> 8) & 255;
@@ -297,7 +297,7 @@ public class ColorUtil {
 	public static int blockColor(World world, BlockState state, BlockPos pos) {
 		int materialColor = state.getTopMaterialColor(world, pos).color;
 		if (ClientParams.alternateColorRender) {
-			int blockColor = minecraft.getBlockColorMap().getColor(state, world, pos, Colors.LIGHT);
+			int blockColor = minecraft.getBlockColors().getColor(state, world, pos, Colors.LIGHT);
 			int textureColor = getStateColor(state);
 			
 			Block block = state.getBlock();
