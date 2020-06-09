@@ -70,9 +70,11 @@ public class StorageUtil {
 		ServerInfo serverInfo = client.getCurrentServerEntry();
 		if (client.isIntegratedServerRunning()) {
 			MinecraftServer server = client.getServer();
-			filesDir = new File(MAP_DIR, String.format("local/%s/", server.getLevelName()));
+			String name = scrubNameFile(server.getLevelName());
+			filesDir = new File(MAP_DIR, String.format("local/%s/", name));
 		} else if (serverInfo != null) {
-			filesDir = new File(MAP_DIR, String.format("servers/%s/", serverInfo.name));
+			String name = scrubNameFile(serverInfo.name);
+			filesDir = new File(MAP_DIR, String.format("servers/%s/", name));
 		}
 		
 		if (!filesDir.exists()) {
@@ -108,5 +110,20 @@ public class StorageUtil {
 			}
 		}
 		dir.delete();
+	}
+	
+	private static String scrubNameFile(String input) {
+		input = input.replace("<", "_");
+		input = input.replace(">", "_");
+		input = input.replace(":", "_");
+		input = input.replace("\"", "_");
+		input = input.replace("/", "_");
+		input = input.replace("\\", "_");
+		input = input.replace("//", "_");
+		input = input.replace("|", "_");
+		input = input.replace("?", "_");
+		input = input.replace("*", "_");
+
+		return input;
 	}
 }
