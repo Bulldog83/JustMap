@@ -32,15 +32,15 @@ public class EntityIcon extends MapIcon<EntityIcon> {
 		
 		IconPos pos = new IconPos(mapX + x, mapY + y);
 		
-		if (ClientParams.rotateMap) {
-			this.rotatePos(pos, map.getWidth(), map.getHeight(), mapX, mapY, rotation);
-		}
-		
 		pos.x -= size / 2 + offX;
 		pos.y -= size / 2 + offY;
 		
 		if (pos.x < mapX || pos.x > (mapX + map.getWidth()) - size ||
 			pos.y < mapY || pos.y > (mapY + map.getHeight()) - size) return;
+		
+		if (ClientParams.rotateMap) {
+			this.rotatePos(pos, map.getWidth(), map.getHeight(), mapX, mapY, rotation);
+		}
 		
 		EntityHeadIcon icon = null;
 		if (ClientParams.showEntityHeads) {

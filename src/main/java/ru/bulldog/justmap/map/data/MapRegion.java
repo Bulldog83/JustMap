@@ -1,5 +1,7 @@
 package ru.bulldog.justmap.map.data;
 
+import java.io.File;
+
 import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -12,6 +14,7 @@ import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.client.render.MapTexture;
 import ru.bulldog.justmap.util.Colors;
+import ru.bulldog.justmap.util.StorageUtil;
 import ru.bulldog.justmap.util.TaskManager;
 
 public class MapRegion {
@@ -22,6 +25,9 @@ public class MapRegion {
 	
 	private final RegionPos pos;
 	private final MapTexture image;
+	
+	private Layer.Type layer;
+	private int level;
 
 	private boolean hideWater = false;
 	private boolean waterTint = true;
@@ -33,12 +39,14 @@ public class MapRegion {
 	
 	public long updated = 0;
 	
-	public MapRegion(BlockPos blockPos) {
+	public MapRegion(BlockPos blockPos, Layer.Type layer, int level) {
 		this.pos = new RegionPos(blockPos);
 		this.image = new MapTexture(512, 512);
 		this.image.fill(Colors.BLACK);
-		this.updateMapData();
-		this.updateImage();
+		this.layer = layer;
+		this.level = level;
+		this.loadImage();
+		this.updateTexture();
 	}
 	
 	public int getX() {
@@ -51,12 +59,12 @@ public class MapRegion {
 	
 	public void updateTexture() {
 		if (updating) return;
-		this.updateMapData();
+		this.updateMapParams();
 		worker.execute(this::updateImage);
 		this.updating = true;
 	}
 	
-	private void updateMapData() {
+	private void updateMapParams() {
 		if (ClientParams.hideWater != hideWater) {
 			this.hideWater = ClientParams.hideWater;
 			this.needUpdate = true;
@@ -87,24 +95,71 @@ public class MapRegion {
 					mapChunk = mapData.getChunk(Layer.Type.SURFACE, 0, chunkX, chunkZ);
 					if (MapCache.currentLayer() == Layer.Type.SURFACE) {
 						mapChunk.update(needUpdate);
-						this.saveChunk(mapChunk);
+						if (mapChunk.saveNeeded()) {
+							this.saveChunk(mapChunk);
+							this.changed = true;
+						}
 					}
 				} else {
 					mapChunk = mapData.getCurrentChunk(chunkX, chunkZ).update(needUpdate);
-					this.saveChunk(mapChunk);
+					if (mapChunk.saveNeeded()) {
+						this.saveChunk(mapChunk);
+						this.changed = true;
+					}
 				}				
 				this.image.writeChunkData(x, y, mapChunk.getColorData());
 			}
 		}		
+		if (changed) this.saveImage();
 		this.updated = System.currentTimeMillis();
 		this.needUpdate = false;
-		this.changed = true;
 		this.updating = false;
+	}
+	
+	public Layer.Type getLayer() {
+		return this.layer != null ? this.layer : null;
+	}
+	
+	public int getLevel() {
+		return this.level;
+	}
+	
+	public void swapLayer(Layer.Type layer, int level) {
+		this.layer = layer;
+		this.level = level;
+		this.loadImage();
+		this.updateTexture();
 	}
 	
 	private void saveChunk(MapChunk mapChunk) {
 		if (mapChunk.saving) return;
 		JustMap.WORKER.execute(() -> MapCache.storeChunk(mapChunk));
+	}
+	
+	private void saveImage() {
+		File imgFile = this.imageFile();
+		JustMap.WORKER.execute(() -> this.image.saveImage(imgFile));
+	}
+	
+	private void loadImage() {
+		File imgFile = this.imageFile();
+		this.image.loadImage(imgFile);
+		this.changed = true;
+	}
+	
+	private File imageFile() {
+		File dir = StorageUtil.cacheDir();
+		if (surfaceOnly || Layer.Type.SURFACE == layer) {
+			dir = new File(dir, "surface/");
+		} else {
+			dir = new File(dir, String.format("%s/%d/", layer.value.name, level));
+		}
+		
+		if (!dir.exists()) {
+			dir.mkdirs();
+		}
+		
+		return new File(dir, String.format("r%d.%d.png", pos.x, pos.z));
 	}
 	
 	public void draw(double x, double y, int imgX, int imgY, int width, int height, float scale) {

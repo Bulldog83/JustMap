@@ -1,8 +1,16 @@
 package ru.bulldog.justmap.client.render;
 
+import java.awt.image.BufferedImage;
+import java.awt.image.DataBufferByte;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.util.Arrays;
+
+import javax.imageio.ImageIO;
 
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
@@ -11,6 +19,8 @@ import org.lwjgl.opengl.GL14;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.texture.TextureUtil;
+
+import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.util.ColorUtil;
 import ru.bulldog.justmap.util.Colors;
@@ -67,7 +77,7 @@ public class MapTexture {
 
 	private byte[] getBytes() {
 		synchronized(bufferLock) {
-			return Arrays.copyOf(this.bytes, this.bytes.length);
+			return this.bytes.clone();
 		}
 	}
 	
@@ -123,6 +133,35 @@ public class MapTexture {
 					this.setRGB(x, y, color);
 				}
 			}
+		}
+	}
+	
+	public void saveImage(File png) {
+		try (OutputStream fileOut = new FileOutputStream(png)) {
+			BufferedImage pngImage = new BufferedImage(width, height, BufferedImage.TYPE_4BYTE_ABGR);
+			byte[] data = ((DataBufferByte) pngImage.getTile(0, 0).getDataBuffer()).getData();
+			byte[] bytes = this.getBytes();
+			for (int i = 0; i < bytes.length; i++) {
+				data[i] = bytes[i];
+			}
+			ImageIO.write(pngImage, "png", fileOut);
+			pngImage.flush();
+		} catch (Exception ex) {
+			JustMap.LOGGER.logWarning("Can't save image: " + png.toString());
+			JustMap.LOGGER.logWarning(ex.getLocalizedMessage());
+		}
+	}
+	
+	public void loadImage(File png) {
+		if (!png.exists()) return;
+		try (InputStream fileInput = new FileInputStream(png)) {
+			BufferedImage pngImage = new BufferedImage(width, height, BufferedImage.TYPE_4BYTE_ABGR);
+			pngImage.setData(ImageIO.read(fileInput).getData());
+			this.bytes = ((DataBufferByte) pngImage.getTile(0, 0).getDataBuffer()).getData().clone();
+			pngImage.flush();
+		} catch (Exception ex) {
+			JustMap.LOGGER.logWarning("Can't load image: " + png.toString());
+			JustMap.LOGGER.logWarning(ex.getLocalizedMessage());
 		}
 	}
 	

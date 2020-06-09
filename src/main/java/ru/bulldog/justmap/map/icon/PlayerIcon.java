@@ -26,15 +26,15 @@ public class PlayerIcon extends MapIcon<PlayerIcon> {
 		
 		IconPos pos = new IconPos(mapX + x, mapY + y);
 		
-		if (ClientParams.rotateMap) {
-			this.rotatePos(pos, map.getWidth(), map.getHeight(), mapX, mapY, rotation);
-		}
-		
 		pos.x -= size / 2 + offX;
 		pos.y -= size / 2 + offY;
 		
 		if (pos.x < mapX + size || pos.x > (mapX + map.getWidth()) - size ||
 			pos.y < mapY + size || pos.y > (mapY + map.getHeight()) - size) return;
+		
+		if (ClientParams.rotateMap) {
+			this.rotatePos(pos, map.getWidth(), map.getHeight(), mapX, mapY, rotation);
+		}
 		
 		if (ClientParams.showPlayerHeads) {
 			if (ClientParams.renderEntityModel) {

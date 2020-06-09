@@ -35,6 +35,10 @@ public class MapCache {
 		return currentLayer;
 	}
 	
+	public static int currentLevel() {
+		return currentLevel;
+	}
+	
 	public static void setLayerLevel(int level) {
 		currentLevel = level > 0 ? level : 0;
 	}
@@ -176,18 +180,22 @@ public class MapCache {
 	public MapRegion getRegion(BlockPos blockPos, boolean surfaceOnly) {
 		RegionPos regPos = new RegionPos(blockPos);
 
+		Layer.Type layer = surfaceOnly ? Layer.Type.SURFACE : currentLayer;
+		int level = surfaceOnly ? 0 : currentLevel;
+		
 		MapRegion region;
 		if(regions.containsKey(regPos)) {
 			region = this.regions.get(regPos);
 		} else {
-			region = new MapRegion(blockPos);
+			region = new MapRegion(blockPos, layer, level);
 			this.regions.put(regPos, region);
 		}
+		region.surfaceOnly = surfaceOnly;
 		
 		long time = System.currentTimeMillis();
-		if (region.surfaceOnly != surfaceOnly) {
-			region.surfaceOnly = surfaceOnly;
-			region.updateTexture();
+		if (layer != region.getLayer() ||
+			level != region.getLevel()) {
+			region.swapLayer(layer, level);
 		} else if (time - region.updated > 1000) {
 			region.updateTexture();
 		}
@@ -198,7 +206,7 @@ public class MapCache {
 	private Map<ChunkPos, MapChunk> getChunks() {
 		return this.chunks;
 	}
-	
+
 	public MapChunk getCurrentChunk(ChunkPos chunkPos) {
 		return this.getChunk(currentLayer, currentLevel, chunkPos.x, chunkPos.z);
 	}
