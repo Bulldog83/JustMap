@@ -6,6 +6,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.util.Identifier;
 import ru.bulldog.justmap.JustMap;
+import ru.bulldog.justmap.client.config.ConfigFactory;
 import ru.bulldog.justmap.map.Worldmap;
 import ru.bulldog.justmap.map.waypoint.WaypointsList;
 
@@ -82,6 +83,18 @@ public enum KeyHandler {
 			@Override
 			public boolean isListening() {
 				return MC.player != null && MC.currentScreen == null;
+			}
+		});
+		
+		INSTANCE.register(new KeyParser(createKeyBinding("show_config", GLFW.GLFW_KEY_J)) {
+			@Override
+			public void onKeyUp() {
+				MinecraftClient.getInstance().openScreen(ConfigFactory.getConfigScreen(null));
+			}
+			
+			@Override
+			public boolean isListening() {
+				return MC.currentScreen == null;
 			}
 		});
 		
