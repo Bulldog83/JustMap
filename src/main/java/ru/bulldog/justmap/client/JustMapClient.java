@@ -23,12 +23,16 @@ public class JustMapClient implements ClientModInitializer {
 		ClientTickCallback.EVENT.register((client) -> {
 			KeyHandler.INSTANCE.update();
 			MAP.update();
-			
+
 			boolean paused = this.paused;
+			boolean online = !client.isIntegratedServerRunning() && client.currentScreen == null;
 			this.paused = client.isPaused() || client.overlay != null && client.overlay.pausesGame() ||
 					client.currentScreen != null && client.currentScreen.isPauseScreen();
+			long time = System.currentTimeMillis();
 			if (!paused && this.paused) {
 				JustMap.LOGGER.logInfo("Saving chunks data...");
+				MapCache.saveData();
+			} else if (online && time - MapCache.lastSaved > 60000) {
 				MapCache.saveData();
 			}
 		});

@@ -323,10 +323,10 @@ public class MapRenderer {
 		float scale = minimap.getScale();
 		
 		int picX = 0, picW = 0;
-		while(picX <= scaledW) {
+		while(picX < scaledW) {
 			int cX = cornerX + picX;
 			int picY = 0, picH = 0;
-			while (picY <= scaledH ) {				
+			while (picY < scaledH ) {				
 				int cZ = cornerZ + picY;
 				
 				MapRegion region = mapData.getRegion(new BlockPos(cX, 0, cZ));

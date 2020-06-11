@@ -159,10 +159,10 @@ public class Worldmap extends MapScreen implements IMap {
 		int cornerZ = centerPos.getZ() - scaledHeight / 2;
 		
 		int picX = 0, picW = 0;
-		while(picX <= scaledWidth) {
+		while(picX < scaledWidth) {
 			int cX = cornerX + picX;
 			int picY = 0, picH = 0;
-			while (picY <= scaledHeight) {				
+			while (picY < scaledHeight) {				
 				int cZ = cornerZ + picY;
 				
 				MapRegion region = mapData.getRegion(new BlockPos(cX, 0, cZ), surfaceOnly);

@@ -96,17 +96,15 @@ public class MapRegion {
 					if (MapCache.currentLayer() == Layer.Type.SURFACE) {
 						mapChunk.update(needUpdate);
 						if (mapChunk.saveNeeded()) {
-							this.saveChunk(mapChunk);
 							this.changed = true;
 						}
 					}
 				} else {
 					mapChunk = mapData.getCurrentChunk(chunkX, chunkZ).update(needUpdate);
 					if (mapChunk.saveNeeded()) {
-						this.saveChunk(mapChunk);
 						this.changed = true;
 					}
-				}				
+				}
 				this.image.writeChunkData(x, y, mapChunk.getColorData());
 			}
 		}		
@@ -129,11 +127,6 @@ public class MapRegion {
 		this.level = level;
 		this.loadImage();
 		this.updateTexture();
-	}
-	
-	private void saveChunk(MapChunk mapChunk) {
-		if (mapChunk.saving) return;
-		JustMap.WORKER.execute(() -> MapCache.storeChunk(mapChunk));
 	}
 	
 	private void saveImage() {

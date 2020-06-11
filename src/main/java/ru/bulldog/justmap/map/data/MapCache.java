@@ -26,6 +26,8 @@ public class MapCache {
 	private static int currentLevel = 0;
 	private static int currentDimension = 0;
 	
+	public static long lastSaved = 0;
+	
 	public static void setCurrentLayer(Layer.Type layer, int y) {
 		currentLevel =  y / layer.value.height;
 		currentLayer = layer;
@@ -106,6 +108,7 @@ public class MapCache {
 				storeChunk(chunk);
 			});
 		});
+		lastSaved = System.currentTimeMillis();
 	}
 	
 	public static void storeChunk(MapChunk chunk) {
