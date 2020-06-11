@@ -9,6 +9,7 @@
   "key.justmap.reduce_scale": "Reduce map scale",
   "key.justmap.increase_scale": "Increase map scale",
   "key.justmap.show_worldmap": "Show Worldmap",
+  "key.justmap.show_config": "Show map config",
 
   "justmap.configuration.category.general": "General",
   "justmap.configuration.category.info": "Map Info",
