@@ -49,7 +49,8 @@ public class Minimap implements IMap{
 	
 	private int mapWidth;
 	private int mapHeight;
-	private int scaledSize;
+	private int scaledWidth;
+	private int scaledHeight;
 	private float mapScale;
 	private int lastPosX = 0;
 	private int lastPosZ = 0;
@@ -63,6 +64,7 @@ public class Minimap implements IMap{
 	
 	private boolean isMapVisible = true;
 	private boolean rotateMap = false;
+	private boolean bigMap = false;
 
 	public boolean posChanged = false;
 	
@@ -91,19 +93,28 @@ public class Minimap implements IMap{
 		int configSize = JustMapClient.CONFIG.getInt("map_size");
 		float configScale = JustMapClient.CONFIG.getFloat("map_scale");		
 		boolean needRotate = JustMapClient.CONFIG.getBoolean("rotate_map");
+		boolean bigMap = JustMapClient.CONFIG.getBoolean("show_big_map");
 		
 		if (configSize != mapWidth || configScale != mapScale ||
-			this.rotateMap != needRotate) {
+			this.rotateMap != needRotate || this.bigMap != bigMap) {
 			
-			this.mapWidth = configSize;
-			this.mapHeight = configSize;
+			if (bigMap) {
+				this.mapWidth = 320;
+				this.mapHeight = 200;
+			} else {
+				this.mapWidth = configSize;
+				this.mapHeight = configSize;				
+			}
 			this.mapScale = configScale;
 			this.rotateMap = needRotate;
+			this.bigMap = bigMap;
 			
 			if (rotateMap) {
-				this.scaledSize = (int) ((mapWidth * mapScale) * 1.42 + 8);
+				this.scaledWidth = (int) ((mapWidth * mapScale) * 1.42 + 8);
+				this.scaledHeight = (int) ((mapHeight * mapScale) * 1.42 + 8);
 			} else {
-				this.scaledSize = (int) ((mapWidth * mapScale) + 8);
+				this.scaledWidth = (int) ((mapWidth * mapScale) + 8);
+				this.scaledHeight = (int) ((mapHeight * mapScale) + 8);
 			}
 		}
 		
@@ -191,9 +202,10 @@ public class Minimap implements IMap{
 		int posX = pos.getX();
 		int posZ = pos.getZ();
 		int posY = pos.getY();
-		int scaled = this.getScaledSize();
-		double startX = posX - scaled / 2;
-		double startZ = posZ - scaled / 2;
+		int scaledW = this.scaledWidth;
+		int scaledH = this.scaledHeight;
+		double startX = posX - scaledW / 2;
+		double startZ = posZ - scaledH / 2;
 
 		if (world.dimension.isNether()) {
 			MapCache.setCurrentLayer(Type.NETHER, posY);
@@ -210,13 +222,14 @@ public class Minimap implements IMap{
 		}
 		
 		if (ClientParams.rotateMap) {
-			scaled = (int) (mapWidth * mapScale);
-			startX = posX - scaled / 2;
-			startZ = posZ - scaled / 2;
+			scaledW = (int) (mapWidth * mapScale);
+			scaledH = (int) (mapHeight * mapScale);
+			startX = posX - scaledW / 2;
+			startZ = posZ - scaledH / 2;
 		}		
 		
-		double endX = startX + scaled;
-		double endZ = startZ + scaled;
+		double endX = startX + scaledW;
+		double endZ = startZ + scaledH;
 		
 		if (allowEntityRadar()) {
 			this.players.clear();
@@ -293,10 +306,6 @@ public class Minimap implements IMap{
 		createWaypoint(player.world.dimension.getType().getRawId(), player.getBlockPos());
 	}
 	
-	public int getScaledSize() {
-		return this.scaledSize;
-	}
-	
 	public float getScale() {
 		return this.mapScale;
 	}
@@ -342,11 +351,11 @@ public class Minimap implements IMap{
 
 	@Override
 	public int getScaledWidth() {
-		return this.getScaledSize();
+		return this.scaledWidth;
 	}
 
 	@Override
 	public int getScaledHeight() {
-		return this.getScaledSize();
+		return this.scaledHeight;
 	}
 }

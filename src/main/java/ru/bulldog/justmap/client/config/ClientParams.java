@@ -15,6 +15,7 @@ public class ClientParams {
 	public static boolean showEffectTimers = true;
 	public static boolean rotateMap = false;
 	public static boolean showInChat = false;
+	public static boolean showBigMap = false;
 
 	public static boolean drawCaves = true;
 	public static boolean hidePlants = false;

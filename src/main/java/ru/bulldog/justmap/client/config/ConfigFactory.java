@@ -50,6 +50,10 @@ public final class ConfigFactory {
 				.setSaveConsumer(val -> JustMapClient.CONFIG.setInt("map_offset", val))
 				.setDefaultValue((int) JustMapClient.CONFIG.getDefault("map_offset"))
 				.build());
+		general.addEntry(entryBuilder.startBooleanToggle(lang("show_big_map"), JustMapClient.CONFIG.getBoolean("show_big_map"))
+				.setSaveConsumer(val -> JustMapClient.CONFIG.setBoolean("show_big_map", val))
+				.setDefaultValue((boolean) JustMapClient.CONFIG.getDefault("show_big_map"))
+				.build());
 		general.addEntry(entryBuilder.startDropdownMenu(lang("map_size"), JustMapClient.CONFIG.getInt("map_size"), (val) -> {
 					if (val.equals("")) return 0;			
 					return Integer.valueOf(val);

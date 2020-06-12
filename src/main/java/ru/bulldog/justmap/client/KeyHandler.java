@@ -47,6 +47,14 @@ public final class KeyHandler {
 			}
 		});
 		
+		registerKey(new KeyParser(createKeyBinding("toggle_big_map", GLFW.GLFW_KEY_N)) {
+			@Override
+			public void onKeyUp() {
+				JustMapClient.CONFIG.setBoolean("show_big_map", !JustMapClient.CONFIG.getBoolean("show_big_map"));
+				JustMapClient.CONFIG.saveChanges();
+			}
+		});
+		
 		registerKey(new KeyParser(createKeyBinding("toggle_show_caves", GLFW.GLFW_KEY_K)) {
 			@Override
 			public void onKeyUp() {
