@@ -256,30 +256,30 @@ public class Worldmap extends MapScreen implements IMap {
 		switch(i) {
 			case GLFW.GLFW_KEY_W:
 			case GLFW.GLFW_KEY_UP:
-				moveMap(Direction.NORTH);
+				this.moveMap(Direction.NORTH);
 		  		return true;
 		  	case GLFW.GLFW_KEY_S:
 		  	case GLFW.GLFW_KEY_DOWN:
-		  		moveMap(Direction.SOUTH);
+		  		this.moveMap(Direction.SOUTH);
 		  		return true;
 		  	case GLFW.GLFW_KEY_A:
 		  	case GLFW.GLFW_KEY_LEFT:
-		  		moveMap(Direction.WEST);
+		  		this.moveMap(Direction.WEST);
 		  		return true;
 		  	case GLFW.GLFW_KEY_D:
 		  	case GLFW.GLFW_KEY_RIGHT:
-		  		moveMap(Direction.EAST);
+		  		this.moveMap(Direction.EAST);
 		  		return true;
 		  	case GLFW.GLFW_KEY_MINUS:
 		  	case GLFW.GLFW_KEY_KP_SUBTRACT:
-		  		changeScale(0.25F);
+		  		this.changeScale(0.25F);
 		  		return true;
 		  	case GLFW.GLFW_KEY_EQUAL:
 		  	case GLFW.GLFW_KEY_KP_ADD:
-		  		changeScale(-0.25F);
+		  		this.changeScale(-0.25F);
 		  		return true;
 		  	case GLFW.GLFW_KEY_X:
-		  		setCenterByPlayer();
+		  		this.setCenterByPlayer();
 		  		return true;
 		  	case GLFW.GLFW_KEY_M:
 		  		this.onClose();
@@ -360,7 +360,7 @@ public class Worldmap extends MapScreen implements IMap {
 		
 		if (i == 0) {
 			long time = System.currentTimeMillis();
-			if (time - clicked > 500) clicks = 0;
+			if (time - clicked > 300) clicks = 0;
 			
 			if (++clicks == 2) {			
 				JustMapClient.MAP.createWaypoint(dimension.getRawId(), cursorBlockPos(d, e));
@@ -379,8 +379,9 @@ public class Worldmap extends MapScreen implements IMap {
 	
 	@Override
 	public boolean mouseScrolled(double d, double e, double f) {
+		boolean scrolled = super.mouseScrolled(d, e, f);
 		this.changeScale(f > 0 ? -0.25F : 0.25F);
-		return true;
+		return scrolled;
 	}
 
 	@Override

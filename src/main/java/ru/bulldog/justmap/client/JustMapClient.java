@@ -1,7 +1,6 @@
 package ru.bulldog.justmap.client;
 
 import net.fabricmc.api.ClientModInitializer;
-import net.fabricmc.fabric.api.client.keybinding.KeyBindingRegistry;
 import net.fabricmc.fabric.api.event.client.ClientTickCallback;
 
 import ru.bulldog.justmap.JustMap;
@@ -17,11 +16,10 @@ public class JustMapClient implements ClientModInitializer {
 	
 	@Override
 	public void onInitializeClient() {
-		KeyBindingRegistry.INSTANCE.addCategory(JustMap.MODID);
-		
-		KeyHandler.INSTANCE.initKeyBindings();		
+		KeyHandler.initKeyBindings();
+
 		ClientTickCallback.EVENT.register((client) -> {
-			KeyHandler.INSTANCE.update();
+			KeyHandler.update();
 			MAP.update();
 
 			boolean paused = this.paused;
