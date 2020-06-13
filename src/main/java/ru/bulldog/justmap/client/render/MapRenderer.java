@@ -236,7 +236,8 @@ public class MapRenderer {
 		RenderSystem.disableDepthTest();
 		
 		if (ClientParams.useSkins) {
-			mapSkin.draw(posX, posY, mapW + border * 2);
+			int brd = border * 2;
+			mapSkin.draw(posX, posY, mapW + brd, mapH + brd);
 		}
 		
 		if (this.minimap.posChanged) {

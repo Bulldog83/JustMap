@@ -212,6 +212,51 @@ public class DrawHelper extends DrawableHelper {
 		tessellator.draw();
 	}
 	
+	public static void drawBorderedSprite(MatrixStack matrix, Sprite sprite, double x, double y, float w, float h, int border) {
+		RenderSystem.enableBlend();
+		RenderSystem.enableAlphaTest();		
+		RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+		
+		builder.begin(GL11.GL_QUADS, VF_POS_TEX_NORMAL);
+		
+		VertexConsumer vertexConsumer = sprite.getTextureSpecificVertexConsumer(builder);
+		
+		int spriteW = sprite.getWidth();
+		int spriteH = sprite.getHeight();
+		
+		float sMinU = sprite.getMinU();
+		float sMaxU = sprite.getMaxU();
+		float sMinV = sprite.getMinV();
+		float sMaxV = sprite.getMaxV();
+		
+		float hSide = w - border * 2;
+		float vSide = h - border * 2;
+		
+		double leftC = x + border;
+		double right = x + w;
+		double rightC = right - border;
+		double topC = y + border;
+		double bottom = y + h;
+		double bottomC = bottom - border;
+		
+		float leftU = (float) border / spriteW;
+		float rightU = (float) (spriteW - border) / spriteW;
+		float topV = (float) border / spriteH;
+		float bottomV = (float) (spriteH - border) / spriteH;
+		
+		draw(matrix, vertexConsumer, x, y, border, border, sMinU, sMinV, leftU, topV);
+		draw(matrix, vertexConsumer, leftC, y, hSide, border, leftU, sMinV, rightU, topV);
+		draw(matrix, vertexConsumer, rightC, y, border, border, rightU, sMinV, sMaxU, topV);
+		draw(matrix, vertexConsumer, x, topC, border, vSide, sMinU, topV, leftU, bottomV);
+		draw(matrix, vertexConsumer, rightC, topC, border, vSide, rightU, topV, sMaxU, bottomV);
+		draw(matrix, vertexConsumer, x, bottomC, border, border, sMinU, bottomV, leftU, sMaxV);
+		draw(matrix, vertexConsumer, leftC, bottomC, hSide, border, leftU, bottomV, rightU, sMaxV);
+		draw(matrix, vertexConsumer, rightC, bottomC, border, border, rightU, bottomV, sMaxU, sMaxV);
+		draw(matrix, vertexConsumer, leftC, topC, hSide, vSide, leftU, topV, rightU, bottomV);
+		
+		tessellator.draw();
+	}
+	
 	public static void drawSprite(MatrixStack matrix, Sprite sprite, double x, double y, float w, float h) {
 		RenderSystem.enableBlend();
 		RenderSystem.enableAlphaTest();		

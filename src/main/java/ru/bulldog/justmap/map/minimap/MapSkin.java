@@ -19,6 +19,7 @@ import net.minecraft.client.texture.NativeImageBackedTexture;
 import net.minecraft.client.texture.Sprite;
 import net.minecraft.client.texture.SpriteAtlasTexture;
 import net.minecraft.client.texture.TextureManager;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
 
 @Environment(EnvType.CLIENT)
@@ -82,12 +83,16 @@ public class MapSkin extends Sprite {
 	}
 	
 	public void draw(int x, int y, int w, int h) {
-		if (this.resizable) {
+		if (name.equals("Minecraft Map")) {
 			textureManager.bindTexture(this.getTexture());
+			DrawHelper.blit(x, y, 0, w, h, this);
+		} else if (resizable) {
+			textureManager.bindTexture(this.getTexture());
+			DrawHelper.drawBorderedSprite(new MatrixStack(), this, x, y, w, h, this.border);
 		} else {
-			bindPavedTexture(w, h);
+			this.bindPavedTexture(w, h);
+			DrawHelper.blit(x, y, 0, w, h, this);
 		}
-		DrawHelper.blit(x, y, 0, w, h, this);
 	}
 	
 	public void draw(int x, int y, int size) {
