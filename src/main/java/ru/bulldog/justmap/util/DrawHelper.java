@@ -17,6 +17,7 @@ import net.minecraft.client.util.math.Matrix3f;
 import net.minecraft.client.util.math.Matrix4f;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.client.util.math.Rotation3;
+import ru.bulldog.justmap.map.minimap.MapSkin;
 
 import org.lwjgl.opengl.GL11;
 
@@ -35,6 +36,8 @@ public class DrawHelper extends DrawableHelper {
 	private final static Tessellator tessellator = Tessellator.getInstance();
 	private final static BufferBuilder builder = tessellator.getBuffer();
 	private final static TextRenderer textRenderer = MinecraftClient.getInstance().textRenderer;
+	
+	private static MinecraftClient client = MinecraftClient.getInstance();
 
 	public void fillNoDepth(int x, int y, int right, int left, int color) {
 		RenderSystem.disableDepthTest();
@@ -212,47 +215,61 @@ public class DrawHelper extends DrawableHelper {
 		tessellator.draw();
 	}
 	
-	public static void drawBorderedSprite(MatrixStack matrix, Sprite sprite, double x, double y, float w, float h, int border) {
+	public static void drawSkin(MatrixStack matrix, MapSkin skin, double x, double y, float w, float h) {
+		int spriteW = skin.getWidth();
+		int spriteH = skin.getHeight();
+		
+		float sMinU = skin.getMinU();
+		float sMaxU = skin.getMaxU();
+		float sMinV = skin.getMinV();
+		float sMaxV = skin.getMaxV();
+		
+		float scaledBrd = (float) (skin.border * client.getWindow().getScaleFactor());
+		
+		float hSide = w - scaledBrd * 2;
+		float vSide = h - scaledBrd * 2;
+		
+		double leftC = x + scaledBrd;
+		double right = x + w;
+		double rightC = right - scaledBrd;
+		double topC = y + scaledBrd;
+		double bottom = y + h;
+		double bottomC = bottom - scaledBrd;
+		
+		float leftU = (float) skin.border / spriteW;
+		float rightU = (float) (spriteW - skin.border) / spriteW;
+		float topV = (float) skin.border / spriteH;
+		float bottomV = (float) (spriteH - skin.border) / spriteH;
+		
 		RenderSystem.enableBlend();
 		RenderSystem.enableAlphaTest();		
 		RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
 		
 		builder.begin(GL11.GL_QUADS, VF_POS_TEX_NORMAL);
 		
-		VertexConsumer vertexConsumer = sprite.getTextureSpecificVertexConsumer(builder);
+		VertexConsumer vertexConsumer = skin.getTextureSpecificVertexConsumer(builder);
 		
-		int spriteW = sprite.getWidth();
-		int spriteH = sprite.getHeight();
-		
-		float sMinU = sprite.getMinU();
-		float sMaxU = sprite.getMaxU();
-		float sMinV = sprite.getMinV();
-		float sMaxV = sprite.getMaxV();
-		
-		float hSide = w - border * 2;
-		float vSide = h - border * 2;
-		
-		double leftC = x + border;
-		double right = x + w;
-		double rightC = right - border;
-		double topC = y + border;
-		double bottom = y + h;
-		double bottomC = bottom - border;
-		
-		float leftU = (float) border / spriteW;
-		float rightU = (float) (spriteW - border) / spriteW;
-		float topV = (float) border / spriteH;
-		float bottomV = (float) (spriteH - border) / spriteH;
-		
-		draw(matrix, vertexConsumer, x, y, border, border, sMinU, sMinV, leftU, topV);
-		draw(matrix, vertexConsumer, leftC, y, hSide, border, leftU, sMinV, rightU, topV);
-		draw(matrix, vertexConsumer, rightC, y, border, border, rightU, sMinV, sMaxU, topV);
-		draw(matrix, vertexConsumer, x, topC, border, vSide, sMinU, topV, leftU, bottomV);
-		draw(matrix, vertexConsumer, rightC, topC, border, vSide, rightU, topV, sMaxU, bottomV);
-		draw(matrix, vertexConsumer, x, bottomC, border, border, sMinU, bottomV, leftU, sMaxV);
-		draw(matrix, vertexConsumer, leftC, bottomC, hSide, border, leftU, bottomV, rightU, sMaxV);
-		draw(matrix, vertexConsumer, rightC, bottomC, border, border, rightU, bottomV, sMaxU, sMaxV);
+		draw(matrix, vertexConsumer, x, y, scaledBrd, scaledBrd, sMinU, sMinV, leftU, topV);
+		draw(matrix, vertexConsumer, rightC, y, scaledBrd, scaledBrd, rightU, sMinV, sMaxU, topV);
+		draw(matrix, vertexConsumer, x, topC, scaledBrd, vSide, sMinU, topV, leftU, bottomV);
+		draw(matrix, vertexConsumer, rightC, topC, scaledBrd, vSide, rightU, topV, sMaxU, bottomV);
+		draw(matrix, vertexConsumer, x, bottomC, scaledBrd, scaledBrd, sMinU, bottomV, leftU, sMaxV);
+		draw(matrix, vertexConsumer, rightC, bottomC, scaledBrd, scaledBrd, rightU, bottomV, sMaxU, sMaxV);
 		draw(matrix, vertexConsumer, leftC, topC, hSide, vSide, leftU, topV, rightU, bottomV);
+		
+		if (skin.repeating) {
+			float tail = hSide - vSide;
+			float sw = (spriteW * 10) / 16 - skin.border * 2;
+			float sTail = (spriteW - skin.border * 2) - sw;
+			float tailU = (skin.border + sTail) / spriteW;
+			hSide = vSide;
+			
+			draw(matrix, vertexConsumer, leftC + hSide, y, tail, scaledBrd, leftU, sMinV, tailU, topV);
+			draw(matrix, vertexConsumer, leftC + hSide, bottomC, tail, scaledBrd, leftU, bottomV, tailU, sMaxV);
+		}
+		
+		draw(matrix, vertexConsumer, leftC, y, hSide, scaledBrd, leftU, sMinV, rightU, topV);
+		draw(matrix, vertexConsumer, leftC, bottomC, hSide, scaledBrd, leftU, bottomV, rightU, sMaxV);
 		
 		tessellator.draw();
 	}

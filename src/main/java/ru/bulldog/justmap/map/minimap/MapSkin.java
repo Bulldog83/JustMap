@@ -30,22 +30,32 @@ public class MapSkin extends Sprite {
 	
 	public final int id, border;
 	public final boolean resizable;
+	public final boolean repeating;
 	public final String name;
 	
 	private final static TextureManager textureManager = MinecraftClient.getInstance().getTextureManager();
 	
-	private MapSkin(int id, String name, Identifier texture, int w, int h, int border, boolean resize) {
+	private MapSkin(int id, String name, Identifier texture, int w, int h, int border, boolean resize, boolean repeat) {
 		super(ATLAS, new Sprite.Info(texture, w, h, AnimationResourceMetadata.EMPTY), 0, w, h, 0, 0, ImageUtil.loadImage(texture, w, h));
 	
 		this.id = id;
 		this.border = border;
 		this.resizable = resize;
+		this.repeating = repeat;
 		this.name = name;
 	}
 	
-	public static void addSkin(String name, Identifier texture, int w, int h, int border, boolean resizable) {
+	public static void addSkin(String name, Identifier texture, int w, int h, int border, boolean resizable, boolean repeat) {
 		int id = SKINS.size();
-		SKINS.add(id, new MapSkin(id, name, texture, w, h, border, resizable));
+		SKINS.add(id, new MapSkin(id, name, texture, w, h, border, resizable, repeat));
+	}
+	
+	public static void addSkin(String name, Identifier texture, int w, int h, int border, boolean resizable) {
+		addSkin(name, texture, w, h, border, resizable, false);
+	}
+	
+	public static void addSkin(String name, Identifier texture, int w, int h, int border) {
+		addSkin(name, texture, w, h, border, false, false);
 	}
 	
 	public static MapSkin getSkin(int id) {
@@ -83,12 +93,9 @@ public class MapSkin extends Sprite {
 	}
 	
 	public void draw(int x, int y, int w, int h) {
-		if (name.equals("Minecraft Map")) {
+		if (resizable) {
 			textureManager.bindTexture(this.getTexture());
-			DrawHelper.blit(x, y, 0, w, h, this);
-		} else if (resizable) {
-			textureManager.bindTexture(this.getTexture());
-			DrawHelper.drawBorderedSprite(new MatrixStack(), this, x, y, w, h, this.border);
+			DrawHelper.drawSkin(new MatrixStack(), this, x, y, w, h);
 		} else {
 			this.bindPavedTexture(w, h);
 			DrawHelper.blit(x, y, 0, w, h, this);
@@ -127,64 +134,64 @@ public class MapSkin extends Sprite {
 	}
 	
 	static {
-		addSkin("Minecraft Map", new Identifier("textures/map/map_background.png"), 64, 64, 4, true);
+		addSkin("Minecraft Map", new Identifier("textures/map/map_background.png"), 64, 64, 3, true);
 		addSkin("Minecraft Gui", new Identifier(JustMap.MODID, "textures/skin/mad_def_gui_2.png"), 128, 128, 5, true);
 		addSkin("Minecraft Gui Fancy", new Identifier(JustMap.MODID, "textures/skin/mad_def_gui.png"), 128, 128, 7, true);
 		addSkin("Metal Frame", new Identifier(JustMap.MODID, "textures/skin/frame_simple_metal.png"), 128, 128, 5, true);
-		addSkin("Oak Frame", new Identifier(JustMap.MODID, "textures/skin/map_frame_oak.png"), 64, 64, 10, true);
-		addSkin("Bamboo Frame", new Identifier(JustMap.MODID, "textures/skin/map_frame_bamboo.png"), 64, 64, 10, true);
-		addSkin("Stone", new Identifier("textures/block/stone.png"), 16, 16, 4, false);
-		addSkin("Cobblestone", new Identifier("textures/block/cobblestone.png"), 16, 16, 4, false);
-		addSkin("Mossy Cobblestone", new Identifier("textures/block/mossy_cobblestone.png"), 16, 16, 4, false);
-		addSkin("Andesite", new Identifier("textures/block/andesite.png"), 16, 16, 4, false);
-		addSkin("Diorite", new Identifier("textures/block/diorite.png"), 16, 16, 4, false);
-		addSkin("Granite", new Identifier("textures/block/granite.png"), 16, 16, 4, false);
-		addSkin("Bedrock", new Identifier("textures/block/bedrock.png"), 16, 16, 4, false);
-		addSkin("Bricks", new Identifier("textures/block/bricks.png"), 16, 16, 4, false);
-		addSkin("Dark Prizmarine", new Identifier("textures/block/dark_prismarine.png"), 16, 16, 4, false);
-		addSkin("End Stone", new Identifier("textures/block/end_stone.png"), 16, 16, 4, false);
-		addSkin("Glowstone", new Identifier("textures/block/glowstone.png"), 16, 16, 4, false);
-		addSkin("Netherrack", new Identifier("textures/block/netherrack.png"), 16, 16, 4, false);
-		addSkin("Obsidian", new Identifier("textures/block/obsidian.png"), 16, 16, 4, false);
-		addSkin("Purpur", new Identifier("textures/block/purpur_block.png"), 16, 16, 4, false);
-		addSkin("Quartz", new Identifier("textures/block/quartz_block_side.png"), 16, 16, 4, false);
-		addSkin("Sand", new Identifier("textures/block/sand.png"), 16, 16, 4, false);
-		addSkin("Mushroom Inside", new Identifier("textures/block/mushroom_block_inside.png"), 16, 16, 4, false);
-		addSkin("Brown Mushroom", new Identifier("textures/block/brown_mushroom_block.png"), 16, 16, 4, false);
-		addSkin("Acacia Planks", new Identifier("textures/block/acacia_planks.png"), 16, 16, 4, false);
-		addSkin("Birch Planks", new Identifier("textures/block/birch_planks.png"), 16, 16, 4, false);
-		addSkin("Oak Planks", new Identifier("textures/block/oak_planks.png"), 16, 16, 4, false);
-		addSkin("Dark Oak Planks", new Identifier("textures/block/dark_oak_planks.png"), 16, 16, 4, false);
-		addSkin("Jungle Planks", new Identifier("textures/block/jungle_planks.png"), 16, 16, 4, false);
-		addSkin("Spruce Planks", new Identifier("textures/block/spruce_planks.png"), 16, 16, 4, false);
-		addSkin("Nether Bricks", new Identifier("textures/block/nether_bricks.png"), 16, 16, 4, false);
-		addSkin("Lava", new Identifier("textures/block/lava_still.png"), 16, 128, 4, false);
-		addSkin("Water", new Identifier("textures/block/water_still.png"), 16, 128, 4, false);
-		addSkin("Nether Portal", new Identifier("textures/block/nether_portal.png"), 16, 128, 4, false);
-		addSkin("Blue Ice", new Identifier("textures/block/blue_ice.png"), 16, 16, 4, false);
-		addSkin("Bone Block", new Identifier("textures/block/bone_block_side.png"), 16, 16, 4, false);
-		addSkin("Brain Coral", new Identifier("textures/block/brain_coral_block.png"), 16, 16, 4, false);
-		addSkin("Bubble Coral", new Identifier("textures/block/bubble_coral_block.png"), 16, 16, 4, false);
-		addSkin("Fire Coral", new Identifier("textures/block/fire_coral_block.png"), 16, 16, 4, false);
-		addSkin("Horn Coral", new Identifier("textures/block/horn_coral_block.png"), 16, 16, 4, false);
-		addSkin("Tube Coral", new Identifier("textures/block/tube_coral_block.png"), 16, 16, 4, false);
-		addSkin("Blue Wool", new Identifier("textures/block/blue_wool.png"), 16, 16, 4, false);
-		addSkin("Brown Wool", new Identifier("textures/block/brown_wool.png"), 16, 16, 4, false);
-		addSkin("Cyan Wool", new Identifier("textures/block/cyan_wool.png"), 16, 16, 4, false);
-		addSkin("Green Wool", new Identifier("textures/block/green_wool.png"), 16, 16, 4, false);
-		addSkin("Light Blue Wool", new Identifier("textures/block/light_blue_wool.png"), 16, 16, 4, false);
-		addSkin("Lime Wool", new Identifier("textures/block/lime_wool.png"), 16, 16, 4, false);
-		addSkin("Magenta Wool", new Identifier("textures/block/magenta_wool.png"), 16, 16, 4, false);
-		addSkin("Orange Wool", new Identifier("textures/block/orange_wool.png"), 16, 16, 4, false);
-		addSkin("Pink Wool", new Identifier("textures/block/pink_wool.png"), 16, 16, 4, false);
-		addSkin("Purple Wool", new Identifier("textures/block/purple_wool.png"), 16, 16, 4, false);
-		addSkin("Red Wool", new Identifier("textures/block/red_wool.png"), 16, 16, 4, false);
-		addSkin("White Wool", new Identifier("textures/block/white_wool.png"), 16, 16, 4, false);
-		addSkin("Yellow Wool", new Identifier("textures/block/yellow_wool.png"), 16, 16, 4, false);
-		addSkin("Magma", new Identifier("textures/block/magma.png"), 16, 48, 4, false);
-		addSkin("Mycelium", new Identifier("textures/block/mycelium_top.png"), 16, 16, 4, false);
-		addSkin("Podzol", new Identifier("textures/block/podzol_top.png"), 16, 16, 4, false);
-		addSkin("Nether Wart", new Identifier("textures/block/nether_wart_block.png"), 16, 16, 4, false);
-		addSkin("Sponge", new Identifier("textures/block/sponge.png"), 16, 16, 4, false);
+		addSkin("Oak Frame", new Identifier(JustMap.MODID, "textures/skin/map_frame_oak.png"), 64, 64, 10, true, true);
+		addSkin("Bamboo Frame", new Identifier(JustMap.MODID, "textures/skin/map_frame_bamboo.png"), 64, 64, 9, true, true);
+		addSkin("Stone", new Identifier("textures/block/stone.png"), 16, 16, 4);
+		addSkin("Cobblestone", new Identifier("textures/block/cobblestone.png"), 16, 16, 4);
+		addSkin("Mossy Cobblestone", new Identifier("textures/block/mossy_cobblestone.png"), 16, 16, 4);
+		addSkin("Andesite", new Identifier("textures/block/andesite.png"), 16, 16, 4);
+		addSkin("Diorite", new Identifier("textures/block/diorite.png"), 16, 16, 4);
+		addSkin("Granite", new Identifier("textures/block/granite.png"), 16, 16, 4);
+		addSkin("Bedrock", new Identifier("textures/block/bedrock.png"), 16, 16, 4);
+		addSkin("Bricks", new Identifier("textures/block/bricks.png"), 16, 16, 4);
+		addSkin("Dark Prizmarine", new Identifier("textures/block/dark_prismarine.png"), 16, 16, 4);
+		addSkin("End Stone", new Identifier("textures/block/end_stone.png"), 16, 16, 4);
+		addSkin("Glowstone", new Identifier("textures/block/glowstone.png"), 16, 16, 4);
+		addSkin("Netherrack", new Identifier("textures/block/netherrack.png"), 16, 16, 4);
+		addSkin("Obsidian", new Identifier("textures/block/obsidian.png"), 16, 16, 4);
+		addSkin("Purpur", new Identifier("textures/block/purpur_block.png"), 16, 16, 4);
+		addSkin("Quartz", new Identifier("textures/block/quartz_block_side.png"), 16, 16, 4);
+		addSkin("Sand", new Identifier("textures/block/sand.png"), 16, 16, 4);
+		addSkin("Mushroom Inside", new Identifier("textures/block/mushroom_block_inside.png"), 16, 16, 4);
+		addSkin("Brown Mushroom", new Identifier("textures/block/brown_mushroom_block.png"), 16, 16, 4);
+		addSkin("Acacia Planks", new Identifier("textures/block/acacia_planks.png"), 16, 16, 4);
+		addSkin("Birch Planks", new Identifier("textures/block/birch_planks.png"), 16, 16, 4);
+		addSkin("Oak Planks", new Identifier("textures/block/oak_planks.png"), 16, 16, 4);
+		addSkin("Dark Oak Planks", new Identifier("textures/block/dark_oak_planks.png"), 16, 16, 4);
+		addSkin("Jungle Planks", new Identifier("textures/block/jungle_planks.png"), 16, 16, 4);
+		addSkin("Spruce Planks", new Identifier("textures/block/spruce_planks.png"), 16, 16, 4);
+		addSkin("Nether Bricks", new Identifier("textures/block/nether_bricks.png"), 16, 16, 4);
+		addSkin("Lava", new Identifier("textures/block/lava_still.png"), 16, 128, 4);
+		addSkin("Water", new Identifier("textures/block/water_still.png"), 16, 128, 4);
+		addSkin("Nether Portal", new Identifier("textures/block/nether_portal.png"), 16, 128, 4);
+		addSkin("Blue Ice", new Identifier("textures/block/blue_ice.png"), 16, 16, 4);
+		addSkin("Bone Block", new Identifier("textures/block/bone_block_side.png"), 16, 16, 4);
+		addSkin("Brain Coral", new Identifier("textures/block/brain_coral_block.png"), 16, 16, 4);
+		addSkin("Bubble Coral", new Identifier("textures/block/bubble_coral_block.png"), 16, 16, 4);
+		addSkin("Fire Coral", new Identifier("textures/block/fire_coral_block.png"), 16, 16, 4);
+		addSkin("Horn Coral", new Identifier("textures/block/horn_coral_block.png"), 16, 16, 4);
+		addSkin("Tube Coral", new Identifier("textures/block/tube_coral_block.png"), 16, 16, 4);
+		addSkin("Blue Wool", new Identifier("textures/block/blue_wool.png"), 16, 16, 4);
+		addSkin("Brown Wool", new Identifier("textures/block/brown_wool.png"), 16, 16, 4);
+		addSkin("Cyan Wool", new Identifier("textures/block/cyan_wool.png"), 16, 16, 4);
+		addSkin("Green Wool", new Identifier("textures/block/green_wool.png"), 16, 16, 4);
+		addSkin("Light Blue Wool", new Identifier("textures/block/light_blue_wool.png"), 16, 16, 4);
+		addSkin("Lime Wool", new Identifier("textures/block/lime_wool.png"), 16, 16, 4);
+		addSkin("Magenta Wool", new Identifier("textures/block/magenta_wool.png"), 16, 16, 4);
+		addSkin("Orange Wool", new Identifier("textures/block/orange_wool.png"), 16, 16, 4);
+		addSkin("Pink Wool", new Identifier("textures/block/pink_wool.png"), 16, 16, 4);
+		addSkin("Purple Wool", new Identifier("textures/block/purple_wool.png"), 16, 16, 4);
+		addSkin("Red Wool", new Identifier("textures/block/red_wool.png"), 16, 16, 4);
+		addSkin("White Wool", new Identifier("textures/block/white_wool.png"), 16, 16, 4);
+		addSkin("Yellow Wool", new Identifier("textures/block/yellow_wool.png"), 16, 16, 4);
+		addSkin("Magma", new Identifier("textures/block/magma.png"), 16, 48, 4);
+		addSkin("Mycelium", new Identifier("textures/block/mycelium_top.png"), 16, 16, 4);
+		addSkin("Podzol", new Identifier("textures/block/podzol_top.png"), 16, 16, 4);
+		addSkin("Nether Wart", new Identifier("textures/block/nether_wart_block.png"), 16, 16, 4);
+		addSkin("Sponge", new Identifier("textures/block/sponge.png"), 16, 16, 4);
 	}
 }
