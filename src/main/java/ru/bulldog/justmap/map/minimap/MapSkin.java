@@ -143,12 +143,12 @@ public class MapSkin extends Sprite {
 	
 	public final class RenderData {
 		public double x, y;
-		public float width, height;
 		public double scaleFactor = 1;
-		public float scaledBorder;
-		public float hSide, vSide;
 		public double leftC, rightC;
-		public double topC, bottomC;		
+		public double topC, bottomC;
+		public float width, height;
+		public float scaledBorder;
+		public float hSide, vSide;		
 		public float leftU, rightU;
 		public float topV, bottomV;
 		public float tail, tailU;

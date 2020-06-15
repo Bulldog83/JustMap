@@ -99,8 +99,8 @@ public class Minimap implements IMap{
 			this.rotateMap != needRotate || this.bigMap != bigMap) {
 			
 			if (bigMap) {
-				this.mapWidth = 320;
-				this.mapHeight = 200;
+				this.mapWidth = JustMapClient.CONFIG.getInt("big_map_size");
+				this.mapHeight = (mapWidth * 10) / 16;
 			} else {
 				this.mapWidth = configSize;
 				this.mapHeight = configSize;				
