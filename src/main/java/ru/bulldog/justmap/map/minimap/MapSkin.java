@@ -28,6 +28,8 @@ public class MapSkin extends Sprite {
 	private final static SpriteAtlasTexture ATLAS = new SpriteAtlasTexture(new Identifier(JustMap.MODID, "textures/atlas/map_skins.png"));
 	private final static List<MapSkin> SKINS = new ArrayList<>();
 	
+	private final RenderData renderData;
+	
 	public final int id, border;
 	public final boolean resizable;
 	public final boolean repeating;
@@ -43,6 +45,8 @@ public class MapSkin extends Sprite {
 		this.resizable = resize;
 		this.repeating = repeat;
 		this.name = name;
+		
+		this.renderData = new RenderData();
 	}
 	
 	public static void addSkin(String name, Identifier texture, int w, int h, int border, boolean resizable, boolean repeat) {
@@ -131,6 +135,55 @@ public class MapSkin extends Sprite {
 	
 	public static MapSkin getCurrentSkin() {
 		return getSkin(ClientParams.currentSkin);
+	}
+	
+	public RenderData getRenderData() {
+		return this.renderData;
+	}
+	
+	public final class RenderData {
+		public double x, y;
+		public float width, height;
+		public double scaleFactor = 1; 
+		public float scaledBorder;
+		public float hSide, vSide;
+		public double leftC, rightC;
+		public double topC, bottomC;		
+		public float leftU, rightU;
+		public float topV, bottomV;
+		public float tail, tailU;
+		
+		private RenderData() {}
+		
+		public void calculate(double x, double y, float w, float h, double scale) {
+			int spriteW = MapSkin.this.getWidth();
+			int spriteH = MapSkin.this.getHeight();
+			int border = MapSkin.this.border;
+			
+			float sw = (spriteW * 10) / 16 - border * 2;
+			float sTail = (spriteW - border * 2) - sw;
+			double right = x + w;
+			double bottom = y + h;
+			
+			this.x = x;
+			this.y = y;
+			this.width = w;
+			this.height = h;			
+			this.scaleFactor = scale;
+			this.scaledBorder = (float) (border * scaleFactor);			
+			this.hSide = w - scaledBorder * 2;
+			this.vSide = h - scaledBorder * 2;
+			this.leftC = x + scaledBorder;
+			this.rightC = right - scaledBorder;
+			this.topC = y + scaledBorder;
+			this.bottomC = bottom - scaledBorder;			
+			this.leftU = (float) border / spriteW;
+			this.rightU = (float) (spriteW - border) / spriteW;
+			this.topV = (float) border / spriteH;
+			this.bottomV = (float) (spriteH - border) / spriteH;
+			this.tail = hSide - vSide;
+			this.tailU = (border + sTail) / spriteW;
+		}
 	}
 	
 	static {

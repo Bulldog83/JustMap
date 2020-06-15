@@ -18,6 +18,7 @@ import net.minecraft.client.util.math.Matrix4f;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.client.util.math.Rotation3;
 import ru.bulldog.justmap.map.minimap.MapSkin;
+import ru.bulldog.justmap.map.minimap.MapSkin.RenderData;
 
 import org.lwjgl.opengl.GL11;
 
@@ -216,30 +217,30 @@ public class DrawHelper extends DrawableHelper {
 	}
 	
 	public static void drawSkin(MatrixStack matrix, MapSkin skin, double x, double y, float w, float h) {
-		int spriteW = skin.getWidth();
-		int spriteH = skin.getHeight();
+		RenderData renderData = skin.getRenderData();
 		
+		double scale = client.getWindow().getScaleFactor();
+		if (renderData.x != x || renderData.y != y || renderData.scaleFactor != scale ||
+			renderData.width != w || renderData.height != h) {
+			
+			renderData.calculate(x, y, w, h, scale);
+		}
+
 		float sMinU = skin.getMinU();
 		float sMaxU = skin.getMaxU();
 		float sMinV = skin.getMinV();
 		float sMaxV = skin.getMaxV();
-		
-		float scaledBrd = (float) (skin.border * client.getWindow().getScaleFactor());
-		
-		float hSide = w - scaledBrd * 2;
-		float vSide = h - scaledBrd * 2;
-		
-		double leftC = x + scaledBrd;
-		double right = x + w;
-		double rightC = right - scaledBrd;
-		double topC = y + scaledBrd;
-		double bottom = y + h;
-		double bottomC = bottom - scaledBrd;
-		
-		float leftU = (float) skin.border / spriteW;
-		float rightU = (float) (spriteW - skin.border) / spriteW;
-		float topV = (float) skin.border / spriteH;
-		float bottomV = (float) (spriteH - skin.border) / spriteH;
+		float scaledBrd = renderData.scaledBorder;
+		float hSide = renderData.hSide;
+		float vSide = renderData.vSide;		
+		double leftC = renderData.leftC;
+		double rightC = renderData.rightC;
+		double topC = renderData.topC;
+		double bottomC = renderData.bottomC;		
+		float leftU = renderData.leftU;
+		float rightU = renderData.rightU;
+		float topV = renderData.topV;
+		float bottomV = renderData.bottomV;
 		
 		RenderSystem.enableBlend();
 		RenderSystem.enableAlphaTest();		
@@ -258,10 +259,8 @@ public class DrawHelper extends DrawableHelper {
 		draw(matrix, vertexConsumer, leftC, topC, hSide, vSide, leftU, topV, rightU, bottomV);
 		
 		if (skin.repeating) {
-			float tail = hSide - vSide;
-			float sw = (spriteW * 10) / 16 - skin.border * 2;
-			float sTail = (spriteW - skin.border * 2) - sw;
-			float tailU = (skin.border + sTail) / spriteW;
+			float tail = renderData.tail;
+			float tailU = renderData.tailU;
 			hSide = vSide;
 			
 			draw(matrix, vertexConsumer, leftC + hSide, y, tail, scaledBrd, leftU, sMinV, tailU, topV);

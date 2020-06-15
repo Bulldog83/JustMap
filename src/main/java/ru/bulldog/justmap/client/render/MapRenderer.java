@@ -164,8 +164,8 @@ public class MapRenderer {
 		
 		this.textManager.setPosition(
 			mapX, mapY + (textPos == TextManager.TextPosition.UNDER && minimap.isMapVisible() ?
-				mapH + border + 3 :
-				-(border + 3))
+				mapH + scaledBorder + 3 :
+				-(scaledBorder + 3))
 		);
 		this.textManager.setDirection(textPos);
 		this.textManager.setSpacing(12);
