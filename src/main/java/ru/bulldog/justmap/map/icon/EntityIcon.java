@@ -32,15 +32,15 @@ public class EntityIcon extends MapIcon<EntityIcon> {
 		
 		IconPos pos = new IconPos(mapX + x, mapY + y);
 		
-		if (ClientParams.rotateMap) {
-			this.rotatePos(pos, map.getWidth(), map.getHeight(), mapX, mapY, rotation);
-		}
-		
 		pos.x -= size / 2 + offX;
 		pos.y -= size / 2 + offY;
 		
 		if (pos.x < mapX || pos.x > (mapX + map.getWidth()) - size ||
 			pos.y < mapY || pos.y > (mapY + map.getHeight()) - size) return;
+		
+		if (ClientParams.rotateMap) {
+			this.rotatePos(pos, map.getWidth(), map.getHeight(), mapX, mapY, rotation);
+		}
 		
 		EntityHeadIcon icon = null;
 		if (ClientParams.showEntityHeads) {
@@ -48,9 +48,8 @@ public class EntityIcon extends MapIcon<EntityIcon> {
 				EntityModelRenderer.renderModel(entity, pos.x, pos.y);
 			} else {
 				icon = EntityHeadIcon.getIcon(entity);
-				if (icon != null) {
-					MatrixStack matrix = new MatrixStack();					
-					icon.draw(matrix, pos.x, pos.y, size);
+				if (icon != null) {					
+					icon.draw(matrixStack, pos.x, pos.y, size);
 				} else {
 					DrawHelper.drawOutlineCircle(pos.x, pos.y, size / 3, 0.6, color);
 				}

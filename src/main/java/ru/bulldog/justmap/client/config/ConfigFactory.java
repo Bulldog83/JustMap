@@ -60,6 +60,18 @@ public final class ConfigFactory {
 				.setDefaultValue((int) JustMapClient.CONFIG.getDefault("map_size"))
 				.setSelections(Arrays.asList(32, 64, 96, 128, 160, 192, 224, 256))
 				.build());
+		general.addEntry(entryBuilder.startBooleanToggle(lang("show_big_map"), JustMapClient.CONFIG.getBoolean("show_big_map"))
+				.setSaveConsumer(val -> JustMapClient.CONFIG.setBoolean("show_big_map", val))
+				.setDefaultValue((boolean) JustMapClient.CONFIG.getDefault("show_big_map"))
+				.build());
+		general.addEntry(entryBuilder.startDropdownMenu(lang("big_map_size"), JustMapClient.CONFIG.getInt("big_map_size"), (val) -> {
+					if (val.equals("")) return 0;			
+					return Integer.valueOf(val);
+				})
+				.setSaveConsumer(val -> JustMapClient.CONFIG.setRanged("big_map_size", val))
+				.setDefaultValue((int) JustMapClient.CONFIG.getDefault("big_map_size"))
+				.setSelections(Arrays.asList(256, 272, 288, 304, 320))
+				.build());
 		general.addEntry(entryBuilder.startBooleanToggle(lang("show_in_chat"), JustMapClient.CONFIG.getBoolean("show_in_chat"))
 				.setSaveConsumer(val -> JustMapClient.CONFIG.setBoolean("show_in_chat", val))
 				.setDefaultValue((boolean) JustMapClient.CONFIG.getDefault("show_in_chat"))

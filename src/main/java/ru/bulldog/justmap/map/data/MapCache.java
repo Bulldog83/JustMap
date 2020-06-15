@@ -26,6 +26,7 @@ public class MapCache {
 	private static Layer.Type currentLayer = Layer.Type.SURFACE;
 	private static Identifier currentDimension = DimensionType.OVERWORLD_REGISTRY_KEY.getValue();
 	private static int currentLevel = 0;
+	public static long lastSaved = 0;
 	
 	public static void setCurrentLayer(Layer.Type layer, int y) {
 		currentLevel =  y / layer.value.height;
@@ -94,6 +95,10 @@ public class MapCache {
 		return data;
 	}
 	
+	public static DimensionType getDimension() {
+		return DimensionType.byRawId(currentDimension);
+	}
+	
 	public static void saveData() {
 		MapCache data = get();
 		if (data == null) return;
@@ -103,6 +108,7 @@ public class MapCache {
 				storeChunk(chunk);
 			});
 		});
+		lastSaved = System.currentTimeMillis();
 	}
 	
 	public static void storeChunk(MapChunk chunk) {
@@ -177,25 +183,22 @@ public class MapCache {
 	public MapRegion getRegion(BlockPos blockPos, boolean surfaceOnly) {
 		RegionPos regPos = new RegionPos(blockPos);
 
+		Layer.Type layer = surfaceOnly ? Layer.Type.SURFACE : currentLayer;
+		int level = surfaceOnly ? 0 : currentLevel;
+		
 		MapRegion region;
 		if(regions.containsKey(regPos)) {
 			region = this.regions.get(regPos);
 		} else {
-			region = new MapRegion(blockPos);
+			region = new MapRegion(blockPos, layer, level);
 			this.regions.put(regPos, region);
 		}
+		region.surfaceOnly = surfaceOnly;
 		
 		long time = System.currentTimeMillis();
-		if (region.surfaceOnly != surfaceOnly) {
-			region.surfaceOnly = surfaceOnly;
-			Layer.Type layer = surfaceOnly ? Layer.Type.SURFACE : currentLayer;
-			if (layer != region.getLayer()) {
-				region.swapLayer(layer);
-			} else {
-				region.updateTexture();
-			}
-		} else if (currentLayer != region.getLayer()) {
-			region.swapLayer(currentLayer);
+		if (layer != region.getLayer() ||
+			level != region.getLevel()) {
+			region.swapLayer(layer, level);
 		} else if (time - region.updated > 1000) {
 			region.updateTexture();
 		}

@@ -107,16 +107,16 @@ public class Worldmap extends MapScreen implements IMap {
 	}
 	
 	private void addMapButtons() {
-		children.add(new ButtonWidget(width - 24, 10, 20, 20, new LiteralText("x"), (b) -> onClose()));		
-		children.add(new ButtonWidget(width / 2 - 10, height - paddingBottom - 44, 20, 20, new LiteralText("\u2191"), (b) -> moveMap(Direction.NORTH)));
-		children.add(new ButtonWidget(width / 2 - 10, height - paddingBottom - 22, 20, 20, new LiteralText("\u2193"), (b) -> moveMap(Direction.SOUTH)));
-		children.add(new ButtonWidget(width / 2 - 32, height - paddingBottom - 32, 20, 20, new LiteralText("\u2190"), (b) -> moveMap(Direction.WEST)));
-		children.add(new ButtonWidget(width / 2 + 12, height - paddingBottom - 32, 20, 20, new LiteralText("\u2192"), (b) -> moveMap(Direction.EAST)));		
-		children.add(new ButtonWidget(width - 24, height / 2 - 21, 20, 20, new LiteralText("+"), (b) -> changeScale(-0.25F)));
-		children.add(new ButtonWidget(width - 24, height / 2 + 1, 20, 20, new LiteralText("-"), (b) -> changeScale(+0.25F)));		
-		children.add(new ButtonWidget(width - 24, height - paddingBottom - 22, 20, 20, new LiteralText("\u271C"), (b) -> setCenterByPlayer()));
-		children.add(new ButtonWidget(4, paddingTop + 2, 20, 20, new LiteralText("\u2630"), (b) -> client.openScreen(ConfigFactory.getConfigScreen(this))));
-		children.add(new ButtonWidget(4, height - paddingBottom - 22, 20, 20, new LiteralText("\u2726"), (b) -> client.openScreen(new WaypointsList(this))));
+		this.children.add(new ButtonWidget(width - 24, 10, 20, 20, new LiteralText("x"), (b) -> onClose()));		
+		this.children.add(new ButtonWidget(width / 2 - 10, height - paddingBottom - 44, 20, 20, new LiteralText("\u2191"), (b) -> moveMap(Direction.NORTH)));
+		this.children.add(new ButtonWidget(width / 2 - 10, height - paddingBottom - 22, 20, 20, new LiteralText("\u2193"), (b) -> moveMap(Direction.SOUTH)));
+		this.children.add(new ButtonWidget(width / 2 - 32, height - paddingBottom - 32, 20, 20, new LiteralText("\u2190"), (b) -> moveMap(Direction.WEST)));
+		this.children.add(new ButtonWidget(width / 2 + 12, height - paddingBottom - 32, 20, 20, new LiteralText("\u2192"), (b) -> moveMap(Direction.EAST)));		
+		this.children.add(new ButtonWidget(width - 24, height / 2 - 21, 20, 20, new LiteralText("+"), (b) -> changeScale(-0.25F)));
+		this.children.add(new ButtonWidget(width - 24, height / 2 + 1, 20, 20, new LiteralText("-"), (b) -> changeScale(+0.25F)));		
+		this.children.add(new ButtonWidget(width - 24, height - paddingBottom - 22, 20, 20, new LiteralText("\u271C"), (b) -> setCenterByPlayer()));
+		this.children.add(new ButtonWidget(4, paddingTop + 2, 20, 20, new LiteralText("\u2630"), (b) -> client.openScreen(ConfigFactory.getConfigScreen(this))));
+		this.children.add(new ButtonWidget(4, height - paddingBottom - 22, 20, 20, new LiteralText("\u2726"), (b) -> client.openScreen(new WaypointsList(this))));
 	}
 	
 	@Override
@@ -130,7 +130,7 @@ public class Worldmap extends MapScreen implements IMap {
 		RenderSystem.disableDepthTest();
 		int iconSize = (int) (ClientParams.worldmapIconSize / imageScale);
 		iconSize = iconSize % 2 != 0 ? iconSize + 1 : iconSize;
-		iconSize = MathUtil.clamp(iconSize, 8, 12);
+		iconSize = MathUtil.clamp(iconSize, 6, (int) (ClientParams.worldmapIconSize * 1.2));
 		for (WaypointIcon icon : waypoints) {
 			icon.setPosition(
 				MathUtil.screenPos(icon.waypoint.pos.getX(), startX, endX, width) - shiftW,
@@ -259,30 +259,30 @@ public class Worldmap extends MapScreen implements IMap {
 		switch(i) {
 			case GLFW.GLFW_KEY_W:
 			case GLFW.GLFW_KEY_UP:
-				moveMap(Direction.NORTH);
+				this.moveMap(Direction.NORTH);
 		  		return true;
 		  	case GLFW.GLFW_KEY_S:
 		  	case GLFW.GLFW_KEY_DOWN:
-		  		moveMap(Direction.SOUTH);
+		  		this.moveMap(Direction.SOUTH);
 		  		return true;
 		  	case GLFW.GLFW_KEY_A:
 		  	case GLFW.GLFW_KEY_LEFT:
-		  		moveMap(Direction.WEST);
+		  		this.moveMap(Direction.WEST);
 		  		return true;
 		  	case GLFW.GLFW_KEY_D:
 		  	case GLFW.GLFW_KEY_RIGHT:
-		  		moveMap(Direction.EAST);
+		  		this.moveMap(Direction.EAST);
 		  		return true;
 		  	case GLFW.GLFW_KEY_MINUS:
 		  	case GLFW.GLFW_KEY_KP_SUBTRACT:
-		  		changeScale(0.25F);
+		  		this.changeScale(0.25F);
 		  		return true;
 		  	case GLFW.GLFW_KEY_EQUAL:
 		  	case GLFW.GLFW_KEY_KP_ADD:
-		  		changeScale(-0.25F);
+		  		this.changeScale(-0.25F);
 		  		return true;
 		  	case GLFW.GLFW_KEY_X:
-		  		setCenterByPlayer();
+		  		this.setCenterByPlayer();
 		  		return true;
 		  	case GLFW.GLFW_KEY_M:
 		  		this.onClose();
@@ -363,7 +363,7 @@ public class Worldmap extends MapScreen implements IMap {
 		
 		if (i == 0) {
 			long time = System.currentTimeMillis();
-			if (time - clicked > 500) clicks = 0;
+			if (time - clicked > 300) clicks = 0;
 			
 			if (++clicks == 2) {			
 				JustMapClient.MAP.createWaypoint(dimension, cursorBlockPos(d, e));
@@ -382,8 +382,9 @@ public class Worldmap extends MapScreen implements IMap {
 	
 	@Override
 	public boolean mouseScrolled(double d, double e, double f) {
+		boolean scrolled = super.mouseScrolled(d, e, f);
 		this.changeScale(f > 0 ? -0.25F : 0.25F);
-		return true;
+		return scrolled;
 	}
 
 	@Override

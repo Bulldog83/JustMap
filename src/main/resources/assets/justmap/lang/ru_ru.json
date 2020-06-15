@@ -9,6 +9,7 @@
   "key.justmap.reduce_scale": "Уменьшить масштаб карты",
   "key.justmap.increase_scale": "Увеличить масштаб карты",
   "key.justmap.show_worldmap": "Открыть карту мира",
+  "key.justmap.show_config": "Открыть настройки карты",
 
   "justmap.configuration.category.general": "Основные настройки",
   "justmap.configuration.category.info": "Отображение информации",
@@ -25,6 +26,8 @@
   "justmap.configuration.worldmap_icon_size": "Размер иконки на карте мира",
   "justmap.configuration.simple_arrow": "Прострая стрелка направления",
   "justmap.configuration.map_size": "Размер карты",
+  "justmap.configuration.show_big_map": "Отображать большую карту",
+  "justmap.configuration.big_map_size": "Размер большой карты",
   "justmap.configuration.chunk_level_size": "Высота уровня чанка (блоков)",
   "justmap.configuration.map_scale": "Масштаб карты",
   "justmap.configuration.map_saturation": "Насыщенность карты",

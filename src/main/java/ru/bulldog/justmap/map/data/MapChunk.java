@@ -278,8 +278,8 @@ public class MapChunk {
 	}
 	
 	public int[] getColorData() {
-		ChunkLevel chunkLevel = getChunkLevel();
-		return Arrays.copyOf(chunkLevel.colordata, 256);
+		ChunkLevel chunkLevel = this.getChunkLevel();
+		return chunkLevel.colordata.clone();
 	}
 	
 	public int getBlockColor(int x, int z) {

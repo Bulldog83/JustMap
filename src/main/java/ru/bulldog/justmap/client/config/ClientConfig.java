@@ -31,6 +31,7 @@ public class ClientConfig extends Config{
 		KEEPER.registerEntry("arrow_type", new EnumEntry<DirectionArrow.Type>(ClientParams.arrowIconType, (e) -> ClientParams.arrowIconType = e, () -> ClientParams.arrowIconType));
 		KEEPER.registerEntry("map_offset", new IntegerEntry(ClientParams.positionOffset, (i) -> ClientParams.positionOffset = i, () -> ClientParams.positionOffset));
 		KEEPER.registerEntry("map_size", new IntegerRange(ClientParams.mapSize, (i) -> ClientParams.mapSize = i, () -> ClientParams.mapSize, 16, 256));
+		KEEPER.registerEntry("big_map_size", new IntegerRange(ClientParams.bigMapSize, (i) -> ClientParams.bigMapSize = i, () -> ClientParams.bigMapSize, 256, 320));
 		KEEPER.registerEntry("map_scale", new FloatRange(ClientParams.mapScale, (f) -> ClientParams.mapScale = f, () -> ClientParams.mapScale, 0.25F, 2.0F));
 		KEEPER.registerEntry("map_saturation", new IntegerRange(ClientParams.mapSaturation, (i) -> ClientParams.mapSaturation = i, () -> ClientParams.mapSaturation, -50, 50));
 		KEEPER.registerEntry("map_brightness", new IntegerRange(ClientParams.mapBrightness, (i) -> ClientParams.mapBrightness = i, () -> ClientParams.mapBrightness, -50, 50));
@@ -74,6 +75,7 @@ public class ClientConfig extends Config{
 		KEEPER.registerEntry("show_player_names", new BooleanEntry(ClientParams.showPlayerNames, (b) -> ClientParams.showPlayerNames = b, () -> ClientParams.showPlayerNames));
 		KEEPER.registerEntry("render_entity_model", new BooleanEntry(ClientParams.renderEntityModel, (b) -> ClientParams.renderEntityModel = b, () -> ClientParams.renderEntityModel));
 		KEEPER.registerEntry("show_icons_outline", new BooleanEntry(ClientParams.showIconsOutline, (b) -> ClientParams.showIconsOutline = b, () -> ClientParams.showIconsOutline));
+		KEEPER.registerEntry("show_big_map", new BooleanEntry(ClientParams.showBigMap, (b) -> ClientParams.showBigMap = b, () -> ClientParams.showBigMap));
 		KEEPER.registerEntry("entity_icon_size", new IntegerRange(ClientParams.entityIconSize, (i) -> ClientParams.entityIconSize = i, () -> ClientParams.entityIconSize, 2, 16));
 		KEEPER.registerEntry("entity_model_size", new IntegerRange(ClientParams.entityModelSize, (i) -> ClientParams.entityModelSize = i, () -> ClientParams.entityModelSize, 2, 16));
 		KEEPER.registerEntry("arrow_size", new IntegerRange(ClientParams.arrowIconSize, (i) -> ClientParams.arrowIconSize = i, () -> ClientParams.arrowIconSize, 6, 16));

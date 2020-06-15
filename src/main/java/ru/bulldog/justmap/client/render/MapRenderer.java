@@ -91,18 +91,26 @@ public class MapRenderer {
 	}
 	
 	public void updateParams() {		
+		if (ClientParams.useSkins) {
+			this.mapSkin = MapSkin.getSkin(ClientParams.currentSkin);			
+			this.border = mapSkin.border;
+		}
+		
 		int winW = client.getWindow().getScaledWidth();
 		int winH = client.getWindow().getScaledHeight();
+		double scale = client.getWindow().getScaleFactor();
 		
 		this.offset = ClientParams.positionOffset;
 		this.mapPosition = ClientParams.mapPosition;
+		
+		int scaledBorder = (int) (border * scale);
 		
 		this.mapW = minimap.getWidth();
 		this.mapH = minimap.getHeight();
 		this.posX = offset;
 		this.posY = offset;
-		this.mapX = posX + border;
-		this.mapY = posY + border;
+		this.mapX = posX + scaledBorder;
+		this.mapY = posY + scaledBorder;
 		
 		this.rotation = client.player.headYaw;
 		
@@ -116,8 +124,8 @@ public class MapRenderer {
 				this.posX = mapX - border;
 				break;
 			case TOP_RIGHT:
-				this.mapX = winW - offset - mapW - border;
-				this.posX = mapX - border;
+				this.mapX = winW - offset - mapW - scaledBorder;
+				this.posX = mapX - scaledBorder;
 				break;
 			case MIDDLE_RIGHT:
 				this.mapX = winW - offset - mapW - border;
@@ -157,8 +165,8 @@ public class MapRenderer {
 		
 		this.textManager.setPosition(
 			mapX, mapY + (textPos == TextManager.TextPosition.UNDER && minimap.isMapVisible() ?
-				mapH + border + 3 :
-				-(border + 3))
+				mapH + scaledBorder + 3 :
+				-(scaledBorder + 3))
 		);
 		this.textManager.setDirection(textPos);
 		this.textManager.setSpacing(12);
@@ -199,14 +207,6 @@ public class MapRenderer {
 		this.textManager.add(dirS, pointS.x, pointS.y - 5);
 		this.textManager.add(dirE, pointE.x, pointE.y - 5);
 		this.textManager.add(dirW, pointW.x, pointW.y - 5);
-		
-		if (ClientParams.useSkins) {
-			this.mapSkin = MapSkin.getSkin(ClientParams.currentSkin);
-			
-			this.border = mapSkin.resizable ?
-						  (int) (mapW * ((float)(mapSkin.border) / mapSkin.getWidth())) :
-						  mapSkin.border;
-		}
 	}
 	
 	private void calculatePos(Point center, Point dir, int mr, int mb, double angle) {		
@@ -237,7 +237,8 @@ public class MapRenderer {
 		RenderSystem.disableDepthTest();
 		
 		if (ClientParams.useSkins) {
-			mapSkin.draw(matrix, posX, posY, mapW + border * 2);
+			int brd = (int) ((border * 2) * scale);
+			mapSkin.draw(matrix, posX, posY, mapW + brd, mapH + brd);
 		}
 		
 		if (this.minimap.posChanged) {
@@ -287,6 +288,7 @@ public class MapRenderer {
 				waypoint.draw(matrix, mapX, mapY, offX, offY, rotation);
 			}
 		}
+		GL11.glDisable(GL11.GL_SCISSOR_TEST);
 		
 		int centerX = mapX + mapW / 2;
 		int centerY = mapY + mapH / 2;
@@ -297,9 +299,9 @@ public class MapRenderer {
 		} else {
 			PlayerHeadIcon.getIcon(client.player).draw(centerX, centerY, iconSize, true);
 		}
-
-		GL11.glDisable(GL11.GL_SCISSOR_TEST);		
-		this.textManager.draw(matrix);		
+		
+		this.textManager.draw();
+		
 		RenderSystem.enableDepthTest();
 	}
 	
@@ -322,10 +324,10 @@ public class MapRenderer {
 		float scale = minimap.getScale();
 		
 		int picX = 0, picW = 0;
-		while(picX <= scaledW) {
+		while(picX < scaledW) {
 			int cX = cornerX + picX;
 			int picY = 0, picH = 0;
-			while (picY <= scaledH ) {				
+			while (picY < scaledH ) {				
 				int cZ = cornerZ + picY;
 				
 				MapRegion region = mapData.getRegion(new BlockPos(cX, 0, cZ));

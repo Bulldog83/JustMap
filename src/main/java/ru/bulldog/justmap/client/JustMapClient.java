@@ -1,7 +1,6 @@
 package ru.bulldog.justmap.client;
 
 import net.fabricmc.api.ClientModInitializer;
-import net.fabricmc.fabric.api.client.keybinding.KeyBindingRegistry;
 import net.fabricmc.fabric.api.event.client.ClientTickCallback;
 
 import ru.bulldog.justmap.JustMap;
@@ -17,18 +16,21 @@ public class JustMapClient implements ClientModInitializer {
 	
 	@Override
 	public void onInitializeClient() {
-		KeyBindingRegistry.INSTANCE.addCategory(JustMap.MODID);
-		
-		KeyHandler.INSTANCE.initKeyBindings();		
+		KeyHandler.initKeyBindings();
+
 		ClientTickCallback.EVENT.register((client) -> {
-			KeyHandler.INSTANCE.update();
+			KeyHandler.update();
 			MAP.update();
-			
+
 			boolean paused = this.paused;
+			boolean online = !client.isIntegratedServerRunning() && client.currentScreen == null;
 			this.paused = client.isPaused() || client.overlay != null && client.overlay.pausesGame() ||
 					client.currentScreen != null && client.currentScreen.isPauseScreen();
+			long time = System.currentTimeMillis();
 			if (!paused && this.paused) {
 				JustMap.LOGGER.logInfo("Saving chunks data...");
+				MapCache.saveData();
+			} else if (online && time - MapCache.lastSaved > 60000) {
 				MapCache.saveData();
 			}
 		});

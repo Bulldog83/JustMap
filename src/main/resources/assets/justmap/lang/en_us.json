@@ -9,6 +9,7 @@
   "key.justmap.reduce_scale": "Reduce map scale",
   "key.justmap.increase_scale": "Increase map scale",
   "key.justmap.show_worldmap": "Show Worldmap",
+  "key.justmap.show_config": "Show map config",
 
   "justmap.configuration.category.general": "General",
   "justmap.configuration.category.info": "Map Info",
@@ -25,6 +26,8 @@
   "justmap.configuration.worldmap_icon_size": "Worldmap Icon Size",
   "justmap.configuration.simple_arrow": "Simple Direction Arrow",
   "justmap.configuration.map_size": "Map Size",
+  "justmap.configuration.show_big_map": "Show Big Map",
+  "justmap.configuration.big_map_size": "Big Map Size",
   "justmap.configuration.chunk_level_size": "Chunk Level Size (blocks)",
   "justmap.configuration.map_scale": "Map Scale",
   "justmap.configuration.map_saturation": "Map Saturation",

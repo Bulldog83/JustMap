@@ -25,7 +25,9 @@ public class MapRegion {
 	
 	private final RegionPos pos;
 	private final MapTexture image;
+	
 	private Layer.Type layer;
+	private int level;
 
 	private boolean hideWater = false;
 	private boolean waterTint = true;
@@ -37,10 +39,12 @@ public class MapRegion {
 	
 	public long updated = 0;
 	
-	public MapRegion(BlockPos blockPos) {
+	public MapRegion(BlockPos blockPos, Layer.Type layer, int level) {
 		this.pos = new RegionPos(blockPos);
 		this.image = new MapTexture(512, 512);
 		this.image.fill(Colors.BLACK);
+		this.layer = layer;
+		this.level = level;
 		this.loadImage();
 		this.updateTexture();
 	}
@@ -92,22 +96,19 @@ public class MapRegion {
 					if (MapCache.currentLayer() == Layer.Type.SURFACE) {
 						mapChunk.update(needUpdate);
 						if (mapChunk.saveNeeded()) {
-							this.saveChunk(mapChunk);
 							this.changed = true;
 						}
 					}
 				} else {
 					mapChunk = mapData.getCurrentChunk(chunkX, chunkZ).update(needUpdate);
 					if (mapChunk.saveNeeded()) {
-						this.saveChunk(mapChunk);
 						this.changed = true;
 					}
-				}				
+				}
 				this.image.writeChunkData(x, y, mapChunk.getColorData());
 			}
-		}
+		}		
 		if (changed) this.saveImage();
-		
 		this.updated = System.currentTimeMillis();
 		this.needUpdate = false;
 		this.updating = false;
@@ -117,15 +118,15 @@ public class MapRegion {
 		return this.layer != null ? this.layer : null;
 	}
 	
-	public void swapLayer(Layer.Type layer) {
-		this.layer = layer;
-		this.loadImage();
-		this.updateTexture();
+	public int getLevel() {
+		return this.level;
 	}
 	
-	private void saveChunk(MapChunk mapChunk) {
-		if (mapChunk.saving) return;
-		JustMap.WORKER.execute(() -> MapCache.storeChunk(mapChunk));
+	public void swapLayer(Layer.Type layer, int level) {
+		this.layer = layer;
+		this.level = level;
+		this.loadImage();
+		this.updateTexture();
 	}
 	
 	private void saveImage() {
@@ -141,11 +142,9 @@ public class MapRegion {
 	
 	private File imageFile() {
 		File dir = StorageUtil.cacheDir();
-		if (surfaceOnly) {
-			dir = new File(dir, "surface/0/");
+		if (surfaceOnly || Layer.Type.SURFACE == layer) {
+			dir = new File(dir, "surface/");
 		} else {
-			Layer.Type layer = MapCache.currentLayer();
-			int level = MapCache.currentLevel();
 			dir = new File(dir, String.format("%s/%d/", layer.value.name, level));
 		}
 		
