@@ -300,7 +300,7 @@ public class MapRenderer {
 			PlayerHeadIcon.getIcon(client.player).draw(centerX, centerY, iconSize, true);
 		}
 		
-		this.textManager.draw();
+		this.textManager.draw(matrix);
 		
 		RenderSystem.enableDepthTest();
 	}

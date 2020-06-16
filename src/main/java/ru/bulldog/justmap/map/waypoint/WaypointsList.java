@@ -5,6 +5,7 @@ import com.mojang.datafixers.util.Pair;
 import ru.bulldog.justmap.client.MapScreen;
 import ru.bulldog.justmap.map.waypoint.Waypoint.Icon;
 import ru.bulldog.justmap.util.Colors;
+import ru.bulldog.justmap.util.Dimension;
 import ru.bulldog.justmap.util.DrawHelper;
 import ru.bulldog.justmap.util.math.MathUtil;
 import ru.bulldog.justmap.util.math.RandomUtil;
@@ -265,7 +266,7 @@ public class WaypointsList extends MapScreen {
 	
 	public void teleport(Waypoint waypoint) {
 		if (!client.world.getDimensionRegistryKey().getValue().equals(currentDim)) return;
-		int y = waypoint.pos.getY() > 0 ? waypoint.pos.getY() : (this.client.world.getDimension().isNether() ? 128 : 64);
+		int y = waypoint.pos.getY() > 0 ? waypoint.pos.getY() : (Dimension.isNether(client.world.getDimensionRegistryKey()) ? 128 : 64);
 		this.client.player.sendChatMessage("/tp " + this.client.player.getName().asString() + " " + waypoint.pos.getX() + " " + y + " " + waypoint.pos.getZ());
 		this.onClose();
 	}

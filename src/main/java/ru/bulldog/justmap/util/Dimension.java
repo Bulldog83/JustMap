@@ -6,9 +6,9 @@ import net.minecraft.world.dimension.DimensionType;
 
 public class Dimension {
 	public static int getId(RegistryKey<DimensionType> dimType) {
-		if (dimType.equals(DimensionType.THE_NETHER_REGISTRY_KEY)) return -1;
-		if (dimType.equals(DimensionType.OVERWORLD_REGISTRY_KEY)) return 0;
-		if (dimType.equals(DimensionType.THE_END_REGISTRY_KEY)) return 1;
+		if (isNether(dimType)) return -1;
+		if (isOvervorld(dimType)) return 0;
+		if (isEnd(dimType)) return 1;
 		
 		return Integer.MIN_VALUE;
 	}
@@ -21,5 +21,17 @@ public class Dimension {
 		}
 		
 		return new Identifier("unknown");
+	}
+	
+	public static boolean isEnd(RegistryKey<DimensionType> dimType) {
+		return dimType.equals(DimensionType.THE_END_REGISTRY_KEY);
+	}
+
+	public static boolean isNether(RegistryKey<DimensionType> dimType) {
+		return dimType.equals(DimensionType.THE_NETHER_REGISTRY_KEY);
+	}
+	
+	public static boolean isOvervorld(RegistryKey<DimensionType> dimType) {
+		return dimType.equals(DimensionType.OVERWORLD_REGISTRY_KEY);
 	}
 }

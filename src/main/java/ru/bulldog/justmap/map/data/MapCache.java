@@ -95,10 +95,6 @@ public class MapCache {
 		return data;
 	}
 	
-	public static DimensionType getDimension() {
-		return DimensionType.byRawId(currentDimension);
-	}
-	
 	public static void saveData() {
 		MapCache data = get();
 		if (data == null) return;

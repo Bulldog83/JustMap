@@ -1,13 +1,14 @@
 package ru.bulldog.justmap.client;
 
-import net.fabricmc.fabric.api.client.keybinding.FabricKeyBinding;
+
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.options.KeyBinding;
 
 public abstract class KeyParser {
-	public final FabricKeyBinding keyBinding;
+	public final KeyBinding keyBinding;
 	public static final MinecraftClient MC = MinecraftClient.getInstance();
 	
-	protected KeyParser(FabricKeyBinding keyBinding) {
+	protected KeyParser(KeyBinding keyBinding) {
 		this.keyBinding = keyBinding;
 	}
 	

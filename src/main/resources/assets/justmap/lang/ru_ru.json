@@ -10,6 +10,7 @@
   "key.justmap.increase_scale": "Увеличить масштаб карты",
   "key.justmap.show_worldmap": "Открыть карту мира",
   "key.justmap.show_config": "Открыть настройки карты",
+  "key.justmap.toggle_big_map": "Переключиться на большую карту",
 
   "justmap.configuration.category.general": "Основные настройки",
   "justmap.configuration.category.info": "Отображение информации",

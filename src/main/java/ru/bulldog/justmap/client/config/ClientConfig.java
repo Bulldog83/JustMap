@@ -31,7 +31,7 @@ public class ClientConfig extends Config{
 		KEEPER.registerEntry("arrow_type", new EnumEntry<DirectionArrow.Type>(ClientParams.arrowIconType, (e) -> ClientParams.arrowIconType = e, () -> ClientParams.arrowIconType));
 		KEEPER.registerEntry("map_offset", new IntegerEntry(ClientParams.positionOffset, (i) -> ClientParams.positionOffset = i, () -> ClientParams.positionOffset));
 		KEEPER.registerEntry("map_size", new IntegerRange(ClientParams.mapSize, (i) -> ClientParams.mapSize = i, () -> ClientParams.mapSize, 16, 256));
-		KEEPER.registerEntry("big_map_size", new IntegerRange(ClientParams.bigMapSize, (i) -> ClientParams.bigMapSize = i, () -> ClientParams.bigMapSize, 256, 320));
+		KEEPER.registerEntry("big_map_size", new IntegerRange(ClientParams.bigMapSize, (i) -> ClientParams.bigMapSize = i, () -> ClientParams.bigMapSize, 256, 400));
 		KEEPER.registerEntry("map_scale", new FloatRange(ClientParams.mapScale, (f) -> ClientParams.mapScale = f, () -> ClientParams.mapScale, 0.25F, 2.0F));
 		KEEPER.registerEntry("map_saturation", new IntegerRange(ClientParams.mapSaturation, (i) -> ClientParams.mapSaturation = i, () -> ClientParams.mapSaturation, -50, 50));
 		KEEPER.registerEntry("map_brightness", new IntegerRange(ClientParams.mapBrightness, (i) -> ClientParams.mapBrightness = i, () -> ClientParams.mapBrightness, -50, 50));

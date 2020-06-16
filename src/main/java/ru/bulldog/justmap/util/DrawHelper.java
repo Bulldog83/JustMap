@@ -15,6 +15,8 @@ import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.texture.Sprite;
 import net.minecraft.util.math.Matrix3f;
 import net.minecraft.util.math.Matrix4f;
+import ru.bulldog.justmap.map.minimap.MapSkin;
+import ru.bulldog.justmap.map.minimap.MapSkin.RenderData;
 import net.minecraft.client.util.math.AffineTransformation;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
@@ -35,7 +37,8 @@ public class DrawHelper extends DrawableHelper {
 	private final static VertexFormat VF_POS_TEX_NORMAL = new VertexFormat(ImmutableList.of(VertexFormats.POSITION_ELEMENT, VertexFormats.TEXTURE_ELEMENT, VertexFormats.NORMAL_ELEMENT, VertexFormats.PADDING_ELEMENT));
 	private final static Tessellator tessellator = Tessellator.getInstance();
 	private final static BufferBuilder builder = tessellator.getBuffer();
-	private final static TextRenderer textRenderer = MinecraftClient.getInstance().textRenderer;
+	private final static MinecraftClient client = MinecraftClient.getInstance();
+	private final static TextRenderer textRenderer = client.textRenderer;
 
 	public static int getWidth(Text text) {
 		return textRenderer.getWidth(text);
@@ -234,6 +237,63 @@ public class DrawHelper extends DrawableHelper {
 		
 		builder.begin(GL11.GL_QUADS, VF_POS_TEX_NORMAL);
 		draw(matrix, builder, x, y, w, h, minU, minV, maxU, maxV);
+		tessellator.draw();
+	}
+	
+	public static void drawSkin(MatrixStack matrix, MapSkin skin, double x, double y, float w, float h) {
+		RenderData renderData = skin.getRenderData();
+		
+		double scale = client.getWindow().getScaleFactor();
+		if (renderData.x != x || renderData.y != y || renderData.scaleFactor != scale ||
+			renderData.width != w || renderData.height != h) {
+			
+			renderData.calculate(x, y, w, h, scale);
+		}
+
+		float sMinU = skin.getMinU();
+		float sMaxU = skin.getMaxU();
+		float sMinV = skin.getMinV();
+		float sMaxV = skin.getMaxV();
+		float scaledBrd = renderData.scaledBorder;
+		float hSide = renderData.hSide;
+		float vSide = renderData.vSide;		
+		double leftC = renderData.leftC;
+		double rightC = renderData.rightC;
+		double topC = renderData.topC;
+		double bottomC = renderData.bottomC;		
+		float leftU = renderData.leftU;
+		float rightU = renderData.rightU;
+		float topV = renderData.topV;
+		float bottomV = renderData.bottomV;
+		
+		RenderSystem.enableBlend();
+		RenderSystem.enableAlphaTest();		
+		RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+		
+		builder.begin(GL11.GL_QUADS, VF_POS_TEX_NORMAL);
+		
+		VertexConsumer vertexConsumer = skin.getTextureSpecificVertexConsumer(builder);
+		
+		draw(matrix, vertexConsumer, x, y, scaledBrd, scaledBrd, sMinU, sMinV, leftU, topV);
+		draw(matrix, vertexConsumer, rightC, y, scaledBrd, scaledBrd, rightU, sMinV, sMaxU, topV);
+		draw(matrix, vertexConsumer, x, topC, scaledBrd, vSide, sMinU, topV, leftU, bottomV);
+		draw(matrix, vertexConsumer, rightC, topC, scaledBrd, vSide, rightU, topV, sMaxU, bottomV);
+		draw(matrix, vertexConsumer, x, bottomC, scaledBrd, scaledBrd, sMinU, bottomV, leftU, sMaxV);
+		draw(matrix, vertexConsumer, rightC, bottomC, scaledBrd, scaledBrd, rightU, bottomV, sMaxU, sMaxV);
+		draw(matrix, vertexConsumer, leftC, topC, hSide, vSide, leftU, topV, rightU, bottomV);
+		
+		if (skin.repeating) {
+			float tail = renderData.tail;
+			float tailU = renderData.tailU;
+			hSide = vSide;
+			
+			draw(matrix, vertexConsumer, leftC + hSide, y, tail, scaledBrd, leftU, sMinV, tailU, topV);
+			draw(matrix, vertexConsumer, leftC + hSide, bottomC, tail, scaledBrd, leftU, bottomV, tailU, sMaxV);
+		}
+		
+		draw(matrix, vertexConsumer, leftC, y, hSide, scaledBrd, leftU, sMinV, rightU, topV);
+		draw(matrix, vertexConsumer, leftC, bottomC, hSide, scaledBrd, leftU, bottomV, rightU, sMaxV);
+		
 		tessellator.draw();
 	}
 	
