@@ -68,7 +68,7 @@ public final class ConfigFactory {
 				})
 				.setSaveConsumer(val -> JustMapClient.CONFIG.setRanged("big_map_size", val))
 				.setDefaultValue((int) JustMapClient.CONFIG.getDefault("big_map_size"))
-				.setSelections(Arrays.asList(256, 272, 288, 304, 320))
+				.setSelections(Arrays.asList(256, 272, 288, 304, 320, 336, 352, 368, 384, 400))
 				.build());
 		general.addEntry(entryBuilder.startBooleanToggle(lang("show_in_chat"), JustMapClient.CONFIG.getBoolean("show_in_chat"))
 				.setSaveConsumer(val -> JustMapClient.CONFIG.setBoolean("show_in_chat", val))
