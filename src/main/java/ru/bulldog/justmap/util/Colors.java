@@ -21,4 +21,5 @@ public final class Colors {
 	public static final int GRAY = 0xFF676676;
 	
 	public static final int LIGHT = 15728880;
+	public static final int TRANSPARENT = 0x00000000;
 }
