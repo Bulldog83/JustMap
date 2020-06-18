@@ -26,7 +26,7 @@ public abstract class ClientPlayNetworkHandlerMixin {
 	public void onChatMessage(ChatMessageS2CPacket chatMessageS2CPacket, CallbackInfo ci) {
 		if (chatMessageS2CPacket.getLocation() == MessageType.SYSTEM) {
 			String pref = "§0§0", suff = "§f§f";
-			String message = chatMessageS2CPacket.getMessage().getString();
+			String message = chatMessageS2CPacket.getMessage().getString().replaceAll("[&\\$]", "§");
 			
 			if (message.contains(pref) && message.contains(suff)) {
 				int start = message.indexOf(pref) + 4;
