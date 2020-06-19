@@ -93,41 +93,41 @@ public class EntityHeadIcon extends AbstractIcon {
 		
 		boolean solidBorder = true;
 		for (int i = 0; i < width; i++) {
-			int alpha = (icon.getPixelRgba(i, 0) >> 24) & 255;
+			int alpha = (icon.getPixelColor(i, 0) >> 24) & 255;
 			solidBorder = alpha > 0;
 			if (!solidBorder) break;
 			
-			alpha = (icon.getPixelRgba(i, height - 1) >> 24) & 255;
+			alpha = (icon.getPixelColor(i, height - 1) >> 24) & 255;
 			solidBorder = alpha > 0;
 			if (!solidBorder) break;
 		}		
 		if (solidBorder) {
 			for (int i = 0; i < height; i++) {
-				int alpha = (icon.getPixelRgba(0, i) >> 24) & 255;
+				int alpha = (icon.getPixelColor(0, i) >> 24) & 255;
 				solidBorder = alpha > 0;
 				if (!solidBorder) break;
 				
-				alpha = (icon.getPixelRgba(width - 1, i) >> 24) & 255;
+				alpha = (icon.getPixelColor(width - 1, i) >> 24) & 255;
 				solidBorder = alpha > 0;
 				if (!solidBorder) break;
 			}
 		}
 		if (solidBorder) {
 			for (int i = 0; i < outWidth; i++) {
-				outline.setPixelRgba(i, 0, outlineColor);
-				outline.setPixelRgba(i, 1, outlineColor);
-				outline.setPixelRgba(i, 2, outlineColor);
-				outline.setPixelRgba(i, outHeight - 3, outlineColor);
-				outline.setPixelRgba(i, outHeight - 2, outlineColor);
-				outline.setPixelRgba(i, outHeight - 1, outlineColor);
+				outline.setPixelColor(i, 0, outlineColor);
+				outline.setPixelColor(i, 1, outlineColor);
+				outline.setPixelColor(i, 2, outlineColor);
+				outline.setPixelColor(i, outHeight - 3, outlineColor);
+				outline.setPixelColor(i, outHeight - 2, outlineColor);
+				outline.setPixelColor(i, outHeight - 1, outlineColor);
 			}
 			for (int i = 0; i < outHeight; i++) {
-				outline.setPixelRgba(0, i, outlineColor);
-				outline.setPixelRgba(1, i, outlineColor);
-				outline.setPixelRgba(2, i, outlineColor);
-				outline.setPixelRgba(outWidth - 3, i, outlineColor);
-				outline.setPixelRgba(outWidth - 2, i, outlineColor);
-				outline.setPixelRgba(outWidth - 1, i, outlineColor);
+				outline.setPixelColor(0, i, outlineColor);
+				outline.setPixelColor(1, i, outlineColor);
+				outline.setPixelColor(2, i, outlineColor);
+				outline.setPixelColor(outWidth - 3, i, outlineColor);
+				outline.setPixelColor(outWidth - 2, i, outlineColor);
+				outline.setPixelColor(outWidth - 1, i, outlineColor);
 			}
 		} else {		
 			List<IconPos> outlinePixels = new ArrayList<>();
@@ -135,13 +135,13 @@ public class EntityHeadIcon extends AbstractIcon {
 				int left = x - 1;
 				int right = x + 1;
 				for (int y = 0; y < height; y++) {
-					int alpha = (icon.getPixelRgba(x, y) >> 24) & 255;
+					int alpha = (icon.getPixelColor(x, y) >> 24) & 255;
 					if (alpha == 0) continue;
 					
 					int top = y - 1;
 					int bottom = y + 1;					
 					if (top >= 0) {
-						alpha = (icon.getPixelRgba(x, top) >> 24) & 255;
+						alpha = (icon.getPixelColor(x, top) >> 24) & 255;
 						if (alpha == 0) {
 							IconPos pixel = new IconPos(x + 2, y);
 							if (!outlinePixels.contains(pixel)) {
@@ -151,7 +151,7 @@ public class EntityHeadIcon extends AbstractIcon {
 							}
 						}
 						if (left >= 0) {
-							alpha = (icon.getPixelRgba(left, top) >> 24) & 255;
+							alpha = (icon.getPixelColor(left, top) >> 24) & 255;
 							if (alpha == 0) {
 								IconPos pixel = new IconPos(x, y);
 								if (!outlinePixels.contains(pixel)) {
@@ -163,7 +163,7 @@ public class EntityHeadIcon extends AbstractIcon {
 							}
 						}
 						if (right < width) {
-							alpha = (icon.getPixelRgba(right, top) >> 24) & 255;
+							alpha = (icon.getPixelColor(right, top) >> 24) & 255;
 							if (alpha == 0) {
 								IconPos pixel = new IconPos(right + 2, y);
 								if (!outlinePixels.contains(pixel)) {
@@ -183,7 +183,7 @@ public class EntityHeadIcon extends AbstractIcon {
 						}
 					}
 					if (bottom < height) {
-						alpha = (icon.getPixelRgba(x, bottom) >> 24) & 255;
+						alpha = (icon.getPixelColor(x, bottom) >> 24) & 255;
 						if (alpha == 0) {
 							IconPos pixel = new IconPos(x + 2, bottom + 1);
 							if (!outlinePixels.contains(pixel)) {
@@ -193,7 +193,7 @@ public class EntityHeadIcon extends AbstractIcon {
 							}
 						}
 						if (left >= 0) {
-							alpha = (icon.getPixelRgba(left, bottom) >> 24) & 255;
+							alpha = (icon.getPixelColor(left, bottom) >> 24) & 255;
 							if (alpha == 0) {
 								IconPos pixel = new IconPos(x, bottom + 2);
 								if (!outlinePixels.contains(pixel)) {
@@ -205,7 +205,7 @@ public class EntityHeadIcon extends AbstractIcon {
 							}
 						}
 						if (right < width) {
-							alpha = (icon.getPixelRgba(right, bottom) >> 24) & 255;
+							alpha = (icon.getPixelColor(right, bottom) >> 24) & 255;
 							if (alpha == 0) {
 								IconPos pixel = new IconPos(right + 2, bottom + 2);
 								if (!outlinePixels.contains(pixel)) {
@@ -225,7 +225,7 @@ public class EntityHeadIcon extends AbstractIcon {
 						}
 					}
 					if (left >= 0) {
-						alpha = (icon.getPixelRgba(left, y) >> 24) & 255;
+						alpha = (icon.getPixelColor(left, y) >> 24) & 255;
 						if (alpha == 0) {
 							IconPos pixel = new IconPos(x, y + 2);
 							if (!outlinePixels.contains(pixel)) {
@@ -243,7 +243,7 @@ public class EntityHeadIcon extends AbstractIcon {
 						}
 					}
 					if (right < width) {
-						alpha = (icon.getPixelRgba(right, y) >> 24) & 255;
+						alpha = (icon.getPixelColor(right, y) >> 24) & 255;
 						if (alpha == 0) {
 							IconPos pixel = new IconPos(right + 1, y + 2);
 							if (!outlinePixels.contains(pixel)) {
@@ -263,7 +263,7 @@ public class EntityHeadIcon extends AbstractIcon {
 				}
 			}
 			outlinePixels.forEach(pixel -> {
-				outline.setPixelRgba((int) pixel.x, (int) pixel.y, outlineColor);
+				outline.setPixelColor((int) pixel.x, (int) pixel.y, outlineColor);
 			});
 		}
 		

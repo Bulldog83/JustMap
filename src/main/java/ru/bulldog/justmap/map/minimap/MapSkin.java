@@ -98,7 +98,7 @@ public class MapSkin extends Sprite {
 		textureManager.bindTexture(id);
 	}
 	
-	public void draw(int x, int y, int w, int h) {
+	public void draw(MatrixStack matrixStack, int x, int y, int w, int h) {
 		if (resizable) {
 			textureManager.bindTexture(this.getTexture());
 			if (w > this.getWidth() || h > this.getHeight()) {

@@ -106,7 +106,6 @@ public class MapRenderer {
 		
 		int winW = client.getWindow().getScaledWidth();
 		int winH = client.getWindow().getScaledHeight();
-		double scale = client.getWindow().getScaleFactor();
 		
 		this.offset = ClientParams.positionOffset;
 		this.mapPosition = ClientParams.mapPosition;

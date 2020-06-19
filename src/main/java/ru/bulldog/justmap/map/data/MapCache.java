@@ -26,7 +26,6 @@ public class MapCache {
 	private static Layer.Type currentLayer = Layer.Type.SURFACE;
 	private static Identifier currentDimension = DimensionType.OVERWORLD_REGISTRY_KEY.getValue();
 	private static int currentLevel = 0;
-	public static long lastSaved = 0;
 	
 	public static long lastSaved = 0;
 	
