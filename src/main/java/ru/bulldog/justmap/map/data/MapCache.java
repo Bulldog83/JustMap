@@ -116,7 +116,7 @@ public class MapCache {
 			chunk.store(chunkData);
 			
 			if (!chunkData.isEmpty()) {
-				chunkData.putInt("version", 2);
+				chunkData.putInt("version", 3);
 				StorageUtil.saveCache(chunk.getPos(), chunkData);
 			}
 			chunk.saving = false;

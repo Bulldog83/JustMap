@@ -252,6 +252,16 @@ public class MapChunk {
 						
 						this.setBlockState(blockPos, worldState);
 						
+						int middle;
+						if (layer == Layer.Type.SURFACE) {
+							middle = this.world.getSeaLevel();
+						} else {
+							int bottom = level * layer.value.height;
+							middle = bottom + layer.value.height / 2;
+						}
+						
+						int topoLevel = posY - middle;						
+						chunkLevel.topomap[index] = topoLevel;
 						chunkLevel.colormap[index] = color;
 						chunkLevel.levelmap[index] = heightDiff;
 						chunkLevel.colordata[index] = ColorUtil.proccessColor(color, heightDiff);

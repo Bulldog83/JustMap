@@ -22,6 +22,7 @@ public class ChunkLevel {
 	int[] colormap;
 	int[] colordata;
 	int[] levelmap;
+	int[] topomap;
 	
 	long updated = 0;
 	long refreshed = 0;
@@ -33,12 +34,14 @@ public class ChunkLevel {
 		this.colormap = new int[256];
 		this.colordata = new int[256];
 		this.levelmap = new int[256];
+		this.topomap = new int[256];
 		
 		this.level = level;
 		
 		Arrays.fill(colormap, -1);
 		Arrays.fill(heightmap, -1);
 		Arrays.fill(levelmap, 0);
+		Arrays.fill(topomap, 0);
 		Arrays.fill(colordata, Colors.BLACK);
 	}
 	
@@ -73,6 +76,7 @@ public class ChunkLevel {
 		
 		this.colormap[index] = -1;
 		this.levelmap[index] = 0;
+		this.topomap[index] = 0;
 		this.colordata[index] = Colors.BLACK;
 	}
 	
@@ -84,6 +88,7 @@ public class ChunkLevel {
 		tag.putIntArray("Heightmap", heightmap);
 		tag.putIntArray("Colormap", colormap);
 		tag.putIntArray("Levelmap", levelmap);
+		tag.putIntArray("Topomap", levelmap);
 	}
 	
 	public void load(CompoundTag tag) {
@@ -92,6 +97,9 @@ public class ChunkLevel {
 		this.heightmap = tag.getIntArray("Heightmap");
 		this.colormap = tag.getIntArray("Colormap");
 		this.levelmap = tag.getIntArray("Levelmap");
+		if (tag.contains("Topomap")) {
+			this.topomap = tag.getIntArray("Topomap");
+		}
 		
 		for (int i = 0; i < 256; i++) {
 			int color = this.colormap[i];
