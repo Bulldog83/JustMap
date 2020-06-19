@@ -99,7 +99,11 @@ public class MapSkin extends Sprite {
 	public void draw(int x, int y, int w, int h) {
 		if (resizable) {
 			textureManager.bindTexture(this.getTexture());
-			DrawHelper.drawSkin(new MatrixStack(), this, x, y, w, h);
+			if (w > this.getWidth() || h > this.getHeight()) {
+				DrawHelper.drawSkin(new MatrixStack(), this, x, y, w, h);
+			} else {
+				DrawHelper.blit(x, y, 0, w, h, this);
+			}
 		} else {
 			this.bindPavedTexture(w, h);
 			DrawHelper.blit(x, y, 0, w, h, this);
@@ -188,9 +192,9 @@ public class MapSkin extends Sprite {
 	
 	static {
 		addSkin("Minecraft Map", new Identifier("textures/map/map_background.png"), 64, 64, 3, true);
-		addSkin("Minecraft Gui", new Identifier(JustMap.MODID, "textures/skin/mad_def_gui_2.png"), 128, 128, 5, true);
-		addSkin("Minecraft Gui Fancy", new Identifier(JustMap.MODID, "textures/skin/mad_def_gui.png"), 128, 128, 7, true);
-		addSkin("Metal Frame", new Identifier(JustMap.MODID, "textures/skin/frame_simple_metal.png"), 128, 128, 5, true);
+		addSkin("Minecraft Gui", new Identifier(JustMap.MODID, "textures/skin/mad_def_gui_2.png"), 64, 64, 5, true);
+		addSkin("Minecraft Gui Fancy", new Identifier(JustMap.MODID, "textures/skin/mad_def_gui.png"), 64, 64, 7, true);
+		addSkin("Metal Frame", new Identifier(JustMap.MODID, "textures/skin/frame_simple_metal.png"), 64, 64, 4, true);
 		addSkin("Oak Frame", new Identifier(JustMap.MODID, "textures/skin/map_frame_oak.png"), 64, 64, 10, true, true);
 		addSkin("Bamboo Frame", new Identifier(JustMap.MODID, "textures/skin/map_frame_bamboo.png"), 64, 64, 9, true, true);
 		addSkin("Stone", new Identifier("textures/block/stone.png"), 16, 16, 4);

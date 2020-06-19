@@ -2,7 +2,7 @@ package ru.bulldog.justmap.map.icon;
 
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
-
+import net.minecraft.entity.passive.TameableEntity;
 import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.client.render.EntityModelRenderer;
 import ru.bulldog.justmap.map.IMap;
@@ -28,7 +28,14 @@ public class EntityIcon extends MapIcon<EntityIcon> {
 		if (!Minimap.allowHostileRadar() && hostile) { return; }
 		
 		int size = ClientParams.showEntityHeads ? ClientParams.entityIconSize : 4;
-		int color = (hostile) ? Colors.DARK_RED : Colors.YELLOW;
+		
+		int color;
+		if (entity instanceof TameableEntity) {
+			TameableEntity tameable = (TameableEntity) entity;
+			color = tameable.isTamed() ? Colors.GREEN : Colors.YELLOW;
+		} else {
+			color = (hostile) ? Colors.DARK_RED : Colors.YELLOW;
+		}
 		
 		IconPos pos = new IconPos(mapX + x, mapY + y);
 		
