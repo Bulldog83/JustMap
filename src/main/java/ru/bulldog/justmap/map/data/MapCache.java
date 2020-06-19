@@ -28,6 +28,8 @@ public class MapCache {
 	private static int currentLevel = 0;
 	public static long lastSaved = 0;
 	
+	public static long lastSaved = 0;
+	
 	public static void setCurrentLayer(Layer.Type layer, int y) {
 		currentLevel =  y / layer.value.height;
 		currentLayer = layer;
@@ -205,7 +207,7 @@ public class MapCache {
 	private Map<ChunkPos, MapChunk> getChunks() {
 		return this.chunks;
 	}
-	
+
 	public MapChunk getCurrentChunk(ChunkPos chunkPos) {
 		return this.getChunk(currentLayer, currentLevel, chunkPos.x, chunkPos.z);
 	}

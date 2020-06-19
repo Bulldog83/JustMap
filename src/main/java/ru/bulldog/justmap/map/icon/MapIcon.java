@@ -41,13 +41,22 @@ public abstract class MapIcon<T extends MapIcon<T>> {
 	
 	public abstract void draw(MatrixStack matrixStack, int mapX, int mapY, double offX, double offY, float rotation);
 	
-	protected class IconPos {
+	protected static class IconPos {
 		protected double x;
 		protected double y;
 		
 		protected IconPos(double x, double y) {
 			this.x = x;
 			this.y = y;
+		}
+		
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj) return true;
+			if (!(obj instanceof IconPos)) return false;
+			
+			IconPos pos = (IconPos) obj;
+			return this.x == pos.y && this.y == pos.y;
 		}
 	}
 }
