@@ -236,7 +236,7 @@ public class ColorUtil {
 		return -1;
 	}
 	
-	public static int proccessColor(int color, int heightDiff) {
+	public static int proccessColor(int color, int heightDiff, float topoLevel) {
 		RGBtoHSB((color >> 16) & 255, (color >> 8) & 255, color & 255, floatBuffer);
 		floatBuffer[1] += ClientParams.mapSaturation / 100.0F;
 		floatBuffer[1] = MathUtil.clamp(floatBuffer[1], 0.0F, 1.0F);
@@ -246,6 +246,8 @@ public class ColorUtil {
 			floatBuffer[2] += heightDiff / 10.0F;
 			floatBuffer[2] = MathUtil.clamp(floatBuffer[2], 0.0F, 1.0F);
 		}
+		floatBuffer[2] += MathUtil.clamp(topoLevel, -0.2F, 0.2F);
+		floatBuffer[2] = MathUtil.clamp(floatBuffer[2], 0.0F, 1.0F);
 		return HSBtoRGB(floatBuffer[0], floatBuffer[1], floatBuffer[2]);
 	}
 	

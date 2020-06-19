@@ -105,7 +105,8 @@ public class ChunkLevel {
 			int color = this.colormap[i];
 			if (color != -1) {
 				int level = this.levelmap[i];
-				this.colordata[i] = ColorUtil.proccessColor(color, level);
+				float topoLevel = this.topomap[i] / 100F;
+				this.colordata[i] = ColorUtil.proccessColor(color, level, topoLevel);
 			}			
 		}
 	}

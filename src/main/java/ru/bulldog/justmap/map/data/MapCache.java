@@ -196,7 +196,7 @@ public class MapCache {
 		if (layer != region.getLayer() ||
 			level != region.getLevel()) {
 			region.swapLayer(layer, level);
-		} else if (time - region.updated > 1000) {
+		} else if (time - region.updated > 3000) {
 			region.updateTexture();
 		}
 		

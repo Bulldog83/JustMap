@@ -94,20 +94,15 @@ public class MapRegion {
 				if (surfaceOnly) {
 					mapChunk = mapData.getChunk(Layer.Type.SURFACE, 0, chunkX, chunkZ);
 					if (MapCache.currentLayer() == Layer.Type.SURFACE) {
-						mapChunk.update(needUpdate);
-						if (mapChunk.saveNeeded()) {
-							this.changed = true;
-						}
+						if (!changed) this.changed = mapChunk.update(needUpdate);
 					}
 				} else {
-					mapChunk = mapData.getCurrentChunk(chunkX, chunkZ).update(needUpdate);
-					if (mapChunk.saveNeeded()) {
-						this.changed = true;
-					}
+					mapChunk = mapData.getCurrentChunk(chunkX, chunkZ);
+					if (!changed) this.changed = mapChunk.update(needUpdate);
 				}
 				this.image.writeChunkData(x, y, mapChunk.getColorData());
 			}
-		}		
+		}
 		if (changed) this.saveImage();
 		this.updated = System.currentTimeMillis();
 		this.needUpdate = false;

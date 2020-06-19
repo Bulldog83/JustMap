@@ -19,7 +19,9 @@ import net.minecraft.world.dimension.DimensionType;
 
 import java.util.Arrays;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
 
 public class MapChunk {
 	
@@ -39,6 +41,7 @@ public class MapChunk {
 	private boolean updating = false;
 	private boolean saved = true;
 	private boolean purged = false;
+	private long refreshed = 0;
 	
 	public boolean saving = false;
 	public long updated = 0;
@@ -191,20 +194,27 @@ public class MapChunk {
 		return this;
 	}
 	
-	public MapChunk update(boolean forceUpdate) {
-		if (updating) return this;		
+	private <T> CompletableFuture<T> run(Function<CompletableFuture<T>, Runnable> function) {
+		CompletableFuture<T> completableFuture = new CompletableFuture<>();
+		chunkUpdater.execute(function.apply(completableFuture));
+		return completableFuture;
+	}
+	
+	public boolean update(boolean forceUpdate) {
+		if (updating) return false;		
 		if (!outdated && forceUpdate) {
 			this.outdated = forceUpdate;
 		}
 		
 		long currentTime = System.currentTimeMillis();
-		if (!outdated && currentTime - updated < ClientParams.chunkUpdateInterval) return this;
-		if (purged || !this.updateWorldChunk()) return this;
+		if (!outdated && currentTime - updated < ClientParams.chunkUpdateInterval) return false;
+		if (purged || !this.updateWorldChunk()) return false;
 		
-		chunkUpdater.execute(this::updateChunkData);
-		this.updating = true;
+		boolean updated = (boolean) this.run(future -> {
+			return () -> future.complete(this.updateChunkData());
+		}).join();
 		
-		return this;
+		return updated;
 	}
 	
 	private boolean updateWorldChunk() {
@@ -216,7 +226,9 @@ public class MapChunk {
 		return true;
 	}
 	
-	private void updateChunkData() {
+	private boolean updateChunkData() {
+		this.updating = true;
+		
 		MapCache mapData = MapCache.get();
 		MapChunk eastChunk = mapData.getCurrentChunk(chunkPos.x + 1, chunkPos.z);
 		MapChunk southChunk = mapData.getCurrentChunk(chunkPos.x, chunkPos.z - 1);
@@ -245,28 +257,33 @@ public class MapChunk {
 				BlockPos blockPos = new BlockPos(posX, posY, posZ);
 				BlockState blockState = this.getBlockState(blockPos);
 				BlockState worldState = worldChunk.getBlockState(blockPos);
-				if(outdated || !blockState.equals(worldState)) {
+				if(outdated || !blockState.equals(worldState) || currentTime - refreshed > 60000) {
 					int color = ColorUtil.blockColor(worldChunk, blockPos);
 					if (color != -1) {
 						int heightDiff = MapProcessor.heightDifference(this, eastChunk, southChunk, x, posY, z);
 						
 						this.setBlockState(blockPos, worldState);
 						
-						int top, middle;
-						if (layer == Layer.Type.SURFACE) {
-							top = 255;
+						int middle, baseHeight;
+						if (layer == Layer.Type.NETHER) {
+							int bottom = level * layer.value.height;
+							middle = bottom + layer.value.height / 2;
+							baseHeight = 128;
+						} else if (layer == Layer.Type.SURFACE) {
 							middle = this.world.getSeaLevel();
+							baseHeight = 256;
 						} else {
 							int bottom = level * layer.value.height;
-							top = bottom + layer.value.height - 1;
 							middle = bottom + layer.value.height / 2;
+							baseHeight = layer.value.height;
 						}
 						
-						int topoLevel = posY - middle;						
+						int topoLevel = (int) (((double) (posY - middle) / baseHeight) * 100);						
+						
 						chunkLevel.topomap[index] = topoLevel;
 						chunkLevel.colormap[index] = color;
 						chunkLevel.levelmap[index] = heightDiff;
-						chunkLevel.colordata[index] = ColorUtil.proccessColor(color, heightDiff);
+						chunkLevel.colordata[index] = ColorUtil.proccessColor(color, heightDiff, topoLevel / 100F);
 						
 						this.saved = false;
 					}
@@ -275,8 +292,9 @@ public class MapChunk {
 					if (color != -1) {
 						int heightDiff = MapProcessor.heightDifference(this, eastChunk, southChunk, x, posY, z);
 						if (chunkLevel.levelmap[index] != heightDiff) {
+							float topoLevel = chunkLevel.topomap[index] / 100F;
 							chunkLevel.levelmap[index] = heightDiff;
-							chunkLevel.colordata[index] = ColorUtil.proccessColor(color, heightDiff);
+							chunkLevel.colordata[index] = ColorUtil.proccessColor(color, heightDiff, topoLevel);
 							this.saved = false;
 						}
 					}
@@ -286,7 +304,10 @@ public class MapChunk {
 		
 		this.outdated = false;
 		this.updated = currentTime;
+		this.refreshed = currentTime;
 		this.updating = false;
+		
+		return this.saveNeeded();
 	}
 	
 	public int[] getColorData() {
