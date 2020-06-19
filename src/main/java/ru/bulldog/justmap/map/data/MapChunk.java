@@ -252,11 +252,13 @@ public class MapChunk {
 						
 						this.setBlockState(blockPos, worldState);
 						
-						int middle;
+						int top, middle;
 						if (layer == Layer.Type.SURFACE) {
+							top = 255;
 							middle = this.world.getSeaLevel();
 						} else {
 							int bottom = level * layer.value.height;
+							top = bottom + layer.value.height - 1;
 							middle = bottom + layer.value.height / 2;
 						}
 						
