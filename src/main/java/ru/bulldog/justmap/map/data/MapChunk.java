@@ -273,7 +273,7 @@ public class MapChunk {
 							baseHeight = 256;
 						} else {
 							bottom = level * layer.value.height;
-							baseHeight = 64;
+							baseHeight = 32;
 						}
 						
 						float topoLevel = baseHeight > 0 ? ((float) (posY - bottom) / baseHeight) : 0;						
