@@ -264,26 +264,24 @@ public class MapChunk {
 						
 						this.setBlockState(blockPos, worldState);
 						
-						int middle, baseHeight;
+						int bottom = 0, baseHeight = 0;
 						if (layer == Layer.Type.NETHER) {
-							int bottom = level * layer.value.height;
-							middle = bottom + layer.value.height / 2;
+							bottom = level * layer.value.height;
 							baseHeight = 128;
 						} else if (layer == Layer.Type.SURFACE) {
-							middle = this.world.getSeaLevel();
+							bottom = this.world.getSeaLevel();
 							baseHeight = 256;
 						} else {
-							int bottom = level * layer.value.height;
-							middle = bottom + layer.value.height / 2;
-							baseHeight = layer.value.height;
+							bottom = level * layer.value.height;
+							baseHeight = 64;
 						}
 						
-						int topoLevel = (int) (((double) (posY - middle) / baseHeight) * 100);						
+						float topoLevel = baseHeight > 0 ? ((float) (posY - bottom) / baseHeight) : 0;						
 						
-						chunkLevel.topomap[index] = topoLevel;
+						chunkLevel.topomap[index] = (int) (topoLevel * 100);
 						chunkLevel.colormap[index] = color;
 						chunkLevel.levelmap[index] = heightDiff;
-						chunkLevel.colordata[index] = ColorUtil.proccessColor(color, heightDiff, topoLevel / 100F);
+						chunkLevel.colordata[index] = ColorUtil.proccessColor(color, heightDiff, topoLevel);
 						
 						this.saved = false;
 					}

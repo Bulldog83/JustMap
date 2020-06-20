@@ -17,12 +17,14 @@ public class ClientParams {
 	public static boolean rotateMap = false;
 	public static boolean showInChat = false;
 	public static boolean showBigMap = false;
+	public static boolean forceUpdate = true;
 
 	public static boolean drawCaves = true;
 	public static boolean hidePlants = false;
 	public static boolean hideWater = false;
 	public static boolean showGrid = false;
 	public static boolean showTerrain = true;
+	public static boolean showTopography = true;
 	public static int terrainStrength = 4;
 
 	public static boolean useSkins = true;
