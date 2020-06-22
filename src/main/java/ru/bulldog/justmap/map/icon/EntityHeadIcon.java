@@ -45,10 +45,12 @@ public class EntityHeadIcon extends AbstractIcon {
 	private final Identifier id;
 	private Identifier outlineId;
 	private int color = Colors.LIGHT_GRAY;
+	private boolean solid;
 	
 	private EntityHeadIcon(Identifier id, Identifier texture, int w, int h) {
 		super(SpriteAtlas.ENTITY_HEAD_ICONS, new Sprite.Info(texture, w, h, AnimationResourceMetadata.EMPTY), 0, w, h, 0, 0, ImageUtil.loadImage(texture, w, h));
 	
+		this.solid = this.isSolid();
 		this.id = id;
 	}
 
@@ -61,9 +63,13 @@ public class EntityHeadIcon extends AbstractIcon {
 	@Override
 	public void draw(MatrixStack matrix, double x, double y, int w, int h) {
 		if (ClientParams.showIconsOutline) {
-			this.bindOutline();
-			DrawHelper.draw(x - 1, y - 1, w + 2, h + 2);
-			//DrawHelper.fill(matrix, x - 0.5, y - 0.5, x + w + 0.5, y + h + 0.5, Colors.LIGHT_GRAY);
+			double thickness = ClientParams.entityOutlineSize;
+			if (solid) {
+				DrawHelper.fill(matrix, x - thickness / 2, y - thickness / 2, w + thickness, h + thickness, this.color);
+			} else {
+				this.bindOutline();
+				DrawHelper.draw(x - thickness / 2, y - thickness / 2, (float) (w + thickness), (float) (h + thickness));
+			}
 		}
 		textureManager.bindTexture(this.getId());		
 		this.draw(matrix, x, y, (float) w, (float) h);
@@ -75,6 +81,24 @@ public class EntityHeadIcon extends AbstractIcon {
 			this.outlineId = textureManager.registerDynamicTexture(String.format("%s_%s_outline", this.id.getNamespace(), this.id.getPath()), outTexture);
 		}
 		textureManager.bindTexture(outlineId);
+	}
+	
+	private boolean isSolid() {
+		NativeImage icon = this.images[0];
+		
+		int width = icon.getWidth();
+		int height = icon.getHeight();
+		
+		boolean solid = true;
+		for (int i = 0; i < width; i++) {
+			for (int j = 0; j < height; j++) {
+				int alpha = (icon.getPixelColor(i, j) >> 24) & 255;
+				solid = alpha > 0;
+				if (!solid) break;
+			}
+		}
+		
+		return solid;
 	}
 	
 	private NativeImage generateOutline() {
@@ -91,181 +115,135 @@ public class EntityHeadIcon extends AbstractIcon {
 		
 		int outlineColor = ColorUtil.toABGR(this.color);
 		
-		boolean solidBorder = true;
-		for (int i = 0; i < width; i++) {
-			int alpha = (icon.getPixelColor(i, 0) >> 24) & 255;
-			solidBorder = alpha > 0;
-			if (!solidBorder) break;
-			
-			alpha = (icon.getPixelColor(i, height - 1) >> 24) & 255;
-			solidBorder = alpha > 0;
-			if (!solidBorder) break;
-		}		
-		if (solidBorder) {
-			for (int i = 0; i < height; i++) {
-				int alpha = (icon.getPixelColor(0, i) >> 24) & 255;
-				solidBorder = alpha > 0;
-				if (!solidBorder) break;
+		List<IconPos> outlinePixels = new ArrayList<>();
+		for (int x = 0; x < width; x++) {
+			int left = x - 1;
+			int right = x + 1;
+			for (int y = 0; y < height; y++) {
+				int alpha = (icon.getPixelColor(x, y) >> 24) & 255;
+				if (alpha == 0) continue;
 				
-				alpha = (icon.getPixelColor(width - 1, i) >> 24) & 255;
-				solidBorder = alpha > 0;
-				if (!solidBorder) break;
-			}
-		}
-		if (solidBorder) {
-			for (int i = 0; i < outWidth; i++) {
-				outline.setPixelColor(i, 0, outlineColor);
-				outline.setPixelColor(i, 1, outlineColor);
-				outline.setPixelColor(i, 2, outlineColor);
-				outline.setPixelColor(i, outHeight - 3, outlineColor);
-				outline.setPixelColor(i, outHeight - 2, outlineColor);
-				outline.setPixelColor(i, outHeight - 1, outlineColor);
-			}
-			for (int i = 0; i < outHeight; i++) {
-				outline.setPixelColor(0, i, outlineColor);
-				outline.setPixelColor(1, i, outlineColor);
-				outline.setPixelColor(2, i, outlineColor);
-				outline.setPixelColor(outWidth - 3, i, outlineColor);
-				outline.setPixelColor(outWidth - 2, i, outlineColor);
-				outline.setPixelColor(outWidth - 1, i, outlineColor);
-			}
-		} else {		
-			List<IconPos> outlinePixels = new ArrayList<>();
-			for (int x = 0; x < width; x++) {
-				int left = x - 1;
-				int right = x + 1;
-				for (int y = 0; y < height; y++) {
-					int alpha = (icon.getPixelColor(x, y) >> 24) & 255;
-					if (alpha == 0) continue;
-					
-					int top = y - 1;
-					int bottom = y + 1;					
-					if (top >= 0) {
-						alpha = (icon.getPixelColor(x, top) >> 24) & 255;
-						if (alpha == 0) {
-							IconPos pixel = new IconPos(x + 2, y);
-							if (!outlinePixels.contains(pixel)) {
-								outlinePixels.add(pixel);
-								outlinePixels.add(new IconPos(x + 2, y + 1));
-								outlinePixels.add(new IconPos(x + 2, y + 2));
-							}
-						}
-						if (left >= 0) {
-							alpha = (icon.getPixelColor(left, top) >> 24) & 255;
-							if (alpha == 0) {
-								IconPos pixel = new IconPos(x, y);
-								if (!outlinePixels.contains(pixel)) {
-									outlinePixels.add(pixel);
-									outlinePixels.add(new IconPos(x, y + 1));
-									outlinePixels.add(new IconPos(x + 1, y));
-									outlinePixels.add(new IconPos(x + 1, y + 1));
-								}
-							}
-						}
-						if (right < width) {
-							alpha = (icon.getPixelColor(right, top) >> 24) & 255;
-							if (alpha == 0) {
-								IconPos pixel = new IconPos(right + 2, y);
-								if (!outlinePixels.contains(pixel)) {
-									outlinePixels.add(pixel);
-									outlinePixels.add(new IconPos(right + 2, y + 1));
-									outlinePixels.add(new IconPos(right + 3, y));
-									outlinePixels.add(new IconPos(right + 3, y + 1));
-								}
-							}
-						}
-					} else if (y == 0){
-						IconPos pixel = new IconPos(x + 2, 0);
+				outlinePixels.add(new IconPos(x + 2, y + 2));
+				
+				int top = y - 1;
+				int bottom = y + 1;					
+				if (top >= 0) {
+					alpha = (icon.getPixelColor(x, top) >> 24) & 255;
+					if (alpha == 0) {
+						IconPos pixel = new IconPos(x + 2, y);
 						if (!outlinePixels.contains(pixel)) {
 							outlinePixels.add(pixel);
-							outlinePixels.add(new IconPos(x + 2, 1));
-							outlinePixels.add(new IconPos(x + 2, 2));
-						}
-					}
-					if (bottom < height) {
-						alpha = (icon.getPixelColor(x, bottom) >> 24) & 255;
-						if (alpha == 0) {
-							IconPos pixel = new IconPos(x + 2, bottom + 1);
-							if (!outlinePixels.contains(pixel)) {
-								outlinePixels.add(pixel);
-								outlinePixels.add(new IconPos(x + 2, bottom + 2));
-								outlinePixels.add(new IconPos(x + 2, bottom + 3));
-							}
-						}
-						if (left >= 0) {
-							alpha = (icon.getPixelColor(left, bottom) >> 24) & 255;
-							if (alpha == 0) {
-								IconPos pixel = new IconPos(x, bottom + 2);
-								if (!outlinePixels.contains(pixel)) {
-									outlinePixels.add(pixel);
-									outlinePixels.add(new IconPos(x, bottom + 3));
-									outlinePixels.add(new IconPos(x + 1, bottom + 2));
-									outlinePixels.add(new IconPos(x + 1, bottom + 3));
-								}
-							}
-						}
-						if (right < width) {
-							alpha = (icon.getPixelColor(right, bottom) >> 24) & 255;
-							if (alpha == 0) {
-								IconPos pixel = new IconPos(right + 2, bottom + 2);
-								if (!outlinePixels.contains(pixel)) {
-									outlinePixels.add(pixel);
-									outlinePixels.add(new IconPos(right + 2, bottom + 3));
-									outlinePixels.add(new IconPos(right + 3, bottom + 2));
-									outlinePixels.add(new IconPos(right + 3, bottom + 3));
-								}
-							}
-						}
-					} else if (y == height - 1) {
-						IconPos pixel = new IconPos(x + 2, outHeight - 1);
-						if (!outlinePixels.contains(pixel)) {
-							outlinePixels.add(pixel);
-							outlinePixels.add(new IconPos(x + 2, outHeight - 2));
-							outlinePixels.add(new IconPos(x + 2, outHeight - 3));
+							outlinePixels.add(new IconPos(x + 2, y + 1));
 						}
 					}
 					if (left >= 0) {
-						alpha = (icon.getPixelColor(left, y) >> 24) & 255;
+						alpha = (icon.getPixelColor(left, top) >> 24) & 255;
 						if (alpha == 0) {
-							IconPos pixel = new IconPos(x, y + 2);
+							IconPos pixel = new IconPos(x, y);
 							if (!outlinePixels.contains(pixel)) {
 								outlinePixels.add(pixel);
-								outlinePixels.add(new IconPos(x + 1, y + 2));
-								outlinePixels.add(new IconPos(x + 2, y + 2));
+								outlinePixels.add(new IconPos(x, y + 1));
+								outlinePixels.add(new IconPos(x + 1, y));
+								outlinePixels.add(new IconPos(x + 1, y + 1));
 							}
-						}
-					} else if (x == 0) {
-						IconPos pixel = new IconPos(0, y + 2);
-						if (!outlinePixels.contains(pixel)) {
-							outlinePixels.add(pixel);
-							outlinePixels.add(new IconPos(1, y + 2));
-							outlinePixels.add(new IconPos(2, y + 2));
 						}
 					}
 					if (right < width) {
-						alpha = (icon.getPixelColor(right, y) >> 24) & 255;
+						alpha = (icon.getPixelColor(right, top) >> 24) & 255;
 						if (alpha == 0) {
-							IconPos pixel = new IconPos(right + 1, y + 2);
+							IconPos pixel = new IconPos(right + 2, y);
 							if (!outlinePixels.contains(pixel)) {
 								outlinePixels.add(pixel);
-								outlinePixels.add(new IconPos(right + 2, y + 2));
-								outlinePixels.add(new IconPos(right + 3, y + 2));
+								outlinePixels.add(new IconPos(right + 2, y + 1));
+								outlinePixels.add(new IconPos(right + 3, y));
+								outlinePixels.add(new IconPos(right + 3, y + 1));
 							}
 						}
-					} else if (x == width - 1) {
-						IconPos pixel = new IconPos(outWidth - 1, y + 2);
+					}
+				} else if (y == 0){
+					IconPos pixel = new IconPos(x + 2, 0);
+					if (!outlinePixels.contains(pixel)) {
+						outlinePixels.add(pixel);
+						outlinePixels.add(new IconPos(x + 2, 1));
+					}
+				}
+				if (bottom < height) {
+					alpha = (icon.getPixelColor(x, bottom) >> 24) & 255;
+					if (alpha == 0) {
+						IconPos pixel = new IconPos(x + 2, bottom + 1);
 						if (!outlinePixels.contains(pixel)) {
 							outlinePixels.add(pixel);
-							outlinePixels.add(new IconPos(outWidth - 2, y + 2));
-							outlinePixels.add(new IconPos(outWidth - 3, y + 2));
+							outlinePixels.add(new IconPos(x + 2, bottom + 2));
 						}
+					}
+					if (left >= 0) {
+						alpha = (icon.getPixelColor(left, bottom) >> 24) & 255;
+						if (alpha == 0) {
+							IconPos pixel = new IconPos(x, bottom + 2);
+							if (!outlinePixels.contains(pixel)) {
+								outlinePixels.add(pixel);
+								outlinePixels.add(new IconPos(x, bottom + 3));
+								outlinePixels.add(new IconPos(x + 1, bottom + 2));
+								outlinePixels.add(new IconPos(x + 1, bottom + 3));
+							}
+						}
+					}
+					if (right < width) {
+						alpha = (icon.getPixelColor(right, bottom) >> 24) & 255;
+						if (alpha == 0) {
+							IconPos pixel = new IconPos(right + 2, bottom + 2);
+							if (!outlinePixels.contains(pixel)) {
+								outlinePixels.add(pixel);
+								outlinePixels.add(new IconPos(right + 2, bottom + 3));
+								outlinePixels.add(new IconPos(right + 3, bottom + 2));
+								outlinePixels.add(new IconPos(right + 3, bottom + 3));
+							}
+						}
+					}
+				} else if (y == height - 1) {
+					IconPos pixel = new IconPos(x + 2, outHeight - 1);
+					if (!outlinePixels.contains(pixel)) {
+						outlinePixels.add(pixel);
+						outlinePixels.add(new IconPos(x + 2, outHeight - 2));
+					}
+				}
+				if (left >= 0) {
+					alpha = (icon.getPixelColor(left, y) >> 24) & 255;
+					if (alpha == 0) {
+						IconPos pixel = new IconPos(x, y + 2);
+						if (!outlinePixels.contains(pixel)) {
+							outlinePixels.add(pixel);
+							outlinePixels.add(new IconPos(x + 1, y + 2));
+						}
+					}
+				} else if (x == 0) {
+					IconPos pixel = new IconPos(0, y + 2);
+					if (!outlinePixels.contains(pixel)) {
+						outlinePixels.add(pixel);
+						outlinePixels.add(new IconPos(1, y + 2));
+					}
+				}
+				if (right < width) {
+					alpha = (icon.getPixelColor(right, y) >> 24) & 255;
+					if (alpha == 0) {
+						IconPos pixel = new IconPos(right + 1, y + 2);
+						if (!outlinePixels.contains(pixel)) {
+							outlinePixels.add(pixel);
+							outlinePixels.add(new IconPos(right + 2, y + 2));
+						}
+					}
+				} else if (x == width - 1) {
+					IconPos pixel = new IconPos(outWidth - 1, y + 2);
+					if (!outlinePixels.contains(pixel)) {
+						outlinePixels.add(pixel);
+						outlinePixels.add(new IconPos(outWidth - 2, y + 2));
 					}
 				}
 			}
-			outlinePixels.forEach(pixel -> {
-				outline.setPixelColor((int) pixel.x, (int) pixel.y, outlineColor);
-			});
 		}
+		outlinePixels.forEach(pixel -> {
+			outline.setPixelColor((int) pixel.x, (int) pixel.y, outlineColor);
+		});
 		
 		return outline;
 	}

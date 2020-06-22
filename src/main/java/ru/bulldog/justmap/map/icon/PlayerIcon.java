@@ -46,7 +46,7 @@ public class PlayerIcon extends MapIcon<PlayerIcon> {
 				PlayerHeadIcon.getIcon(player).draw(matrix, pos.x, pos.y);
 			}
 		} else {
-			DrawHelper.fill(pos.x, pos.y, pos.x, pos.y, Colors.GREEN);
+			DrawHelper.fill(pos.x, pos.y, size, size, Colors.GREEN);
 		}
 			
 		if (ClientParams.showPlayerNames) {

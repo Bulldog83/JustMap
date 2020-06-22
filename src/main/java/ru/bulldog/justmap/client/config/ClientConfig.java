@@ -56,6 +56,7 @@ public class ClientConfig extends Config{
 		KEEPER.registerEntry("purge_delay", new IntegerRange(ClientParams.purgeDelay, (i) -> ClientParams.purgeDelay = i, () -> ClientParams.purgeDelay, 1, 600));
 		KEEPER.registerEntry("purge_amount", new IntegerRange(ClientParams.purgeAmount, (i) -> ClientParams.purgeAmount = i, () -> ClientParams.purgeAmount, 100, 50000));
 		KEEPER.registerEntry("show_terrain", new BooleanEntry(ClientParams.showTerrain, (b) -> ClientParams.showTerrain = b, () -> ClientParams.showTerrain));
+		KEEPER.registerEntry("show_topography", new BooleanEntry(ClientParams.showTopography, (b) -> ClientParams.showTopography = b, () -> ClientParams.showTopography));
 		KEEPER.registerEntry("terrain_strength", new IntegerRange(ClientParams.terrainStrength, (i) -> ClientParams.terrainStrength = i, () -> ClientParams.terrainStrength, 2, 9));
 		KEEPER.registerEntry("draw_chunk_grid", new BooleanEntry(ClientParams.showGrid, (b) -> ClientParams.showGrid = b, () -> ClientParams.showGrid));
 		KEEPER.registerEntry("show_in_chat", new BooleanEntry(ClientParams.showInChat, (b) -> ClientParams.showInChat = b, () -> ClientParams.showInChat));
@@ -76,8 +77,10 @@ public class ClientConfig extends Config{
 		KEEPER.registerEntry("render_entity_model", new BooleanEntry(ClientParams.renderEntityModel, (b) -> ClientParams.renderEntityModel = b, () -> ClientParams.renderEntityModel));
 		KEEPER.registerEntry("show_icons_outline", new BooleanEntry(ClientParams.showIconsOutline, (b) -> ClientParams.showIconsOutline = b, () -> ClientParams.showIconsOutline));
 		KEEPER.registerEntry("show_big_map", new BooleanEntry(ClientParams.showBigMap, (b) -> ClientParams.showBigMap = b, () -> ClientParams.showBigMap));
+		KEEPER.registerEntry("force_map_update", new BooleanEntry(ClientParams.forceUpdate, (b) -> ClientParams.forceUpdate = b, () -> ClientParams.forceUpdate));
 		KEEPER.registerEntry("entity_icon_size", new IntegerRange(ClientParams.entityIconSize, (i) -> ClientParams.entityIconSize = i, () -> ClientParams.entityIconSize, 2, 16));
 		KEEPER.registerEntry("entity_model_size", new IntegerRange(ClientParams.entityModelSize, (i) -> ClientParams.entityModelSize = i, () -> ClientParams.entityModelSize, 2, 16));
+		KEEPER.registerEntry("entity_outline_size", new IntegerRange(ClientParams.entityOutlineSize, (i) -> ClientParams.entityOutlineSize = i, () -> ClientParams.entityOutlineSize, 1, 5));
 		KEEPER.registerEntry("arrow_size", new IntegerRange(ClientParams.arrowIconSize, (i) -> ClientParams.arrowIconSize = i, () -> ClientParams.arrowIconSize, 6, 16));
 		KEEPER.registerEntry("worldmap_icon_size", new IntegerRange(ClientParams.worldmapIconSize, (i) -> ClientParams.worldmapIconSize = i, () -> ClientParams.worldmapIconSize, 8, 16));
 		

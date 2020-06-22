@@ -26,7 +26,7 @@ public class StateUtil {
 	}
 	
 	public static boolean isWater(BlockState state) {
-		return !isSeaweed(state) && state.getFluidState().matches(FluidTags.WATER);
+		return !isSeaweed(state) && state.getFluidState().isIn(FluidTags.WATER);
 	}
 	
 	public static boolean isPlant(BlockState state) {

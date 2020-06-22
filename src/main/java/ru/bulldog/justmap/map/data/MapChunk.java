@@ -21,7 +21,6 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Function;
 
 public class MapChunk {
 	
@@ -29,7 +28,6 @@ public class MapChunk {
 	
 	private final static TaskManager chunkUpdater = TaskManager.getManager("chunk-data");
 	private volatile Map<Layer, ChunkLevel[]> levels;
-	private static MinecraftClient client = MinecraftClient.getInstance();
 	
 	private World world;
 	private WorldChunk worldChunk;
@@ -55,6 +53,8 @@ public class MapChunk {
 	}
 	
 	public MapChunk(World world, ChunkPos pos, Layer.Type layer) {
+		MinecraftClient client = MinecraftClient.getInstance();
+		
 		this.world = world;
 		this.worldChunk = client.world.getChunk(pos.x, pos.z);
 		this.dimension = world.getDimensionRegistryKey().getValue();
@@ -194,12 +194,6 @@ public class MapChunk {
 		return this;
 	}
 	
-	private <T> CompletableFuture<T> run(Function<CompletableFuture<T>, Runnable> function) {
-		CompletableFuture<T> completableFuture = new CompletableFuture<>();
-		chunkUpdater.execute(function.apply(completableFuture));
-		return completableFuture;
-	}
-	
 	public boolean update(boolean forceUpdate) {
 		if (updating) return false;		
 		if (!outdated && forceUpdate) {
@@ -210,11 +204,11 @@ public class MapChunk {
 		if (!outdated && currentTime - updated < ClientParams.chunkUpdateInterval) return false;
 		if (purged || !this.updateWorldChunk()) return false;
 		
-		boolean updated = (boolean) this.run(future -> {
+		CompletableFuture<Boolean> updated = chunkUpdater.run(future -> {
 			return () -> future.complete(this.updateChunkData());
-		}).join();
+		});
 		
-		return updated;
+		return updated.join();
 	}
 	
 	private boolean updateWorldChunk() {
@@ -264,19 +258,20 @@ public class MapChunk {
 						
 						this.setBlockState(blockPos, worldState);
 						
+						int height = layer.value.height;
 						int bottom = 0, baseHeight = 0;
 						if (layer == Layer.Type.NETHER) {
-							bottom = level * layer.value.height;
+							bottom = level * height;
 							baseHeight = 128;
 						} else if (layer == Layer.Type.SURFACE) {
 							bottom = this.world.getSeaLevel();
 							baseHeight = 256;
 						} else {
-							bottom = level * layer.value.height;
+							bottom = level * height;
 							baseHeight = 32;
 						}
 						
-						float topoLevel = baseHeight > 0 ? ((float) (posY - bottom) / baseHeight) : 0;						
+						float topoLevel = ((float) (posY - bottom) / baseHeight);						
 						
 						chunkLevel.topomap[index] = (int) (topoLevel * 100);
 						chunkLevel.colormap[index] = color;
@@ -300,9 +295,9 @@ public class MapChunk {
 			}
 		}
 		
-		this.outdated = false;
 		this.updated = currentTime;
 		this.refreshed = currentTime;
+		this.outdated = false;
 		this.updating = false;
 		
 		return this.saveNeeded();

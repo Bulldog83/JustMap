@@ -98,6 +98,10 @@ public final class ConfigFactory {
 				.setSaveConsumer(val -> JustMapClient.CONFIG.setBoolean("show_terrain", val))
 				.setDefaultValue((boolean) JustMapClient.CONFIG.getDefault("show_terrain"))
 				.build());
+		mapDetails.addEntry(entryBuilder.startBooleanToggle(lang("show_topography"), JustMapClient.CONFIG.getBoolean("show_topography"))
+				.setSaveConsumer(val -> JustMapClient.CONFIG.setBoolean("show_topography", val))
+				.setDefaultValue((boolean) JustMapClient.CONFIG.getDefault("show_topography"))
+				.build());
 		mapDetails.addEntry(entryBuilder.startIntSlider(lang("terrain_strength"), JustMapClient.CONFIG.getInt("terrain_strength"), 2, 9)
 				.setSaveConsumer(val -> JustMapClient.CONFIG.setRanged("terrain_strength", val))
 				.setDefaultValue((int) JustMapClient.CONFIG.getDefault("terrain_strength"))
@@ -232,6 +236,10 @@ public final class ConfigFactory {
 				.setSaveConsumer(val -> JustMapClient.CONFIG.setBoolean("show_icons_outline", val))
 				.setDefaultValue((boolean) JustMapClient.CONFIG.getDefault("show_icons_outline"))
 				.build());
+		entityRadar.addEntry(entryBuilder.startIntSlider(lang("entity_outline_thickness"), JustMapClient.CONFIG.getInt("entity_outline_size"), 1, 5)
+				.setSaveConsumer(val -> JustMapClient.CONFIG.setRanged("entity_outline_size", val))
+				.setDefaultValue((int) JustMapClient.CONFIG.getDefault("entity_outline_size"))
+				.build());
 		entityRadar.addEntry(entryBuilder.startBooleanToggle(lang("render_entity_model"), JustMapClient.CONFIG.getBoolean("render_entity_model"))
 				.setSaveConsumer(val -> JustMapClient.CONFIG.setBoolean("render_entity_model", val))
 				.setDefaultValue((boolean) JustMapClient.CONFIG.getDefault("render_entity_model"))
@@ -276,6 +284,10 @@ public final class ConfigFactory {
 				.setSaveConsumer(val -> JustMapClient.CONFIG.setRanged("purge_amount", val))
 				.setDefaultValue((int) JustMapClient.CONFIG.getDefault("purge_amount"))
 				.setMin(100).setMax(5000).build());
+		optimization.addEntry(entryBuilder.startBooleanToggle(lang("uninterrupted_map_update"), JustMapClient.CONFIG.getBoolean("force_map_update"))
+				.setSaveConsumer(val -> JustMapClient.CONFIG.setBoolean("force_map_update", val))
+				.setDefaultValue((boolean) JustMapClient.CONFIG.getDefault("force_map_update"))
+				.build());
 		
 		configBuilder.setDoesConfirmSave(false);
 		configBuilder.transparentBackground();

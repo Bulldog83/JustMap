@@ -48,12 +48,6 @@ public class DrawHelper extends DrawableHelper {
 		return textRenderer.getWidth(string);
 	}
 	
-	public void fillNoDepth(int x, int y, int right, int left, int color) {
-		RenderSystem.disableDepthTest();
-		fill(x, y, right, left, color);
-		RenderSystem.enableDepthTest();
-	}
-	
 	public static void drawCenteredString(String string, double x, double y, int color) {
 		MatrixStack matrix = new MatrixStack();
 		drawCenteredString(matrix, string, x, y, color);
@@ -198,9 +192,9 @@ public class DrawHelper extends DrawableHelper {
 		RenderSystem.disableTexture();
 		RenderSystem.defaultBlendFunc();
 		builder.begin(GL11.GL_QUADS, VertexFormats.POSITION_COLOR);
-		builder.vertex(matrix4f, (float) x, (float) h, 0.0F).color(r, g, b, a).next();
-		builder.vertex(matrix4f, (float) w, (float) h, 0.0F).color(r, g, b, a).next();
-		builder.vertex(matrix4f, (float) w, (float) y, 0.0F).color(r, g, b, a).next();
+		builder.vertex(matrix4f, (float) x, (float) (y + h), 0.0F).color(r, g, b, a).next();
+		builder.vertex(matrix4f, (float) (x + w), (float) (y + h), 0.0F).color(r, g, b, a).next();
+		builder.vertex(matrix4f, (float) (x + w), (float) y, 0.0F).color(r, g, b, a).next();
 		builder.vertex(matrix4f, (float) x, (float) y, 0.0F).color(r, g, b, a).next();
 		builder.end();
 		BufferRenderer.draw(builder);
