@@ -33,7 +33,7 @@
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="C:/Users/СерегинАГ/.gradle/caches/modules-2/files-2.1/com.ibm.icu/icu4j-core-mojang/51.2/63d216a9311cca6be337c1e458e587f99d382b84/icu4j-core-mojang-51.2.jar" sourcepath="C:/Users/СерегинАГ/.gradle/caches/modules-2/files-2.1/com.ibm.icu/icu4j-core-mojang/51.2/814397ccbafff1132758e551c37396c528d7f2d7/icu4j-core-mojang-51.2-sources.jar">
+	<classpathentry kind="lib" path="C:/Users/СерегинАГ/.gradle/caches/modules-2/files-2.1/com.ibm.icu/icu4j/66.1/72c7519b6d91f7a1f993bd44a99fe95d67211b27/icu4j-66.1.jar" sourcepath="C:/Users/СерегинАГ/.gradle/caches/modules-2/files-2.1/com.ibm.icu/icu4j/66.1/57d00b7135ca8fa82311d6b9fd345309e4c46f0b/icu4j-66.1-sources.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
@@ -88,7 +88,7 @@
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="C:/Users/СерегинАГ/.gradle/caches/modules-2/files-2.1/com.mojang/datafixerupper/2.0.24/944c24a8519981847ffb36c6dcd059d96fcb4b0/datafixerupper-2.0.24.jar" sourcepath="C:/Users/СерегинАГ/.gradle/caches/modules-2/files-2.1/com.mojang/datafixerupper/2.0.24/b4d25114ce61af97e739a6942cd8c6caa5d092a7/datafixerupper-2.0.24-sources.jar">
+	<classpathentry kind="lib" path="C:/Users/СерегинАГ/.gradle/caches/modules-2/files-2.1/com.mojang/datafixerupper/3.0.25/b3e9ae66d5a69b4aa43d9dbe1e2b2d1401251343/datafixerupper-3.0.25.jar" sourcepath="C:/Users/СерегинАГ/.gradle/caches/modules-2/files-2.1/com.mojang/datafixerupper/3.0.25/9a4f9605319b6da180c7b50bf6da6551f95b2e6c/datafixerupper-3.0.25-sources.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
@@ -98,7 +98,7 @@
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="C:/Users/СерегинАГ/.gradle/caches/modules-2/files-2.1/com.mojang/authlib/1.5.25/9834cdf236c22e84b946bba989e2f94ef5897c3c/authlib-1.5.25.jar" sourcepath="C:/Users/СерегинАГ/.gradle/caches/modules-2/files-2.1/com.mojang/authlib/1.5.25/18840707f662a3236542716fff61c659584f3e6c/authlib-1.5.25-sources.jar">
+	<classpathentry kind="lib" path="C:/Users/СерегинАГ/.gradle/caches/modules-2/files-2.1/com.mojang/authlib/1.6.25/5bd0ce00c1e1f483641f85bccb02d1956dd77ec0/authlib-1.6.25.jar" sourcepath="C:/Users/СерегинАГ/.gradle/caches/modules-2/files-2.1/com.mojang/authlib/1.6.25/de9a1ba1e01d2f3e03a0b5812f4f4e51624a671e/authlib-1.6.25-sources.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
@@ -228,197 +228,237 @@
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="C:/Users/СерегинАГ/.gradle/caches/fabric-loom/minecraft-1.15.2-mapped-net.fabricmc.yarn-1.15.2+build.15-v2.jar" sourcepath="C:/Users/СерегинАГ/.gradle/caches/fabric-loom/minecraft-1.15.2-mapped-net.fabricmc.yarn-1.15.2+build.15-v2-sources.jar">
+	<classpathentry kind="lib" path="C:/Users/СерегинАГ/.gradle/caches/fabric-loom/1.16-rc1-mapped-net.fabricmc.yarn-1.16-rc1+build.9-v2/minecraft-1.16-rc1-mapped-net.fabricmc.yarn-1.16-rc1+build.9-v2.jar" sourcepath="C:/Users/СерегинАГ/.gradle/caches/fabric-loom/1.16-rc1-mapped-net.fabricmc.yarn-1.16-rc1+build.9-v2/minecraft-1.16-rc1-mapped-net.fabricmc.yarn-1.16-rc1+build.9-v2-sources.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/config-2-2.11.2@net.fabricmc.yarn.1_15_2.1.15.2+build.15-v2.jar" sourcepath="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/config-2-2.11.2@net.fabricmc.yarn.1_15_2.1.15.2+build.15-v2-sources.jar">
+	<classpathentry kind="lib" path="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/modmenu-1.12.1+build.15@net.fabricmc.yarn.1_16_rc1.1.16-rc1+build.9-v2.jar" sourcepath="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/modmenu-1.12.1+build.15@net.fabricmc.yarn.1_16_rc1.1.16-rc1+build.9-v2-sources.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/modmenu-1.10.2+build.32@net.fabricmc.yarn.1_15_2.1.15.2+build.15-v2.jar" sourcepath="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/modmenu-1.10.2+build.32@net.fabricmc.yarn.1_15_2.1.15.2+build.15-v2-sources.jar">
+	<classpathentry kind="lib" path="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/config-2-4.5.3@net.fabricmc.yarn.1_16_rc1.1.16-rc1+build.9-v2.jar" sourcepath="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/config-2-4.5.3@net.fabricmc.yarn.1_16_rc1.1.16-rc1+build.9-v2-sources.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-api-0.5.12+build.296-1.15@net.fabricmc.yarn.1_15_2.1.15.2+build.15-v2.jar" sourcepath="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-api-0.5.12+build.296-1.15@net.fabricmc.yarn.1_15_2.1.15.2+build.15-v2-sources.jar">
+	<classpathentry kind="lib" path="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-api-0.13.1+build.370-1.16@net.fabricmc.yarn.1_16_rc1.1.16-rc1+build.9-v2.jar" sourcepath="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-api-0.13.1+build.370-1.16@net.fabricmc.yarn.1_16_rc1.1.16-rc1+build.9-v2-sources.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-api-base-0.1.2+b7f9825d0c@net.fabricmc.yarn.1_15_2.1.15.2+build.15-v2.jar" sourcepath="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-api-base-0.1.2+b7f9825d0c@net.fabricmc.yarn.1_15_2.1.15.2+build.15-v2-sources.jar">
+	<classpathentry kind="lib" path="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-api-base-0.1.3+12a8474c7c@net.fabricmc.yarn.1_16_rc1.1.16-rc1+build.9-v2.jar" sourcepath="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-api-base-0.1.3+12a8474c7c@net.fabricmc.yarn.1_16_rc1.1.16-rc1+build.9-v2-sources.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-biomes-v1-0.1.5+3b05f68e0c@net.fabricmc.yarn.1_15_2.1.15.2+build.15-v2.jar" sourcepath="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-biomes-v1-0.1.5+3b05f68e0c@net.fabricmc.yarn.1_15_2.1.15.2+build.15-v2-sources.jar">
+	<classpathentry kind="lib" path="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-biomes-v1-0.2.7+059ea8667c@net.fabricmc.yarn.1_16_rc1.1.16-rc1+build.9-v2.jar" sourcepath="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-biomes-v1-0.2.7+059ea8667c@net.fabricmc.yarn.1_16_rc1.1.16-rc1+build.9-v2-sources.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-blockrenderlayer-v1-1.1.4+c6a8ea890c@net.fabricmc.yarn.1_15_2.1.15.2+build.15-v2.jar" sourcepath="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-blockrenderlayer-v1-1.1.4+c6a8ea890c@net.fabricmc.yarn.1_15_2.1.15.2+build.15-v2-sources.jar">
+	<classpathentry kind="lib" path="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-blockrenderlayer-v1-1.1.4+c6a8ea897c@net.fabricmc.yarn.1_16_rc1.1.16-rc1+build.9-v2.jar" sourcepath="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-blockrenderlayer-v1-1.1.4+c6a8ea897c@net.fabricmc.yarn.1_16_rc1.1.16-rc1+build.9-v2-sources.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-commands-v0-0.1.2+b7f9825d0c@net.fabricmc.yarn.1_15_2.1.15.2+build.15-v2.jar" sourcepath="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-commands-v0-0.1.2+b7f9825d0c@net.fabricmc.yarn.1_15_2.1.15.2+build.15-v2-sources.jar">
+	<classpathentry kind="lib" path="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-command-api-v1-1.0.8+5ce533987c@net.fabricmc.yarn.1_16_rc1.1.16-rc1+build.9-v2.jar" sourcepath="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-command-api-v1-1.0.8+5ce533987c@net.fabricmc.yarn.1_16_rc1.1.16-rc1+build.9-v2-sources.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-containers-v0-0.1.3+b7f9825d0c@net.fabricmc.yarn.1_15_2.1.15.2+build.15-v2.jar" sourcepath="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-containers-v0-0.1.3+b7f9825d0c@net.fabricmc.yarn.1_15_2.1.15.2+build.15-v2-sources.jar">
+	<classpathentry kind="lib" path="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-commands-v0-0.2.0+52d308367c@net.fabricmc.yarn.1_16_rc1.1.16-rc1+build.9-v2.jar" sourcepath="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-commands-v0-0.2.0+52d308367c@net.fabricmc.yarn.1_16_rc1.1.16-rc1+build.9-v2-sources.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-content-registries-v0-0.1.3+b7f9825d0c@net.fabricmc.yarn.1_15_2.1.15.2+build.15-v2.jar" sourcepath="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-content-registries-v0-0.1.3+b7f9825d0c@net.fabricmc.yarn.1_15_2.1.15.2+build.15-v2-sources.jar">
+	<classpathentry kind="lib" path="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-containers-v0-0.1.8+045df74f7c@net.fabricmc.yarn.1_16_rc1.1.16-rc1+build.9-v2.jar" sourcepath="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-containers-v0-0.1.8+045df74f7c@net.fabricmc.yarn.1_16_rc1.1.16-rc1+build.9-v2-sources.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-crash-report-info-v1-0.1.2+b7f9825d0c@net.fabricmc.yarn.1_15_2.1.15.2+build.15-v2.jar" sourcepath="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-crash-report-info-v1-0.1.2+b7f9825d0c@net.fabricmc.yarn.1_15_2.1.15.2+build.15-v2-sources.jar">
+	<classpathentry kind="lib" path="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-content-registries-v0-0.1.9+059ea8667c@net.fabricmc.yarn.1_16_rc1.1.16-rc1+build.9-v2.jar" sourcepath="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-content-registries-v0-0.1.9+059ea8667c@net.fabricmc.yarn.1_16_rc1.1.16-rc1+build.9-v2-sources.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-dimensions-v1-0.3.0+2ad156310c@net.fabricmc.yarn.1_15_2.1.15.2+build.15-v2.jar" sourcepath="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-dimensions-v1-0.3.0+2ad156310c@net.fabricmc.yarn.1_15_2.1.15.2+build.15-v2-sources.jar">
+	<classpathentry kind="lib" path="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-crash-report-info-v1-0.1.2+b7f9825d7c@net.fabricmc.yarn.1_16_rc1.1.16-rc1+build.9-v2.jar" sourcepath="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-crash-report-info-v1-0.1.2+b7f9825d7c@net.fabricmc.yarn.1_16_rc1.1.16-rc1+build.9-v2-sources.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-events-interaction-v0-0.3.0+fac69e320c@net.fabricmc.yarn.1_15_2.1.15.2+build.15-v2.jar" sourcepath="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-events-interaction-v0-0.3.0+fac69e320c@net.fabricmc.yarn.1_15_2.1.15.2+build.15-v2-sources.jar">
+	<classpathentry kind="lib" path="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-dimensions-v1-1.0.0+a71b30537c@net.fabricmc.yarn.1_16_rc1.1.16-rc1+build.9-v2.jar" sourcepath="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-dimensions-v1-1.0.0+a71b30537c@net.fabricmc.yarn.1_16_rc1.1.16-rc1+build.9-v2-sources.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-events-lifecycle-v0-0.1.2+003643510c@net.fabricmc.yarn.1_15_2.1.15.2+build.15-v2.jar" sourcepath="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-events-lifecycle-v0-0.1.2+003643510c@net.fabricmc.yarn.1_15_2.1.15.2+build.15-v2-sources.jar">
+	<classpathentry kind="lib" path="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-events-interaction-v0-0.3.3+7066030f7c@net.fabricmc.yarn.1_16_rc1.1.16-rc1+build.9-v2.jar" sourcepath="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-events-interaction-v0-0.3.3+7066030f7c@net.fabricmc.yarn.1_16_rc1.1.16-rc1+build.9-v2-sources.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-item-groups-v0-0.1.6+ec40b2e10c@net.fabricmc.yarn.1_15_2.1.15.2+build.15-v2.jar" sourcepath="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-item-groups-v0-0.1.6+ec40b2e10c@net.fabricmc.yarn.1_15_2.1.15.2+build.15-v2-sources.jar">
+	<classpathentry kind="lib" path="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-events-lifecycle-v0-0.1.3+0d474ec47c@net.fabricmc.yarn.1_16_rc1.1.16-rc1+build.9-v2.jar" sourcepath="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-events-lifecycle-v0-0.1.3+0d474ec47c@net.fabricmc.yarn.1_16_rc1.1.16-rc1+build.9-v2-sources.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-keybindings-v0-0.1.1+dfdb52d60c@net.fabricmc.yarn.1_15_2.1.15.2+build.15-v2.jar" sourcepath="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-keybindings-v0-0.1.1+dfdb52d60c@net.fabricmc.yarn.1_15_2.1.15.2+build.15-v2-sources.jar">
+	<classpathentry kind="lib" path="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-item-groups-v0-0.2.0+438f96367c@net.fabricmc.yarn.1_16_rc1.1.16-rc1+build.9-v2.jar" sourcepath="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-item-groups-v0-0.2.0+438f96367c@net.fabricmc.yarn.1_16_rc1.1.16-rc1+build.9-v2-sources.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-loot-tables-v1-0.1.5+e08a73050c@net.fabricmc.yarn.1_15_2.1.15.2+build.15-v2.jar" sourcepath="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-loot-tables-v1-0.1.5+e08a73050c@net.fabricmc.yarn.1_15_2.1.15.2+build.15-v2-sources.jar">
+	<classpathentry kind="lib" path="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-key-binding-api-v1-1.0.0+e16a97747c@net.fabricmc.yarn.1_16_rc1.1.16-rc1+build.9-v2.jar" sourcepath="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-key-binding-api-v1-1.0.0+e16a97747c@net.fabricmc.yarn.1_16_rc1.1.16-rc1+build.9-v2-sources.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-mining-levels-v0-0.1.1+b7f9825d0c@net.fabricmc.yarn.1_15_2.1.15.2+build.15-v2.jar" sourcepath="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-mining-levels-v0-0.1.1+b7f9825d0c@net.fabricmc.yarn.1_15_2.1.15.2+build.15-v2-sources.jar">
+	<classpathentry kind="lib" path="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-keybindings-v0-0.2.0+3fa9f7c57c@net.fabricmc.yarn.1_16_rc1.1.16-rc1+build.9-v2.jar" sourcepath="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-keybindings-v0-0.2.0+3fa9f7c57c@net.fabricmc.yarn.1_16_rc1.1.16-rc1+build.9-v2-sources.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-models-v0-0.1.0+dfdb52d60c@net.fabricmc.yarn.1_15_2.1.15.2+build.15-v2.jar" sourcepath="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-models-v0-0.1.0+dfdb52d60c@net.fabricmc.yarn.1_15_2.1.15.2+build.15-v2-sources.jar">
+	<classpathentry kind="lib" path="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-loot-tables-v1-0.1.10+059ea8667c@net.fabricmc.yarn.1_16_rc1.1.16-rc1+build.9-v2.jar" sourcepath="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-loot-tables-v1-0.1.10+059ea8667c@net.fabricmc.yarn.1_16_rc1.1.16-rc1+build.9-v2-sources.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-networking-blockentity-v0-0.2.3+e08a73050c@net.fabricmc.yarn.1_15_2.1.15.2+build.15-v2.jar" sourcepath="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-networking-blockentity-v0-0.2.3+e08a73050c@net.fabricmc.yarn.1_15_2.1.15.2+build.15-v2-sources.jar">
+	<classpathentry kind="lib" path="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-mining-levels-v0-0.1.2+b764ce997c@net.fabricmc.yarn.1_16_rc1.1.16-rc1+build.9-v2.jar" sourcepath="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-mining-levels-v0-0.1.2+b764ce997c@net.fabricmc.yarn.1_16_rc1.1.16-rc1+build.9-v2-sources.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-networking-v0-0.1.7+003643510c@net.fabricmc.yarn.1_15_2.1.15.2+build.15-v2.jar" sourcepath="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-networking-v0-0.1.7+003643510c@net.fabricmc.yarn.1_15_2.1.15.2+build.15-v2-sources.jar">
+	<classpathentry kind="lib" path="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-models-v0-0.1.0+dfdb52d67c@net.fabricmc.yarn.1_16_rc1.1.16-rc1+build.9-v2.jar" sourcepath="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-models-v0-0.1.0+dfdb52d67c@net.fabricmc.yarn.1_16_rc1.1.16-rc1+build.9-v2-sources.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-object-builders-v0-0.1.4+0fb9af840c@net.fabricmc.yarn.1_15_2.1.15.2+build.15-v2.jar" sourcepath="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-object-builders-v0-0.1.4+0fb9af840c@net.fabricmc.yarn.1_15_2.1.15.2+build.15-v2-sources.jar">
+	<classpathentry kind="lib" path="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-networking-blockentity-v0-0.2.5+b50ffc7b7c@net.fabricmc.yarn.1_16_rc1.1.16-rc1+build.9-v2.jar" sourcepath="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-networking-blockentity-v0-0.2.5+b50ffc7b7c@net.fabricmc.yarn.1_16_rc1.1.16-rc1+build.9-v2-sources.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-particles-v1-0.1.1+dfdb52d60c@net.fabricmc.yarn.1_15_2.1.15.2+build.15-v2.jar" sourcepath="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-particles-v1-0.1.1+dfdb52d60c@net.fabricmc.yarn.1_15_2.1.15.2+build.15-v2-sources.jar">
+	<classpathentry kind="lib" path="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-networking-v0-0.1.10+e00ecb5f7c@net.fabricmc.yarn.1_16_rc1.1.16-rc1+build.9-v2.jar" sourcepath="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-networking-v0-0.1.10+e00ecb5f7c@net.fabricmc.yarn.1_16_rc1.1.16-rc1+build.9-v2-sources.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-registry-sync-v0-0.2.6+f3d8141b0c@net.fabricmc.yarn.1_15_2.1.15.2+build.15-v2.jar" sourcepath="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-registry-sync-v0-0.2.6+f3d8141b0c@net.fabricmc.yarn.1_15_2.1.15.2+build.15-v2-sources.jar">
+	<classpathentry kind="lib" path="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-object-builder-api-v1-1.5.5+e00ecb5f7c@net.fabricmc.yarn.1_16_rc1.1.16-rc1+build.9-v2.jar" sourcepath="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-object-builder-api-v1-1.5.5+e00ecb5f7c@net.fabricmc.yarn.1_16_rc1.1.16-rc1+build.9-v2-sources.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-renderer-api-v1-0.2.10+f08b61330c@net.fabricmc.yarn.1_15_2.1.15.2+build.15-v2.jar" sourcepath="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-renderer-api-v1-0.2.10+f08b61330c@net.fabricmc.yarn.1_15_2.1.15.2+build.15-v2-sources.jar">
+	<classpathentry kind="lib" path="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-object-builders-v0-0.6.0+da175ad67c@net.fabricmc.yarn.1_16_rc1.1.16-rc1+build.9-v2.jar" sourcepath="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-object-builders-v0-0.6.0+da175ad67c@net.fabricmc.yarn.1_16_rc1.1.16-rc1+build.9-v2-sources.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-renderer-indigo-0.2.23+9290e2ed0c@net.fabricmc.yarn.1_15_2.1.15.2+build.15-v2.jar" sourcepath="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-renderer-indigo-0.2.23+9290e2ed0c@net.fabricmc.yarn.1_15_2.1.15.2+build.15-v2-sources.jar">
+	<classpathentry kind="lib" path="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-particles-v1-0.2.1+0a6f2a707c@net.fabricmc.yarn.1_16_rc1.1.16-rc1+build.9-v2.jar" sourcepath="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-particles-v1-0.2.1+0a6f2a707c@net.fabricmc.yarn.1_16_rc1.1.16-rc1+build.9-v2-sources.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-renderer-registries-v1-2.0.1+5a0f9a600c@net.fabricmc.yarn.1_15_2.1.15.2+build.15-v2.jar" sourcepath="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-renderer-registries-v1-2.0.1+5a0f9a600c@net.fabricmc.yarn.1_15_2.1.15.2+build.15-v2-sources.jar">
+	<classpathentry kind="lib" path="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-registry-sync-v0-0.3.8+7dba2d6c7c@net.fabricmc.yarn.1_16_rc1.1.16-rc1+build.9-v2.jar" sourcepath="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-registry-sync-v0-0.3.8+7dba2d6c7c@net.fabricmc.yarn.1_16_rc1.1.16-rc1+build.9-v2-sources.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-rendering-data-attachment-v1-0.1.3+b7f9825d0c@net.fabricmc.yarn.1_15_2.1.15.2+build.15-v2.jar" sourcepath="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-rendering-data-attachment-v1-0.1.3+b7f9825d0c@net.fabricmc.yarn.1_15_2.1.15.2+build.15-v2-sources.jar">
+	<classpathentry kind="lib" path="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-renderer-api-v1-0.2.13+eae12eb87c@net.fabricmc.yarn.1_16_rc1.1.16-rc1+build.9-v2.jar" sourcepath="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-renderer-api-v1-0.2.13+eae12eb87c@net.fabricmc.yarn.1_16_rc1.1.16-rc1+build.9-v2-sources.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-rendering-fluids-v1-0.1.6+12515ed90c@net.fabricmc.yarn.1_15_2.1.15.2+build.15-v2.jar" sourcepath="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-rendering-fluids-v1-0.1.6+12515ed90c@net.fabricmc.yarn.1_15_2.1.15.2+build.15-v2-sources.jar">
+	<classpathentry kind="lib" path="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-renderer-indigo-0.3.1+059ea8667c@net.fabricmc.yarn.1_16_rc1.1.16-rc1+build.9-v2.jar" sourcepath="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-renderer-indigo-0.3.1+059ea8667c@net.fabricmc.yarn.1_16_rc1.1.16-rc1+build.9-v2-sources.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-rendering-v0-1.1.0+534104900c@net.fabricmc.yarn.1_15_2.1.15.2+build.15-v2.jar" sourcepath="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-rendering-v0-1.1.0+534104900c@net.fabricmc.yarn.1_15_2.1.15.2+build.15-v2-sources.jar">
+	<classpathentry kind="lib" path="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-renderer-registries-v1-2.0.1+5a0f9a607c@net.fabricmc.yarn.1_16_rc1.1.16-rc1+build.9-v2.jar" sourcepath="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-renderer-registries-v1-2.0.1+5a0f9a607c@net.fabricmc.yarn.1_16_rc1.1.16-rc1+build.9-v2-sources.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-rendering-v1-0.1.0+003643510c@net.fabricmc.yarn.1_15_2.1.15.2+build.15-v2.jar" sourcepath="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-rendering-v1-0.1.0+003643510c@net.fabricmc.yarn.1_15_2.1.15.2+build.15-v2-sources.jar">
+	<classpathentry kind="lib" path="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-rendering-data-attachment-v1-0.1.3+b7f9825d7c@net.fabricmc.yarn.1_16_rc1.1.16-rc1+build.9-v2.jar" sourcepath="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-rendering-data-attachment-v1-0.1.3+b7f9825d7c@net.fabricmc.yarn.1_16_rc1.1.16-rc1+build.9-v2-sources.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-resource-loader-v0-0.1.10+06c939b30c@net.fabricmc.yarn.1_15_2.1.15.2+build.15-v2.jar" sourcepath="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-resource-loader-v0-0.1.10+06c939b30c@net.fabricmc.yarn.1_15_2.1.15.2+build.15-v2-sources.jar">
+	<classpathentry kind="lib" path="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-rendering-fluids-v1-0.1.7+12a8474c7c@net.fabricmc.yarn.1_16_rc1.1.16-rc1+build.9-v2.jar" sourcepath="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-rendering-fluids-v1-0.1.7+12a8474c7c@net.fabricmc.yarn.1_16_rc1.1.16-rc1+build.9-v2-sources.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-tag-extensions-v0-0.1.3+abd915800c@net.fabricmc.yarn.1_15_2.1.15.2+build.15-v2.jar" sourcepath="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-tag-extensions-v0-0.1.3+abd915800c@net.fabricmc.yarn.1_15_2.1.15.2+build.15-v2-sources.jar">
+	<classpathentry kind="lib" path="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-rendering-v0-1.1.0+534104907c@net.fabricmc.yarn.1_16_rc1.1.16-rc1+build.9-v2.jar" sourcepath="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-rendering-v0-1.1.0+534104907c@net.fabricmc.yarn.1_16_rc1.1.16-rc1+build.9-v2-sources.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-textures-v0-1.0.4+821cdba70c@net.fabricmc.yarn.1_15_2.1.15.2+build.15-v2.jar" sourcepath="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-textures-v0-1.0.4+821cdba70c@net.fabricmc.yarn.1_15_2.1.15.2+build.15-v2-sources.jar">
+	<classpathentry kind="lib" path="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-rendering-v1-1.1.2+346247d77c@net.fabricmc.yarn.1_16_rc1.1.16-rc1+build.9-v2.jar" sourcepath="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-rendering-v1-1.1.2+346247d77c@net.fabricmc.yarn.1_16_rc1.1.16-rc1+build.9-v2-sources.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-loader-0.8.5+build.199@net.fabricmc.yarn.1_15_2.1.15.2+build.15-v2.jar" sourcepath="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-loader-0.8.5+build.199@net.fabricmc.yarn.1_15_2.1.15.2+build.15-v2-sources.jar">
+	<classpathentry kind="lib" path="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-resource-loader-v0-0.2.5+059ea8667c@net.fabricmc.yarn.1_16_rc1.1.16-rc1+build.9-v2.jar" sourcepath="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-resource-loader-v0-0.2.5+059ea8667c@net.fabricmc.yarn.1_16_rc1.1.16-rc1+build.9-v2-sources.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/basic-math-0.4.1@net.fabricmc.yarn.1_15_2.1.15.2+build.15-v2.jar" sourcepath="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/basic-math-0.4.1@net.fabricmc.yarn.1_15_2.1.15.2+build.15-v2-sources.jar">
+	<classpathentry kind="lib" path="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-screen-handler-api-v1-1.0.1+f362c86e7c@net.fabricmc.yarn.1_16_rc1.1.16-rc1+build.9-v2.jar" sourcepath="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-screen-handler-api-v1-1.0.1+f362c86e7c@net.fabricmc.yarn.1_16_rc1.1.16-rc1+build.9-v2-sources.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="C:/Users/СерегинАГ/.gradle/caches/modules-2/files-2.1/net.fabricmc/dev-launch-injector/0.2.0+build.6/dd742e9568d7c00250fcf0bd9a549e87ce39d3d8/dev-launch-injector-0.2.0+build.6.jar">
+	<classpathentry kind="lib" path="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-tag-extensions-v0-0.2.5+5a6e8f4c7c@net.fabricmc.yarn.1_16_rc1.1.16-rc1+build.9-v2.jar" sourcepath="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-tag-extensions-v0-0.2.5+5a6e8f4c7c@net.fabricmc.yarn.1_16_rc1.1.16-rc1+build.9-v2-sources.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="C:/Users/СерегинАГ/.gradle/caches/modules-2/files-2.1/net.fabricmc/fabric-loom/0.2.6-SNAPSHOT/c4870a9dea65b47e62686806437c907ccf5f4b65/fabric-loom-0.2.6-SNAPSHOT.jar">
+	<classpathentry kind="lib" path="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-textures-v0-1.0.4+eae12eb87c@net.fabricmc.yarn.1_16_rc1.1.16-rc1+build.9-v2.jar" sourcepath="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-textures-v0-1.0.4+eae12eb87c@net.fabricmc.yarn.1_16_rc1.1.16-rc1+build.9-v2-sources.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-tool-attribute-api-v1-1.1.4+5794386e7c@net.fabricmc.yarn.1_16_rc1.1.16-rc1+build.9-v2.jar" sourcepath="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-tool-attribute-api-v1-1.1.4+5794386e7c@net.fabricmc.yarn.1_16_rc1.1.16-rc1+build.9-v2-sources.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-loader-0.8.8+build.202@net.fabricmc.yarn.1_16_rc1.1.16-rc1+build.9-v2.jar" sourcepath="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/fabric-loader-0.8.8+build.202@net.fabricmc.yarn.1_16_rc1.1.16-rc1+build.9-v2-sources.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/basic-math-0.5.1@net.fabricmc.yarn.1_16_rc1.1.16-rc1+build.9-v2.jar" sourcepath="D:/NetBeans/Projects/Minecraft/JustMap/.gradle/loom-cache/remapped_mods/basic-math-0.5.1@net.fabricmc.yarn.1_16_rc1.1.16-rc1+build.9-v2-sources.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="C:/Users/СерегинАГ/.gradle/caches/modules-2/files-2.1/net.minecrell/terminalconsoleappender/1.2.0/96d02cd3b384ff015a8fef4223bcb4ccf1717c95/terminalconsoleappender-1.2.0.jar" sourcepath="C:/Users/СерегинАГ/.gradle/caches/modules-2/files-2.1/net.minecrell/terminalconsoleappender/1.2.0/c9e9c6ef25149f84e9ca5d133b4016749d95c1a2/terminalconsoleappender-1.2.0-sources.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="C:/Users/СерегинАГ/.gradle/caches/modules-2/files-2.1/net.fabricmc/dev-launch-injector/0.2.1+build.8/da8bef7e6e2f952da707f282bdb46882a0fce5e3/dev-launch-injector-0.2.1+build.8.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="C:/Users/СерегинАГ/.gradle/caches/modules-2/files-2.1/org.jline/jline-reader/3.12.1/4382ab1382c7b6f379377ed5f665dc2f6e1218bc/jline-reader-3.12.1.jar" sourcepath="C:/Users/СерегинАГ/.gradle/caches/modules-2/files-2.1/org.jline/jline-reader/3.12.1/88d7d2011ebec345d0a5c6237be1e7be864c7ec8/jline-reader-3.12.1-sources.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="C:/Users/СерегинАГ/.gradle/caches/modules-2/files-2.1/org.jline/jline-terminal/3.12.1/c777448314e050d980a6b697c140f3bfe9eb7416/jline-terminal-3.12.1.jar" sourcepath="C:/Users/СерегинАГ/.gradle/caches/modules-2/files-2.1/org.jline/jline-terminal/3.12.1/3f3b61e6f3eafeba0c289b308926e0f93457140/jline-terminal-3.12.1-sources.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="C:/Users/СерегинАГ/.gradle/caches/modules-2/files-2.1/net.fabricmc/fabric-loom/0.4-SNAPSHOT/4285baf945e0de251b2fdaaebb479f196ee316b6/fabric-loom-0.4-SNAPSHOT.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value=""/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="C:/Users/СерегинАГ/.gradle/caches/fabric-loom/yarn-1.15.2+build.15-v2-final.jar">
+	<classpathentry kind="lib" path="C:/Users/СерегинАГ/.gradle/caches/fabric-loom/yarn-1.16-rc1+build.9-v2-final.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>

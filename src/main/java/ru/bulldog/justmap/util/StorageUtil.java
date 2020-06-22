@@ -7,7 +7,8 @@ import net.minecraft.client.network.ServerInfo;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.ChunkPos;
-
+import net.minecraft.util.registry.RegistryKey;
+import net.minecraft.world.dimension.DimensionType;
 import ru.bulldog.justmap.map.data.ChunkStorage;
 
 public class StorageUtil {
@@ -17,9 +18,8 @@ public class StorageUtil {
 	
 	private static ChunkStorage storage;
 	private static File storageDir;
-	private static File filesDir = new File(MAP_DIR, "undefined/");
-	
-	private static int currentDimId = 0;
+	private static File filesDir = new File(MAP_DIR, "undefined/");	
+	private static String currentDim = "unknown";
 	
 	public static synchronized CompoundTag getCache(ChunkPos pos) {
 		if (storage == null) updateCacheStorage();
@@ -48,14 +48,25 @@ public class StorageUtil {
 	}
 	
 	public static File cacheDir() {
+		RegistryKey<DimensionType> dimKey = null;
 		if (minecraft.world != null) {
-			int dimension = minecraft.world.getDimension().getType().getRawId();
-			if (currentDimId != dimension) {
-				currentDimId = dimension;
+			dimKey = minecraft.world.getDimensionRegistryKey();			
+			String dimension = dimKey.getValue().getPath();
+			if (!currentDim.equals(dimension)) {
+				currentDim = dimension;
+			}			
+		}
+
+		File cacheDir = new File(filesDir(), String.format("cache/%s/", currentDim));
+		if (dimKey != null) {
+			int dimId = Dimension.getId(dimKey);
+			if (dimId != Integer.MIN_VALUE) {
+				File oldDir = new File(filesDir(), String.format("cache/DIM%d/", dimId));
+				if (oldDir.exists()) {
+					oldDir.renameTo(cacheDir);
+				}				
 			}
 		}
-		
-		File cacheDir = new File(filesDir(), String.format("cache/DIM%d/", currentDimId));
 		
 		if (!cacheDir.exists()) {
 			cacheDir.mkdirs();
@@ -70,7 +81,7 @@ public class StorageUtil {
 		ServerInfo serverInfo = client.getCurrentServerEntry();
 		if (client.isIntegratedServerRunning()) {
 			MinecraftServer server = client.getServer();
-			String name = scrubNameFile(server.getLevelName());
+			String name = scrubNameFile(server.getSaveProperties().getLevelName());
 			filesDir = new File(MAP_DIR, String.format("local/%s/", name));
 		} else if (serverInfo != null) {
 			String name = scrubNameFile(serverInfo.name);
@@ -111,7 +122,7 @@ public class StorageUtil {
 		}
 		dir.delete();
 	}
-	
+
 	private static String scrubNameFile(String input) {
 		input = input.replace("<", "_");
 		input = input.replace(">", "_");

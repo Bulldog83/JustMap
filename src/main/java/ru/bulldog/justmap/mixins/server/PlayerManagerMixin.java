@@ -8,6 +8,8 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import net.minecraft.network.ClientConnection;
+import net.minecraft.network.MessageType;
+import net.minecraft.network.packet.s2c.play.GameMessageS2CPacket;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.PlayerManager;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -32,46 +34,50 @@ public abstract class PlayerManagerMixin {
 			Text command;
 			if (gameRules.getBoolean(MapGameRules.ALLOW_CAVES_MAP)) {
 				command = new LiteralText("§0§0§a§1§f§f");
-				serverPlayerEntity.sendMessage(command);
+				this.sendCommand(serverPlayerEntity, command);
 			}
 			if (gameRules.getBoolean(MapGameRules.ALLOW_ENTITY_RADAR)) {
 				command = new LiteralText("§0§0§b§1§f§f");
-				serverPlayerEntity.sendMessage(command);
+				this.sendCommand(serverPlayerEntity, command);
 			}
 			if (gameRules.getBoolean(MapGameRules.ALLOW_PLAYER_RADAR)) {
 				command = new LiteralText("§0§0§c§1§f§f");
-				serverPlayerEntity.sendMessage(command);
+				this.sendCommand(serverPlayerEntity, command);
 			}
 			if (gameRules.getBoolean(MapGameRules.ALLOW_CREATURE_RADAR)) {
 				command = new LiteralText("§0§0§d§1§f§f");
-				serverPlayerEntity.sendMessage(command);
+				this.sendCommand(serverPlayerEntity, command);
 			}
 			if (gameRules.getBoolean(MapGameRules.ALLOW_HOSTILE_RADAR)) {
 				command = new LiteralText("§0§0§e§1§f§f");
-				serverPlayerEntity.sendMessage(command);
+				this.sendCommand(serverPlayerEntity, command);
 			}
 		} else {
 			Text command;
 			if (ServerParams.allowCavesMap) {
 				command = new LiteralText("§0§0§a§1§f§f");
-				serverPlayerEntity.sendMessage(command);
+				this.sendCommand(serverPlayerEntity, command);
 			}
 			if (ServerParams.allowEntities) {
 				command = new LiteralText("§0§0§b§1§f§f");
-				serverPlayerEntity.sendMessage(command);
+				this.sendCommand(serverPlayerEntity, command);
 			}
 			if (ServerParams.allowPlayers) {
 				command = new LiteralText("§0§0§c§1§f§f");
-				serverPlayerEntity.sendMessage(command);
+				this.sendCommand(serverPlayerEntity, command);
 			}
 			if (ServerParams.allowCreatures) {
 				command = new LiteralText("§0§0§d§1§f§f");
-				serverPlayerEntity.sendMessage(command);
+				this.sendCommand(serverPlayerEntity, command);
 			}
 			if (ServerParams.allowHostile) {
 				command = new LiteralText("§0§0§e§1§f§f");
-				serverPlayerEntity.sendMessage(command);
+				this.sendCommand(serverPlayerEntity, command);
 			}
 		}
+	}
+	
+	private void sendCommand(ServerPlayerEntity serverPlayerEntity, Text command) {
+		serverPlayerEntity.networkHandler.sendPacket(new GameMessageS2CPacket(command, MessageType.SYSTEM, serverPlayerEntity.getUuid()));
 	}
 }

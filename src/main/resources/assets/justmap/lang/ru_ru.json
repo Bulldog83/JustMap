@@ -35,6 +35,7 @@
   "justmap.configuration.map_brightness": "Яркость карты",
   "justmap.configuration.show_in_chat": "Отображать миникарту когда открыт чат",
   "justmap.configuration.show_terrain": "Показывать рельеф",
+  "justmap.configuration.show_topography": "Показывать топографию",
   "justmap.configuration.show_caves": "Показывать пещеры",
   "justmap.configuration.hide_plants": "Скрыть растения",
   "justmap.configuration.hide_water": "Скрыть воду",
@@ -69,6 +70,7 @@
   "justmap.configuration.show_player_names": "Отображать имена игроков",
   "justmap.configuration.render_entity_model": "Рендерить модельки сущностей (снижает FPS)",
   "justmap.configuration.show_icons_outline": "Отображать обводку иконок",
+  "justmap.configuration.entity_outline_thickness": "Толщина обводки",
   "justmap.configuration.entity_icon_size": "Размер иконки сущностей",
   "justmap.configuration.entity_model_size": "Размер модели сущностей",
   
@@ -77,6 +79,7 @@
   "justmap.configuration.update_cycle": "Обновлений чанков за цикл",
   "justmap.configuration.purge_delay": "Задержка очистки кэша (секунд)",
   "justmap.configuration.purge_amount": "Максимальное количество чанков для удаления",
+  "justmap.configuration.uninterrupted_map_update": "Непрерывное обновление карты",
   
   "justmap.configuration.tooltip_color_config": "Имеет эффект только при альтернативном цветовом рендере.",
 

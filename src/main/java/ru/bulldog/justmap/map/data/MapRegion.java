@@ -65,6 +65,7 @@ public class MapRegion {
 	}
 	
 	private void updateMapParams() {
+		this.needUpdate = ClientParams.forceUpdate;
 		if (ClientParams.hideWater != hideWater) {
 			this.hideWater = ClientParams.hideWater;
 			this.needUpdate = true;
@@ -78,6 +79,7 @@ public class MapRegion {
 			this.alternateRender = ClientParams.alternateColorRender;
 			this.needUpdate = true;
 		}
+		
 	}
 	
 	private void updateImage() {
@@ -91,23 +93,21 @@ public class MapRegion {
 				int chunkZ = (regZ + y) >> 4;
 				
 				MapChunk mapChunk;
+				boolean updated = false;
 				if (surfaceOnly) {
 					mapChunk = mapData.getChunk(Layer.Type.SURFACE, 0, chunkX, chunkZ);
 					if (MapCache.currentLayer() == Layer.Type.SURFACE) {
-						mapChunk.update(needUpdate);
-						if (mapChunk.saveNeeded()) {
-							this.changed = true;
-						}
+						updated = mapChunk.update(needUpdate);
 					}
 				} else {
-					mapChunk = mapData.getCurrentChunk(chunkX, chunkZ).update(needUpdate);
-					if (mapChunk.saveNeeded()) {
-						this.changed = true;
-					}
+					mapChunk = mapData.getCurrentChunk(chunkX, chunkZ);
+					updated = mapChunk.update(needUpdate);
 				}
 				this.image.writeChunkData(x, y, mapChunk.getColorData());
+				
+				if (!changed) this.changed = updated;
 			}
-		}		
+		}
 		if (changed) this.saveImage();
 		this.updated = System.currentTimeMillis();
 		this.needUpdate = false;

@@ -29,6 +29,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.BlockPos;
 
 @Environment(EnvType.CLIENT)
@@ -220,7 +221,7 @@ public class MapRenderer {
 		dir.x = posX; dir.y = posY;
 	}
 	
-	public void draw() {
+	public void draw(MatrixStack matrix) {
 		if (!minimap.isMapVisible() || client.player == null) {
 			return;
 		}
@@ -240,7 +241,7 @@ public class MapRenderer {
 		
 		if (ClientParams.useSkins) {
 			int brd = (int) ((border * 2) * scale);
-			this.mapSkin.draw(posX, posY, mapW + brd, mapH + brd);
+			this.mapSkin.draw(matrix, posX, posY, mapW + brd, mapH + brd);
 		}
 		
 		if (this.minimap.posChanged) {
@@ -264,31 +265,30 @@ public class MapRenderer {
 			RenderSystem.rotatef(-rotation + 180, 0, 0, 1.0F);
 			RenderSystem.translatef(-moveX, -moveY, 0.0F);
 		}
-		RenderSystem.translatef(-offX, -offY, 0.0F);
-		
+		RenderSystem.translatef(-offX, -offY, 0.0F);		
 		this.drawMap();
-
 		RenderSystem.popMatrix();
+		
 		if (Minimap.allowEntityRadar()) {
 			if (Minimap.allowPlayerRadar()) {
 				for (PlayerIcon player : minimap.getPlayerIcons()) {
-					player.draw(mapX, mapY, offX, offY, rotation);
+					player.draw(matrix, mapX, mapY, offX, offY, rotation);
 				}
 			}
 			if (Minimap.allowCreatureRadar() || Minimap.allowHostileRadar()) {
 				for (EntityIcon entity : minimap.getEntities()) {
-					entity.draw(mapX, mapY, offX, offY, rotation);
+					entity.draw(matrix, mapX, mapY, offX, offY, rotation);
 				}
 			}
 		}
 		
-		DrawHelper.DRAWER.drawRightAlignedString(
-				client.textRenderer, Float.toString(minimap.getScale()),
+		DrawHelper.drawRightAlignedString(
+				Float.toString(minimap.getScale()),
 				mapX + mapW - 3, mapY + mapH - 10, Colors.WHITE);
 		
 		for (WaypointIcon waypoint : minimap.getWaypoints()) {
 			if (!waypoint.isHidden()) {
-				waypoint.draw(mapX, mapY, offX, offY, rotation);
+				waypoint.draw(matrix, mapX, mapY, offX, offY, rotation);
 			}
 		}
 		GL11.glDisable(GL11.GL_SCISSOR_TEST);
@@ -303,7 +303,7 @@ public class MapRenderer {
 			PlayerHeadIcon.getIcon(client.player).draw(centerX, centerY, iconSize, true);
 		}
 		
-		this.textManager.draw();
+		this.textManager.draw(matrix);
 		
 		RenderSystem.enableDepthTest();
 	}

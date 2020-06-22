@@ -2,7 +2,8 @@ package ru.bulldog.justmap.map.icon;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.texture.*;
+import net.minecraft.client.texture.PlayerSkinTexture;
+import net.minecraft.client.texture.ResourceTexture;
 import net.minecraft.client.util.DefaultSkinHelper;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
@@ -24,7 +25,7 @@ public class PlayerHeadIcon {
 	private int delay = 5000;
 	private boolean success = false;
 	
-	private ResourceTexture playerSkin;
+	private ResourceTexture playerSkin;	
 	private ClientPlayerEntity player;
 	
 	private PlayerHeadIcon(ClientPlayerEntity player) {
@@ -68,9 +69,10 @@ public class PlayerHeadIcon {
 		double drawY = y - size / 2;
 		y -= size / 2;
 		if (outline) {
-			DrawHelper.fill(drawX - 0.5, drawY - 0.5, drawX + size + 0.5, drawY + size + 0.5, Colors.LIGHT_GRAY);
+			double thickness = ClientParams.entityOutlineSize;
+			DrawHelper.fill(drawX - thickness / 2, drawY - thickness / 2, size + thickness, size + thickness, Colors.LIGHT_GRAY);
 		}
-		this.playerSkin.bindTexture();
+		this.playerSkin.bindTexture();	
 		DrawHelper.drawPlayerHead(matrix, drawX, drawY, size, size);
 	}
 	

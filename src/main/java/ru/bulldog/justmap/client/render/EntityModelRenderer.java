@@ -51,7 +51,7 @@ public class EntityModelRenderer {
 			matrixStack.multiply(Vector3f.POSITIVE_Z.getDegreesQuaternion(rotation));
 		} else {
 			matrixStack.multiply(Vector3f.POSITIVE_X.getDegreesQuaternion(180.0F));
-		}		
+		}
 		matrixStack.push();
 		matrixStack.scale(scale, scale, scale);
 		

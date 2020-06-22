@@ -6,6 +6,7 @@ import ru.bulldog.justmap.util.StorageUtil;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
@@ -20,11 +21,11 @@ import java.util.concurrent.ConcurrentHashMap;
 public class MapCache {
 	private final static MinecraftClient minecraft = MinecraftClient.getInstance();
 	
-	private static Map<Integer, MapCache> dimensions = new HashMap<>();
+	private static Map<Identifier, MapCache> dimensions = new HashMap<>();
 	private static World currentWorld;
-	private static Layer.Type currentLayer = Layer.Type.SURFACE;	
+	private static Layer.Type currentLayer = Layer.Type.SURFACE;
+	private static Identifier currentDimension = DimensionType.OVERWORLD_REGISTRY_KEY.getValue();
 	private static int currentLevel = 0;
-	private static int currentDimension = 0;
 	
 	public static long lastSaved = 0;
 	
@@ -48,7 +49,7 @@ public class MapCache {
 	public static MapCache get() {
 		World world = minecraft.world;
 		if (minecraft.isIntegratedServerRunning() && world != null) {
-			world = minecraft.getServer().getWorld(minecraft.player.dimension);
+			world = minecraft.getServer().getWorld(minecraft.world.getRegistryKey());
 		}
 		if (currentWorld == null || (world != null &&
 									 world != currentWorld)) {
@@ -58,7 +59,7 @@ public class MapCache {
 		
 		if (currentWorld == null) return null;
 		
-		int dimId = currentWorld.dimension.getType().getRawId();
+		Identifier dimId = currentWorld.getDimensionRegistryKey().getValue();
 		if(currentDimension != dimId) {
 			StorageUtil.updateCacheStorage();
 			currentDimension = dimId;
@@ -67,7 +68,7 @@ public class MapCache {
 		return get(currentWorld, currentDimension);
 	}
 	
-	public static MapCache get(World world, int dimension) {	
+	public static MapCache get(World world, Identifier dimension) {	
 		MapCache data = getData(world, dimension);
 		
 		if (data == null) return null;
@@ -82,21 +83,17 @@ public class MapCache {
 		return data;
 	}
 	
-	private static MapCache getData(World world, int dimendion) {
+	private static MapCache getData(World world, Identifier dimension) {
 		if (world == null) return null;
 		
-		if (dimensions.containsKey(dimendion)) {
-			return dimensions.get(dimendion);
+		if (dimensions.containsKey(dimension)) {
+			return dimensions.get(dimension);
 		}
 		
 		MapCache data = new MapCache(world);
-		dimensions.put(dimendion, data);
+		dimensions.put(dimension, data);
 		
 		return data;
-	}
-	
-	public static DimensionType getDimension() {
-		return DimensionType.byRawId(currentDimension);
 	}
 	
 	public static void saveData() {
@@ -119,7 +116,7 @@ public class MapCache {
 			chunk.store(chunkData);
 			
 			if (!chunkData.isEmpty()) {
-				chunkData.putInt("version", 2);
+				chunkData.putInt("version", 3);
 				StorageUtil.saveCache(chunk.getPos(), chunkData);
 			}
 			chunk.saving = false;
@@ -199,7 +196,7 @@ public class MapCache {
 		if (layer != region.getLayer() ||
 			level != region.getLevel()) {
 			region.swapLayer(layer, level);
-		} else if (time - region.updated > 1000) {
+		} else if (time - region.updated > 3000) {
 			region.updateTexture();
 		}
 		

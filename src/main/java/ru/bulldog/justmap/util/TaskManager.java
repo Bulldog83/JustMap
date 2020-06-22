@@ -3,9 +3,11 @@ package ru.bulldog.justmap.util;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Queue;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executor;
 import java.util.concurrent.locks.LockSupport;
+import java.util.function.Function;
 
 import ru.bulldog.justmap.JustMap;
 
@@ -52,6 +54,12 @@ public class TaskManager implements Executor {
     	this.workQueue.offer(command);
     	LockSupport.unpark(this.worker);
     }
+    
+    public <T> CompletableFuture<T> run(Function<CompletableFuture<T>, Runnable> function) {
+		CompletableFuture<T> completableFuture = new CompletableFuture<>();
+		this.execute(function.apply(completableFuture));
+		return completableFuture;
+	}
     
     public void stop() {
     	this.execute(() -> {

@@ -11,12 +11,15 @@ import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.chunk.WorldChunk;
+import net.minecraft.world.dimension.DimensionType;
 
 import java.util.Arrays;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class MapChunk {
@@ -25,18 +28,18 @@ public class MapChunk {
 	
 	private final static TaskManager chunkUpdater = TaskManager.getManager("chunk-data");
 	private volatile Map<Layer, ChunkLevel[]> levels;
-	private static MinecraftClient client = MinecraftClient.getInstance();
 	
 	private World world;
 	private WorldChunk worldChunk;
 	private ChunkPos chunkPos;
 	private Layer.Type layer;
-	private int dimension;
+	private Identifier dimension;
 	private int level = 0;
 	private boolean outdated = false;
 	private boolean updating = false;
 	private boolean saved = true;
 	private boolean purged = false;
+	private long refreshed = 0;
 	
 	public boolean saving = false;
 	public long updated = 0;
@@ -50,9 +53,11 @@ public class MapChunk {
 	}
 	
 	public MapChunk(World world, ChunkPos pos, Layer.Type layer) {
+		MinecraftClient client = MinecraftClient.getInstance();
+		
 		this.world = world;
 		this.worldChunk = client.world.getChunk(pos.x, pos.z);
-		this.dimension = world.getDimension().getType().getRawId();
+		this.dimension = world.getDimensionRegistryKey().getValue();
 		this.chunkPos = pos;
 		this.layer = layer;
 		this.levels = new ConcurrentHashMap<>();
@@ -61,7 +66,7 @@ public class MapChunk {
 	}
 	
 	private void init() {
-		if (dimension == -1) {
+		if (dimension.equals(DimensionType.THE_NETHER_REGISTRY_KEY.getValue())) {
 			initLayer(Layer.Type.NETHER);
 		} else {
 			initLayer(Layer.Type.SURFACE);
@@ -189,20 +194,21 @@ public class MapChunk {
 		return this;
 	}
 	
-	public MapChunk update(boolean forceUpdate) {
-		if (updating) return this;		
+	public boolean update(boolean forceUpdate) {
+		if (updating) return false;		
 		if (!outdated && forceUpdate) {
 			this.outdated = forceUpdate;
 		}
 		
 		long currentTime = System.currentTimeMillis();
-		if (!outdated && currentTime - updated < ClientParams.chunkUpdateInterval) return this;
-		if (purged || !this.updateWorldChunk()) return this;
+		if (!outdated && currentTime - updated < ClientParams.chunkUpdateInterval) return false;
+		if (purged || !this.updateWorldChunk()) return false;
 		
-		chunkUpdater.execute(this::updateChunkData);
-		this.updating = true;
+		CompletableFuture<Boolean> updated = chunkUpdater.run(future -> {
+			return () -> future.complete(this.updateChunkData());
+		});
 		
-		return this;
+		return updated.join();
 	}
 	
 	private boolean updateWorldChunk() {
@@ -214,7 +220,9 @@ public class MapChunk {
 		return true;
 	}
 	
-	private void updateChunkData() {
+	private boolean updateChunkData() {
+		this.updating = true;
+		
 		MapCache mapData = MapCache.get();
 		MapChunk eastChunk = mapData.getCurrentChunk(chunkPos.x + 1, chunkPos.z);
 		MapChunk southChunk = mapData.getCurrentChunk(chunkPos.x, chunkPos.z - 1);
@@ -243,16 +251,32 @@ public class MapChunk {
 				BlockPos blockPos = new BlockPos(posX, posY, posZ);
 				BlockState blockState = this.getBlockState(blockPos);
 				BlockState worldState = worldChunk.getBlockState(blockPos);
-				if(outdated || !blockState.equals(worldState)) {
+				if(outdated || !blockState.equals(worldState) || currentTime - refreshed > 60000) {
 					int color = ColorUtil.blockColor(worldChunk, blockPos);
 					if (color != -1) {
 						int heightDiff = MapProcessor.heightDifference(this, eastChunk, southChunk, x, posY, z);
 						
 						this.setBlockState(blockPos, worldState);
 						
+						int height = layer.value.height;
+						int bottom = 0, baseHeight = 0;
+						if (layer == Layer.Type.NETHER) {
+							bottom = level * height;
+							baseHeight = 128;
+						} else if (layer == Layer.Type.SURFACE) {
+							bottom = this.world.getSeaLevel();
+							baseHeight = 256;
+						} else {
+							bottom = level * height;
+							baseHeight = 32;
+						}
+						
+						float topoLevel = ((float) (posY - bottom) / baseHeight);						
+						
+						chunkLevel.topomap[index] = (int) (topoLevel * 100);
 						chunkLevel.colormap[index] = color;
 						chunkLevel.levelmap[index] = heightDiff;
-						chunkLevel.colordata[index] = ColorUtil.proccessColor(color, heightDiff);
+						chunkLevel.colordata[index] = ColorUtil.proccessColor(color, heightDiff, topoLevel);
 						
 						this.saved = false;
 					}
@@ -261,8 +285,9 @@ public class MapChunk {
 					if (color != -1) {
 						int heightDiff = MapProcessor.heightDifference(this, eastChunk, southChunk, x, posY, z);
 						if (chunkLevel.levelmap[index] != heightDiff) {
+							float topoLevel = chunkLevel.topomap[index] / 100F;
 							chunkLevel.levelmap[index] = heightDiff;
-							chunkLevel.colordata[index] = ColorUtil.proccessColor(color, heightDiff);
+							chunkLevel.colordata[index] = ColorUtil.proccessColor(color, heightDiff, topoLevel);
 							this.saved = false;
 						}
 					}
@@ -270,9 +295,12 @@ public class MapChunk {
 			}
 		}
 		
-		this.outdated = false;
 		this.updated = currentTime;
+		this.refreshed = currentTime;
+		this.outdated = false;
 		this.updating = false;
+		
+		return this.saveNeeded();
 	}
 	
 	public int[] getColorData() {

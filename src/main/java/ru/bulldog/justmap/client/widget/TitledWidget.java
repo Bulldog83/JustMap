@@ -1,28 +1,30 @@
 package ru.bulldog.justmap.client.widget;
 
 import net.minecraft.client.sound.SoundManager;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.text.LiteralText;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.widget.AbstractButtonWidget;
 
 
 public class TitledWidget<W extends AbstractButtonWidget> extends AbstractButtonWidget {
 	public final W widget;
-	public final String title;
+	public final LiteralText title;
 	private final TextRenderer font;
 	
 	private int spacing = 3;
 	
 	public TitledWidget(TextRenderer font, W widget, int x, int y, int width, int height, String message, String title) {
-		super(x, y, width, height, message);
+		super(x, y, width, height, new LiteralText(message));
 		this.widget = widget;
-		this.title = title;
+		this.title = new LiteralText(title);
 		this.font = font;
 		
 		update();
 	}
 	
 	private void update() {
-		int titleWidth = font.getStringWidth(title);
+		int titleWidth = font.getWidth(title);
 		int widgetWidth = widget.getWidth();
 		int wx = x + width - widgetWidth;
 		if (x + titleWidth + spacing > wx) {
@@ -35,9 +37,9 @@ public class TitledWidget<W extends AbstractButtonWidget> extends AbstractButton
 	}
 	
 	@Override
-	public void render(int int_1, int int_2, float float_1) {
-		drawString(font, title, x, y, 0xffffffff);
-		widget.render(int_1, int_2, float_1);
+	public void render(MatrixStack matrixStack, int int_1, int int_2, float float_1) {
+		this.drawStringWithShadow(matrixStack, font, title.getString(), x, y, 0xFFFFFFFF);
+		widget.render(matrixStack, int_1, int_2, float_1);
 	}
 	
 	@Override
@@ -71,8 +73,8 @@ public class TitledWidget<W extends AbstractButtonWidget> extends AbstractButton
 	}
 	
 	@Override
-	public void renderButton(int int_1, int int_2, float float_1) {
-		widget.renderButton(int_1, int_2, float_1);
+	public void renderButton(MatrixStack matrixStack, int int_1, int int_2, float float_1) {
+		widget.renderButton(matrixStack, int_1, int_2, float_1);
 	}
 	
 	@Override
@@ -111,8 +113,8 @@ public class TitledWidget<W extends AbstractButtonWidget> extends AbstractButton
 	}
 	
 	@Override
-	public void renderToolTip(int int_1, int int_2) {
-		widget.renderToolTip(int_1, int_2);
+	public void renderToolTip(MatrixStack matrixStack, int int_1, int int_2) {
+		widget.renderToolTip(matrixStack, int_1, int_2);
 	}
 	
 	@Override

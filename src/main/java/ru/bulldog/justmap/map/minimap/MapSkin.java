@@ -20,6 +20,8 @@ import net.minecraft.client.texture.Sprite;
 import net.minecraft.client.texture.SpriteAtlasTexture;
 import net.minecraft.client.texture.TextureManager;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
 @Environment(EnvType.CLIENT)
@@ -96,31 +98,31 @@ public class MapSkin extends Sprite {
 		textureManager.bindTexture(id);
 	}
 	
-	public void draw(int x, int y, int w, int h) {
+	public void draw(MatrixStack matrixStack, int x, int y, int w, int h) {
 		if (resizable) {
 			textureManager.bindTexture(this.getTexture());
 			if (w > this.getWidth() || h > this.getHeight()) {
-				DrawHelper.drawSkin(new MatrixStack(), this, x, y, w, h);
+				DrawHelper.drawSkin(matrixStack, this, x, y, w, h);
 			} else {
-				DrawHelper.blit(x, y, 0, w, h, this);
+				DrawHelper.drawSprite(matrixStack, x, y, 0, w, h, this);
 			}
 		} else {
 			this.bindPavedTexture(w, h);
-			DrawHelper.blit(x, y, 0, w, h, this);
+			DrawHelper.drawSprite(matrixStack, x, y, 0, w, h, this);
 		}
 	}
 	
-	public void draw(int x, int y, int size) {
-		this.draw(x, y, size, size);
+	public void draw(MatrixStack matrixStack, int x, int y, int size) {
+		this.draw(matrixStack, x, y, size, size);
 	}
 	
-	public String getName() {
-		return this.name;
+	public Text getName() {
+		return new LiteralText(this.name);
 	}
 	
 	@Override
 	public String toString() {
-		return this.getName();
+		return this.getName().asString();
 	}
 	
 	public static MapSkin getSkinByName(String name) {

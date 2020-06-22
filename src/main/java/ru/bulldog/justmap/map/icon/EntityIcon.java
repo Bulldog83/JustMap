@@ -23,7 +23,7 @@ public class EntityIcon extends MapIcon<EntityIcon> {
 	}
 	
 	@Override
-	public void draw(int mapX, int mapY, double offX, double offY, float rotation) {
+	public void draw(MatrixStack matrixStack, int mapX, int mapY, double offX, double offY, float rotation) {
 		if (!Minimap.allowCreatureRadar() && !hostile) { return; }
 		if (!Minimap.allowHostileRadar() && hostile) { return; }
 		
@@ -55,9 +55,8 @@ public class EntityIcon extends MapIcon<EntityIcon> {
 				EntityModelRenderer.renderModel(entity, pos.x, pos.y);
 			} else {
 				icon = EntityHeadIcon.getIcon(entity);
-				if (icon != null) {
-					MatrixStack matrix = new MatrixStack();					
-					icon.draw(matrix, pos.x, pos.y, size);
+				if (icon != null) {					
+					icon.draw(matrixStack, pos.x, pos.y, size);
 				} else {
 					DrawHelper.drawOutlineCircle(pos.x, pos.y, size / 3, 0.6, color);
 				}

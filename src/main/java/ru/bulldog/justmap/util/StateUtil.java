@@ -26,7 +26,7 @@ public class StateUtil {
 	}
 	
 	public static boolean isWater(BlockState state) {
-		return !isSeaweed(state) && state.getFluidState().matches(FluidTags.WATER);
+		return !isSeaweed(state) && state.getFluidState().isIn(FluidTags.WATER);
 	}
 	
 	public static boolean isPlant(BlockState state) {
@@ -37,7 +37,7 @@ public class StateUtil {
 	
 	public static boolean isSeaweed(BlockState state) {
 		Material material = state.getMaterial();
-		return material == Material.UNDERWATER_PLANT || material == Material.SEAGRASS;
+		return material == Material.UNDERWATER_PLANT || material == Material.REPLACEABLE_UNDERWATER_PLANT;
 	}
 	
 	public static boolean isWaterlogged(BlockState state) {

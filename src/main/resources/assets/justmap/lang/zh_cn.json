@@ -9,6 +9,7 @@
   "key.justmap.increase_scale": "增加地图比例",
   "key.justmap.show_worldmap": "显示世界地图",
   "key.justmap.show_config": "显示地图设置",
+  "key.justmap.toggle_big_map": "切换到大地图",
   "justmap.configuration.category.general": "常规设置",
   "justmap.configuration.category.info": "地图信息",
   "justmap.configuration.category.optimization": "优化",
@@ -22,7 +23,9 @@
   "justmap.configuration.arrow_size": "箭头图标尺寸",
   "justmap.configuration.worldmap_icon_size": "世界地图图标尺寸",
   "justmap.configuration.simple_arrow": "简易方向箭头",
-  "justmap.configuration.map_size": "地图尺寸",
+  "justmap.configuration.map_size": "地图大小",
+  "justmap.configuration.show_big_map": "显示大地图",
+  "justmap.configuration.big_map_size": "大地图尺寸",
   "justmap.configuration.chunk_level_size": "区块等级尺寸(方块)",
   "justmap.configuration.map_scale": "地图比例",
   "justmap.configuration.map_saturation": "地图饱和度",
@@ -86,9 +89,9 @@
   "justmap.gui.wp_hidden": "隐藏",
   "justmap.gui.wp_tracking": "屏幕边缘",
   "justmap.gui.wp_render": "在世界中",
-  "gamerule.allowCavesMap": "(仅地图) 洞穴测绘",
-  "gamerule.allowEntityRadar": "(仅地图) 生物雷达",
-  "gamerule.allowPlayerRadar": "(仅地图) 生物雷达",
-  "gamerule.allowCreatureRadar": "(仅地图) 生物雷达",
-  "gamerule.allowHostileRadar": "(仅地图) 敌对生物雷达"
+  "gamerule.allowCavesMap": "(Just Map) 洞穴测绘",
+  "gamerule.allowEntityRadar": "(Just Map) 实体雷达",
+  "gamerule.allowPlayerRadar": "(Just Map) 玩家雷达",
+  "gamerule.allowCreatureRadar": "(Just Map) 生物雷达",
+  "gamerule.allowHostileRadar": "(Just Map) 敌对生物雷达"
 }
