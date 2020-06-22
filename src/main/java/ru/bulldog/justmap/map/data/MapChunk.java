@@ -17,6 +17,7 @@ import net.minecraft.world.chunk.WorldChunk;
 
 import java.util.Arrays;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class MapChunk {
@@ -189,20 +190,21 @@ public class MapChunk {
 		return this;
 	}
 	
-	public MapChunk update(boolean forceUpdate) {
-		if (updating) return this;		
+	public boolean update(boolean forceUpdate) {
+		if (updating) return false;		
 		if (!outdated && forceUpdate) {
 			this.outdated = forceUpdate;
 		}
 		
 		long currentTime = System.currentTimeMillis();
-		if (!outdated && currentTime - updated < ClientParams.chunkUpdateInterval) return this;
-		if (purged || !this.updateWorldChunk()) return this;
+		if (!outdated && currentTime - updated < ClientParams.chunkUpdateInterval) return false;
+		if (purged || !this.updateWorldChunk()) return false;
 		
-		chunkUpdater.execute(this::updateChunkData);
-		this.updating = true;
+		CompletableFuture<Boolean> updated = chunkUpdater.run((future) -> {
+			return () -> future.complete(this.updateChunkData());
+		});
 		
-		return this;
+		return updated.join();
 	}
 	
 	private boolean updateWorldChunk() {
@@ -214,7 +216,9 @@ public class MapChunk {
 		return true;
 	}
 	
-	private void updateChunkData() {
+	private boolean updateChunkData() {
+		this.updating = true;
+		
 		MapCache mapData = MapCache.get();
 		MapChunk eastChunk = mapData.getCurrentChunk(chunkPos.x + 1, chunkPos.z);
 		MapChunk southChunk = mapData.getCurrentChunk(chunkPos.x, chunkPos.z - 1);
@@ -273,6 +277,8 @@ public class MapChunk {
 		this.outdated = false;
 		this.updated = currentTime;
 		this.updating = false;
+		
+		return this.saveNeeded();
 	}
 	
 	public int[] getColorData() {

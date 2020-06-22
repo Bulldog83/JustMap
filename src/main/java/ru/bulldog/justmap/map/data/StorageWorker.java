@@ -9,7 +9,6 @@ import java.util.Map.Entry;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.Function;
 
 import com.google.common.collect.Maps;
 
@@ -44,7 +43,7 @@ public class StorageWorker implements AutoCloseable {
 	}
 
 	public void setResult(File dir, ChunkPos chunkPos, CompoundTag compoundTag) {
-		this.run((completableFuture) -> {
+		this.worker.run((completableFuture) -> {
 			return () -> {
 				Result result = (Result) this.results.computeIfAbsent(chunkPos, (chunkPosx) -> {
 					return new Result();
@@ -64,7 +63,7 @@ public class StorageWorker implements AutoCloseable {
 	}
 
 	public CompoundTag getNbt(File dir, ChunkPos chunkPos) throws IOException {
-		CompletableFuture<?> completableFuture = this.run((completableFuturex) -> {
+		CompletableFuture<?> completableFuture = this.worker.run((completableFuturex) -> {
 			return () -> {
 				Result result = (Result) this.results.get(chunkPos);
 				if (result != null) {
@@ -93,7 +92,7 @@ public class StorageWorker implements AutoCloseable {
 	}
 
 	private CompletableFuture<Void> shutdown() {
-		return this.run((completableFuture) -> {
+		return this.worker.run((completableFuture) -> {
 			return () -> {
 				this.writeAll();
 				this.finish();
@@ -104,7 +103,7 @@ public class StorageWorker implements AutoCloseable {
 	}
 
 	public CompletableFuture<Void> completeAll() {
-		return this.run((completableFuture) -> {
+		return this.worker.run((completableFuture) -> {
 			return () -> {
 				CompletableFuture<?> completableFuture2 = CompletableFuture.allOf((CompletableFuture[]) this.results.values().stream().map((result) -> {
 					return result.future;
@@ -116,12 +115,6 @@ public class StorageWorker implements AutoCloseable {
 				});
 			};
 		});
-	}
-
-	private <T> CompletableFuture<T> run(Function<CompletableFuture<T>, Runnable> function) {
-		CompletableFuture<T> completableFuture = new CompletableFuture<>();
-		this.worker.execute(function.apply(completableFuture));
-		return completableFuture;
 	}
 	
 	private boolean writeResult() {
