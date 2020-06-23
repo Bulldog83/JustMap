@@ -157,9 +157,20 @@ public class MapSkin extends Sprite {
 		public float topV, bottomV;
 		public float tail, tailU;
 		
+		public boolean scaleChanged = false;
+		
 		private RenderData() {}
 		
-		public void calculate(double x, double y, float w, float h, double scale) {
+		public void updateScale() {
+			double scale = MinecraftClient.getInstance().getWindow().getScaleFactor();
+			scale = Math.min(2.0, scale);
+			if (scaleFactor != scale) {
+				this.scaleFactor = scale;
+				this.scaleChanged = true;
+			}
+		}
+		
+		public void calculate(double x, double y, float w, float h) {
 			int spriteW = MapSkin.this.getWidth();
 			int spriteH = MapSkin.this.getHeight();
 			int border = MapSkin.this.border;
@@ -172,8 +183,7 @@ public class MapSkin extends Sprite {
 			this.x = x;
 			this.y = y;
 			this.width = w;
-			this.height = h;			
-			this.scaleFactor = scale;
+			this.height = h;
 			this.scaledBorder = (float) (border * scaleFactor);			
 			this.hSide = w - scaledBorder * 2;
 			this.vSide = h - scaledBorder * 2;

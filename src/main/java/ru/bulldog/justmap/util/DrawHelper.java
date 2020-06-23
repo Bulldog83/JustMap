@@ -37,8 +37,6 @@ public class DrawHelper extends DrawableHelper {
 	private final static Tessellator tessellator = Tessellator.getInstance();
 	private final static BufferBuilder builder = tessellator.getBuffer();
 	private final static TextRenderer textRenderer = MinecraftClient.getInstance().textRenderer;
-	
-	private static MinecraftClient client = MinecraftClient.getInstance();
 
 	public void fillNoDepth(int x, int y, int right, int left, int color) {
 		RenderSystem.disableDepthTest();
@@ -219,11 +217,10 @@ public class DrawHelper extends DrawableHelper {
 	public static void drawSkin(MatrixStack matrix, MapSkin skin, double x, double y, float w, float h) {
 		RenderData renderData = skin.getRenderData();
 		
-		double scale = client.getWindow().getScaleFactor();
-		if (renderData.x != x || renderData.y != y || renderData.scaleFactor != scale ||
+		if (renderData.scaleChanged || renderData.x != x || renderData.y != y ||
 			renderData.width != w || renderData.height != h) {
 			
-			renderData.calculate(x, y, w, h, scale);
+			renderData.calculate(x, y, w, h);
 		}
 
 		float sMinU = skin.getMinU();
