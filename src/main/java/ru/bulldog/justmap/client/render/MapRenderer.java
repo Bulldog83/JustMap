@@ -125,33 +125,33 @@ public class MapRenderer {
 				break;
 			case TOP_CENTER:
 				this.mapX = winW / 2 - mapW / 2;
-				this.posX = mapX - border;
+				this.posX = mapX - scaledBorder;
 				break;
 			case TOP_RIGHT:
 				this.mapX = winW - offset - mapW - scaledBorder;
 				this.posX = mapX - scaledBorder;
 				break;
 			case MIDDLE_RIGHT:
-				this.mapX = winW - offset - mapW - border;
+				this.mapX = winW - offset - mapW - scaledBorder;
 				this.mapY = winH / 2 - mapH / 2;
-				this.posX = mapX - border;
-				this.posY = mapY - border;
+				this.posX = mapX - scaledBorder;
+				this.posY = mapY - scaledBorder;
 				break;
 			case MIDDLE_LEFT:
 				this.mapY = winH / 2 - mapH / 2;
-				this.posY = mapY - border;
+				this.posY = mapY - scaledBorder;
 				break;
 			case BOTTOM_LEFT:
 				textPos = TextManager.TextPosition.ABOVE;
-				this.mapY = winH - offset - mapH - border;
-				this.posY = mapY - border;
+				this.mapY = winH - offset - mapH - scaledBorder;
+				this.posY = mapY - scaledBorder;
 				break;
 			case BOTTOM_RIGHT:
 				textPos = TextManager.TextPosition.ABOVE;
-				this.mapX = winW - offset - mapW - border;
-				this.posX = mapX - border;
-				this.mapY = winH - offset - mapH - border;
-				this.posY = mapY - border;
+				this.mapX = winW - offset - mapW - scaledBorder;
+				this.posX = mapX - scaledBorder;
+				this.mapY = winH - offset - mapH - scaledBorder;
+				this.posY = mapY - scaledBorder;
 				break;
 		}
 		
