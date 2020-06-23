@@ -197,6 +197,8 @@ public class MapSkin extends Sprite {
 			this.bottomV = (float) (spriteH - border) / spriteH;
 			this.tail = hSide - vSide;
 			this.tailU = (border + sTail) / spriteW;
+			
+			this.scaleChanged = false;
 		}
 	}
 	
