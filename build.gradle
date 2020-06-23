@@ -70,7 +70,7 @@ task sourcesJar(type: Jar, dependsOn: classes) {
 }
 
 compileJava {
-	version += "-${project.minecraft_version}-beta"
+	version += "-${project.minecraft_version}-release"
 }
 
 jar {
