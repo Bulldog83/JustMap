@@ -32,6 +32,7 @@ public class ClientParams {
 	public static boolean waterTint = true;
 	public static boolean simpleArrow = false;
 	public static boolean textureFilter = false;
+	public static float skinScale = 2.0F;
 	public static int currentSkin = 0;
 	public static int mapSaturation = 0;
 	public static int mapBrightness = 0;

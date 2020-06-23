@@ -54,6 +54,7 @@
   "justmap.configuration.water_tint": "Water Tint",
   "justmap.configuration.use_skins": "Use map skins",
   "justmap.configuration.current_skin": "Current Skin",
+  "justmap.configuration.skin_border_scale": "Skin border scale",
   "justmap.configuration.waypoints_tracking": "Waypoints tracking",
   "justmap.configuration.waypoints_render": "Render waypoints in the world",
   "justmap.configuration.render_light_beam": "Render light beam",

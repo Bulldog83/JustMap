@@ -159,9 +159,21 @@ public class MapSkin extends Sprite {
 		public float topV, bottomV;
 		public float tail, tailU;
 		
-		private RenderData() {}
+		public boolean scaleChanged = false;
 		
-		public void calculate(double x, double y, float w, float h, double scale) {
+		private RenderData() {
+			this.updateScale();
+		}
+		
+		public void updateScale() {
+			double scale = ClientParams.skinScale;
+			if (this.scaleFactor != scale) {
+				this.scaleFactor = scale;
+				this.scaleChanged = true;
+			}
+		}
+		
+		public void calculate(double x, double y, float w, float h) {
 			int spriteW = MapSkin.this.getWidth();
 			int spriteH = MapSkin.this.getHeight();
 			int border = MapSkin.this.border;
@@ -174,8 +186,7 @@ public class MapSkin extends Sprite {
 			this.x = x;
 			this.y = y;
 			this.width = w;
-			this.height = h;			
-			this.scaleFactor = scale;
+			this.height = h;
 			this.scaledBorder = (float) (border * scaleFactor);			
 			this.hSide = w - scaledBorder * 2;
 			this.vSide = h - scaledBorder * 2;
@@ -189,6 +200,8 @@ public class MapSkin extends Sprite {
 			this.bottomV = (float) (spriteH - border) / spriteH;
 			this.tail = hSide - vSide;
 			this.tailU = (border + sTail) / spriteW;
+			
+			this.scaleChanged = false;
 		}
 	}
 	

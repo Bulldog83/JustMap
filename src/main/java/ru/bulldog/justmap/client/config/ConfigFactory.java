@@ -124,6 +124,9 @@ public final class ConfigFactory {
 		EnumSelectorBuilder<DirectionArrow.Type> arrowTypeEntry = entryBuilder.startEnumSelector(lang("arrow_type"), DirectionArrow.Type.class, arrowTypeConfig.getValue());
 		arrowTypeEntry.setSaveConsumer(val -> arrowTypeConfig.setValue(val))
 					  .setDefaultValue(arrowTypeConfig.getDefault());
+		FloatSliderBuilder doubleSlider = new FloatSliderBuilder(entryBuilder.getResetButtonKey(), lang("skin_border_scale"), JustMapClient.CONFIG.getFloat("skin_scale"), 0.5F, 3.0F)
+				.setSaveConsumer(val -> JustMapClient.CONFIG.setRanged("skin_scale", val))
+				.setDefaultValue((float) JustMapClient.CONFIG.getDefault("skin_scale"));
 		
 		ConfigCategory mapAppearance = configBuilder.getOrCreateCategory(lang("category.appearance"));
 		mapAppearance.addEntry(entryBuilder.startBooleanToggle(lang("use_skins"), JustMapClient.CONFIG.getBoolean("use_skins"))
@@ -135,6 +138,7 @@ public final class ConfigFactory {
 				.setDefaultValue(MapSkin.getSkin((int) JustMapClient.CONFIG.getDefault("current_skin")))
 				.setSelections(MapSkin.getSkins())
 				.build());
+		mapAppearance.addEntry(doubleSlider.build());
 		mapAppearance.addEntry(arrowTypeEntry.build());
 		mapAppearance.addEntry(entryBuilder.startBooleanToggle(lang("simple_arrow"), JustMapClient.CONFIG.getBoolean("simple_direction_arrow"))
 				.setSaveConsumer(val -> JustMapClient.CONFIG.setBoolean("simple_direction_arrow", val))

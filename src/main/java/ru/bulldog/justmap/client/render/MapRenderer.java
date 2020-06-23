@@ -94,14 +94,15 @@ public class MapRenderer {
 		this.mapW = minimap.getWidth();
 		this.mapH = minimap.getHeight();
 		
-		double scaleFactor = client.getWindow().getScaleFactor();
-		
 		int scaledBorder = this.border;
 		if (ClientParams.useSkins) {
 			this.mapSkin = MapSkin.getSkin(ClientParams.currentSkin);			
 			this.border = this.mapSkin.border;
 			
-			scaledBorder = (int) (border * scaleFactor);
+			mapSkin.getRenderData().updateScale();
+			
+			double scale = mapSkin.getRenderData().scaleFactor;
+			scaledBorder = (int) (border * scale);
 		}
 		
 		int winW = client.getWindow().getScaledWidth();
@@ -240,7 +241,8 @@ public class MapRenderer {
 		RenderSystem.disableDepthTest();
 		
 		if (ClientParams.useSkins) {
-			int brd = (int) ((border * 2) * scale);
+			double skinScale = mapSkin.getRenderData().scaleFactor;
+			int brd = (int) ((border * 2) * skinScale);
 			this.mapSkin.draw(matrix, posX, posY, mapW + brd, mapH + brd);
 		}
 		

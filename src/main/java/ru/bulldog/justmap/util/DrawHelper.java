@@ -237,11 +237,10 @@ public class DrawHelper extends DrawableHelper {
 	public static void drawSkin(MatrixStack matrix, MapSkin skin, double x, double y, float w, float h) {
 		RenderData renderData = skin.getRenderData();
 		
-		double scale = client.getWindow().getScaleFactor();
-		if (renderData.x != x || renderData.y != y || renderData.scaleFactor != scale ||
+		if (renderData.scaleChanged || renderData.x != x || renderData.y != y ||
 			renderData.width != w || renderData.height != h) {
 			
-			renderData.calculate(x, y, w, h, scale);
+			renderData.calculate(x, y, w, h);
 		}
 
 		float sMinU = skin.getMinU();

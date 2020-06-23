@@ -49,6 +49,7 @@ public class ClientConfig extends Config{
 		KEEPER.registerEntry("texture_filter", new BooleanEntry(ClientParams.textureFilter, (b) -> ClientParams.textureFilter = b, () -> ClientParams.textureFilter));
 		KEEPER.registerEntry("water_tint", new BooleanEntry(ClientParams.waterTint, (b) -> ClientParams.waterTint = b, () -> ClientParams.waterTint));
 		KEEPER.registerEntry("use_skins", new BooleanEntry(ClientParams.useSkins, (b) -> ClientParams.useSkins = b, () -> ClientParams.useSkins));
+		KEEPER.registerEntry("skin_scale", new FloatRange(ClientParams.skinScale, (f) -> ClientParams.skinScale = f, () -> ClientParams.skinScale, 0.5F, 3.0F));
 		KEEPER.registerEntry("simple_direction_arrow", new BooleanEntry(ClientParams.simpleArrow, (b) -> ClientParams.simpleArrow = b, () -> ClientParams.simpleArrow));
 		KEEPER.registerEntry("current_skin", new IntegerEntry(ClientParams.currentSkin, (i) -> ClientParams.currentSkin = i, () -> ClientParams.currentSkin));
 		KEEPER.registerEntry("chunk_update_interval", new IntegerRange(ClientParams.chunkUpdateInterval, (i) -> ClientParams.chunkUpdateInterval = i, () -> ClientParams.chunkUpdateInterval, 500, 5000));
