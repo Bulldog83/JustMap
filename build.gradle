@@ -1,5 +1,6 @@
 plugins {
 	id 'fabric-loom' version '0.4-SNAPSHOT'
+	id "com.wynprice.cursemaven" version "2.1.5"
 	id 'maven-publish'
 }
 
@@ -69,7 +70,7 @@ task sourcesJar(type: Jar, dependsOn: classes) {
 }
 
 compileJava {
-	version += "-${project.minecraft_version}"
+	version += "-${project.minecraft_version}-beta"
 }
 
 jar {

@@ -53,8 +53,7 @@ public final class ConfigFactory {
 				.setDefaultValue((int) JustMapClient.CONFIG.getDefault("map_offset"))
 				.build());
 		general.addEntry(entryBuilder.startDropdownMenu(lang("map_size"), JustMapClient.CONFIG.getInt("map_size"), (val) -> {
-					if (val.equals("")) return 0;			
-					return Integer.valueOf(val);
+					return getIntValue(val, (int) JustMapClient.CONFIG.getDefault("map_size"));
 				})
 				.setSaveConsumer(val -> JustMapClient.CONFIG.setRanged("map_size", val))
 				.setDefaultValue((int) JustMapClient.CONFIG.getDefault("map_size"))
@@ -65,8 +64,7 @@ public final class ConfigFactory {
 				.setDefaultValue((boolean) JustMapClient.CONFIG.getDefault("show_big_map"))
 				.build());
 		general.addEntry(entryBuilder.startDropdownMenu(lang("big_map_size"), JustMapClient.CONFIG.getInt("big_map_size"), (val) -> {
-					if (val.equals("")) return 0;			
-					return Integer.valueOf(val);
+					return getIntValue(val, (int) JustMapClient.CONFIG.getDefault("big_map_size"));
 				})
 				.setSaveConsumer(val -> JustMapClient.CONFIG.setRanged("big_map_size", val))
 				.setDefaultValue((int) JustMapClient.CONFIG.getDefault("big_map_size"))
@@ -296,5 +294,13 @@ public final class ConfigFactory {
 		configBuilder.setDoesConfirmSave(false);
 		configBuilder.transparentBackground();
 		configBuilder.setSavingRunnable(JustMapClient.CONFIG::saveChanges);
+	}
+	
+	private static int getIntValue(String value, int defVal) {
+		try {
+			return Integer.valueOf(value);
+		} catch (NumberFormatException ex) {
+			return defVal;
+		}
 	}
 }
