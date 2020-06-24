@@ -19,7 +19,6 @@ import ru.bulldog.justmap.util.math.RandomUtil;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ChatScreen;
-import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
@@ -253,7 +252,7 @@ public class Minimap implements IMap{
 				double iconX = MathUtil.screenPos(entX, startX, endX, mapWidth);
 				double iconY = MathUtil.screenPos(entZ, startZ, endZ, mapHeight);
 				if (entity instanceof PlayerEntity && allowPlayerRadar()) {
-					ClientPlayerEntity pEntity  = (ClientPlayerEntity) entity;
+					PlayerEntity pEntity  = (PlayerEntity) entity;
 					if (pEntity == player) continue;
 					PlayerIcon playerIcon = new PlayerIcon(this, pEntity, false);
 					playerIcon.setPosition(iconX, iconY);

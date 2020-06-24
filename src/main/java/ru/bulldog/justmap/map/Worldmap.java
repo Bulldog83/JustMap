@@ -26,8 +26,8 @@ import ru.bulldog.justmap.map.data.Layer;
 import ru.bulldog.justmap.map.data.MapCache;
 import ru.bulldog.justmap.map.data.MapChunk;
 import ru.bulldog.justmap.map.data.MapRegion;
-import ru.bulldog.justmap.map.icon.PlayerHeadIcon;
 import ru.bulldog.justmap.map.icon.WaypointIcon;
+import ru.bulldog.justmap.map.minimap.MapPlayerManager;
 import ru.bulldog.justmap.map.waypoint.Waypoint;
 import ru.bulldog.justmap.map.waypoint.WaypointKeeper;
 import ru.bulldog.justmap.map.waypoint.WaypointsList;
@@ -146,7 +146,7 @@ public class Worldmap extends MapScreen implements IMap {
 		double arrowX = MathUtil.screenPos(playerX, startX, endX, width) - shiftW;
 		double arrowY = MathUtil.screenPos(playerZ, startZ, endZ, height) - shiftH;
 		
-		PlayerHeadIcon.getIcon(player).draw(arrowX, arrowY, iconSize, true);
+		MapPlayerManager.getPlayer(player).getIcon().draw(arrowX, arrowY, iconSize, true);
 		
 		this.drawBorders(paddingTop, paddingBottom);
 		this.drawCenteredString(matrixStack, client.textRenderer, cursorCoords, width / 2, paddingTop + 4, Colors.WHITE);

@@ -9,9 +9,9 @@ import ru.bulldog.justmap.map.DirectionArrow;
 import ru.bulldog.justmap.map.data.MapCache;
 import ru.bulldog.justmap.map.data.MapRegion;
 import ru.bulldog.justmap.map.icon.EntityIcon;
-import ru.bulldog.justmap.map.icon.PlayerHeadIcon;
 import ru.bulldog.justmap.map.icon.PlayerIcon;
 import ru.bulldog.justmap.map.icon.WaypointIcon;
+import ru.bulldog.justmap.map.minimap.MapPlayerManager;
 import ru.bulldog.justmap.map.minimap.MapPosition;
 import ru.bulldog.justmap.map.minimap.MapSkin;
 import ru.bulldog.justmap.map.minimap.MapText;
@@ -302,7 +302,7 @@ public class MapRenderer {
 			float direction = ClientParams.rotateMap ? 180 : rotation;
 			DirectionArrow.draw(centerX, centerY, iconSize, direction);
 		} else {
-			PlayerHeadIcon.getIcon(client.player).draw(centerX, centerY, iconSize, true);
+			MapPlayerManager.getPlayer(client.player).getIcon().draw(centerX, centerY, iconSize, true);
 		}
 		
 		this.textManager.draw(matrix);

@@ -1,24 +1,25 @@
 package ru.bulldog.justmap.map.icon;
 
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.util.Window;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.entity.player.PlayerEntity;
 
 import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.client.render.EntityModelRenderer;
 import ru.bulldog.justmap.map.IMap;
+import ru.bulldog.justmap.map.minimap.MapPlayerManager;
+import ru.bulldog.justmap.util.ColorUtil;
 import ru.bulldog.justmap.util.Colors;
 import ru.bulldog.justmap.util.DrawHelper;
 
 public class PlayerIcon extends MapIcon<PlayerIcon> {
 	
-	protected boolean self;
-	protected ClientPlayerEntity player;
+	private PlayerEntity player;	
+	private int color = Colors.GREEN;
 	
-	public PlayerIcon(IMap map, ClientPlayerEntity player, boolean self) {
+	public PlayerIcon(IMap map, PlayerEntity player, boolean self) {
 		super(map);
-		this.self = self;
 		this.player = player;
 	}
 
@@ -39,14 +40,14 @@ public class PlayerIcon extends MapIcon<PlayerIcon> {
 			pos.y < mapY + size || pos.y > (mapY + map.getHeight()) - size) return;
 		
 		MatrixStack matrix = new MatrixStack();
-		if (ClientParams.showPlayerHeads) {
-			if (ClientParams.renderEntityModel) {
-				EntityModelRenderer.renderModel(player, pos.x, pos.y);
-			} else {
-				PlayerHeadIcon.getIcon(player).draw(matrix, pos.x, pos.y);
-			}
+		 if (ClientParams.renderEntityModel) {
+			EntityModelRenderer.renderModel(player, pos.x, pos.y);
+		} else if (ClientParams.showPlayerHeads) {
+			MapPlayerManager.getPlayer(player).getIcon().draw(matrix, pos.x, pos.y);
 		} else {
-			DrawHelper.fill(pos.x, pos.y, size, size, Colors.GREEN);
+			int darken = ColorUtil.colorBrigtness(this.color, -3);
+			DrawHelper.fill(pos.x - 0.5, pos.y - 0.5, size + 1, size + 1, darken);
+			DrawHelper.fill(pos.x, pos.y, size, size, this.color);
 		}
 			
 		if (ClientParams.showPlayerNames) {
