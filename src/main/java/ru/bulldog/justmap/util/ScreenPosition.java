@@ -1,6 +1,6 @@
-package ru.bulldog.justmap.map.minimap;
+package ru.bulldog.justmap.util;
 
-public enum MapPosition {
+public enum ScreenPosition {
 	TOP_LEFT,
 	TOP_CENTER,
 	TOP_RIGHT,
@@ -9,7 +9,7 @@ public enum MapPosition {
 	BOTTOM_LEFT,
 	BOTTOM_RIGHT;
   
-	public static MapPosition get(int i) {
+	public static ScreenPosition get(int i) {
 		return values()[i];
 	}
 }

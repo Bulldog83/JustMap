@@ -11,7 +11,7 @@ import ru.bulldog.justmap.config.ConfigKeeper.FloatRange;
 import ru.bulldog.justmap.config.ConfigKeeper.IntegerEntry;
 import ru.bulldog.justmap.config.ConfigKeeper.IntegerRange;
 import ru.bulldog.justmap.map.DirectionArrow;
-import ru.bulldog.justmap.map.minimap.MapPosition;
+import ru.bulldog.justmap.util.ScreenPosition;
 
 public class ClientConfig extends Config{
 	
@@ -27,7 +27,7 @@ public class ClientConfig extends Config{
 	
 	private ClientConfig() {
 		KEEPER.registerEntry("map_visible", new BooleanEntry(ClientParams.mapVisible, (b) -> ClientParams.mapVisible = b, () -> ClientParams.mapVisible));
-		KEEPER.registerEntry("map_position", new EnumEntry<MapPosition>(ClientParams.mapPosition, (e) -> ClientParams.mapPosition = e, () -> ClientParams.mapPosition));
+		KEEPER.registerEntry("map_position", new EnumEntry<ScreenPosition>(ClientParams.mapPosition, (e) -> ClientParams.mapPosition = e, () -> ClientParams.mapPosition));
 		KEEPER.registerEntry("arrow_type", new EnumEntry<DirectionArrow.Type>(ClientParams.arrowIconType, (e) -> ClientParams.arrowIconType = e, () -> ClientParams.arrowIconType));
 		KEEPER.registerEntry("map_offset", new IntegerEntry(ClientParams.positionOffset, (i) -> ClientParams.positionOffset = i, () -> ClientParams.positionOffset));
 		KEEPER.registerEntry("map_size", new IntegerRange(ClientParams.mapSize, (i) -> ClientParams.mapSize = i, () -> ClientParams.mapSize, 16, 256));

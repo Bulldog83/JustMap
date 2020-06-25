@@ -57,6 +57,11 @@ public abstract class GameRuleCommandMixin {
 						serverCommandSource.getMinecraftServer().getPlayerManager().sendToAll(
 								new GameMessageS2CPacket(command, MessageType.SYSTEM, Util.NIL_UUID));
 						break;
+					case "allowSlimeChunks":
+						command = new LiteralText(String.format("§0§0§s%s§f§f", val));
+						serverCommandSource.getMinecraftServer().getPlayerManager().sendToAll(
+								new GameMessageS2CPacket(command, MessageType.SYSTEM, Util.NIL_UUID));
+						break;
 				}
 			}
 		}

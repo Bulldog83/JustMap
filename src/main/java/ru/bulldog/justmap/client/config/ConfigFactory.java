@@ -15,8 +15,8 @@ import net.minecraft.text.TranslatableText;
 import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.config.ConfigKeeper.EnumEntry;
 import ru.bulldog.justmap.map.DirectionArrow;
-import ru.bulldog.justmap.map.minimap.MapPosition;
 import ru.bulldog.justmap.map.minimap.MapSkin;
+import ru.bulldog.justmap.util.ScreenPosition;
 
 public final class ConfigFactory {
 	
@@ -42,8 +42,8 @@ public final class ConfigFactory {
 		ConfigCategory general = configBuilder.getOrCreateCategory(lang("category.general"));
 		
 		@SuppressWarnings("unchecked")
-		EnumEntry<MapPosition> drawPosConfig = (EnumEntry<MapPosition>) JustMapClient.CONFIG.getEntry("map_position");
-		EnumSelectorBuilder<MapPosition> drawPosEntry = entryBuilder.startEnumSelector(lang("map_position"), MapPosition.class, drawPosConfig.getValue());
+		EnumEntry<ScreenPosition> drawPosConfig = (EnumEntry<ScreenPosition>) JustMapClient.CONFIG.getEntry("map_position");
+		EnumSelectorBuilder<ScreenPosition> drawPosEntry = entryBuilder.startEnumSelector(lang("map_position"), ScreenPosition.class, drawPosConfig.getValue());
 		drawPosEntry.setSaveConsumer(val -> drawPosConfig.setValue(val))
 					.setDefaultValue(drawPosConfig.getDefault());
 		

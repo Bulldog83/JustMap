@@ -318,6 +318,10 @@ public class MapChunk {
 		return !this.saved;
 	}
 	
+	public boolean isChunkLoaded() {
+		return !world.getChunk(getX(), getZ()).isEmpty();
+	}
+	
 	public void store(CompoundTag data) {
 		this.levels.forEach((layer, levels) -> {
 			ListTag levelsTag = new ListTag();

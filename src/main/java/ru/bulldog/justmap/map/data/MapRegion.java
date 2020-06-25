@@ -25,6 +25,7 @@ public class MapRegion {
 	
 	private final RegionPos pos;
 	private final MapTexture image;
+	private final MapTexture overlay;
 	
 	private Layer.Type layer;
 	private int level;
@@ -42,7 +43,9 @@ public class MapRegion {
 	public MapRegion(BlockPos blockPos, Layer.Type layer, int level) {
 		this.pos = new RegionPos(blockPos);
 		this.image = new MapTexture(512, 512);
+		this.overlay = new MapTexture(512, 512);
 		this.image.fill(Colors.BLACK);
+		this.overlay.fill(Colors.TRANSPARENT);
 		this.layer = layer;
 		this.level = level;
 		this.loadImage();
@@ -103,9 +106,15 @@ public class MapRegion {
 					mapChunk = mapData.getCurrentChunk(chunkX, chunkZ);
 					updated = mapChunk.update(needUpdate);
 				}
-				this.image.writeChunkData(x, y, mapChunk.getColorData());
-				
-				if (!changed) this.changed = updated;
+				if (mapChunk.isChunkLoaded()) {
+					this.overlay.fill(x, y, 16, 16, Colors.PURPLE);
+				} else {
+					this.overlay.fill(x, y, 16, 16, Colors.TRANSPARENT);
+				}
+				if (updated) {
+					this.image.writeChunkData(x, y, mapChunk.getColorData());
+					this.changed = updated;
+				}
 			}
 		}
 		if (changed) this.saveImage();
@@ -176,6 +185,18 @@ public class MapRegion {
 		double scW = (double) width / scale;
 		double scH = (double) height / scale;
 		
+		RenderSystem.enableBlend();
+		RenderSystem.defaultBlendFunc();
+		
+		builder.begin(GL11.GL_QUADS, VertexFormats.POSITION_TEXTURE);
+		builder.vertex(x, y, 0.0).texture(u1, v1).next();
+		builder.vertex(x, y + scH, 0.0).texture(u1, v2).next();
+		builder.vertex(x + scW, y + scH, 0.0).texture(u2, v2).next();
+		builder.vertex(x + scW, y, 0.0).texture(u2, v1).next();
+		
+		tessellator.draw();
+		
+		this.overlay.upload();
 		builder.begin(GL11.GL_QUADS, VertexFormats.POSITION_TEXTURE);
 		builder.vertex(x, y, 0.0).texture(u1, v1).next();
 		builder.vertex(x, y + scH, 0.0).texture(u1, v2).next();
@@ -187,5 +208,6 @@ public class MapRegion {
 	
 	public void close() {
 		this.image.close();
+		this.overlay.close();
 	}
 }

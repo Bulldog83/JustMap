@@ -126,10 +126,24 @@ public class MapTexture {
 		int width = this.getWidth();
 		int height = this.getHeight();
 		
+		this.fill(0, 0, width, height, color);
+	}
+	
+	public void fill(int x, int y, int w, int h, int color) {
+		if (x < 0 || y < 0 || w <= 0 || h <= 0) return;
+		
+		int width = this.getWidth();
+		int height = this.getHeight();
+		
+		if (x + w > width) width -= x;
+		else width = w;
+		if (y + h > height) height -= y;
+		else height = h;
+		
 		synchronized(bufferLock) {
-			for(int x = 0; x < width; x++) {
-				for (int y = 0; y < height; y++) {
-					this.setRGB(x, y, color);
+			for(int i = x; i < width; i++) {
+				for (int j = y; j < height; j++) {
+					this.setRGB(i, j, color);
 				}
 			}
 		}
