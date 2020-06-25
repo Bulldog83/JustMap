@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.player.PlayerEntity;
 
 public class MapPlayerManager {
@@ -18,7 +19,8 @@ public class MapPlayerManager {
 			return players.get(id);
 		}
 		
-		MapPlayer mapPlayer = new MapPlayer(player);
+		MinecraftClient client = MinecraftClient.getInstance();
+		MapPlayer mapPlayer = new MapPlayer(client.world, player);
 		players.put(id, mapPlayer);
 		
 		return mapPlayer;
