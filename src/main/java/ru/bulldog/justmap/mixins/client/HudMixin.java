@@ -6,9 +6,8 @@ import com.mojang.blaze3d.systems.RenderSystem;
 
 import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.client.render.MapRenderer;
-import ru.bulldog.justmap.map.minimap.MapPosition;
 import ru.bulldog.justmap.util.Colors;
-
+import ru.bulldog.justmap.util.ScreenPosition;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.hud.InGameHud;
@@ -52,7 +51,7 @@ abstract class HudMixin extends DrawableHelper {
 		if (ClientParams.moveEffects) {
 			int posX = this.scaledWidth;
 			int posY = ClientParams.positionOffset;
-			if (ClientParams.mapPosition == MapPosition.TOP_RIGHT) {
+			if (ClientParams.mapPosition == ScreenPosition.TOP_RIGHT) {
 				posX = MapRenderer.getInstance().getX();
 			}
 			

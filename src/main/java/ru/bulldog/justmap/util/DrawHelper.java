@@ -80,8 +80,7 @@ public class DrawHelper extends DrawableHelper {
 		DRAWER.drawStringWithShadow(matrix, textRenderer, string, drawX, y, color);
 	}
 
-	public static void drawRightAlignedString(String string, int x, int y, int color) {
-		MatrixStack matrix = new MatrixStack();
+	public static void drawRightAlignedString(MatrixStack matrix, String string, int x, int y, int color) {
 		textRenderer.drawWithShadow(matrix, string, x - textRenderer.getWidth(string), y, color);
 	}
 	

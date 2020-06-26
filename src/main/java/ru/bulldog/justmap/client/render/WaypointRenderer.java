@@ -47,21 +47,20 @@ public class WaypointRenderer {
 	}
 	
 	public static void renderHUD(float delta, float fov) {
-		if (ClientParams.waypointsTracking) {
-			if (renderer == null) {
-				renderer = new WaypointRenderer();
-			}
-			MinecraftClient client = MinecraftClient.getInstance();
-			if (client.world == null || client.player == null || client.currentScreen != null) {
-				return;
-			}
-		
-			List<Waypoint> wayPoints = WaypointKeeper.getInstance().getWaypoints(client.world.getDimensionRegistryKey().getValue(), true);
-			for (Waypoint wp : wayPoints) {
-				int dist = (int) MathUtil.getDistance(wp.pos, client.player.getBlockPos(), false);
-				if (wp.tracking && dist <= wp.showRange) {
-					renderer.renderHUD(wp, client, delta, fov, dist);
-				}
+		if (!ClientParams.showWaypoints || !ClientParams.waypointsTracking) return;
+		if (renderer == null) {
+			renderer = new WaypointRenderer();
+		}
+		MinecraftClient client = MinecraftClient.getInstance();
+		if (client.world == null || client.player == null || client.currentScreen != null) {
+			return;
+		}
+	
+		List<Waypoint> wayPoints = WaypointKeeper.getInstance().getWaypoints(client.world.getDimensionRegistryKey().getValue(), true);
+		for (Waypoint wp : wayPoints) {
+			int dist = (int) MathUtil.getDistance(wp.pos, client.player.getBlockPos(), false);
+			if (wp.tracking && dist <= wp.showRange) {
+				renderer.renderHUD(wp, client, delta, fov, dist);
 			}
 		}
 	}
@@ -96,32 +95,31 @@ public class WaypointRenderer {
 	}
 	
 	public static void renderWaypoints(MatrixStack matrixStack, MinecraftClient client, Camera camera, float tickDelta) {
-		if (ClientParams.waypointsWorldRender) {
-			if (renderer == null) {
-				renderer = new WaypointRenderer();
-			}
-			
-			long time = client.player.world.getTime();
-			float tick = (float) Math.floorMod(time, 125L) + tickDelta;
-			
-			BlockPos playerPos = client.player.getBlockPos();
-			
-			RenderSystem.enableBlend();
-			RenderSystem.defaultBlendFunc();
-			RenderSystem.enableDepthTest();
-			RenderSystem.depthMask(false);
-			
-			List<Waypoint> wayPoints = WaypointKeeper.getInstance().getWaypoints(client.world.getDimensionRegistryKey().getValue(), true);
-			for (Waypoint wp : wayPoints) {
-				int dist = (int) MathUtil.getDistance(wp.pos, playerPos, false);
-				if (wp.render && dist > ClientParams.minRenderDist && dist < ClientParams.maxRenderDist) {
-					renderer.renderWaypoint(matrixStack, wp, client, camera, tick, dist);
-				}
-			}
-			
-			RenderSystem.depthMask(true);
-			RenderSystem.disableBlend();
+		if (!ClientParams.showWaypoints || !ClientParams.waypointsWorldRender) return;
+		if (renderer == null) {
+			renderer = new WaypointRenderer();
 		}
+		
+		long time = client.player.world.getTime();
+		float tick = (float) Math.floorMod(time, 125L) + tickDelta;
+		
+		BlockPos playerPos = client.player.getBlockPos();
+		
+		RenderSystem.enableBlend();
+		RenderSystem.defaultBlendFunc();
+		RenderSystem.enableDepthTest();
+		RenderSystem.depthMask(false);
+		
+		List<Waypoint> wayPoints = WaypointKeeper.getInstance().getWaypoints(client.world.getDimensionRegistryKey().getValue(), true);
+		for (Waypoint wp : wayPoints) {
+			int dist = (int) MathUtil.getDistance(wp.pos, playerPos, false);
+			if (wp.render && dist > ClientParams.minRenderDist && dist < ClientParams.maxRenderDist) {
+				renderer.renderWaypoint(matrixStack, wp, client, camera, tick, dist);
+			}
+		}
+		
+		RenderSystem.depthMask(true);
+		RenderSystem.disableBlend();
 	}
 	
 	private void renderWaypoint(MatrixStack matrixStack, Waypoint waypoint, MinecraftClient client, Camera camera, float tick, int dist) {
