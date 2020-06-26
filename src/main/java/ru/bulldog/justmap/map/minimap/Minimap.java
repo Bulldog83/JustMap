@@ -1,8 +1,12 @@
 package ru.bulldog.justmap.map.minimap;
 
+import ru.bulldog.justmap.advancedinfo.AdvancedInfo;
+import ru.bulldog.justmap.advancedinfo.InfoText;
+import ru.bulldog.justmap.advancedinfo.TextManager;
 import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.map.IMap;
+import ru.bulldog.justmap.map.MapGameRules;
 import ru.bulldog.justmap.map.data.Layer.Type;
 import ru.bulldog.justmap.map.data.MapCache;
 import ru.bulldog.justmap.map.icon.EntityIcon;
@@ -44,10 +48,10 @@ public class Minimap implements IMap{
 	
 	private final TextManager textManager;
 	
-	private MapText txtCoords = new MapText(TextAlignment.CENTER, "0, 0, 0");
-	private MapText txtBiome = new MapText(TextAlignment.CENTER, "Void");
-	private MapText txtTime = new MapText(TextAlignment.CENTER, "00:00");
-	private MapText txtFPS = new MapText(TextAlignment.CENTER, "00 fps");
+	private InfoText txtCoords = new InfoText(TextAlignment.CENTER, "0, 0, 0");
+	private InfoText txtBiome = new InfoText(TextAlignment.CENTER, "Void");
+	private InfoText txtTime = new InfoText(TextAlignment.CENTER, "00:00");
+	private InfoText txtFPS = new InfoText(TextAlignment.CENTER, "00 fps");
 	
 	private int mapWidth;
 	private int mapHeight;
@@ -71,7 +75,12 @@ public class Minimap implements IMap{
 	public boolean posChanged = false;
 	
 	public Minimap() {
-		this.textManager = new TextManager(this);
+		this.textManager = AdvancedInfo.getInstance().getMapTextManager();
+		this.textManager.add(txtCoords);
+		this.textManager.add(txtBiome);
+		this.textManager.add(txtFPS);
+		this.textManager.add(txtTime);
+		
 		this.updateMapParams();
 	}
 	
@@ -118,30 +127,31 @@ public class Minimap implements IMap{
 				this.scaledWidth = (int) ((mapWidth * mapScale) + 8);
 				this.scaledHeight = (int) ((mapHeight * mapScale) + 8);
 			}
+			
+			this.textManager.setLineWidth(this.mapWidth);
 		}
 		
 		this.isMapVisible = JustMapClient.CONFIG.getBoolean("map_visible");
 	}
 	
 	private void updateInfo(PlayerEntity player) {
-		textManager.clear();
+		this.txtCoords.setVisible(ClientParams.showPosition);
+		this.txtBiome.setVisible(ClientParams.showBiome);
+		this.txtFPS.setVisible(ClientParams.showFPS);
+		this.txtTime.setVisible(ClientParams.showTime);
 		
 		if (ClientParams.showPosition) {
 			Entity camera = minecraftClient.cameraEntity;
-			txtCoords.setText(PosUtil.posToString(camera.getX(), camera.getY(), camera.getZ()));
-			textManager.add(txtCoords);
+			this.txtCoords.setText(PosUtil.posToString(camera.getX(), camera.getY(), camera.getZ()));
 		}		
 		if (ClientParams.showBiome) {
-			txtBiome.setText(I18n.translate(currentBiome.getTranslationKey()));
-			textManager.add(txtBiome);
+			this.txtBiome.setText(I18n.translate(currentBiome.getTranslationKey()));
 		}		
 		if (ClientParams.showFPS) {
-			txtFPS.setText(minecraftClient.fpsDebugString.substring(0, minecraftClient.fpsDebugString.indexOf("fps") + 3));
-			textManager.add(txtFPS);
+			this.txtFPS.setText(minecraftClient.fpsDebugString.substring(0, minecraftClient.fpsDebugString.indexOf("fps") + 3));
 		}		
 		if (ClientParams.showTime) {
-			txtTime.setText(this.timeString(minecraftClient.world.getTimeOfDay()));
-			textManager.add(txtTime);
+			this.txtTime.setText(this.timeString(minecraftClient.world.getTimeOfDay()));
 		}
 	}
 	
@@ -277,16 +287,18 @@ public class Minimap implements IMap{
 		}
 		
 		waypoints.clear();
-		List<Waypoint> wps = WaypointKeeper.getInstance().getWaypoints(world.getDimensionRegistryKey().getValue(), true);
-		if (wps != null) {
-			Stream<Waypoint> stream = wps.stream().filter(wp -> MathUtil.getDistance(pos, wp.pos, false) <= wp.showRange);
-			for (Waypoint wp : stream.toArray(Waypoint[]::new)) {
-				WaypointIcon waypoint = new WaypointIcon(this, wp);
-				waypoint.setPosition(
-					MathUtil.screenPos(wp.pos.getX(), startX, endX, mapWidth),
-					MathUtil.screenPos(wp.pos.getZ(), startZ, endZ, mapHeight)
-				);
-				this.waypoints.add(waypoint);
+		if (ClientParams.showWaypoints) {
+			List<Waypoint> wps = WaypointKeeper.getInstance().getWaypoints(world.getDimensionRegistryKey().getValue(), true);
+			if (wps != null) {
+				Stream<Waypoint> stream = wps.stream().filter(wp -> MathUtil.getDistance(pos, wp.pos, false) <= wp.showRange);
+				for (Waypoint wp : stream.toArray(Waypoint[]::new)) {
+					WaypointIcon waypoint = new WaypointIcon(this, wp);
+					waypoint.setPosition(
+						MathUtil.screenPos(wp.pos.getX(), startX, endX, mapWidth),
+						MathUtil.screenPos(wp.pos.getZ(), startZ, endZ, mapHeight)
+					);
+					this.waypoints.add(waypoint);
+				}
 			}
 		}
 	}

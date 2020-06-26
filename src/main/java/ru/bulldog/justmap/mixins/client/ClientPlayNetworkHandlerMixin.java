@@ -13,8 +13,7 @@ import net.minecraft.network.packet.s2c.play.HealthUpdateS2CPacket;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.network.MessageType;
-
-import ru.bulldog.justmap.map.minimap.MapGameRules;
+import ru.bulldog.justmap.map.MapGameRules;
 import ru.bulldog.justmap.map.waypoint.Waypoint;
 
 @Mixin(ClientPlayNetworkHandler.class)

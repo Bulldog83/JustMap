@@ -1,10 +1,10 @@
 package ru.bulldog.justmap.client.config;
 
 import ru.bulldog.justmap.map.DirectionArrow;
-import ru.bulldog.justmap.map.minimap.MapPosition;
+import ru.bulldog.justmap.util.ScreenPosition;
 
 public class ClientParams {
-	public static MapPosition mapPosition = MapPosition.TOP_RIGHT;
+	public static ScreenPosition mapPosition = ScreenPosition.TOP_RIGHT;
 	public static DirectionArrow.Type arrowIconType = DirectionArrow.Type.DIRECTION_ARROW;
 	
 	public static int positionOffset = 4;
@@ -25,6 +25,9 @@ public class ClientParams {
 	public static boolean showGrid = false;
 	public static boolean showTerrain = true;
 	public static boolean showTopography = true;
+	public static boolean showSlime = false;
+	public static boolean showLoadedChunks = false;
+	public static boolean showMobSpawn = false;
 	public static int terrainStrength = 4;
 
 	public static boolean useSkins = true;
@@ -62,6 +65,7 @@ public class ClientParams {
 	public static int purgeDelay = 60;
 	public static int purgeAmount = 1500;
 	
+	public static boolean showWaypoints = true;
 	public static boolean waypointsTracking = true;
 	public static boolean waypointsWorldRender = true;
 	public static boolean renderLightBeam = true;

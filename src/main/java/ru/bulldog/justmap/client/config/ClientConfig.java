@@ -11,7 +11,7 @@ import ru.bulldog.justmap.config.ConfigKeeper.FloatRange;
 import ru.bulldog.justmap.config.ConfigKeeper.IntegerEntry;
 import ru.bulldog.justmap.config.ConfigKeeper.IntegerRange;
 import ru.bulldog.justmap.map.DirectionArrow;
-import ru.bulldog.justmap.map.minimap.MapPosition;
+import ru.bulldog.justmap.util.ScreenPosition;
 
 public class ClientConfig extends Config{
 	
@@ -27,7 +27,7 @@ public class ClientConfig extends Config{
 	
 	private ClientConfig() {
 		KEEPER.registerEntry("map_visible", new BooleanEntry(ClientParams.mapVisible, (b) -> ClientParams.mapVisible = b, () -> ClientParams.mapVisible));
-		KEEPER.registerEntry("map_position", new EnumEntry<MapPosition>(ClientParams.mapPosition, (e) -> ClientParams.mapPosition = e, () -> ClientParams.mapPosition));
+		KEEPER.registerEntry("map_position", new EnumEntry<ScreenPosition>(ClientParams.mapPosition, (e) -> ClientParams.mapPosition = e, () -> ClientParams.mapPosition));
 		KEEPER.registerEntry("arrow_type", new EnumEntry<DirectionArrow.Type>(ClientParams.arrowIconType, (e) -> ClientParams.arrowIconType = e, () -> ClientParams.arrowIconType));
 		KEEPER.registerEntry("map_offset", new IntegerEntry(ClientParams.positionOffset, (i) -> ClientParams.positionOffset = i, () -> ClientParams.positionOffset));
 		KEEPER.registerEntry("map_size", new IntegerRange(ClientParams.mapSize, (i) -> ClientParams.mapSize = i, () -> ClientParams.mapSize, 16, 256));
@@ -61,6 +61,7 @@ public class ClientConfig extends Config{
 		KEEPER.registerEntry("terrain_strength", new IntegerRange(ClientParams.terrainStrength, (i) -> ClientParams.terrainStrength = i, () -> ClientParams.terrainStrength, 2, 9));
 		KEEPER.registerEntry("draw_chunk_grid", new BooleanEntry(ClientParams.showGrid, (b) -> ClientParams.showGrid = b, () -> ClientParams.showGrid));
 		KEEPER.registerEntry("show_in_chat", new BooleanEntry(ClientParams.showInChat, (b) -> ClientParams.showInChat = b, () -> ClientParams.showInChat));
+		KEEPER.registerEntry("show_waypoints", new BooleanEntry(ClientParams.showWaypoints, (b) -> ClientParams.showWaypoints = b, () -> ClientParams.showWaypoints));
 		KEEPER.registerEntry("waypoints_tracking", new BooleanEntry(ClientParams.waypointsTracking, (b) -> ClientParams.waypointsTracking = b, () -> ClientParams.waypointsTracking));
 		KEEPER.registerEntry("waypoints_world_render", new BooleanEntry(ClientParams.waypointsWorldRender, (b) -> ClientParams.waypointsWorldRender = b, () -> ClientParams.waypointsWorldRender));
 		KEEPER.registerEntry("render_light_beam", new BooleanEntry(ClientParams.renderLightBeam, (b) -> ClientParams.renderLightBeam = b, () -> ClientParams.renderLightBeam));
@@ -79,6 +80,8 @@ public class ClientConfig extends Config{
 		KEEPER.registerEntry("show_icons_outline", new BooleanEntry(ClientParams.showIconsOutline, (b) -> ClientParams.showIconsOutline = b, () -> ClientParams.showIconsOutline));
 		KEEPER.registerEntry("show_big_map", new BooleanEntry(ClientParams.showBigMap, (b) -> ClientParams.showBigMap = b, () -> ClientParams.showBigMap));
 		KEEPER.registerEntry("force_map_update", new BooleanEntry(ClientParams.forceUpdate, (b) -> ClientParams.forceUpdate = b, () -> ClientParams.forceUpdate));
+		KEEPER.registerEntry("show_slime", new BooleanEntry(ClientParams.showSlime, (b) -> ClientParams.showSlime = b, () -> ClientParams.showSlime));
+		KEEPER.registerEntry("show_loaded_chunks", new BooleanEntry(ClientParams.showLoadedChunks, (b) -> ClientParams.showLoadedChunks = b, () -> ClientParams.showLoadedChunks));
 		KEEPER.registerEntry("entity_icon_size", new IntegerRange(ClientParams.entityIconSize, (i) -> ClientParams.entityIconSize = i, () -> ClientParams.entityIconSize, 2, 16));
 		KEEPER.registerEntry("entity_model_size", new IntegerRange(ClientParams.entityModelSize, (i) -> ClientParams.entityModelSize = i, () -> ClientParams.entityModelSize, 2, 16));
 		KEEPER.registerEntry("entity_outline_size", new IntegerRange(ClientParams.entityOutlineSize, (i) -> ClientParams.entityOutlineSize = i, () -> ClientParams.entityOutlineSize, 1, 5));

@@ -24,6 +24,7 @@ private static ServerConfig instance;
 		KEEPER.registerEntry("allow_hostile_radar", new BooleanEntry(ServerParams.allowHostile, (b) -> ServerParams.allowHostile = b, () -> ServerParams.allowHostile));
 		KEEPER.registerEntry("allow_creatures_radar", new BooleanEntry(ServerParams.allowCreatures, (b) -> ServerParams.allowCreatures = b, () -> ServerParams.allowCreatures));
 		KEEPER.registerEntry("allow_players_radar", new BooleanEntry(ServerParams.allowPlayers, (b) -> ServerParams.allowPlayers = b, () -> ServerParams.allowPlayers));
+		KEEPER.registerEntry("allow_slime_chunks", new BooleanEntry(ServerParams.allowSlime, (b) -> ServerParams.allowSlime = b, () -> ServerParams.allowSlime));
 		
 		JsonObject config = ConfigWriter.load();
 		if (config.size() > 0) {

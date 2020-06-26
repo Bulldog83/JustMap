@@ -7,4 +7,5 @@ public class ServerParams {
 	public static boolean allowHostile = true;
 	public static boolean allowCreatures = true;
 	public static boolean allowPlayers = true;
+	public static boolean allowSlime = true;
 }

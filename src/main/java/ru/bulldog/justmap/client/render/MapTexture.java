@@ -19,8 +19,8 @@ import org.lwjgl.opengl.GL14;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.texture.TextureUtil;
+
 import ru.bulldog.justmap.JustMap;
-import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.util.ColorUtil;
 import ru.bulldog.justmap.util.Colors;
 
@@ -31,6 +31,8 @@ public class MapTexture {
 	private int glId = -1;
 	private final int width;
 	private final int height;
+	
+	public boolean changed = false;
 	
 	private Object bufferLock = new Object();
 	
@@ -64,6 +66,8 @@ public class MapTexture {
 		RenderSystem.pixelStore(GL11.GL_UNPACK_SKIP_ROWS, GL11.GL_ZERO);
 		
 		GL11.glTexImage2D(GL11.GL_TEXTURE_2D, GL11.GL_ZERO, GL11.GL_RGBA, this.getWidth(), this.getHeight(), GL11.GL_ZERO, GL11.GL_RGBA, GL12.GL_UNSIGNED_INT_8_8_8_8, this.buffer);
+	
+		this.changed = false;
 	}
 	
 	public int getHeight() {
@@ -100,36 +104,74 @@ public class MapTexture {
 				if (py < 0) continue;
 				
 				int color = colorData[i + (j << 4)];
-				if (ClientParams.showGrid && (i == 0 || j == 0)) {
-					color = ColorUtil.applyTint(color, 0x66333333);
-				}
-				this.setRGB(px, py, color);
+				this.setColor(px, py, color);
 			}
 		}
 	}
 	
-	public void setRGB(int x, int y, int color) {
+	public void setColor(int x, int y, int color) {
 		if (x < 0 || x >= this.getWidth()) return;
 		if (y < 0 || y >= this.getHeight()) return;
 		
-		int index = (x + y * this.getWidth()) * 4;
-		
+		int index = (x + y * this.getWidth()) * 4;		
 		synchronized(bufferLock) {
 			this.bytes[index] = (byte) (color >> 24);
 			this.bytes[index + 1] = (byte) (color >> 0);
 			this.bytes[index + 2] = (byte) (color >> 8);
 			this.bytes[index + 3] = (byte) (color >> 16);
 		}
+		
+		this.changed = true;
+	}
+	
+	public int getColor(int x, int y) {
+		if (x < 0 || x >= this.getWidth()) return -1;
+		if (y < 0 || y >= this.getHeight()) return -1;
+		
+		int index = (x + y * this.getWidth()) * 4;
+		
+		synchronized(bufferLock) {
+			int a = this.bytes[index];
+			int b = this.bytes[index + 1];
+			int g = this.bytes[index + 2];
+			int r = this.bytes[index + 3];
+			
+			return (a << 24) | (b << 16) | (g << 8) | (r << 0);
+		}
+	}
+	
+	public void applyTint(int x, int y, int tint) {
+		if (x < 0 || x >= this.getWidth()) return;
+		if (y < 0 || y >= this.getHeight()) return;
+		
+		int color = this.getColor(x, y);
+		this.setColor(x, y, ColorUtil.applyTint(color, tint));
 	}
 	
 	public void fill(int color) {
 		int width = this.getWidth();
 		int height = this.getHeight();
 		
+		this.fill(0, 0, width, height, color);
+	}
+	
+	public void fill(int x, int y, int w, int h, int color) {
+		if (x < 0 || y < 0) return;
+		
+		int width = this.getWidth();
+		int height = this.getHeight();
+		
+		if (x + w > width) width -= x;
+		else width = w;
+		if (y + h > height) height -= y;
+		else height = h;
+		
+		if (width <= 0 || height <= 0) return;
+		
 		synchronized(bufferLock) {
-			for(int x = 0; x < width; x++) {
-				for (int y = 0; y < height; y++) {
-					this.setRGB(x, y, color);
+			for(int i = x; i < x + width; i++) {
+				for (int j = y; j < y + height; j++) {
+					this.setColor(i, j, color);
 				}
 			}
 		}
@@ -157,6 +199,7 @@ public class MapTexture {
 			BufferedImage pngImage = new BufferedImage(width, height, BufferedImage.TYPE_4BYTE_ABGR);
 			pngImage.setData(ImageIO.read(fileInput).getData());
 			this.bytes = ((DataBufferByte) pngImage.getTile(0, 0).getDataBuffer()).getData().clone();
+			this.changed = true;
 			pngImage.flush();
 		} catch (Exception ex) {
 			JustMap.LOGGER.logWarning("Can't load image: " + png.toString());

@@ -1,4 +1,4 @@
-package ru.bulldog.justmap.map.minimap;
+package ru.bulldog.justmap.map;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -19,6 +19,7 @@ public class MapGameRules {
 	public final static GameRules.Key<GameRules.BooleanRule> ALLOW_PLAYER_RADAR = register("allowPlayerRadar", true);
 	public final static GameRules.Key<GameRules.BooleanRule> ALLOW_CREATURE_RADAR = register("allowCreatureRadar", true);
 	public final static GameRules.Key<GameRules.BooleanRule> ALLOW_HOSTILE_RADAR = register("allowHostileRadar", true);
+	public final static GameRules.Key<GameRules.BooleanRule> ALLOW_SLIME_CHUNKS = register("allowSlimeChunks", true);
 	
 	private MapGameRules() {}
 	
@@ -40,6 +41,7 @@ public class MapGameRules {
 		codes.put("§c", ALLOW_PLAYER_RADAR);
 		codes.put("§d", ALLOW_CREATURE_RADAR);
 		codes.put("§e", ALLOW_HOSTILE_RADAR);
+		codes.put("§s", ALLOW_SLIME_CHUNKS);
 	}
 	
 	/*
@@ -51,6 +53,7 @@ public class MapGameRules {
 	 *	§c: entities radar (player)
 	 *	§d: entities radar (animal)
 	 *	§e: entities radar (hostile)
+	 *	§s: slime chunks
 	 *
 	 *  §1: enable
 	 *  §0: disable

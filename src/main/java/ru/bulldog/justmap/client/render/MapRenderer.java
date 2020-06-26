@@ -3,6 +3,8 @@ package ru.bulldog.justmap.client.render;
 import org.lwjgl.opengl.GL11;
 import com.mojang.blaze3d.systems.RenderSystem;
 
+import ru.bulldog.justmap.advancedinfo.InfoText;
+import ru.bulldog.justmap.advancedinfo.TextManager;
 import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.map.DirectionArrow;
@@ -12,14 +14,12 @@ import ru.bulldog.justmap.map.icon.EntityIcon;
 import ru.bulldog.justmap.map.icon.PlayerIcon;
 import ru.bulldog.justmap.map.icon.WaypointIcon;
 import ru.bulldog.justmap.map.minimap.MapPlayerManager;
-import ru.bulldog.justmap.map.minimap.MapPosition;
 import ru.bulldog.justmap.map.minimap.MapSkin;
-import ru.bulldog.justmap.map.minimap.MapText;
 import ru.bulldog.justmap.map.minimap.Minimap;
-import ru.bulldog.justmap.map.minimap.TextManager;
 import ru.bulldog.justmap.util.DrawHelper.TextAlignment;
 import ru.bulldog.justmap.util.Colors;
 import ru.bulldog.justmap.util.DrawHelper;
+import ru.bulldog.justmap.util.ScreenPosition;
 import ru.bulldog.justmap.util.PosUtil;
 import ru.bulldog.justmap.util.math.Line;
 import ru.bulldog.justmap.util.math.Line.Point;
@@ -37,13 +37,13 @@ public class MapRenderer {
 	
 	private static MapRenderer instance;
 	
-	protected MapPosition mapPosition;
-	protected int border = 2;
+	protected ScreenPosition mapPosition;
+	protected int border = 0;
 	
 	private int offset;
 	private int posX, posY;
 	private int mapX, mapY;
-	private int mapW, mapH;
+	private int mapWidth, mapHeight;
 	private int imgX, imgY;
 	private int imgW, imgH;
 	private float rotation;
@@ -54,10 +54,10 @@ public class MapRenderer {
 	
 	private TextManager textManager;
 	
-	private MapText dirN = new MapText(TextAlignment.CENTER, "N");
-	private MapText dirS = new MapText(TextAlignment.CENTER, "S");
-	private MapText dirE = new MapText(TextAlignment.CENTER, "E");
-	private MapText dirW = new MapText(TextAlignment.CENTER, "W");
+	private InfoText dirN = new InfoText(TextAlignment.CENTER, "N");
+	private InfoText dirS = new InfoText(TextAlignment.CENTER, "S");
+	private InfoText dirE = new InfoText(TextAlignment.CENTER, "E");
+	private InfoText dirW = new InfoText(TextAlignment.CENTER, "W");
 	
 	private final MinecraftClient client = MinecraftClient.getInstance();
 	
@@ -73,9 +73,12 @@ public class MapRenderer {
 	
 	private MapRenderer() {
 		this.minimap = JustMapClient.MAP;
-		this.offset = ClientParams.positionOffset;
-		this.mapPosition = ClientParams.mapPosition;
 		this.textManager = this.minimap.getTextManager();
+		this.textManager.setSpacing(12);		
+		this.textManager.add(dirN);
+		this.textManager.add(dirS);
+		this.textManager.add(dirE);
+		this.textManager.add(dirW);
 	}
 	
 	public int getX() {
@@ -86,105 +89,105 @@ public class MapRenderer {
 		return this.posY;
 	}
 	
-	public int getBorder() {
-		return this.border;
-	}
-	
 	public void updateParams() {		
-		this.mapW = minimap.getWidth();
-		this.mapH = minimap.getHeight();
-		
-		int scaledBorder = this.border;
+		int border = 0;
 		if (ClientParams.useSkins) {
-			this.mapSkin = MapSkin.getSkin(ClientParams.currentSkin);			
-			this.border = this.mapSkin.border;
+			this.mapSkin = MapSkin.getSkin(ClientParams.currentSkin);
 			
 			mapSkin.getRenderData().updateScale();
 			
 			double scale = mapSkin.getRenderData().scaleFactor;
-			scaledBorder = (int) (border * scale);
+			border = (int) (this.mapSkin.border * scale);
 		}
 		
-		int winW = client.getWindow().getScaledWidth();
-		int winH = client.getWindow().getScaledHeight();
-		
-		this.offset = ClientParams.positionOffset;
-		this.mapPosition = ClientParams.mapPosition;
-		
-		this.posX = offset;
-		this.posY = offset;
-		this.mapX = posX + scaledBorder;
-		this.mapY = posY + scaledBorder;
-		
-		this.rotation = client.player.headYaw;
-		
-		TextManager.TextPosition textPos = TextManager.TextPosition.UNDER;
-		
-		switch (mapPosition) {
-			case TOP_LEFT:
-				break;
-			case TOP_CENTER:
-				this.mapX = winW / 2 - mapW / 2;
-				this.posX = mapX - scaledBorder;
-				break;
-			case TOP_RIGHT:
-				this.mapX = winW - offset - mapW - scaledBorder;
-				this.posX = mapX - scaledBorder;
-				break;
-			case MIDDLE_RIGHT:
-				this.mapX = winW - offset - mapW - scaledBorder;
-				this.mapY = winH / 2 - mapH / 2;
-				this.posX = mapX - scaledBorder;
-				this.posY = mapY - scaledBorder;
-				break;
-			case MIDDLE_LEFT:
-				this.mapY = winH / 2 - mapH / 2;
-				this.posY = mapY - scaledBorder;
-				break;
-			case BOTTOM_LEFT:
-				textPos = TextManager.TextPosition.ABOVE;
-				this.mapY = winH - offset - mapH - scaledBorder;
-				this.posY = mapY - scaledBorder;
-				break;
-			case BOTTOM_RIGHT:
-				textPos = TextManager.TextPosition.ABOVE;
-				this.mapX = winW - offset - mapW - scaledBorder;
-				this.posX = mapX - scaledBorder;
-				this.mapY = winH - offset - mapH - scaledBorder;
-				this.posY = mapY - scaledBorder;
-				break;
+		int mapW = this.minimap.getWidth();
+		int mapH = this.minimap.getHeight();
+		int off = ClientParams.positionOffset;
+		ScreenPosition mapPos = ClientParams.mapPosition;
+		if (mapWidth != mapW || mapPosition == null || mapPosition != mapPos ||
+			mapHeight != mapH || offset != off || this.border != border) {
+			this.mapWidth = mapW;
+			this.mapHeight = mapH;
+			this.mapPosition = mapPos;
+			this.offset = off;
+			this.border = border;
+			
+			this.posX = offset;
+			this.posY = offset;
+			this.mapX = posX + border;
+			this.mapY = posY + border;			
+			
+			TextManager.TextPosition textPos = TextManager.TextPosition.UNDER;
+			
+			int winW = client.getWindow().getScaledWidth();
+			int winH = client.getWindow().getScaledHeight();
+			switch (mapPosition) {
+				case TOP_LEFT:
+					break;
+				case TOP_CENTER:
+					this.mapX = winW / 2 - mapWidth / 2;
+					this.posX = mapX - border;
+					break;
+				case TOP_RIGHT:
+					this.mapX = winW - offset - mapWidth - border;
+					this.posX = mapX - border;
+					break;
+				case MIDDLE_RIGHT:
+					this.mapX = winW - offset - mapWidth - border;
+					this.mapY = winH / 2 - mapHeight / 2;
+					this.posX = mapX - border;
+					this.posY = mapY - border;
+					break;
+				case MIDDLE_LEFT:
+					this.mapY = winH / 2 - mapHeight / 2;
+					this.posY = mapY - border;
+					break;
+				case BOTTOM_LEFT:
+					textPos = TextManager.TextPosition.ABOVE;
+					this.mapY = winH - offset - mapHeight - border;
+					this.posY = mapY - border;
+					break;
+				case BOTTOM_RIGHT:
+					textPos = TextManager.TextPosition.ABOVE;
+					this.mapX = winW - offset - mapWidth - border;
+					this.posX = mapX - border;
+					this.mapY = winH - offset - mapHeight - border;
+					this.posY = mapY - border;
+					break;
+			}
+			
+			if (ClientParams.rotateMap) {
+				this.imgW = (int) (mapWidth * 1.42);
+				this.imgH = (int) (mapHeight * 1.42);
+				this.imgX = mapX - (imgW - mapWidth) / 2;
+				this.imgY = mapY - (imgH - mapHeight) / 2;
+			} else {
+				this.imgW = this.mapWidth;
+				this.imgH = this.mapHeight;
+				this.imgX = this.mapX;
+				this.imgY = this.mapY;
+			}
+			
+			this.textManager.setPosition(
+				mapX, mapY + (textPos == TextManager.TextPosition.UNDER ?
+					mapHeight + border + 3 :
+					-(border + 3))
+			);
+			this.textManager.setDirection(textPos);
 		}
 		
-		if (ClientParams.rotateMap) {
-			this.imgW = (int) (mapW * 1.42);
-			this.imgH = (int) (mapH * 1.42);
-			this.imgX = mapX - (imgW - mapW) / 2;
-			this.imgY = mapY - (imgH - mapH) / 2;
-		} else {
-			this.imgW = this.mapW;
-			this.imgH = this.mapH;
-			this.imgX = this.mapX;
-			this.imgY = this.mapY;
-		}
-		
-		this.textManager.setPosition(
-			mapX, mapY + (textPos == TextManager.TextPosition.UNDER && minimap.isMapVisible() ?
-				mapH + scaledBorder + 3 :
-				-(scaledBorder + 3))
-		);
-		this.textManager.setDirection(textPos);
-		this.textManager.setSpacing(12);
-		
-		int centerX = mapX + mapW / 2;
-		int centerY = mapY + mapH / 2;
-		int mapR = mapX + mapW;
-		int mapB = mapY + mapH;
+		int centerX = mapX + mapWidth / 2;
+		int centerY = mapY + mapHeight / 2;
+		int mapR = mapX + mapWidth;
+		int mapB = mapY + mapHeight;
 		
 		Point center = new Point(centerX, centerY);
 		Point pointN = new Point(centerX, mapY);
 		Point pointS = new Point(centerX, mapB);
 		Point pointE = new Point(mapR, centerY);
 		Point pointW = new Point(mapX, centerY);
+		
+		this.rotation = client.player.headYaw;
 		
 		if (ClientParams.rotateMap) {
 			float rotate = MathUtil.correctAngle(rotation) + 180;
@@ -201,16 +204,16 @@ public class MapRenderer {
 			pointE.x = centerX + len;
 			pointW.x = centerX - len;
 			
-			calculatePos(center, pointN, mapR, mapB, angle);
-			calculatePos(center, pointS, mapR, mapB, angle);
-			calculatePos(center, pointE, mapR, mapB, angle);
-			calculatePos(center, pointW, mapR, mapB, angle);
+			this.calculatePos(center, pointN, mapR, mapB, angle);
+			this.calculatePos(center, pointS, mapR, mapB, angle);
+			this.calculatePos(center, pointE, mapR, mapB, angle);
+			this.calculatePos(center, pointW, mapR, mapB, angle);
 		}
 		
-		this.textManager.add(dirN, pointN.x, pointN.y - 5);
-		this.textManager.add(dirS, pointS.x, pointS.y - 5);
-		this.textManager.add(dirE, pointE.x, pointE.y - 5);
-		this.textManager.add(dirW, pointW.x, pointW.y - 5);
+		this.dirN.setPos(pointN.x, pointN.y - 5);
+		this.dirS.setPos(pointS.x, pointS.y - 5);
+		this.dirE.setPos(pointE.x, pointE.y - 5);
+		this.dirW.setPos(pointW.x, pointW.y - 5);
 	}
 	
 	private void calculatePos(Point center, Point dir, int mr, int mb, double angle) {		
@@ -233,17 +236,16 @@ public class MapRenderer {
 		double scale = client.getWindow().getScaleFactor();
 		
 		int scaledX = (int) (mapX * scale);
-		int scaledY = (int) (winH - (mapY + mapH) * scale);
-		int scaledW = (int) (mapW * scale);
-		int scaledH = (int) (mapH * scale);
+		int scaledY = (int) (winH - (mapY + mapHeight) * scale);
+		int scaledW = (int) (mapWidth * scale);
+		int scaledH = (int) (mapHeight * scale);
 		
 		RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
 		RenderSystem.disableDepthTest();
 		
 		if (ClientParams.useSkins) {
-			double skinScale = mapSkin.getRenderData().scaleFactor;
-			int brd = (int) ((border * 2) * skinScale);
-			this.mapSkin.draw(matrix, posX, posY, mapW + brd, mapH + brd);
+			int brd = border * 2;
+			this.mapSkin.draw(matrix, posX, posY, mapWidth + brd, mapHeight + brd);
 		}
 		
 		if (this.minimap.posChanged) {
@@ -285,8 +287,8 @@ public class MapRenderer {
 		}
 		
 		DrawHelper.drawRightAlignedString(
-				Float.toString(minimap.getScale()),
-				mapX + mapW - 3, mapY + mapH - 10, Colors.WHITE);
+				matrix, Float.toString(minimap.getScale()),
+				mapX + mapWidth - 3, mapY + mapHeight - 10, Colors.WHITE);
 		
 		for (WaypointIcon waypoint : minimap.getWaypoints()) {
 			if (!waypoint.isHidden()) {
@@ -295,8 +297,8 @@ public class MapRenderer {
 		}
 		GL11.glDisable(GL11.GL_SCISSOR_TEST);
 		
-		int centerX = mapX + mapW / 2;
-		int centerY = mapY + mapH / 2;
+		int centerX = mapX + mapWidth / 2;
+		int centerY = mapY + mapHeight / 2;
 		int iconSize = ClientParams.arrowIconSize;
 		if (ClientParams.arrowIconType == DirectionArrow.Type.DIRECTION_ARROW) {
 			float direction = ClientParams.rotateMap ? 180 : rotation;

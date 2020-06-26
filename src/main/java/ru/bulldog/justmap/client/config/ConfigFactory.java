@@ -15,8 +15,8 @@ import net.minecraft.text.TranslatableText;
 import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.config.ConfigKeeper.EnumEntry;
 import ru.bulldog.justmap.map.DirectionArrow;
-import ru.bulldog.justmap.map.minimap.MapPosition;
 import ru.bulldog.justmap.map.minimap.MapSkin;
+import ru.bulldog.justmap.util.ScreenPosition;
 
 public final class ConfigFactory {
 	
@@ -42,8 +42,8 @@ public final class ConfigFactory {
 		ConfigCategory general = configBuilder.getOrCreateCategory(lang("category.general"));
 		
 		@SuppressWarnings("unchecked")
-		EnumEntry<MapPosition> drawPosConfig = (EnumEntry<MapPosition>) JustMapClient.CONFIG.getEntry("map_position");
-		EnumSelectorBuilder<MapPosition> drawPosEntry = entryBuilder.startEnumSelector(lang("map_position"), MapPosition.class, drawPosConfig.getValue());
+		EnumEntry<ScreenPosition> drawPosConfig = (EnumEntry<ScreenPosition>) JustMapClient.CONFIG.getEntry("map_position");
+		EnumSelectorBuilder<ScreenPosition> drawPosEntry = entryBuilder.startEnumSelector(lang("map_position"), ScreenPosition.class, drawPosConfig.getValue());
 		drawPosEntry.setSaveConsumer(val -> drawPosConfig.setValue(val))
 					.setDefaultValue(drawPosConfig.getDefault());
 		
@@ -107,6 +107,14 @@ public final class ConfigFactory {
 		mapDetails.addEntry(entryBuilder.startBooleanToggle(lang("show_grid"), JustMapClient.CONFIG.getBoolean("draw_chunk_grid"))
 				.setSaveConsumer(val -> JustMapClient.CONFIG.setBoolean("draw_chunk_grid", val))
 				.setDefaultValue((boolean) JustMapClient.CONFIG.getDefault("draw_chunk_grid"))
+				.build());
+		mapDetails.addEntry(entryBuilder.startBooleanToggle(lang("show_slime_chunks"), JustMapClient.CONFIG.getBoolean("show_slime"))
+				.setSaveConsumer(val -> JustMapClient.CONFIG.setBoolean("show_slime", val))
+				.setDefaultValue((boolean) JustMapClient.CONFIG.getDefault("show_slime"))
+				.build());
+		mapDetails.addEntry(entryBuilder.startBooleanToggle(lang("show_loaded_chunks"), JustMapClient.CONFIG.getBoolean("show_loaded_chunks"))
+				.setSaveConsumer(val -> JustMapClient.CONFIG.setBoolean("show_loaded_chunks", val))
+				.setDefaultValue((boolean) JustMapClient.CONFIG.getDefault("show_loaded_chunks"))
 				.build());
 		mapDetails.addEntry(entryBuilder.startBooleanToggle(lang("hide_plants"), JustMapClient.CONFIG.getBoolean("hide_plants"))
 				.setSaveConsumer(val -> JustMapClient.CONFIG.setBoolean("hide_plants", val))
@@ -172,6 +180,10 @@ public final class ConfigFactory {
 				.build());
 		
 		ConfigCategory waypoints = configBuilder.getOrCreateCategory(lang("category.waypoints"));
+		waypoints.addEntry(entryBuilder.startBooleanToggle(lang("show_waypoints"), JustMapClient.CONFIG.getBoolean("show_waypoints"))
+				.setSaveConsumer(val -> JustMapClient.CONFIG.setBoolean("show_waypoints", val))
+				.setDefaultValue((boolean) JustMapClient.CONFIG.getDefault("show_waypoints"))
+				.build());
 		waypoints.addEntry(entryBuilder.startBooleanToggle(lang("waypoints_tracking"), JustMapClient.CONFIG.getBoolean("waypoints_tracking"))
 				.setSaveConsumer(val -> JustMapClient.CONFIG.setBoolean("waypoints_tracking", val))
 				.setDefaultValue((boolean) JustMapClient.CONFIG.getDefault("waypoints_tracking"))
