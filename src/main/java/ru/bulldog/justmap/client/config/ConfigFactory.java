@@ -108,6 +108,14 @@ public final class ConfigFactory {
 				.setSaveConsumer(val -> JustMapClient.CONFIG.setBoolean("draw_chunk_grid", val))
 				.setDefaultValue((boolean) JustMapClient.CONFIG.getDefault("draw_chunk_grid"))
 				.build());
+		mapDetails.addEntry(entryBuilder.startBooleanToggle(lang("show_slime_chunks"), JustMapClient.CONFIG.getBoolean("show_slime"))
+				.setSaveConsumer(val -> JustMapClient.CONFIG.setBoolean("show_slime", val))
+				.setDefaultValue((boolean) JustMapClient.CONFIG.getDefault("show_slime"))
+				.build());
+		mapDetails.addEntry(entryBuilder.startBooleanToggle(lang("show_loaded_chunks"), JustMapClient.CONFIG.getBoolean("show_loaded_chunks"))
+				.setSaveConsumer(val -> JustMapClient.CONFIG.setBoolean("show_loaded_chunks", val))
+				.setDefaultValue((boolean) JustMapClient.CONFIG.getDefault("show_loaded_chunks"))
+				.build());
 		mapDetails.addEntry(entryBuilder.startBooleanToggle(lang("hide_plants"), JustMapClient.CONFIG.getBoolean("hide_plants"))
 				.setSaveConsumer(val -> JustMapClient.CONFIG.setBoolean("hide_plants", val))
 				.setDefaultValue((boolean) JustMapClient.CONFIG.getDefault("hide_plants"))
@@ -172,6 +180,10 @@ public final class ConfigFactory {
 				.build());
 		
 		ConfigCategory waypoints = configBuilder.getOrCreateCategory(lang("category.waypoints"));
+		waypoints.addEntry(entryBuilder.startBooleanToggle(lang("show_waypoints"), JustMapClient.CONFIG.getBoolean("show_waypoints"))
+				.setSaveConsumer(val -> JustMapClient.CONFIG.setBoolean("show_waypoints", val))
+				.setDefaultValue((boolean) JustMapClient.CONFIG.getDefault("show_waypoints"))
+				.build());
 		waypoints.addEntry(entryBuilder.startBooleanToggle(lang("waypoints_tracking"), JustMapClient.CONFIG.getBoolean("waypoints_tracking"))
 				.setSaveConsumer(val -> JustMapClient.CONFIG.setBoolean("waypoints_tracking", val))
 				.setDefaultValue((boolean) JustMapClient.CONFIG.getDefault("waypoints_tracking"))

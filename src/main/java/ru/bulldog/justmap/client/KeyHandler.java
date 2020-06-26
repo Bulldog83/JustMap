@@ -76,6 +76,14 @@ public final class KeyHandler {
 			}
 		});
 		
+		registerKey(new KeyParser(createKeyBinding("toggle_show_waypoints", GLFW.GLFW_KEY_P)) {
+			@Override
+			public void onKeyUp() {
+				JustMapClient.CONFIG.setBoolean("show_waypoints", !JustMapClient.CONFIG.getBoolean("show_waypoints"));
+				JustMapClient.CONFIG.saveChanges();
+			}
+		});
+		
 		registerKey(new KeyParser(createKeyBinding("waypoints_list", GLFW.GLFW_KEY_U)) {
 			@Override
 			public void onKeyUp() {

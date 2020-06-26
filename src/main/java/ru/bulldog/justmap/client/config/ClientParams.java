@@ -25,6 +25,9 @@ public class ClientParams {
 	public static boolean showGrid = false;
 	public static boolean showTerrain = true;
 	public static boolean showTopography = true;
+	public static boolean showSlime = false;
+	public static boolean showLoadedChunks = false;
+	public static boolean showMobSpawn = false;
 	public static int terrainStrength = 4;
 
 	public static boolean useSkins = true;
@@ -62,6 +65,7 @@ public class ClientParams {
 	public static int purgeDelay = 60;
 	public static int purgeAmount = 1500;
 	
+	public static boolean showWaypoints = true;
 	public static boolean waypointsTracking = true;
 	public static boolean waypointsWorldRender = true;
 	public static boolean renderLightBeam = true;

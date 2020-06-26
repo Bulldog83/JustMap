@@ -2,6 +2,7 @@ package ru.bulldog.justmap.map.data;
 
 import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.util.ColorUtil;
+import ru.bulldog.justmap.util.Dimension;
 import ru.bulldog.justmap.util.StorageUtil;
 import ru.bulldog.justmap.util.TaskManager;
 
@@ -11,11 +12,14 @@ import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
+import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.chunk.WorldChunk;
 import net.minecraft.world.dimension.DimensionType;
+import net.minecraft.world.gen.ChunkRandom;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -39,6 +43,7 @@ public class MapChunk {
 	private boolean updating = false;
 	private boolean saved = true;
 	private boolean purged = false;
+	private boolean slime = false;
 	private long refreshed = 0;
 	
 	public boolean saving = false;
@@ -54,13 +59,19 @@ public class MapChunk {
 	
 	public MapChunk(World world, ChunkPos pos, Layer.Type layer) {
 		MinecraftClient client = MinecraftClient.getInstance();
+		RegistryKey<DimensionType> dimType = client.world.getDimensionRegistryKey();
 		
 		this.world = world;
 		this.worldChunk = client.world.getChunk(pos.x, pos.z);
-		this.dimension = world.getDimensionRegistryKey().getValue();
+		this.dimension = dimType.getValue();
 		this.chunkPos = pos;
 		this.layer = layer;
 		this.levels = new ConcurrentHashMap<>();
+		
+		if (Dimension.isOverworld(dimType) && (world instanceof ServerWorld)) {
+			this.slime = ChunkRandom.getSlimeRandom(chunkPos.x, chunkPos.z,
+					((ServerWorld) world).getSeed(), 987234911L).nextInt(10) == 0;
+		}
 		
 		this.init();
 	}
@@ -319,7 +330,11 @@ public class MapChunk {
 	}
 	
 	public boolean isChunkLoaded() {
-		return !world.getChunk(getX(), getZ()).isEmpty();
+		return world.getChunkManager().isChunkLoaded(getX(), getZ());
+	}
+	
+	public boolean hasSlime() {
+		return this.slime;
 	}
 	
 	public void store(CompoundTag data) {

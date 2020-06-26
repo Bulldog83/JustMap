@@ -287,16 +287,18 @@ public class Minimap implements IMap{
 		}
 		
 		waypoints.clear();
-		List<Waypoint> wps = WaypointKeeper.getInstance().getWaypoints(world.getDimensionRegistryKey().getValue(), true);
-		if (wps != null) {
-			Stream<Waypoint> stream = wps.stream().filter(wp -> MathUtil.getDistance(pos, wp.pos, false) <= wp.showRange);
-			for (Waypoint wp : stream.toArray(Waypoint[]::new)) {
-				WaypointIcon waypoint = new WaypointIcon(this, wp);
-				waypoint.setPosition(
-					MathUtil.screenPos(wp.pos.getX(), startX, endX, mapWidth),
-					MathUtil.screenPos(wp.pos.getZ(), startZ, endZ, mapHeight)
-				);
-				this.waypoints.add(waypoint);
+		if (ClientParams.showWaypoints) {
+			List<Waypoint> wps = WaypointKeeper.getInstance().getWaypoints(world.getDimensionRegistryKey().getValue(), true);
+			if (wps != null) {
+				Stream<Waypoint> stream = wps.stream().filter(wp -> MathUtil.getDistance(pos, wp.pos, false) <= wp.showRange);
+				for (Waypoint wp : stream.toArray(Waypoint[]::new)) {
+					WaypointIcon waypoint = new WaypointIcon(this, wp);
+					waypoint.setPosition(
+						MathUtil.screenPos(wp.pos.getX(), startX, endX, mapWidth),
+						MathUtil.screenPos(wp.pos.getZ(), startZ, endZ, mapHeight)
+					);
+					this.waypoints.add(waypoint);
+				}
 			}
 		}
 	}

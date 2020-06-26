@@ -10,6 +10,7 @@ import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.util.math.BlockPos;
+
 import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.client.render.MapTexture;
@@ -30,12 +31,16 @@ public class MapRegion {
 	private Layer.Type layer;
 	private int level;
 
+	private boolean needUpdate = false;
+	private boolean renewOverlay = false;
+	private boolean updating = false;
 	private boolean hideWater = false;
 	private boolean waterTint = true;
 	private boolean alternateRender = true;
-	private boolean needUpdate = false;
-	private boolean changed = false;
-	private boolean updating = false;
+	private boolean slimeOverlay = false;
+	private boolean loadedOverlay = false;
+	private boolean gridOverlay = false;
+	
 	public boolean surfaceOnly = false;
 	
 	public long updated = 0;
@@ -82,7 +87,18 @@ public class MapRegion {
 			this.alternateRender = ClientParams.alternateColorRender;
 			this.needUpdate = true;
 		}
-		
+		if (ClientParams.showGrid != gridOverlay) {
+			this.gridOverlay = ClientParams.showGrid;
+			this.renewOverlay = true;
+		}
+		if (ClientParams.showSlime != slimeOverlay) {
+			this.slimeOverlay = ClientParams.showSlime;
+			this.renewOverlay = true;
+		}
+		if (ClientParams.showLoadedChunks != loadedOverlay) {
+			this.loadedOverlay = ClientParams.showLoadedChunks;
+			this.renewOverlay = true;
+		}
 	}
 	
 	private void updateImage() {
@@ -106,21 +122,36 @@ public class MapRegion {
 					mapChunk = mapData.getCurrentChunk(chunkX, chunkZ);
 					updated = mapChunk.update(needUpdate);
 				}
-				if (mapChunk.isChunkLoaded()) {
-					this.overlay.fill(x, y, 16, 16, Colors.PURPLE);
-				} else {
-					this.overlay.fill(x, y, 16, 16, Colors.TRANSPARENT);
-				}
 				if (updated) {
 					this.image.writeChunkData(x, y, mapChunk.getColorData());
-					this.changed = updated;
+				}
+				if (renewOverlay) {
+					this.updateOverlay(x, y, mapChunk);
 				}
 			}
 		}
-		if (changed) this.saveImage();
+		if (image.changed) this.saveImage();
 		this.updated = System.currentTimeMillis();
 		this.needUpdate = false;
+		this.renewOverlay = false;
 		this.updating = false;
+	}
+	
+	private void updateOverlay(int x, int y, MapChunk mapChunk) {
+		this.overlay.fill(x, y, 16, 16, Colors.TRANSPARENT);
+		if (loadedOverlay && mapChunk.isChunkLoaded()) {
+			this.overlay.fill(x, y, 16, 16, Colors.LOADED_OVERLAY);
+		}
+		if (slimeOverlay && mapChunk.hasSlime()) {
+			this.overlay.fill(x, y, 16, 16, Colors.SLIME_OVERLAY);
+		}
+		if (gridOverlay) {
+			this.overlay.setColor(x, y, Colors.GRID);
+			for (int i = 1; i < 16; i++) {
+				this.overlay.setColor(x + i, y, Colors.GRID);
+				this.overlay.setColor(x, y + i, Colors.GRID);
+			}
+		}
 	}
 	
 	public Layer.Type getLayer() {
@@ -146,7 +177,6 @@ public class MapRegion {
 	private void loadImage() {
 		File imgFile = this.imageFile();
 		this.image.loadImage(imgFile);
-		this.changed = true;
 	}
 	
 	private File imageFile() {
@@ -167,16 +197,6 @@ public class MapRegion {
 	public void draw(double x, double y, int imgX, int imgY, int width, int height, float scale) {
 		if (width <= 0 || height <= 0) return;
 		
-		if (changed) {
-			this.image.upload();
-			this.changed = false;
-		}
-		RenderSystem.bindTexture(image.getId());
-		if (ClientParams.textureFilter) {
-			RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR_MIPMAP_LINEAR);
-			RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
-		}
-		
 		float u1 = imgX / 512F;
 		float v1 = imgY / 512F;
 		float u2 = (imgX + width) / 512F;
@@ -188,20 +208,41 @@ public class MapRegion {
 		RenderSystem.enableBlend();
 		RenderSystem.defaultBlendFunc();
 		
+		this.drawImage(x, y, scW, scH, u1, v1, u2, v2);
+		if (gridOverlay || slimeOverlay || loadedOverlay) {
+			this.drawOverlay(x, y, scW, scH, u1, v1, u2, v2);
+		}
+	}
+	
+	private void drawImage(double x, double y, double w, double h, float u1, float v1, float u2, float v2) {
+		if (image.changed) {
+			this.image.upload();
+		}
+		RenderSystem.bindTexture(image.getId());
+		if (ClientParams.textureFilter) {
+			RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR_MIPMAP_LINEAR);
+			RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
+		}
+		
 		builder.begin(GL11.GL_QUADS, VertexFormats.POSITION_TEXTURE);
 		builder.vertex(x, y, 0.0).texture(u1, v1).next();
-		builder.vertex(x, y + scH, 0.0).texture(u1, v2).next();
-		builder.vertex(x + scW, y + scH, 0.0).texture(u2, v2).next();
-		builder.vertex(x + scW, y, 0.0).texture(u2, v1).next();
+		builder.vertex(x, y + h, 0.0).texture(u1, v2).next();
+		builder.vertex(x + w, y + h, 0.0).texture(u2, v2).next();
+		builder.vertex(x + w, y, 0.0).texture(u2, v1).next();
 		
 		tessellator.draw();
-		
-		this.overlay.upload();
+	}
+	
+	private void drawOverlay(double x, double y, double w, double h, float u1, float v1, float u2, float v2) {
+		if (overlay.changed) {
+			this.overlay.upload();
+		}		
+		RenderSystem.bindTexture(overlay.getId());
 		builder.begin(GL11.GL_QUADS, VertexFormats.POSITION_TEXTURE);
 		builder.vertex(x, y, 0.0).texture(u1, v1).next();
-		builder.vertex(x, y + scH, 0.0).texture(u1, v2).next();
-		builder.vertex(x + scW, y + scH, 0.0).texture(u2, v2).next();
-		builder.vertex(x + scW, y, 0.0).texture(u2, v1).next();
+		builder.vertex(x, y + h, 0.0).texture(u1, v2).next();
+		builder.vertex(x + w, y + h, 0.0).texture(u2, v2).next();
+		builder.vertex(x + w, y, 0.0).texture(u2, v1).next();
 		
 		tessellator.draw();
 	}

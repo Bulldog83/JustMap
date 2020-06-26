@@ -236,6 +236,10 @@ public class ColorUtil {
 		return -1;
 	}
 	
+	public static int applyTint(int color, int tint) {
+		return colorBrigtness(ColorHelper.multiplyColor(color, tint), 1.5F);
+	}
+	
 	public static int proccessColor(int color, int heightDiff, float topoLevel) {
 		RGBtoHSB((color >> 16) & 255, (color >> 8) & 255, color & 255, floatBuffer);
 		floatBuffer[1] += ClientParams.mapSaturation / 100.0F;
@@ -266,10 +270,6 @@ public class ColorUtil {
 		FluidState fluidState = state.getBlock().getFluidState(state);
 		int fcolor = fluidRenderHandlerRegistry.get(fluidState.getFluid()).getFluidColor(world, pos, fluidState);
 		return fcolor != -1 ? fcolor : defColor;
-	}
-	
-	public static int applyTint(int color, int tint) {
-		return colorBrigtness(ColorHelper.multiplyColor(color, tint), 1.5F);
 	}
 	
 	public static int blockColor(WorldChunk worldChunk, BlockPos pos) {
