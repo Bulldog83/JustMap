@@ -10,10 +10,12 @@ public class TextManager {
 		ABOVE,
 		UNDER,
 		LEFT,
-		RIGHT
+		RIGHT,
+		ABOVE_LEFT,
+		ABOVE_RIGHT
 	}	
 
-	private TextPosition position = TextPosition.UNDER;	
+	private TextPosition position = TextPosition.RIGHT;	
 	private List<InfoText> elements;
 	private int x, y;
 	private int lineWidth;
@@ -31,9 +33,13 @@ public class TextManager {
 		int yp = y;
 		int xp = x;
 		
-		if (position == TextPosition.ABOVE) {
+		if (position == TextPosition.ABOVE ||
+			position == TextPosition.ABOVE_LEFT ||
+			position == TextPosition.ABOVE_RIGHT) {
+			
 			yp -= spacing / 2;
-		} else if (position == TextPosition.LEFT) {
+		} else if (position == TextPosition.LEFT ||
+				   position == TextPosition.ABOVE_LEFT) {
 			xp = x - lineWidth;
 		}
 		
@@ -47,7 +53,10 @@ public class TextManager {
 				}
 			  
 				line.y = yp;
-				if (position == TextPosition.ABOVE) {
+				if (position == TextPosition.ABOVE ||
+					position == TextPosition.ABOVE_LEFT ||
+					position == TextPosition.ABOVE_RIGHT) {
+					
 					yp -= spacing;
 				} else {
 					yp += spacing;
