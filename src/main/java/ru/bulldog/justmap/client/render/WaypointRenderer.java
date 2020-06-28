@@ -107,7 +107,9 @@ public class WaypointRenderer {
 		
 		RenderSystem.enableBlend();
 		RenderSystem.defaultBlendFunc();
+		RenderSystem.enableAlphaTest();
 		RenderSystem.enableDepthTest();
+		RenderSystem.enableTexture();
 		RenderSystem.depthMask(false);
 		
 		List<Waypoint> wayPoints = WaypointKeeper.getInstance().getWaypoints(client.world.getDimensionRegistryKey().getValue(), true);
@@ -119,7 +121,6 @@ public class WaypointRenderer {
 		}
 		
 		RenderSystem.depthMask(true);
-		RenderSystem.disableBlend();
 	}
 	
 	private void renderWaypoint(MatrixStack matrixStack, Waypoint waypoint, MinecraftClient client, Camera camera, float tick, int dist) {

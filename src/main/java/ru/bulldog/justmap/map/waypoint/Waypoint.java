@@ -251,7 +251,7 @@ public class Waypoint {
 			if (this.key > 0) {
 				return this.getId();
 			}
-			return getColoredTexture();
+			return this.getColoredTexture();
 		}
 	}
 }
