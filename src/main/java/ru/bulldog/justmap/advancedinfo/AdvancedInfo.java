@@ -3,8 +3,12 @@ package ru.bulldog.justmap.advancedinfo;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.mojang.blaze3d.systems.RenderSystem;
+
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.screen.ChatScreen;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.entity.EquipmentSlot;
 import ru.bulldog.justmap.advancedinfo.TextManager.TextPosition;
 import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.util.ScreenPosition;
@@ -20,6 +24,8 @@ public class AdvancedInfo {
 		
 		return INSTANCE;
 	}
+	
+	private boolean initialized = false;
 	
 	private MinecraftClient minecraft = MinecraftClient.getInstance();
 	private Map<ScreenPosition, TextManager> managers;
@@ -46,6 +52,7 @@ public class AdvancedInfo {
 		
 		TextManager textManager = new TextManager();
 		textManager.setLineWidth(lineWidth);
+		textManager.setSpacing(12);
 		switch(position) {
 			case TOP_LEFT:
 				textManager.setPosition(offset, offset);
@@ -79,7 +86,56 @@ public class AdvancedInfo {
 		return textManager;
 	}
 	
+	private void initInfo() {
+		TextManager textManager = this.getTextManager(ScreenPosition.TOP_LEFT);
+		textManager.setSpacing(12);
+		
+		textManager.add(new BiomeInfo());
+		textManager.add(new TimeInfo());
+		textManager.add(new FpsInfo());
+		textManager.add(new LightLevelInfo());
+		
+		textManager = this.getTextManager(ScreenPosition.MIDDLE_LEFT);
+		textManager.setSpacing(16);
+		
+		textManager.add(new ItemInfo(EquipmentSlot.MAINHAND));
+		textManager.add(new ItemInfo(EquipmentSlot.OFFHAND));
+		textManager.add(new ItemInfo(EquipmentSlot.HEAD));
+		textManager.add(new ItemInfo(EquipmentSlot.CHEST));
+		textManager.add(new ItemInfo(EquipmentSlot.LEGS));
+		textManager.add(new ItemInfo(EquipmentSlot.FEET));
+		
+		this.initialized = true;
+	}
+	
+	public void updateInfo() {
+		if (minecraft.currentScreen != null &&
+		  !(minecraft.currentScreen instanceof ChatScreen)) return;
+		
+		if (!initialized) this.initInfo();
+		int screenH = minecraft.getWindow().getScaledHeight();
+		this.managers.forEach((position, manager) -> {
+			switch(position) {
+				case MIDDLE_LEFT:
+					manager.setPosition(manager.getX(), 
+							screenH / 2 - ((manager.size() / 2) * manager.getSpacing()));
+					break;
+				case MIDDLE_RIGHT:
+					break;
+				case BOTTOM_LEFT:
+					break;	
+				case BOTTOM_RIGHT:
+					break;
+				default:
+					break;
+			}
+			
+			manager.update();
+		});
+	}
+	
 	public void draw(MatrixStack matrixStack) {
+		RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
 		this.managers.forEach((position, manager) -> manager.draw(matrixStack));
 	}
 }

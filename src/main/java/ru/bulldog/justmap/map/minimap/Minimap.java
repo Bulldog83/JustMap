@@ -1,6 +1,7 @@
 package ru.bulldog.justmap.map.minimap;
 
 import ru.bulldog.justmap.advancedinfo.AdvancedInfo;
+import ru.bulldog.justmap.advancedinfo.CoordsInfo;
 import ru.bulldog.justmap.advancedinfo.InfoText;
 import ru.bulldog.justmap.advancedinfo.TextManager;
 import ru.bulldog.justmap.client.JustMapClient;
@@ -23,7 +24,6 @@ import ru.bulldog.justmap.util.math.RandomUtil;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ChatScreen;
-import net.minecraft.client.resource.language.I18n;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.mob.HostileEntity;
@@ -35,7 +35,6 @@ import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.GameRules;
 import net.minecraft.world.LightType;
 import net.minecraft.world.World;
-import net.minecraft.world.biome.Biome;
 import net.minecraft.world.dimension.DimensionType;
 
 import java.util.ArrayList;
@@ -48,10 +47,7 @@ public class Minimap implements IMap{
 	
 	private final TextManager textManager;
 	
-	private InfoText txtCoords = new InfoText(TextAlignment.CENTER, "0, 0, 0");
-	private InfoText txtBiome = new InfoText(TextAlignment.CENTER, "Void");
-	private InfoText txtTime = new InfoText(TextAlignment.CENTER, "00:00");
-	private InfoText txtFPS = new InfoText(TextAlignment.CENTER, "00 fps");
+	private InfoText txtCoords = new CoordsInfo(TextAlignment.CENTER, "0, 0, 0");
 	
 	private int mapWidth;
 	private int mapHeight;
@@ -60,8 +56,6 @@ public class Minimap implements IMap{
 	private float mapScale;
 	private int lastPosX = 0;
 	private int lastPosZ = 0;
-	
-	private Biome currentBiome;	
 	
 	private List<WaypointIcon> waypoints = new ArrayList<>();
 	private List<PlayerIcon> players = new ArrayList<>();
@@ -77,9 +71,6 @@ public class Minimap implements IMap{
 	public Minimap() {
 		this.textManager = AdvancedInfo.getInstance().getMapTextManager();
 		this.textManager.add(txtCoords);
-		this.textManager.add(txtBiome);
-		this.textManager.add(txtFPS);
-		this.textManager.add(txtTime);
 		
 		this.updateMapParams();
 	}
@@ -94,7 +85,7 @@ public class Minimap implements IMap{
 			}
 
 			prepareMap(player);
-			updateInfo(player);
+			updateCoords(player);
 		} else {
 			locPlayer = null;
 		}
@@ -134,36 +125,12 @@ public class Minimap implements IMap{
 		this.isMapVisible = JustMapClient.CONFIG.getBoolean("map_visible");
 	}
 	
-	private void updateInfo(PlayerEntity player) {
+	private void updateCoords(PlayerEntity player) {
 		this.txtCoords.setVisible(ClientParams.showPosition);
-		this.txtBiome.setVisible(ClientParams.showBiome);
-		this.txtFPS.setVisible(ClientParams.showFPS);
-		this.txtTime.setVisible(ClientParams.showTime);
 		
 		if (ClientParams.showPosition) {
-			Entity camera = minecraftClient.cameraEntity;
-			this.txtCoords.setText(PosUtil.posToString(camera.getX(), camera.getY(), camera.getZ()));
-		}		
-		if (ClientParams.showBiome) {
-			this.txtBiome.setText(I18n.translate(currentBiome.getTranslationKey()));
-		}		
-		if (ClientParams.showFPS) {
-			this.txtFPS.setText(minecraftClient.fpsDebugString.substring(0, minecraftClient.fpsDebugString.indexOf("fps") + 3));
-		}		
-		if (ClientParams.showTime) {
-			this.txtTime.setText(this.timeString(minecraftClient.world.getTimeOfDay()));
+			this.txtCoords.update();
 		}
-	}
-	
-	private String timeString(long time) {
-		time = time > 24000 ? time % 24000 : time;
-	
-		int h = (int) time / 1000 + 6;
-		int m = (int) (((time % 1000) / 1000.0F) * 60);
-		
-		h = h >= 24 ? h - 24 : h;
-	
-		return String.format("%02d:%02d", h, m);
 	}
 	
 	private static boolean isAllowed(boolean param, GameRules.Key<GameRules.BooleanRule> rule) {
@@ -210,8 +177,6 @@ public class Minimap implements IMap{
 	public void prepareMap(PlayerEntity player) {
 		World world = player.world;
 		BlockPos pos = PosUtil.currentPos();
-		
-		currentBiome = world.getBiome(pos);
 		
 		int posX = pos.getX();
 		int posZ = pos.getZ();

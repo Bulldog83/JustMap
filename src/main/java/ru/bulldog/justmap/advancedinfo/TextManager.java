@@ -28,6 +28,14 @@ public class TextManager {
 	public void clear() {
 		this.elements.clear();
 	}
+	
+	public int getX() {
+		return x;
+	}
+	
+	public int getY() {
+		return y;
+	}
   
 	public void draw(MatrixStack matrixStack) {
 		int yp = y;
@@ -47,12 +55,13 @@ public class TextManager {
 			if (!line.visible) continue;
 			if (!line.fixed) {
 				switch (line.alignment) {
-			  		case CENTER: line.x = xp + lineWidth / 2; break;
+			  		case CENTER: line.x = (xp + lineWidth / 2); break;
 			  		case RIGHT: line.x = xp + lineWidth; break;
 			  		default: line.x = xp;
 				}
+				line.x += line.offsetX;
 			  
-				line.y = yp;
+				line.y = yp + line.offsetY;
 				if (position == TextPosition.ABOVE ||
 					position == TextPosition.ABOVE_LEFT ||
 					position == TextPosition.ABOVE_RIGHT) {
@@ -89,5 +98,17 @@ public class TextManager {
 	public TextManager setSpacing(int spacing) {
 		this.spacing = spacing;
 		return this;
+	}
+
+	public void update() {
+		this.elements.forEach(element -> element.update());
+	}
+
+	public int size() {
+		return this.elements.size();
+	}
+
+	public int getSpacing() {
+		return this.spacing;
 	}
 }

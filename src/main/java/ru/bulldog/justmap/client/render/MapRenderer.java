@@ -4,6 +4,7 @@ import org.lwjgl.opengl.GL11;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import ru.bulldog.justmap.advancedinfo.InfoText;
+import ru.bulldog.justmap.advancedinfo.MapText;
 import ru.bulldog.justmap.advancedinfo.TextManager;
 import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.client.config.ClientParams;
@@ -54,10 +55,10 @@ public class MapRenderer {
 	
 	private TextManager textManager;
 	
-	private InfoText dirN = new InfoText(TextAlignment.CENTER, "N");
-	private InfoText dirS = new InfoText(TextAlignment.CENTER, "S");
-	private InfoText dirE = new InfoText(TextAlignment.CENTER, "E");
-	private InfoText dirW = new InfoText(TextAlignment.CENTER, "W");
+	private InfoText dirN = new MapText(TextAlignment.CENTER, "N");
+	private InfoText dirS = new MapText(TextAlignment.CENTER, "S");
+	private InfoText dirE = new MapText(TextAlignment.CENTER, "E");
+	private InfoText dirW = new MapText(TextAlignment.CENTER, "W");
 	
 	private final MinecraftClient client = MinecraftClient.getInstance();
 	
