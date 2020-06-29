@@ -3,36 +3,38 @@ package ru.bulldog.justmap.advancedinfo;
 import ru.bulldog.justmap.util.Colors;
 import ru.bulldog.justmap.util.DrawHelper;
 import ru.bulldog.justmap.util.DrawHelper.TextAlignment;
+
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
 
-public class InfoText {
-	  TextAlignment alignment = TextAlignment.LEFT;
+public abstract class InfoText {
+	  TextAlignment alignment;
 	  Text text;
-	  Identifier icon;
 	  boolean fixed = false;
 	  boolean visible = true;
-	  int color = Colors.WHITE;
+	  int color;
+	  int offset;
+	  int offsetX;
+	  int offsetY;
 	  int x, y;
   
-	  private static final MinecraftClient client = MinecraftClient.getInstance();
+	  protected static final MinecraftClient minecraft = MinecraftClient.getInstance();
+	  
+	  public abstract void update();
 	  
 	  public InfoText(String text) {
-		  this.text = new LiteralText(text);
+		  this(TextAlignment.LEFT, text, Colors.WHITE);
 	  }
   
 	  public InfoText(TextAlignment alignment, String text) {
-		this.alignment = alignment;
-		this.text = new LiteralText(text);
+		  this(alignment, text, Colors.WHITE);
 	  }
   
 	  public InfoText(String text, int color) {
-		  this.text = new LiteralText(text);
-		  this.color = color;
+		  this(TextAlignment.LEFT, text, color);
 	  }
 	  
 	  public InfoText(TextAlignment alignment, String text, int color) {
@@ -42,9 +44,13 @@ public class InfoText {
 	  }
 	  
 	  public void draw(MatrixStack matrixStack) {
-		  TextRenderer textRenderer = client.textRenderer;
+		  this.draw(matrixStack, x, y);
+	  }
+	  
+	  public void draw(MatrixStack matrixStack, int x, int y) {
+		  TextRenderer textRenderer = minecraft.textRenderer;
 		
-		  int width = client.getWindow().getScaledWidth();
+		  int width = minecraft.getWindow().getScaledWidth();
 		
 		  switch (alignment) {
 			 case LEFT:
