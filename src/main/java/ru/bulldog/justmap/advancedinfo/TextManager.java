@@ -20,7 +20,7 @@ public class TextManager {
 		ABOVE_RIGHT
 	}	
 
-	private TextPosition position = TextPosition.RIGHT;
+	private TextPosition textPosition = TextPosition.RIGHT;
 	private List<InfoText> elements;
 	private int x, y;
 	private int lineWidth;
@@ -30,22 +30,23 @@ public class TextManager {
 		this.elements = new ArrayList<>();
 	}
   
-	public void clear() {
-		this.elements.clear();
-	}
-	
-	public int getX() {
-		return x;
-	}
-	
-	public int getY() {
-		return y;
-	}
-  
 	public void draw(MatrixStack matrixStack) {
-		this.elements.forEach(line -> {
-			if (line.visible) line.draw(matrixStack);
-		});
+		int yp = this.y;
+		for (InfoText line : elements) {
+			if (!line.visible) continue;
+			if (!line.fixed) {
+				line.y = yp + line.offsetY;
+				if (textPosition == TextPosition.ABOVE ||
+					textPosition == TextPosition.ABOVE_LEFT ||
+					textPosition == TextPosition.ABOVE_RIGHT) {
+					
+					yp -= spacing;
+				} else {
+					yp += spacing;
+				}
+			}
+			line.draw(matrixStack);
+		}
 	}
 	
 	public TextManager updatePosition(ScreenPosition position) {
@@ -55,7 +56,7 @@ public class TextManager {
 		int screenH = minecraft.getWindow().getScaledHeight();
 		switch(position) {
 			case TOP_LEFT:
-				this.updatePosition(offset, offset);
+				this.updatePosition(TextPosition.RIGHT, offset, offset);
 				break;
 			case TOP_CENTER:
 				this.updatePosition(TextPosition.UNDER,
@@ -66,7 +67,8 @@ public class TextManager {
 						screenW - offset, offset);
 				break;
 			case MIDDLE_LEFT:
-				this.updatePosition(offset, screenH / 2 - (this.size() / 2) * spacing);
+				this.updatePosition(TextPosition.RIGHT,
+						offset, screenH / 2 - (this.size() / 2) * spacing);
 				break;
 			case MIDDLE_RIGHT:
 				this.updatePosition(TextPosition.LEFT,
@@ -86,8 +88,8 @@ public class TextManager {
 	}
 	
 	public TextManager updatePosition(TextPosition pos, int x, int y) {
-		if (position != pos || this.x != x || this.y != y) {
-			this.position = pos;
+		if (textPosition != pos || this.x != x || this.y != y) {
+			this.textPosition = pos;
 			this.x = x;
 			this.y = y;
 			this.updateLines();
@@ -95,35 +97,20 @@ public class TextManager {
 		return this;
 	}
 	
-	public TextManager updatePosition(int x, int y) {
-		return updatePosition(position, x, y);
-	}
-  
-	public TextManager updatePosition(TextPosition pos) {
-		return updatePosition(pos, x, y);
-	}
-	
 	private void updateLines() {
-		int yp = y;
 		int xp = x;
-		
-		if (position == TextPosition.ABOVE ||
-			position == TextPosition.ABOVE_LEFT ||
-			position == TextPosition.ABOVE_RIGHT) {
+		if (textPosition == TextPosition.LEFT ||
+			textPosition == TextPosition.ABOVE_LEFT) {
 			
-			yp -= spacing / 2;
-		}
-		if (position == TextPosition.LEFT ||
-				   position == TextPosition.ABOVE_LEFT) {
-			xp -= lineWidth;
+			xp = x - lineWidth;
 		}
 		for (InfoText line : elements) {
 			if (line.fixed) continue;
 			line.offset = ClientParams.positionOffset;
-			if (position == TextPosition.ABOVE || position == TextPosition.UNDER) {
+			if (textPosition == TextPosition.ABOVE || textPosition == TextPosition.UNDER) {
 				line.alignment = TextAlignment.CENTER;
-			} else if (position == TextPosition.LEFT ||
-					   position == TextPosition.ABOVE_LEFT) {
+			} else if (textPosition == TextPosition.LEFT ||
+					   textPosition == TextPosition.ABOVE_LEFT) {
 				line.alignment = TextAlignment.RIGHT;
 			}
 			switch (line.alignment) {
@@ -131,22 +118,12 @@ public class TextManager {
 		  		case RIGHT: line.x = xp + lineWidth; break;
 		  		default: line.x = xp;
 			}
-			if (position == TextPosition.LEFT ||
-				position == TextPosition.ABOVE_LEFT) {
+			if (textPosition == TextPosition.LEFT ||
+				textPosition == TextPosition.ABOVE_LEFT) {
 				
 				line.x -= line.offsetX;
 			} else {
 				line.x += line.offsetX;
-			}
-		  
-			line.y = yp + line.offsetY;
-			if (position == TextPosition.ABOVE ||
-				position == TextPosition.ABOVE_LEFT ||
-				position == TextPosition.ABOVE_RIGHT) {
-				
-				yp -= spacing;
-			} else {
-				yp += spacing;
 			}
 		}
 	}
@@ -171,5 +148,12 @@ public class TextManager {
 
 	public int size() {
 		return this.elements.size();
+	}
+
+	public void clear() {
+		this.elements.clear();
+		this.textPosition = TextPosition.RIGHT;
+		this.x = 0;
+		this.y = 0;
 	}
 }
