@@ -3,8 +3,11 @@ package ru.bulldog.justmap.advancedinfo;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.util.math.MatrixStack;
+
 import ru.bulldog.justmap.client.config.ClientParams;
+import ru.bulldog.justmap.util.ScreenPosition;
 import ru.bulldog.justmap.util.DrawHelper.TextAlignment;
 
 public class TextManager {
@@ -40,6 +43,67 @@ public class TextManager {
 	}
   
 	public void draw(MatrixStack matrixStack) {
+		this.elements.forEach(line -> {
+			if (line.visible) line.draw(matrixStack);
+		});
+	}
+	
+	public TextManager updatePosition(ScreenPosition position) {
+		int offset = ClientParams.positionOffset;
+		MinecraftClient minecraft = MinecraftClient.getInstance();
+		int screenW = minecraft.getWindow().getScaledWidth();
+		int screenH = minecraft.getWindow().getScaledHeight();
+		switch(position) {
+			case TOP_LEFT:
+				this.updatePosition(offset, offset);
+				break;
+			case TOP_CENTER:
+				this.updatePosition(TextPosition.UNDER,
+						screenW / 2 - lineWidth / 2, offset);
+				break;
+			case TOP_RIGHT:
+				this.updatePosition(TextPosition.LEFT,
+						screenW - offset, offset);
+				break;
+			case MIDDLE_LEFT:
+				this.updatePosition(offset, screenH / 2 - (this.size() / 2) * spacing);
+				break;
+			case MIDDLE_RIGHT:
+				this.updatePosition(TextPosition.LEFT,
+						screenW - offset, screenH / 2 - (this.size() / 2) * spacing);
+				break;
+			case BOTTOM_LEFT:
+				this.updatePosition(TextPosition.ABOVE_RIGHT,
+						offset, screenH - offset - spacing);
+				break;	
+			case BOTTOM_RIGHT:
+				this.updatePosition(TextPosition.ABOVE_LEFT,
+						screenW - offset, screenH - offset - spacing);
+				break;
+		}
+		
+		return this;
+	}
+	
+	public TextManager updatePosition(TextPosition pos, int x, int y) {
+		if (position != pos || this.x != x || this.y != y) {
+			this.position = pos;
+			this.x = x;
+			this.y = y;
+			this.updateLines();
+		}
+		return this;
+	}
+	
+	public TextManager updatePosition(int x, int y) {
+		return updatePosition(position, x, y);
+	}
+  
+	public TextManager updatePosition(TextPosition pos) {
+		return updatePosition(pos, x, y);
+	}
+	
+	private void updateLines() {
 		int yp = y;
 		int xp = x;
 		
@@ -53,41 +117,37 @@ public class TextManager {
 				   position == TextPosition.ABOVE_LEFT) {
 			xp -= lineWidth;
 		}
-		
 		for (InfoText line : elements) {
-			if (!line.visible) continue;
-			if (!line.fixed) {
-				line.offset = ClientParams.positionOffset;
-				if (position == TextPosition.ABOVE || position == TextPosition.UNDER) {
-					line.alignment = TextAlignment.CENTER;
-				} else if (position == TextPosition.LEFT ||
-						   position == TextPosition.ABOVE_LEFT) {
-					line.alignment = TextAlignment.RIGHT;
-				}
-				switch (line.alignment) {
-			  		case CENTER: line.x = (xp + lineWidth / 2); break;
-			  		case RIGHT: line.x = xp + lineWidth; break;
-			  		default: line.x = xp;
-				}
-				if (position == TextPosition.LEFT ||
-					position == TextPosition.ABOVE_LEFT) {
-					
-					line.x -= line.offsetX;
-				} else {
-					line.x += line.offsetX;
-				}
-			  
-				line.y = yp + line.offsetY;
-				if (position == TextPosition.ABOVE ||
-					position == TextPosition.ABOVE_LEFT ||
-					position == TextPosition.ABOVE_RIGHT) {
-					
-					yp -= spacing;
-				} else {
-					yp += spacing;
-				}
+			if (line.fixed) continue;
+			line.offset = ClientParams.positionOffset;
+			if (position == TextPosition.ABOVE || position == TextPosition.UNDER) {
+				line.alignment = TextAlignment.CENTER;
+			} else if (position == TextPosition.LEFT ||
+					   position == TextPosition.ABOVE_LEFT) {
+				line.alignment = TextAlignment.RIGHT;
 			}
-			line.draw(matrixStack);
+			switch (line.alignment) {
+		  		case CENTER: line.x = (xp + lineWidth / 2); break;
+		  		case RIGHT: line.x = xp + lineWidth; break;
+		  		default: line.x = xp;
+			}
+			if (position == TextPosition.LEFT ||
+				position == TextPosition.ABOVE_LEFT) {
+				
+				line.x -= line.offsetX;
+			} else {
+				line.x += line.offsetX;
+			}
+		  
+			line.y = yp + line.offsetY;
+			if (position == TextPosition.ABOVE ||
+				position == TextPosition.ABOVE_LEFT ||
+				position == TextPosition.ABOVE_RIGHT) {
+				
+				yp -= spacing;
+			} else {
+				yp += spacing;
+			}
 		}
 	}
   
@@ -97,21 +157,6 @@ public class TextManager {
 	
 	public TextManager setLineWidth(int width) {
 		this.lineWidth = width;
-		return this;
-	}
-	
-	public int getLineWidth() {
-		return this.lineWidth;
-	}
-	
-	public TextManager setPosition(int x, int y) {
-		this.x = x;
-		this.y = y;
-		return this;
-	}
-  
-	public TextManager setDirection(TextPosition pos) {
-		this.position = pos;
 		return this;
 	}
 	
@@ -126,9 +171,5 @@ public class TextManager {
 
 	public int size() {
 		return this.elements.size();
-	}
-
-	public int getSpacing() {
-		return this.spacing;
 	}
 }

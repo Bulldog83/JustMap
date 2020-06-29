@@ -174,12 +174,11 @@ public class MapRenderer {
 				this.imgY = this.mapY;
 			}
 			
-			this.textManager.setPosition(
+			this.textManager.updatePosition(textPos,
 				mapX, mapY + (textPos == TextManager.TextPosition.UNDER ?
 					mapHeight + border + 3 :
 					-(border + 3))
 			);
-			this.textManager.setDirection(textPos);
 		}
 		
 		int centerX = mapX + mapWidth / 2;
