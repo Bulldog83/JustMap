@@ -263,7 +263,28 @@ public final class ConfigFactory {
 				.setDefaultValue((int) JustMapClient.CONFIG.getDefault("entity_model_size"))
 				.build());
 		
+		@SuppressWarnings("unchecked")
+		EnumEntry<ScreenPosition> infoPosConfig = (EnumEntry<ScreenPosition>) JustMapClient.CONFIG.getEntry("info_position");
+		EnumSelectorBuilder<ScreenPosition> infoPosEntry = entryBuilder.startEnumSelector(lang("info_position"), ScreenPosition.class, infoPosConfig.getValue());
+		infoPosEntry.setSaveConsumer(val -> infoPosConfig.setValue(val))
+					.setDefaultValue(infoPosConfig.getDefault());
+		@SuppressWarnings("unchecked")
+		EnumEntry<ScreenPosition> itemsPosConfig = (EnumEntry<ScreenPosition>) JustMapClient.CONFIG.getEntry("items_position");
+		EnumSelectorBuilder<ScreenPosition> itemsPosEntry = entryBuilder.startEnumSelector(lang("equipment_position"), ScreenPosition.class, itemsPosConfig.getValue());
+		itemsPosEntry.setSaveConsumer(val -> itemsPosConfig.setValue(val))
+		.setDefaultValue(itemsPosConfig.getDefault());
+		
 		ConfigCategory mapInfo = configBuilder.getOrCreateCategory(lang("category.info"));
+		mapInfo.addEntry(infoPosEntry.build());
+		mapInfo.addEntry(itemsPosEntry.build());
+		mapInfo.addEntry(entryBuilder.startBooleanToggle(lang("advanced_info"), JustMapClient.CONFIG.getBoolean("advanced_info"))
+				.setSaveConsumer(val -> JustMapClient.CONFIG.setBoolean("advanced_info", val))
+				.setDefaultValue((boolean) JustMapClient.CONFIG.getDefault("advanced_info"))
+				.build());
+		mapInfo.addEntry(entryBuilder.startBooleanToggle(lang("map_info"), JustMapClient.CONFIG.getBoolean("map_info"))
+				.setSaveConsumer(val -> JustMapClient.CONFIG.setBoolean("map_info", val))
+				.setDefaultValue((boolean) JustMapClient.CONFIG.getDefault("map_info"))
+				.build());
 		mapInfo.addEntry(entryBuilder.startBooleanToggle(lang("show_position"), JustMapClient.CONFIG.getBoolean("show_position"))
 				.setSaveConsumer(val -> JustMapClient.CONFIG.setBoolean("show_position", val))
 				.setDefaultValue((boolean) JustMapClient.CONFIG.getDefault("show_position"))
@@ -279,6 +300,38 @@ public final class ConfigFactory {
 		mapInfo.addEntry(entryBuilder.startBooleanToggle(lang("show_game_time"), JustMapClient.CONFIG.getBoolean("show_time"))
 				.setSaveConsumer(val -> JustMapClient.CONFIG.setBoolean("show_time", val))
 				.setDefaultValue((boolean) JustMapClient.CONFIG.getDefault("show_time"))
+				.build());
+		mapInfo.addEntry(entryBuilder.startBooleanToggle(lang("show_light_level"), JustMapClient.CONFIG.getBoolean("show_light"))
+				.setSaveConsumer(val -> JustMapClient.CONFIG.setBoolean("show_light", val))
+				.setDefaultValue((boolean) JustMapClient.CONFIG.getDefault("show_light"))
+				.build());
+		mapInfo.addEntry(entryBuilder.startBooleanToggle(lang("show_equipment_info"), JustMapClient.CONFIG.getBoolean("show_items"))
+				.setSaveConsumer(val -> JustMapClient.CONFIG.setBoolean("show_items", val))
+				.setDefaultValue((boolean) JustMapClient.CONFIG.getDefault("show_items"))
+				.build());
+		mapInfo.addEntry(entryBuilder.startBooleanToggle(lang("show_mainhand"), JustMapClient.CONFIG.getBoolean("show_mainhand"))
+				.setSaveConsumer(val -> JustMapClient.CONFIG.setBoolean("show_mainhand", val))
+				.setDefaultValue((boolean) JustMapClient.CONFIG.getDefault("show_mainhand"))
+				.build());
+		mapInfo.addEntry(entryBuilder.startBooleanToggle(lang("show_offhand"), JustMapClient.CONFIG.getBoolean("show_offhand"))
+				.setSaveConsumer(val -> JustMapClient.CONFIG.setBoolean("show_offhand", val))
+				.setDefaultValue((boolean) JustMapClient.CONFIG.getDefault("show_offhand"))
+				.build());
+		mapInfo.addEntry(entryBuilder.startBooleanToggle(lang("show_head"), JustMapClient.CONFIG.getBoolean("show_head"))
+				.setSaveConsumer(val -> JustMapClient.CONFIG.setBoolean("show_head", val))
+				.setDefaultValue((boolean) JustMapClient.CONFIG.getDefault("show_head"))
+				.build());
+		mapInfo.addEntry(entryBuilder.startBooleanToggle(lang("show_chest"), JustMapClient.CONFIG.getBoolean("show_chest"))
+				.setSaveConsumer(val -> JustMapClient.CONFIG.setBoolean("show_chest", val))
+				.setDefaultValue((boolean) JustMapClient.CONFIG.getDefault("show_chest"))
+				.build());
+		mapInfo.addEntry(entryBuilder.startBooleanToggle(lang("show_legs"), JustMapClient.CONFIG.getBoolean("show_legs"))
+				.setSaveConsumer(val -> JustMapClient.CONFIG.setBoolean("show_legs", val))
+				.setDefaultValue((boolean) JustMapClient.CONFIG.getDefault("show_legs"))
+				.build());
+		mapInfo.addEntry(entryBuilder.startBooleanToggle(lang("show_feet"), JustMapClient.CONFIG.getBoolean("show_feet"))
+				.setSaveConsumer(val -> JustMapClient.CONFIG.setBoolean("show_feet", val))
+				.setDefaultValue((boolean) JustMapClient.CONFIG.getDefault("show_feet"))
 				.build());
 	
 		ConfigCategory optimization = configBuilder.getOrCreateCategory(lang("category.optimization"));

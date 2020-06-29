@@ -25,11 +25,11 @@ public class AdvancedInfo {
 		return INSTANCE;
 	}
 	
-	private boolean initialized = false;
-	
 	private MinecraftClient minecraft = MinecraftClient.getInstance();
 	private Map<ScreenPosition, TextManager> managers;
 	private TextManager mapTextManager;
+	private ScreenPosition infoPos;
+	private ScreenPosition itemsPos;
 	
 	private AdvancedInfo() {
 		this.managers = new HashMap<>();		
@@ -45,49 +45,57 @@ public class AdvancedInfo {
 			return this.managers.get(position);
 		}
 		
-		int offset = ClientParams.positionOffset;
-		int screenW = minecraft.getWindow().getScaledWidth();
-		int screenH = minecraft.getWindow().getScaledHeight();
-		int lineWidth = 64;
+		int lineWidth = 128;
 		
 		TextManager textManager = new TextManager();
 		textManager.setLineWidth(lineWidth);
-		textManager.setSpacing(12);
+		this.managers.put(position, textManager);
+		
+		return textManager;
+	}
+	
+	private void updatePosition(TextManager textManager, ScreenPosition position) {
+		int offset = ClientParams.positionOffset;
+		int screenW = minecraft.getWindow().getScaledWidth();
+		int screenH = minecraft.getWindow().getScaledHeight();
+		int spacing = textManager.getSpacing();
 		switch(position) {
 			case TOP_LEFT:
 				textManager.setPosition(offset, offset);
 				break;
 			case TOP_CENTER:
 				textManager.setDirection(TextPosition.UNDER)
-						   .setPosition(screenW / 2, offset);
+						   .setPosition(screenW / 2 - textManager.getLineWidth() / 2, offset);
 				break;
 			case TOP_RIGHT:
 				textManager.setDirection(TextPosition.LEFT)
-						   .setPosition(screenW, offset);
+						   .setPosition(screenW - offset, offset);
 				break;
 			case MIDDLE_LEFT:
 				textManager.setPosition(offset, screenH / 2);
 				break;
 			case MIDDLE_RIGHT:
 				textManager.setDirection(TextPosition.LEFT)
-						   .setPosition(screenW, screenH / 2);
+						   .setPosition(screenW - offset, screenH / 2);
 				break;
 			case BOTTOM_LEFT:
 				textManager.setDirection(TextPosition.ABOVE_RIGHT)
-						   .setPosition(offset, screenH);
+						   .setPosition(offset, screenH - offset - spacing);
 				break;	
 			case BOTTOM_RIGHT:
 				textManager.setDirection(TextPosition.ABOVE_LEFT)
-						   .setPosition(screenW, screenH);
+						   .setPosition(screenW - offset, screenH - offset - spacing);
 				break;
 		}
-		this.managers.put(position, textManager);
-		
-		return textManager;
 	}
 	
 	private void initInfo() {
-		TextManager textManager = this.getTextManager(ScreenPosition.TOP_LEFT);
+		this.managers.forEach((position, manager) -> manager.clear());
+		
+		this.infoPos = ClientParams.infoPosition;
+		this.itemsPos = ClientParams.itemsPosition;
+		
+		TextManager textManager = this.getTextManager(infoPos);
 		textManager.setSpacing(12);
 		
 		textManager.add(new BiomeInfo());
@@ -95,7 +103,9 @@ public class AdvancedInfo {
 		textManager.add(new FpsInfo());
 		textManager.add(new LightLevelInfo());
 		
-		textManager = this.getTextManager(ScreenPosition.MIDDLE_LEFT);
+		this.updatePosition(textManager, infoPos);
+		
+		textManager = this.getTextManager(itemsPos);
 		textManager.setSpacing(16);
 		
 		textManager.add(new ItemInfo(EquipmentSlot.MAINHAND));
@@ -105,26 +115,24 @@ public class AdvancedInfo {
 		textManager.add(new ItemInfo(EquipmentSlot.LEGS));
 		textManager.add(new ItemInfo(EquipmentSlot.FEET));
 		
-		this.initialized = true;
+		this.updatePosition(textManager, itemsPos);
 	}
 	
 	public void updateInfo() {
+		if (!ClientParams.advancedInfo) return;
 		if (minecraft.currentScreen != null &&
 		  !(minecraft.currentScreen instanceof ChatScreen)) return;
 		
-		if (!initialized) this.initInfo();
+		if (ClientParams.infoPosition != infoPos || ClientParams.itemsPosition != itemsPos) {
+			this.initInfo();
+		}
 		int screenH = minecraft.getWindow().getScaledHeight();
 		this.managers.forEach((position, manager) -> {
 			switch(position) {
 				case MIDDLE_LEFT:
+				case MIDDLE_RIGHT:
 					manager.setPosition(manager.getX(), 
 							screenH / 2 - ((manager.size() / 2) * manager.getSpacing()));
-					break;
-				case MIDDLE_RIGHT:
-					break;
-				case BOTTOM_LEFT:
-					break;	
-				case BOTTOM_RIGHT:
 					break;
 				default:
 					break;
@@ -135,6 +143,7 @@ public class AdvancedInfo {
 	}
 	
 	public void draw(MatrixStack matrixStack) {
+		if (!ClientParams.advancedInfo) return;
 		RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
 		this.managers.forEach((position, manager) -> manager.draw(matrixStack));
 	}

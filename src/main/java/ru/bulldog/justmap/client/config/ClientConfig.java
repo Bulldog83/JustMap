@@ -39,10 +39,20 @@ public class ClientConfig extends Config{
 		KEEPER.registerEntry("show_caves", new BooleanEntry(ClientParams.drawCaves, (b) -> ClientParams.drawCaves = b, () -> ClientParams.drawCaves));
 		KEEPER.registerEntry("hide_plants", new BooleanEntry(ClientParams.hidePlants, (b) -> ClientParams.hidePlants = b, () -> ClientParams.hidePlants));
 		KEEPER.registerEntry("hide_water", new BooleanEntry(ClientParams.hideWater, (b) -> ClientParams.hideWater = b, () -> ClientParams.hideWater));
+		KEEPER.registerEntry("advanced_info", new BooleanEntry(ClientParams.advancedInfo, (b) -> ClientParams.advancedInfo = b, () -> ClientParams.advancedInfo));
+		KEEPER.registerEntry("map_info", new BooleanEntry(ClientParams.mapInfo, (b) -> ClientParams.mapInfo = b, () -> ClientParams.mapInfo));
 		KEEPER.registerEntry("show_position", new BooleanEntry(ClientParams.showPosition, (b) -> ClientParams.showPosition = b, () -> ClientParams.showPosition));
 		KEEPER.registerEntry("show_FPS", new BooleanEntry(ClientParams.showFPS, (b) -> ClientParams.showFPS = b, () -> ClientParams.showFPS));
 		KEEPER.registerEntry("show_biome", new BooleanEntry(ClientParams.showBiome, (b) -> ClientParams.showBiome = b, () -> ClientParams.showBiome));
 		KEEPER.registerEntry("show_time", new BooleanEntry(ClientParams.showTime, (b) -> ClientParams.showTime = b, () -> ClientParams.showTime));
+		KEEPER.registerEntry("show_light", new BooleanEntry(ClientParams.showLight, (b) -> ClientParams.showLight = b, () -> ClientParams.showLight));
+		KEEPER.registerEntry("show_items", new BooleanEntry(ClientParams.showItems, (b) -> ClientParams.showItems = b, () -> ClientParams.showItems));
+		KEEPER.registerEntry("show_mainhand", new BooleanEntry(ClientParams.showMainhand, (b) -> ClientParams.showMainhand = b, () -> ClientParams.showMainhand));
+		KEEPER.registerEntry("show_offhand", new BooleanEntry(ClientParams.showOffhand, (b) -> ClientParams.showOffhand = b, () -> ClientParams.showOffhand));
+		KEEPER.registerEntry("show_head", new BooleanEntry(ClientParams.showHead, (b) -> ClientParams.showHead = b, () -> ClientParams.showHead));
+		KEEPER.registerEntry("show_chest", new BooleanEntry(ClientParams.showChest, (b) -> ClientParams.showChest = b, () -> ClientParams.showChest));
+		KEEPER.registerEntry("show_legs", new BooleanEntry(ClientParams.showLegs, (b) -> ClientParams.showLegs = b, () -> ClientParams.showLegs));
+		KEEPER.registerEntry("show_feet", new BooleanEntry(ClientParams.showFeet, (b) -> ClientParams.showFeet = b, () -> ClientParams.showFeet));
 		KEEPER.registerEntry("move_effects", new BooleanEntry(ClientParams.moveEffects, (b) -> ClientParams.moveEffects = b, () -> ClientParams.moveEffects));
 		KEEPER.registerEntry("show_effect_timers", new BooleanEntry(ClientParams.showEffectTimers, (b) -> ClientParams.showEffectTimers = b, () -> ClientParams.showEffectTimers));
 		KEEPER.registerEntry("alternate_color_render", new BooleanEntry(ClientParams.alternateColorRender, (b) -> ClientParams.alternateColorRender = b, () -> ClientParams.alternateColorRender));
@@ -87,6 +97,8 @@ public class ClientConfig extends Config{
 		KEEPER.registerEntry("entity_outline_size", new IntegerRange(ClientParams.entityOutlineSize, (i) -> ClientParams.entityOutlineSize = i, () -> ClientParams.entityOutlineSize, 1, 5));
 		KEEPER.registerEntry("arrow_size", new IntegerRange(ClientParams.arrowIconSize, (i) -> ClientParams.arrowIconSize = i, () -> ClientParams.arrowIconSize, 6, 16));
 		KEEPER.registerEntry("worldmap_icon_size", new IntegerRange(ClientParams.worldmapIconSize, (i) -> ClientParams.worldmapIconSize = i, () -> ClientParams.worldmapIconSize, 8, 16));
+		KEEPER.registerEntry("info_position", new EnumEntry<ScreenPosition>(ClientParams.infoPosition, (e) -> ClientParams.infoPosition = e, () -> ClientParams.infoPosition));
+		KEEPER.registerEntry("items_position", new EnumEntry<ScreenPosition>(ClientParams.itemsPosition, (e) -> ClientParams.itemsPosition = e, () -> ClientParams.itemsPosition));
 		
 		JsonObject config = ConfigWriter.load();
 		if (config.size() > 0) {

@@ -1,9 +1,11 @@
 package ru.bulldog.justmap.map.minimap;
 
 import ru.bulldog.justmap.advancedinfo.AdvancedInfo;
+import ru.bulldog.justmap.advancedinfo.BiomeInfo;
 import ru.bulldog.justmap.advancedinfo.CoordsInfo;
 import ru.bulldog.justmap.advancedinfo.InfoText;
 import ru.bulldog.justmap.advancedinfo.TextManager;
+import ru.bulldog.justmap.advancedinfo.TimeInfo;
 import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.map.IMap;
@@ -48,6 +50,8 @@ public class Minimap implements IMap{
 	private final TextManager textManager;
 	
 	private InfoText txtCoords = new CoordsInfo(TextAlignment.CENTER, "0, 0, 0");
+	private InfoText txtBiome = new BiomeInfo(TextAlignment.CENTER, "");
+	private InfoText txtTime = new TimeInfo(TextAlignment.CENTER, "");
 	
 	private int mapWidth;
 	private int mapHeight;
@@ -71,6 +75,8 @@ public class Minimap implements IMap{
 	public Minimap() {
 		this.textManager = AdvancedInfo.getInstance().getMapTextManager();
 		this.textManager.add(txtCoords);
+		this.textManager.add(txtBiome);
+		this.textManager.add(txtTime);
 		
 		this.updateMapParams();
 	}
@@ -85,7 +91,7 @@ public class Minimap implements IMap{
 			}
 
 			prepareMap(player);
-			updateCoords(player);
+			updateInfo(player);
 		} else {
 			locPlayer = null;
 		}
@@ -125,12 +131,24 @@ public class Minimap implements IMap{
 		this.isMapVisible = JustMapClient.CONFIG.getBoolean("map_visible");
 	}
 	
-	private void updateCoords(PlayerEntity player) {
+	private void updateInfo(PlayerEntity player) {
+		if (!ClientParams.mapInfo) {
+			this.txtCoords.setVisible(false);
+			this.txtBiome.setVisible(false);
+			this.txtTime.setVisible(false);
+			
+			return;
+		}
 		this.txtCoords.setVisible(ClientParams.showPosition);
-		
 		if (ClientParams.showPosition) {
 			this.txtCoords.update();
-		}
+		}		
+		boolean showBiome = !ClientParams.advancedInfo && ClientParams.showBiome;
+		boolean showTime = !ClientParams.advancedInfo && ClientParams.showTime;		
+		this.txtBiome.setVisible(showBiome);
+		this.txtTime.setVisible(showTime);		
+		if (showBiome) this.txtBiome.update();
+		if (showTime) this.txtTime.update();
 	}
 	
 	private static boolean isAllowed(boolean param, GameRules.Key<GameRules.BooleanRule> rule) {

@@ -1,18 +1,27 @@
 package ru.bulldog.justmap.advancedinfo;
 
 import ru.bulldog.justmap.client.config.ClientParams;
+import ru.bulldog.justmap.util.DrawHelper.TextAlignment;
 
 public class TimeInfo extends InfoText {
 
+	private String title;
+	
 	public TimeInfo() {
-		super("Time: 00:00");
+		super("00:00");
+		this.title = "Time: ";
+	}
+	
+	public TimeInfo(TextAlignment alignment, String title) {
+		super(alignment, "00:00");
+		this.title = title;
 	}
 
 	@Override
 	public void update() {
 		this.setVisible(ClientParams.showTime);
 		if (visible && minecraft.world != null) {
-			this.setText("Time: " + this.timeString(minecraft.world.getTimeOfDay()));
+			this.setText(title + this.timeString(minecraft.world.getTimeOfDay()));
 		}
 	}
 	

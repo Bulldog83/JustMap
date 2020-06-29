@@ -2,6 +2,7 @@ package ru.bulldog.justmap.advancedinfo;
 
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.LightType;
+import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.util.PosUtil;
 
 public class LightLevelInfo extends InfoText {
@@ -12,6 +13,7 @@ public class LightLevelInfo extends InfoText {
 
 	@Override
 	public void update() {
+		this.setVisible(ClientParams.showLight);
 		if (visible && minecraft.world != null) {
 			BlockPos currentPos = PosUtil.currentPos();
 			minecraft.world.calculateAmbientDarkness();

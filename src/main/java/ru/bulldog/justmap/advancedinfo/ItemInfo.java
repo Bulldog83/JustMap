@@ -4,6 +4,8 @@ import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.item.ItemStack;
+import ru.bulldog.justmap.client.config.ClientParams;
+import ru.bulldog.justmap.util.DrawHelper;
 
 public class ItemInfo extends InfoText {
 
@@ -19,16 +21,29 @@ public class ItemInfo extends InfoText {
 	@Override
 	public void draw(MatrixStack matrix) {
 		super.draw(matrix);
-		minecraft.getItemRenderer().renderInGuiWithOverrides(itemStack, x - offsetX, y - 5);
+		int posX;
+		switch (alignment) {
+			case RIGHT:
+				posX = x + offset;
+				break;
+			case CENTER:
+				int textWidth = DrawHelper.getWidth(text);
+				posX = x - textWidth / 2 - offsetX;
+				break;
+			default:
+				posX = x - offsetX;	
+		}
+		minecraft.getItemRenderer().renderInGuiWithOverrides(itemStack, posX, y - 5);
 	}
 
 	@Override
 	public void update() {
-		if (minecraft.player == null) return;
-		
-		this.itemStack = minecraft.player.getEquippedStack(slot);
-		
-		this.visible = !this.itemStack.isEmpty();
+		if (minecraft.player == null) {
+			this.setVisible(false);
+			return;
+		}		
+		this.itemStack = minecraft.player.getEquippedStack(slot);		
+		this.setVisible(this.isVisible() && !this.itemStack.isEmpty());
 		if (visible) {
 			String itemString;
 			if (this.itemStack.isDamageable()) {
@@ -43,5 +58,18 @@ public class ItemInfo extends InfoText {
 			this.setText(itemString);
 		}
 	}
-
+	
+	private boolean isVisible() {
+		if (!ClientParams.showItems) return false;
+		switch (slot) {
+			case MAINHAND: return ClientParams.showMainhand;
+			case OFFHAND: return ClientParams.showOffhand;
+			case HEAD: return ClientParams.showHead;
+			case CHEST: return ClientParams.showChest;
+			case LEGS: return ClientParams.showLegs;
+			case FEET: return ClientParams.showFeet;
+		}
+		
+		return true;
+	}
 }

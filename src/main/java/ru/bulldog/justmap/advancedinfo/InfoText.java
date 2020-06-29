@@ -16,8 +16,9 @@ public abstract class InfoText {
 	  boolean fixed = false;
 	  boolean visible = true;
 	  int color;
-	  int offsetX = 0;
-	  int offsetY = 0;
+	  int offset;
+	  int offsetX;
+	  int offsetY;
 	  int x, y;
   
 	  protected static final MinecraftClient minecraft = MinecraftClient.getInstance();
