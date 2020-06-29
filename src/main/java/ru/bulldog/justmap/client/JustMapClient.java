@@ -4,6 +4,7 @@ import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.event.client.ClientTickCallback;
 
 import ru.bulldog.justmap.JustMap;
+import ru.bulldog.justmap.advancedinfo.AdvancedInfo;
 import ru.bulldog.justmap.client.config.ClientConfig;
 import ru.bulldog.justmap.map.data.MapCache;
 import ru.bulldog.justmap.map.minimap.Minimap;
@@ -19,6 +20,7 @@ public class JustMapClient implements ClientModInitializer {
 		KeyHandler.initKeyBindings();
 
 		ClientTickCallback.EVENT.register((client) -> {
+			AdvancedInfo.getInstance().updateInfo();
 			KeyHandler.update();
 			MAP.update();
 

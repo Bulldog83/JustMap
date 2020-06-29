@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Ordering;
 import com.mojang.blaze3d.systems.RenderSystem;
 
+import ru.bulldog.justmap.advancedinfo.AdvancedInfo;
 import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.client.render.MapRenderer;
 import ru.bulldog.justmap.util.Colors;
@@ -38,12 +39,10 @@ abstract class HudMixin extends DrawableHelper {
 	@Shadow
 	private int scaledWidth;
 	
-	@Inject(at = @At("HEAD"), method = "render")
+	@Inject(at = @At("RETURN"), method = "render")
 	public void draw(MatrixStack matrixStack, float delta, CallbackInfo info) {
-		MapRenderer mapGui = MapRenderer.getInstance();
-		if (mapGui != null) {
-			mapGui.draw(matrixStack);
-		}
+		MapRenderer.getInstance().draw(matrixStack);
+		AdvancedInfo.getInstance().draw(matrixStack);
 	}
 	
 	@Inject(at = @At("HEAD"), method = "renderStatusEffectOverlay", cancellable = true)

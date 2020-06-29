@@ -7,14 +7,17 @@ public class PosUtil {
 	private static MinecraftClient minecraft = MinecraftClient.getInstance();
 
 	public static int coordX() {
+		if (minecraft.getCameraEntity() == null) return 0;
 		return (int) (minecraft.getCameraEntity().getX() < 0.0 ? minecraft.getCameraEntity().getX() - 1.0 : minecraft.getCameraEntity().getX());
 	}
 
 	public static int coordZ() {
+		if (minecraft.getCameraEntity() == null) return 0;
 		return (int) (minecraft.getCameraEntity().getZ() < 0.0 ? minecraft.getCameraEntity().getZ() - 1.0 : minecraft.getCameraEntity().getZ());
 	}
 
 	public static int coordY() {
+		if (minecraft.getCameraEntity() == null) return 0;
 		return (int) Math.ceil(minecraft.getCameraEntity().getY());
 	}
 

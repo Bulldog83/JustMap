@@ -4,6 +4,7 @@ import org.lwjgl.opengl.GL11;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import ru.bulldog.justmap.advancedinfo.InfoText;
+import ru.bulldog.justmap.advancedinfo.MapText;
 import ru.bulldog.justmap.advancedinfo.TextManager;
 import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.client.config.ClientParams;
@@ -43,6 +44,7 @@ public class MapRenderer {
 	private int offset;
 	private int posX, posY;
 	private int mapX, mapY;
+	private int winWidth, winHeight;
 	private int mapWidth, mapHeight;
 	private int imgX, imgY;
 	private int imgW, imgH;
@@ -54,10 +56,10 @@ public class MapRenderer {
 	
 	private TextManager textManager;
 	
-	private InfoText dirN = new InfoText(TextAlignment.CENTER, "N");
-	private InfoText dirS = new InfoText(TextAlignment.CENTER, "S");
-	private InfoText dirE = new InfoText(TextAlignment.CENTER, "E");
-	private InfoText dirW = new InfoText(TextAlignment.CENTER, "W");
+	private InfoText dirN = new MapText(TextAlignment.CENTER, "N");
+	private InfoText dirS = new MapText(TextAlignment.CENTER, "S");
+	private InfoText dirE = new MapText(TextAlignment.CENTER, "E");
+	private InfoText dirW = new MapText(TextAlignment.CENTER, "W");
 	
 	private final MinecraftClient client = MinecraftClient.getInstance();
 	
@@ -100,12 +102,18 @@ public class MapRenderer {
 			border = (int) (this.mapSkin.border * scale);
 		}
 		
+		int winW = client.getWindow().getScaledWidth();
+		int winH = client.getWindow().getScaledHeight();
 		int mapW = this.minimap.getWidth();
 		int mapH = this.minimap.getHeight();
 		int off = ClientParams.positionOffset;
 		ScreenPosition mapPos = ClientParams.mapPosition;
-		if (mapWidth != mapW || mapPosition == null || mapPosition != mapPos ||
-			mapHeight != mapH || offset != off || this.border != border) {
+		if (mapWidth != mapW || mapHeight != mapH || mapPosition != mapPos ||
+			this.border != border || offset != off ||
+			winWidth != winW || winHeight != winH) {
+			
+			this.winWidth = winW;
+			this.winHeight = winH;
 			this.mapWidth = mapW;
 			this.mapHeight = mapH;
 			this.mapPosition = mapPos;
@@ -118,9 +126,7 @@ public class MapRenderer {
 			this.mapY = posY + border;			
 			
 			TextManager.TextPosition textPos = TextManager.TextPosition.UNDER;
-			
-			int winW = client.getWindow().getScaledWidth();
-			int winH = client.getWindow().getScaledHeight();
+
 			switch (mapPosition) {
 				case TOP_LEFT:
 					break;

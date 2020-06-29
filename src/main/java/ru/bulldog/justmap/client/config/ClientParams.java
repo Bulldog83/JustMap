@@ -5,6 +5,8 @@ import ru.bulldog.justmap.util.ScreenPosition;
 
 public class ClientParams {
 	public static ScreenPosition mapPosition = ScreenPosition.TOP_RIGHT;
+	public static ScreenPosition infoPosition = ScreenPosition.TOP_LEFT;
+	public static ScreenPosition itemsPosition = ScreenPosition.MIDDLE_LEFT;
 	public static DirectionArrow.Type arrowIconType = DirectionArrow.Type.DIRECTION_ARROW;
 	
 	public static int positionOffset = 4;
@@ -42,10 +44,20 @@ public class ClientParams {
 	public static int arrowIconSize = 12;
 	public static int worldmapIconSize = 12;
 	
+	public static boolean advancedInfo = true;
+	public static boolean mapInfo = true;
 	public static boolean showPosition = true;
-	public static boolean showFPS = false;
+	public static boolean showFPS = true;
 	public static boolean showBiome = true;
 	public static boolean showTime = true;
+	public static boolean showLight = true;
+	public static boolean showItems = true;
+	public static boolean showMainhand = true;
+	public static boolean showOffhand = true;
+	public static boolean showHead = true;
+	public static boolean showChest = true;
+	public static boolean showLegs = true;
+	public static boolean showFeet = true;
 	
 	public static boolean showEntities = true;
 	public static boolean showEntityHeads = true;
