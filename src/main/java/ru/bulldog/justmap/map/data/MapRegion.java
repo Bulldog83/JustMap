@@ -19,6 +19,7 @@ public class MapRegion {
 	private final RegionPos pos;
 	private final MapTexture image;
 	private final MapTexture overlay;
+	private final MapTexture texture;
 	
 	private Layer.Type layer;
 	private int level;
@@ -40,13 +41,15 @@ public class MapRegion {
 	public MapRegion(BlockPos blockPos, Layer.Type layer, int level) {
 		this.pos = new RegionPos(blockPos);
 		this.image = new MapTexture(512, 512);
+		this.texture = new MapTexture(512, 512);
 		this.overlay = new MapTexture(512, 512);
 		this.image.fill(Colors.BLACK);
+		this.texture.fill(Colors.BLACK);
 		this.overlay.fill(Colors.TRANSPARENT);
 		this.layer = layer;
 		this.level = level;
 		this.loadImage();
-		this.updateTexture();
+		this.updateImage();
 	}
 	
 	public int getX() {
@@ -57,10 +60,10 @@ public class MapRegion {
 		return this.pos.z;
 	}
 	
-	public void updateTexture() {
+	public void updateImage() {
 		if (updating) return;
 		this.updateMapParams();
-		worker.execute(this::updateImage);
+		worker.execute(this::update);
 		this.updating = true;
 	}
 	
@@ -79,21 +82,9 @@ public class MapRegion {
 			this.alternateRender = ClientParams.alternateColorRender;
 			this.needUpdate = true;
 		}
-		if (ClientParams.showGrid != gridOverlay) {
-			this.gridOverlay = ClientParams.showGrid;
-			this.renewOverlay = true;
-		}
-		if (ClientParams.showSlime != slimeOverlay) {
-			this.slimeOverlay = ClientParams.showSlime;
-			this.renewOverlay = true;
-		}
-		if (ClientParams.showLoadedChunks != loadedOverlay) {
-			this.loadedOverlay = ClientParams.showLoadedChunks;
-			this.renewOverlay = true;
-		}
 	}
 	
-	private void updateImage() {
+	private void update() {
 		MapCache mapData = MapCache.get();
 		
 		int regX = this.pos.x << 9;
@@ -117,16 +108,24 @@ public class MapRegion {
 				if (updated) {
 					this.image.writeChunkData(x, y, mapChunk.getColorData());
 				}
-				if (renewOverlay) {
-					this.updateOverlay(x, y, mapChunk);
-				}
+				this.updateOverlay(x, y, mapChunk);
 			}
 		}
 		if (image.changed) this.saveImage();
+		if (image.changed || overlay.changed) {
+			this.updateTexture();
+		}
 		this.updated = System.currentTimeMillis();
 		this.needUpdate = false;
 		this.renewOverlay = false;
 		this.updating = false;
+	}
+	
+	private void updateTexture() {
+		this.texture.copyData(image);
+		this.texture.applyOverlay(overlay);
+		this.image.changed = false;
+		this.overlay.changed = false;
 	}
 	
 	private void updateOverlay(int x, int y, MapChunk mapChunk) {
@@ -158,7 +157,7 @@ public class MapRegion {
 		this.layer = layer;
 		this.level = level;
 		this.loadImage();
-		this.updateTexture();
+		this.updateImage();
 	}
 	
 	private void saveImage() {
@@ -169,6 +168,7 @@ public class MapRegion {
 	private void loadImage() {
 		File imgFile = this.imageFile();
 		this.image.loadImage(imgFile);
+		this.updateTexture();
 	}
 	
 	private File imageFile() {
@@ -197,17 +197,14 @@ public class MapRegion {
 		double scW = (double) width / scale;
 		double scH = (double) height / scale;
 		
-		this.drawImage(x, y, scW, scH, u1, v1, u2, v2);
-		if (gridOverlay || slimeOverlay || loadedOverlay) {
-			this.drawOverlay(x, y, scW, scH, u1, v1, u2, v2);
-		}
+		this.drawTexture(x, y, scW, scH, u1, v1, u2, v2);
 	}
 	
-	private void drawImage(double x, double y, double w, double h, float u1, float v1, float u2, float v2) {
-		if (image.changed) {
-			this.image.upload();
+	private void drawTexture(double x, double y, double w, double h, float u1, float v1, float u2, float v2) {
+		if (texture.changed) {
+			this.texture.upload();
 		}
-		RenderUtil.bindTexture(image.getId());
+		RenderUtil.bindTexture(texture.getId());
 		if (ClientParams.textureFilter) {
 			RenderUtil.applyFilter();
 		}
@@ -217,18 +214,9 @@ public class MapRegion {
 		RenderUtil.endDraw();
 	}
 	
-	private void drawOverlay(double x, double y, double w, double h, float u1, float v1, float u2, float v2) {
-		if (overlay.changed) {
-			this.overlay.upload();
-		}		
-		RenderUtil.bindTexture(overlay.getId());
-		RenderUtil.startDraw();
-		RenderUtil.addQuad(x, y, w, h, u1, v1, u2, v2);
-		RenderUtil.endDraw();
-	}
-	
 	public void close() {
 		this.image.close();
+		this.texture.close();
 		this.overlay.close();
 	}
 }

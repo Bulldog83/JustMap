@@ -119,8 +119,7 @@ public class MapTexture {
 			this.bytes[index + 1] = (byte) (color >> 0);
 			this.bytes[index + 2] = (byte) (color >> 8);
 			this.bytes[index + 3] = (byte) (color >> 16);
-		}
-		
+		}		
 		this.changed = true;
 	}
 	
@@ -128,15 +127,14 @@ public class MapTexture {
 		if (x < 0 || x >= this.getWidth()) return -1;
 		if (y < 0 || y >= this.getHeight()) return -1;
 		
-		int index = (x + y * this.getWidth()) * 4;
-		
+		int index = (x + y * this.getWidth()) * 4;		
 		synchronized(bufferLock) {
-			int a = this.bytes[index];
-			int b = this.bytes[index + 1];
-			int g = this.bytes[index + 2];
-			int r = this.bytes[index + 3];
+			int a = this.bytes[index] & 255;
+			int b = this.bytes[index + 1] & 255;
+			int g = this.bytes[index + 2] & 255;
+			int r = this.bytes[index + 3] & 255;
 			
-			return (a << 24) | (b << 16) | (g << 8) | (r << 0);
+			return (a << 24) | (r << 16) | (g << 8) | (b << 0);
 		}
 	}
 	
@@ -171,7 +169,29 @@ public class MapTexture {
 		synchronized(bufferLock) {
 			for(int i = x; i < x + width; i++) {
 				for (int j = y; j < y + height; j++) {
+					if (color == Colors.GRID) {
+						System.out.println(color);
+						System.out.println(this.getColor(i, j));
+					}
+					if (this.getColor(i, j) == color) continue;
 					this.setColor(i, j, color);
+				}
+			}
+		}
+	}
+	
+	public void applyOverlay(MapTexture overlay) {
+		int width = Math.min(this.width, overlay.getWidth());
+		int height = Math.min(this.height, overlay.getHeight());
+		if (width <= 0 || height <= 0) return;
+		synchronized(bufferLock) {
+			for (int x = 0; x < width; x++) {
+				for (int y = 0; y < height; y++) {
+					int color = overlay.getColor(x, y);
+					int alpha = (color >> 24) & 255;
+					if (alpha > 0) {
+						this.applyTint(x, y, color);
+					}
 				}
 			}
 		}
@@ -208,14 +228,16 @@ public class MapTexture {
 	}
 	
 	public void clear() {
-		this.fill(Colors.BLACK);
-		this.upload();
+		synchronized(bufferLock) {
+			this.buffer.clear();
+		}
 	}
 	
 	public void close() {
-		this.clearId();		
+		this.clearId();
 		synchronized(bufferLock) {
-			this.buffer.clear();
+			this.bytes = null;
+			this.clear();
 		}
 	}
 	
