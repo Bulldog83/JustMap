@@ -19,7 +19,7 @@ import ru.bulldog.justmap.map.waypoint.Waypoint;
 import ru.bulldog.justmap.map.waypoint.WaypointEditor;
 import ru.bulldog.justmap.map.waypoint.WaypointKeeper;
 import ru.bulldog.justmap.util.Dimension;
-import ru.bulldog.justmap.util.DrawHelper.TextAlignment;
+import ru.bulldog.justmap.util.RenderUtil.TextAlignment;
 import ru.bulldog.justmap.util.PosUtil;
 import ru.bulldog.justmap.util.math.MathUtil;
 import ru.bulldog.justmap.util.math.RandomUtil;

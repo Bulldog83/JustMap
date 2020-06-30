@@ -7,38 +7,41 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.BufferRenderer;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.texture.Sprite;
-import net.minecraft.util.math.Matrix3f;
-import net.minecraft.util.math.Matrix4f;
-import ru.bulldog.justmap.map.minimap.MapSkin;
-import ru.bulldog.justmap.map.minimap.MapSkin.RenderData;
+import net.minecraft.client.texture.TextureManager;
 import net.minecraft.client.util.math.AffineTransformation;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.math.Matrix3f;
+import net.minecraft.util.math.Matrix4f;
+
+import ru.bulldog.justmap.map.minimap.MapSkin;
+import ru.bulldog.justmap.map.minimap.MapSkin.RenderData;
 import net.minecraft.text.Text;
 
 import org.lwjgl.opengl.GL11;
 
-public class DrawHelper extends DrawableHelper {	
+public class RenderUtil extends DrawableHelper {	
 	public static enum TextAlignment {
 		LEFT,
 		CENTER,
 		RIGHT
 	}
 	
-	private DrawHelper() {}
+	private RenderUtil() {}
 	
-	public final static DrawHelper DRAWER = new DrawHelper();
+	public final static RenderUtil DRAWER = new RenderUtil();
 	
 	private final static VertexFormat VF_POS_TEX_NORMAL = new VertexFormat(ImmutableList.of(VertexFormats.POSITION_ELEMENT, VertexFormats.TEXTURE_ELEMENT, VertexFormats.NORMAL_ELEMENT, VertexFormats.PADDING_ELEMENT));
 	private final static Tessellator tessellator = Tessellator.getInstance();
-	private final static BufferBuilder builder = tessellator.getBuffer();
-	private final static MinecraftClient client = MinecraftClient.getInstance();
-	private final static TextRenderer textRenderer = client.textRenderer;
+	private final static BufferBuilder vertexBuffer = tessellator.getBuffer();
+	private final static MinecraftClient minecraft = MinecraftClient.getInstance();
+	private final static TextRenderer textRenderer = minecraft.textRenderer;
+	private final static TextureManager textureManager = minecraft.getTextureManager();
 
 	public static int getWidth(Text text) {
 		return textRenderer.getWidth(text);
@@ -95,6 +98,39 @@ public class DrawHelper extends DrawableHelper {
 				 color);
 	}
 	
+	public static void bindTexture(Identifier id) {
+    	textureManager.bindTexture(id);
+    }
+    
+	public static void bindTexture(int id) {
+		RenderSystem.bindTexture(id);
+	}
+	
+	public static void applyFilter() {
+		RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR_MIPMAP_LINEAR);
+		RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
+	}
+	
+    public static void startDraw() {
+    	startDraw(VertexFormats.POSITION_TEXTURE);
+    }
+    
+    public static void startDrawNormal() {
+    	startDraw(VF_POS_TEX_NORMAL);
+    }
+    
+    public static void startDraw(VertexFormat vertexFormat) {
+    	startDraw(GL11.GL_QUADS, vertexFormat);
+    }
+    
+    public static void startDraw(int mode, VertexFormat vertexFormat) {
+    	vertexBuffer.begin(mode, vertexFormat);
+    }
+    
+    public static void endDraw() {
+    	tessellator.draw();
+    }
+	
 	public static void drawTriangle(double x1, double y1, double x2, double y2, double x3, double y3, int color) {
 		float a = (float)(color >> 24 & 255) / 255.0F;
 		float r = (float)(color >> 16 & 255) / 255.0F;
@@ -103,11 +139,11 @@ public class DrawHelper extends DrawableHelper {
 	
 		RenderSystem.disableTexture();
 		RenderSystem.color4f(r, g, b, a);
-		builder.begin(GL11.GL_TRIANGLES, VertexFormats.POSITION);
-		builder.vertex(x1, y1, 0).next();
-		builder.vertex(x2, y2, 0).next();
-		builder.vertex(x3, y3, 0).next();
-		tessellator.draw();
+		startDraw(GL11.GL_TRIANGLES, VertexFormats.POSITION);
+		vertexBuffer.vertex(x1, y1, 0).next();
+		vertexBuffer.vertex(x2, y2, 0).next();
+		vertexBuffer.vertex(x3, y3, 0).next();
+		endDraw();
 		RenderSystem.enableTexture();
 	}
 	
@@ -119,17 +155,17 @@ public class DrawHelper extends DrawableHelper {
 	
 		RenderSystem.disableTexture();
 		RenderSystem.color4f(r, g, b, a);
-		builder.begin(GL11.GL_LINES, VertexFormats.POSITION);
-		builder.vertex(x1, y1, 0).next();
-		builder.vertex(x2, y2, 0).next();
-		tessellator.draw();
+		startDraw(GL11.GL_LINES, VertexFormats.POSITION);
+		vertexBuffer.vertex(x1, y1, 0).next();
+		vertexBuffer.vertex(x2, y2, 0).next();
+		endDraw();
 		RenderSystem.enableTexture();
 	}	
 	
 	public static void drawOutlineCircle(double x, double y, double radius, double outline, int color) {
 		int darken = ColorUtil.colorBrigtness(color, -3);
-		DrawHelper.drawCircle(x, y, radius + outline, darken);
-		DrawHelper.drawCircle(x, y, radius, color);
+		RenderUtil.drawCircle(x, y, radius + outline, darken);
+		RenderUtil.drawCircle(x, y, radius, color);
 	}
 	
 	public static void drawCircle(double x, double y, double radius, int color) {
@@ -145,17 +181,17 @@ public class DrawHelper extends DrawableHelper {
 	    RenderSystem.defaultBlendFunc();
 		RenderSystem.color4f(r, g, b, a);
 		
-		builder.begin(GL11.GL_TRIANGLE_FAN, VertexFormats.POSITION);		
-		builder.vertex(x, y, 0).next();		
+		startDraw(GL11.GL_TRIANGLE_FAN, VertexFormats.POSITION);		
+		vertexBuffer.vertex(x, y, 0).next();		
 		
 		int sides = 50;
 		for (int i = 0; i <= sides; i++) {
 			double angle = (pi2 * i / sides) + Math.toRadians(180);
 			double vx = x + Math.sin(angle) * radius;
 			double vy = y + Math.cos(angle) * radius;
-			builder.vertex(vx, vy, 0).next();
+			vertexBuffer.vertex(vx, vy, 0).next();
 		}
-		tessellator.draw();
+		endDraw();
 		
 		RenderSystem.enableTexture();
 		RenderSystem.disableBlend();
@@ -190,32 +226,31 @@ public class DrawHelper extends DrawableHelper {
 		RenderSystem.enableBlend();
 		RenderSystem.disableTexture();
 		RenderSystem.defaultBlendFunc();
-		builder.begin(GL11.GL_QUADS, VertexFormats.POSITION_COLOR);
-		builder.vertex(matrix4f, (float) x, (float) (y + h), 0.0F).color(r, g, b, a).next();
-		builder.vertex(matrix4f, (float) (x + w), (float) (y + h), 0.0F).color(r, g, b, a).next();
-		builder.vertex(matrix4f, (float) (x + w), (float) y, 0.0F).color(r, g, b, a).next();
-		builder.vertex(matrix4f, (float) x, (float) y, 0.0F).color(r, g, b, a).next();
-		builder.end();
-		BufferRenderer.draw(builder);
+		startDraw(GL11.GL_QUADS, VertexFormats.POSITION_COLOR);
+		vertexBuffer.vertex(matrix4f, (float) x, (float) (y + h), 0.0F).color(r, g, b, a).next();
+		vertexBuffer.vertex(matrix4f, (float) (x + w), (float) (y + h), 0.0F).color(r, g, b, a).next();
+		vertexBuffer.vertex(matrix4f, (float) (x + w), (float) y, 0.0F).color(r, g, b, a).next();
+		vertexBuffer.vertex(matrix4f, (float) x, (float) y, 0.0F).color(r, g, b, a).next();
+		endDraw();
 		RenderSystem.enableTexture();
 		RenderSystem.disableBlend();
 	}
 	
 	public static void draw(double x, double y, float w, float h) {
 		MatrixStack matrix = new MatrixStack();		
-		builder.begin(GL11.GL_QUADS, VF_POS_TEX_NORMAL);		
-		draw(matrix, builder, x, y, w, h, 0.0F, 0.0F, 1.0F, 1.0F);
-		tessellator.draw();		
+		startDrawNormal();
+		draw(matrix, vertexBuffer, x, y, w, h, 0.0F, 0.0F, 1.0F, 1.0F);
+		endDraw();
 	}
 	
 	public static void drawPlayerHead(MatrixStack matrix, double x, double y, int w, int h) {
 		RenderSystem.enableBlend();
 		RenderSystem.defaultBlendFunc();
 		RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
-		builder.begin(GL11.GL_QUADS, VF_POS_TEX_NORMAL);
-		draw(matrix, builder, x, y, w, h, 0.125F, 0.125F, 0.25F, 0.25F);
-		draw(matrix, builder, x, y, w, h, 0.625F, 0.125F, 0.75F, 0.25F);
-		tessellator.draw();
+		startDrawNormal();
+		draw(matrix, vertexBuffer, x, y, w, h, 0.125F, 0.125F, 0.25F, 0.25F);
+		draw(matrix, vertexBuffer, x, y, w, h, 0.625F, 0.125F, 0.75F, 0.25F);
+		endDraw();
 	}
 	
 	public static void draw(MatrixStack matrix, double x, double y, int size, int isize, int ix, int iy, int tw, int th) {
@@ -228,9 +263,9 @@ public class DrawHelper extends DrawableHelper {
 		float maxU = (float) (ix + iw) / tw;
 		float maxV = (float) (iy + ih) / th;
 		
-		builder.begin(GL11.GL_QUADS, VF_POS_TEX_NORMAL);
-		draw(matrix, builder, x, y, w, h, minU, minV, maxU, maxV);
-		tessellator.draw();
+		startDrawNormal();
+		draw(matrix, vertexBuffer, x, y, w, h, minU, minV, maxU, maxV);
+		endDraw();
 	}
 	
 	public static void drawSkin(MatrixStack matrix, MapSkin skin, double x, double y, float w, float h) {
@@ -262,9 +297,9 @@ public class DrawHelper extends DrawableHelper {
 		RenderSystem.enableAlphaTest();		
 		RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
 		
-		builder.begin(GL11.GL_QUADS, VF_POS_TEX_NORMAL);
+		startDrawNormal();
 		
-		VertexConsumer vertexConsumer = skin.getTextureSpecificVertexConsumer(builder);
+		VertexConsumer vertexConsumer = skin.getTextureSpecificVertexConsumer(vertexBuffer);
 		
 		draw(matrix, vertexConsumer, x, y, scaledBrd, scaledBrd, sMinU, sMinV, leftU, topV);
 		draw(matrix, vertexConsumer, rightC, y, scaledBrd, scaledBrd, rightU, sMinV, sMaxU, topV);
@@ -286,7 +321,7 @@ public class DrawHelper extends DrawableHelper {
 		draw(matrix, vertexConsumer, leftC, y, hSide, scaledBrd, leftU, sMinV, rightU, topV);
 		draw(matrix, vertexConsumer, leftC, bottomC, hSide, scaledBrd, leftU, bottomV, rightU, sMaxV);
 		
-		tessellator.draw();
+		endDraw();
 	}
 	
 	public static void drawSprite(MatrixStack matrix, Sprite sprite, double x, double y, float w, float h) {
@@ -294,12 +329,12 @@ public class DrawHelper extends DrawableHelper {
 		RenderSystem.enableAlphaTest();		
 		RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
 		
-		builder.begin(GL11.GL_QUADS, VF_POS_TEX_NORMAL);
+		startDrawNormal();
 		
-		VertexConsumer vertexConsumer = sprite.getTextureSpecificVertexConsumer(builder);
+		VertexConsumer vertexConsumer = sprite.getTextureSpecificVertexConsumer(vertexBuffer);
 		
 		draw(matrix, vertexConsumer, x, y, w, h, sprite.getMinU(), sprite.getMinV(), sprite.getMaxU(), sprite.getMaxV());
-		tessellator.draw();
+		endDraw();
 	}
 	
 	private static void draw(MatrixStack matrixStack, VertexConsumer vertexConsumer, double x, double y, float w, float h, float minU, float minV, float maxU, float maxV) {
@@ -323,13 +358,28 @@ public class DrawHelper extends DrawableHelper {
 	}
 	
 	private static void addVertices(Matrix4f m4f, Matrix3f m3f, VertexConsumer vertexConsumer, float minX, float maxX, float minY, float maxY, float minU, float minV, float maxU, float maxV) {
-		addVertex(m4f, m3f, vertexConsumer, minX, minY, 1.0F, minU, minV);
-		addVertex(m4f, m3f, vertexConsumer, minX, maxY, 1.0F, minU, maxV);
-		addVertex(m4f, m3f, vertexConsumer, maxX, maxY, 1.0F, maxU, maxV);
-		addVertex(m4f, m3f, vertexConsumer, maxX, minY, 1.0F, maxU, minV);
+		vertex(m4f, m3f, vertexConsumer, minX, minY, 1.0F, minU, minV);
+		vertex(m4f, m3f, vertexConsumer, minX, maxY, 1.0F, minU, maxV);
+		vertex(m4f, m3f, vertexConsumer, maxX, maxY, 1.0F, maxU, maxV);
+		vertex(m4f, m3f, vertexConsumer, maxX, minY, 1.0F, maxU, minV);
 	}
 	
-	private static void addVertex(Matrix4f m4f, Matrix3f m3f, VertexConsumer vertexConsumer, float x, float y, float z, float u, float v) {
+	public static void addQuad(double x, double y, double w, double h) {
+		addQuad(x, y, w, h, 0.0F, 0.0F, 1.0F, 1.0F);
+	}
+	
+	public static void addQuad(double x, double y, double w, double h, float minU, float minV, float maxU, float maxV) {
+		vertex(x, y, 0.0, minU, minV);
+		vertex(x, y + h, 0.0, minU, maxV);
+		vertex(x + w, y + h, 0.0, maxU, maxV);
+		vertex(x + w, y, 0.0, maxU, minV);
+	}
+	
+	private static void vertex(Matrix4f m4f, Matrix3f m3f, VertexConsumer vertexConsumer, float x, float y, float z, float u, float v) {
 		vertexConsumer.vertex(m4f, x, y, z).texture(u, v).normal(m3f, 0.0F, 1.0F, 0.0F).next();
 	}
+	
+	private static void vertex(double x, double y, double z, float u, float v) {
+    	vertexBuffer.vertex(x, y, z).texture(u, v).next();
+    }
 }

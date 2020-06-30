@@ -6,7 +6,7 @@ import ru.bulldog.justmap.client.MapScreen;
 import ru.bulldog.justmap.map.waypoint.Waypoint.Icon;
 import ru.bulldog.justmap.util.Colors;
 import ru.bulldog.justmap.util.Dimension;
-import ru.bulldog.justmap.util.DrawHelper;
+import ru.bulldog.justmap.util.RenderUtil;
 import ru.bulldog.justmap.util.math.MathUtil;
 import ru.bulldog.justmap.util.math.RandomUtil;
 
@@ -75,16 +75,16 @@ public class WaypointsList extends MapScreen {
 			if (icon != null) {
 				icon.draw(x, y + 1, iconSize, iconSize);
 			} else {
-				DrawHelper.drawDiamond(x, y + 1, iconSize, iconSize, waypoint.color);
+				RenderUtil.drawDiamond(x, y + 1, iconSize, iconSize, waypoint.color);
 			}
 			
 			int stringY = y + 7;			
 			int nameX = x + iconSize + 2;
 
-			DrawHelper.DRAWER.drawStringWithShadow(matrixStack, font, waypoint.name, nameX, stringY, Colors.WHITE);
+			RenderUtil.DRAWER.drawStringWithShadow(matrixStack, font, waypoint.name, nameX, stringY, Colors.WHITE);
 			
 			int posX = tpButton.x - 5;
-			DrawHelper.drawRightAlignedString(matrixStack, waypoint.pos.toShortString(), posX, stringY, Colors.WHITE);
+			RenderUtil.drawRightAlignedString(matrixStack, waypoint.pos.toShortString(), posX, stringY, Colors.WHITE);
 			
 			editButton.render(matrixStack, mouseX, mouseY, delta);
 			tpButton.render(matrixStack, mouseX, mouseY, delta);

@@ -8,7 +8,7 @@ import ru.bulldog.justmap.client.render.EntityModelRenderer;
 import ru.bulldog.justmap.map.IMap;
 import ru.bulldog.justmap.map.minimap.Minimap;
 import ru.bulldog.justmap.util.Colors;
-import ru.bulldog.justmap.util.DrawHelper;
+import ru.bulldog.justmap.util.RenderUtil;
 
 public class EntityIcon extends MapIcon<EntityIcon> {
 	
@@ -58,11 +58,11 @@ public class EntityIcon extends MapIcon<EntityIcon> {
 				if (icon != null) {					
 					icon.draw(matrixStack, pos.x, pos.y, size);
 				} else {
-					DrawHelper.drawOutlineCircle(pos.x, pos.y, size / 3, 0.6, color);
+					RenderUtil.drawOutlineCircle(pos.x, pos.y, size / 3, 0.6, color);
 				}
 			}
 		} else {
-			DrawHelper.drawOutlineCircle(pos.x, pos.y, size / 3, 0.6, color);
+			RenderUtil.drawOutlineCircle(pos.x, pos.y, size / 3, 0.6, color);
 		}
 	}
 }

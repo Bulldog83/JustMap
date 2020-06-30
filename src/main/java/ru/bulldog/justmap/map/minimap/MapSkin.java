@@ -7,7 +7,7 @@ import java.util.List;
 import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.util.ImageUtil;
-import ru.bulldog.justmap.util.DrawHelper;
+import ru.bulldog.justmap.util.RenderUtil;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -29,6 +29,7 @@ public class MapSkin extends Sprite {
 
 	private final static SpriteAtlasTexture ATLAS = new SpriteAtlasTexture(new Identifier(JustMap.MODID, "textures/atlas/map_skins.png"));
 	private final static List<MapSkin> SKINS = new ArrayList<>();
+	private final static TextureManager textureManager = MinecraftClient.getInstance().getTextureManager();
 	
 	private final RenderData renderData;
 	
@@ -36,8 +37,6 @@ public class MapSkin extends Sprite {
 	public final boolean resizable;
 	public final boolean repeating;
 	public final String name;
-	
-	private final static TextureManager textureManager = MinecraftClient.getInstance().getTextureManager();
 	
 	private MapSkin(int id, String name, Identifier texture, int w, int h, int border, boolean resize, boolean repeat) {
 		super(ATLAS, new Sprite.Info(texture, w, h, AnimationResourceMetadata.EMPTY), 0, w, h, 0, 0, ImageUtil.loadImage(texture, w, h));
@@ -102,13 +101,13 @@ public class MapSkin extends Sprite {
 		if (resizable) {
 			textureManager.bindTexture(this.getTexture());
 			if (w > this.getWidth() || h > this.getHeight()) {
-				DrawHelper.drawSkin(matrixStack, this, x, y, w, h);
+				RenderUtil.drawSkin(matrixStack, this, x, y, w, h);
 			} else {
-				DrawHelper.drawSprite(matrixStack, x, y, 0, w, h, this);
+				RenderUtil.drawSprite(matrixStack, x, y, 0, w, h, this);
 			}
 		} else {
 			this.bindPavedTexture(w, h);
-			DrawHelper.drawSprite(matrixStack, x, y, 0, w, h, this);
+			RenderUtil.drawSprite(matrixStack, x, y, 0, w, h, this);
 		}
 	}
 	

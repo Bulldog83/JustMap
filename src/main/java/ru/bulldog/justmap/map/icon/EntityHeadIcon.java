@@ -11,7 +11,7 @@ import ru.bulldog.justmap.util.ImageUtil;
 import ru.bulldog.justmap.util.SpriteAtlas;
 import ru.bulldog.justmap.util.ColorUtil;
 import ru.bulldog.justmap.util.Colors;
-import ru.bulldog.justmap.util.DrawHelper;
+import ru.bulldog.justmap.util.RenderUtil;
 
 import net.minecraft.client.resource.metadata.AnimationResourceMetadata;
 import net.minecraft.client.texture.NativeImage;
@@ -65,10 +65,10 @@ public class EntityHeadIcon extends AbstractIcon {
 		if (ClientParams.showIconsOutline) {
 			double thickness = ClientParams.entityOutlineSize;
 			if (solid) {
-				DrawHelper.fill(matrix, x - thickness / 2, y - thickness / 2, w + thickness, h + thickness, this.color);
+				RenderUtil.fill(matrix, x - thickness / 2, y - thickness / 2, w + thickness, h + thickness, this.color);
 			} else {
 				this.bindOutline();
-				DrawHelper.draw(x - thickness / 2, y - thickness / 2, (float) (w + thickness), (float) (h + thickness));
+				RenderUtil.draw(x - thickness / 2, y - thickness / 2, (float) (w + thickness), (float) (h + thickness));
 			}
 		}
 		textureManager.bindTexture(this.getId());		

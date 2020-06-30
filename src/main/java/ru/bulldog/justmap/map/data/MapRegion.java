@@ -2,26 +2,18 @@ package ru.bulldog.justmap.map.data;
 
 import java.io.File;
 
-import org.lwjgl.opengl.GL11;
-
-import com.mojang.blaze3d.systems.RenderSystem;
-
-import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.Tessellator;
-import net.minecraft.client.render.VertexFormats;
 import net.minecraft.util.math.BlockPos;
 
 import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.client.render.MapTexture;
 import ru.bulldog.justmap.util.Colors;
+import ru.bulldog.justmap.util.RenderUtil;
 import ru.bulldog.justmap.util.StorageUtil;
 import ru.bulldog.justmap.util.TaskManager;
 
 public class MapRegion {
 	
-	private static Tessellator tessellator = Tessellator.getInstance();
-	private static BufferBuilder builder = tessellator.getBuffer();
 	private static TaskManager worker = TaskManager.getManager("region-data");
 	
 	private final RegionPos pos;
@@ -205,9 +197,6 @@ public class MapRegion {
 		double scW = (double) width / scale;
 		double scH = (double) height / scale;
 		
-		RenderSystem.enableBlend();
-		RenderSystem.defaultBlendFunc();
-		
 		this.drawImage(x, y, scW, scH, u1, v1, u2, v2);
 		if (gridOverlay || slimeOverlay || loadedOverlay) {
 			this.drawOverlay(x, y, scW, scH, u1, v1, u2, v2);
@@ -218,33 +207,24 @@ public class MapRegion {
 		if (image.changed) {
 			this.image.upload();
 		}
-		RenderSystem.bindTexture(image.getId());
+		RenderUtil.bindTexture(image.getId());
 		if (ClientParams.textureFilter) {
-			RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR_MIPMAP_LINEAR);
-			RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
+			RenderUtil.applyFilter();
 		}
 		
-		builder.begin(GL11.GL_QUADS, VertexFormats.POSITION_TEXTURE);
-		builder.vertex(x, y, 0.0).texture(u1, v1).next();
-		builder.vertex(x, y + h, 0.0).texture(u1, v2).next();
-		builder.vertex(x + w, y + h, 0.0).texture(u2, v2).next();
-		builder.vertex(x + w, y, 0.0).texture(u2, v1).next();
-		
-		tessellator.draw();
+		RenderUtil.startDraw();
+		RenderUtil.addQuad(x, y, w, h, u1, v1, u2, v2);
+		RenderUtil.endDraw();
 	}
 	
 	private void drawOverlay(double x, double y, double w, double h, float u1, float v1, float u2, float v2) {
 		if (overlay.changed) {
 			this.overlay.upload();
 		}		
-		RenderSystem.bindTexture(overlay.getId());
-		builder.begin(GL11.GL_QUADS, VertexFormats.POSITION_TEXTURE);
-		builder.vertex(x, y, 0.0).texture(u1, v1).next();
-		builder.vertex(x, y + h, 0.0).texture(u1, v2).next();
-		builder.vertex(x + w, y + h, 0.0).texture(u2, v2).next();
-		builder.vertex(x + w, y, 0.0).texture(u2, v1).next();
-		
-		tessellator.draw();
+		RenderUtil.bindTexture(overlay.getId());
+		RenderUtil.startDraw();
+		RenderUtil.addQuad(x, y, w, h, u1, v1, u2, v2);
+		RenderUtil.endDraw();
 	}
 	
 	public void close() {

@@ -6,7 +6,7 @@ import net.minecraft.client.texture.Sprite;
 import net.minecraft.client.texture.SpriteAtlasTexture;
 import net.minecraft.client.texture.TextureManager;
 import net.minecraft.client.util.math.MatrixStack;
-import ru.bulldog.justmap.util.DrawHelper;
+import ru.bulldog.justmap.util.RenderUtil;
 
 public abstract class AbstractIcon extends Sprite {
 
@@ -38,6 +38,6 @@ public abstract class AbstractIcon extends Sprite {
 	}
 	
 	protected void draw(MatrixStack matrix, double x, double y, float w, float h) {
-		DrawHelper.drawSprite(matrix, this, x, y, w, h);
+		RenderUtil.drawSprite(matrix, this, x, y, w, h);
 	}
 }

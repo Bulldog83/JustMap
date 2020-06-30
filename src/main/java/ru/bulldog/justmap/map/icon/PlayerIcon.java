@@ -11,7 +11,7 @@ import ru.bulldog.justmap.map.IMap;
 import ru.bulldog.justmap.map.minimap.MapPlayerManager;
 import ru.bulldog.justmap.util.ColorUtil;
 import ru.bulldog.justmap.util.Colors;
-import ru.bulldog.justmap.util.DrawHelper;
+import ru.bulldog.justmap.util.RenderUtil;
 
 public class PlayerIcon extends MapIcon<PlayerIcon> {
 	
@@ -46,8 +46,8 @@ public class PlayerIcon extends MapIcon<PlayerIcon> {
 			MapPlayerManager.getPlayer(player).getIcon().draw(matrix, pos.x, pos.y);
 		} else {
 			int darken = ColorUtil.colorBrigtness(this.color, -3);
-			DrawHelper.fill(pos.x - 0.5, pos.y - 0.5, size + 1, size + 1, darken);
-			DrawHelper.fill(pos.x, pos.y, size, size, this.color);
+			RenderUtil.fill(pos.x - 0.5, pos.y - 0.5, size + 1, size + 1, darken);
+			RenderUtil.fill(pos.x, pos.y, size, size, this.color);
 		}
 			
 		if (ClientParams.showPlayerNames) {
@@ -60,7 +60,7 @@ public class PlayerIcon extends MapIcon<PlayerIcon> {
 				matrix.scale(scale, scale, 1.0F);
 				matrix.translate(pos.x * (sf - 1), pos.y * (sf - 1), 0.0);
 			}
-			DrawHelper.drawCenteredText(matrix, player.getName(), pos.x, pos.y + 12, Colors.WHITE);
+			RenderUtil.drawCenteredText(matrix, player.getName(), pos.x, pos.y + 12, Colors.WHITE);
 			matrix.pop();
 		}
 	}
