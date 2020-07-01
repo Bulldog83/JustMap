@@ -18,14 +18,15 @@ public class MapRegion {
 	
 	private final RegionPos pos;
 	private final MapTexture image;
-	private final MapTexture overlay;
-	private final MapTexture texture;
+	private MapTexture texture;
+	private MapTexture overlay;
 	
 	private Layer.Type layer;
 	private int level;
 
 	private boolean needUpdate = false;
 	private boolean renewOverlay = false;
+	private boolean overlayNeeded = false;
 	private boolean updating = false;
 	private boolean hideWater = false;
 	private boolean waterTint = true;
@@ -40,12 +41,7 @@ public class MapRegion {
 	
 	public MapRegion(BlockPos blockPos, Layer.Type layer, int level) {
 		this.pos = new RegionPos(blockPos);
-		this.image = new MapTexture(512, 512);
-		this.texture = new MapTexture(512, 512);
-		this.overlay = new MapTexture(512, 512);
-		this.image.fill(Colors.BLACK);
-		this.texture.fill(Colors.BLACK);
-		this.overlay.fill(Colors.TRANSPARENT);
+		this.image = new MapTexture(512, 512, Colors.BLACK);
 		this.layer = layer;
 		this.level = level;
 		this.loadImage();
@@ -62,9 +58,11 @@ public class MapRegion {
 	
 	public void updateImage() {
 		if (updating) return;
-		this.updateMapParams();
-		worker.execute(this::update);
 		this.updating = true;
+		worker.execute(() -> {
+			this.updateMapParams();
+			this.update();
+		});
 	}
 	
 	private void updateMapParams() {
@@ -81,6 +79,28 @@ public class MapRegion {
 		if (ClientParams.alternateColorRender != alternateRender) {
 			this.alternateRender = ClientParams.alternateColorRender;
 			this.needUpdate = true;
+		}
+		if (ClientParams.showGrid != gridOverlay) {
+			this.gridOverlay = ClientParams.showGrid;
+			this.renewOverlay = true;
+		}
+		if (ClientParams.showSlime != slimeOverlay) {
+			this.slimeOverlay = ClientParams.showSlime;
+			this.renewOverlay = true;
+		}
+		if (ClientParams.showLoadedChunks != loadedOverlay) {
+			this.loadedOverlay = ClientParams.showLoadedChunks;
+			this.renewOverlay = true;
+		}
+		this.overlayNeeded = gridOverlay || slimeOverlay || loadedOverlay;
+		if (overlayNeeded && overlay == null) {
+			this.texture = new MapTexture(image);
+			this.overlay = new MapTexture(512, 512, Colors.TRANSPARENT);
+		} else if (!overlayNeeded && overlay != null) {
+			this.overlay.close();
+			this.overlay = null;
+			this.texture.close();
+			this.texture = null;
 		}
 	}
 	
@@ -108,30 +128,36 @@ public class MapRegion {
 				if (updated) {
 					this.image.writeChunkData(x, y, mapChunk.getColorData());
 				}
-				this.updateOverlay(x, y, mapChunk);
+				if (overlayNeeded) {
+					this.updateOverlay(x, y, mapChunk);
+				}
 			}
 		}
 		if (image.changed) this.saveImage();
-		if (image.changed || overlay.changed) {
+		if (overlayNeeded && (image.changed || overlay.changed)) {
 			this.updateTexture();
 		}
 		this.updated = System.currentTimeMillis();
-		this.needUpdate = false;
 		this.renewOverlay = false;
+		this.needUpdate = false;
 		this.updating = false;
 	}
 	
 	private void updateTexture() {
 		this.texture.copyData(image);
-		this.texture.applyOverlay(overlay);
 		this.image.changed = false;
+		this.texture.applyOverlay(overlay);		
 		this.overlay.changed = false;
 	}
 	
 	private void updateOverlay(int x, int y, MapChunk mapChunk) {
-		this.overlay.fill(x, y, 16, 16, Colors.TRANSPARENT);
+		if (renewOverlay) {
+			this.overlay.fill(x, y, 16, 16, Colors.TRANSPARENT);
+		}
 		if (loadedOverlay && mapChunk.isChunkLoaded()) {
 			this.overlay.fill(x, y, 16, 16, Colors.LOADED_OVERLAY);
+		} else if (loadedOverlay && !renewOverlay) {
+			this.overlay.fill(x, y, 16, 16, Colors.TRANSPARENT);
 		}
 		if (slimeOverlay && mapChunk.hasSlime()) {
 			this.overlay.fill(x, y, 16, 16, Colors.SLIME_OVERLAY);
@@ -168,7 +194,6 @@ public class MapRegion {
 	private void loadImage() {
 		File imgFile = this.imageFile();
 		this.image.loadImage(imgFile);
-		this.updateTexture();
 	}
 	
 	private File imageFile() {
@@ -201,10 +226,13 @@ public class MapRegion {
 	}
 	
 	private void drawTexture(double x, double y, double w, double h, float u1, float v1, float u2, float v2) {
-		if (texture.changed) {
+		if (texture != null && texture.changed) {
 			this.texture.upload();
+		} else if (texture == null && image.changed) {
+			this.image.upload();
 		}
-		RenderUtil.bindTexture(texture.getId());
+		int id = texture != null ? texture.getId() : image.getId();
+		RenderUtil.bindTexture(id);
 		if (ClientParams.textureFilter) {
 			RenderUtil.applyFilter();
 		}
@@ -216,7 +244,9 @@ public class MapRegion {
 	
 	public void close() {
 		this.image.close();
-		this.texture.close();
-		this.overlay.close();
+		if (overlay != null) {
+			this.overlay.close();
+			this.texture.close();
+		}
 	}
 }

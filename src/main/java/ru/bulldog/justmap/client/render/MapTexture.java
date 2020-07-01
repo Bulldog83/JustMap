@@ -22,7 +22,6 @@ import net.minecraft.client.texture.TextureUtil;
 
 import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.util.ColorUtil;
-import ru.bulldog.justmap.util.Colors;
 
 public class MapTexture {
 
@@ -42,6 +41,16 @@ public class MapTexture {
 		this.buffer = ByteBuffer.allocateDirect(bytes.length).order(ByteOrder.nativeOrder());
 		this.width = width;
 		this.height = height;
+	}
+	
+	public MapTexture(int width, int height, int color) {
+		this(width, height);
+		this.fill(color);
+	}
+	
+	public MapTexture(MapTexture source) {
+		this(source.getWidth(), source.getHeight());
+		this.copyData(source);
 	}
 	
 	public int getId() {
@@ -88,6 +97,7 @@ public class MapTexture {
 		synchronized(bufferLock) {
 			this.bytes = image.getBytes();
 		}
+		this.changed = true;
 	}
 	
 	public void writeChunkData(int x, int y, int[] colorData) {
@@ -113,12 +123,25 @@ public class MapTexture {
 		if (x < 0 || x >= this.getWidth()) return;
 		if (y < 0 || y >= this.getHeight()) return;
 		
-		int index = (x + y * this.getWidth()) * 4;		
+		byte a = (byte) (color >> 24);
+		byte r = (byte) (color >> 16);
+		byte g = (byte) (color >> 8);
+		byte b = (byte) (color >> 0);
+		
+		int index = (x + y * this.getWidth()) * 4;
 		synchronized(bufferLock) {
-			this.bytes[index] = (byte) (color >> 24);
-			this.bytes[index + 1] = (byte) (color >> 0);
-			this.bytes[index + 2] = (byte) (color >> 8);
-			this.bytes[index + 3] = (byte) (color >> 16);
+			if (this.bytes[index] == a &&
+				this.bytes[index + 1] == b &&
+				this.bytes[index + 2] == g &&
+				this.bytes[index + 3] == r) {
+				
+				return;
+			}
+		
+			this.bytes[index] = a;
+			this.bytes[index + 1] = b;
+			this.bytes[index + 2] = g;
+			this.bytes[index + 3] = r;
 		}		
 		this.changed = true;
 	}
@@ -169,11 +192,6 @@ public class MapTexture {
 		synchronized(bufferLock) {
 			for(int i = x; i < x + width; i++) {
 				for (int j = y; j < y + height; j++) {
-					if (color == Colors.GRID) {
-						System.out.println(color);
-						System.out.println(this.getColor(i, j));
-					}
-					if (this.getColor(i, j) == color) continue;
 					this.setColor(i, j, color);
 				}
 			}
