@@ -18,6 +18,7 @@ import ru.bulldog.justmap.map.icon.WaypointIcon;
 import ru.bulldog.justmap.map.minimap.MapPlayerManager;
 import ru.bulldog.justmap.map.minimap.MapSkin;
 import ru.bulldog.justmap.map.minimap.Minimap;
+import ru.bulldog.justmap.map.minimap.MapSkin.SkinType;
 import ru.bulldog.justmap.util.RenderUtil.TextAlignment;
 import ru.bulldog.justmap.util.Colors;
 import ru.bulldog.justmap.util.RenderUtil;
@@ -95,12 +96,15 @@ public class MapRenderer {
 	public void updateParams() {		
 		int border = 0;
 		if (ClientParams.useSkins) {
-			this.mapSkin = MapSkin.getSkin(ClientParams.currentSkin);
-			
-			mapSkin.getRenderData().updateScale();
-			
-			double scale = mapSkin.getRenderData().scaleFactor;
-			border = (int) (this.mapSkin.border * scale);
+			this.mapSkin = MapSkin.getSkin(ClientParams.currentSkin);			
+			if (mapSkin.type == SkinType.ROUND) {
+				double scale = (double) this.mapWidth / mapSkin.getWidth();
+				border = (int) (this.mapSkin.border * scale);
+			} else {
+				mapSkin.getRenderData().updateScale();
+				double scale = mapSkin.getRenderData().scaleFactor;
+				border = (int) (this.mapSkin.border * scale);
+			}
 		}
 		
 		int winW = minecraft.getWindow().getScaledWidth();
@@ -271,7 +275,6 @@ public class MapRenderer {
 		RenderUtil.startDraw();
 		RenderUtil.addQuad(mapX, mapY, mapWidth, mapHeight);
 		RenderUtil.endDraw();
-		//RenderSystem.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 		RenderSystem.blendFunc(GL11.GL_DST_ALPHA, GL11.GL_ONE_MINUS_DST_ALPHA);
 		
 		RenderSystem.pushMatrix();
@@ -299,16 +302,16 @@ public class MapRenderer {
 			}
 		}
 		
-		RenderUtil.drawRightAlignedString(
-				matrix, Float.toString(minimap.getScale()),
-				mapX + mapWidth - 3, mapY + mapHeight - 10, Colors.WHITE);
-		
 		for (WaypointIcon waypoint : minimap.getWaypoints()) {
 			if (!waypoint.isHidden()) {
 				waypoint.draw(matrix, mapX, mapY, offX, offY, rotation);
 			}
 		}
 		GL11.glDisable(GL11.GL_SCISSOR_TEST);
+		
+		RenderUtil.drawRightAlignedString(
+				matrix, Float.toString(minimap.getScale()),
+				mapX + mapWidth - 3, mapY + mapHeight - 10, Colors.WHITE);
 		
 		if (ClientParams.useSkins) {
 			int brd = border * 2;
