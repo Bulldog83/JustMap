@@ -231,17 +231,19 @@ public class MapTexture {
 		}
 	}
 	
-	public void loadImage(File png) {
-		if (!png.exists()) return;
+	public boolean loadImage(File png) {
+		if (!png.exists()) return false;
 		try (InputStream fileInput = new FileInputStream(png)) {
 			BufferedImage pngImage = new BufferedImage(width, height, BufferedImage.TYPE_4BYTE_ABGR);
 			pngImage.setData(ImageIO.read(fileInput).getData());
 			this.bytes = ((DataBufferByte) pngImage.getTile(0, 0).getDataBuffer()).getData().clone();
 			this.changed = true;
-			pngImage.flush();
+			pngImage.flush();			
+			return true;
 		} catch (Exception ex) {
 			JustMap.LOGGER.logWarning("Can't load image: " + png.toString());
 			JustMap.LOGGER.logWarning(ex.getLocalizedMessage());
+			return false;
 		}
 	}
 	

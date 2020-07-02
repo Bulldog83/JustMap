@@ -182,7 +182,12 @@ public class MapRegion {
 	public void swapLayer(Layer.Type layer, int level) {
 		this.layer = layer;
 		this.level = level;
-		this.loadImage();
+		if (!this.loadImage()) {
+			this.image.fill(Colors.BLACK);
+		}
+		if (texture != null) {
+			this.updateTexture();
+		}
 		this.updateImage();
 	}
 	
@@ -191,9 +196,9 @@ public class MapRegion {
 		JustMap.WORKER.execute(() -> this.image.saveImage(imgFile));
 	}
 	
-	private void loadImage() {
+	private boolean loadImage() {
 		File imgFile = this.imageFile();
-		this.image.loadImage(imgFile);
+		return this.image.loadImage(imgFile);
 	}
 	
 	private File imageFile() {
