@@ -18,7 +18,6 @@ import ru.bulldog.justmap.map.icon.WaypointIcon;
 import ru.bulldog.justmap.map.minimap.MapPlayerManager;
 import ru.bulldog.justmap.map.minimap.MapSkin;
 import ru.bulldog.justmap.map.minimap.Minimap;
-import ru.bulldog.justmap.map.minimap.MapSkin.SkinType;
 import ru.bulldog.justmap.util.RenderUtil.TextAlignment;
 import ru.bulldog.justmap.util.Colors;
 import ru.bulldog.justmap.util.RenderUtil;
@@ -54,6 +53,7 @@ public class MapRenderer {
 	private float rotation;
 	private int lastX;
 	private int lastZ;
+	private boolean isRound = false;
 
 	private final Minimap minimap;
 	
@@ -94,16 +94,22 @@ public class MapRenderer {
 	}
 	
 	public void updateParams() {		
+		this.isRound = !minimap.isBigMap() && Minimap.isRound();
 		int border = 0;
 		if (ClientParams.useSkins) {
-			this.mapSkin = MapSkin.getSkin(ClientParams.currentSkin);			
-			if (mapSkin.type == SkinType.ROUND) {
-				double scale = (double) this.mapWidth / mapSkin.getWidth();
-				border = (int) (this.mapSkin.border * scale);
+			if (minimap.isBigMap()) {
+				this.mapSkin = MapSkin.getBigMapSkin();
 			} else {
-				mapSkin.getRenderData().updateScale();
+				this.mapSkin = MapSkin.getCurrentSkin();
+			}
+			if (isRound) {
+				double scale = (double) mapWidth / mapSkin.getWidth();
+				this.mapSkin.getRenderData().updateScale(scale);
+				border = (int) (mapSkin.border * scale);
+			} else {
+				this.mapSkin.getRenderData().updateScale();
 				double scale = mapSkin.getRenderData().scaleFactor;
-				border = (int) (this.mapSkin.border * scale);
+				border = (int) (mapSkin.border * scale);
 			}
 		}
 		
@@ -266,16 +272,18 @@ public class MapRenderer {
 		float offX = (float) (PosUtil.doubleCoordX() - this.lastX) * mult;
 		float offY = (float) (PosUtil.doubleCoordZ() - this.lastZ) * mult;
 		
-		RenderSystem.enableBlend();
-		RenderSystem.colorMask(false, false, false, true);
-		RenderSystem.clearColor(0.0F, 0.0F, 0.0F, 0.0F);
-		RenderSystem.clear(GL11.GL_COLOR_BUFFER_BIT, false);
-		RenderSystem.colorMask(true, true, true, true);
-		RenderUtil.bindTexture(this.roundMask);
-		RenderUtil.startDraw();
-		RenderUtil.addQuad(mapX, mapY, mapWidth, mapHeight);
-		RenderUtil.endDraw();
-		RenderSystem.blendFunc(GL11.GL_DST_ALPHA, GL11.GL_ONE_MINUS_DST_ALPHA);
+		if (isRound) {
+			RenderSystem.enableBlend();
+			RenderSystem.colorMask(false, false, false, true);
+			RenderSystem.clearColor(0.0F, 0.0F, 0.0F, 0.0F);
+			RenderSystem.clear(GL11.GL_COLOR_BUFFER_BIT, false);
+			RenderSystem.colorMask(true, true, true, true);
+			RenderUtil.bindTexture(this.roundMask);
+			RenderUtil.startDraw();
+			RenderUtil.addQuad(mapX, mapY, mapWidth, mapHeight);
+			RenderUtil.endDraw();
+			RenderSystem.blendFunc(GL11.GL_DST_ALPHA, GL11.GL_ONE_MINUS_DST_ALPHA);
+		}
 		
 		RenderSystem.pushMatrix();
 		if (ClientParams.rotateMap) {

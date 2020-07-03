@@ -1,6 +1,7 @@
 package ru.bulldog.justmap.client.config;
 
 import ru.bulldog.justmap.map.DirectionArrow;
+import ru.bulldog.justmap.map.minimap.Minimap;
 import ru.bulldog.justmap.util.ScreenPosition;
 
 public class ClientParams {
@@ -8,6 +9,7 @@ public class ClientParams {
 	public static ScreenPosition infoPosition = ScreenPosition.TOP_LEFT;
 	public static ScreenPosition itemsPosition = ScreenPosition.MIDDLE_LEFT;
 	public static DirectionArrow.Type arrowIconType = DirectionArrow.Type.DIRECTION_ARROW;
+	public static Minimap.Shape mapShape = Minimap.Shape.SQUARE;
 	
 	public static int positionOffset = 4;
 	public static int mapSize = 128;
@@ -39,6 +41,7 @@ public class ClientParams {
 	public static boolean textureFilter = false;
 	public static float skinScale = 2.0F;
 	public static int currentSkin = 0;
+	public static int bigMapSkin = 0;
 	public static int mapSaturation = 0;
 	public static int mapBrightness = 0;
 	public static int arrowIconSize = 12;

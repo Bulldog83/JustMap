@@ -16,6 +16,7 @@ import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.config.ConfigKeeper.EnumEntry;
 import ru.bulldog.justmap.map.DirectionArrow;
 import ru.bulldog.justmap.map.minimap.MapSkin;
+import ru.bulldog.justmap.map.minimap.Minimap;
 import ru.bulldog.justmap.util.ScreenPosition;
 
 public final class ConfigFactory {
@@ -24,19 +25,15 @@ public final class ConfigFactory {
 		return new TranslatableText("justmap.configuration." + key);
 	}
 	
-	private static ConfigBuilder configBuilder;
-	
 	public static Screen getConfigScreen(Screen parent) {
-		if (configBuilder == null) {
-			initConfigBuilder();
-		}		
+		ConfigBuilder configBuilder = ConfigFactory.getConfigBuilder();		
 		configBuilder.setParentScreen(parent);
 		
 		return configBuilder.build();
 	}
 	
-	private static void initConfigBuilder() {
-		configBuilder = ConfigBuilder.create().setTitle(new LiteralText("Just Map Configuration"));
+	private static ConfigBuilder getConfigBuilder() {
+		ConfigBuilder configBuilder = ConfigBuilder.create().setTitle(new LiteralText("Just Map Configuration"));
 		ConfigEntryBuilder entryBuilder = ConfigEntryBuilder.create();
 		
 		ConfigCategory general = configBuilder.getOrCreateCategory(lang("category.general"));
@@ -130,19 +127,39 @@ public final class ConfigFactory {
 		EnumSelectorBuilder<DirectionArrow.Type> arrowTypeEntry = entryBuilder.startEnumSelector(lang("arrow_type"), DirectionArrow.Type.class, arrowTypeConfig.getValue());
 		arrowTypeEntry.setSaveConsumer(val -> arrowTypeConfig.setValue(val))
 					  .setDefaultValue(arrowTypeConfig.getDefault());
+		@SuppressWarnings("unchecked")
+		EnumEntry<Minimap.Shape> mapShapeConfig = (EnumEntry<Minimap.Shape>) JustMapClient.CONFIG.getEntry("map_shape");
+		EnumSelectorBuilder<Minimap.Shape> mapShapeEntry = entryBuilder.startEnumSelector(lang("map_shape"), Minimap.Shape.class, mapShapeConfig.getValue());
+		mapShapeEntry.setSaveConsumer(val -> mapShapeConfig.setValue(val))
+					 .setDefaultValue(mapShapeConfig.getDefault());
 		FloatSliderBuilder doubleSlider = new FloatSliderBuilder(entryBuilder.getResetButtonKey(), lang("skin_border_scale"), JustMapClient.CONFIG.getFloat("skin_scale"), 0.5F, 3.0F)
 				.setSaveConsumer(val -> JustMapClient.CONFIG.setRanged("skin_scale", val))
 				.setDefaultValue((float) JustMapClient.CONFIG.getDefault("skin_scale"));
 		
 		ConfigCategory mapAppearance = configBuilder.getOrCreateCategory(lang("category.appearance"));
+		mapAppearance.addEntry(mapShapeEntry.build());
 		mapAppearance.addEntry(entryBuilder.startBooleanToggle(lang("use_skins"), JustMapClient.CONFIG.getBoolean("use_skins"))
 				.setSaveConsumer(val -> JustMapClient.CONFIG.setBoolean("use_skins", val))
 				.setDefaultValue((boolean) JustMapClient.CONFIG.getDefault("use_skins"))
 				.build());
 		mapAppearance.addEntry(entryBuilder.startDropdownMenu(lang("current_skin"), MapSkin.getCurrentSkin(), MapSkin::getSkinByName, MapSkin::getName)
-				.setSaveConsumer(val -> JustMapClient.CONFIG.setInt("current_skin", val.id))
-				.setDefaultValue(MapSkin.getSkin((int) JustMapClient.CONFIG.getDefault("current_skin")))
+				.setSaveConsumer(skin -> {
+					int id = 0;
+					if (Minimap.isRound() && skin.isRound() ||
+						!Minimap.isRound() && skin.isSquare()) {
+						id = skin.id;
+					} else {
+						id = MapSkin.getDefaultSkin().id;
+					}
+					JustMapClient.CONFIG.setInt("current_skin", id);
+				})
+				.setDefaultValue(MapSkin::getDefaultSkin)
 				.setSelections(MapSkin.getSkins())
+				.build());
+		mapAppearance.addEntry(entryBuilder.startDropdownMenu(lang("big_map_skin"), MapSkin.getBigMapSkin(), MapSkin::getSkinByName, MapSkin::getName)
+				.setSaveConsumer(val -> JustMapClient.CONFIG.setInt("big_map_skin", val.id))
+				.setDefaultValue(MapSkin.getDefaultSquareSkin())
+				.setSelections(MapSkin.getSquareSkins())
 				.build());
 		mapAppearance.addEntry(doubleSlider.build());
 		mapAppearance.addEntry(arrowTypeEntry.build());
@@ -359,6 +376,8 @@ public final class ConfigFactory {
 		configBuilder.setDoesConfirmSave(false);
 		configBuilder.transparentBackground();
 		configBuilder.setSavingRunnable(JustMapClient.CONFIG::saveChanges);
+		
+		return configBuilder;
 	}
 	
 	private static int getIntValue(String value, int defVal) {
