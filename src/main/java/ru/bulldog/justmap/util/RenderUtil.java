@@ -303,23 +303,50 @@ public class RenderUtil extends DrawableHelper {
 		
 		draw(matrix, vertexConsumer, x, y, scaledBrd, scaledBrd, sMinU, sMinV, leftU, topV);
 		draw(matrix, vertexConsumer, rightC, y, scaledBrd, scaledBrd, rightU, sMinV, sMaxU, topV);
-		draw(matrix, vertexConsumer, x, topC, scaledBrd, vSide, sMinU, topV, leftU, bottomV);
-		draw(matrix, vertexConsumer, rightC, topC, scaledBrd, vSide, rightU, topV, sMaxU, bottomV);
 		draw(matrix, vertexConsumer, x, bottomC, scaledBrd, scaledBrd, sMinU, bottomV, leftU, sMaxV);
 		draw(matrix, vertexConsumer, rightC, bottomC, scaledBrd, scaledBrd, rightU, bottomV, sMaxU, sMaxV);
-		draw(matrix, vertexConsumer, leftC, topC, hSide, vSide, leftU, topV, rightU, bottomV);
 		
-		if (skin.repeating) {
-			float tail = renderData.tail;
-			float tailU = renderData.tailU;
-			hSide = vSide;
+		if (skin.resizable) {
+			draw(matrix, vertexConsumer, rightC, topC, scaledBrd, vSide, rightU, topV, sMaxU, bottomV);
+			draw(matrix, vertexConsumer, x, topC, scaledBrd, vSide, sMinU, topV, leftU, bottomV);
+			draw(matrix, vertexConsumer, leftC, topC, hSide, vSide, leftU, topV, rightU, bottomV);
+			if (skin.repeating) {
+				float tail = renderData.tail;
+				float tailU = renderData.tailU;
+				hSide = vSide;
+				
+				draw(matrix, vertexConsumer, leftC + hSide, y, tail, scaledBrd, leftU, sMinV, tailU, topV);
+				draw(matrix, vertexConsumer, leftC + hSide, bottomC, tail, scaledBrd, leftU, bottomV, tailU, sMaxV);
+			}
+		
+			draw(matrix, vertexConsumer, leftC, y, hSide, scaledBrd, leftU, sMinV, rightU, topV);
+			draw(matrix, vertexConsumer, leftC, bottomC, hSide, scaledBrd, leftU, bottomV, rightU, sMaxV);
+		} else {
+			double left = leftC;
+			int segments = renderData.hSegments;
+			for (int i = 0; i < segments; i++) {
+				draw(matrix, vertexConsumer, left, y, hSide, scaledBrd, leftU, sMinV, rightU, topV);
+				draw(matrix, vertexConsumer, left, bottomC, hSide, scaledBrd, leftU, bottomV, rightU, sMaxV);
+				left += hSide;
+			}
+			double top = topC;
+			segments = renderData.vSegments;
+			for (int i = 0; i < segments; i++) {
+				draw(matrix, vertexConsumer, x, top, scaledBrd, vSide, sMinU, topV, leftU, bottomV);
+				draw(matrix, vertexConsumer, rightC, top, scaledBrd, vSide, rightU, topV, sMaxU, bottomV);
+				top += vSide;
+			}
 			
-			draw(matrix, vertexConsumer, leftC + hSide, y, tail, scaledBrd, leftU, sMinV, tailU, topV);
-			draw(matrix, vertexConsumer, leftC + hSide, bottomC, tail, scaledBrd, leftU, bottomV, tailU, sMaxV);
+			float hTail = renderData.hTail;
+			float vTail = renderData.vTail;
+			float hTailU = renderData.hTailU;
+			float vTailV = renderData.vTailV;
+			
+			draw(matrix, vertexConsumer, left, y, hTail, scaledBrd, leftU, sMinV, hTailU, topV);
+			draw(matrix, vertexConsumer, left, bottomC, hTail, scaledBrd, leftU, bottomV, hTailU, sMaxV);
+			draw(matrix, vertexConsumer, x, top, scaledBrd, vTail, sMinU, topV, leftU, vTailV);
+			draw(matrix, vertexConsumer, rightC, top, scaledBrd, vTail, rightU, topV, sMaxU, vTailV);
 		}
-		
-		draw(matrix, vertexConsumer, leftC, y, hSide, scaledBrd, leftU, sMinV, rightU, topV);
-		draw(matrix, vertexConsumer, leftC, bottomC, hSide, scaledBrd, leftU, bottomV, rightU, sMaxV);
 		
 		endDraw();
 	}

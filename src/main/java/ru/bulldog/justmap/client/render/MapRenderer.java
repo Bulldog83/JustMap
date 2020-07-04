@@ -211,9 +211,7 @@ public class MapRenderer {
 			
 			Line radius = new Line(center, pointN);
 			Line corner = new Line(center, new Point(mapX, mapY));
-			
-			radius.add(corner.lenght() - radius.lenght());
-			int len = radius.lenght();
+			int len = corner.lenght();
 			
 			pointN.y = centerY - len;
 			pointS.y = centerY + len;

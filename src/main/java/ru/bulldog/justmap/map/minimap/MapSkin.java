@@ -116,7 +116,7 @@ public class MapSkin extends Sprite {
 		RenderSystem.enableBlend();
 		RenderSystem.defaultBlendFunc();
 		float hMult = (float) this.getWidth() / this.getHeight();
-		if (resizable) {
+		if (resizable || repeating) {
 			textureManager.bindTexture(this.getTexture());
 			if (type != SkinType.ROUND && (w > this.getWidth() || h > this.getHeight())) {
 				RenderUtil.drawSkin(matrixStack, this, x, y, w, h);
@@ -207,6 +207,9 @@ public class MapSkin extends Sprite {
 		public float leftU, rightU;
 		public float topV, bottomV;
 		public float tail, tailU;
+		public int hSegments, vSegments;
+		public float hTail, vTail;
+		public float hTailU, vTailV;
 		
 		public boolean scaleChanged = false;
 		
@@ -239,9 +242,16 @@ public class MapSkin extends Sprite {
 			this.y = y;
 			this.width = w;
 			this.height = h;
-			this.scaledBorder = (float) (border * scaleFactor);			
-			this.hSide = w - scaledBorder * 2;
-			this.vSide = h - scaledBorder * 2;
+			this.hSegments = (int) Math.round(w / (spriteW * scaleFactor));
+			this.vSegments = (int) Math.round(h / (spriteH * scaleFactor));
+			this.scaledBorder = (float) (border * scaleFactor);
+			if (MapSkin.this.resizable) {
+				this.hSide = w - scaledBorder * 2;
+				this.vSide = h - scaledBorder * 2;
+			} else {
+				this.hSide = (float) ((spriteW - border * 2) * scaleFactor);
+				this.vSide = (float) ((spriteH - border * 2) * scaleFactor);
+			}
 			this.leftC = x + scaledBorder;
 			this.rightC = right - scaledBorder;
 			this.topC = y + scaledBorder;
@@ -252,18 +262,30 @@ public class MapSkin extends Sprite {
 			this.bottomV = (float) (spriteH - border) / spriteH;
 			this.tail = hSide - vSide;
 			this.tailU = (border + sTail) / spriteW;
+			this.hTail = w - hSegments * hSide - scaledBorder * 2;
+			if (hTail < 0) {
+				this.hSegments--;
+				this.hTail = w - hSegments * hSide - scaledBorder * 2;
+			}
+			this.vTail = h - vSegments * vSide - scaledBorder * 2;
+			if (vTail < 0) {
+				this.vSegments--;
+				this.vTail = h - vSegments * vSide - scaledBorder * 2;
+			}
+			this.hTailU = (float) ((border + hTail / scaleFactor) / spriteW);
+			this.vTailV = (float) ((border + vTail / scaleFactor) / spriteH);
 			
 			this.scaleChanged = false;
 		}
 	}
 	
 	static {
-		addSquareSkin("Minecraft Map", new Identifier(JustMap.MODID, "textures/skin/map_background.png"), 64, 64, 5, true);
+		addSquareSkin("Minecraft Map", new Identifier(JustMap.MODID, "textures/skin/map_background.png"), 64, 64, 5, false, true);
 		addSquareSkin("Minecraft Gui", new Identifier(JustMap.MODID, "textures/skin/mad_def_gui_2.png"), 64, 64, 5, true);
 		addSquareSkin("Minecraft Gui Fancy", new Identifier(JustMap.MODID, "textures/skin/mad_def_gui.png"), 64, 64, 7, true);
 		addSquareSkin("Metal Frame", new Identifier(JustMap.MODID, "textures/skin/frame_simple_metal.png"), 64, 64, 4, true);
-		addSquareSkin("Oak Frame", new Identifier(JustMap.MODID, "textures/skin/map_frame_oak.png"), 64, 64, 10, true, true);
-		addSquareSkin("Bamboo Frame", new Identifier(JustMap.MODID, "textures/skin/map_frame_bamboo.png"), 64, 64, 9, true, true);
+		addSquareSkin("Oak Frame", new Identifier(JustMap.MODID, "textures/skin/map_frame_oak.png"), 64, 64, 10, false, true);
+		addSquareSkin("Bamboo Frame", new Identifier(JustMap.MODID, "textures/skin/map_frame_bamboo.png"), 64, 64, 9, false, true);
 		addRoundSkin("Minecraft Round", new Identifier(JustMap.MODID, "textures/skin/mad_def_gui_2_round.png"), 256, 256, 16);
 		addRoundSkin("Frame Round", new Identifier(JustMap.MODID, "textures/skin/frame_round.png"), 256, 256, 12);
 		addRoundSkin("Frame Runed Round", new Identifier(JustMap.MODID, "textures/skin/frame_runed_round.png"), 256, 256, 19);

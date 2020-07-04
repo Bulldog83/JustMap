@@ -3,7 +3,8 @@ package ru.bulldog.justmap.util;
 import java.io.IOException;
 
 import ru.bulldog.justmap.JustMap;
-import ru.bulldog.justmap.util.math.MathUtil;
+import ru.bulldog.justmap.util.math.Line;
+
 import net.fabricmc.fabric.impl.client.indigo.renderer.helper.ColorHelper;
 
 import net.minecraft.client.MinecraftClient;
@@ -105,7 +106,7 @@ public class ImageUtil {
 			int x = 0;
 			while(x < width) {
 				if (imgX >= imgW) imgX = 0;
-				int len = (int) Math.sqrt(MathUtil.pow2(x - centerX) + MathUtil.pow2(y - centerY));
+				int len = new Line(centerX, centerY, x, y).lenght();
 				if (len <= rOut && len >= rIn) {							
 					int pixel = texture.getPixelColor(imgX, imgY);
 					roundSkin.setPixelColor(x, y, pixel);
