@@ -1,6 +1,7 @@
 package ru.bulldog.justmap.util.math;
 
 import net.minecraft.util.math.BlockPos;
+import ru.bulldog.justmap.util.math.Line.Point;
 
 public class MathUtil {
 	public static int clamp(int val, int min, int max) {
@@ -23,6 +24,15 @@ public class MathUtil {
 		return Math.pow(n, 2);
 	}
 	
+	public static double max(double... args) {
+		double max = 0.0;
+		for(double arg : args) {
+			max = Math.max(max, arg);
+		}
+		
+		return max;
+	}
+	
 	public static float correctAngle(float angle) {
 		int turns = (int) Math.abs(angle / 360);		
 		if(angle >= 360) return angle - 360 * turns;
@@ -37,6 +47,13 @@ public class MathUtil {
 	
 	public static int worldPos(double val, double x1, double x2, double range) {
 		return (int) Math.round((val * (x2 - x1) + range * x1) / range);
+	}
+
+	public static void circlePos(Point center, Point pos, int mr, int mb, double angle) {
+		int posX = (int) (center.x + (pos.x - center.x) * Math.cos(angle) - (pos.y - center.y) * Math.sin(angle));
+		int posY = (int) (center.y + (pos.y - center.y) * Math.cos(angle) + (pos.x - center.x) * Math.sin(angle));
+		
+		pos.x = posX; pos.y = posY;
 	}
 	
 	public static double getDistance(BlockPos a, BlockPos b) {

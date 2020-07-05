@@ -211,7 +211,7 @@ public class MapRenderer {
 			
 			Line radius = new Line(center, pointN);
 			Line corner = new Line(center, new Point(mapX, mapY));
-			int len = corner.lenght();
+			int len = (int) (Minimap.isRound() ? radius.lenght() : corner.lenght());
 			
 			pointN.y = centerY - len;
 			pointS.y = centerY + len;
@@ -224,17 +224,16 @@ public class MapRenderer {
 			this.calculatePos(center, pointW, mapR, mapB, angle);
 		}
 		
-		this.dirN.setPos(pointN.x, pointN.y - 5);
-		this.dirS.setPos(pointS.x, pointS.y - 5);
-		this.dirE.setPos(pointE.x, pointE.y - 5);
-		this.dirW.setPos(pointW.x, pointW.y - 5);
+		this.dirN.setPos((int) pointN.x, (int) pointN.y - 5);
+		this.dirS.setPos((int) pointS.x, (int) pointS.y - 5);
+		this.dirE.setPos((int) pointE.x, (int) pointE.y - 5);
+		this.dirW.setPos((int) pointW.x, (int) pointW.y - 5);
 	}
 	
 	private void calculatePos(Point center, Point dir, int mr, int mb, double angle) {		
-		int posX = (int) (center.x + (dir.x - center.x) * Math.cos(angle) - (dir.y - center.y) * Math.sin(angle));
-		int posY = (int) (center.y + (dir.y - center.y) * Math.cos(angle) + (dir.x - center.x) * Math.sin(angle));
-		posX = MathUtil.clamp(posX, mapX, mr);
-		posY = MathUtil.clamp(posY, mapY, mb);
+		MathUtil.circlePos(center, dir, mr, mb, angle);
+		int posX = (int) MathUtil.clamp(dir.x, mapX, mr);
+		int posY = (int) MathUtil.clamp(dir.y, mapY, mb);
 		
 		dir.x = posX; dir.y = posY;
 	}

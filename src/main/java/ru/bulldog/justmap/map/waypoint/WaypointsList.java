@@ -73,7 +73,7 @@ public class WaypointsList extends MapScreen {
 			int iconSize = height - 2;
 			Icon icon = waypoint.getIcon();
 			if (icon != null) {
-				icon.draw(x, y + 1, iconSize, iconSize);
+				icon.draw(matrixStack, x, y + 1, iconSize, iconSize);
 			} else {
 				RenderUtil.drawDiamond(x, y + 1, iconSize, iconSize, waypoint.color);
 			}
