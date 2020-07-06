@@ -7,6 +7,7 @@ import ru.bulldog.justmap.advancedinfo.InfoText;
 import ru.bulldog.justmap.advancedinfo.TextManager;
 import ru.bulldog.justmap.advancedinfo.TimeInfo;
 import ru.bulldog.justmap.client.JustMapClient;
+import ru.bulldog.justmap.client.config.ClientConfig;
 import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.map.IMap;
 import ru.bulldog.justmap.map.MapGameRules;
@@ -19,7 +20,7 @@ import ru.bulldog.justmap.map.waypoint.Waypoint;
 import ru.bulldog.justmap.map.waypoint.WaypointEditor;
 import ru.bulldog.justmap.map.waypoint.WaypointKeeper;
 import ru.bulldog.justmap.util.Dimension;
-import ru.bulldog.justmap.util.DrawHelper.TextAlignment;
+import ru.bulldog.justmap.util.RenderUtil.TextAlignment;
 import ru.bulldog.justmap.util.PosUtil;
 import ru.bulldog.justmap.util.math.MathUtil;
 import ru.bulldog.justmap.util.math.RandomUtil;
@@ -43,12 +44,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
-public class Minimap implements IMap{
+public class Minimap implements IMap{	
+	public static enum Shape {
+		CIRCLE,
+		SQUARE
+	}
 	
 	private static final MinecraftClient minecraftClient = MinecraftClient.getInstance();
 	
-	private final TextManager textManager;
-	
+	private final TextManager textManager;	
 	private InfoText txtCoords = new CoordsInfo(TextAlignment.CENTER, "0, 0, 0");
 	private InfoText txtBiome = new BiomeInfo(TextAlignment.CENTER, "");
 	private InfoText txtTime = new TimeInfo(TextAlignment.CENTER, "");
@@ -98,16 +102,17 @@ public class Minimap implements IMap{
 	}
 	
 	public void updateMapParams() {
-		int configSize = JustMapClient.CONFIG.getInt("map_size");
-		float configScale = JustMapClient.CONFIG.getFloat("map_scale");		
-		boolean needRotate = JustMapClient.CONFIG.getBoolean("rotate_map");
-		boolean bigMap = JustMapClient.CONFIG.getBoolean("show_big_map");
+		ClientConfig config = JustMapClient.CONFIG;
+		int configSize = config.getInt("map_size");
+		float configScale = config.getFloat("map_scale");		
+		boolean needRotate = config.getBoolean("rotate_map");
+		boolean bigMap = config.getBoolean("show_big_map");
 		
 		if (configSize != mapWidth || configScale != mapScale ||
 			this.rotateMap != needRotate || this.bigMap != bigMap) {
 			
 			if (bigMap) {
-				this.mapWidth = JustMapClient.CONFIG.getInt("big_map_size");
+				this.mapWidth = config.getInt("big_map_size");
 				this.mapHeight = (mapWidth * 10) / 16;
 			} else {
 				this.mapWidth = configSize;
@@ -128,7 +133,7 @@ public class Minimap implements IMap{
 			this.textManager.setLineWidth(this.mapWidth);
 		}
 		
-		this.isMapVisible = JustMapClient.CONFIG.getBoolean("map_visible");
+		this.isMapVisible = config.getBoolean("map_visible");
 	}
 	
 	private void updateInfo(PlayerEntity player) {
@@ -175,21 +180,29 @@ public class Minimap implements IMap{
 		
 		return allowCaves;
 	}
-	
+
 	public static boolean allowEntityRadar() {
 		return isAllowed(ClientParams.showEntities, MapGameRules.ALLOW_ENTITY_RADAR);
 	}
-	
+
 	public static boolean allowHostileRadar() {
 		return isAllowed(ClientParams.showHostile, MapGameRules.ALLOW_HOSTILE_RADAR);
 	}
-	
+
 	public static boolean allowCreatureRadar() {
 		return isAllowed(ClientParams.showCreatures, MapGameRules.ALLOW_CREATURE_RADAR);
 	}
-	
+
 	public static boolean allowPlayerRadar() {
 		return isAllowed(ClientParams.showPlayers, MapGameRules.ALLOW_PLAYER_RADAR);
+	}
+	
+	public static boolean allowSlimeChunks() {
+		return isAllowed(ClientParams.showSlime, MapGameRules.ALLOW_SLIME_CHUNKS);
+	}
+	
+	public static boolean allowTeleportation() {
+		return isAllowed(ClientParams.jumpToWaypoints, MapGameRules.ALLOW_TELEPORTATION);
 	}
 	
 	public void prepareMap(PlayerEntity player) {
@@ -319,6 +332,18 @@ public class Minimap implements IMap{
 	
 	public TextManager getTextManager() {
 		return this.textManager;
+	}
+	
+	public boolean isBigMap() {
+		return this.bigMap;
+	}
+	
+	public static boolean isBig() {
+		return ClientParams.showBigMap;
+	}
+	
+	public static boolean isRound() {
+		return !isBig() && (ClientParams.mapShape == Shape.CIRCLE);
 	}
 	
 	public boolean isMapVisible() {

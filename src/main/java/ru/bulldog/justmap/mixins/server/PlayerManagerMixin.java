@@ -50,6 +50,9 @@ public abstract class PlayerManagerMixin {
 			if (gameRules.getBoolean(MapGameRules.ALLOW_SLIME_CHUNKS)) {
 				command.append("§s§1");
 			}
+			if (gameRules.getBoolean(MapGameRules.ALLOW_TELEPORTATION)) {
+				command.append("§t§1");
+			}
 		} else {
 			if (ServerParams.allowCavesMap) {
 				command.append("§a§1");
@@ -68,6 +71,9 @@ public abstract class PlayerManagerMixin {
 			}
 			if (ServerParams.allowSlime) {
 				command.append("§s§1");
+			}
+			if (ServerParams.allowTeleportation) {
+				command.append("§t§1");
 			}
 		}
 		command.append("§f§f");

@@ -5,7 +5,7 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.item.ItemStack;
 import ru.bulldog.justmap.client.config.ClientParams;
-import ru.bulldog.justmap.util.DrawHelper;
+import ru.bulldog.justmap.util.RenderUtil;
 
 public class ItemInfo extends InfoText {
 
@@ -27,7 +27,7 @@ public class ItemInfo extends InfoText {
 				posX = x + offset;
 				break;
 			case CENTER:
-				int textWidth = DrawHelper.getWidth(text);
+				int textWidth = RenderUtil.getWidth(text);
 				posX = x - textWidth / 2 - offsetX;
 				break;
 			default:

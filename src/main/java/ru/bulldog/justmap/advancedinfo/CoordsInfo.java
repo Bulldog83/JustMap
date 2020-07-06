@@ -1,7 +1,7 @@
 package ru.bulldog.justmap.advancedinfo;
 
 import ru.bulldog.justmap.client.config.ClientParams;
-import ru.bulldog.justmap.util.DrawHelper.TextAlignment;
+import ru.bulldog.justmap.util.RenderUtil.TextAlignment;
 import ru.bulldog.justmap.util.PosUtil;
 
 public class CoordsInfo extends InfoText {

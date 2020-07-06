@@ -20,6 +20,7 @@ public class MapGameRules {
 	public final static GameRules.Key<GameRules.BooleanRule> ALLOW_CREATURE_RADAR = register("allowCreatureRadar", false);
 	public final static GameRules.Key<GameRules.BooleanRule> ALLOW_HOSTILE_RADAR = register("allowHostileRadar", false);
 	public final static GameRules.Key<GameRules.BooleanRule> ALLOW_SLIME_CHUNKS = register("allowSlimeChunks", false);
+	public final static GameRules.Key<GameRules.BooleanRule> ALLOW_TELEPORTATION = register("allowWaypointsJump", false);
 	
 	private MapGameRules() {}
 	
@@ -42,6 +43,7 @@ public class MapGameRules {
 		codes.put("§d", ALLOW_CREATURE_RADAR);
 		codes.put("§e", ALLOW_HOSTILE_RADAR);
 		codes.put("§s", ALLOW_SLIME_CHUNKS);
+		codes.put("§t", ALLOW_TELEPORTATION);
 	}
 	
 	/*

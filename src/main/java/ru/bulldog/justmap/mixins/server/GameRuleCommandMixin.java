@@ -62,6 +62,11 @@ public abstract class GameRuleCommandMixin {
 						serverCommandSource.getMinecraftServer().getPlayerManager().sendToAll(
 								new GameMessageS2CPacket(command, MessageType.SYSTEM, Util.NIL_UUID));
 						break;
+					case "allowWaypointsJump":
+						command = new LiteralText(String.format("§0§0§t%s§f§f", val));
+						serverCommandSource.getMinecraftServer().getPlayerManager().sendToAll(
+								new GameMessageS2CPacket(command, MessageType.SYSTEM, Util.NIL_UUID));
+						break;
 				}
 			}
 		}

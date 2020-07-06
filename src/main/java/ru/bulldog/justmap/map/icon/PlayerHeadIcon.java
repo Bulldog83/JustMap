@@ -12,7 +12,7 @@ import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.map.minimap.MapPlayer;
 import ru.bulldog.justmap.util.Colors;
-import ru.bulldog.justmap.util.DrawHelper;
+import ru.bulldog.justmap.util.RenderUtil;
 
 import java.io.IOException;
 
@@ -40,10 +40,10 @@ public class PlayerHeadIcon {
 		y -= size / 2;
 		if (outline) {
 			double thickness = ClientParams.entityOutlineSize;
-			DrawHelper.fill(drawX - thickness / 2, drawY - thickness / 2, size + thickness, size + thickness, Colors.LIGHT_GRAY);
+			RenderUtil.fill(drawX - thickness / 2, drawY - thickness / 2, size + thickness, size + thickness, Colors.LIGHT_GRAY);
 		}
 		this.playerSkin.bindTexture();	
-		DrawHelper.drawPlayerHead(matrix, drawX, drawY, size, size);
+		RenderUtil.drawPlayerHead(matrix, drawX, drawY, size, size);
 	}
 	
 	public void updatePlayerSkin(MapPlayer player) {
