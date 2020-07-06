@@ -1,8 +1,8 @@
 {
     "schemaVersion": 1,
-    "id": "justmap",
+    "id": "justmap-unlimited",
     "version": "${version}",
-    "name": "Just Map",
+    "name": "Just Map Unlimited",
     "description": "A minimap mod for Minecraft.",
     "authors": [
         "Bulldog83"
