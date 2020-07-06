@@ -74,6 +74,7 @@ public class ClientConfig extends Config {
 		KEEPER.registerEntry("draw_chunk_grid", new BooleanEntry(ClientParams.showGrid, (b) -> ClientParams.showGrid = b, () -> ClientParams.showGrid));
 		KEEPER.registerEntry("show_in_chat", new BooleanEntry(ClientParams.showInChat, (b) -> ClientParams.showInChat = b, () -> ClientParams.showInChat));
 		KEEPER.registerEntry("show_waypoints", new BooleanEntry(ClientParams.showWaypoints, (b) -> ClientParams.showWaypoints = b, () -> ClientParams.showWaypoints));
+		KEEPER.registerEntry("jump_to_waypoints", new BooleanEntry(ClientParams.jumpToWaypoints, (b) -> ClientParams.jumpToWaypoints = b, () -> ClientParams.jumpToWaypoints));
 		KEEPER.registerEntry("waypoints_tracking", new BooleanEntry(ClientParams.waypointsTracking, (b) -> ClientParams.waypointsTracking = b, () -> ClientParams.waypointsTracking));
 		KEEPER.registerEntry("waypoints_world_render", new BooleanEntry(ClientParams.waypointsWorldRender, (b) -> ClientParams.waypointsWorldRender = b, () -> ClientParams.waypointsWorldRender));
 		KEEPER.registerEntry("render_light_beam", new BooleanEntry(ClientParams.renderLightBeam, (b) -> ClientParams.renderLightBeam = b, () -> ClientParams.renderLightBeam));

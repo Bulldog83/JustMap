@@ -180,21 +180,29 @@ public class Minimap implements IMap{
 		
 		return allowCaves;
 	}
-	
+
 	public static boolean allowEntityRadar() {
 		return isAllowed(ClientParams.showEntities, MapGameRules.ALLOW_ENTITY_RADAR);
 	}
-	
+
 	public static boolean allowHostileRadar() {
 		return isAllowed(ClientParams.showHostile, MapGameRules.ALLOW_HOSTILE_RADAR);
 	}
-	
+
 	public static boolean allowCreatureRadar() {
 		return isAllowed(ClientParams.showCreatures, MapGameRules.ALLOW_CREATURE_RADAR);
 	}
-	
+
 	public static boolean allowPlayerRadar() {
 		return isAllowed(ClientParams.showPlayers, MapGameRules.ALLOW_PLAYER_RADAR);
+	}
+	
+	public static boolean allowSlimeChunks() {
+		return isAllowed(ClientParams.showSlime, MapGameRules.ALLOW_SLIME_CHUNKS);
+	}
+	
+	public static boolean allowTeleportation() {
+		return isAllowed(ClientParams.jumpToWaypoints, MapGameRules.ALLOW_TELEPORTATION);
 	}
 	
 	public void prepareMap(PlayerEntity player) {
@@ -330,8 +338,12 @@ public class Minimap implements IMap{
 		return this.bigMap;
 	}
 	
+	public static boolean isBig() {
+		return ClientParams.showBigMap;
+	}
+	
 	public static boolean isRound() {
-		return ClientParams.mapShape == Shape.CIRCLE;
+		return !isBig() && (ClientParams.mapShape == Shape.CIRCLE);
 	}
 	
 	public boolean isMapVisible() {

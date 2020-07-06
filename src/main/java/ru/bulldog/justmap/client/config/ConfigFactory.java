@@ -144,14 +144,11 @@ public final class ConfigFactory {
 				.build());
 		mapAppearance.addEntry(entryBuilder.startDropdownMenu(lang("current_skin"), MapSkin.getCurrentSkin(), MapSkin::getSkinByName, MapSkin::getName)
 				.setSaveConsumer(skin -> {
-					int id = 0;
-					if (Minimap.isRound() && skin.isRound() ||
-						!Minimap.isRound() && skin.isSquare()) {
-						id = skin.id;
-					} else {
-						id = MapSkin.getDefaultSkin().id;
+					if (Minimap.isRound() && !skin.isRound() ||
+						!Minimap.isRound() && !skin.isSquare()) {
+						skin = MapSkin.getDefaultSkin();
 					}
-					JustMapClient.CONFIG.setInt("current_skin", id);
+					JustMapClient.CONFIG.setInt("current_skin", skin.id);
 				})
 				.setDefaultValue(MapSkin::getDefaultSkin)
 				.setSelections(MapSkin.getSkins())
@@ -200,6 +197,10 @@ public final class ConfigFactory {
 		waypoints.addEntry(entryBuilder.startBooleanToggle(lang("show_waypoints"), JustMapClient.CONFIG.getBoolean("show_waypoints"))
 				.setSaveConsumer(val -> JustMapClient.CONFIG.setBoolean("show_waypoints", val))
 				.setDefaultValue((boolean) JustMapClient.CONFIG.getDefault("show_waypoints"))
+				.build());
+		waypoints.addEntry(entryBuilder.startBooleanToggle(lang("jump_to_waypoints"), JustMapClient.CONFIG.getBoolean("jump_to_waypoints"))
+				.setSaveConsumer(val -> JustMapClient.CONFIG.setBoolean("jump_to_waypoints", val))
+				.setDefaultValue((boolean) JustMapClient.CONFIG.getDefault("jump_to_waypoints"))
 				.build());
 		waypoints.addEntry(entryBuilder.startBooleanToggle(lang("waypoints_tracking"), JustMapClient.CONFIG.getBoolean("waypoints_tracking"))
 				.setSaveConsumer(val -> JustMapClient.CONFIG.setBoolean("waypoints_tracking", val))

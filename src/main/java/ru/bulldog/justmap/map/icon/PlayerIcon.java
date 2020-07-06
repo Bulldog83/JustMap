@@ -12,6 +12,7 @@ import ru.bulldog.justmap.map.minimap.MapPlayerManager;
 import ru.bulldog.justmap.util.ColorUtil;
 import ru.bulldog.justmap.util.Colors;
 import ru.bulldog.justmap.util.RenderUtil;
+import ru.bulldog.justmap.util.math.Line.Point;
 
 public class PlayerIcon extends MapIcon<PlayerIcon> {
 	
@@ -27,7 +28,7 @@ public class PlayerIcon extends MapIcon<PlayerIcon> {
 	public void draw(MatrixStack matrixStack, int mapX, int mapY, double offX, double offY, float rotation) {
 		int size = ClientParams.entityIconSize;
 		
-		IconPos pos = new IconPos(mapX + x, mapY + y);
+		Point pos = new Point(mapX + x, mapY + y);
 		
 		if (ClientParams.rotateMap) {
 			this.rotatePos(pos, map.getWidth(), map.getHeight(), mapX, mapY, rotation);

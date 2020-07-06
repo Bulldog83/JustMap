@@ -24,8 +24,19 @@ public class MathUtil {
 		return Math.pow(n, 2);
 	}
 	
+	public static double min(double... args) {
+		if (args.length == 0) return 0.0;
+		double min = Double.POSITIVE_INFINITY;
+		for(double arg : args) {
+			min = Math.min(min, arg);
+		}
+		
+		return min;
+	}
+	
 	public static double max(double... args) {
-		double max = 0.0;
+		if (args.length == 0) return 0.0;
+		double max = Double.NEGATIVE_INFINITY;
 		for(double arg : args) {
 			max = Math.max(max, arg);
 		}
@@ -49,11 +60,11 @@ public class MathUtil {
 		return (int) Math.round((val * (x2 - x1) + range * x1) / range);
 	}
 
-	public static void circlePos(Point center, Point pos, int mr, int mb, double angle) {
+	public static Point circlePos(Point pos, Point center, double angle) {
 		int posX = (int) (center.x + (pos.x - center.x) * Math.cos(angle) - (pos.y - center.y) * Math.sin(angle));
 		int posY = (int) (center.y + (pos.y - center.y) * Math.cos(angle) + (pos.x - center.x) * Math.sin(angle));
 		
-		pos.x = posX; pos.y = posY;
+		return new Point(posX, posY);
 	}
 	
 	public static double getDistance(BlockPos a, BlockPos b) {

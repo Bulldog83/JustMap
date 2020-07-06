@@ -7,6 +7,7 @@ import ru.bulldog.justmap.map.IMap;
 import ru.bulldog.justmap.map.minimap.Minimap;
 import ru.bulldog.justmap.map.waypoint.Waypoint;
 import ru.bulldog.justmap.util.math.Line;
+import ru.bulldog.justmap.util.math.Line.Point;
 import ru.bulldog.justmap.util.math.MathUtil;
 
 public class WaypointIcon extends MapIcon<WaypointIcon> {
@@ -31,11 +32,12 @@ public class WaypointIcon extends MapIcon<WaypointIcon> {
 	@Override
 	public void draw(MatrixStack matrixStack, int mapX, int mapY, double offX, double offY, float rotation) {
 		int size = 8;
+		int halfSize = size / 2;
 		
-		IconPos iconPos = new IconPos(mapX + x, mapY + y);
+		Point iconPos = new Point(mapX + x, mapY + y);
 		
-		iconPos.x -= size / 2 + offX;
-		iconPos.y -= size / 2 + offY;
+		iconPos.x -= halfSize + offX;
+		iconPos.y -= halfSize + offY;
 		
 		int mapW = map.getWidth();
 		int mapH = map.getHeight();
@@ -47,18 +49,19 @@ public class WaypointIcon extends MapIcon<WaypointIcon> {
 			int centerX = mapX + mapW / 2;
 			int centerY = mapY + mapH / 2;
 			Line radius = new Line(centerX, centerY, centerX, mapY);
-			Line iconRay = new Line(centerX, centerY, iconPos.x, iconPos.y);
-			if (iconRay.lenght() > radius.lenght()) {
-				double diff = iconRay.lenght() - radius.lenght();
-				double brdX = centerX + mapW;
-				double brdY = centerY + mapH;
-				if (iconPos.x > brdX || iconPos.y > brdY) {
-					diff += size;
-				}
-				iconRay.subtract(diff);
-				iconPos.x = iconRay.second.x;
-				iconPos.y = iconRay.second.y;
+			Line rayTL = new Line(centerX, centerY, iconPos.x, iconPos.y);
+			Line rayTR = new Line(centerX, centerY, iconPos.x + halfSize, iconPos.y);
+			Line rayBL = new Line(centerX, centerY, iconPos.x, iconPos.y + halfSize);
+			Line rayBR = new Line(centerX, centerY, iconPos.x + size, iconPos.y + halfSize);
+			double diff = MathUtil.max(rayTL.difference(radius),
+									   rayTR.difference(radius),
+									   rayBL.difference(radius),
+									   rayBR.difference(radius));
+			if (diff > 0) {
+				rayTL.subtract(diff);
 			}
+			iconPos.x = rayTL.second.x;
+			iconPos.y = rayTL.second.y;
 		}
 		
 		iconPos.x = MathUtil.clamp(iconPos.x, mapX, (mapX + mapW) - size);

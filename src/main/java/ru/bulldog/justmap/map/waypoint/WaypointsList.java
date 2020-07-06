@@ -3,6 +3,7 @@ package ru.bulldog.justmap.map.waypoint;
 import com.mojang.datafixers.util.Pair;
 
 import ru.bulldog.justmap.client.MapScreen;
+import ru.bulldog.justmap.map.minimap.Minimap;
 import ru.bulldog.justmap.map.waypoint.Waypoint.Icon;
 import ru.bulldog.justmap.util.Colors;
 import ru.bulldog.justmap.util.Dimension;
@@ -56,11 +57,14 @@ public class WaypointsList extends MapScreen {
 			
 			this.rightAlign(deleteButton, x + width - 2);
 			this.rightAlign(editButton, deleteButton);
-			this.rightAlign(tpButton, editButton);
 			
-			editButton.y = y + 1;
-			tpButton.y = y + 1;
-			deleteButton.y = y + 1;
+			this.editButton.y = y + 1;
+			this.deleteButton.y = y + 1;
+			
+			if (tpButton != null) {
+				this.rightAlign(tpButton, editButton);
+				this.tpButton.y = y + 1;
+			}
 		}		
 		
 		public void render(MatrixStack matrixStack, int mouseX, int mouseY, float delta) {
@@ -86,8 +90,10 @@ public class WaypointsList extends MapScreen {
 			int posX = tpButton.x - 5;
 			RenderUtil.drawRightAlignedString(matrixStack, waypoint.pos.toShortString(), posX, stringY, Colors.WHITE);
 			
+			if (Minimap.allowTeleportation()) {
+				tpButton.render(matrixStack, mouseX, mouseY, delta);
+			}
 			editButton.render(matrixStack, mouseX, mouseY, delta);
-			tpButton.render(matrixStack, mouseX, mouseY, delta);
 			deleteButton.render(matrixStack, mouseX, mouseY, delta);
 		}
 	

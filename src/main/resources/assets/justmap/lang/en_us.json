@@ -67,10 +67,13 @@
   "justmap.configuration.alternate_color_render": "Alternate map colors rendering",
   "justmap.configuration.texture_filter": "Textures filter",
   "justmap.configuration.water_tint": "Water Tint",
+  "justmap.configuration.map_shape": "Map shape",
   "justmap.configuration.use_skins": "Use map skins",
-  "justmap.configuration.current_skin": "Current Skin",
+  "justmap.configuration.current_skin": "Current skin",
+  "justmap.configuration.big_map_skin": "Big map skin",
   "justmap.configuration.skin_border_scale": "Skin border scale",
   "justmap.configuration.show_waypoints": "Show Waypoints",
+  "justmap.configuration.jump_to_waypoints": "Waypoints jumps",
   "justmap.configuration.waypoints_tracking": "Waypoints tracking",
   "justmap.configuration.waypoints_render": "Render waypoints in the world",
   "justmap.configuration.render_light_beam": "Render light beam",
@@ -121,5 +124,7 @@
   "gamerule.allowEntityRadar": "(Just Map) Entities radar",
   "gamerule.allowPlayerRadar": "(Just Map) Players radar",
   "gamerule.allowCreatureRadar": "(Just Map) Creatures radar",
-  "gamerule.allowHostileRadar": "(Just Map) Hostile radar"
+  "gamerule.allowHostileRadar": "(Just Map) Hostile radar",
+  "gamerule.allowSlimeChunks": "(Just Map) Slime chunks",
+  "gamerule.allowWaypointsJump": "(Just Map) Waypoints jump"
 }

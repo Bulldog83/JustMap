@@ -81,6 +81,7 @@ public class ClientParams {
 	public static int purgeAmount = 1500;
 	
 	public static boolean showWaypoints = true;
+	public static boolean jumpToWaypoints = true;
 	public static boolean waypointsTracking = true;
 	public static boolean waypointsWorldRender = true;
 	public static boolean renderLightBeam = true;

@@ -231,9 +231,9 @@ public class MapRenderer {
 	}
 	
 	private void calculatePos(Point center, Point dir, int mr, int mb, double angle) {		
-		MathUtil.circlePos(center, dir, mr, mb, angle);
-		int posX = (int) MathUtil.clamp(dir.x, mapX, mr);
-		int posY = (int) MathUtil.clamp(dir.y, mapY, mb);
+		Point pos = MathUtil.circlePos(dir, center, angle);
+		int posX = (int) MathUtil.clamp(pos.x, mapX, mr);
+		int posY = (int) MathUtil.clamp(pos.y, mapY, mb);
 		
 		dir.x = posX; dir.y = posY;
 	}
@@ -314,14 +314,14 @@ public class MapRenderer {
 		}
 		GL11.glDisable(GL11.GL_SCISSOR_TEST);
 		
-		RenderUtil.drawRightAlignedString(
-				matrix, Float.toString(minimap.getScale()),
-				mapX + mapWidth - 3, mapY + mapHeight - 10, Colors.WHITE);
-		
 		if (ClientParams.useSkins) {
 			int brd = border * 2;
 			this.mapSkin.draw(matrix, posX, posY, mapWidth + brd, mapHeight + brd);
 		}
+		
+		RenderUtil.drawRightAlignedString(
+				matrix, Float.toString(minimap.getScale()),
+				mapX + mapWidth - 3, mapY + mapHeight - 10, Colors.WHITE);
 		
 		int centerX = mapX + mapWidth / 2;
 		int centerY = mapY + mapHeight / 2;

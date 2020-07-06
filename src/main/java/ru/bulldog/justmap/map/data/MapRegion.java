@@ -7,6 +7,7 @@ import net.minecraft.util.math.BlockPos;
 import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.client.render.MapTexture;
+import ru.bulldog.justmap.map.minimap.Minimap;
 import ru.bulldog.justmap.util.Colors;
 import ru.bulldog.justmap.util.RenderUtil;
 import ru.bulldog.justmap.util.StorageUtil;
@@ -84,8 +85,8 @@ public class MapRegion {
 			this.gridOverlay = ClientParams.showGrid;
 			this.renewOverlay = true;
 		}
-		if (ClientParams.showSlime != slimeOverlay) {
-			this.slimeOverlay = ClientParams.showSlime;
+		if (ClientParams.showSlime != Minimap.allowSlimeChunks()) {
+			this.slimeOverlay = Minimap.allowSlimeChunks();
 			this.renewOverlay = true;
 		}
 		if (ClientParams.showLoadedChunks != loadedOverlay) {

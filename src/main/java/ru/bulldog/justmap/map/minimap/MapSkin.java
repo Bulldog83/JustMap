@@ -280,16 +280,16 @@ public class MapSkin extends Sprite {
 	}
 	
 	static {
-		addSquareSkin("Minecraft Map", new Identifier(JustMap.MODID, "textures/skin/map_background.png"), 64, 64, 5, false, true);
-		addSquareSkin("Minecraft Gui", new Identifier(JustMap.MODID, "textures/skin/mad_def_gui_2.png"), 64, 64, 5, true);
-		addSquareSkin("Minecraft Gui Fancy", new Identifier(JustMap.MODID, "textures/skin/mad_def_gui.png"), 64, 64, 7, true);
-		addSquareSkin("Metal Frame", new Identifier(JustMap.MODID, "textures/skin/frame_simple_metal.png"), 64, 64, 4, true);
-		addSquareSkin("Oak Frame", new Identifier(JustMap.MODID, "textures/skin/map_frame_oak.png"), 64, 64, 10, false, true);
-		addSquareSkin("Bamboo Frame", new Identifier(JustMap.MODID, "textures/skin/map_frame_bamboo.png"), 64, 64, 9, false, true);
-		addRoundSkin("Minecraft Round", new Identifier(JustMap.MODID, "textures/skin/mad_def_gui_2_round.png"), 256, 256, 16);
-		addRoundSkin("Frame Round", new Identifier(JustMap.MODID, "textures/skin/frame_round.png"), 256, 256, 12);
-		addRoundSkin("Frame Runed Round", new Identifier(JustMap.MODID, "textures/skin/frame_runed_round.png"), 256, 256, 19);
-		addRoundSkin("Frame Frozen Round", new Identifier(JustMap.MODID, "textures/skin/frame_frozen_round.png"), 256, 273, 17);
+		addSquareSkin("Minecraft Map", new Identifier(JustMap.MODID, "textures/skin/skin_def_map.png"), 64, 64, 5, false, true);
+		addSquareSkin("Minecraft Gui", new Identifier(JustMap.MODID, "textures/skin/skin_def_gui.png"), 64, 64, 5, true);
+		addSquareSkin("Minecraft Gui Fancy", new Identifier(JustMap.MODID, "textures/skin/skin_def_gui_fancy.png"), 64, 64, 7, true);
+		addSquareSkin("Metal Frame", new Identifier(JustMap.MODID, "textures/skin/skin_simple_metal.png"), 64, 64, 4, true);
+		addSquareSkin("Oak Frame", new Identifier(JustMap.MODID, "textures/skin/skin_oak.png"), 64, 64, 10, false, true);
+		addSquareSkin("Bamboo Frame", new Identifier(JustMap.MODID, "textures/skin/skin_bamboo.png"), 64, 64, 9, false, true);
+		addRoundSkin("Minecraft Gui", new Identifier(JustMap.MODID, "textures/skin/skin_def_gui_round.png"), 256, 256, 10);
+		addRoundSkin("Frame Round", new Identifier(JustMap.MODID, "textures/skin/skin_frame_round.png"), 256, 256, 12);
+		addRoundSkin("Frame Runed", new Identifier(JustMap.MODID, "textures/skin/skin_runed_round.png"), 256, 256, 19);
+		addRoundSkin("Frame Frozen", new Identifier(JustMap.MODID, "textures/skin/skin_frozen_round.png"), 256, 273, 17);
 		addUniversalSkin("Stone", new Identifier("textures/block/stone.png"), 256, 256, 8);
 		addUniversalSkin("Cobblestone", new Identifier("textures/block/cobblestone.png"), 256, 256, 8);
 		addUniversalSkin("Mossy Cobblestone", new Identifier("textures/block/mossy_cobblestone.png"), 256, 256, 8);
