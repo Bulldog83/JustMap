@@ -11,9 +11,10 @@ import ru.bulldog.justmap.config.ConfigKeeper.FloatRange;
 import ru.bulldog.justmap.config.ConfigKeeper.IntegerEntry;
 import ru.bulldog.justmap.config.ConfigKeeper.IntegerRange;
 import ru.bulldog.justmap.map.DirectionArrow;
+import ru.bulldog.justmap.map.minimap.Minimap;
 import ru.bulldog.justmap.util.ScreenPosition;
 
-public class ClientConfig extends Config{
+public class ClientConfig extends Config {
 	
 	private static ClientConfig instance;
 	
@@ -62,6 +63,7 @@ public class ClientConfig extends Config{
 		KEEPER.registerEntry("skin_scale", new FloatRange(ClientParams.skinScale, (f) -> ClientParams.skinScale = f, () -> ClientParams.skinScale, 0.5F, 3.0F));
 		KEEPER.registerEntry("simple_direction_arrow", new BooleanEntry(ClientParams.simpleArrow, (b) -> ClientParams.simpleArrow = b, () -> ClientParams.simpleArrow));
 		KEEPER.registerEntry("current_skin", new IntegerEntry(ClientParams.currentSkin, (i) -> ClientParams.currentSkin = i, () -> ClientParams.currentSkin));
+		KEEPER.registerEntry("big_map_skin", new IntegerEntry(ClientParams.bigMapSkin, (i) -> ClientParams.bigMapSkin = i, () -> ClientParams.bigMapSkin));
 		KEEPER.registerEntry("chunk_update_interval", new IntegerRange(ClientParams.chunkUpdateInterval, (i) -> ClientParams.chunkUpdateInterval = i, () -> ClientParams.chunkUpdateInterval, 500, 5000));
 		KEEPER.registerEntry("chunk_level_update_interval", new IntegerRange(ClientParams.chunkLevelUpdateInterval, (i) -> ClientParams.chunkLevelUpdateInterval = i, () -> ClientParams.chunkLevelUpdateInterval, 500, 10000));
 		KEEPER.registerEntry("purge_delay", new IntegerRange(ClientParams.purgeDelay, (i) -> ClientParams.purgeDelay = i, () -> ClientParams.purgeDelay, 1, 600));
@@ -72,6 +74,7 @@ public class ClientConfig extends Config{
 		KEEPER.registerEntry("draw_chunk_grid", new BooleanEntry(ClientParams.showGrid, (b) -> ClientParams.showGrid = b, () -> ClientParams.showGrid));
 		KEEPER.registerEntry("show_in_chat", new BooleanEntry(ClientParams.showInChat, (b) -> ClientParams.showInChat = b, () -> ClientParams.showInChat));
 		KEEPER.registerEntry("show_waypoints", new BooleanEntry(ClientParams.showWaypoints, (b) -> ClientParams.showWaypoints = b, () -> ClientParams.showWaypoints));
+		KEEPER.registerEntry("jump_to_waypoints", new BooleanEntry(ClientParams.jumpToWaypoints, (b) -> ClientParams.jumpToWaypoints = b, () -> ClientParams.jumpToWaypoints));
 		KEEPER.registerEntry("waypoints_tracking", new BooleanEntry(ClientParams.waypointsTracking, (b) -> ClientParams.waypointsTracking = b, () -> ClientParams.waypointsTracking));
 		KEEPER.registerEntry("waypoints_world_render", new BooleanEntry(ClientParams.waypointsWorldRender, (b) -> ClientParams.waypointsWorldRender = b, () -> ClientParams.waypointsWorldRender));
 		KEEPER.registerEntry("render_light_beam", new BooleanEntry(ClientParams.renderLightBeam, (b) -> ClientParams.renderLightBeam = b, () -> ClientParams.renderLightBeam));
@@ -99,6 +102,7 @@ public class ClientConfig extends Config{
 		KEEPER.registerEntry("worldmap_icon_size", new IntegerRange(ClientParams.worldmapIconSize, (i) -> ClientParams.worldmapIconSize = i, () -> ClientParams.worldmapIconSize, 8, 16));
 		KEEPER.registerEntry("info_position", new EnumEntry<ScreenPosition>(ClientParams.infoPosition, (e) -> ClientParams.infoPosition = e, () -> ClientParams.infoPosition));
 		KEEPER.registerEntry("items_position", new EnumEntry<ScreenPosition>(ClientParams.itemsPosition, (e) -> ClientParams.itemsPosition = e, () -> ClientParams.itemsPosition));
+		KEEPER.registerEntry("map_shape", new EnumEntry<Minimap.Shape>(ClientParams.mapShape, (e) -> ClientParams.mapShape = e, () -> ClientParams.mapShape));
 		
 		JsonObject config = ConfigWriter.load();
 		if (config.size() > 0) {

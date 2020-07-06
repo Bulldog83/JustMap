@@ -3,10 +3,11 @@ package ru.bulldog.justmap.map.waypoint;
 import com.mojang.datafixers.util.Pair;
 
 import ru.bulldog.justmap.client.MapScreen;
+import ru.bulldog.justmap.map.minimap.Minimap;
 import ru.bulldog.justmap.map.waypoint.Waypoint.Icon;
 import ru.bulldog.justmap.util.Colors;
 import ru.bulldog.justmap.util.Dimension;
-import ru.bulldog.justmap.util.DrawHelper;
+import ru.bulldog.justmap.util.RenderUtil;
 import ru.bulldog.justmap.util.math.MathUtil;
 import ru.bulldog.justmap.util.math.RandomUtil;
 
@@ -56,11 +57,14 @@ public class WaypointsList extends MapScreen {
 			
 			this.rightAlign(deleteButton, x + width - 2);
 			this.rightAlign(editButton, deleteButton);
-			this.rightAlign(tpButton, editButton);
 			
-			editButton.y = y + 1;
-			tpButton.y = y + 1;
-			deleteButton.y = y + 1;
+			this.editButton.y = y + 1;
+			this.deleteButton.y = y + 1;
+			
+			if (tpButton != null) {
+				this.rightAlign(tpButton, editButton);
+				this.tpButton.y = y + 1;
+			}
 		}		
 		
 		public void render(MatrixStack matrixStack, int mouseX, int mouseY, float delta) {
@@ -73,21 +77,23 @@ public class WaypointsList extends MapScreen {
 			int iconSize = height - 2;
 			Icon icon = waypoint.getIcon();
 			if (icon != null) {
-				icon.draw(x, y + 1, iconSize, iconSize);
+				icon.draw(matrixStack, x, y + 1, iconSize, iconSize);
 			} else {
-				DrawHelper.drawDiamond(x, y + 1, iconSize, iconSize, waypoint.color);
+				RenderUtil.drawDiamond(x, y + 1, iconSize, iconSize, waypoint.color);
 			}
 			
 			int stringY = y + 7;			
 			int nameX = x + iconSize + 2;
 
-			DrawHelper.DRAWER.drawStringWithShadow(matrixStack, font, waypoint.name, nameX, stringY, Colors.WHITE);
+			RenderUtil.DRAWER.drawStringWithShadow(matrixStack, font, waypoint.name, nameX, stringY, Colors.WHITE);
 			
 			int posX = tpButton.x - 5;
-			DrawHelper.drawRightAlignedString(matrixStack, waypoint.pos.toShortString(), posX, stringY, Colors.WHITE);
+			RenderUtil.drawRightAlignedString(matrixStack, waypoint.pos.toShortString(), posX, stringY, Colors.WHITE);
 			
+			if (Minimap.allowTeleportation()) {
+				tpButton.render(matrixStack, mouseX, mouseY, delta);
+			}
 			editButton.render(matrixStack, mouseX, mouseY, delta);
-			tpButton.render(matrixStack, mouseX, mouseY, delta);
 			deleteButton.render(matrixStack, mouseX, mouseY, delta);
 		}
 	

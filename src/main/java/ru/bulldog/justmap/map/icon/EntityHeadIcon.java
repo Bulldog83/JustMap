@@ -6,12 +6,12 @@ import java.util.List;
 import java.util.Map;
 
 import ru.bulldog.justmap.client.config.ClientParams;
-import ru.bulldog.justmap.map.icon.MapIcon.IconPos;
 import ru.bulldog.justmap.util.ImageUtil;
 import ru.bulldog.justmap.util.SpriteAtlas;
 import ru.bulldog.justmap.util.ColorUtil;
 import ru.bulldog.justmap.util.Colors;
-import ru.bulldog.justmap.util.DrawHelper;
+import ru.bulldog.justmap.util.RenderUtil;
+import ru.bulldog.justmap.util.math.Line.Point;
 
 import net.minecraft.client.resource.metadata.AnimationResourceMetadata;
 import net.minecraft.client.texture.NativeImage;
@@ -65,10 +65,10 @@ public class EntityHeadIcon extends AbstractIcon {
 		if (ClientParams.showIconsOutline) {
 			double thickness = ClientParams.entityOutlineSize;
 			if (solid) {
-				DrawHelper.fill(matrix, x - thickness / 2, y - thickness / 2, w + thickness, h + thickness, this.color);
+				RenderUtil.fill(matrix, x - thickness / 2, y - thickness / 2, w + thickness, h + thickness, this.color);
 			} else {
 				this.bindOutline();
-				DrawHelper.draw(x - thickness / 2, y - thickness / 2, (float) (w + thickness), (float) (h + thickness));
+				RenderUtil.draw(x - thickness / 2, y - thickness / 2, (float) (w + thickness), (float) (h + thickness));
 			}
 		}
 		textureManager.bindTexture(this.getId());		
@@ -115,7 +115,7 @@ public class EntityHeadIcon extends AbstractIcon {
 		
 		int outlineColor = ColorUtil.toABGR(this.color);
 		
-		List<IconPos> outlinePixels = new ArrayList<>();
+		List<Point> outlinePixels = new ArrayList<>();
 		for (int x = 0; x < width; x++) {
 			int left = x - 1;
 			int right = x + 1;
@@ -123,120 +123,120 @@ public class EntityHeadIcon extends AbstractIcon {
 				int alpha = (icon.getPixelColor(x, y) >> 24) & 255;
 				if (alpha == 0) continue;
 				
-				outlinePixels.add(new IconPos(x + 2, y + 2));
+				outlinePixels.add(new Point(x + 2, y + 2));
 				
 				int top = y - 1;
 				int bottom = y + 1;					
 				if (top >= 0) {
 					alpha = (icon.getPixelColor(x, top) >> 24) & 255;
 					if (alpha == 0) {
-						IconPos pixel = new IconPos(x + 2, y);
+						Point pixel = new Point(x + 2, y);
 						if (!outlinePixels.contains(pixel)) {
 							outlinePixels.add(pixel);
-							outlinePixels.add(new IconPos(x + 2, y + 1));
+							outlinePixels.add(new Point(x + 2, y + 1));
 						}
 					}
 					if (left >= 0) {
 						alpha = (icon.getPixelColor(left, top) >> 24) & 255;
 						if (alpha == 0) {
-							IconPos pixel = new IconPos(x, y);
+							Point pixel = new Point(x, y);
 							if (!outlinePixels.contains(pixel)) {
 								outlinePixels.add(pixel);
-								outlinePixels.add(new IconPos(x, y + 1));
-								outlinePixels.add(new IconPos(x + 1, y));
-								outlinePixels.add(new IconPos(x + 1, y + 1));
+								outlinePixels.add(new Point(x, y + 1));
+								outlinePixels.add(new Point(x + 1, y));
+								outlinePixels.add(new Point(x + 1, y + 1));
 							}
 						}
 					}
 					if (right < width) {
 						alpha = (icon.getPixelColor(right, top) >> 24) & 255;
 						if (alpha == 0) {
-							IconPos pixel = new IconPos(right + 2, y);
+							Point pixel = new Point(right + 2, y);
 							if (!outlinePixels.contains(pixel)) {
 								outlinePixels.add(pixel);
-								outlinePixels.add(new IconPos(right + 2, y + 1));
-								outlinePixels.add(new IconPos(right + 3, y));
-								outlinePixels.add(new IconPos(right + 3, y + 1));
+								outlinePixels.add(new Point(right + 2, y + 1));
+								outlinePixels.add(new Point(right + 3, y));
+								outlinePixels.add(new Point(right + 3, y + 1));
 							}
 						}
 					}
 				} else if (y == 0){
-					IconPos pixel = new IconPos(x + 2, 0);
+					Point pixel = new Point(x + 2, 0);
 					if (!outlinePixels.contains(pixel)) {
 						outlinePixels.add(pixel);
-						outlinePixels.add(new IconPos(x + 2, 1));
+						outlinePixels.add(new Point(x + 2, 1));
 					}
 				}
 				if (bottom < height) {
 					alpha = (icon.getPixelColor(x, bottom) >> 24) & 255;
 					if (alpha == 0) {
-						IconPos pixel = new IconPos(x + 2, bottom + 1);
+						Point pixel = new Point(x + 2, bottom + 1);
 						if (!outlinePixels.contains(pixel)) {
 							outlinePixels.add(pixel);
-							outlinePixels.add(new IconPos(x + 2, bottom + 2));
+							outlinePixels.add(new Point(x + 2, bottom + 2));
 						}
 					}
 					if (left >= 0) {
 						alpha = (icon.getPixelColor(left, bottom) >> 24) & 255;
 						if (alpha == 0) {
-							IconPos pixel = new IconPos(x, bottom + 2);
+							Point pixel = new Point(x, bottom + 2);
 							if (!outlinePixels.contains(pixel)) {
 								outlinePixels.add(pixel);
-								outlinePixels.add(new IconPos(x, bottom + 3));
-								outlinePixels.add(new IconPos(x + 1, bottom + 2));
-								outlinePixels.add(new IconPos(x + 1, bottom + 3));
+								outlinePixels.add(new Point(x, bottom + 3));
+								outlinePixels.add(new Point(x + 1, bottom + 2));
+								outlinePixels.add(new Point(x + 1, bottom + 3));
 							}
 						}
 					}
 					if (right < width) {
 						alpha = (icon.getPixelColor(right, bottom) >> 24) & 255;
 						if (alpha == 0) {
-							IconPos pixel = new IconPos(right + 2, bottom + 2);
+							Point pixel = new Point(right + 2, bottom + 2);
 							if (!outlinePixels.contains(pixel)) {
 								outlinePixels.add(pixel);
-								outlinePixels.add(new IconPos(right + 2, bottom + 3));
-								outlinePixels.add(new IconPos(right + 3, bottom + 2));
-								outlinePixels.add(new IconPos(right + 3, bottom + 3));
+								outlinePixels.add(new Point(right + 2, bottom + 3));
+								outlinePixels.add(new Point(right + 3, bottom + 2));
+								outlinePixels.add(new Point(right + 3, bottom + 3));
 							}
 						}
 					}
 				} else if (y == height - 1) {
-					IconPos pixel = new IconPos(x + 2, outHeight - 1);
+					Point pixel = new Point(x + 2, outHeight - 1);
 					if (!outlinePixels.contains(pixel)) {
 						outlinePixels.add(pixel);
-						outlinePixels.add(new IconPos(x + 2, outHeight - 2));
+						outlinePixels.add(new Point(x + 2, outHeight - 2));
 					}
 				}
 				if (left >= 0) {
 					alpha = (icon.getPixelColor(left, y) >> 24) & 255;
 					if (alpha == 0) {
-						IconPos pixel = new IconPos(x, y + 2);
+						Point pixel = new Point(x, y + 2);
 						if (!outlinePixels.contains(pixel)) {
 							outlinePixels.add(pixel);
-							outlinePixels.add(new IconPos(x + 1, y + 2));
+							outlinePixels.add(new Point(x + 1, y + 2));
 						}
 					}
 				} else if (x == 0) {
-					IconPos pixel = new IconPos(0, y + 2);
+					Point pixel = new Point(0, y + 2);
 					if (!outlinePixels.contains(pixel)) {
 						outlinePixels.add(pixel);
-						outlinePixels.add(new IconPos(1, y + 2));
+						outlinePixels.add(new Point(1, y + 2));
 					}
 				}
 				if (right < width) {
 					alpha = (icon.getPixelColor(right, y) >> 24) & 255;
 					if (alpha == 0) {
-						IconPos pixel = new IconPos(right + 1, y + 2);
+						Point pixel = new Point(right + 1, y + 2);
 						if (!outlinePixels.contains(pixel)) {
 							outlinePixels.add(pixel);
-							outlinePixels.add(new IconPos(right + 2, y + 2));
+							outlinePixels.add(new Point(right + 2, y + 2));
 						}
 					}
 				} else if (x == width - 1) {
-					IconPos pixel = new IconPos(outWidth - 1, y + 2);
+					Point pixel = new Point(outWidth - 1, y + 2);
 					if (!outlinePixels.contains(pixel)) {
 						outlinePixels.add(pixel);
-						outlinePixels.add(new IconPos(outWidth - 2, y + 2));
+						outlinePixels.add(new Point(outWidth - 2, y + 2));
 					}
 				}
 			}

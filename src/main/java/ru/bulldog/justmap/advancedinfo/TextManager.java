@@ -8,7 +8,7 @@ import net.minecraft.client.util.math.MatrixStack;
 
 import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.util.ScreenPosition;
-import ru.bulldog.justmap.util.DrawHelper.TextAlignment;
+import ru.bulldog.justmap.util.RenderUtil.TextAlignment;
 
 public class TextManager {
 	public enum TextPosition {

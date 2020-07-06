@@ -1,8 +1,8 @@
 package ru.bulldog.justmap.advancedinfo;
 
 import ru.bulldog.justmap.util.Colors;
-import ru.bulldog.justmap.util.DrawHelper;
-import ru.bulldog.justmap.util.DrawHelper.TextAlignment;
+import ru.bulldog.justmap.util.RenderUtil;
+import ru.bulldog.justmap.util.RenderUtil.TextAlignment;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
@@ -54,13 +54,13 @@ public abstract class InfoText {
 		
 		  switch (alignment) {
 			 case LEFT:
-				 DrawHelper.DRAWER.drawStringWithShadow(matrixStack, textRenderer, text.getString(), x, y, color);
+				 RenderUtil.DRAWER.drawStringWithShadow(matrixStack, textRenderer, text.getString(), x, y, color);
 			 break;
 			 case CENTER:
-				 DrawHelper.drawBoundedString(matrixStack, text.getString(), x, y, 0, width - 2, color);
+				 RenderUtil.drawBoundedString(matrixStack, text.getString(), x, y, 0, width - 2, color);
 			 break;
 			 case RIGHT:
-				 DrawHelper.drawRightAlignedString(matrixStack, text.getString(), x, y, color);
+				 RenderUtil.drawRightAlignedString(matrixStack, text.getString(), x, y, color);
 			 break;
 		  }
 	  }

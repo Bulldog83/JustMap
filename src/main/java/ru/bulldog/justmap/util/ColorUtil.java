@@ -191,6 +191,10 @@ public class ColorUtil {
 		return HSBtoRGB(floatBuffer[0], floatBuffer[1], floatBuffer[2]);
 	}
 	
+	public static int applyTint(int color, int tint) {
+		return colorBrigtness(ColorHelper.multiplyColor(color, tint), 1.5F);
+	}
+	
 	private static int getStateColor(BlockState state) {
 		if (colorCache.containsKey(state)) {
 			return colorCache.get(state);
@@ -234,10 +238,6 @@ public class ColorUtil {
 		}
 		
 		return -1;
-	}
-	
-	public static int applyTint(int color, int tint) {
-		return colorBrigtness(ColorHelper.multiplyColor(color, tint), 1.5F);
 	}
 	
 	public static int proccessColor(int color, int heightDiff, float topoLevel) {

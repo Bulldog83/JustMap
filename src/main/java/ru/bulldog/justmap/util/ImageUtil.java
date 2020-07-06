@@ -1,9 +1,9 @@
 package ru.bulldog.justmap.util;
 
-import java.awt.image.BufferedImage;
 import java.io.IOException;
 
 import ru.bulldog.justmap.JustMap;
+import ru.bulldog.justmap.util.math.Line;
 
 import net.fabricmc.fabric.impl.client.indigo.renderer.helper.ColorHelper;
 
@@ -65,55 +65,61 @@ public class ImageUtil {
 		image.fillRect(0, 0, image.getWidth(), image.getHeight(), color);
 	}
 	
-	public static NativeImage readTile(NativeImage source, int x, int y, int w, int h, boolean closeSource) {
-		NativeImage tile = new NativeImage(w, h, false);
-		
-		for(int i = 0; i < w; i++) {
-			for(int j = 0; j < h; j++) {
-				tile.setPixelColor(i, j, source.getPixelColor(x + i, y + j));
+	public static NativeImage createSquareSkin(NativeImage texture, int width, int height, int border) {
+		NativeImage squareSkin = new NativeImage(width, height, false);
+		int imgW = texture.getWidth();
+		int imgH = texture.getHeight();
+		int imgX = 0, imgY = 0;
+		int y = 0;
+		while(y < height) {
+			int x = 0;
+			while(x < width) {
+				if (imgX >= imgW) imgX = 0;
+				if ((x >= width - border || x <= border) ||
+					(y >= height - border || y <= border)) {							
+					int pixel = texture.getPixelColor(imgX, imgY);
+					squareSkin.setPixelColor(x, y, pixel);
+				}				
+				imgX++;
+				if (imgX >= imgW) imgX = 0;
+				x++;
 			}
+			imgY++;
+			if (imgY >= imgH) imgY = 0;
+			y++;
 		}
 		
-		if (closeSource) source.close();
-		
-		return tile;
+		return squareSkin;
 	}
 	
-	public static NativeImage writeTile(NativeImage image, NativeImage tile, int x, int y) {
-		int tileWidth = tile.getWidth();
-		int tileHeight = tile.getHeight();
-		int imageWidth = image.getWidth();
-		int imageHeight = image.getHeight();
-
-		if (tileWidth + x <= 0 || tileHeight + y <= 0) return image;
-		
-		if (x + tileWidth > imageWidth) {
-			tileWidth = imageWidth - x;
-		}		
-		if (y + tileHeight > imageHeight) {
-			tileHeight = imageHeight - y;
-		}
-	
-		for (int i = 0; i < tileWidth; i++) {
-			int xp = x + i;
-			if (xp < 0) continue;
-	
-			for (int j = 0; j < tileHeight; j++) {
-				int yp = y + j;
-				if (yp < 0) continue;
-				
-				try {
-					image.setPixelColor(xp, yp, tile.getPixelColor(i, j));
-				} catch(Exception ex) {
-					return null;
+	public static NativeImage createRoundSkin(NativeImage texture, int width, int height, int border) {
+		NativeImage roundSkin = new NativeImage(width, height, false);
+		int imgW = texture.getWidth();
+		int imgH = texture.getHeight();
+		int imgX = 0, imgY = 0;
+		int centerX = width / 2;
+		int centerY = height / 2;
+		int rOut = centerX;
+		int rIn = rOut - border;
+		int y = 0;
+		while(y < height) {
+			int x = 0;
+			while(x < width) {
+				if (imgX >= imgW) imgX = 0;
+				int len = (int) new Line(centerX, centerY, x, y).lenght();
+				if (len <= rOut && len >= rIn) {							
+					int pixel = texture.getPixelColor(imgX, imgY);
+					roundSkin.setPixelColor(x, y, pixel);
 				}
+				imgX++;
+				if (imgX >= imgW) imgX = 0;
+				x++;
 			}
+			imgY++;
+			if (imgY >= imgH) imgY = 0;
+			y++;
 		}
 		
-		return image;
-	}
-	
-	public static NativeImage fromBufferedImage(BufferedImage image) {
-		return null;
+		return roundSkin;
 	}
 }

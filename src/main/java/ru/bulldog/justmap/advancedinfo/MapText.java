@@ -1,6 +1,6 @@
 package ru.bulldog.justmap.advancedinfo;
 
-import ru.bulldog.justmap.util.DrawHelper.TextAlignment;
+import ru.bulldog.justmap.util.RenderUtil.TextAlignment;
 
 public class MapText extends InfoText {
 

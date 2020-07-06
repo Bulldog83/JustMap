@@ -183,6 +183,8 @@ public class Worldmap extends MapScreen implements IMap {
 				double scX = picX / imageScale;
 				double scY = picY / imageScale;
 				
+				RenderSystem.enableBlend();
+				RenderSystem.defaultBlendFunc();
 				region.draw(scX, scY, imgX, imgY, picW, picH, imageScale);
 				
 				picY += picH > 0 ? picH : 512;

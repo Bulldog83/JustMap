@@ -22,7 +22,6 @@ import net.minecraft.client.texture.TextureUtil;
 
 import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.util.ColorUtil;
-import ru.bulldog.justmap.util.Colors;
 
 public class MapTexture {
 
@@ -42,6 +41,16 @@ public class MapTexture {
 		this.buffer = ByteBuffer.allocateDirect(bytes.length).order(ByteOrder.nativeOrder());
 		this.width = width;
 		this.height = height;
+	}
+	
+	public MapTexture(int width, int height, int color) {
+		this(width, height);
+		this.fill(color);
+	}
+	
+	public MapTexture(MapTexture source) {
+		this(source.getWidth(), source.getHeight());
+		this.copyData(source);
 	}
 	
 	public int getId() {
@@ -88,6 +97,7 @@ public class MapTexture {
 		synchronized(bufferLock) {
 			this.bytes = image.getBytes();
 		}
+		this.changed = true;
 	}
 	
 	public void writeChunkData(int x, int y, int[] colorData) {
@@ -113,14 +123,26 @@ public class MapTexture {
 		if (x < 0 || x >= this.getWidth()) return;
 		if (y < 0 || y >= this.getHeight()) return;
 		
-		int index = (x + y * this.getWidth()) * 4;		
-		synchronized(bufferLock) {
-			this.bytes[index] = (byte) (color >> 24);
-			this.bytes[index + 1] = (byte) (color >> 0);
-			this.bytes[index + 2] = (byte) (color >> 8);
-			this.bytes[index + 3] = (byte) (color >> 16);
-		}
+		byte a = (byte) (color >> 24);
+		byte r = (byte) (color >> 16);
+		byte g = (byte) (color >> 8);
+		byte b = (byte) (color >> 0);
 		
+		int index = (x + y * this.getWidth()) * 4;
+		synchronized(bufferLock) {
+			if (this.bytes[index] == a &&
+				this.bytes[index + 1] == b &&
+				this.bytes[index + 2] == g &&
+				this.bytes[index + 3] == r) {
+				
+				return;
+			}
+		
+			this.bytes[index] = a;
+			this.bytes[index + 1] = b;
+			this.bytes[index + 2] = g;
+			this.bytes[index + 3] = r;
+		}		
 		this.changed = true;
 	}
 	
@@ -128,15 +150,14 @@ public class MapTexture {
 		if (x < 0 || x >= this.getWidth()) return -1;
 		if (y < 0 || y >= this.getHeight()) return -1;
 		
-		int index = (x + y * this.getWidth()) * 4;
-		
+		int index = (x + y * this.getWidth()) * 4;		
 		synchronized(bufferLock) {
-			int a = this.bytes[index];
-			int b = this.bytes[index + 1];
-			int g = this.bytes[index + 2];
-			int r = this.bytes[index + 3];
+			int a = this.bytes[index] & 255;
+			int b = this.bytes[index + 1] & 255;
+			int g = this.bytes[index + 2] & 255;
+			int r = this.bytes[index + 3] & 255;
 			
-			return (a << 24) | (b << 16) | (g << 8) | (r << 0);
+			return (a << 24) | (r << 16) | (g << 8) | (b << 0);
 		}
 	}
 	
@@ -177,6 +198,23 @@ public class MapTexture {
 		}
 	}
 	
+	public void applyOverlay(MapTexture overlay) {
+		int width = Math.min(this.width, overlay.getWidth());
+		int height = Math.min(this.height, overlay.getHeight());
+		if (width <= 0 || height <= 0) return;
+		synchronized(bufferLock) {
+			for (int x = 0; x < width; x++) {
+				for (int y = 0; y < height; y++) {
+					int color = overlay.getColor(x, y);
+					int alpha = (color >> 24) & 255;
+					if (alpha > 0) {
+						this.applyTint(x, y, color);
+					}
+				}
+			}
+		}
+	}
+	
 	public void saveImage(File png) {
 		try (OutputStream fileOut = new FileOutputStream(png)) {
 			BufferedImage pngImage = new BufferedImage(width, height, BufferedImage.TYPE_4BYTE_ABGR);
@@ -193,29 +231,33 @@ public class MapTexture {
 		}
 	}
 	
-	public void loadImage(File png) {
-		if (!png.exists()) return;
+	public boolean loadImage(File png) {
+		if (!png.exists()) return false;
 		try (InputStream fileInput = new FileInputStream(png)) {
 			BufferedImage pngImage = new BufferedImage(width, height, BufferedImage.TYPE_4BYTE_ABGR);
 			pngImage.setData(ImageIO.read(fileInput).getData());
 			this.bytes = ((DataBufferByte) pngImage.getTile(0, 0).getDataBuffer()).getData().clone();
 			this.changed = true;
-			pngImage.flush();
+			pngImage.flush();			
+			return true;
 		} catch (Exception ex) {
 			JustMap.LOGGER.logWarning("Can't load image: " + png.toString());
 			JustMap.LOGGER.logWarning(ex.getLocalizedMessage());
+			return false;
 		}
 	}
 	
 	public void clear() {
-		this.fill(Colors.BLACK);
-		this.upload();
+		synchronized(bufferLock) {
+			this.buffer.clear();
+		}
 	}
 	
 	public void close() {
-		this.clearId();		
+		this.clearId();
 		synchronized(bufferLock) {
-			this.buffer.clear();
+			this.bytes = null;
+			this.clear();
 		}
 	}
 	

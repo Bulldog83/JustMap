@@ -3,7 +3,7 @@ package ru.bulldog.justmap.advancedinfo;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.world.biome.Biome;
 import ru.bulldog.justmap.client.config.ClientParams;
-import ru.bulldog.justmap.util.DrawHelper.TextAlignment;
+import ru.bulldog.justmap.util.RenderUtil.TextAlignment;
 import ru.bulldog.justmap.util.PosUtil;
 
 public class BiomeInfo extends InfoText {
