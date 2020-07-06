@@ -70,7 +70,9 @@ task sourcesJar(type: Jar, dependsOn: classes) {
 
 jar {
 	from "LICENSE"
-	
+}
+
+assemble {
 	build += 1
 	
 	if (versionPropsFile.canWrite()) {
@@ -80,5 +82,5 @@ jar {
 		versionProps.store(versionPropsFile.newWriter(), null)
 	}
 
-	version = "${major}.${minor}.${build}-${project.minecraft_version}-beta"
+	version = "${major}.${minor}.${build}-${project.minecraft_version}-release"
 }
