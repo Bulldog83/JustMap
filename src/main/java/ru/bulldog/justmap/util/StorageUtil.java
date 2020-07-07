@@ -2,6 +2,7 @@ package ru.bulldog.justmap.util;
 
 import java.io.File;
 
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ServerInfo;
 import net.minecraft.nbt.CompoundTag;
@@ -9,16 +10,21 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.dimension.DimensionType;
+import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.map.data.ChunkStorage;
 
 public class StorageUtil {
 	
 	private static MinecraftClient minecraft = MinecraftClient.getInstance();	
-	public final static File MAP_DIR = new File(minecraft.runDirectory, "justmap/");
+	private final static File MAP_DATA_DIR = new File(minecraft.runDirectory, JustMap.MODID + "/");
+	private final static File GAME_CONFIG_DIR = FabricLoader.getInstance().getConfigDirectory();
+	private final static File MAP_CONFIG_DIR = new File(GAME_CONFIG_DIR, String.format("/%s/", JustMap.MODID));
+	private final static File MAP_SKINS_DIR = new File(MAP_CONFIG_DIR, "skins/");
+	private final static File MAP_ICONS_DIR = new File(MAP_CONFIG_DIR, "icons/");
 	
 	private static ChunkStorage storage;
 	private static File storageDir;
-	private static File filesDir = new File(MAP_DIR, "undefined/");	
+	private static File filesDir = new File(MAP_DATA_DIR, "undefined/");	
 	private static String currentDim = "unknown";
 	
 	public static synchronized CompoundTag getCache(ChunkPos pos) {
@@ -45,6 +51,27 @@ public class StorageUtil {
 		}		
 		
 		if (storage == null) storage = new ChunkStorage();
+	}
+	
+	public static File configDir() {
+		if (!MAP_CONFIG_DIR.exists()) {
+			MAP_CONFIG_DIR.mkdirs();
+		}
+		return MAP_CONFIG_DIR;
+	}
+	
+	public static File skinsDir() {
+		if (!MAP_SKINS_DIR.exists()) {
+			MAP_SKINS_DIR.mkdirs();
+		}
+		return MAP_SKINS_DIR;
+	}
+	
+	public static File iconsDir() {
+		if (!MAP_ICONS_DIR.exists()) {
+			MAP_ICONS_DIR.mkdirs();
+		}
+		return MAP_ICONS_DIR;
 	}
 	
 	public static File cacheDir() {
@@ -82,10 +109,10 @@ public class StorageUtil {
 		if (client.isIntegratedServerRunning()) {
 			MinecraftServer server = client.getServer();
 			String name = scrubNameFile(server.getSaveProperties().getLevelName());
-			filesDir = new File(MAP_DIR, String.format("local/%s/", name));
+			filesDir = new File(MAP_DATA_DIR, String.format("local/%s/", name));
 		} else if (serverInfo != null) {
 			String name = scrubNameFile(serverInfo.name);
-			filesDir = new File(MAP_DIR, String.format("servers/%s/", name));
+			filesDir = new File(MAP_DATA_DIR, String.format("servers/%s/", name));
 		}
 		
 		if (!filesDir.exists()) {

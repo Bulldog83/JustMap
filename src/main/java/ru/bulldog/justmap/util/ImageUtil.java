@@ -1,6 +1,9 @@
 package ru.bulldog.justmap.util;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.util.math.Line;
@@ -23,8 +26,7 @@ public class ImageUtil {
 	}
 	
 	public static boolean imageExists(Identifier image) {
-		if (image == null) return false;
-		
+		if (image == null) return false;		
 		try {
 			return resourceManager.containsResource(image);
 		} catch(Exception ex) {
@@ -33,9 +35,20 @@ public class ImageUtil {
 		}
 	}
 	
+	public static NativeImage loadImage(File image, int w, int h) {
+		if (image.exists()) {
+			try (InputStream fis = new FileInputStream(image)) {
+				return NativeImage.read(fis);
+			} catch (IOException ex) {
+				JustMap.LOGGER.logWarning(String.format("Can't load texture image: %s. Will be created empty image.", image));
+				JustMap.LOGGER.logWarning(String.format("Cause: %s.", ex.getMessage()));
+			}
+		}		
+		return new NativeImage(w, h, false);
+	}
+	
 	public static NativeImage loadImage(Identifier image, int w, int h) {
-		checkResourceManager();
-		
+		checkResourceManager();		
 		if (imageExists(image)) {
 			try (Resource resource = resourceManager.getResource(image)) {
 				return NativeImage.read(resource.getInputStream());			
@@ -43,8 +56,7 @@ public class ImageUtil {
 				JustMap.LOGGER.logWarning(String.format("Can't load texture image: %s. Will be created empty image.", image));
 				JustMap.LOGGER.logWarning(String.format("Cause: %s.", e.getMessage()));
 			}
-		}
-		
+		}		
 		return new NativeImage(w, h, false);
 	}
 	

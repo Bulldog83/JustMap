@@ -48,15 +48,17 @@ public class MapCache {
 	
 	public static MapCache get() {
 		World world = minecraft.world;
-		if (minecraft.isIntegratedServerRunning() && world != null) {
-			world = minecraft.getServer().getWorld(minecraft.world.getRegistryKey());
+		if (world != null) {
+			if (minecraft.isIntegratedServerRunning()) {
+				World serverWorld = minecraft.getServer().getWorld(world.getRegistryKey());
+				if (serverWorld != null) {
+					world = serverWorld;
+				}
+			}
+			if (!world.equals(currentWorld)) {
+				currentWorld = world;
+			}
 		}
-		if (currentWorld == null || (world != null &&
-									 world != currentWorld)) {
-			
-			currentWorld = world;
-		}
-		
 		if (currentWorld == null) return null;
 		
 		Identifier dimId = currentWorld.getDimensionRegistryKey().getValue();
@@ -207,17 +209,13 @@ public class MapCache {
 		return this.chunks;
 	}
 
-	public MapChunk getCurrentChunk(ChunkPos chunkPos) {
-		return this.getChunk(currentLayer, currentLevel, chunkPos.x, chunkPos.z);
-	}
-	
 	public MapChunk getCurrentChunk(int posX, int posZ) {
 		return this.getChunk(currentLayer, currentLevel, posX, posZ);
 	}
 	
 	public MapChunk getChunk(Layer.Type layer, int level, int posX, int posZ) {
-		ChunkPos chunkPos = new ChunkPos(posX, posZ);		
-		
+		ChunkPos chunkPos = new ChunkPos(posX, posZ);
+
 		MapChunk mapChunk;
 		if (chunks.containsKey(chunkPos)) {
 			mapChunk = this.chunks.get(chunkPos);
