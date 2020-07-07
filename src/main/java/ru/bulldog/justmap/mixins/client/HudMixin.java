@@ -9,6 +9,7 @@ import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.client.render.MapRenderer;
 import ru.bulldog.justmap.util.Colors;
 import ru.bulldog.justmap.util.ScreenPosition;
+
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.hud.InGameHud;
@@ -41,8 +42,10 @@ abstract class HudMixin extends DrawableHelper {
 	
 	@Inject(at = @At("RETURN"), method = "render")
 	public void draw(MatrixStack matrixStack, float delta, CallbackInfo info) {
-		MapRenderer.getInstance().draw(matrixStack);
-		AdvancedInfo.getInstance().draw(matrixStack);
+		if (!client.options.debugEnabled) {
+			MapRenderer.getInstance().draw(matrixStack);
+			AdvancedInfo.getInstance().draw(matrixStack);
+		}
 	}
 	
 	@Inject(at = @At("HEAD"), method = "renderStatusEffectOverlay", cancellable = true)
