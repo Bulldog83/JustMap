@@ -1,4 +1,4 @@
-package ru.bulldog.justmap.map.minimap;
+package ru.bulldog.justmap.map.minimap.skin;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -9,6 +9,8 @@ import com.mojang.blaze3d.systems.RenderSystem;
 
 import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.client.config.ClientParams;
+import ru.bulldog.justmap.client.render.Image;
+import ru.bulldog.justmap.map.minimap.Minimap;
 import ru.bulldog.justmap.util.ImageUtil;
 import ru.bulldog.justmap.util.RenderUtil;
 
@@ -16,11 +18,8 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.resource.metadata.AnimationResourceMetadata;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.texture.NativeImageBackedTexture;
-import net.minecraft.client.texture.Sprite;
-import net.minecraft.client.texture.SpriteAtlasTexture;
 import net.minecraft.client.texture.TextureManager;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.LiteralText;
@@ -28,14 +27,13 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
 @Environment(EnvType.CLIENT)
-public class MapSkin extends Sprite {	
+public class MapSkin extends Image {	
 	public static enum SkinType {
 		UNIVERSAL,
 		SQUARE,
 		ROUND
 	}
 
-	private final static SpriteAtlasTexture ATLAS = new SpriteAtlasTexture(new Identifier(JustMap.MODID, "textures/atlas/map_skins"));
 	private final static List<MapSkin> SKINS = new ArrayList<>();
 	private final static TextureManager textureManager = MinecraftClient.getInstance().getTextureManager();
 	
@@ -48,14 +46,20 @@ public class MapSkin extends Sprite {
 	public final String name;
 	
 	private MapSkin(int id, String name, SkinType type, Identifier texture, int w, int h, int border, boolean resize, boolean repeat) {
-		super(ATLAS, new Sprite.Info(texture, w, h, AnimationResourceMetadata.EMPTY), 0, w, h, 0, 0, ImageUtil.loadImage(texture, w, h));
+		this(id, name, type, texture, ImageUtil.loadImage(texture, w, h), w, h, border, resize, repeat);
+	}
 	
+	private MapSkin(int id, String name, SkinType type, Identifier texture, NativeImage image, int w, int h, int border, boolean resize, boolean repeat) {
+		super(texture, image);
+		
 		this.id = id;
 		this.type = type;
 		this.border = border;
 		this.resizable = resize;
 		this.repeating = repeat;
 		this.name = name;
+		this.width = w;
+		this.height = h;
 		
 		this.renderData = new RenderData();
 	}
@@ -65,20 +69,37 @@ public class MapSkin extends Sprite {
 		SKINS.add(id, new MapSkin(id, name, type, texture, w, h, border, resizable, repeat));
 	}
 	
+	public static void addSkin(SkinType type, String name, Identifier texture, NativeImage image, int w, int h, int border, boolean resizable, boolean repeat) {
+		int id = SKINS.size();
+		SKINS.add(id, new MapSkin(id, name, type, texture, image, w, h, border, resizable, repeat));
+	}
+	
 	public static void addSquareSkin(String name, Identifier texture, int w, int h, int border, boolean resizable, boolean repeat) {
 		addSkin(SkinType.SQUARE, name, texture, w, h, border, resizable, repeat);
+	}
+	
+	public static void addSquareSkin(String name, Identifier texture, NativeImage image, int w, int h, int border, boolean resizable, boolean repeat) {
+		addSkin(SkinType.SQUARE, name, texture, image, w, h, border, resizable, repeat);
 	}
 	
 	public static void addSquareSkin(String name, Identifier texture, int w, int h, int border, boolean resizable) {
 		addSkin(SkinType.SQUARE, name, texture, w, h, border, resizable, false);
 	}
 	
+	public static void addRoundSkin(String name, Identifier texture, int w, int h, int border) {
+		addSkin(SkinType.ROUND, name, texture, w, h, border, true, false);
+	}
+	
+	public static void addRoundSkin(String name, Identifier texture, NativeImage image, int w, int h, int border) {
+		addSkin(SkinType.ROUND, name, texture, image, w, h, border, true, false);
+	}
+	
 	public static void addUniversalSkin(String name, Identifier texture, int w, int h, int border) {
 		addSkin(SkinType.UNIVERSAL, name, texture, w, h, border, false, false);
 	}
 	
-	public static void addRoundSkin(String name, Identifier texture, int w, int h, int border) {
-		addSkin(SkinType.ROUND, name, texture, w, h, border, true, false);
+	public static void addUniversalSkin(String name, Identifier texture, NativeImage image, int w, int h, int border) {
+		addSkin(SkinType.UNIVERSAL, name, texture, image, w, h, border, false, false);
 	}
 	
 	public static MapSkin getSkin(int id) {
@@ -91,41 +112,36 @@ public class MapSkin extends Sprite {
 		return SKINS.get(0);
 	}
 	
-	public Identifier getTexture() {
-		return this.getId();
-	}
-	
-	private void bindPavedTexture(int w, int h) {
+	private void registerPavedTexture(int w, int h) {
 		int border = (int) (this.border * renderData.scaleFactor);
 		String pattern = "skin_%d_%dx%d_%d";
 		if (Minimap.isRound()) pattern += "_round";
-		Identifier id = new Identifier(JustMap.MODID, String.format(pattern, this.id, w, h, border));
-		if (textureManager.getTexture(id) == null) {
+		this.textureId = new Identifier(JustMap.MODID, String.format(pattern, this.id, w, h, border));
+		if (textureManager.getTexture(textureId) == null) {
 			NativeImage pavedImage;
 			if (Minimap.isRound()) {
-				pavedImage = ImageUtil.createRoundSkin(images[0], w, h, border);
+				pavedImage = ImageUtil.createRoundSkin(image, w, h, border);
 			} else {
-				pavedImage = ImageUtil.createSquareSkin(images[0], w, h, border);
+				pavedImage = ImageUtil.createSquareSkin(image, w, h, border);
 			}
-			textureManager.registerTexture(id, new NativeImageBackedTexture(pavedImage));
+			textureManager.registerTexture(textureId, new NativeImageBackedTexture(pavedImage));
 		}
-		textureManager.bindTexture(id);
 	}
-	
-	public void draw(MatrixStack matrixStack, int x, int y, int w, int h) {
+
+	@Override
+	public void draw(MatrixStack matrixStack, double x, double y, int w, int h) {
 		RenderSystem.enableBlend();
 		RenderSystem.defaultBlendFunc();
 		float hMult = (float) this.getWidth() / this.getHeight();
 		if (resizable || repeating) {
-			textureManager.bindTexture(this.getTexture());
 			if (type != SkinType.ROUND && (w > this.getWidth() || h > this.getHeight())) {
 				RenderUtil.drawSkin(matrixStack, this, x, y, w, h);
 			} else {
-				RenderUtil.drawSprite(matrixStack, x, y, 0, w, (int) (h / hMult), this);
+				RenderUtil.drawImage(matrixStack, this, x, y, w, h / hMult);
 			}
 		} else {
-			this.bindPavedTexture(w, h);
-			RenderUtil.drawSprite(matrixStack, x, y, 0, w, h, this);
+			this.registerPavedTexture(w, h);
+			RenderUtil.drawImage(matrixStack, this, x, y, w, h);
 		}
 	}
 	
@@ -343,5 +359,7 @@ public class MapSkin extends Sprite {
 		addUniversalSkin("Podzol", new Identifier("textures/block/podzol_top.png"), 256, 256, 8);
 		addUniversalSkin("Nether Wart", new Identifier("textures/block/nether_wart_block.png"), 256, 256, 8);
 		addUniversalSkin("Sponge", new Identifier("textures/block/sponge.png"), 256, 256, 8);
+		
+		SkinLoader.loadSkins();
 	}
 }

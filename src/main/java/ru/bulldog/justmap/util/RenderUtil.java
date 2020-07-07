@@ -11,17 +11,17 @@ import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
-import net.minecraft.client.texture.Sprite;
 import net.minecraft.client.texture.TextureManager;
 import net.minecraft.client.util.math.AffineTransformation;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Matrix3f;
 import net.minecraft.util.math.Matrix4f;
-
-import ru.bulldog.justmap.map.minimap.MapSkin;
-import ru.bulldog.justmap.map.minimap.MapSkin.RenderData;
 import net.minecraft.text.Text;
+
+import ru.bulldog.justmap.client.render.Image;
+import ru.bulldog.justmap.map.minimap.skin.MapSkin;
+import ru.bulldog.justmap.map.minimap.skin.MapSkin.RenderData;
 
 import org.lwjgl.opengl.GL11;
 
@@ -277,10 +277,10 @@ public class RenderUtil extends DrawableHelper {
 			renderData.calculate(x, y, w, h);
 		}
 
-		float sMinU = skin.getMinU();
-		float sMaxU = skin.getMaxU();
-		float sMinV = skin.getMinV();
-		float sMaxV = skin.getMaxV();
+		float sMinU = 0.0F;
+		float sMaxU = 1.0F;
+		float sMinV = 0.0F;
+		float sMaxV = 1.0F;
 		float scaledBrd = renderData.scaledBorder;
 		float hSide = renderData.hSide;
 		float vSide = renderData.vSide;		
@@ -297,43 +297,42 @@ public class RenderUtil extends DrawableHelper {
 		RenderSystem.enableAlphaTest();		
 		RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
 		
+		skin.bindTexture();		
 		startDrawNormal();
 		
-		VertexConsumer vertexConsumer = skin.getTextureSpecificVertexConsumer(vertexBuffer);
-		
-		draw(matrix, vertexConsumer, x, y, scaledBrd, scaledBrd, sMinU, sMinV, leftU, topV);
-		draw(matrix, vertexConsumer, rightC, y, scaledBrd, scaledBrd, rightU, sMinV, sMaxU, topV);
-		draw(matrix, vertexConsumer, x, bottomC, scaledBrd, scaledBrd, sMinU, bottomV, leftU, sMaxV);
-		draw(matrix, vertexConsumer, rightC, bottomC, scaledBrd, scaledBrd, rightU, bottomV, sMaxU, sMaxV);
+		draw(matrix, vertexBuffer, x, y, scaledBrd, scaledBrd, sMinU, sMinV, leftU, topV);
+		draw(matrix, vertexBuffer, rightC, y, scaledBrd, scaledBrd, rightU, sMinV, sMaxU, topV);
+		draw(matrix, vertexBuffer, x, bottomC, scaledBrd, scaledBrd, sMinU, bottomV, leftU, sMaxV);
+		draw(matrix, vertexBuffer, rightC, bottomC, scaledBrd, scaledBrd, rightU, bottomV, sMaxU, sMaxV);
 		
 		if (skin.resizable) {
-			draw(matrix, vertexConsumer, rightC, topC, scaledBrd, vSide, rightU, topV, sMaxU, bottomV);
-			draw(matrix, vertexConsumer, x, topC, scaledBrd, vSide, sMinU, topV, leftU, bottomV);
-			draw(matrix, vertexConsumer, leftC, topC, hSide, vSide, leftU, topV, rightU, bottomV);
+			draw(matrix, vertexBuffer, rightC, topC, scaledBrd, vSide, rightU, topV, sMaxU, bottomV);
+			draw(matrix, vertexBuffer, x, topC, scaledBrd, vSide, sMinU, topV, leftU, bottomV);
+			draw(matrix, vertexBuffer, leftC, topC, hSide, vSide, leftU, topV, rightU, bottomV);
 			if (skin.repeating) {
 				float tail = renderData.tail;
 				float tailU = renderData.tailU;
 				hSide = vSide;
 				
-				draw(matrix, vertexConsumer, leftC + hSide, y, tail, scaledBrd, leftU, sMinV, tailU, topV);
-				draw(matrix, vertexConsumer, leftC + hSide, bottomC, tail, scaledBrd, leftU, bottomV, tailU, sMaxV);
+				draw(matrix, vertexBuffer, leftC + hSide, y, tail, scaledBrd, leftU, sMinV, tailU, topV);
+				draw(matrix, vertexBuffer, leftC + hSide, bottomC, tail, scaledBrd, leftU, bottomV, tailU, sMaxV);
 			}
 		
-			draw(matrix, vertexConsumer, leftC, y, hSide, scaledBrd, leftU, sMinV, rightU, topV);
-			draw(matrix, vertexConsumer, leftC, bottomC, hSide, scaledBrd, leftU, bottomV, rightU, sMaxV);
+			draw(matrix, vertexBuffer, leftC, y, hSide, scaledBrd, leftU, sMinV, rightU, topV);
+			draw(matrix, vertexBuffer, leftC, bottomC, hSide, scaledBrd, leftU, bottomV, rightU, sMaxV);
 		} else {
 			double left = leftC;
 			int segments = renderData.hSegments;
 			for (int i = 0; i < segments; i++) {
-				draw(matrix, vertexConsumer, left, y, hSide, scaledBrd, leftU, sMinV, rightU, topV);
-				draw(matrix, vertexConsumer, left, bottomC, hSide, scaledBrd, leftU, bottomV, rightU, sMaxV);
+				draw(matrix, vertexBuffer, left, y, hSide, scaledBrd, leftU, sMinV, rightU, topV);
+				draw(matrix, vertexBuffer, left, bottomC, hSide, scaledBrd, leftU, bottomV, rightU, sMaxV);
 				left += hSide;
 			}
 			double top = topC;
 			segments = renderData.vSegments;
 			for (int i = 0; i < segments; i++) {
-				draw(matrix, vertexConsumer, x, top, scaledBrd, vSide, sMinU, topV, leftU, bottomV);
-				draw(matrix, vertexConsumer, rightC, top, scaledBrd, vSide, rightU, topV, sMaxU, bottomV);
+				draw(matrix, vertexBuffer, x, top, scaledBrd, vSide, sMinU, topV, leftU, bottomV);
+				draw(matrix, vertexBuffer, rightC, top, scaledBrd, vSide, rightU, topV, sMaxU, bottomV);
 				top += vSide;
 			}
 			
@@ -342,25 +341,23 @@ public class RenderUtil extends DrawableHelper {
 			float hTailU = renderData.hTailU;
 			float vTailV = renderData.vTailV;
 			
-			draw(matrix, vertexConsumer, left, y, hTail, scaledBrd, leftU, sMinV, hTailU, topV);
-			draw(matrix, vertexConsumer, left, bottomC, hTail, scaledBrd, leftU, bottomV, hTailU, sMaxV);
-			draw(matrix, vertexConsumer, x, top, scaledBrd, vTail, sMinU, topV, leftU, vTailV);
-			draw(matrix, vertexConsumer, rightC, top, scaledBrd, vTail, rightU, topV, sMaxU, vTailV);
+			draw(matrix, vertexBuffer, left, y, hTail, scaledBrd, leftU, sMinV, hTailU, topV);
+			draw(matrix, vertexBuffer, left, bottomC, hTail, scaledBrd, leftU, bottomV, hTailU, sMaxV);
+			draw(matrix, vertexBuffer, x, top, scaledBrd, vTail, sMinU, topV, leftU, vTailV);
+			draw(matrix, vertexBuffer, rightC, top, scaledBrd, vTail, rightU, topV, sMaxU, vTailV);
 		}
 		
 		endDraw();
 	}
 	
-	public static void drawSprite(MatrixStack matrix, Sprite sprite, double x, double y, float w, float h) {
+	public static void drawImage(MatrixStack matrix, Image image, double x, double y, float w, float h) {
 		RenderSystem.enableBlend();
 		RenderSystem.enableAlphaTest();		
 		RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
 		
+		image.bindTexture();
 		startDrawNormal();
-		
-		VertexConsumer vertexConsumer = sprite.getTextureSpecificVertexConsumer(vertexBuffer);
-		
-		draw(matrix, vertexConsumer, x, y, w, h, sprite.getMinU(), sprite.getMinV(), sprite.getMaxU(), sprite.getMaxV());
+		draw(matrix, vertexBuffer, x, y, w, h, 0.0F, 0.0F, 1.0F, 1.0F);
 		endDraw();
 	}
 	

@@ -1,22 +1,22 @@
 package ru.bulldog.justmap.map.icon;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import ru.bulldog.justmap.client.config.ClientParams;
+import ru.bulldog.justmap.client.render.Image;
 import ru.bulldog.justmap.util.ImageUtil;
-import ru.bulldog.justmap.util.SpriteAtlas;
+import ru.bulldog.justmap.util.StorageUtil;
 import ru.bulldog.justmap.util.ColorUtil;
 import ru.bulldog.justmap.util.Colors;
 import ru.bulldog.justmap.util.RenderUtil;
 import ru.bulldog.justmap.util.math.Line.Point;
 
-import net.minecraft.client.resource.metadata.AnimationResourceMetadata;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.texture.NativeImageBackedTexture;
-import net.minecraft.client.texture.Sprite;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
@@ -24,7 +24,7 @@ import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.entity.passive.TameableEntity;
 import net.minecraft.util.Identifier;
 
-public class EntityHeadIcon extends AbstractIcon {
+public class EntityHeadIcon extends Image {
 	
 	private final static Map<Identifier, EntityHeadIcon> ICONS = new HashMap<>();
 	
@@ -33,9 +33,15 @@ public class EntityHeadIcon extends AbstractIcon {
 		if (ICONS.containsKey(id)) {
 			return ICONS.get(id);
 		} else {
-			Identifier iconId = iconId(id);
-			if (ImageUtil.imageExists(iconId)) {
-				return registerIcon(entity, id, iconId);
+			File iconsDir = StorageUtil.iconsDir();
+			File iconPng = new File(iconsDir, String.format("%s/%s.png", id.getNamespace(), id.getPath()));
+			if (iconPng.exists()) {
+				return registerIcon(entity, id, iconPng);
+			} else {
+				Identifier iconId = iconId(id);
+				if (ImageUtil.imageExists(iconId)) {
+					return registerIcon(entity, id, iconId);
+				}
 			}
 		}
 		
@@ -48,18 +54,16 @@ public class EntityHeadIcon extends AbstractIcon {
 	private boolean solid;
 	
 	private EntityHeadIcon(Identifier id, Identifier texture, int w, int h) {
-		super(SpriteAtlas.ENTITY_HEAD_ICONS, new Sprite.Info(texture, w, h, AnimationResourceMetadata.EMPTY), 0, w, h, 0, 0, ImageUtil.loadImage(texture, w, h));
+		this(id, texture, ImageUtil.loadImage(texture, w, h));
+	}
 	
+	private EntityHeadIcon(Identifier id, Identifier texture, NativeImage image) {
+		super(texture, image);
+		
 		this.solid = this.isSolid();
 		this.id = id;
 	}
 
-	@Override
-	public void draw(double x, double y, int w, int h) {
-		MatrixStack matrix = new MatrixStack();
-		this.draw(matrix, x, y, (float) w, (float) h);
-	}
-	
 	@Override
 	public void draw(MatrixStack matrix, double x, double y, int w, int h) {
 		if (ClientParams.showIconsOutline) {
@@ -71,7 +75,6 @@ public class EntityHeadIcon extends AbstractIcon {
 				RenderUtil.draw(x - thickness / 2, y - thickness / 2, (float) (w + thickness), (float) (h + thickness));
 			}
 		}
-		textureManager.bindTexture(this.getId());		
 		this.draw(matrix, x, y, (float) w, (float) h);
 	}
 	
@@ -84,7 +87,7 @@ public class EntityHeadIcon extends AbstractIcon {
 	}
 	
 	private boolean isSolid() {
-		NativeImage icon = this.images[0];
+		NativeImage icon = this.image;
 		
 		int width = icon.getWidth();
 		int height = icon.getHeight();
@@ -102,11 +105,6 @@ public class EntityHeadIcon extends AbstractIcon {
 	}
 	
 	private NativeImage generateOutline() {
-		NativeImage icon = this.images[0];
-		
-		int width = icon.getWidth();
-		int height = icon.getHeight();
-		
 		NativeImage outline = new NativeImage(width + 4, height + 4, false);
 		ImageUtil.fillImage(outline, Colors.TRANSPARENT);
 		
@@ -120,7 +118,7 @@ public class EntityHeadIcon extends AbstractIcon {
 			int left = x - 1;
 			int right = x + 1;
 			for (int y = 0; y < height; y++) {
-				int alpha = (icon.getPixelColor(x, y) >> 24) & 255;
+				int alpha = (image.getPixelColor(x, y) >> 24) & 255;
 				if (alpha == 0) continue;
 				
 				outlinePixels.add(new Point(x + 2, y + 2));
@@ -128,7 +126,7 @@ public class EntityHeadIcon extends AbstractIcon {
 				int top = y - 1;
 				int bottom = y + 1;					
 				if (top >= 0) {
-					alpha = (icon.getPixelColor(x, top) >> 24) & 255;
+					alpha = (image.getPixelColor(x, top) >> 24) & 255;
 					if (alpha == 0) {
 						Point pixel = new Point(x + 2, y);
 						if (!outlinePixels.contains(pixel)) {
@@ -137,7 +135,7 @@ public class EntityHeadIcon extends AbstractIcon {
 						}
 					}
 					if (left >= 0) {
-						alpha = (icon.getPixelColor(left, top) >> 24) & 255;
+						alpha = (image.getPixelColor(left, top) >> 24) & 255;
 						if (alpha == 0) {
 							Point pixel = new Point(x, y);
 							if (!outlinePixels.contains(pixel)) {
@@ -149,7 +147,7 @@ public class EntityHeadIcon extends AbstractIcon {
 						}
 					}
 					if (right < width) {
-						alpha = (icon.getPixelColor(right, top) >> 24) & 255;
+						alpha = (image.getPixelColor(right, top) >> 24) & 255;
 						if (alpha == 0) {
 							Point pixel = new Point(right + 2, y);
 							if (!outlinePixels.contains(pixel)) {
@@ -168,7 +166,7 @@ public class EntityHeadIcon extends AbstractIcon {
 					}
 				}
 				if (bottom < height) {
-					alpha = (icon.getPixelColor(x, bottom) >> 24) & 255;
+					alpha = (image.getPixelColor(x, bottom) >> 24) & 255;
 					if (alpha == 0) {
 						Point pixel = new Point(x + 2, bottom + 1);
 						if (!outlinePixels.contains(pixel)) {
@@ -177,7 +175,7 @@ public class EntityHeadIcon extends AbstractIcon {
 						}
 					}
 					if (left >= 0) {
-						alpha = (icon.getPixelColor(left, bottom) >> 24) & 255;
+						alpha = (image.getPixelColor(left, bottom) >> 24) & 255;
 						if (alpha == 0) {
 							Point pixel = new Point(x, bottom + 2);
 							if (!outlinePixels.contains(pixel)) {
@@ -189,7 +187,7 @@ public class EntityHeadIcon extends AbstractIcon {
 						}
 					}
 					if (right < width) {
-						alpha = (icon.getPixelColor(right, bottom) >> 24) & 255;
+						alpha = (image.getPixelColor(right, bottom) >> 24) & 255;
 						if (alpha == 0) {
 							Point pixel = new Point(right + 2, bottom + 2);
 							if (!outlinePixels.contains(pixel)) {
@@ -208,7 +206,7 @@ public class EntityHeadIcon extends AbstractIcon {
 					}
 				}
 				if (left >= 0) {
-					alpha = (icon.getPixelColor(left, y) >> 24) & 255;
+					alpha = (image.getPixelColor(left, y) >> 24) & 255;
 					if (alpha == 0) {
 						Point pixel = new Point(x, y + 2);
 						if (!outlinePixels.contains(pixel)) {
@@ -224,7 +222,7 @@ public class EntityHeadIcon extends AbstractIcon {
 					}
 				}
 				if (right < width) {
-					alpha = (icon.getPixelColor(right, y) >> 24) & 255;
+					alpha = (image.getPixelColor(right, y) >> 24) & 255;
 					if (alpha == 0) {
 						Point pixel = new Point(right + 1, y + 2);
 						if (!outlinePixels.contains(pixel)) {
@@ -255,6 +253,18 @@ public class EntityHeadIcon extends AbstractIcon {
 	
 	private static EntityHeadIcon registerIcon(Entity entity, Identifier entityId, Identifier texture) {
 		EntityHeadIcon icon = new EntityHeadIcon(entityId, texture, 32, 32);
+		return registerIcon(entity, entityId, icon);
+	}
+	
+	private static EntityHeadIcon registerIcon(Entity entity, Identifier entityId, File image) {
+		NativeImage iconImage = ImageUtil.loadImage(image, 32, 32);
+		String prefix = String.format("icon_%s_%s", entityId.getNamespace(), entityId.getPath());
+		Identifier textureId = textureManager.registerDynamicTexture(prefix, new NativeImageBackedTexture(iconImage));
+		EntityHeadIcon icon = new EntityHeadIcon(entityId, textureId, iconImage);
+		return registerIcon(entity, entityId, icon);
+	}
+	
+	private static EntityHeadIcon registerIcon(Entity entity, Identifier entityId, EntityHeadIcon icon) {
 		if (entity instanceof HostileEntity) {
 			icon.color = Colors.DARK_RED;
 		} else if (entity instanceof TameableEntity) {

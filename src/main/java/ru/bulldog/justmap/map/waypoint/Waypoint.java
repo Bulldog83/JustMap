@@ -7,18 +7,15 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import ru.bulldog.justmap.JustMap;
-import ru.bulldog.justmap.map.icon.AbstractIcon;
+import ru.bulldog.justmap.client.render.Image;
 import ru.bulldog.justmap.util.ColorUtil;
 import ru.bulldog.justmap.util.Colors;
 import ru.bulldog.justmap.util.Dimension;
 import ru.bulldog.justmap.util.ImageUtil;
-import ru.bulldog.justmap.util.SpriteAtlas;
 import ru.bulldog.justmap.util.math.RandomUtil;
 
-import net.minecraft.client.resource.metadata.AnimationResourceMetadata;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.texture.NativeImageBackedTexture;
-import net.minecraft.client.texture.Sprite;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.JsonHelper;
@@ -185,7 +182,7 @@ public class Waypoint {
 		return waypoint;
 	}
 	
-	public static class Icon extends AbstractIcon {
+	public static class Icon extends Image {
 		
 		public final static Identifier DEFAULT_ICON = new Identifier(JustMap.MODID, "textures/icon/default.png");
 		private final static NativeImage DEFAULT_TEXTURE = ImageUtil.loadImage(DEFAULT_ICON, 18, 18);
@@ -196,13 +193,13 @@ public class Waypoint {
 		private final static Map<Integer, Icon> coloredIcons = new HashMap<>();
 		
 		private Icon(int key, Identifier icon, int color, int w, int h) {
-			super(SpriteAtlas.WAYPOINT_ICONS, new Sprite.Info(icon, w, h, AnimationResourceMetadata.EMPTY), 0, w, h, 0, 0, ImageUtil.loadImage(icon, w, h));
+			super(icon, ImageUtil.loadImage(icon, w, h));
 			this.key = key;
 			this.color = color;
 		}
 		
 		private Icon(int key, Identifier icon, NativeImage texture, int color, int w, int h) {
-			super(SpriteAtlas.WAYPOINT_ICONS, new Sprite.Info(icon, w, h, AnimationResourceMetadata.EMPTY), 0, w, h, 0, 0, texture);
+			super(icon, texture);
 			this.key = key;
 			this.color = color;
 		}
@@ -223,14 +220,9 @@ public class Waypoint {
 			return icon;
 		}
 		
+		@Override
 		public void bindTexture() {
 			textureManager.bindTexture(this.getTexture());
-		}
-		
-		@Override
-		public void draw(double x, double y, int w, int h) {
-			MatrixStack matrix = new MatrixStack();
-			this.draw(matrix, x, y, w, h);
 		}
 		
 		@Override
@@ -242,7 +234,7 @@ public class Waypoint {
 		private Identifier getColoredTexture() {
 			Identifier id = new Identifier(JustMap.MODID, String.format("wp_icon_%d", this.color));
 			if (textureManager.getTexture(id) == null) {
-				textureManager.registerTexture(id, new NativeImageBackedTexture(this.images[0]));
+				textureManager.registerTexture(id, new NativeImageBackedTexture(this.image));
 			}
 			return id;
 		}
