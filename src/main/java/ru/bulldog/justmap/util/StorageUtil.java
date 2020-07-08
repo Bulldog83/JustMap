@@ -59,8 +59,6 @@ public class StorageUtil {
 	}
 	
 	public static File configDir() {
-		System.out.println(FabricLoader.getInstance().getGameDirectory().getPath());
-		
 		if (!MAP_CONFIG_DIR.exists()) {
 			MAP_CONFIG_DIR.mkdirs();
 		}
