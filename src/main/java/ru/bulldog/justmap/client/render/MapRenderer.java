@@ -31,6 +31,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.util.Window;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
@@ -94,6 +95,8 @@ public class MapRenderer {
 	}
 	
 	public void updateParams() {		
+		this.minimap.updateMapParams();
+		
 		this.isRound = !minimap.isBigMap() && Minimap.isRound();
 		int border = 0;
 		if (ClientParams.useSkins) {
@@ -113,8 +116,9 @@ public class MapRenderer {
 			}
 		}
 		
-		int winW = minecraft.getWindow().getScaledWidth();
-		int winH = minecraft.getWindow().getScaledHeight();
+		Window window = minecraft.getWindow();
+		int winW = window.getScaledWidth();
+		int winH = window.getScaledHeight();
 		int mapW = this.minimap.getWidth();
 		int mapH = this.minimap.getHeight();
 		int off = ClientParams.positionOffset;
