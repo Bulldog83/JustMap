@@ -27,6 +27,7 @@ import ru.bulldog.justmap.util.math.RandomUtil;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ChatScreen;
+import net.minecraft.client.util.Window;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.mob.HostileEntity;
@@ -50,7 +51,7 @@ public class Minimap implements IMap{
 		SQUARE
 	}
 	
-	private static final MinecraftClient minecraftClient = MinecraftClient.getInstance();
+	private static final MinecraftClient minecraft = MinecraftClient.getInstance();
 	
 	private final TextManager textManager;	
 	private InfoText txtCoords = new CoordsInfo(TextAlignment.CENTER, "0, 0, 0");
@@ -88,7 +89,7 @@ public class Minimap implements IMap{
 	public void update() {
 		if (!this.isMapVisible()) { return; }
 	
-		PlayerEntity player = minecraftClient.player;
+		PlayerEntity player = minecraft.player;
 		if (player != null) {
 			if (locPlayer == null) {
 				locPlayer = player;
@@ -108,9 +109,18 @@ public class Minimap implements IMap{
 		boolean needRotate = config.getBoolean("rotate_map");
 		boolean bigMap = config.getBoolean("show_big_map");
 		
+		Window window = minecraft.getWindow();
+		if (window != null) {
+			int winWidth = window.getScaledWidth();
+			int guiScale = minecraft.options.guiScale;
+			double winScale = window.getScaleFactor();
+			if (guiScale == 0 && winScale > 2) {
+				configSize *= configSize / (winWidth / winScale);
+			}
+		}
+		
 		if (configSize != mapWidth || configScale != mapScale ||
-			this.rotateMap != needRotate || this.bigMap != bigMap) {
-			
+			this.rotateMap != needRotate || this.bigMap != bigMap) {			
 			if (bigMap) {
 				this.mapWidth = config.getInt("big_map_size");
 				this.mapHeight = (mapWidth * 10) / 16;
@@ -158,7 +168,7 @@ public class Minimap implements IMap{
 	
 	private static boolean isAllowed(boolean param, GameRules.Key<GameRules.BooleanRule> rule) {
 		if (param) {
-			return minecraftClient.isInSingleplayer() || MapGameRules.isAllowed(rule);
+			return minecraft.isInSingleplayer() || MapGameRules.isAllowed(rule);
 		}
 		
 		return false;
@@ -252,7 +262,7 @@ public class Minimap implements IMap{
 		
 			int amount = 0;				
 			for (Entity entity : entities) {
-				float tick = minecraftClient.getTickDelta();
+				float tick = minecraft.getTickDelta();
 				double entX = entity.prevX + (entity.getX() - entity.prevX) * tick;
 				double entZ = entity.prevZ + (entity.getZ() - entity.prevZ) * tick;
 				double iconX = MathUtil.screenPos(entX, startX, endX, mapWidth);
@@ -310,11 +320,11 @@ public class Minimap implements IMap{
 		waypoint.color = RandomUtil.getElement(Waypoint.WAYPOINT_COLORS);
 		waypoint.pos = pos;
 		
-		minecraftClient.openScreen(new WaypointEditor(waypoint, minecraftClient.currentScreen, WaypointKeeper.getInstance()::addNew));
+		minecraft.openScreen(new WaypointEditor(waypoint, minecraft.currentScreen, WaypointKeeper.getInstance()::addNew));
 	}
 	
 	public void createWaypoint() {
-		World world = minecraftClient.world;
+		World world = minecraft.world;
 		createWaypoint(world.getDimensionRegistryKey().getValue(), PosUtil.currentPos());
 	}
 	
@@ -347,9 +357,9 @@ public class Minimap implements IMap{
 	}
 	
 	public boolean isMapVisible() {
-		if (minecraftClient.currentScreen != null) {
-			return this.isMapVisible && !minecraftClient.isPaused() &&
-				   ClientParams.showInChat && minecraftClient.currentScreen instanceof ChatScreen;
+		if (minecraft.currentScreen != null) {
+			return this.isMapVisible && !minecraft.isPaused() &&
+				   ClientParams.showInChat && minecraft.currentScreen instanceof ChatScreen;
 		}
 		
 		return this.isMapVisible;
