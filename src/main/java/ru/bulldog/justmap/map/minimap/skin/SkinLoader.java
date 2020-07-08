@@ -31,47 +31,47 @@ public final class SkinLoader extends JsonFactory {
 			if (folder.isFile()) continue;
 			File skinFile = new File(folder, "skin_data.json");
 			if (!skinFile.exists()) continue;
-			loadSkin(folder, skinFile);
+			try {
+				loadSkin(folder, skinFile);
+			} catch (Exception ex) {
+				JustMap.LOGGER.logWarning("Can't load skin: " + skinFile.getPath());
+				JustMap.LOGGER.logWarning(ex.getLocalizedMessage());
+			}
 		}
 	}
 	
-	private static void loadSkin(File dir, File skinFile) {
+	private static void loadSkin(File folder, File skinFile) throws Exception {
 		JsonObject skinData = loadJson(skinFile);
-		try {
-			String name = JsonHelper.getString(skinData, "name");
-			int width = JsonHelper.getInt(skinData, "width");
-			int height = JsonHelper.getInt(skinData, "height");
-			int border = JsonHelper.getInt(skinData, "border");
-			SkinType shape = getSkinType(JsonHelper.getString(skinData, "shape", "universal"));
-			boolean resizable = JsonHelper.getBoolean(skinData, "resizable", false);
-			boolean repeating = JsonHelper.getBoolean(skinData, "repeating", false);
-			String textureType = JsonHelper.getString(skinData, "texture_type");
-			if (textureType.equals("source")) {	
-				Identifier texture = new Identifier(JsonHelper.getString(skinData, "texture"));
-				MapSkin.addUniversalSkin(name, texture, width, height, border);
-			} else if (textureType.equals("image")) {
-				String imageName = JsonHelper.getString(skinData, "image");
-				File imageFile = new File(dir, imageName);
-				NativeImage skinImage = ImageUtil.loadImage(imageFile, width, height);
-				String prefix = String.format("%s_%s", JustMap.MODID, imageName);
-				Identifier textureId = textureManager.registerDynamicTexture(prefix, new NativeImageBackedTexture(skinImage));
-				switch (shape) {
-					case ROUND:
-						MapSkin.addRoundSkin(name, textureId, skinImage, width, height, border);
-						break;
-					case SQUARE:
-						MapSkin.addSquareSkin(name, textureId, skinImage, width, height, border, resizable, repeating);
-						break;
-					case UNIVERSAL:
-						MapSkin.addUniversalSkin(imageName, textureId, skinImage, width, height, border);
-						break;
-				}
-			} else {
-				throw new JsonParseException("Invalid skin texture type: '" + textureType + "'");
+		String name = JsonHelper.getString(skinData, "name");
+		int width = JsonHelper.getInt(skinData, "width");
+		int height = JsonHelper.getInt(skinData, "height");
+		int border = JsonHelper.getInt(skinData, "border");
+		SkinType shape = getSkinType(JsonHelper.getString(skinData, "shape", "universal"));
+		boolean resizable = JsonHelper.getBoolean(skinData, "resizable", false);
+		boolean repeating = JsonHelper.getBoolean(skinData, "repeating", false);
+		String textureType = JsonHelper.getString(skinData, "texture_type");
+		if (textureType.equals("source")) {	
+			Identifier texture = new Identifier(JsonHelper.getString(skinData, "texture"));
+			MapSkin.addUniversalSkin(name, texture, width, height, border);
+		} else if (textureType.equals("image")) {
+			String imageName = JsonHelper.getString(skinData, "image");
+			File imageFile = new File(folder, imageName);
+			NativeImage skinImage = ImageUtil.loadImage(imageFile, width, height);
+			String prefix = String.format("%s_%s", JustMap.MODID, imageName);
+			Identifier textureId = textureManager.registerDynamicTexture(prefix, new NativeImageBackedTexture(skinImage));
+			switch (shape) {
+				case ROUND:
+					MapSkin.addRoundSkin(name, textureId, skinImage, width, height, border);
+					break;
+				case SQUARE:
+					MapSkin.addSquareSkin(name, textureId, skinImage, width, height, border, resizable, repeating);
+					break;
+				case UNIVERSAL:
+					MapSkin.addUniversalSkin(imageName, textureId, skinImage, width, height, border);
+					break;
 			}
-		} catch (Exception ex) {
-			JustMap.LOGGER.logWarning("Can't load skin: " + skinFile.getPath());
-			JustMap.LOGGER.logWarning(ex.getLocalizedMessage());
+		} else {
+			throw new JsonParseException("Invalid skin texture type: '" + textureType + "'");
 		}
 	}
 	
