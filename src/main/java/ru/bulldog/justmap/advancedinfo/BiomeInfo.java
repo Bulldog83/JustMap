@@ -1,7 +1,11 @@
 package ru.bulldog.justmap.advancedinfo;
 
+import net.minecraft.class_5458;
 import net.minecraft.client.resource.language.I18n;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.Util;
 import net.minecraft.world.biome.Biome;
+
 import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.util.RenderUtil.TextAlignment;
 import ru.bulldog.justmap.util.PosUtil;
@@ -9,6 +13,7 @@ import ru.bulldog.justmap.util.PosUtil;
 public class BiomeInfo extends InfoText {
 
 	private String title;
+	private Identifier currentBiome;
 	
 	public BiomeInfo() {
 		super("Void");
@@ -24,8 +29,18 @@ public class BiomeInfo extends InfoText {
 	public void update() {
 		this.setVisible(ClientParams.showBiome);
 		if (visible && minecraft.world != null) {
-			Biome currentBiome = minecraft.world.getBiome(PosUtil.currentPos());
-			this.setText(title + I18n.translate(currentBiome.getTranslationKey()));
+			Biome biome = minecraft.world.getBiome(PosUtil.currentPos());
+			Identifier biomeId = class_5458.field_25933.getId(biome);
+			if (biomeId != null && !biomeId.equals(currentBiome)) {
+				this.currentBiome = biomeId;
+				this.setText(title + this.getTranslation());
+			} else if (biomeId == null) {
+				this.setText(title + "Unknown");
+			}
 		}
+	}
+
+	private String getTranslation() {
+		return I18n.translate(Util.createTranslationKey("biome", currentBiome));
 	}
 }
