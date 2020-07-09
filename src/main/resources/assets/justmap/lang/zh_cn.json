@@ -64,10 +64,13 @@
   "justmap.configuration.alternate_color_render": "交替地图颜色渲染",
   "justmap.configuration.texture_filter": "材质过滤器",
   "justmap.configuration.water_tint": "水的颜色",
+  "justmap.configuration.map_shape": "地图形状",
   "justmap.configuration.use_skins": "使用地图皮肤",
   "justmap.configuration.current_skin": "当前皮肤",
+  "justmap.configuration.big_map_skin": "大地图皮肤",
   "justmap.configuration.skin_border_scale": "皮肤边框比例",
   "justmap.configuration.show_waypoints": "显示路径点",
+  "justmap.configuration.jump_to_waypoints": "路径点传送",
   "justmap.configuration.waypoints_tracking": "追踪路标",
   "justmap.configuration.waypoints_render": "在世界中渲染路标",
   "justmap.configuration.render_light_beam": "渲染光束",
@@ -113,5 +116,7 @@
   "gamerule.allowEntityRadar": "(Just Map) 实体雷达",
   "gamerule.allowPlayerRadar": "(Just Map) 玩家雷达",
   "gamerule.allowCreatureRadar": "(Just Map) 生物雷达",
-  "gamerule.allowHostileRadar": "(Just Map) 敌对生物雷达"
+  "gamerule.allowHostileRadar": "(Just Map) 敌对生物雷达",
+  "gamerule.allowSlimeChunks": "(Just Map) 史莱姆区块",
+  "gamerule.allowWaypointsJump": "(Just Map) 路径点传送"
 }
