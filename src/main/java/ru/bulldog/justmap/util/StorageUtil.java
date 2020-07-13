@@ -31,10 +31,8 @@ public class StorageUtil {
 	
 	@Environment(EnvType.CLIENT)
 	public static synchronized CompoundTag getCache(ChunkPos pos) {
-		if (storage == null) updateCacheStorage();
-		
 		try {
-			CompoundTag data = storage.getNbt(storageDir, pos);
+			CompoundTag data = storage.getNbt(getCacheStorage(), pos);
 			return data != null ? data : new CompoundTag();
 		} catch (Exception ex) {
 			return new CompoundTag();
@@ -43,19 +41,18 @@ public class StorageUtil {
 	
 	@Environment(EnvType.CLIENT)
 	public static synchronized void saveCache(ChunkPos pos, CompoundTag data) {
-		if (storage == null) updateCacheStorage();
-		storage.setTagAt(storageDir, pos, data);
+		storage.setTagAt(getCacheStorage(), pos, data);
 	}
 	
 	@Environment(EnvType.CLIENT)
-	public static void updateCacheStorage() {
+	public static File getCacheStorage() {
 		storageDir = new File(cacheDir(), "chunk-data/");
-
 		if (!storageDir.exists()) {
 			storageDir.mkdirs();
 		}		
-		
 		if (storage == null) storage = new ChunkStorage();
+		
+		return storageDir;
 	}
 	
 	public static File configDir() {

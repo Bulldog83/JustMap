@@ -10,7 +10,6 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
-import net.minecraft.world.dimension.DimensionType;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -22,9 +21,7 @@ public class MapCache {
 	private final static MinecraftClient minecraft = MinecraftClient.getInstance();
 	
 	private static Map<Identifier, MapCache> dimensions = new HashMap<>();
-	private static World currentWorld;
 	private static Layer.Type currentLayer = Layer.Type.SURFACE;
-	private static Identifier currentDimension = DimensionType.OVERWORLD_REGISTRY_KEY.getValue();
 	private static int currentLevel = 0;
 	
 	public static long lastSaved = 0;
@@ -55,32 +52,18 @@ public class MapCache {
 					world = serverWorld;
 				}
 			}
-			if (!world.equals(currentWorld)) {
-				currentWorld = world;
-			}
 		}
-		if (currentWorld == null) return null;
+		if (world == null) return null;
 		
-		Identifier dimId = currentWorld.getDimensionRegistryKey().getValue();
-		if(currentDimension != dimId) {
-			StorageUtil.updateCacheStorage();
-			currentDimension = dimId;
-		}
-		
-		return get(currentWorld, currentDimension);
+		Identifier dimId = world.getDimensionRegistryKey().getValue();
+		return get(world, dimId);
 	}
 	
 	public static MapCache get(World world, Identifier dimension) {	
 		MapCache data = getData(world, dimension);
 		
 		if (data == null) return null;
-		
-		if (data.world != world) {
-			data.world = world;
-			data.clear();
-		} else {		
-			data.clearCache();
-		}
+		data.clearCache();
 		
 		return data;
 	}
