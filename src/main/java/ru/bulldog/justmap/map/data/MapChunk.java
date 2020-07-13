@@ -4,8 +4,7 @@ import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.util.ColorUtil;
 import ru.bulldog.justmap.util.Dimension;
 import ru.bulldog.justmap.util.StorageUtil;
-import ru.bulldog.justmap.util.TaskManager;
-
+import ru.bulldog.justmap.util.tasks.TaskManager;
 import net.minecraft.world.Heightmap;
 import net.minecraft.world.World;
 import net.minecraft.block.BlockState;
@@ -31,8 +30,12 @@ public class MapChunk {
 	public final ChunkLevel EMPTY_LEVEL = new ChunkLevel(-1);
 	
 	private final static TaskManager chunkUpdater = TaskManager.getManager("chunk-data");
-	private volatile Map<Layer, ChunkLevel[]> levels;
 	
+	public static boolean hasWorks() {
+		return chunkUpdater.queueSize() > 0;
+	}
+	
+	private volatile Map<Layer, ChunkLevel[]> levels;	
 	private World world;
 	private WorldChunk worldChunk;
 	private ChunkPos chunkPos;
@@ -215,7 +218,7 @@ public class MapChunk {
 		if (!outdated && currentTime - updated < ClientParams.chunkUpdateInterval) return false;
 		if (purged || !this.updateWorldChunk()) return false;
 		
-		CompletableFuture<Boolean> updated = chunkUpdater.run(future -> {
+		CompletableFuture<Boolean> updated = chunkUpdater.run("Updating Chunk: " + chunkPos, future -> {
 			return () -> future.complete(this.updateChunkData());
 		});
 		

@@ -11,11 +11,15 @@ import ru.bulldog.justmap.map.minimap.Minimap;
 import ru.bulldog.justmap.util.Colors;
 import ru.bulldog.justmap.util.RenderUtil;
 import ru.bulldog.justmap.util.StorageUtil;
-import ru.bulldog.justmap.util.TaskManager;
+import ru.bulldog.justmap.util.tasks.TaskManager;
 
 public class MapRegion {
 	
 	private static TaskManager worker = TaskManager.getManager("region-data");
+	
+	public static boolean hasWorks() {
+		return worker.queueSize() > 0;
+	}
 	
 	private final RegionPos pos;
 	private final MapTexture image;
@@ -60,7 +64,7 @@ public class MapRegion {
 	public void updateImage() {
 		if (updating) return;
 		this.updating = true;
-		worker.execute(() -> {
+		worker.execute("Updating Region: " + pos, () -> {
 			this.updateMapParams();
 			this.update();
 		});
@@ -194,7 +198,7 @@ public class MapRegion {
 	
 	private void saveImage() {
 		File imgFile = this.imageFile();
-		JustMap.WORKER.execute(() -> this.image.saveImage(imgFile));
+		JustMap.WORKER.execute("Saving image for region: " + pos, () -> this.image.saveImage(imgFile));
 	}
 	
 	private boolean loadImage() {

@@ -204,7 +204,7 @@ public class ColorUtil {
 	}
 	
 	private static int extractColor(BlockState state) {
-		List<BakedQuad> quads = blockModels.getModel(state).getQuads(state, Direction.UP, new Random());		
+		List<BakedQuad> quads = blockModels.getModel(state).getQuads(state, Direction.UP, new Random());
 		
 		Identifier blockSprite;
 		if (quads.size() > 0) {

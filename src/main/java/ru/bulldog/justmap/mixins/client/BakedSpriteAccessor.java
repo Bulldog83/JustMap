@@ -8,6 +8,6 @@ import net.minecraft.client.texture.Sprite;
 
 @Mixin(BakedQuad.class)
 public interface BakedSpriteAccessor {	
-	@Accessor(value = "sprite", remap = false)
-	public Sprite getSprite();
+	@Accessor(value = "sprite")
+	Sprite getSprite();
 }

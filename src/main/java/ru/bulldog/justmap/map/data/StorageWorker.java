@@ -16,7 +16,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.math.ChunkPos;
 
 import ru.bulldog.justmap.JustMap;
-import ru.bulldog.justmap.util.TaskManager;
+import ru.bulldog.justmap.util.tasks.TaskManager;
 
 public class StorageWorker implements AutoCloseable {
 
@@ -59,7 +59,7 @@ public class StorageWorker implements AutoCloseable {
 				});
 			};
 		});
-		this.worker.execute(this::writeResult);
+		this.worker.execute("Storing chunk data for: " + chunkPos, this::writeResult);
 	}
 
 	public CompoundTag getNbt(File dir, ChunkPos chunkPos) throws IOException {

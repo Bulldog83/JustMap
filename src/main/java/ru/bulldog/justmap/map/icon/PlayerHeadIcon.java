@@ -47,7 +47,8 @@ public class PlayerHeadIcon {
 	}
 	
 	public void updatePlayerSkin(MapPlayer player) {
-		JustMap.WORKER.execute(() -> this.getPlayerSkin(player));
+		JustMap.WORKER.execute("Update skin for: " + player.getName().getString(),
+				() -> this.getPlayerSkin(player));
 	}
 	
 	public void getPlayerSkin(MapPlayer player) {

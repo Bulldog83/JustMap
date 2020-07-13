@@ -55,6 +55,17 @@ public class StorageUtil {
 		return storageDir;
 	}
 	
+	public static void closeStorage() {
+		if (storage != null) {
+			try {
+				storage.close();
+				storage = null;
+			} catch (Exception ex) {
+				JustMap.LOGGER.catching(ex);
+			}
+		}
+	}
+	
 	public static File configDir() {
 		if (!MAP_CONFIG_DIR.exists()) {
 			MAP_CONFIG_DIR.mkdirs();
