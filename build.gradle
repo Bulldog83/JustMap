@@ -45,7 +45,6 @@ dependencies {
 	modCompile "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 	modCompile "io.github.prospector:modmenu:${project.modmenu_version}"
 	modCompile "me.shedaniel.cloth:config-2:${project.cloth_version}"
-	modCompile name: "immersive-portals-0.18-dev"
 	
 	include "me.shedaniel.cloth:config-2:${project.cloth_version}"
 }

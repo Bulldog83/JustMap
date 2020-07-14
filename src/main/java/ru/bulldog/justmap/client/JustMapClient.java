@@ -1,8 +1,5 @@
 package ru.bulldog.justmap.client;
 
-import com.mojang.realmsclient.RealmsMainScreen;
-import com.mojang.realmsclient.gui.screens.RealmsGenericErrorScreen;
-
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 
@@ -10,11 +7,13 @@ import net.minecraft.client.gui.screen.BackupPromptScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.TitleScreen;
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen;
-import net.minecraft.client.gui.screen.pack.DataPackScreen;
 import net.minecraft.client.gui.screen.world.CreateWorldScreen;
 import net.minecraft.client.gui.screen.world.EditGameRulesScreen;
 import net.minecraft.client.gui.screen.world.EditWorldScreen;
 import net.minecraft.client.gui.screen.world.SelectWorldScreen;
+import net.minecraft.client.realms.RealmsMainScreen;
+import net.minecraft.client.realms.gui.screen.RealmsGenericErrorScreen;
+import net.minecraft.text.TranslatableText;
 
 import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.advancedinfo.AdvancedInfo;
@@ -62,15 +61,21 @@ public class JustMapClient implements ClientModInitializer {
 	}
 	
 	private boolean isOnTitleScreen(Screen currentScreen) {
+		boolean isTitleScreen = false;
+		if (currentScreen.getTitle() instanceof TranslatableText) {
+			TranslatableText title = (TranslatableText) currentScreen.getTitle();
+			isTitleScreen = title.getKey().equals("dataPack.title");
+		}
+		
 		return currentScreen instanceof TitleScreen ||
 			   currentScreen instanceof SelectWorldScreen ||
 		       currentScreen instanceof MultiplayerScreen ||
 		       currentScreen instanceof BackupPromptScreen ||
 		       currentScreen instanceof CreateWorldScreen ||
-		       currentScreen instanceof DataPackScreen ||
 		       currentScreen instanceof EditGameRulesScreen ||
 		       currentScreen instanceof EditWorldScreen ||
 		       currentScreen instanceof RealmsMainScreen ||
-		       currentScreen instanceof RealmsGenericErrorScreen;
+		       currentScreen instanceof RealmsGenericErrorScreen ||
+		       isTitleScreen;
 	}
 }
