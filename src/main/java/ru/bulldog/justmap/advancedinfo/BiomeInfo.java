@@ -1,9 +1,9 @@
 package ru.bulldog.justmap.advancedinfo;
 
-import net.minecraft.class_5458;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
+import net.minecraft.util.registry.BuiltinRegistries;
 import net.minecraft.world.biome.Biome;
 
 import ru.bulldog.justmap.client.config.ClientParams;
@@ -30,7 +30,7 @@ public class BiomeInfo extends InfoText {
 		this.setVisible(ClientParams.showBiome);
 		if (visible && minecraft.world != null) {
 			Biome biome = minecraft.world.getBiome(PosUtil.currentPos());
-			Identifier biomeId = class_5458.field_25933.getId(biome);
+			Identifier biomeId = BuiltinRegistries.BIOME.getId(biome);
 			if (biomeId != null && !biomeId.equals(currentBiome)) {
 				this.currentBiome = biomeId;
 				this.setText(title + this.getTranslation());
