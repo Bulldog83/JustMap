@@ -32,6 +32,9 @@ minecraft {}
 repositories {
 	maven { url "https://maven.fabricmc.net/" }
 	jcenter()
+	flatDir {
+		dirs 'libs'
+	}
 }
 
 dependencies {

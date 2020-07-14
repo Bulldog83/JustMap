@@ -5,10 +5,10 @@ import org.spongepowered.asm.mixin.gen.Invoker;
 
 import net.minecraft.world.GameRules;
 
-@Mixin(GameRules.class)
-public interface GameRulesProcessor {
+@Mixin(GameRules.BooleanRule.class)
+public interface BooleanRuleAccessor {
 	@Invoker
-	static <T extends GameRules.Rule<T>> GameRules.Key<T> callRegister(String name, GameRules.Category category, GameRules.Type<T> type) {
+	static GameRules.Type<GameRules.BooleanRule> callCreate(boolean value) {
 		throw new AssertionError("@Invoker dummy body called");
 	}
 }
