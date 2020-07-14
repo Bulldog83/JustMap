@@ -1,8 +1,6 @@
 package ru.bulldog.justmap.map.icon;
 
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.texture.PlayerSkinTexture;
 import net.minecraft.client.texture.ResourceTexture;
 import net.minecraft.client.util.DefaultSkinHelper;
 import net.minecraft.client.util.math.MatrixStack;
@@ -10,7 +8,7 @@ import net.minecraft.util.Identifier;
 
 import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.client.config.ClientParams;
-import ru.bulldog.justmap.map.minimap.MapPlayer;
+import ru.bulldog.justmap.map.MapPlayer;
 import ru.bulldog.justmap.util.Colors;
 import ru.bulldog.justmap.util.RenderUtil;
 
@@ -47,7 +45,8 @@ public class PlayerHeadIcon {
 	}
 	
 	public void updatePlayerSkin(MapPlayer player) {
-		JustMap.WORKER.execute(() -> this.getPlayerSkin(player));
+		JustMap.WORKER.execute("Update skin for: " + player.getName().getString(),
+				() -> this.getPlayerSkin(player));
 	}
 	
 	public void getPlayerSkin(MapPlayer player) {
@@ -55,7 +54,7 @@ public class PlayerHeadIcon {
 		
 		Identifier defaultSkin = DefaultSkinHelper.getTexture(player.getUuid());
 		if (!player.getSkinTexture().equals(defaultSkin)) {
-			PlayerSkinTexture skinTexture = ClientPlayerEntity.loadSkin(player.getSkinTexture(), player.getName().getString());
+			ResourceTexture skinTexture = MapPlayer.loadSkinTexture(player.getSkinTexture(), player.getName().getString());
 			if (skinTexture != this.playerSkin) {
 				if (this.playerSkin != null) {
 					this.playerSkin.clearGlId();
