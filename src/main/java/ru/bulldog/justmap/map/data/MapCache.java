@@ -10,10 +10,8 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
-import net.minecraft.world.dimension.DimensionType;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -21,10 +19,10 @@ import java.util.concurrent.ConcurrentHashMap;
 public class MapCache {
 	private final static MinecraftClient minecraft = MinecraftClient.getInstance();
 	
-	private static Map<Identifier, MapCache> dimensions = new HashMap<>();
-	private static World currentWorld;
+	private static Map<Identifier, MapCache> dimensions = new ConcurrentHashMap<>();
+	private static Identifier lastDimension;
+	private static World lastWorld;
 	private static Layer.Type currentLayer = Layer.Type.SURFACE;
-	private static Identifier currentDimension = DimensionType.OVERWORLD_REGISTRY_KEY.getValue();
 	private static int currentLevel = 0;
 	
 	public static long lastSaved = 0;
@@ -55,32 +53,23 @@ public class MapCache {
 					world = serverWorld;
 				}
 			}
-			if (!world.equals(currentWorld)) {
-				currentWorld = world;
-			}
 		}
-		if (currentWorld == null) return null;
-		
-		Identifier dimId = currentWorld.getDimensionRegistryKey().getValue();
-		if(currentDimension != dimId) {
-			StorageUtil.updateCacheStorage();
-			currentDimension = dimId;
+		if (world == null) return null;
+		if (!world.equals(lastWorld)) {
+			lastWorld = world;
+		}		
+		Identifier dimId = lastWorld.getDimensionRegistryKey().getValue();
+		if (!dimId.equals(lastDimension)) {
+			lastDimension = dimId;
 		}
-		
-		return get(currentWorld, currentDimension);
+		return get(lastWorld, lastDimension);
 	}
 	
 	public static MapCache get(World world, Identifier dimension) {	
 		MapCache data = getData(world, dimension);
 		
 		if (data == null) return null;
-		
-		if (data.world != world) {
-			data.world = world;
-			data.clear();
-		} else {		
-			data.clearCache();
-		}
+		data.clearCache();
 		
 		return data;
 	}
@@ -102,7 +91,7 @@ public class MapCache {
 		MapCache data = get();
 		if (data == null) return;
 		
-		JustMap.WORKER.execute(() -> {
+		JustMap.WORKER.execute("Saving data to storage...", () -> {
 			data.getChunks().forEach((pos, chunk) -> {
 				storeChunk(chunk);
 			});
@@ -125,19 +114,24 @@ public class MapCache {
 		}
 	}
 	
+	public static void clearData() {
+		if (dimensions.size() > 0) {
+			dimensions.forEach((id, data) -> data.clear());
+			dimensions.clear();
+		}
+	}
+	
 	public World world;
 	
-	private Map<ChunkPos, MapChunk> chunks;
-	private Map<RegionPos, MapRegion> regions;
+	private Map<ChunkPos, MapChunk> chunks = new ConcurrentHashMap<>();
+	private Map<RegionPos, MapRegion> regions = new ConcurrentHashMap<>();
 	
 	private long lastPurged = 0;
 	private long purgeDelay = 1000;
 	private int purgeAmount = 500;
 	
 	private MapCache(World world) {
-		this.world = world;		
-		this.chunks = new ConcurrentHashMap<>();
-		this.regions = new ConcurrentHashMap<>();
+		this.world = world;
 	}
 	
 	private void clearCache() {
@@ -146,9 +140,7 @@ public class MapCache {
 		
 		long currentTime = System.currentTimeMillis();
 		if (currentTime - lastPurged > purgeDelay) {
-			JustMap.WORKER.execute(() -> {
-				this.purge(purgeAmount);
-			});
+			JustMap.WORKER.execute("Remove unnecessary chunks...", () -> this.purge(purgeAmount));
 			this.lastPurged = currentTime;
 		}
 	}
@@ -187,10 +179,10 @@ public class MapCache {
 		
 		MapRegion region;
 		if(regions.containsKey(regPos)) {
-			region = this.regions.get(regPos);
+			region = regions.get(regPos);
 		} else {
 			region = new MapRegion(blockPos, layer, level);
-			this.regions.put(regPos, region);
+			regions.put(regPos, region);
 		}
 		region.surfaceOnly = surfaceOnly;
 		
@@ -230,11 +222,11 @@ public class MapCache {
 		return mapChunk;
 	}
 	
-	private void clear() {
-		this.regions.forEach((pos, region) -> {
-			region.close();
-		});
-		this.regions.clear();
+	public void clear() {
+		if (regions.size() > 0) {
+			regions.forEach((pos, region) -> region.close());
+			regions.clear();
+		}
 		this.chunks.clear();
 	}
 }

@@ -32,6 +32,9 @@ minecraft {}
 repositories {
 	maven { url "https://maven.fabricmc.net/" }
 	jcenter()
+	flatDir {
+		dirs 'libs'
+	}
 }
 
 dependencies {
@@ -42,6 +45,7 @@ dependencies {
 	modCompile "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 	modCompile "io.github.prospector:modmenu:${project.modmenu_version}"
 	modCompile "me.shedaniel.cloth:config-2:${project.cloth_version}"
+	modCompile name: "immersive-portals-0.18-dev"
 	
 	include "me.shedaniel.cloth:config-2:${project.cloth_version}"
 }
@@ -70,7 +74,9 @@ task sourcesJar(type: Jar, dependsOn: classes) {
 
 jar {
 	from "LICENSE"
-	
+}
+
+assemble {
 	build += 1
 	
 	if (versionPropsFile.canWrite()) {
