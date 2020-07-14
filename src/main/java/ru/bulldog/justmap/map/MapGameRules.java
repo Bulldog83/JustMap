@@ -4,8 +4,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import ru.bulldog.justmap.JustMap;
-import ru.bulldog.justmap.mixins.BooleanRuleProcessor;
-import ru.bulldog.justmap.mixins.GameRulesProcessor;
+import ru.bulldog.justmap.mixins.BooleanRuleAccessor;
+import ru.bulldog.justmap.mixins.GameRulesAccessor;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
@@ -29,7 +29,7 @@ public class MapGameRules {
 	}
 
 	private static GameRules.Key<GameRules.BooleanRule> register(String name, boolean defaultValue) {
-		return GameRulesProcessor.callRegister(name, GameRules.Category.MISC, BooleanRuleProcessor.callCreate(defaultValue));
+		return GameRulesAccessor.callRegister(name, GameRules.Category.MISC, BooleanRuleAccessor.callCreate(defaultValue));
 	}
 	
 	private static Map<String, Key<GameRules.BooleanRule>> codes;
@@ -56,7 +56,6 @@ public class MapGameRules {
 	 *	§d: entities radar (animal)
 	 *	§e: entities radar (hostile)
 	 *	§s: slime chunks
-	 *	§t: teleportation
 	 *
 	 *  §1: enable
 	 *  §0: disable
