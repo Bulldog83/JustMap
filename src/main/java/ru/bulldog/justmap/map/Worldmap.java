@@ -27,7 +27,6 @@ import ru.bulldog.justmap.map.data.MapCache;
 import ru.bulldog.justmap.map.data.MapChunk;
 import ru.bulldog.justmap.map.data.MapRegion;
 import ru.bulldog.justmap.map.icon.WaypointIcon;
-import ru.bulldog.justmap.map.minimap.MapPlayerManager;
 import ru.bulldog.justmap.map.waypoint.Waypoint;
 import ru.bulldog.justmap.map.waypoint.WaypointKeeper;
 import ru.bulldog.justmap.map.waypoint.WaypointsList;

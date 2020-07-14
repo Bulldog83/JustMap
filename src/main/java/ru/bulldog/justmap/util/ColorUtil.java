@@ -32,6 +32,7 @@ import net.minecraft.world.chunk.WorldChunk;
 
 import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.client.config.ClientParams;
+import ru.bulldog.justmap.mixins.client.BakedSpriteAccessor;
 import ru.bulldog.justmap.util.math.MathUtil;
 
 public class ColorUtil {
@@ -203,11 +204,11 @@ public class ColorUtil {
 	}
 	
 	private static int extractColor(BlockState state) {
-		List<BakedQuad> quads = blockModels.getModel(state).getQuads(state, Direction.UP, new Random());		
+		List<BakedQuad> quads = blockModels.getModel(state).getQuads(state, Direction.UP, new Random());
 		
 		Identifier blockSprite;
 		if (quads.size() > 0) {
-			blockSprite = ((BakedData) quads.get(0)).getSprite().getId();
+			blockSprite = ((BakedSpriteAccessor) quads.get(0)).getSprite().getId();
 		} else {
 			blockSprite = blockModels.getSprite(state).getId();
 		}

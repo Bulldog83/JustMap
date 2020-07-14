@@ -4,8 +4,7 @@ import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.util.ColorUtil;
 import ru.bulldog.justmap.util.Dimension;
 import ru.bulldog.justmap.util.StorageUtil;
-import ru.bulldog.justmap.util.TaskManager;
-
+import ru.bulldog.justmap.util.tasks.TaskManager;
 import net.minecraft.world.Heightmap;
 import net.minecraft.world.World;
 import net.minecraft.block.BlockState;
@@ -31,19 +30,20 @@ public class MapChunk {
 	public final ChunkLevel EMPTY_LEVEL = new ChunkLevel(-1);
 	
 	private final static TaskManager chunkUpdater = TaskManager.getManager("chunk-data");
-	private volatile Map<Layer, ChunkLevel[]> levels;
 	
-	private World world;
+	private final Map<Layer, ChunkLevel[]> levels = new ConcurrentHashMap<>();
+	private final Identifier dimension;
+	private final ChunkPos chunkPos;
+	private final World world;
 	private WorldChunk worldChunk;
-	private ChunkPos chunkPos;
 	private Layer.Type layer;
-	private Identifier dimension;
 	private int level = 0;
 	private boolean outdated = false;
 	private boolean updating = false;
-	private boolean saved = true;
+	private boolean restored = false;
 	private boolean purged = false;
 	private boolean slime = false;
+	private boolean saved = true;
 	private long refreshed = 0;
 	
 	public boolean saving = false;
@@ -66,25 +66,18 @@ public class MapChunk {
 		this.dimension = dimType.getValue();
 		this.chunkPos = pos;
 		this.layer = layer;
-		this.levels = new ConcurrentHashMap<>();
 		
 		if (Dimension.isOverworld(dimType) && (world instanceof ServerWorld)) {
 			this.slime = ChunkRandom.getSlimeRandom(chunkPos.x, chunkPos.z,
 					((ServerWorld) world).getSeed(), 987234911L).nextInt(10) == 0;
 		}
 		
-		this.init();
-	}
-	
-	private void init() {
 		if (dimension.equals(DimensionType.THE_NETHER_REGISTRY_KEY.getValue())) {
 			initLayer(Layer.Type.NETHER);
 		} else {
 			initLayer(Layer.Type.SURFACE);
 			initLayer(Layer.Type.CAVES);
 		}
-		
-		this.restore();
 	}
 	
 	public MapChunk resetChunk() {
@@ -128,11 +121,6 @@ public class MapChunk {
 		synchronized (levelLock) {
 			return chunkLevel;
 		}
-	}
-	
-	public MapChunk setPos(ChunkPos chunkPos) {
-		this.chunkPos = chunkPos;
-		return this;
 	}
 	
 	public ChunkPos getPos() {
@@ -211,15 +199,17 @@ public class MapChunk {
 			this.outdated = forceUpdate;
 		}
 		
+		boolean result = false;
 		long currentTime = System.currentTimeMillis();
 		if (!outdated && currentTime - updated < ClientParams.chunkUpdateInterval) return false;
 		if (purged || !this.updateWorldChunk()) return false;
 		
-		CompletableFuture<Boolean> updated = chunkUpdater.run(future -> {
+		CompletableFuture<Boolean> updated = chunkUpdater.run("Updating Chunk: " + chunkPos, future -> {
 			return () -> future.complete(this.updateChunkData());
-		});
+		});		
+		result = updated.join();
 		
-		return updated.join();
+		return result;
 	}
 	
 	private boolean updateWorldChunk() {
@@ -233,6 +223,10 @@ public class MapChunk {
 	
 	private boolean updateChunkData() {
 		this.updating = true;
+		
+		if (!restored) {
+			this.restored = this.restore();
+		}
 		
 		MapCache mapData = MapCache.get();
 		MapChunk eastChunk = mapData.getCurrentChunk(chunkPos.x + 1, chunkPos.z);
@@ -365,9 +359,9 @@ public class MapChunk {
 		this.saved = true;
 	}
 	
-	private void restore() {
+	private boolean restore() {
 		CompoundTag chunkData = StorageUtil.getCache(chunkPos);
-		if (chunkData.isEmpty()) return;
+		if (chunkData.isEmpty()) return true;
 		
 		final int dataVer = chunkData.contains("version") ? chunkData.getInt("version") : -1;
 		this.levels.forEach((layer, levels) -> {
@@ -394,5 +388,7 @@ public class MapChunk {
 				}
 			}			
 		});
+
+		return true;
 	}
 }
