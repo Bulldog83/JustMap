@@ -78,7 +78,11 @@ public class MapCache {
 		if (world == null) return null;
 		
 		if (dimensions.containsKey(dimension)) {
-			return dimensions.get(dimension);
+			MapCache data = dimensions.get(dimension);
+			if (!data.world.equals(world)) {
+				data.world = world;
+			}
+			return data;
 		}
 		
 		MapCache data = new MapCache(world);
@@ -211,6 +215,9 @@ public class MapCache {
 		MapChunk mapChunk;
 		if (chunks.containsKey(chunkPos)) {
 			mapChunk = this.chunks.get(chunkPos);
+			if (!world.equals(mapChunk.getWorld())) {
+				mapChunk.updateWorld(world);
+			}
 		} else {
 			mapChunk = new MapChunk(world, chunkPos, layer, level);
 			this.chunks.put(chunkPos, mapChunk);

@@ -34,7 +34,7 @@ public class MapChunk {
 	private final Map<Layer, ChunkLevel[]> levels = new ConcurrentHashMap<>();
 	private final Identifier dimension;
 	private final ChunkPos chunkPos;
-	private final World world;
+	private World world;
 	private WorldChunk worldChunk;
 	private Layer.Type layer;
 	private int level = 0;
@@ -214,7 +214,7 @@ public class MapChunk {
 	
 	private boolean updateWorldChunk() {
 		if(worldChunk.isEmpty()) {
-			WorldChunk lifeChunk = world.getChunkManager().getWorldChunk(getX(), getZ(), false);
+			WorldChunk lifeChunk = this.world.getChunkManager().getWorldChunk(getX(), getZ());
 			if (lifeChunk == null || lifeChunk.isEmpty()) return false;
 			this.worldChunk = lifeChunk;
 		}
@@ -324,11 +324,19 @@ public class MapChunk {
 	}
 	
 	public boolean isChunkLoaded() {
-		return world.getChunkManager().isChunkLoaded(getX(), getZ());
+		return this.world.getChunkManager().isChunkLoaded(getX(), getZ());
 	}
 	
 	public boolean hasSlime() {
 		return this.slime;
+	}
+	
+	public void updateWorld(World world) {
+		this.world = world;
+	}
+	
+	public World getWorld() {
+		return this.world;
 	}
 	
 	public void store(CompoundTag data) {

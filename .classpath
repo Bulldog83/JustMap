@@ -439,7 +439,7 @@
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="D:/NetBeans/Projects/Minecraft/JustMap/libs/immersive-portals-0.18-dev.jar">
+	<classpathentry kind="lib" path="D:/NetBeans/Projects/Minecraft/JustMap/libs/authme-1.16.1-1.2.1-dev.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
