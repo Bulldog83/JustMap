@@ -8,7 +8,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.client.render.EntityModelRenderer;
 import ru.bulldog.justmap.map.IMap;
-import ru.bulldog.justmap.map.minimap.MapPlayerManager;
+import ru.bulldog.justmap.map.MapPlayerManager;
 import ru.bulldog.justmap.util.ColorUtil;
 import ru.bulldog.justmap.util.Colors;
 import ru.bulldog.justmap.util.RenderUtil;

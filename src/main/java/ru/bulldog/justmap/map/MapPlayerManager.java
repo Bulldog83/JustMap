@@ -1,4 +1,4 @@
-package ru.bulldog.justmap.map.minimap;
+package ru.bulldog.justmap.map;
 
 import java.util.HashMap;
 import java.util.Map;
