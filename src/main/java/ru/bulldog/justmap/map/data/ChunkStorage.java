@@ -5,6 +5,8 @@ import java.io.IOException;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.math.ChunkPos;
+import ru.bulldog.justmap.JustMap;
+import ru.bulldog.justmap.util.tasks.TaskManager;
 
 public class ChunkStorage implements AutoCloseable {
 	
@@ -23,7 +25,18 @@ public class ChunkStorage implements AutoCloseable {
 	}
 
 	@Override
-	public void close() throws Exception {
-		this.worker.close();
+	public void close() {
+		TaskManager storageDestroyer = TaskManager.getManager("storage-destroyer");
+		storageDestroyer.execute("Storage: Destructing chunk storage...", () -> {
+			JustMap.LOGGER.debug("Storage: Start storage destructing...");
+			try {
+				this.worker.completeAll().join();
+				this.worker.close();
+			} catch (Exception ex) {
+				JustMap.LOGGER.catching(ex);
+			}
+			JustMap.LOGGER.debug("Storage: Chunk storage destructed!");
+		});
+		storageDestroyer.stop();
 	}
 }

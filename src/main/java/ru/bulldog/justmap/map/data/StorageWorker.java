@@ -43,7 +43,7 @@ public class StorageWorker implements AutoCloseable {
 	}
 
 	public void setResult(File dir, ChunkPos chunkPos, CompoundTag compoundTag) {
-		this.worker.run((completableFuture) -> {
+		this.worker.run("Storage: Writing chunk data for: " + chunkPos, (completableFuture) -> {
 			return () -> {
 				Result result = (Result) this.results.computeIfAbsent(chunkPos, (chunkPosx) -> {
 					return new Result();
@@ -59,11 +59,11 @@ public class StorageWorker implements AutoCloseable {
 				});
 			};
 		});
-		this.worker.execute("Storing chunk data for: " + chunkPos, this::writeResult);
+		this.worker.execute("Storage: Storing chunk data for: " + chunkPos, this::writeResult);
 	}
 
 	public CompoundTag getNbt(File dir, ChunkPos chunkPos) throws IOException {
-		CompletableFuture<?> completableFuture = this.worker.run((completableFuturex) -> {
+		CompletableFuture<?> completableFuture = this.worker.run("Storage: Get chunk NBT: " + chunkPos, (completableFuturex) -> {
 			return () -> {
 				Result result = (Result) this.results.get(chunkPos);
 				if (result != null) {
@@ -92,18 +92,17 @@ public class StorageWorker implements AutoCloseable {
 	}
 
 	private CompletableFuture<Void> shutdown() {
-		return this.worker.run((completableFuture) -> {
+		return this.worker.run("Storage: Shutdown...", (completableFuture) -> {
 			return () -> {
+				this.future = completableFuture;
 				this.writeAll();
 				this.finish();
-				this.future = completableFuture;
-				this.worker.stop();
 			};
 		});
 	}
 
 	public CompletableFuture<Void> completeAll() {
-		return this.worker.run((completableFuture) -> {
+		return this.worker.run("Storage: Complete all...", (completableFuture) -> {
 			return () -> {
 				CompletableFuture<?> completableFuture2 = CompletableFuture.allOf((CompletableFuture[]) this.results.values().stream().map((result) -> {
 					return result.future;
@@ -131,8 +130,10 @@ public class StorageWorker implements AutoCloseable {
 	}
 
 	private void writeAll() {
+		JustMap.LOGGER.debug("Storage: Start writing results...");
 		this.results.forEach(this::write);
 		this.results.clear();
+		JustMap.LOGGER.debug("Storage: All results written!");
 	}
 
 	private void write(ChunkPos chunkPos, Result result) {
@@ -146,6 +147,7 @@ public class StorageWorker implements AutoCloseable {
 	}
 
 	private void finish() {
+		JustMap.LOGGER.debug("Storage: Start closing storages...");
 		Exception error = new Exception();
 		this.storages.forEach((dir, storage) -> {
 			try {
@@ -155,6 +157,7 @@ public class StorageWorker implements AutoCloseable {
 				error.addSuppressed(ex);
 			}
 		});		
+		JustMap.LOGGER.debug("Storage: Storages closed!");
 		if (error.getSuppressed().length > 0) {
 			this.future.completeExceptionally(error);
 		} else {
@@ -167,6 +170,7 @@ public class StorageWorker implements AutoCloseable {
 		if (this.closed.compareAndSet(false, true)) {
 			try {
 				this.shutdown().join();
+				this.worker.stop();
 			} catch (CompletionException ex) {
 				if (ex.getCause() instanceof IOException) {
 					throw (IOException) ex.getCause();

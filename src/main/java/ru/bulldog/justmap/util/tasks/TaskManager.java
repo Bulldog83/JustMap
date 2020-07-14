@@ -13,9 +13,9 @@ import ru.bulldog.justmap.JustMap;
 
 public class TaskManager implements Executor {
     private final Queue<Task> workQueue = new ConcurrentLinkedQueue<>();
+    private final QueueBlocker queueBlocker;
     private Thread worker;   
     private String name = JustMap.MODID;
-    private final QueueBlocker queueBlocker;
     private boolean running = true; 
     
     private static Map<String, TaskManager> managers = new HashMap<>();
@@ -86,20 +86,10 @@ public class TaskManager implements Executor {
 
     private void work() {
     	while (running) {
-            Task nextTask = workQueue.poll();
-            if (nextTask != null) {
-                long time = System.currentTimeMillis();
-            	if (name.equals("justmap-region-data")) {
-                	System.out.println("Start: " + nextTask);
-                }
-            	JustMap.LOGGER.debug(nextTask);
-                nextTask.run();
-                if (name.equals("justmap-region-data")) {
-                	System.out.println("Finished: " + nextTask);
-                	System.out.println(System.currentTimeMillis() - time);
-                	System.out.println(worker.getState());
-                	System.out.println(this.queueSize());
-                }
+    		Task nextTask = workQueue.poll();
+    		if (nextTask != null) {
+    			JustMap.LOGGER.debug(nextTask);
+    			nextTask.run();
             } else {
             	LockSupport.park(queueBlocker);
             }

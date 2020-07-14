@@ -17,10 +17,6 @@ public class MapRegion {
 	
 	private static TaskManager worker = TaskManager.getManager("region-data");
 	
-	public static boolean hasWorks() {
-		return worker.queueSize() > 0;
-	}
-	
 	private final RegionPos pos;
 	private final MapTexture image;
 	private MapTexture texture;

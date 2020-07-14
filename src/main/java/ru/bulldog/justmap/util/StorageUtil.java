@@ -50,19 +50,17 @@ public class StorageUtil {
 		if (!storageDir.exists()) {
 			storageDir.mkdirs();
 		}		
-		if (storage == null) storage = new ChunkStorage();
+		if (storage == null) {
+			storage = new ChunkStorage();
+		}
 		
 		return storageDir;
 	}
 	
 	public static void closeStorage() {
 		if (storage != null) {
-			try {
-				storage.close();
-				storage = null;
-			} catch (Exception ex) {
-				JustMap.LOGGER.catching(ex);
-			}
+			storage.close();
+			storage = null;
 		}
 	}
 	
