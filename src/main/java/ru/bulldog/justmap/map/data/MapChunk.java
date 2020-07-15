@@ -16,6 +16,7 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.registry.RegistryKey;
+import net.minecraft.world.chunk.ChunkManager;
 import net.minecraft.world.chunk.WorldChunk;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.gen.ChunkRandom;
@@ -51,6 +52,11 @@ public class MapChunk {
 	public long requested = 0;
 	
 	private Object levelLock = new Object();
+	
+	public MapChunk(World world, WorldChunk lifeChunk, Layer.Type layer, int level) {
+		this(world, lifeChunk.getPos(), layer, level);
+		this.worldChunk = lifeChunk;
+	}
 	
 	public MapChunk(World world, ChunkPos pos, Layer.Type layer, int level) {
 		this(world, pos, layer);
@@ -169,6 +175,35 @@ public class MapChunk {
 		return getChunkLevel().setBlockState(pos.getX() & 15, pos.getY() & 15, pos.getZ() & 15, blockState);
 	}
 	
+	public boolean update(boolean forceUpdate) {
+		if (updating) return false;		
+		if (!outdated && forceUpdate) {
+			this.outdated = forceUpdate;
+		}
+		
+		long currentTime = System.currentTimeMillis();
+		if (!outdated && currentTime - updated < ClientParams.chunkUpdateInterval) return false;
+		if (purged || !this.updateWorldChunk()) return false;
+		
+		CompletableFuture<Boolean> updated = chunkUpdater.run("Updating Chunk: " + chunkPos, future -> {
+			return () -> future.complete(this.updateChunkData());
+		});
+		
+		return updated.join();
+	}
+	
+	private boolean updateWorldChunk() {
+		if(worldChunk.isEmpty()) {
+			ChunkManager chunkManager = this.world.getChunkManager();
+			if (chunkManager == null) return false;
+			WorldChunk lifeChunk = chunkManager.getWorldChunk(getX(), getZ());
+			if (lifeChunk == null || lifeChunk.isEmpty()) return false;
+			this.worldChunk = lifeChunk;
+		}
+		this.worldChunk.setLoadedToWorld(true);
+		return true;
+	}
+	
 	public MapChunk updateHeighmap() {
 		if (!this.updateWorldChunk()) return this;
 		
@@ -176,7 +211,11 @@ public class MapChunk {
 		boolean skipWater = !(ClientParams.hideWater || waterTint);
 		for (int x = 0; x < 16; x++) {
 			for (int z = 0; z < 16; z++) {
-				int y = worldChunk.sampleHeightmap(Heightmap.Type.WORLD_SURFACE, x, z);
+				int yws = worldChunk.sampleHeightmap(Heightmap.Type.WORLD_SURFACE, x, z);
+				int ymb = worldChunk.sampleHeightmap(Heightmap.Type.MOTION_BLOCKING, x, z);
+				int y = Math.max(yws, ymb);
+				if (y < 0) continue; 
+				
 				y = MapProcessor.getTopBlockY(this, x, y + 1, z, skipWater);
 				
 				int index = x + (z << 4);
@@ -191,34 +230,6 @@ public class MapChunk {
 		}
 		
 		return this;
-	}
-	
-	public boolean update(boolean forceUpdate) {
-		if (updating) return false;		
-		if (!outdated && forceUpdate) {
-			this.outdated = forceUpdate;
-		}
-		
-		boolean result = false;
-		long currentTime = System.currentTimeMillis();
-		if (!outdated && currentTime - updated < ClientParams.chunkUpdateInterval) return false;
-		if (purged || !this.updateWorldChunk()) return false;
-		
-		CompletableFuture<Boolean> updated = chunkUpdater.run("Updating Chunk: " + chunkPos, future -> {
-			return () -> future.complete(this.updateChunkData());
-		});		
-		result = updated.join();
-		
-		return result;
-	}
-	
-	private boolean updateWorldChunk() {
-		if(worldChunk.isEmpty()) {
-			WorldChunk lifeChunk = this.world.getChunkManager().getWorldChunk(getX(), getZ());
-			if (lifeChunk == null || lifeChunk.isEmpty()) return false;
-			this.worldChunk = lifeChunk;
-		}
-		return true;
 	}
 	
 	private boolean updateChunkData() {
@@ -251,7 +262,7 @@ public class MapChunk {
 				int posZ = z + (chunkPos.z << 4);
 				int posY = getHeighmap()[index];
 				
-				if (posY == -1) continue;
+				if (posY < 0) continue;
 				
 				BlockPos blockPos = new BlockPos(posX, posY, posZ);
 				BlockState blockState = this.getBlockState(blockPos);

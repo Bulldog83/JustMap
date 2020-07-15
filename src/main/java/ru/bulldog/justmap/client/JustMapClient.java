@@ -4,6 +4,8 @@ import com.mojang.realmsclient.RealmsMainScreen;
 import com.mojang.realmsclient.gui.screens.RealmsGenericErrorScreen;
 
 import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientChunkEvents;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 
 import net.minecraft.client.gui.screen.BackupPromptScreen;
@@ -22,6 +24,7 @@ import ru.bulldog.justmap.client.config.ClientConfig;
 import ru.bulldog.justmap.map.data.MapCache;
 import ru.bulldog.justmap.map.minimap.Minimap;
 import ru.bulldog.justmap.util.StorageUtil;
+import ru.bulldog.justmap.util.tasks.TaskManager;
 
 public class JustMapClient implements ClientModInitializer {
 	public final static ClientConfig CONFIG = ClientConfig.get();
@@ -34,12 +37,11 @@ public class JustMapClient implements ClientModInitializer {
 	public void onInitializeClient() {
 		KeyHandler.initKeyBindings();
 
-		ClientTickEvents.END_CLIENT_TICK.register((client) -> {
+		ClientChunkEvents.CHUNK_LOAD.register(MapCache::addLoadedChunk);
+		ClientTickEvents.END_CLIENT_TICK.register(client -> {
 			boolean isTitle = this.isOnTitleScreen(client.currentScreen);
 			if (isTitle && !isOnTitleScreen) {
-				MapCache.saveData();
-				JustMap.WORKER.execute("Clearing map cache...", MapCache::clearData);
-				JustMap.WORKER.execute("Closing storage...", StorageUtil::closeStorage);
+				JustMapClient.stop();
 			}
 			this.isOnTitleScreen = isTitle;
 			if (isOnTitleScreen) return;
@@ -49,7 +51,7 @@ public class JustMapClient implements ClientModInitializer {
 			MAP.update();
 
 			boolean paused = this.paused;
-			boolean online = !client.isIntegratedServerRunning() && client.currentScreen == null;
+			boolean online = !client.isIntegratedServerRunning();
 			this.paused = client.isPaused() || client.currentScreen != null && client.currentScreen.isPauseScreen();
 			long time = System.currentTimeMillis();
 			if (!paused && this.paused) {
@@ -59,6 +61,16 @@ public class JustMapClient implements ClientModInitializer {
 				MapCache.saveData();
 			}
 		});
+		ClientLifecycleEvents.CLIENT_STOPPING.register(client -> {
+			JustMapClient.stop();
+			TaskManager.shutdown();
+		});
+	}
+	
+	private static void stop() {
+		MapCache.saveData();
+		JustMap.WORKER.execute("Clearing map cache...", MapCache::clearData);
+		JustMap.WORKER.execute("Closing storage...", StorageUtil::closeStorage);
 	}
 	
 	private boolean isOnTitleScreen(Screen currentScreen) {

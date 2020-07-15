@@ -10,6 +10,7 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
+import net.minecraft.world.chunk.WorldChunk;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -101,6 +102,19 @@ public class MapCache {
 			});
 		});
 		lastSaved = System.currentTimeMillis();
+	}
+	
+	public static void addLoadedChunk(World world, WorldChunk lifeChunk) {
+		if (world == null || lifeChunk == null) return;
+		
+		MapCache data = get();
+		MapChunk mapChunk = new MapChunk(world, lifeChunk, currentLayer, currentLevel);
+		ChunkPos chunkPos = mapChunk.getPos();
+		if (data.chunks.containsKey(chunkPos)) {
+			data.chunks.replace(chunkPos, mapChunk);
+		} else {
+			data.chunks.put(chunkPos, mapChunk);
+		}
 	}
 	
 	public static void storeChunk(MapChunk chunk) {
