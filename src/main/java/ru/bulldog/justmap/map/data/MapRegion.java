@@ -3,7 +3,7 @@ package ru.bulldog.justmap.map.data;
 import java.io.File;
 
 import net.minecraft.util.math.BlockPos;
-
+import net.minecraft.world.World;
 import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.client.render.MapTexture;
@@ -19,6 +19,7 @@ public class MapRegion {
 	
 	private final RegionPos pos;
 	private final MapTexture image;
+	private World world;
 	private MapTexture texture;
 	private MapTexture overlay;
 	
@@ -40,13 +41,23 @@ public class MapRegion {
 	
 	public long updated = 0;
 	
-	public MapRegion(BlockPos blockPos, Layer.Type layer, int level) {
+	public MapRegion(World world, BlockPos blockPos, Layer.Type layer, int level) {
+		this.world = world;
 		this.pos = new RegionPos(blockPos);
 		this.image = new MapTexture(512, 512, Colors.BLACK);
 		this.layer = layer;
 		this.level = level;
 		this.loadImage();
-		this.updateImage();
+		this.updateImage(true);
+	}
+	
+	public void updateWorld(World world) {
+		if (world == null) return;
+		if (!world.equals(this.world)) {
+			this.world = world;
+			this.clear();
+			this.updateImage(true);
+		}
 	}
 	
 	public int getX() {
@@ -57,17 +68,17 @@ public class MapRegion {
 		return this.pos.z;
 	}
 	
-	public void updateImage() {
+	public void updateImage(boolean needUpdate) {
 		if (updating) return;
 		this.updating = true;
 		worker.execute("Updating Region: " + pos, () -> {
-			this.updateMapParams();
+			this.updateMapParams(needUpdate);
 			this.update();
 		});
 	}
 	
-	private void updateMapParams() {
-		this.needUpdate = ClientParams.forceUpdate;
+	private void updateMapParams(boolean needUpdate) {
+		this.needUpdate = needUpdate;
 		if (ClientParams.hideWater != hideWater) {
 			this.hideWater = ClientParams.hideWater;
 			this.needUpdate = true;
@@ -189,7 +200,15 @@ public class MapRegion {
 		if (texture != null) {
 			this.updateTexture();
 		}
-		this.updateImage();
+		this.updateImage(true);
+	}
+	
+	private void clear() {
+		this.image.fill(Colors.BLACK);
+		if (texture != null) {
+			this.overlay.fill(Colors.TRANSPARENT);
+			this.texture.fill(Colors.BLACK);
+		}
 	}
 	
 	private void saveImage() {

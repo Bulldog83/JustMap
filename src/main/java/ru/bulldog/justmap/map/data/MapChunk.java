@@ -3,14 +3,12 @@ package ru.bulldog.justmap.map.data;
 import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.util.ColorUtil;
 import ru.bulldog.justmap.util.Dimension;
-import ru.bulldog.justmap.util.StorageUtil;
 import ru.bulldog.justmap.util.tasks.TaskManager;
+
 import net.minecraft.world.Heightmap;
 import net.minecraft.world.World;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
@@ -21,7 +19,6 @@ import net.minecraft.world.chunk.WorldChunk;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.gen.ChunkRandom;
 
-import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
@@ -41,7 +38,6 @@ public class MapChunk {
 	private int level = 0;
 	private boolean outdated = false;
 	private boolean updating = false;
-	private boolean restored = false;
 	private boolean purged = false;
 	private boolean slime = false;
 	private boolean saved = true;
@@ -164,7 +160,7 @@ public class MapChunk {
 	}
 	
 	public WorldChunk getWorldChunk() {
-		return worldChunk;
+		return this.worldChunk;
 	}
 	
 	public BlockState getBlockState(BlockPos pos) {
@@ -234,10 +230,6 @@ public class MapChunk {
 	
 	private boolean updateChunkData() {
 		this.updating = true;
-		
-		if (!restored) {
-			this.restored = this.restore();
-		}
 		
 		MapCache mapData = MapCache.get();
 		MapChunk eastChunk = mapData.getCurrentChunk(chunkPos.x + 1, chunkPos.z);
@@ -348,66 +340,5 @@ public class MapChunk {
 	
 	public World getWorld() {
 		return this.world;
-	}
-	
-	public void store(CompoundTag data) {
-		this.levels.forEach((layer, levels) -> {
-			ListTag levelsTag = new ListTag();
-			
-			CompoundTag level;
-			for(int i = 0; i < levels.length; i++) {
-				int lvl = i;
-				ChunkLevel chunkLevel = Arrays.stream(levels).filter((levelx) -> {
-					return levelx != null && levelx.level == lvl;
-				}).findFirst().orElse(EMPTY_LEVEL);
-		         
-				if (chunkLevel.isEmpty()) continue;
-	            
-				level = new CompoundTag();
-	            
-	            level.putInt("Level", lvl);
-	            chunkLevel.container().write(level, "Palette", "BlockStates");
-	            chunkLevel.store(level);
-
-	            levelsTag.add(level);
-			}
-			
-			if (!levelsTag.isEmpty()) data.put(layer.name, levelsTag);
-		});
-		
-		this.saved = true;
-	}
-	
-	private boolean restore() {
-		CompoundTag chunkData = StorageUtil.getCache(chunkPos);
-		if (chunkData.isEmpty()) return true;
-		
-		final int dataVer = chunkData.contains("version") ? chunkData.getInt("version") : -1;
-		this.levels.forEach((layer, levels) -> {
-			ListTag listTag = chunkData.getList(layer.name, 10);
-			for(int i = 0; i < listTag.size(); ++i) {
-				CompoundTag level = listTag.getCompound(i);
-				int lvl = level.getInt("Level");
-				if (level.contains("Palette", 9) && level.contains("BlockStates", 12)) {
-					ChunkLevel chunkLevel = this.getChunkLevel(layer.type, lvl);
-					if (chunkLevel.isEmpty()) continue;
-					
-					chunkLevel.container().read(level.getList("Palette", 10), level.getLongArray("BlockStates"));
-					chunkLevel.load(level);
-					
-					if (dataVer == -1) {
-						for (int j = 0; j < chunkLevel.colormap.length; j++) {
-							int color = chunkLevel.colormap[j];
-							if (color != -1) {
-								chunkLevel.colormap[j] = ColorUtil.ABGRtoARGB(color);
-							}
-						}
-						this.saved = false;
-					}
-				}
-			}			
-		});
-
-		return true;
 	}
 }

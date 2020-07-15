@@ -5,16 +5,14 @@ import java.io.File;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.loader.api.FabricLoader;
+
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ServerInfo;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.dimension.DimensionType;
 
 import ru.bulldog.justmap.JustMap;
-import ru.bulldog.justmap.map.data.ChunkStorage;
 
 public class StorageUtil {
 	
@@ -24,45 +22,8 @@ public class StorageUtil {
 	private final static File MAP_SKINS_DIR = new File(MAP_CONFIG_DIR, "skins/");
 	private final static File MAP_ICONS_DIR = new File(MAP_CONFIG_DIR, "icons/");
 	
-	private static ChunkStorage storage;
-	private static File storageDir;
 	private static File filesDir = new File(MAP_DATA_DIR, "undefined/");	
 	private static String currentDim = "unknown";
-	
-	@Environment(EnvType.CLIENT)
-	public static synchronized CompoundTag getCache(ChunkPos pos) {
-		try {
-			CompoundTag data = storage.getNbt(getCacheStorage(), pos);
-			return data != null ? data : new CompoundTag();
-		} catch (Exception ex) {
-			return new CompoundTag();
-		}		
-	}
-	
-	@Environment(EnvType.CLIENT)
-	public static synchronized void saveCache(ChunkPos pos, CompoundTag data) {
-		storage.setTagAt(getCacheStorage(), pos, data);
-	}
-	
-	@Environment(EnvType.CLIENT)
-	public static File getCacheStorage() {
-		storageDir = new File(cacheDir(), "chunk-data/");
-		if (!storageDir.exists()) {
-			storageDir.mkdirs();
-		}		
-		if (storage == null) {
-			storage = new ChunkStorage();
-		}
-		
-		return storageDir;
-	}
-	
-	public static void closeStorage() {
-		if (storage != null) {
-			storage.close();
-			storage = null;
-		}
-	}
 	
 	public static File configDir() {
 		if (!MAP_CONFIG_DIR.exists()) {

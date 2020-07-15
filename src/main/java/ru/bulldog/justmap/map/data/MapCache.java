@@ -2,10 +2,8 @@ package ru.bulldog.justmap.map.data;
 
 import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.client.config.ClientParams;
-import ru.bulldog.justmap.util.StorageUtil;
 
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
@@ -66,23 +64,17 @@ public class MapCache {
 		return get(lastWorld, lastDimension);
 	}
 	
-	public static MapCache get(World world, Identifier dimension) {	
-		MapCache data = getData(world, dimension);
-		
-		if (data == null) return null;
-		data.clearCache();
-		
-		return data;
-	}
-	
-	private static MapCache getData(World world, Identifier dimension) {
+	private static MapCache get(World world, Identifier dimension) {
 		if (world == null) return null;
 		
 		if (dimensions.containsKey(dimension)) {
 			MapCache data = dimensions.get(dimension);
 			if (!data.world.equals(world)) {
+				data.chunks.clear();
 				data.world = world;
 			}
+			data.clearCache();
+			
 			return data;
 		}
 		
@@ -90,18 +82,6 @@ public class MapCache {
 		dimensions.put(dimension, data);
 		
 		return data;
-	}
-	
-	public static void saveData() {
-		MapCache data = get();
-		if (data == null) return;
-		
-		JustMap.WORKER.execute("Saving data to storage...", () -> {
-			data.getChunks().forEach((pos, chunk) -> {
-				storeChunk(chunk);
-			});
-		});
-		lastSaved = System.currentTimeMillis();
 	}
 	
 	public static void addLoadedChunk(World world, WorldChunk lifeChunk) {
@@ -114,21 +94,6 @@ public class MapCache {
 			data.chunks.replace(chunkPos, mapChunk);
 		} else {
 			data.chunks.put(chunkPos, mapChunk);
-		}
-	}
-	
-	public static void storeChunk(MapChunk chunk) {
-		if (!chunk.saving && chunk.saveNeeded()) {
-			chunk.saving = true;
-			
-			CompoundTag chunkData = new CompoundTag();
-			chunk.store(chunkData);
-			
-			if (!chunkData.isEmpty()) {
-				chunkData.putInt("version", 3);
-				StorageUtil.saveCache(chunk.getPos(), chunkData);
-			}
-			chunk.saving = false;
 		}
 	}
 	
@@ -170,8 +135,7 @@ public class MapCache {
 		List<ChunkPos> chunks = new ArrayList<>();
 		for (ChunkPos chunkPos : this.chunks.keySet()) {
 			MapChunk chunkData = this.chunks.get(chunkPos);
-			if (currentTime - chunkData.requested >= 5000) {
-				storeChunk(chunkData);
+			if (currentTime - chunkData.requested >= 300000) {
 				chunks.add(chunkPos);
 				purged++;
 				if (purged >= maxPurged) {
@@ -186,10 +150,14 @@ public class MapCache {
 	}
 	
 	public MapRegion getRegion(BlockPos blockPos) {
-		return this.getRegion(blockPos, false);
+		return this.getRegion(world, blockPos, false);
 	}
 	
 	public MapRegion getRegion(BlockPos blockPos, boolean surfaceOnly) {
+		return this.getRegion(world, blockPos, surfaceOnly);
+	}
+	
+	public MapRegion getRegion(World world, BlockPos blockPos, boolean surfaceOnly) {
 		RegionPos regPos = new RegionPos(blockPos);
 
 		Layer.Type layer = surfaceOnly ? Layer.Type.SURFACE : currentLayer;
@@ -198,8 +166,9 @@ public class MapCache {
 		MapRegion region;
 		if(regions.containsKey(regPos)) {
 			region = regions.get(regPos);
+			region.updateWorld(world);
 		} else {
-			region = new MapRegion(blockPos, layer, level);
+			region = new MapRegion(world, blockPos, layer, level);
 			regions.put(regPos, region);
 		}
 		region.surfaceOnly = surfaceOnly;
@@ -209,14 +178,10 @@ public class MapCache {
 			level != region.getLevel()) {
 			region.swapLayer(layer, level);
 		} else if (time - region.updated > 3000) {
-			region.updateImage();
+			region.updateImage(ClientParams.forceUpdate);
 		}
 		
 		return region;
-	}
-	
-	private Map<ChunkPos, MapChunk> getChunks() {
-		return this.chunks;
 	}
 
 	public MapChunk getCurrentChunk(int posX, int posZ) {
