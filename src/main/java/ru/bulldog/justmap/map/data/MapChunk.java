@@ -188,6 +188,16 @@ public class MapChunk {
 		return updated.join();
 	}
 	
+	private void callSavedChunk() {
+		
+	}
+	
+	public void updateWorldChunk(WorldChunk lifeChunk) {
+		if (lifeChunk != null && !lifeChunk.isEmpty()) {
+			this.worldChunk = lifeChunk;
+		}
+	}
+	
 	private boolean updateWorldChunk() {
 		if(worldChunk.isEmpty()) {
 			ChunkManager chunkManager = this.world.getChunkManager();
@@ -335,7 +345,13 @@ public class MapChunk {
 	}
 	
 	public void updateWorld(World world) {
-		this.world = world;
+		if (!this.world.equals(world)) {
+			this.world = world;
+			synchronized (levelLock) {
+				this.levels.clear();
+			}
+			this.update(true);
+		}
 	}
 	
 	public World getWorld() {

@@ -14,16 +14,43 @@ import net.minecraft.world.dimension.DimensionType;
 
 import ru.bulldog.justmap.JustMap;
 
-public class StorageUtil {
+public final class StorageUtil {
+	
+	private StorageUtil() {}
 	
 	private final static FabricLoader fabricLoader = FabricLoader.getInstance();
-	private final static File MAP_DATA_DIR = new File(fabricLoader.getGameDirectory(), JustMap.MODID + "/");
+	private final static File GAME_DIR = fabricLoader.getGameDirectory();
+	private final static File MAP_DATA_DIR = new File(GAME_DIR, JustMap.MODID + "/");
 	private final static File MAP_CONFIG_DIR = new File(fabricLoader.getConfigDirectory(), String.format("/%s/", JustMap.MODID));
 	private final static File MAP_SKINS_DIR = new File(MAP_CONFIG_DIR, "skins/");
 	private final static File MAP_ICONS_DIR = new File(MAP_CONFIG_DIR, "icons/");
 	
 	private static File filesDir = new File(MAP_DATA_DIR, "undefined/");	
 	private static String currentDim = "unknown";
+	
+	public static File savesDir() {
+		File savesDir = new File(GAME_DIR, "saves/");
+		if (!savesDir.exists()) {
+			savesDir.mkdirs();
+		}		
+		return savesDir;
+	}
+	
+	@Environment(EnvType.CLIENT)
+	public static File worldSavesDir() {
+		File savesDir = savesDir();
+		
+		MinecraftClient minecraft = MinecraftClient.getInstance();
+		if (!minecraft.isIntegratedServerRunning()) return null;
+		
+		File worldSavesDir = new File(savesDir, minecraft.getServer().getName());
+		if (!worldSavesDir.exists()) return null;
+		
+		File dimDir = DimensionType.getSaveDirectory(minecraft.world.getRegistryKey(), worldSavesDir);
+		if (dimDir.exists()) return dimDir;
+		
+		return null;
+	}
 	
 	public static File configDir() {
 		if (!MAP_CONFIG_DIR.exists()) {

@@ -85,14 +85,16 @@ public class MapCache {
 	}
 	
 	public static void addLoadedChunk(World world, WorldChunk lifeChunk) {
-		if (world == null || lifeChunk == null) return;
+		if (world == null || lifeChunk == null || lifeChunk.isEmpty()) return;
 		
 		MapCache data = get();
-		MapChunk mapChunk = new MapChunk(world, lifeChunk, currentLayer, currentLevel);
-		ChunkPos chunkPos = mapChunk.getPos();
+		ChunkPos chunkPos = lifeChunk.getPos();
 		if (data.chunks.containsKey(chunkPos)) {
-			data.chunks.replace(chunkPos, mapChunk);
+			MapChunk mapChunk = data.chunks.get(chunkPos);
+			mapChunk.updateWorldChunk(lifeChunk);
+			mapChunk.updateWorld(world);
 		} else {
+			MapChunk mapChunk = new MapChunk(world, lifeChunk, currentLayer, currentLevel);
 			data.chunks.put(chunkPos, mapChunk);
 		}
 	}
@@ -194,9 +196,7 @@ public class MapCache {
 		MapChunk mapChunk;
 		if (chunks.containsKey(chunkPos)) {
 			mapChunk = this.chunks.get(chunkPos);
-			if (!world.equals(mapChunk.getWorld())) {
-				mapChunk.updateWorld(world);
-			}
+			mapChunk.updateWorld(world);
 		} else {
 			mapChunk = new MapChunk(world, chunkPos, layer, level);
 			this.chunks.put(chunkPos, mapChunk);
