@@ -146,7 +146,6 @@ public class MapRegion {
 				}
 			}
 		}
-		System.out.println(image.changed);
 		if (image.changed) this.saveImage();
 		if (overlayNeeded && (image.changed || overlay.changed)) {
 			this.updateTexture();
