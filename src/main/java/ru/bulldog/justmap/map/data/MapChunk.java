@@ -183,7 +183,8 @@ public class MapChunk {
 	}
 	
 	public boolean update(boolean forceUpdate) {
-		if (updating || purged) return false;		
+		if (updating || purged) return false;
+		
 		if (!outdated && forceUpdate) {
 			this.outdated = forceUpdate;
 		}
@@ -214,6 +215,7 @@ public class MapChunk {
 				WorldChunk worldChunk = ((ReadOnlyChunk) chunk).getWrappedChunk();
 				worldChunk.setLoadedToWorld(true);
 				this.updateWorldChunk(worldChunk);
+				
 				return true;
 			}
 			return false;
@@ -224,6 +226,7 @@ public class MapChunk {
 	}
 	
 	public void updateWorldChunk(WorldChunk lifeChunk) {
+		if (!this.worldChunk.isEmpty()) return;
 		if (lifeChunk != null && !lifeChunk.isEmpty()) {
 			this.worldChunk = lifeChunk;
 		}
@@ -252,7 +255,8 @@ public class MapChunk {
 				int yws = worldChunk.sampleHeightmap(Heightmap.Type.WORLD_SURFACE, x, z);
 				int ymb = worldChunk.sampleHeightmap(Heightmap.Type.MOTION_BLOCKING, x, z);
 				int y = Math.max(yws, ymb);
-				if (y < 0) continue; 
+				
+				if (y <= 0) continue; 
 				
 				y = MapProcessor.getTopBlockY(this, x, y + 1, z, skipWater);
 				
@@ -273,7 +277,10 @@ public class MapChunk {
 	private boolean updateChunkData() {
 		this.updating = true;
 		
-		if (!this.updateWorldChunk()) return false;
+		if (!this.updateWorldChunk()) {
+			this.updating = false;
+			return false;
+		}
 		
 		MapCache mapData = MapCache.get();
 		MapChunk eastChunk = mapData.getCurrentChunk(chunkPos.x + 1, chunkPos.z);

@@ -52,6 +52,14 @@ public class MapRegion {
 		this.updateImage(true);
 	}
 	
+	public int getX() {
+		return this.pos.x;
+	}
+	
+	public int getZ() {
+		return this.pos.z;
+	}
+	
 	public void updateWorld(World world) {
 		if (world == null) return;
 		if (!world.equals(this.world)) {
@@ -59,14 +67,6 @@ public class MapRegion {
 			this.clear();
 			this.updateImage(true);
 		}
-	}
-	
-	public int getX() {
-		return this.pos.x;
-	}
-	
-	public int getZ() {
-		return this.pos.z;
 	}
 	
 	public void updateImage(boolean needUpdate) {
