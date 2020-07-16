@@ -1,24 +1,32 @@
 package ru.bulldog.justmap.map.data;
 
+import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.util.ColorUtil;
 import ru.bulldog.justmap.util.Dimension;
 import ru.bulldog.justmap.util.tasks.TaskManager;
 
+import net.minecraft.world.ChunkSerializer;
 import net.minecraft.world.Heightmap;
 import net.minecraft.world.World;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.world.ServerChunkManager;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.registry.RegistryKey;
+import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.ChunkManager;
+import net.minecraft.world.chunk.ReadOnlyChunk;
 import net.minecraft.world.chunk.WorldChunk;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.gen.ChunkRandom;
+import net.minecraft.world.storage.VersionedChunkStorage;
 
+import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
@@ -83,7 +91,10 @@ public class MapChunk {
 	}
 	
 	public MapChunk resetChunk() {
-		this.levels.clear();
+		synchronized (levelLock) {
+			this.levels.clear();
+		}
+		this.outdated = true;
 		this.updated = 0;
 		
 		return this;
@@ -172,14 +183,13 @@ public class MapChunk {
 	}
 	
 	public boolean update(boolean forceUpdate) {
-		if (updating) return false;		
+		if (updating || purged) return false;		
 		if (!outdated && forceUpdate) {
 			this.outdated = forceUpdate;
 		}
 		
 		long currentTime = System.currentTimeMillis();
 		if (!outdated && currentTime - updated < ClientParams.chunkUpdateInterval) return false;
-		if (purged || !this.updateWorldChunk()) return false;
 		
 		CompletableFuture<Boolean> updated = chunkUpdater.run("Updating Chunk: " + chunkPos, future -> {
 			return () -> future.complete(this.updateChunkData());
@@ -188,8 +198,29 @@ public class MapChunk {
 		return updated.join();
 	}
 	
-	private void callSavedChunk() {
+	private boolean callSavedChunk() {
+		if (!(world instanceof ServerWorld)) return false;
 		
+		ServerWorld world = (ServerWorld) this.world;
+		ServerChunkManager manager = world.getChunkManager();
+		VersionedChunkStorage storage = manager.threadedAnvilChunkStorage;
+		try {		
+			CompoundTag chunkTag = storage.getNbt(chunkPos);
+			if (chunkTag == null) return false;
+			
+			Chunk chunk = ChunkSerializer.deserialize(
+					world, world.getStructureManager(), world.getPointOfInterestStorage(), chunkPos, chunkTag);
+			if (chunk instanceof ReadOnlyChunk) {
+				WorldChunk worldChunk = ((ReadOnlyChunk) chunk).getWrappedChunk();
+				worldChunk.setLoadedToWorld(true);
+				this.updateWorldChunk(worldChunk);
+				return true;
+			}
+			return false;
+		} catch (IOException ex) {
+			JustMap.LOGGER.catching(ex);
+			return false;
+		}
 	}
 	
 	public void updateWorldChunk(WorldChunk lifeChunk) {
@@ -203,10 +234,11 @@ public class MapChunk {
 			ChunkManager chunkManager = this.world.getChunkManager();
 			if (chunkManager == null) return false;
 			WorldChunk lifeChunk = chunkManager.getWorldChunk(getX(), getZ());
-			if (lifeChunk == null || lifeChunk.isEmpty()) return false;
+			if (lifeChunk == null || lifeChunk.isEmpty()) {
+				return this.callSavedChunk();
+			}
 			this.worldChunk = lifeChunk;
 		}
-		this.worldChunk.setLoadedToWorld(true);
 		return true;
 	}
 	
@@ -240,6 +272,8 @@ public class MapChunk {
 	
 	private boolean updateChunkData() {
 		this.updating = true;
+		
+		if (!this.updateWorldChunk()) return false;
 		
 		MapCache mapData = MapCache.get();
 		MapChunk eastChunk = mapData.getCurrentChunk(chunkPos.x + 1, chunkPos.z);
@@ -346,11 +380,8 @@ public class MapChunk {
 	
 	public void updateWorld(World world) {
 		if (!this.world.equals(world)) {
+			this.resetChunk();
 			this.world = world;
-			synchronized (levelLock) {
-				this.levels.clear();
-			}
-			this.update(true);
 		}
 	}
 	

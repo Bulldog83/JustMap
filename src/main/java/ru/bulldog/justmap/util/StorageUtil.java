@@ -28,30 +28,6 @@ public final class StorageUtil {
 	private static File filesDir = new File(MAP_DATA_DIR, "undefined/");	
 	private static String currentDim = "unknown";
 	
-	public static File savesDir() {
-		File savesDir = new File(GAME_DIR, "saves/");
-		if (!savesDir.exists()) {
-			savesDir.mkdirs();
-		}		
-		return savesDir;
-	}
-	
-	@Environment(EnvType.CLIENT)
-	public static File worldSavesDir() {
-		File savesDir = savesDir();
-		
-		MinecraftClient minecraft = MinecraftClient.getInstance();
-		if (!minecraft.isIntegratedServerRunning()) return null;
-		
-		File worldSavesDir = new File(savesDir, minecraft.getServer().getName());
-		if (!worldSavesDir.exists()) return null;
-		
-		File dimDir = DimensionType.getSaveDirectory(minecraft.world.getRegistryKey(), worldSavesDir);
-		if (dimDir.exists()) return dimDir;
-		
-		return null;
-	}
-	
 	public static File configDir() {
 		if (!MAP_CONFIG_DIR.exists()) {
 			MAP_CONFIG_DIR.mkdirs();

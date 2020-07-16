@@ -4,6 +4,7 @@ import java.io.File;
 
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+
 import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.client.render.MapTexture;
@@ -145,6 +146,7 @@ public class MapRegion {
 				}
 			}
 		}
+		System.out.println(image.changed);
 		if (image.changed) this.saveImage();
 		if (overlayNeeded && (image.changed || overlay.changed)) {
 			this.updateTexture();

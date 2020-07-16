@@ -92,7 +92,6 @@ public class MapCache {
 		if (data.chunks.containsKey(chunkPos)) {
 			MapChunk mapChunk = data.chunks.get(chunkPos);
 			mapChunk.updateWorldChunk(lifeChunk);
-			mapChunk.updateWorld(world);
 		} else {
 			MapChunk mapChunk = new MapChunk(world, lifeChunk, currentLayer, currentLevel);
 			data.chunks.put(chunkPos, mapChunk);
