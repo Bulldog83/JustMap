@@ -21,7 +21,6 @@ public class ClientParams {
 	public static boolean rotateMap = false;
 	public static boolean showInChat = false;
 	public static boolean showBigMap = false;
-	public static boolean forceUpdate = false;
 
 	public static boolean drawCaves = true;
 	public static boolean hidePlants = false;
@@ -74,11 +73,13 @@ public class ClientParams {
 	public static int entityIconSize = 8;
 	public static int entityModelSize = 5;
 	public static int entityOutlineSize = 1;
-	
+
 	public static int chunkUpdateInterval = 1000;
 	public static int chunkLevelUpdateInterval = 3000;
 	public static int purgeDelay = 60;
 	public static int purgeAmount = 1500;
+	public static boolean forceUpdate = false;
+	public static boolean chunksGeneration = false;
 	
 	public static boolean showWaypoints = true;
 	public static boolean jumpToWaypoints = true;

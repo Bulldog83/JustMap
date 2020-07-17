@@ -95,6 +95,7 @@ public class ClientConfig extends Config {
 		KEEPER.registerEntry("force_map_update", new BooleanEntry(ClientParams.forceUpdate, (b) -> ClientParams.forceUpdate = b, () -> ClientParams.forceUpdate));
 		KEEPER.registerEntry("show_slime", new BooleanEntry(ClientParams.showSlime, (b) -> ClientParams.showSlime = b, () -> ClientParams.showSlime));
 		KEEPER.registerEntry("show_loaded_chunks", new BooleanEntry(ClientParams.showLoadedChunks, (b) -> ClientParams.showLoadedChunks = b, () -> ClientParams.showLoadedChunks));
+		KEEPER.registerEntry("generate_new_chunks", new BooleanEntry(ClientParams.chunksGeneration, (b) -> ClientParams.chunksGeneration = b, () -> ClientParams.chunksGeneration));
 		KEEPER.registerEntry("entity_icon_size", new IntegerRange(ClientParams.entityIconSize, (i) -> ClientParams.entityIconSize = i, () -> ClientParams.entityIconSize, 2, 16));
 		KEEPER.registerEntry("entity_model_size", new IntegerRange(ClientParams.entityModelSize, (i) -> ClientParams.entityModelSize = i, () -> ClientParams.entityModelSize, 2, 16));
 		KEEPER.registerEntry("entity_outline_size", new IntegerRange(ClientParams.entityOutlineSize, (i) -> ClientParams.entityOutlineSize = i, () -> ClientParams.entityOutlineSize, 1, 5));

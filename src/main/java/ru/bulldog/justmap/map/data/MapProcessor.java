@@ -12,10 +12,9 @@ public class MapProcessor {
 	
 	public static int getTopBlockY(MapChunk mapChunk, int x, int y, int z, boolean liquids) {
 		WorldChunk worldChunk = mapChunk.getWorldChunk();
-		ChunkPos chunkPos = worldChunk.getPos();		
+		if (worldChunk == null || worldChunk.isEmpty()) return -1;
 		
-		if (worldChunk.isEmpty()) return -1;
-		
+		ChunkPos chunkPos = worldChunk.getPos();
 		int posX = x + (chunkPos.x << 4);
 		int posZ = z + (chunkPos.z << 4);
 		
@@ -56,7 +55,7 @@ public class MapProcessor {
 	
 	private static int checkLiquids(MapChunk mapChunk, int x, int y, int z) {
 		WorldChunk worldChunk = mapChunk.getWorldChunk();
-		if (worldChunk.isEmpty() || y == -1) return 0;
+		if (y == -1 || worldChunk == null || worldChunk.isEmpty()) return 0;
 		
 		BlockPos pos = new BlockPos(x + (mapChunk.getX() << 4), y, z + (mapChunk.getZ() << 4));
 		BlockState state = worldChunk.getBlockState(pos);

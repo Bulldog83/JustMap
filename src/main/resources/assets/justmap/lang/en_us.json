@@ -100,6 +100,7 @@
   "justmap.configuration.purge_delay": "Delay for cache purging (seconds)",
   "justmap.configuration.purge_amount": "Max amount chunks to purge",
   "justmap.configuration.uninterrupted_map_update": "Uninterrupted map update",
+  "justmap.configuration.generate_new_chunks": "Generate new chunks (CAUTION! Very laggy, memory overload risk.)",
   
   "justmap.configuration.tooltip_color_config": "Has effect only with Alternate color render enabled.",
 

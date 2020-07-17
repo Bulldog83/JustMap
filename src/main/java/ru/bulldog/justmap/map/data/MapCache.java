@@ -2,13 +2,16 @@ package ru.bulldog.justmap.map.data;
 
 import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.client.config.ClientParams;
-
+import ru.bulldog.justmap.util.storage.StorageUtil;
+import ru.bulldog.justmap.util.tasks.MemoryUtil;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.WorldChunk;
+import net.minecraft.world.storage.VersionedChunkStorage;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,6 +27,7 @@ public class MapCache {
 	private static Layer.Type currentLayer = Layer.Type.SURFACE;
 	private static int currentLevel = 0;
 	
+	public static boolean cacheClearing = false;
 	public static long lastSaved = 0;
 	
 	public static void setCurrentLayer(Layer.Type layer, int y) {
@@ -93,8 +97,27 @@ public class MapCache {
 			MapChunk mapChunk = data.chunks.get(chunkPos);
 			mapChunk.updateWorldChunk(lifeChunk);
 		} else {
-			MapChunk mapChunk = new MapChunk(world, lifeChunk, currentLayer, currentLevel);
+			MapChunk mapChunk = new MapChunk(data, world, lifeChunk, currentLayer, currentLevel);
 			data.chunks.put(chunkPos, mapChunk);
+		}
+	}
+	
+	public static void memoryControl() {
+		if (cacheClearing) return;
+		long usedPct = MemoryUtil.getMemoryUsage();
+		if (usedPct >= 85L) {
+			cacheClearing = true;
+			JustMap.LOGGER.logWarning(String.format("Memory usage at %2d%%, forcing garbage collection.", usedPct));
+			JustMap.WORKER.execute("Hard cache clearing...", () -> {
+				int amount = ClientParams.purgeAmount * 10;
+				dimensions.forEach((id, data) -> {
+					data.purge(amount, 1000);
+				});
+				System.gc();
+				cacheClearing = false;
+			});
+			usedPct = MemoryUtil.getMemoryUsage();
+			JustMap.LOGGER.logWarning(String.format("Memory usage at %2d%%.", usedPct));
 		}
 	}
 	
@@ -109,6 +132,7 @@ public class MapCache {
 	
 	private Map<ChunkPos, MapChunk> chunks = new ConcurrentHashMap<>();
 	private Map<RegionPos, MapRegion> regions = new ConcurrentHashMap<>();
+	private VersionedChunkStorage chunkStorage;
 	
 	private long lastPurged = 0;
 	private long purgeDelay = 1000;
@@ -116,6 +140,9 @@ public class MapCache {
 	
 	private MapCache(World world) {
 		this.world = world;
+		if (world instanceof ServerWorld) {
+			this.chunkStorage = StorageUtil.getChunkStorage((ServerWorld) world);
+		}
 	}
 	
 	private void clearCache() {
@@ -124,19 +151,19 @@ public class MapCache {
 		
 		long currentTime = System.currentTimeMillis();
 		if (currentTime - lastPurged > purgeDelay) {
-			JustMap.WORKER.execute("Remove unnecessary chunks...", () -> this.purge(purgeAmount));
+			JustMap.WORKER.execute("Remove unnecessary chunks...", () -> this.purge(purgeAmount, 60000));
 			this.lastPurged = currentTime;
 		}
 	}
 	
-	private void purge(int maxPurged) {
+	private void purge(int maxPurged, int timeLimit) {
 		long currentTime = System.currentTimeMillis();
 		int purged = 0;
 	
 		List<ChunkPos> chunks = new ArrayList<>();
 		for (ChunkPos chunkPos : this.chunks.keySet()) {
 			MapChunk chunkData = this.chunks.get(chunkPos);
-			if (currentTime - chunkData.requested >= 60000) {
+			if (currentTime - chunkData.requested >= timeLimit) {
 				chunks.add(chunkPos);
 				purged++;
 				if (purged >= maxPurged) {
@@ -148,6 +175,10 @@ public class MapCache {
 		for (ChunkPos chunkPos : chunks) {
 			this.chunks.remove(chunkPos);
 		}
+	}
+	
+	public VersionedChunkStorage getChunkStorage() {
+		return this.chunkStorage;
 	}
 	
 	public MapRegion getRegion(BlockPos blockPos) {
@@ -197,7 +228,7 @@ public class MapCache {
 			mapChunk = this.chunks.get(chunkPos);
 			mapChunk.updateWorld(world);
 		} else {
-			mapChunk = new MapChunk(world, chunkPos, layer, level);
+			mapChunk = new MapChunk(this, world, chunkPos, layer, level);
 			this.chunks.put(chunkPos, mapChunk);
 		}
 		

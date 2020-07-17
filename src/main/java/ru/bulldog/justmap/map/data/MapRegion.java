@@ -11,7 +11,7 @@ import ru.bulldog.justmap.client.render.MapTexture;
 import ru.bulldog.justmap.map.minimap.Minimap;
 import ru.bulldog.justmap.util.Colors;
 import ru.bulldog.justmap.util.RenderUtil;
-import ru.bulldog.justmap.util.StorageUtil;
+import ru.bulldog.justmap.util.storage.StorageUtil;
 import ru.bulldog.justmap.util.tasks.TaskManager;
 
 public class MapRegion {
@@ -225,9 +225,9 @@ public class MapRegion {
 	private File imageFile() {
 		File dir = StorageUtil.cacheDir();
 		if (surfaceOnly || Layer.Type.SURFACE == layer) {
-			dir = new File(dir, "surface/");
+			dir = new File(dir, "surface");
 		} else {
-			dir = new File(dir, String.format("%s/%d/", layer.value.name, level));
+			dir = new File(dir, String.format("%s/%d", layer.value.name, level));
 		}
 		
 		if (!dir.exists()) {

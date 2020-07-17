@@ -16,7 +16,7 @@ import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.map.minimap.skin.MapSkin.SkinType;
 import ru.bulldog.justmap.util.ImageUtil;
 import ru.bulldog.justmap.util.JsonFactory;
-import ru.bulldog.justmap.util.StorageUtil;
+import ru.bulldog.justmap.util.storage.StorageUtil;
 
 public final class SkinLoader extends JsonFactory {
 

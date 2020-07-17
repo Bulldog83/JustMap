@@ -44,6 +44,7 @@ public class JustMapClient implements ClientModInitializer {
 			this.isOnTitleScreen = isTitle;
 			if (isOnTitleScreen) return;
 			
+			MapCache.memoryControl();
 			AdvancedInfo.getInstance().updateInfo();
 			KeyHandler.update();
 			MAP.update();

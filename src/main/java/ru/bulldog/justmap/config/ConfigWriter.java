@@ -7,7 +7,7 @@ import com.google.gson.JsonObject;
 
 import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.util.JsonFactory;
-import ru.bulldog.justmap.util.StorageUtil;
+import ru.bulldog.justmap.util.storage.StorageUtil;
 
 public class ConfigWriter extends JsonFactory {
 	

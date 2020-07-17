@@ -1,4 +1,4 @@
-package ru.bulldog.justmap.util;
+package ru.bulldog.justmap.util.storage;
 
 import java.io.File;
 
@@ -9,10 +9,13 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ServerInfo;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.dimension.DimensionType;
-
+import net.minecraft.world.storage.VersionedChunkStorage;
 import ru.bulldog.justmap.JustMap;
+import ru.bulldog.justmap.mixins.SessionAccessor;
+import ru.bulldog.justmap.util.Dimension;
 
 public final class StorageUtil {
 	
@@ -20,12 +23,12 @@ public final class StorageUtil {
 	
 	private final static FabricLoader fabricLoader = FabricLoader.getInstance();
 	private final static File GAME_DIR = fabricLoader.getGameDirectory();
-	private final static File MAP_DATA_DIR = new File(GAME_DIR, JustMap.MODID + "/");
-	private final static File MAP_CONFIG_DIR = new File(fabricLoader.getConfigDirectory(), String.format("/%s/", JustMap.MODID));
-	private final static File MAP_SKINS_DIR = new File(MAP_CONFIG_DIR, "skins/");
-	private final static File MAP_ICONS_DIR = new File(MAP_CONFIG_DIR, "icons/");
+	private final static File MAP_DATA_DIR = new File(GAME_DIR, JustMap.MODID);
+	private final static File MAP_CONFIG_DIR = new File(fabricLoader.getConfigDirectory(), JustMap.MODID);
+	private final static File MAP_SKINS_DIR = new File(MAP_CONFIG_DIR, "skins");
+	private final static File MAP_ICONS_DIR = new File(MAP_CONFIG_DIR, "icons");
 	
-	private static File filesDir = new File(MAP_DATA_DIR, "undefined/");	
+	private static File filesDir = new File(MAP_DATA_DIR, "undefined");
 	private static String currentDim = "unknown";
 	
 	public static File configDir() {
@@ -33,6 +36,16 @@ public final class StorageUtil {
 			MAP_CONFIG_DIR.mkdirs();
 		}
 		return MAP_CONFIG_DIR;
+	}
+	
+	public static VersionedChunkStorage getChunkStorage(ServerWorld world) {
+		File regionDir = new File(savesDir(world), "region");
+		return new VersionedChunkStorage(regionDir, world.getServer().getDataFixer(), true);
+	}
+	
+	public static File savesDir(ServerWorld world) {
+		if (world == null) return null;
+		return ((SessionAccessor) world.getServer()).getServerSession().getWorldDirectory(world.getRegistryKey());
 	}
 	
 	@Environment(EnvType.CLIENT)
@@ -63,11 +76,11 @@ public final class StorageUtil {
 			}			
 		}
 
-		File cacheDir = new File(filesDir(), String.format("cache/%s/", currentDim));
+		File cacheDir = new File(filesDir(), String.format("cache/%s", currentDim));
 		if (dimKey != null) {
 			int dimId = Dimension.getId(dimKey);
 			if (dimId != Integer.MIN_VALUE) {
-				File oldDir = new File(filesDir(), String.format("cache/DIM%d/", dimId));
+				File oldDir = new File(filesDir(), String.format("cache/DIM%d", dimId));
 				if (oldDir.exists()) {
 					oldDir.renameTo(cacheDir);
 				}				
@@ -88,10 +101,10 @@ public final class StorageUtil {
 		if (minecraft.isIntegratedServerRunning()) {
 			MinecraftServer server = minecraft.getServer();
 			String name = scrubNameFile(server.getSaveProperties().getLevelName());
-			filesDir = new File(MAP_DATA_DIR, String.format("local/%s/", name));
+			filesDir = new File(MAP_DATA_DIR, String.format("local/%s", name));
 		} else if (serverInfo != null) {
 			String name = scrubNameFile(serverInfo.name);
-			filesDir = new File(MAP_DATA_DIR, String.format("servers/%s/", name));
+			filesDir = new File(MAP_DATA_DIR, String.format("servers/%s", name));
 		}
 		
 		if (!filesDir.exists()) {
