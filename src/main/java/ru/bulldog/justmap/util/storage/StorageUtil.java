@@ -14,6 +14,7 @@ import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.storage.VersionedChunkStorage;
 import ru.bulldog.justmap.JustMap;
+import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.mixins.SessionAccessor;
 import ru.bulldog.justmap.util.Dimension;
 
@@ -67,7 +68,7 @@ public final class StorageUtil {
 	@Environment(EnvType.CLIENT)
 	public static File cacheDir() {
 		RegistryKey<DimensionType> dimKey = null;
-		MinecraftClient minecraft = MinecraftClient.getInstance();
+		MinecraftClient minecraft = JustMapClient.MINECRAFT;
 		if (minecraft.world != null) {
 			dimKey = minecraft.world.getDimensionRegistryKey();			
 			String dimension = dimKey.getValue().getPath();
@@ -96,7 +97,7 @@ public final class StorageUtil {
 	
 	@Environment(EnvType.CLIENT)
 	public static File filesDir() {
-		MinecraftClient minecraft = MinecraftClient.getInstance();		
+		MinecraftClient minecraft = JustMapClient.MINECRAFT;		
 		ServerInfo serverInfo = minecraft.getCurrentServerEntry();
 		if (minecraft.isIntegratedServerRunning()) {
 			MinecraftServer server = minecraft.getServer();

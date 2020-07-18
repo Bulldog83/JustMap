@@ -6,11 +6,11 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import ru.bulldog.justmap.JustMap;
+import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.util.math.Line;
 
 import net.fabricmc.fabric.impl.client.indigo.renderer.helper.ColorHelper;
 
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.resource.Resource;
 import net.minecraft.resource.ResourceManager;
@@ -22,7 +22,7 @@ public class ImageUtil {
 	private static ResourceManager resourceManager;
 	
 	private static void checkResourceManager() {
-		if (resourceManager == null) resourceManager = MinecraftClient.getInstance().getResourceManager();
+		if (resourceManager == null) resourceManager = JustMapClient.MINECRAFT.getResourceManager();
 	}
 	
 	public static boolean imageExists(Identifier image) {

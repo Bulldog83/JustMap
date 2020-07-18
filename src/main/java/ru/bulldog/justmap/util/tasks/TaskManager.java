@@ -14,24 +14,29 @@ import ru.bulldog.justmap.JustMap;
 public class TaskManager implements Executor {
     private final Queue<Task> workQueue = new ConcurrentLinkedQueue<>();
     private final QueueBlocker queueBlocker;
+    private final int queueSize;
     private Thread worker;   
     private String name = JustMap.MODID;
-    private boolean running = true; 
+    private boolean running = true;
     
     private static Map<String, TaskManager> managers = new HashMap<>();
     
     public static TaskManager getManager(String name) {
+    	return getManager(name, 0);
+    }
+    
+    public static TaskManager getManager(String name, int queueSize) {
     	if (managers.containsKey(name)) {
     		TaskManager manager = managers.get(name);
     		if (!manager.isRunning()) {
-    			manager = new TaskManager(name);
+    			manager = new TaskManager(name, queueSize);
     			managers.replace(name, manager);
     		}
     		
     		return manager;
     	}
     	
-    	TaskManager manager = new TaskManager(name);
+    	TaskManager manager = new TaskManager(name, queueSize);
     	managers.put(name, manager);
     	
     	return manager;
@@ -43,14 +48,16 @@ public class TaskManager implements Executor {
     	});
     }
     
-    private TaskManager(String name) {
+    private TaskManager(String name, int queueSize) {
     	this.name += "-" + name;
+    	this.queueSize = queueSize;
     	this.queueBlocker = new QueueBlocker(this.name + "-blocker");
     	this.worker = new Thread(this::work, this.name);
     	this.worker.start();
     }
     
     public void execute(String reason, Runnable command) {
+    	if (!canExecute()) return;
     	this.workQueue.offer(new Task(reason, command));
     	LockSupport.unpark(this.worker);
     }
@@ -65,6 +72,7 @@ public class TaskManager implements Executor {
 	}
     
     public <T> CompletableFuture<T> run(String reason, Function<CompletableFuture<T>, Runnable> function) {
+    	if (!canExecute()) return null;
     	CompletableFuture<T> completableFuture = new CompletableFuture<>();
     	this.execute(reason, function.apply(completableFuture));
     	return completableFuture;
@@ -74,6 +82,10 @@ public class TaskManager implements Executor {
     	this.execute("Stopping " + this.name, () -> {
     		this.running = false;
     	});    	
+    }
+    
+    public boolean canExecute() {
+    	return this.isRunning() && (this.queueSize == 0 || this.queueSize() < queueSize);
     }
     
     public int queueSize() {

@@ -51,7 +51,7 @@ public class Minimap implements IMap{
 		SQUARE
 	}
 	
-	private static final MinecraftClient minecraft = MinecraftClient.getInstance();
+	private static final MinecraftClient minecraft = JustMapClient.MINECRAFT;
 	
 	private final TextManager textManager;	
 	private InfoText txtCoords = new CoordsInfo(TextAlignment.CENTER, "0, 0, 0");

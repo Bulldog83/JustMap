@@ -1,17 +1,16 @@
 package ru.bulldog.justmap.map.data;
 
 import ru.bulldog.justmap.JustMap;
+import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.client.config.ClientParams;
-import ru.bulldog.justmap.util.storage.StorageUtil;
 import ru.bulldog.justmap.util.tasks.MemoryUtil;
+
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.WorldChunk;
-import net.minecraft.world.storage.VersionedChunkStorage;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,7 +18,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class MapCache {
-	private final static MinecraftClient minecraft = MinecraftClient.getInstance();
+	private final static MinecraftClient minecraft = JustMapClient.MINECRAFT;
 	
 	private static Map<Identifier, MapCache> dimensions = new ConcurrentHashMap<>();
 	private static Identifier lastDimension;
@@ -96,8 +95,12 @@ public class MapCache {
 		if (data.chunks.containsKey(chunkPos)) {
 			MapChunk mapChunk = data.chunks.get(chunkPos);
 			mapChunk.updateWorldChunk(lifeChunk);
+			JustMap.WORKER.execute("Call update for chunk " + chunkPos,
+					() -> mapChunk.update(false));
 		} else {
 			MapChunk mapChunk = new MapChunk(data, world, lifeChunk, currentLayer, currentLevel);
+			JustMap.WORKER.execute("Call update for chunk " + chunkPos,
+					() -> mapChunk.update(false));
 			data.chunks.put(chunkPos, mapChunk);
 		}
 	}
@@ -132,7 +135,6 @@ public class MapCache {
 	
 	private Map<ChunkPos, MapChunk> chunks = new ConcurrentHashMap<>();
 	private Map<RegionPos, MapRegion> regions = new ConcurrentHashMap<>();
-	private VersionedChunkStorage chunkStorage;
 	
 	private long lastPurged = 0;
 	private long purgeDelay = 1000;
@@ -140,9 +142,6 @@ public class MapCache {
 	
 	private MapCache(World world) {
 		this.world = world;
-		if (world instanceof ServerWorld) {
-			this.chunkStorage = StorageUtil.getChunkStorage((ServerWorld) world);
-		}
 	}
 	
 	private void clearCache() {
@@ -177,20 +176,16 @@ public class MapCache {
 		}
 	}
 	
-	public VersionedChunkStorage getChunkStorage() {
-		return this.chunkStorage;
+	public MapRegion getRegion(BlockPos currentPos, BlockPos centerPos) {
+		return this.getRegion(world, currentPos, centerPos, false);
 	}
 	
-	public MapRegion getRegion(BlockPos blockPos) {
-		return this.getRegion(world, blockPos, false);
+	public MapRegion getRegion(BlockPos currentPos, BlockPos centerPos, boolean surfaceOnly) {
+		return this.getRegion(world, currentPos, centerPos, surfaceOnly);
 	}
 	
-	public MapRegion getRegion(BlockPos blockPos, boolean surfaceOnly) {
-		return this.getRegion(world, blockPos, surfaceOnly);
-	}
-	
-	public MapRegion getRegion(World world, BlockPos blockPos, boolean surfaceOnly) {
-		RegionPos regPos = new RegionPos(blockPos);
+	public MapRegion getRegion(World world, BlockPos currentPos, BlockPos centerPos, boolean surfaceOnly) {
+		RegionPos regPos = new RegionPos(currentPos);
 
 		Layer.Type layer = surfaceOnly ? Layer.Type.SURFACE : currentLayer;
 		int level = surfaceOnly ? 0 : currentLevel;
@@ -200,10 +195,14 @@ public class MapCache {
 			region = regions.get(regPos);
 			region.updateWorld(world);
 		} else {
-			region = new MapRegion(world, blockPos, layer, level);
+			region = new MapRegion(world, currentPos, layer, level);
 			regions.put(regPos, region);
 		}
 		region.surfaceOnly = surfaceOnly;
+		ChunkPos center = new ChunkPos(centerPos);
+		if (!region.getCenter().equals(center)) {
+			region.setCenter(center);
+		}
 		
 		long time = System.currentTimeMillis();
 		if (layer != region.getLayer() ||

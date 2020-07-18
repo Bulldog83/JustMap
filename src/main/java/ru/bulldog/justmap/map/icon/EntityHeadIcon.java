@@ -12,7 +12,7 @@ import ru.bulldog.justmap.util.ImageUtil;
 import ru.bulldog.justmap.util.ColorUtil;
 import ru.bulldog.justmap.util.Colors;
 import ru.bulldog.justmap.util.RenderUtil;
-import ru.bulldog.justmap.util.math.Line.Point;
+import ru.bulldog.justmap.util.math.Point;
 import ru.bulldog.justmap.util.storage.StorageUtil;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.texture.NativeImageBackedTexture;

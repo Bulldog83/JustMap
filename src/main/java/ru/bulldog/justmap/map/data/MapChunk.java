@@ -1,6 +1,7 @@
 package ru.bulldog.justmap.map.data;
 
 import ru.bulldog.justmap.JustMap;
+import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.util.ColorUtil;
 import ru.bulldog.justmap.util.Dimension;
@@ -39,8 +40,8 @@ public class MapChunk {
 	
 	public final ChunkLevel EMPTY_LEVEL = new ChunkLevel(-1);
 	
-	private final static TaskManager chunkUpdater = TaskManager.getManager("chunk-data");
-	private final static TaskManager chunkGenerator = TaskManager.getManager("chunk-generator");
+	private final static TaskManager chunkUpdater = TaskManager.getManager("chunk-updater");
+	private final static TaskManager chunkGenerator = TaskManager.getManager("chunk-processor", 1024);
 	
 	private final MapCache data;
 	private final Map<Layer, ChunkLevel[]> levels = new ConcurrentHashMap<>();
@@ -74,15 +75,15 @@ public class MapChunk {
 	}
 	
 	public MapChunk(MapCache data, World world, ChunkPos pos, Layer.Type layer) {
-		MinecraftClient client = MinecraftClient.getInstance();
-		RegistryKey<DimensionType> dimType = client.world.getDimensionRegistryKey();
+		MinecraftClient minecraft = JustMapClient.MINECRAFT;
+		RegistryKey<DimensionType> dimType = minecraft.world.getDimensionRegistryKey();
 		
 		this.data = data;
 		this.world = world;
 		this.dimension = dimType.getValue();
 		this.chunkPos = pos;
 		this.layer = layer;
-		this.worldChunk = new WeakReference<>(client.world.getChunk(pos.x, pos.z));
+		this.worldChunk = new WeakReference<>(minecraft.world.getChunk(pos.x, pos.z));
 
 		if (Dimension.isOverworld(dimType) && (world instanceof ServerWorld)) {
 			this.slime = ChunkRandom.getSlimeRandom(chunkPos.x, chunkPos.z,
@@ -230,7 +231,8 @@ public class MapChunk {
         }
 		
 		ServerWorld world = (ServerWorld) this.world;
-		VersionedChunkStorage storage = this.data.getChunkStorage();
+		ServerChunkManager manager = world.getChunkManager();
+		VersionedChunkStorage storage = manager.threadedAnvilChunkStorage;
 		try {		
 			CompoundTag chunkTag = storage.getNbt(chunkPos);
 			if (chunkTag == null) return false;
@@ -243,8 +245,7 @@ public class MapChunk {
 				this.updateWorldChunk(worldChunk);
 				return true;
 			}
-			if (ClientParams.chunksGeneration) {
-				ServerChunkManager manager = world.getChunkManager();
+			if (ClientParams.chunksGeneration && chunkGenerator.canExecute()) {
 				chunkGenerator.execute("Generating Chunk " + chunkPos, () -> this.generateChunk(manager));
 			}
 			return false;
@@ -267,7 +268,13 @@ public class MapChunk {
 			if (chunkManager == null) return false;
 			WorldChunk lifeChunk = chunkManager.getWorldChunk(getX(), getZ());
 			if (lifeChunk == null || lifeChunk.isEmpty()) {
-				return this.callSavedChunk();
+				if (chunkGenerator.canExecute()) {
+					CompletableFuture<Boolean> hasSavedChunk = chunkGenerator.run("Call saves for Chunk: " + chunkPos, future -> {
+						return () -> future.complete(this.callSavedChunk());
+					});
+					return hasSavedChunk.join();
+				}
+				return false;
 			}
 			this.updateWorldChunk(lifeChunk);
 		}

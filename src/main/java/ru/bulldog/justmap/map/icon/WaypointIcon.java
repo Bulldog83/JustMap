@@ -7,8 +7,8 @@ import ru.bulldog.justmap.map.IMap;
 import ru.bulldog.justmap.map.minimap.Minimap;
 import ru.bulldog.justmap.map.waypoint.Waypoint;
 import ru.bulldog.justmap.util.math.Line;
-import ru.bulldog.justmap.util.math.Line.Point;
 import ru.bulldog.justmap.util.math.MathUtil;
+import ru.bulldog.justmap.util.math.Point;
 
 public class WaypointIcon extends MapIcon<WaypointIcon> {
 	

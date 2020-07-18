@@ -9,7 +9,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ChatScreen;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.EquipmentSlot;
-
+import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.util.ScreenPosition;
 
@@ -25,7 +25,7 @@ public class AdvancedInfo {
 		return INSTANCE;
 	}
 	
-	private MinecraftClient minecraft = MinecraftClient.getInstance();
+	private MinecraftClient minecraft = JustMapClient.MINECRAFT;
 	private Map<ScreenPosition, TextManager> managers;
 	private TextManager mapTextManager;
 	private ScreenPosition infoPos;

@@ -11,7 +11,7 @@ import ru.bulldog.justmap.util.Colors;
 import ru.bulldog.justmap.util.RenderUtil;
 import ru.bulldog.justmap.util.math.Line;
 import ru.bulldog.justmap.util.math.MathUtil;
-import ru.bulldog.justmap.util.math.Line.Point;
+import ru.bulldog.justmap.util.math.Point;
 
 public class EntityIcon extends MapIcon<EntityIcon> {
 	

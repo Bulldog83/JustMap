@@ -2,9 +2,11 @@ package ru.bulldog.justmap.util;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.util.math.BlockPos;
+import ru.bulldog.justmap.client.JustMapClient;
 
 public class PosUtil {
-	private static MinecraftClient minecraft = MinecraftClient.getInstance();
+	private static MinecraftClient minecraft = JustMapClient.MINECRAFT;
+	private static BlockPos.Mutable currentPos = new BlockPos.Mutable();
 
 	public static int coordX() {
 		if (minecraft.getCameraEntity() == null) return 0;
@@ -22,7 +24,7 @@ public class PosUtil {
 	}
 
 	public static BlockPos currentPos() {
-		return new BlockPos(coordX(), coordY(), coordZ());
+		return currentPos.set(coordX(), coordY(), coordZ());
 	}
 	
 	public static double doubleCoordX() {

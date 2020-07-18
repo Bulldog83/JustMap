@@ -7,7 +7,7 @@ import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientChunkEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.BackupPromptScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.TitleScreen;
@@ -26,6 +26,7 @@ import ru.bulldog.justmap.map.minimap.Minimap;
 import ru.bulldog.justmap.util.tasks.TaskManager;
 
 public class JustMapClient implements ClientModInitializer {
+	public final static MinecraftClient MINECRAFT = MinecraftClient.getInstance();
 	public final static ClientConfig CONFIG = ClientConfig.get();
 	public final static Minimap MAP = new Minimap();
 	

@@ -24,9 +24,8 @@ import ru.bulldog.justmap.util.RenderUtil;
 import ru.bulldog.justmap.util.ScreenPosition;
 import ru.bulldog.justmap.util.PosUtil;
 import ru.bulldog.justmap.util.math.Line;
-import ru.bulldog.justmap.util.math.Line.Point;
 import ru.bulldog.justmap.util.math.MathUtil;
-
+import ru.bulldog.justmap.util.math.Point;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 
@@ -65,7 +64,7 @@ public class MapRenderer {
 	private InfoText dirE = new MapText(TextAlignment.CENTER, "E");
 	private InfoText dirW = new MapText(TextAlignment.CENTER, "W");
 	
-	private final MinecraftClient minecraft = MinecraftClient.getInstance();
+	private final MinecraftClient minecraft = JustMapClient.MINECRAFT;
 	private final Identifier roundMask = new Identifier(JustMap.MODID, "textures/round_mask.png");
 	
 	public static MapRenderer getInstance() {
@@ -360,6 +359,9 @@ public class MapRenderer {
 		
 		float scale = minimap.getScale();
 		
+		BlockPos center = PosUtil.currentPos();
+		BlockPos.Mutable currentPos = new BlockPos.Mutable();
+		
 		int picX = 0, picW = 0;
 		while(picX < scaledW) {
 			int cX = cornerX + picX;
@@ -367,7 +369,7 @@ public class MapRenderer {
 			while (picY < scaledH ) {				
 				int cZ = cornerZ + picY;
 				
-				MapRegion region = mapData.getRegion(new BlockPos(cX, 0, cZ));
+				MapRegion region = mapData.getRegion(currentPos.set(cX, 0, cZ), center);
 				
 				picW = 512;
 				picH = 512;
