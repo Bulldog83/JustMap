@@ -359,8 +359,4 @@ public class ChunkData {
 			this.world = world;
 		}
 	}
-	
-	public World getWorld() {
-		return this.world;
-	}
 }

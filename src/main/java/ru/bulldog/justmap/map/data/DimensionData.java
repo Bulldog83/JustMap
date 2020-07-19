@@ -57,7 +57,6 @@ public class DimensionData {
 		MapRegion region;
 		if(regions.containsKey(regPos)) {
 			region = regions.get(regPos);
-			region.updateWorld(world);
 		} else {
 			region = new MapRegion(world, currentPos, layer, level);
 			regions.put(regPos, region);
@@ -75,6 +74,7 @@ public class DimensionData {
 		} else if (time - region.updated > 3000) {
 			region.updateImage(ClientParams.forceUpdate);
 		}
+		region.updateWorld(world);
 		
 		return region;
 	}
