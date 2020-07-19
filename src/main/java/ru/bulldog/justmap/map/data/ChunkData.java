@@ -1,49 +1,36 @@
 package ru.bulldog.justmap.map.data;
 
-import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.util.ColorUtil;
 import ru.bulldog.justmap.util.Dimension;
-import ru.bulldog.justmap.util.tasks.MemoryUtil;
 import ru.bulldog.justmap.util.tasks.TaskManager;
 
-import net.minecraft.world.ChunkSerializer;
 import net.minecraft.world.Heightmap;
 import net.minecraft.world.World;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.server.world.ServerChunkManager;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.registry.RegistryKey;
-import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.ChunkManager;
-import net.minecraft.world.chunk.ChunkStatus;
-import net.minecraft.world.chunk.ProtoChunk;
-import net.minecraft.world.chunk.ReadOnlyChunk;
 import net.minecraft.world.chunk.WorldChunk;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.gen.ChunkRandom;
-import net.minecraft.world.storage.VersionedChunkStorage;
 
-import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class MapChunk {
+public class ChunkData {
 	
 	public final ChunkLevel EMPTY_LEVEL = new ChunkLevel(-1);
 	
 	private final static TaskManager chunkUpdater = TaskManager.getManager("chunk-updater");
-	private final static TaskManager chunkGenerator = TaskManager.getManager("chunk-processor", 1024);
 	
-	private final MapCache data;
 	private final Map<Layer, ChunkLevel[]> levels = new ConcurrentHashMap<>();
 	private final Identifier dimension;
 	private final ChunkPos chunkPos;
@@ -64,21 +51,25 @@ public class MapChunk {
 	
 	private Object levelLock = new Object();
 	
-	public MapChunk(MapCache data, World world, WorldChunk lifeChunk, Layer.Type layer, int level) {
-		this(data, world, lifeChunk.getPos(), layer, level);
+	public static void updadeChunk(ChunkData mapChunk) {
+		if (mapChunk.updating || mapChunk.purged) return;
+		chunkUpdater.execute("Updating chunk " + mapChunk.chunkPos, mapChunk::updateChunkData);
+	}
+	
+	public ChunkData(World world, WorldChunk lifeChunk, Layer.Type layer, int level) {
+		this(world, lifeChunk.getPos(), layer, level);
 		this.updateWorldChunk(lifeChunk);
 	}
 	
-	public MapChunk(MapCache data, World world, ChunkPos pos, Layer.Type layer, int level) {
-		this(data, world, pos, layer);
+	public ChunkData(World world, ChunkPos pos, Layer.Type layer, int level) {
+		this(world, pos, layer);
 		this.level = level > 0 ? level : 0;
 	}
 	
-	public MapChunk(MapCache data, World world, ChunkPos pos, Layer.Type layer) {
+	public ChunkData(World world, ChunkPos pos, Layer.Type layer) {
 		MinecraftClient minecraft = JustMapClient.MINECRAFT;
 		RegistryKey<DimensionType> dimType = minecraft.world.getDimensionRegistryKey();
 		
-		this.data = data;
 		this.world = world;
 		this.dimension = dimType.getValue();
 		this.chunkPos = pos;
@@ -97,7 +88,7 @@ public class MapChunk {
 		}
 	}
 	
-	public MapChunk resetChunk() {
+	public ChunkData resetChunk() {
 		synchronized (levelLock) {
 			this.levels.clear();
 		}
@@ -105,10 +96,6 @@ public class MapChunk {
 		this.updated = 0;
 		
 		return this;
-	}
-	
-	private void initLayer() {
-		this.initLayer(layer);
 	}
 	
 	private void initLayer(Layer.Type layer) {
@@ -122,7 +109,7 @@ public class MapChunk {
 	
 	private ChunkLevel getChunkLevel(Layer.Type layer, int level) {
 		if (!levels.containsKey(layer.value)) {
-			initLayer();
+			initLayer(layer);
 		}
 		
 		ChunkLevel chunkLevel;
@@ -167,7 +154,7 @@ public class MapChunk {
 		return getChunkLevel().heightmap;
 	}
 	
-	public MapChunk setLevel(Layer.Type layer, int level) {
+	public ChunkData setLevel(Layer.Type layer, int level) {
 		if (this.layer == layer &&
 			this.level == level) return this;
 		
@@ -191,11 +178,9 @@ public class MapChunk {
 	
 	public boolean update(boolean forceUpdate) {
 		if (updating || purged) return false;
-		
 		if (!outdated && forceUpdate) {
 			this.outdated = forceUpdate;
 		}
-		
 		long currentTime = System.currentTimeMillis();
 		if (!outdated && currentTime - updated < ClientParams.chunkUpdateInterval) return false;
 		
@@ -204,55 +189,6 @@ public class MapChunk {
 		});
 		
 		return updated.join();
-	}
-	
-	private void generateChunk(ServerChunkManager manager) {
-		try {
-			Chunk worldChunk = manager.getChunk(getX(), getZ(), ChunkStatus.FULL, true);
-			if (worldChunk instanceof ProtoChunk) return;
-			if (worldChunk != null) {
-				WorldChunk currentChunk = this.worldChunk.get();
-				if (currentChunk == null || currentChunk.isEmpty()) {
-					this.updateWorldChunk((WorldChunk) worldChunk);
-				}
-			}
-		} catch (Exception ex) {
-			JustMap.LOGGER.catching(ex);
-		}	
-	}
-	
-	private boolean callSavedChunk() {
-		if (!(world instanceof ServerWorld)) return false;
-		
-		long usedPct = MemoryUtil.getMemoryUsage();
-		if (usedPct > 85L) {
-			JustMap.LOGGER.logWarning("Not enough memory, can't load/generate more chunks.");
-			return false;
-        }
-		
-		ServerWorld world = (ServerWorld) this.world;
-		ServerChunkManager manager = world.getChunkManager();
-		VersionedChunkStorage storage = manager.threadedAnvilChunkStorage;
-		try {		
-			CompoundTag chunkTag = storage.getNbt(chunkPos);
-			if (chunkTag == null) return false;
-			
-			Chunk chunk = ChunkSerializer.deserialize(
-					world, world.getStructureManager(), world.getPointOfInterestStorage(), chunkPos, chunkTag);
-			if (chunk instanceof ReadOnlyChunk) {
-				WorldChunk worldChunk = ((ReadOnlyChunk) chunk).getWrappedChunk();
-				worldChunk.setLoadedToWorld(true);
-				this.updateWorldChunk(worldChunk);
-				return true;
-			}
-			if (ClientParams.chunksGeneration && chunkGenerator.canExecute()) {
-				chunkGenerator.execute("Generating Chunk " + chunkPos, () -> this.generateChunk(manager));
-			}
-			return false;
-		} catch (IOException ex) {
-			JustMap.LOGGER.catching(ex);
-			return false;
-		}
 	}
 	
 	public void updateWorldChunk(WorldChunk lifeChunk) {
@@ -268,20 +204,14 @@ public class MapChunk {
 			if (chunkManager == null) return false;
 			WorldChunk lifeChunk = chunkManager.getWorldChunk(getX(), getZ());
 			if (lifeChunk == null || lifeChunk.isEmpty()) {
-				if (chunkGenerator.canExecute()) {
-					CompletableFuture<Boolean> hasSavedChunk = chunkGenerator.run("Call saves for Chunk: " + chunkPos, future -> {
-						return () -> future.complete(this.callSavedChunk());
-					});
-					return hasSavedChunk.join();
-				}
-				return false;
+				return ChunkDataManager.callSavedChunk(world, this);
 			}
 			this.updateWorldChunk(lifeChunk);
 		}
 		return true;
 	}
 	
-	public MapChunk updateHeighmap() {
+	public ChunkData updateHeighmap() {
 		if (!this.updateWorldChunk()) return this;
 		
 		WorldChunk worldChunk = this.worldChunk.get();
@@ -320,12 +250,13 @@ public class MapChunk {
 		}
 		WorldChunk worldChunk = this.worldChunk.get();
 		
-		MapChunk eastChunk = this.data.getCurrentChunk(chunkPos.x + 1, chunkPos.z);
-		MapChunk southChunk = this.data.getCurrentChunk(chunkPos.x, chunkPos.z - 1);
+		DimensionData data = DimensionManager.getData(world, dimension);
+		ChunkData eastChunk = data.getCurrentChunk(chunkPos.x + 1, chunkPos.z);
+		ChunkData southChunk = data.getCurrentChunk(chunkPos.x, chunkPos.z - 1);
 		
 		long currentTime = System.currentTimeMillis();
 		
-		ChunkLevel chunkLevel = getChunkLevel();
+		ChunkLevel chunkLevel = this.getChunkLevel();
 		if (currentTime - chunkLevel.updated > ClientParams.chunkLevelUpdateInterval) {
 			this.updateHeighmap();
 			eastChunk.updateHeighmap();
@@ -340,7 +271,7 @@ public class MapChunk {
 				
 				int posX = x + (chunkPos.x << 4);
 				int posZ = z + (chunkPos.z << 4);
-				int posY = getHeighmap()[index];
+				int posY = this.getHeighmap()[index];
 				
 				if (posY < 0) continue;
 				

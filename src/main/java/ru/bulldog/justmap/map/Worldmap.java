@@ -23,8 +23,9 @@ import ru.bulldog.justmap.client.MapScreen;
 import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.client.config.ConfigFactory;
 import ru.bulldog.justmap.map.data.Layer;
-import ru.bulldog.justmap.map.data.MapCache;
-import ru.bulldog.justmap.map.data.MapChunk;
+import ru.bulldog.justmap.map.data.DimensionData;
+import ru.bulldog.justmap.map.data.DimensionManager;
+import ru.bulldog.justmap.map.data.ChunkData;
 import ru.bulldog.justmap.map.data.MapRegion;
 import ru.bulldog.justmap.map.icon.WaypointIcon;
 import ru.bulldog.justmap.map.waypoint.Waypoint;
@@ -153,8 +154,7 @@ public class Worldmap extends MapScreen implements IMap {
 	}
 	
 	private void drawMap() {		
-		MapCache mapData = MapCache.get();
-		
+		DimensionData mapData = DimensionManager.getData();		
 		boolean surfaceOnly = !DimensionType.THE_NETHER_REGISTRY_KEY.getValue().equals(dimension);
 		
 		int cornerX = centerPos.getX() - scaledWidth / 2;
@@ -336,11 +336,13 @@ public class Worldmap extends MapScreen implements IMap {
 		int chunkX = posX >> 4;
 		int chunkZ = posZ >> 4;
 		
-		MapChunk mapChunk;
+		DimensionData data = DimensionManager.getData();
+		
+		ChunkData mapChunk;
 		if (dimension.equals(DimensionType.THE_NETHER_REGISTRY_KEY.getValue())) {
-			mapChunk = MapCache.get().getCurrentChunk(chunkX, chunkZ);
+			mapChunk = data.getCurrentChunk(chunkX, chunkZ);
 		} else {
-			mapChunk = MapCache.get().getChunk(Layer.Type.SURFACE, 0, chunkX, chunkZ);
+			mapChunk = data.getChunkManager().getChunk(Layer.Type.SURFACE, 0, chunkX, chunkZ);
 		}
 		
 		int cx = posX - (chunkX << 4);

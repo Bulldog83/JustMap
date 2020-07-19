@@ -7,6 +7,7 @@ import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientChunkEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.BackupPromptScreen;
 import net.minecraft.client.gui.screen.Screen;
@@ -21,7 +22,8 @@ import net.minecraft.client.gui.screen.world.SelectWorldScreen;
 import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.advancedinfo.AdvancedInfo;
 import ru.bulldog.justmap.client.config.ClientConfig;
-import ru.bulldog.justmap.map.data.MapCache;
+import ru.bulldog.justmap.map.data.DimensionData;
+import ru.bulldog.justmap.map.data.DimensionManager;
 import ru.bulldog.justmap.map.minimap.Minimap;
 import ru.bulldog.justmap.util.tasks.TaskManager;
 
@@ -36,7 +38,12 @@ public class JustMapClient implements ClientModInitializer {
 	public void onInitializeClient() {
 		KeyHandler.initKeyBindings();
 
-		ClientChunkEvents.CHUNK_LOAD.register(MapCache::addLoadedChunk);
+		ClientChunkEvents.CHUNK_LOAD.register((world, chunk) -> {
+			DimensionData data = DimensionManager.getData();
+			if (data != null) {
+				data.addLoadedChunk(world, chunk);
+			}
+		});
 		ClientTickEvents.END_CLIENT_TICK.register(client -> {
 			boolean isTitle = this.isOnTitleScreen(client.currentScreen);
 			if (isTitle && !isOnTitleScreen) {
@@ -45,7 +52,7 @@ public class JustMapClient implements ClientModInitializer {
 			this.isOnTitleScreen = isTitle;
 			if (isOnTitleScreen) return;
 			
-			MapCache.memoryControl();
+			DimensionManager.memoryControl();
 			AdvancedInfo.getInstance().updateInfo();
 			KeyHandler.update();
 			MAP.update();
@@ -57,7 +64,7 @@ public class JustMapClient implements ClientModInitializer {
 	}
 	
 	private static void stop() {
-		JustMap.WORKER.execute("Clearing map cache...", MapCache::clearData);
+		JustMap.WORKER.execute("Clearing map cache...", DimensionManager::clearData);
 	}
 	
 	private boolean isOnTitleScreen(Screen currentScreen) {

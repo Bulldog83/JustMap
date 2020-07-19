@@ -12,7 +12,7 @@ import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.map.IMap;
 import ru.bulldog.justmap.map.MapGameRules;
 import ru.bulldog.justmap.map.data.Layer.Type;
-import ru.bulldog.justmap.map.data.MapCache;
+import ru.bulldog.justmap.map.data.DimensionData;
 import ru.bulldog.justmap.map.icon.EntityIcon;
 import ru.bulldog.justmap.map.icon.PlayerIcon;
 import ru.bulldog.justmap.map.icon.WaypointIcon;
@@ -228,11 +228,11 @@ public class Minimap implements IMap{
 		double startZ = posZ - scaledH / 2;
 
 		if (Dimension.isNether(world.getDimensionRegistryKey())) {
-			MapCache.setCurrentLayer(Type.NETHER, posY);
+			DimensionData.setCurrentLayer(Type.NETHER, posY);
 		} else if (needRenderCaves(world, pos)) {
-			MapCache.setCurrentLayer(Type.CAVES, posY);
+			DimensionData.setCurrentLayer(Type.CAVES, posY);
 		} else {
-			MapCache.setCurrentLayer(Type.SURFACE, posY);
+			DimensionData.setCurrentLayer(Type.SURFACE, posY);
 		}
 		
 		if (lastPosX != posX || lastPosZ != posZ) { 

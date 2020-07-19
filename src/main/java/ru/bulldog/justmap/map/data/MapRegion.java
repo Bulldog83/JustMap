@@ -139,7 +139,8 @@ public class MapRegion {
 	}
 	
 	private void update() {
-		MapCache mapData = MapCache.get();
+		DimensionData mapData = DimensionManager.getData();
+		ChunkDataManager chunkManager = mapData.getChunkManager();
 		
 		int regX = this.regPos.x << 9;
 		int regZ = this.regPos.z << 9;		
@@ -148,11 +149,11 @@ public class MapRegion {
 			for (int y = 0; y < 512; y += 16) {
 				int chunkZ = (regZ + y) >> 4;
 				
-				MapChunk mapChunk;
+				ChunkData mapChunk;
 				boolean updated = false;
 				if (surfaceOnly) {
-					mapChunk = mapData.getChunk(Layer.Type.SURFACE, 0, chunkX, chunkZ);
-					if (MapCache.currentLayer() == Layer.Type.SURFACE &&
+					mapChunk = chunkManager.getChunk(Layer.Type.SURFACE, 0, chunkX, chunkZ);
+					if (DimensionData.currentLayer() == Layer.Type.SURFACE &&
 						updateArea.contains(Point.fromPos(mapChunk.getPos()))) {
 						
 						updated = mapChunk.update(needUpdate);
@@ -188,7 +189,7 @@ public class MapRegion {
 		this.overlay.changed = false;
 	}
 	
-	private void updateOverlay(int x, int y, MapChunk mapChunk) {
+	private void updateOverlay(int x, int y, ChunkData mapChunk) {
 		if (renewOverlay) {
 			this.overlay.fill(x, y, 16, 16, Colors.TRANSPARENT);
 		}

@@ -11,7 +11,8 @@ import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.map.DirectionArrow;
 import ru.bulldog.justmap.map.MapPlayerManager;
-import ru.bulldog.justmap.map.data.MapCache;
+import ru.bulldog.justmap.map.data.DimensionData;
+import ru.bulldog.justmap.map.data.DimensionManager;
 import ru.bulldog.justmap.map.data.MapRegion;
 import ru.bulldog.justmap.map.icon.EntityIcon;
 import ru.bulldog.justmap.map.icon.PlayerIcon;
@@ -342,7 +343,7 @@ public class MapRenderer {
 	}
 	
 	private void drawMap() {
-		MapCache mapData = MapCache.get();
+		DimensionData mapData = DimensionManager.getData();
 		
 		int scaledW = minimap.getScaledWidth();
 		int scaledH = minimap.getScaledHeight();

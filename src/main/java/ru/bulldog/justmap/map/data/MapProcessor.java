@@ -10,7 +10,7 @@ import net.minecraft.world.chunk.WorldChunk;
 
 public class MapProcessor {
 	
-	public static int getTopBlockY(MapChunk mapChunk, int x, int y, int z, boolean liquids) {
+	public static int getTopBlockY(ChunkData mapChunk, int x, int y, int z, boolean liquids) {
 		WorldChunk worldChunk = mapChunk.getWorldChunk();
 		if (worldChunk == null || worldChunk.isEmpty()) return -1;
 		
@@ -53,7 +53,7 @@ public class MapProcessor {
 		return pos;
 	}
 	
-	private static int checkLiquids(MapChunk mapChunk, int x, int y, int z) {
+	private static int checkLiquids(ChunkData mapChunk, int x, int y, int z) {
 		WorldChunk worldChunk = mapChunk.getWorldChunk();
 		if (y == -1 || worldChunk == null || worldChunk.isEmpty()) return 0;
 		
@@ -66,7 +66,7 @@ public class MapProcessor {
 		return y;
 	}
 	
-	public static int heightDifference(MapChunk mapChunk, MapChunk eastChunk, MapChunk southChunk, int x, int y, int z) {
+	public static int heightDifference(ChunkData mapChunk, ChunkData eastChunk, ChunkData southChunk, int x, int y, int z) {
 		int ex = x + 1;
 		int sz = z - 1;
 		
