@@ -5,7 +5,7 @@ import java.util.List;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.util.math.MatrixStack;
-
+import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.util.ScreenPosition;
 import ru.bulldog.justmap.util.RenderUtil.TextAlignment;
@@ -51,7 +51,7 @@ public class TextManager {
 	
 	public TextManager updatePosition(ScreenPosition position) {
 		int offset = ClientParams.positionOffset;
-		MinecraftClient minecraft = MinecraftClient.getInstance();
+		MinecraftClient minecraft = JustMapClient.MINECRAFT;
 		int screenW = minecraft.getWindow().getScaledWidth();
 		int screenH = minecraft.getWindow().getScaledHeight();
 		switch(position) {

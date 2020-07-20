@@ -1,7 +1,6 @@
 package ru.bulldog.justmap.util.math;
 
 import net.minecraft.util.math.BlockPos;
-import ru.bulldog.justmap.util.math.Line.Point;
 
 public class MathUtil {
 	public static int clamp(int val, int min, int max) {

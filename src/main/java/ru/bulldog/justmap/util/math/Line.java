@@ -1,7 +1,5 @@
 package ru.bulldog.justmap.util.math;
 
-import java.util.Arrays;
-
 public class Line {	
 	public final Point first;
 	public final Point second;
@@ -17,6 +15,12 @@ public class Line {
 		this.first = first;
 		this.second = second;
 		this.lenght = first.distance(second);
+		
+		if (lenght <= 0) {
+			String error = String.format("Invalid Line: %s: %s! Lenght: %f.",
+					first.toString(), second.toString(), lenght);
+			throw new IllegalArgumentException(error);
+		}
 	}
 	
 	public double lenght() {
@@ -60,33 +64,5 @@ public class Line {
 		Line line = (Line) obj;
 		return this.first.equals(line.first) &&
 			   this.second.equals(line.second);
-	}
-	
-	public static class Point {
-		public double x;
-		public double y;
-		
-		public Point(double x, double y) {
-			this.x = x;
-			this.y = y;
-		}
-		
-		public int distance(Point target) {
-			return (int) Math.sqrt(MathUtil.pow2(target.x - x) + MathUtil.pow2(target.y - y));
-		}
-		
-		@Override
-		public int hashCode() {
-			return Arrays.hashCode(new double[]{x, y});
-		}
-		
-		@Override
-		public boolean equals(Object obj) {
-			if (this == obj) return true;
-			if(!(obj instanceof Point)) return false;
-			
-			Point point = (Point) obj;
-			return this.x == point.x && this.y == point.y;
-		}
 	}
 }
