@@ -150,8 +150,6 @@ public class RegionData {
 				int chunkZ = (regZ + y) >> 4;
 				
 				ChunkData mapChunk = chunkManager.getChunk(chunkX, chunkZ);
-				Layer layer = Layer.SURFACE;
-				int level = 0;
 				boolean updated = false;
 				if (surfaceOnly) {
 					if (mapData.getLayer() == Layer.SURFACE &&
@@ -160,8 +158,6 @@ public class RegionData {
 						updated = mapChunk.update(Layer.SURFACE, 0, needUpdate);
 					}
 				} else {
-					layer = mapData.getLayer();
-					level = mapData.getLevel();
 					if (updateArea.contains(Point.fromPos(mapChunk.getPos()))) {
 						updated = mapChunk.update(layer, level, needUpdate);
 					}

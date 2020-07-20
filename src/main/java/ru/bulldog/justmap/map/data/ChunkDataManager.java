@@ -90,7 +90,7 @@ public class ChunkDataManager {
 		this.mapChunks.clear();
 	}
 	
-	public static WorldChunk callSavedChunk(World world, ChunkData mapChunk) {
+	public static WorldChunk callSavedChunk(World world, ChunkPos chunkPos) {
 		if (!(world instanceof ServerWorld)) return null;
 		
 		long usedPct = MemoryUtil.getMemoryUsage();
@@ -102,7 +102,6 @@ public class ChunkDataManager {
 		ServerWorld serverWorld = (ServerWorld) world;
 		ServerChunkManager manager = serverWorld.getChunkManager();
 		VersionedChunkStorage storage = manager.threadedAnvilChunkStorage;
-		ChunkPos chunkPos = mapChunk.getPos();
 		try {		
 			CompoundTag chunkTag = storage.getNbt(chunkPos);
 			if (chunkTag == null) return null;
@@ -112,7 +111,6 @@ public class ChunkDataManager {
 			if (chunk instanceof ReadOnlyChunk) {
 				WorldChunk worldChunk = ((ReadOnlyChunk) chunk).getWrappedChunk();
 				worldChunk.setLoadedToWorld(true);
-				mapChunk.updateWorldChunk(worldChunk);
 				return worldChunk;
 			}
 			return null;

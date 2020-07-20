@@ -28,7 +28,7 @@ public class ChunkData {
 	
 	public final static ChunkLevel EMPTY_LEVEL = new ChunkLevel(-1);
 	
-	private final static TaskManager chunkUpdater = TaskManager.getManager("chunk-updater");
+	private final static TaskManager chunkUpdater = TaskManager.getManager("chunk-updater", 3);
 	
 	private final DimensionData mapData;
 	private final Map<Layer, ChunkLevel[]> levels = new ConcurrentHashMap<>();
@@ -97,24 +97,21 @@ public class ChunkData {
 	}
 	
 	private ChunkLevel getChunkLevel(Layer layer, int level) {
-		if (!levels.containsKey(layer)) {
-			initLayer(layer);
-		}
-		
-		ChunkLevel chunkLevel;
-		try {
-			if (this.levels.get(layer)[level] == null) {
-				chunkLevel = new ChunkLevel(level);
-				this.levels.get(layer)[level] = chunkLevel;
-			} else {
-				chunkLevel = this.levels.get(layer)[level];
-			}			
-			
-		} catch (ArrayIndexOutOfBoundsException ex) {
-			chunkLevel = EMPTY_LEVEL;
-		}
-		
 		synchronized (levelLock) {
+			if (!levels.containsKey(layer)) {
+				initLayer(layer);
+			}
+			
+			ChunkLevel chunkLevel;
+			try {
+				chunkLevel = this.levels.get(layer)[level];
+				if (chunkLevel == null) {
+					chunkLevel = new ChunkLevel(level);
+					this.levels.get(layer)[level] = chunkLevel;
+				}
+			} catch (ArrayIndexOutOfBoundsException ex) {
+				chunkLevel = EMPTY_LEVEL;
+			}
 			return chunkLevel;
 		}
 	}
@@ -179,7 +176,8 @@ public class ChunkData {
 			if (chunkManager == null) return null;
 			WorldChunk lifeChunk = chunkManager.getWorldChunk(getX(), getZ());
 			if (lifeChunk == null || lifeChunk.isEmpty()) {
-				return ChunkDataManager.callSavedChunk(world, this);
+				lifeChunk = ChunkDataManager.callSavedChunk(world, chunkPos);
+				if (lifeChunk == null) return null;
 			}
 			this.updateWorldChunk(lifeChunk);
 			return lifeChunk;
