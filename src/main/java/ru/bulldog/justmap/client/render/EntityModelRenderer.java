@@ -20,9 +20,9 @@ import net.minecraft.entity.LivingEntity;
 
 public class EntityModelRenderer {	
 
-	private static MinecraftClient minecraftClient = MinecraftClient.getInstance();
-	private static EntityRenderDispatcher renderDispatcher = minecraftClient.getEntityRenderManager();
-	private static VertexConsumerProvider.Immediate consumerProvider = minecraftClient.getBufferBuilders().getEntityVertexConsumers();
+	private static MinecraftClient minecraft = JustMapClient.MINECRAFT;
+	private static EntityRenderDispatcher renderDispatcher = minecraft.getEntityRenderManager();
+	private static VertexConsumerProvider.Immediate consumerProvider = minecraft.getBufferBuilders().getEntityVertexConsumers();
 	
 	public static void renderModel(Entity entity, double x, double y) {
 		
@@ -47,7 +47,7 @@ public class EntityModelRenderer {
 		matrixStack.translate(x, y, 0);
 		matrixStack.translate(modelSize / 4, modelSize / 2, 0);
 		if (ClientParams.rotateMap) {
-			float rotation = MathUtil.correctAngle(minecraftClient.player.headYaw);
+			float rotation = MathUtil.correctAngle(minecraft.player.headYaw);
 			matrixStack.multiply(Vector3f.POSITIVE_Z.getDegreesQuaternion(rotation));
 		} else {
 			matrixStack.multiply(Vector3f.POSITIVE_X.getDegreesQuaternion(180.0F));

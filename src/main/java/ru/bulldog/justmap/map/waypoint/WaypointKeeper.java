@@ -14,7 +14,7 @@ import com.google.gson.JsonObject;
 
 import net.minecraft.util.Identifier;
 import ru.bulldog.justmap.util.JsonFactory;
-import ru.bulldog.justmap.util.StorageUtil;
+import ru.bulldog.justmap.util.storage.StorageUtil;
 
 public class WaypointKeeper extends JsonFactory {
 	
@@ -28,7 +28,7 @@ public class WaypointKeeper extends JsonFactory {
 			instance = new WaypointKeeper();
 		}		
 		
-		File waypointsFile = new File(StorageUtil.filesDir(), "/waypoints.json");
+		File waypointsFile = new File(StorageUtil.filesDir(), "waypoints.json");
 		if (currentStorage == null || !currentStorage.equals(waypointsFile)) {
 			currentStorage = waypointsFile;
 			instance.loadWaypoints();
@@ -65,7 +65,7 @@ public class WaypointKeeper extends JsonFactory {
 		JsonObject jsonObject = new JsonObject();
 		jsonObject.add("waypoints", waypointArray);
 		
-		File waypointsFile = new File(StorageUtil.filesDir(), "/waypoints.json");
+		File waypointsFile = new File(StorageUtil.filesDir(), "waypoints.json");
 		storeJson(waypointsFile, jsonObject);
 	}
 	

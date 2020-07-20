@@ -4,7 +4,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.util.Window;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerEntity;
-
+import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.client.render.EntityModelRenderer;
 import ru.bulldog.justmap.map.IMap;
@@ -12,7 +12,7 @@ import ru.bulldog.justmap.map.MapPlayerManager;
 import ru.bulldog.justmap.util.ColorUtil;
 import ru.bulldog.justmap.util.Colors;
 import ru.bulldog.justmap.util.RenderUtil;
-import ru.bulldog.justmap.util.math.Line.Point;
+import ru.bulldog.justmap.util.math.Point;
 
 public class PlayerIcon extends MapIcon<PlayerIcon> {
 	
@@ -52,12 +52,12 @@ public class PlayerIcon extends MapIcon<PlayerIcon> {
 		}
 			
 		if (ClientParams.showPlayerNames) {
-			MinecraftClient client = MinecraftClient.getInstance();
-			Window window = client.getWindow();
+			MinecraftClient minecraft = JustMapClient.MINECRAFT;
+			Window window = minecraft.getWindow();
 			double sf = window.getScaleFactor();
 			float scale = (float) (1.0 / sf);
 			matrix.push();
-			if (sf > 1.0 && !client.options.forceUnicodeFont) {
+			if (sf > 1.0 && !minecraft.options.forceUnicodeFont) {
 				matrix.scale(scale, scale, 1.0F);
 				matrix.translate(pos.x * (sf - 1), pos.y * (sf - 1), 0.0);
 			}
