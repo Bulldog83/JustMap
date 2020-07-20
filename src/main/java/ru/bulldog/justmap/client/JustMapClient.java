@@ -39,7 +39,7 @@ public class JustMapClient implements ClientModInitializer {
 		KeyHandler.initKeyBindings();
 
 		ClientChunkEvents.CHUNK_LOAD.register((world, chunk) -> {
-			DimensionData data = DimensionManager.getData();
+			DimensionData data = DimensionManager.getData(MAP);
 			if (data != null) {
 				data.addLoadedChunk(world, chunk);
 			}

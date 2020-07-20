@@ -12,53 +12,54 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class DimensionData {
-	private static Layer.Type currentLayer = Layer.Type.SURFACE;
-	private static int currentLevel = 0;
-	
-	public static void setCurrentLayer(Layer.Type layer, int y) {
-		currentLevel =  y / layer.value.height;
-		currentLayer = layer;
-	}
-	
-	public static Layer.Type currentLayer() {
-		return currentLayer;
-	}
-	
-	public static int currentLevel() {
-		return currentLevel;
-	}
-	
 	private World world;
 	private ChunkDataManager chunkManager;
-	private Map<RegionPos, MapRegion> regions = new ConcurrentHashMap<>();
+	private Map<RegionPos, RegionData> regions = new ConcurrentHashMap<>();
+	private Layer layer = Layer.SURFACE;
+	private int level = 0;
 	private long lastPurged = 0;
 	private long purgeDelay = 1000;
 	private int purgeAmount = 500;
 	
-	public DimensionData(World world) {
-		this.chunkManager = new ChunkDataManager(world);
+	public DimensionData(World world, Layer layer, int level) {
+		this.chunkManager = new ChunkDataManager(this, world);
 		this.world = world;
+		this.layer = layer;
+		this.level = level;
 	}
 	
-	public MapRegion getRegion(BlockPos currentPos, BlockPos centerPos) {
+	public void setLayer(Layer layer, int level) {
+		this.layer = layer;
+		this.level = level;
+	}
+	
+	public Layer getLayer() {
+		return this.layer;
+	}
+	
+	public int getLevel() {
+		return this.level;
+	}
+	
+	public RegionData getRegion(BlockPos currentPos, BlockPos centerPos) {
 		return this.getRegion(world, currentPos, centerPos, false);
 	}
 	
-	public MapRegion getRegion(BlockPos currentPos, BlockPos centerPos, boolean surfaceOnly) {
+	public RegionData getRegion(BlockPos currentPos, BlockPos centerPos, boolean surfaceOnly) {
 		return this.getRegion(world, currentPos, centerPos, surfaceOnly);
 	}
 	
-	public MapRegion getRegion(World world, BlockPos currentPos, BlockPos centerPos, boolean surfaceOnly) {
+	public RegionData getRegion(World world, BlockPos currentPos, BlockPos centerPos, boolean surfaceOnly) {
 		RegionPos regPos = new RegionPos(currentPos);
 
-		Layer.Type layer = surfaceOnly ? Layer.Type.SURFACE : currentLayer;
-		int level = surfaceOnly ? 0 : currentLevel;
+		Layer layer = surfaceOnly ? Layer.SURFACE : this.layer;
+		int level = surfaceOnly ? 0 : this.level;
 		
-		MapRegion region;
+		RegionData region;
 		if(regions.containsKey(regPos)) {
 			region = regions.get(regPos);
 		} else {
-			region = new MapRegion(world, currentPos, layer, level);
+			region = new RegionData(this, world, currentPos, layer, level);
 			regions.put(regPos, region);
 		}
 		region.surfaceOnly = surfaceOnly;
@@ -81,10 +82,6 @@ public class DimensionData {
 
 	public void addLoadedChunk(World world, WorldChunk lifeChunk) {
 		this.chunkManager.addLoadedChunk(world, lifeChunk);
-	}
-	
-	public ChunkData getCurrentChunk(int x, int z) {
-		return this.chunkManager.getChunk(currentLayer, currentLevel, x, z);
 	}
 	
 	public World getWorld() {

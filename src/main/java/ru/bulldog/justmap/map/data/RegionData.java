@@ -18,20 +18,20 @@ import ru.bulldog.justmap.util.math.Point;
 import ru.bulldog.justmap.util.storage.StorageUtil;
 import ru.bulldog.justmap.util.tasks.TaskManager;
 
-public class MapRegion {
+public class RegionData {
 	
 	private static TaskManager worker = TaskManager.getManager("region-data");
 	
+	private final DimensionData mapData;
 	private final RegionPos regPos;
 	private final MapTexture image;
 	private World world;
 	private MapTexture texture;
 	private MapTexture overlay;
-	private Layer.Type layer;
+	private Layer layer;
 	private ChunkPos center;
 	private Plane updateArea;
 	private int level;
-
 	private boolean needUpdate = false;
 	private boolean renewOverlay = false;
 	private boolean overlayNeeded = false;
@@ -46,7 +46,8 @@ public class MapRegion {
 	public boolean surfaceOnly = false;	
 	public long updated = 0;
 	
-	public MapRegion(World world, BlockPos blockPos, Layer.Type layer, int level) {
+	public RegionData(DimensionData data, World world, BlockPos blockPos, Layer layer, int level) {
+		this.mapData = data;
 		this.world = world;
 		this.regPos = new RegionPos(blockPos);
 		this.center = new ChunkPos(blockPos);
@@ -139,8 +140,7 @@ public class MapRegion {
 	}
 	
 	private void update() {
-		DimensionData mapData = DimensionManager.getData();
-		ChunkDataManager chunkManager = mapData.getChunkManager();
+		ChunkDataManager chunkManager = this.mapData.getChunkManager();
 		
 		int regX = this.regPos.x << 9;
 		int regZ = this.regPos.z << 9;		
@@ -149,23 +149,25 @@ public class MapRegion {
 			for (int y = 0; y < 512; y += 16) {
 				int chunkZ = (regZ + y) >> 4;
 				
-				ChunkData mapChunk;
+				ChunkData mapChunk = chunkManager.getChunk(chunkX, chunkZ);
+				Layer layer = Layer.SURFACE;
+				int level = 0;
 				boolean updated = false;
 				if (surfaceOnly) {
-					mapChunk = chunkManager.getChunk(Layer.Type.SURFACE, 0, chunkX, chunkZ);
-					if (DimensionData.currentLayer() == Layer.Type.SURFACE &&
+					if (mapData.getLayer() == Layer.SURFACE &&
 						updateArea.contains(Point.fromPos(mapChunk.getPos()))) {
 						
-						updated = mapChunk.update(needUpdate);
+						updated = mapChunk.update(Layer.SURFACE, 0, needUpdate);
 					}
 				} else {
-					mapChunk = mapData.getCurrentChunk(chunkX, chunkZ);
+					layer = mapData.getLayer();
+					level = mapData.getLevel();
 					if (updateArea.contains(Point.fromPos(mapChunk.getPos()))) {
-						updated = mapChunk.update(needUpdate);
+						updated = mapChunk.update(layer, level, needUpdate);
 					}
 				}
 				if (updated) {
-					this.image.writeChunkData(x, y, mapChunk.getColorData());
+					this.image.writeChunkData(x, y, mapChunk.getColorData(layer, level));
 				}
 				if (overlayNeeded) {
 					this.updateOverlay(x, y, mapChunk);
@@ -210,7 +212,7 @@ public class MapRegion {
 		}
 	}
 	
-	public Layer.Type getLayer() {
+	public Layer getLayer() {
 		return this.layer != null ? this.layer : null;
 	}
 	
@@ -218,7 +220,7 @@ public class MapRegion {
 		return this.level;
 	}
 	
-	public void swapLayer(Layer.Type layer, int level) {
+	public void swapLayer(Layer layer, int level) {
 		this.layer = layer;
 		this.level = level;
 		if (!this.loadImage()) {
@@ -250,10 +252,10 @@ public class MapRegion {
 	
 	private File imageFile() {
 		File dir = StorageUtil.cacheDir();
-		if (surfaceOnly || Layer.Type.SURFACE == layer) {
+		if (surfaceOnly || Layer.SURFACE == layer) {
 			dir = new File(dir, "surface");
 		} else {
-			dir = new File(dir, String.format("%s/%d", layer.value.name, level));
+			dir = new File(dir, String.format("%s/%d", layer.name, level));
 		}
 		
 		if (!dir.exists()) {

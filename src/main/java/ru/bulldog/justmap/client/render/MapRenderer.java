@@ -13,7 +13,7 @@ import ru.bulldog.justmap.map.DirectionArrow;
 import ru.bulldog.justmap.map.MapPlayerManager;
 import ru.bulldog.justmap.map.data.DimensionData;
 import ru.bulldog.justmap.map.data.DimensionManager;
-import ru.bulldog.justmap.map.data.MapRegion;
+import ru.bulldog.justmap.map.data.RegionData;
 import ru.bulldog.justmap.map.icon.EntityIcon;
 import ru.bulldog.justmap.map.icon.PlayerIcon;
 import ru.bulldog.justmap.map.icon.WaypointIcon;
@@ -343,10 +343,10 @@ public class MapRenderer {
 	}
 	
 	private void drawMap() {
-		DimensionData mapData = DimensionManager.getData();
+		DimensionData mapData = DimensionManager.getData(minimap);
 		
-		int scaledW = minimap.getScaledWidth();
-		int scaledH = minimap.getScaledHeight();
+		int scaledW = this.minimap.getScaledWidth();
+		int scaledH = this.minimap.getScaledHeight();
 		int cornerX = PosUtil.coordX() - scaledW / 2;
 		int cornerZ = PosUtil.coordZ() - scaledH / 2;		
 		int right = this.imgX + scaledW;
@@ -358,7 +358,7 @@ public class MapRenderer {
 			bottom = this.imgY + scaledH;
 		}
 		
-		float scale = minimap.getScale();
+		float scale = this.minimap.getScale();
 		
 		BlockPos center = PosUtil.currentPos();
 		BlockPos.Mutable currentPos = new BlockPos.Mutable();
@@ -370,7 +370,7 @@ public class MapRenderer {
 			while (picY < scaledH ) {				
 				int cZ = cornerZ + picY;
 				
-				MapRegion region = mapData.getRegion(currentPos.set(cX, 0, cZ), center);
+				RegionData region = mapData.getRegion(currentPos.set(cX, 0, cZ), center);
 				
 				picW = 512;
 				picH = 512;

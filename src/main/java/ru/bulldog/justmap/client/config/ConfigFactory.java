@@ -373,10 +373,6 @@ public final class ConfigFactory {
 				.setSaveConsumer(val -> JustMapClient.CONFIG.setBoolean("force_map_update", val))
 				.setDefaultValue((boolean) JustMapClient.CONFIG.getDefault("force_map_update"))
 				.build());
-		optimization.addEntry(entryBuilder.startBooleanToggle(lang("generate_new_chunks"), JustMapClient.CONFIG.getBoolean("generate_new_chunks"))
-				.setSaveConsumer(val -> JustMapClient.CONFIG.setBoolean("generate_new_chunks", val))
-				.setDefaultValue((boolean) JustMapClient.CONFIG.getDefault("generate_new_chunks"))
-				.build());
 		
 		configBuilder.setDoesConfirmSave(false);
 		configBuilder.transparentBackground();

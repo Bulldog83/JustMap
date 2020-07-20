@@ -2,25 +2,15 @@ package ru.bulldog.justmap.map.data;
 
 import java.util.Arrays;
 
-public class Layer {	
-	public enum Type {
-		SURFACE("surface", 256),
-		CAVES("caves", 8),
-		NETHER("nether", 16);
-		
-		public final Layer value;
-		
-		Type(String name, int height) {
-			this.value = new Layer(this, name, height);
-		}
-	}
+public class Layer {
+	public final static Layer SURFACE = new Layer("surface", 256);
+	public final static Layer CAVES = new Layer("caves", 8);
+	public final static Layer NETHER = new Layer("nether", 16);
 	
-	public final Type type;
 	public final String name;
 	public final int height;
 	
-	private Layer(Type type, String name, int height) {
-		this.type = type;
+	private Layer(String name, int height) {
 		this.name = name;
 		this.height = height;
 	}

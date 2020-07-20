@@ -79,7 +79,6 @@ public class ClientParams {
 	public static int purgeDelay = 60;
 	public static int purgeAmount = 1500;
 	public static boolean forceUpdate = false;
-	public static boolean chunksGeneration = false;
 	
 	public static boolean showWaypoints = true;
 	public static boolean jumpToWaypoints = true;
