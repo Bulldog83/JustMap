@@ -67,6 +67,8 @@ public class JustMapClient implements ClientModInitializer {
 	}
 	
 	private boolean isOnTitleScreen(Screen currentScreen) {
+		if (currentScreen == null) return false;
+		
 		boolean isTitleScreen = false;
 		if (currentScreen.getTitle() instanceof TranslatableText) {
 			TranslatableText title = (TranslatableText) currentScreen.getTitle();

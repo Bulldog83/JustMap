@@ -260,7 +260,7 @@ public class Minimap implements IMap{
 			int checkHeight = 24;
 			BlockPos start = new BlockPos(startX, posY - checkHeight / 2, startZ);
 			BlockPos end = new BlockPos(endX, posY + checkHeight / 2, endZ);
-			List<Entity> entities = world.getEntities(null, new Box(start, end));
+			List<Entity> entities = world.getOtherEntities(player, new Box(start, end));
 		
 			int amount = 0;				
 			for (Entity entity : entities) {
@@ -271,7 +271,6 @@ public class Minimap implements IMap{
 				double iconY = MathUtil.screenPos(entZ, startZ, endZ, mapHeight);
 				if (entity instanceof PlayerEntity && allowPlayerRadar()) {
 					PlayerEntity pEntity  = (PlayerEntity) entity;
-					if (pEntity == player) continue;
 					PlayerIcon playerIcon = new PlayerIcon(this, pEntity, false);
 					playerIcon.setPosition(iconX, iconY);
 					this.players.add(playerIcon);

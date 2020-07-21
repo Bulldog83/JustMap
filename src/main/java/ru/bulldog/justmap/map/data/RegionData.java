@@ -31,6 +31,7 @@ public class RegionData {
 	private Layer layer;
 	private ChunkPos center;
 	private Plane updateArea;
+	private File regionFile;
 	private int level;
 	private boolean needUpdate = false;
 	private boolean renewOverlay = false;
@@ -49,11 +50,12 @@ public class RegionData {
 	public RegionData(DimensionData data, World world, BlockPos blockPos, Layer layer, int level) {
 		this.mapData = data;
 		this.world = world;
+		this.layer = layer;
+		this.level = level;
 		this.regPos = new RegionPos(blockPos);
 		this.center = new ChunkPos(blockPos);
 		this.image = new MapTexture(512, 512, Colors.BLACK);
-		this.layer = layer;
-		this.level = level;
+		this.regionFile = this.imageFile();
 		
 		int radius = JustMapClient.MINECRAFT.options.viewDistance;
 		this.updateArea = new Plane(center.x - radius, center.z - radius,
@@ -219,6 +221,7 @@ public class RegionData {
 	public void swapLayer(Layer layer, int level) {
 		this.layer = layer;
 		this.level = level;
+		this.regionFile = this.imageFile();
 		if (!this.loadImage()) {
 			this.image.fill(Colors.BLACK);
 		}
@@ -237,13 +240,11 @@ public class RegionData {
 	}
 	
 	private void saveImage() {
-		File imgFile = this.imageFile();
-		JustMap.WORKER.execute("Saving image for region: " + regPos, () -> this.image.saveImage(imgFile));
+		JustMap.WORKER.execute("Saving image for region: " + regPos, () -> this.image.saveImage(regionFile));
 	}
 	
 	private boolean loadImage() {
-		File imgFile = this.imageFile();
-		return this.image.loadImage(imgFile);
+		return this.image.loadImage(regionFile);
 	}
 	
 	private File imageFile() {
