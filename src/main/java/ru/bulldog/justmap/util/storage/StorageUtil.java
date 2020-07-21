@@ -1,11 +1,11 @@
 package ru.bulldog.justmap.util.storage;
 
 import java.io.File;
+import java.nio.file.Path;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.loader.api.FabricLoader;
-
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ServerInfo;
 import net.minecraft.server.MinecraftServer;
@@ -21,36 +21,40 @@ public final class StorageUtil {
 	private StorageUtil() {}
 	
 	private final static FabricLoader fabricLoader = FabricLoader.getInstance();
-	private final static File GAME_DIR = fabricLoader.getGameDirectory();
-	private final static File MAP_DATA_DIR = new File(GAME_DIR, JustMap.MODID);
-	private final static File MAP_CONFIG_DIR = new File(fabricLoader.getConfigDirectory(), JustMap.MODID);
-	private final static File MAP_SKINS_DIR = new File(MAP_CONFIG_DIR, "skins");
-	private final static File MAP_ICONS_DIR = new File(MAP_CONFIG_DIR, "icons");
+	private final static Path GAME_DIR = fabricLoader.getGameDir();
+	private final static Path GAME_CONFIG_DIR = fabricLoader.getConfigDir();
+	private final static Path MAP_DATA_DIR = GAME_DIR.resolve(JustMap.MODID);
+	private final static Path MAP_CONFIG_DIR = GAME_CONFIG_DIR.resolve(JustMap.MODID);
+	private final static Path MAP_SKINS_DIR = MAP_CONFIG_DIR.resolve("skins");
+	private final static Path MAP_ICONS_DIR = MAP_CONFIG_DIR.resolve("icons");
 	
-	private static File filesDir = new File(MAP_DATA_DIR, "undefined");
+	private static File filesDir = new File(MAP_DATA_DIR.toFile(), "undefined");
 	private static String currentDim = "unknown";
 	
 	public static File configDir() {
-		if (!MAP_CONFIG_DIR.exists()) {
-			MAP_CONFIG_DIR.mkdirs();
+		File mapConfigDir = MAP_CONFIG_DIR.toFile();
+		if (!mapConfigDir.exists()) {
+			mapConfigDir.mkdirs();
 		}
-		return MAP_CONFIG_DIR;
+		return mapConfigDir;
 	}
 	
 	@Environment(EnvType.CLIENT)
 	public static File skinsDir() {
-		if (!MAP_SKINS_DIR.exists()) {
-			MAP_SKINS_DIR.mkdirs();
+		File mapSkinsDir = MAP_SKINS_DIR.toFile();
+		if (!mapSkinsDir.exists()) {
+			mapSkinsDir.mkdirs();
 		}
-		return MAP_SKINS_DIR;
+		return mapSkinsDir;
 	}
 	
 	@Environment(EnvType.CLIENT)
 	public static File iconsDir() {
-		if (!MAP_ICONS_DIR.exists()) {
-			MAP_ICONS_DIR.mkdirs();
+		File iconsDir = MAP_ICONS_DIR.toFile();
+		if (!iconsDir.exists()) {
+			iconsDir.mkdirs();
 		}
-		return MAP_ICONS_DIR;
+		return iconsDir;
 	}
 	
 	@Environment(EnvType.CLIENT)
@@ -87,13 +91,14 @@ public final class StorageUtil {
 	public static File filesDir() {
 		MinecraftClient minecraft = JustMapClient.MINECRAFT;		
 		ServerInfo serverInfo = minecraft.getCurrentServerEntry();
+		File mapDataDir = MAP_DATA_DIR.toFile();
 		if (minecraft.isIntegratedServerRunning()) {
 			MinecraftServer server = minecraft.getServer();
 			String name = scrubNameFile(server.getSaveProperties().getLevelName());
-			filesDir = new File(MAP_DATA_DIR, String.format("local/%s", name));
+			filesDir = new File(mapDataDir, String.format("local/%s", name));
 		} else if (serverInfo != null) {
 			String name = scrubNameFile(serverInfo.name);
-			filesDir = new File(MAP_DATA_DIR, String.format("servers/%s", name));
+			filesDir = new File(mapDataDir, String.format("servers/%s", name));
 		}
 		
 		if (!filesDir.exists()) {
