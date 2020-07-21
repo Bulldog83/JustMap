@@ -1,6 +1,5 @@
 package ru.bulldog.justmap.map;
 
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.texture.AbstractTexture;
 import net.minecraft.client.texture.PlayerSkinTexture;
@@ -12,6 +11,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.ChatUtil;
 import net.minecraft.util.Identifier;
 
+import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.map.icon.PlayerHeadIcon;
 
 public class MapPlayer extends AbstractClientPlayerEntity {
@@ -39,7 +39,7 @@ public class MapPlayer extends AbstractClientPlayerEntity {
 	}
 	
 	public static ResourceTexture loadSkinTexture(Identifier id, String playerName) {
-		TextureManager textureManager = MinecraftClient.getInstance().getTextureManager();
+		TextureManager textureManager = JustMapClient.MINECRAFT.getTextureManager();
 		AbstractTexture abstractTexture = textureManager.getTexture(id);
 		if (abstractTexture == null) {
 			abstractTexture = new PlayerSkinTexture(null, String.format("http://skins.minecraft.net/MinecraftSkins/%s.png", ChatUtil.stripTextFormat(playerName)), DefaultSkinHelper.getTexture(getOfflinePlayerUuid(playerName)), true, null);
