@@ -14,24 +14,30 @@ import ru.bulldog.justmap.JustMap;
 public class TaskManager implements Executor {
     private final Queue<Task> workQueue = new ConcurrentLinkedQueue<>();
     private final QueueBlocker queueBlocker;
-    private Thread worker;   
+    private ThreadGroup group;
+    private Thread[] workers;
     private String name = JustMap.MODID;
-    private boolean running = true; 
+    
+    private boolean running = true;
     
     private static Map<String, TaskManager> managers = new HashMap<>();
     
     public static TaskManager getManager(String name) {
+    	return getManager(name, 1);
+    }
+    
+    public static TaskManager getManager(String name, int maxThreads) {
     	if (managers.containsKey(name)) {
     		TaskManager manager = managers.get(name);
     		if (!manager.isRunning()) {
-    			manager = new TaskManager(name);
+    			manager = new TaskManager(name, maxThreads);
     			managers.replace(name, manager);
     		}
     		
     		return manager;
     	}
     	
-    	TaskManager manager = new TaskManager(name);
+    	TaskManager manager = new TaskManager(name, maxThreads);
     	managers.put(name, manager);
     	
     	return manager;
@@ -43,16 +49,27 @@ public class TaskManager implements Executor {
     	});
     }
     
-    private TaskManager(String name) {
+    private TaskManager(String name, int maxThreads) {
     	this.name += "-" + name;
     	this.queueBlocker = new QueueBlocker(this.name + "-blocker");
-    	this.worker = new Thread(this::work, this.name);
-    	this.worker.start();
+    	this.workers = new Thread[maxThreads];
+    	this.group = new ThreadGroup(this.name);
+    	for (int i = 0; i < maxThreads; i++) {
+    		String threadName = String.format("%s-%d", this.name, i + 1);
+    		this.workers[i] = new Thread(group, this::work, threadName);
+    		this.workers[i].start();
+    	}
     }
     
     public void execute(String reason, Runnable command) {
     	this.workQueue.offer(new Task(reason, command));
-    	LockSupport.unpark(this.worker);
+    	this.unpark();
+    }
+    
+    private void unpark() {
+    	for (Thread worker : workers) {
+    		LockSupport.unpark(worker);
+    	}
     }
 
     @Override

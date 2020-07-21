@@ -11,8 +11,7 @@ import ru.bulldog.justmap.client.config.ClientConfig;
 import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.map.IMap;
 import ru.bulldog.justmap.map.MapGameRules;
-import ru.bulldog.justmap.map.data.Layer.Type;
-import ru.bulldog.justmap.map.data.MapCache;
+import ru.bulldog.justmap.map.data.Layer;
 import ru.bulldog.justmap.map.icon.EntityIcon;
 import ru.bulldog.justmap.map.icon.PlayerIcon;
 import ru.bulldog.justmap.map.icon.WaypointIcon;
@@ -51,13 +50,18 @@ public class Minimap implements IMap{
 		SQUARE
 	}
 	
-	private static final MinecraftClient minecraft = MinecraftClient.getInstance();
+	private static final MinecraftClient minecraft = JustMapClient.MINECRAFT;
 	
 	private final TextManager textManager;	
 	private InfoText txtCoords = new CoordsInfo(TextAlignment.CENTER, "0, 0, 0");
 	private InfoText txtBiome = new BiomeInfo(TextAlignment.CENTER, "");
 	private InfoText txtTime = new TimeInfo(TextAlignment.CENTER, "");
-	
+	private List<WaypointIcon> waypoints = new ArrayList<>();
+	private List<PlayerIcon> players = new ArrayList<>();
+	private List<EntityIcon> entities = new ArrayList<>();	
+	private PlayerEntity locPlayer = null;
+	private Layer mapLayer = Layer.SURFACE;
+	private int mapLevel = 0;
 	private int mapWidth;
 	private int mapHeight;
 	private int scaledWidth;
@@ -65,11 +69,6 @@ public class Minimap implements IMap{
 	private float mapScale;
 	private int lastPosX = 0;
 	private int lastPosZ = 0;
-	
-	private List<WaypointIcon> waypoints = new ArrayList<>();
-	private List<PlayerIcon> players = new ArrayList<>();
-	private List<EntityIcon> entities = new ArrayList<>();	
-	private PlayerEntity locPlayer = null;
 	
 	private boolean isMapVisible = true;
 	private boolean rotateMap = false;
@@ -228,11 +227,14 @@ public class Minimap implements IMap{
 		double startZ = posZ - scaledH / 2;
 
 		if (Dimension.isNether(world.getDimensionRegistryKey())) {
-			MapCache.setCurrentLayer(Type.NETHER, posY);
+			this.mapLayer = Layer.NETHER;
+			this.mapLevel = posY / mapLayer.height;
 		} else if (needRenderCaves(world, pos)) {
-			MapCache.setCurrentLayer(Type.CAVES, posY);
+			this.mapLayer = Layer.CAVES;
+			this.mapLevel = posY / mapLayer.height;
 		} else {
-			MapCache.setCurrentLayer(Type.SURFACE, posY);
+			this.mapLayer = Layer.SURFACE;
+			this.mapLevel = 0;
 		}
 		
 		if (lastPosX != posX || lastPosZ != posZ) { 
@@ -371,6 +373,16 @@ public class Minimap implements IMap{
 	
 	public int getLastZ() {
 		return this.lastPosZ;
+	}
+	
+	@Override
+	public Layer getLayer() {
+		return this.mapLayer;
+	}
+
+	@Override
+	public int getLevel() {
+		return this.mapLevel;
 	}
 
 	@Override

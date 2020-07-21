@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import ru.bulldog.justmap.JustMap;
+import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.client.render.Image;
 import ru.bulldog.justmap.map.minimap.Minimap;
@@ -17,7 +18,6 @@ import ru.bulldog.justmap.util.RenderUtil;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.texture.NativeImageBackedTexture;
 import net.minecraft.client.texture.TextureManager;
@@ -35,7 +35,7 @@ public class MapSkin extends Image {
 	}
 
 	private final static List<MapSkin> SKINS = new ArrayList<>();
-	private final static TextureManager textureManager = MinecraftClient.getInstance().getTextureManager();
+	private final static TextureManager textureManager = JustMapClient.MINECRAFT.getTextureManager();
 	
 	private final RenderData renderData;
 	

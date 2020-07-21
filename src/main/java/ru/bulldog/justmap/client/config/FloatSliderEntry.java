@@ -21,6 +21,7 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.MathHelper;
+import ru.bulldog.justmap.client.JustMapClient;
 
 public class FloatSliderEntry extends TooltipListEntry<Float> {
 
@@ -121,7 +122,7 @@ public class FloatSliderEntry extends TooltipListEntry<Float> {
 	@Override
 	public void render(MatrixStack matrices, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isSelected, float delta) {
 		super.render(matrices, index, y, x, entryWidth, entryHeight, mouseX, mouseY, isSelected, delta);
-		Window window = MinecraftClient.getInstance().getWindow();
+		Window window = JustMapClient.MINECRAFT.getWindow();
 		this.resetButton.active = isEditable() && getDefaultValue().isPresent() && defaultValue.get() != value.get();
 		this.resetButton.y = y;
 		this.sliderWidget.active = isEditable();
