@@ -1,5 +1,6 @@
 package ru.bulldog.justmap.client.render;
 
+import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.map.waypoint.Waypoint;
 import ru.bulldog.justmap.map.waypoint.WaypointKeeper;
@@ -51,16 +52,16 @@ public class WaypointRenderer {
 		if (renderer == null) {
 			renderer = new WaypointRenderer();
 		}
-		MinecraftClient client = MinecraftClient.getInstance();
-		if (client.world == null || client.player == null || client.currentScreen != null) {
+		MinecraftClient minecraft = JustMapClient.MINECRAFT;
+		if (minecraft.world == null || minecraft.player == null || minecraft.currentScreen != null) {
 			return;
 		}
 	
-		List<Waypoint> wayPoints = WaypointKeeper.getInstance().getWaypoints(client.world.getDimensionRegistryKey().getValue(), true);
+		List<Waypoint> wayPoints = WaypointKeeper.getInstance().getWaypoints(minecraft.world.getDimensionRegistryKey().getValue(), true);
 		for (Waypoint wp : wayPoints) {
-			int dist = (int) MathUtil.getDistance(wp.pos, client.player.getBlockPos(), false);
+			int dist = (int) MathUtil.getDistance(wp.pos, minecraft.player.getBlockPos(), false);
 			if (wp.tracking && dist <= wp.showRange) {
-				renderer.renderHUD(wp, client, delta, fov, dist);
+				renderer.renderHUD(wp, minecraft, delta, fov, dist);
 			}
 		}
 	}

@@ -2,6 +2,7 @@ package ru.bulldog.justmap.map.waypoint;
 
 import com.mojang.datafixers.util.Pair;
 
+import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.client.MapScreen;
 import ru.bulldog.justmap.map.minimap.Minimap;
 import ru.bulldog.justmap.map.waypoint.Waypoint.Icon;
@@ -42,7 +43,7 @@ public class WaypointsList extends MapScreen {
 			this.height = height + 2;
 			this.waypoint = waypoint;
 			
-			this.minecraft = MinecraftClient.getInstance();
+			this.minecraft = JustMapClient.MINECRAFT;
 			
 			this.editButton = new ButtonWidget(0, 0, 40, height, wayPointListEditor.lang("edit"), (b) -> wayPointListEditor.edit(waypoint));
 			this.deleteButton = new ButtonWidget(0, 0, 40, height, wayPointListEditor.lang("delete"), (b) -> wayPointListEditor.delete(waypoint));

@@ -62,7 +62,7 @@ public class ChunkLevel {
 	public void updateHeightmap(int x, int z, int y) {
 		int index = x + (z << 4);
 		if (heightmap[index] != y) {
-			setBlockState(x, heightmap[index] & 15, z, StateUtil.AIR);
+			this.setBlockState(x, heightmap[index] & 15, z, StateUtil.AIR);
 			heightmap[index] = y;
 		}
 	}
@@ -70,7 +70,7 @@ public class ChunkLevel {
 	public void clear(int x, int z) {
 		int index = x + (z << 4);
 		if (heightmap[index] != -1) {
-			setBlockState(x, heightmap[index] & 15, z, StateUtil.AIR);
+			this.setBlockState(x, heightmap[index] & 15, z, StateUtil.AIR);
 			this.heightmap[index] = -1;
 		}
 		

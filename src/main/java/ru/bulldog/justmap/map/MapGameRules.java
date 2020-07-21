@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import ru.bulldog.justmap.JustMap;
+import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.mixins.BooleanRuleAccessor;
 import ru.bulldog.justmap.mixins.GameRulesAccessor;
 import net.fabricmc.api.EnvType;
@@ -63,8 +64,7 @@ public class MapGameRules {
 	 */	
 	@Environment(EnvType.CLIENT)
 	public static void parseCommand(String command) {
-		MinecraftClient client = MinecraftClient.getInstance();
-		GameRules gameRules = client.world.getGameRules();
+		GameRules gameRules = JustMapClient.MINECRAFT.world.getGameRules();
 		codes.forEach((key, rule) -> {
 			if (command.contains(key)) {
 				int valPos = command.indexOf(key) + 2;
@@ -77,13 +77,13 @@ public class MapGameRules {
 	
 	@Environment(EnvType.CLIENT)
 	public static boolean isAllowed(GameRules.Key<GameRules.BooleanRule> rule) {
-		MinecraftClient client = MinecraftClient.getInstance();
+		MinecraftClient minecraft = JustMapClient.MINECRAFT;
 		
 		boolean allow = true;
-		if (client.isIntegratedServerRunning()) {
-			allow = client.getServer().getGameRules().getBoolean(rule);
-		} else if (!client.isInSingleplayer()) {
-			allow = client.world.getGameRules().getBoolean(rule);
+		if (minecraft.isIntegratedServerRunning()) {
+			allow = minecraft.getServer().getGameRules().getBoolean(rule);
+		} else if (!minecraft.isInSingleplayer()) {
+			allow = minecraft.world.getGameRules().getBoolean(rule);
 		}
 		
 		return allow;
