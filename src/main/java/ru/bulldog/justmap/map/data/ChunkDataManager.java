@@ -41,12 +41,16 @@ public class ChunkDataManager {
 		if (mapChunks.containsKey(chunkPos)) {
 			ChunkData mapChunk = mapChunks.get(chunkPos);
 			mapChunk.updateWorldChunk(lifeChunk);
-			ChunkData.updadeChunk(mapChunk);
+			mapChunk.update(mapData.getLayer(), mapData.getLevel(), true);
 		} else {
 			ChunkData mapChunk = new ChunkData(mapData, world, lifeChunk);
-			ChunkData.updadeChunk(mapChunk);
+			mapChunk.update(mapData.getLayer(), mapData.getLevel(), true);
 			this.mapChunks.put(chunkPos, mapChunk);
 		}
+	}
+	
+	public ChunkData getChunk(ChunkPos chunkPos) {
+		return this.getChunk(chunkPos.x, chunkPos.z);
 	}
 	
 	public ChunkData getChunk(int posX, int posZ) {
@@ -114,8 +118,10 @@ public class ChunkDataManager {
 				return worldChunk;
 			}
 			return null;
-		} catch (IOException ex) {
-			JustMap.LOGGER.catching(ex);
+		} catch (Exception ex) {
+			if (ex instanceof IOException) {
+				JustMap.LOGGER.catching(ex);
+			}
 			return null;
 		}
 	}

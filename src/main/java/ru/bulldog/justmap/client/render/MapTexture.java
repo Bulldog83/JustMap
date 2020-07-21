@@ -120,6 +120,8 @@ public class MapTexture {
 	}
 	
 	public void setColor(int x, int y, int color) {
+		if (this.bytes == null) return;
+		
 		if (x < 0 || x >= this.getWidth()) return;
 		if (y < 0 || y >= this.getHeight()) return;
 		
@@ -147,6 +149,8 @@ public class MapTexture {
 	}
 	
 	public int getColor(int x, int y) {
+		if (this.bytes == null) return -1;
+		
 		if (x < 0 || x >= this.getWidth()) return -1;
 		if (y < 0 || y >= this.getHeight()) return -1;
 		
@@ -162,6 +166,8 @@ public class MapTexture {
 	}
 	
 	public void applyTint(int x, int y, int tint) {
+		if (this.bytes == null) return;
+		
 		if (x < 0 || x >= this.getWidth()) return;
 		if (y < 0 || y >= this.getHeight()) return;
 		
@@ -177,6 +183,8 @@ public class MapTexture {
 	}
 	
 	public void fill(int x, int y, int w, int h, int color) {
+		if (this.bytes == null) return;
+		
 		if (x < 0 || y < 0) return;
 		
 		int width = this.getWidth();
@@ -199,6 +207,8 @@ public class MapTexture {
 	}
 	
 	public void applyOverlay(MapTexture overlay) {
+		if (this.bytes == null) return;
+		
 		int width = Math.min(this.width, overlay.getWidth());
 		int height = Math.min(this.height, overlay.getHeight());
 		if (width <= 0 || height <= 0) return;
@@ -216,6 +226,7 @@ public class MapTexture {
 	}
 	
 	public void saveImage(File png) {
+		if (this.bytes == null) return;
 		try (OutputStream fileOut = new FileOutputStream(png)) {
 			BufferedImage pngImage = new BufferedImage(width, height, BufferedImage.TYPE_4BYTE_ABGR);
 			byte[] data = ((DataBufferByte) pngImage.getTile(0, 0).getDataBuffer()).getData();
@@ -224,6 +235,7 @@ public class MapTexture {
 				data[i] = bytes[i];
 			}
 			ImageIO.write(pngImage, "png", fileOut);
+			JustMap.LOGGER.debug("Image saved: " + png);
 			pngImage.flush();
 		} catch (Exception ex) {
 			JustMap.LOGGER.logWarning("Can't save image: " + png.toString());
@@ -233,17 +245,20 @@ public class MapTexture {
 	
 	public boolean loadImage(File png) {
 		if (!png.exists()) return false;
-		try (InputStream fileInput = new FileInputStream(png)) {
-			BufferedImage pngImage = new BufferedImage(width, height, BufferedImage.TYPE_4BYTE_ABGR);
-			pngImage.setData(ImageIO.read(fileInput).getData());
-			this.bytes = ((DataBufferByte) pngImage.getTile(0, 0).getDataBuffer()).getData().clone();
-			this.changed = true;
-			pngImage.flush();			
-			return true;
-		} catch (Exception ex) {
-			JustMap.LOGGER.logWarning("Can't load image: " + png.toString());
-			JustMap.LOGGER.logWarning(ex.getLocalizedMessage());
-			return false;
+		synchronized (bufferLock) {
+			try (InputStream fileInput = new FileInputStream(png)) {
+				BufferedImage pngImage = new BufferedImage(width, height, BufferedImage.TYPE_4BYTE_ABGR);
+				pngImage.setData(ImageIO.read(fileInput).getData());
+				this.bytes = ((DataBufferByte) pngImage.getTile(0, 0).getDataBuffer()).getData().clone();
+				this.changed = true;
+				pngImage.flush();			
+				JustMap.LOGGER.debug("Image loaded: " + png);
+				return true;
+			} catch (Exception ex) {
+				JustMap.LOGGER.logWarning("Can't load image: " + png.toString());
+				JustMap.LOGGER.logWarning(ex.getLocalizedMessage());
+				return false;
+			}
 		}
 	}
 	

@@ -22,6 +22,7 @@ import net.minecraft.client.gui.screen.world.SelectWorldScreen;
 import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.advancedinfo.AdvancedInfo;
 import ru.bulldog.justmap.client.config.ClientConfig;
+import ru.bulldog.justmap.event.ChunkUpdateListener;
 import ru.bulldog.justmap.map.data.DimensionData;
 import ru.bulldog.justmap.map.data.DimensionManager;
 import ru.bulldog.justmap.map.minimap.Minimap;
@@ -53,6 +54,7 @@ public class JustMapClient implements ClientModInitializer {
 			if (isOnTitleScreen) return;
 			
 			DimensionManager.memoryControl();
+			ChunkUpdateListener.proceed();
 			AdvancedInfo.getInstance().updateInfo();
 			KeyHandler.update();
 			MAP.update();
@@ -64,6 +66,7 @@ public class JustMapClient implements ClientModInitializer {
 	}
 	
 	private static void stop() {
+		ChunkUpdateListener.stop();
 		JustMap.WORKER.execute("Clearing map cache...", DimensionManager::clearData);
 	}
 	

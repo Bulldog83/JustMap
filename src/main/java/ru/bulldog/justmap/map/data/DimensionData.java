@@ -21,11 +21,9 @@ public class DimensionData {
 	private long purgeDelay = 1000;
 	private int purgeAmount = 500;
 	
-	public DimensionData(World world, Layer layer, int level) {
+	public DimensionData(World world) {
 		this.chunkManager = new ChunkDataManager(this, world);
 		this.world = world;
-		this.layer = layer;
-		this.level = level;
 	}
 	
 	public void setLayer(Layer layer, int level) {
@@ -50,18 +48,10 @@ public class DimensionData {
 	}
 	
 	public RegionData getRegion(World world, BlockPos currentPos, BlockPos centerPos, boolean surfaceOnly) {
-		RegionPos regPos = new RegionPos(currentPos);
-
 		Layer layer = surfaceOnly ? Layer.SURFACE : this.layer;
 		int level = surfaceOnly ? 0 : this.level;
 		
-		RegionData region;
-		if(regions.containsKey(regPos)) {
-			region = regions.get(regPos);
-		} else {
-			region = new RegionData(this, world, currentPos, layer, level);
-			regions.put(regPos, region);
-		}
+		RegionData region = this.getRegion(world, currentPos);
 		region.surfaceOnly = surfaceOnly;
 		ChunkPos center = new ChunkPos(centerPos);
 		if (!region.getCenter().equals(center)) {
@@ -72,10 +62,24 @@ public class DimensionData {
 		if (layer != region.getLayer() ||
 			level != region.getLevel()) {
 			region.swapLayer(layer, level);
-		} else if (time - region.updated > 3000) {
+		} else if (time - region.updated > 1000) {
 			region.updateImage(ClientParams.forceUpdate);
 		}
 		region.updateWorld(world);
+		
+		return region;
+	}
+	
+	public RegionData getRegion(World world, BlockPos currentPos) {
+		RegionPos regPos = new RegionPos(currentPos);
+		
+		RegionData region;
+		if(regions.containsKey(regPos)) {
+			region = regions.get(regPos);
+		} else {
+			region = new RegionData(this, world, currentPos, layer, level);
+			regions.put(regPos, region);
+		}
 		
 		return region;
 	}

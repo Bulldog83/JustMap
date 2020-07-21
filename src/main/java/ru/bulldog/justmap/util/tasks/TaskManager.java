@@ -44,8 +44,20 @@ public class TaskManager implements Executor {
     }
     
     public static void shutdown() {
+    	long timeout = 5000;
     	managers.forEach((name, manager) -> {
-    		if (manager.isRunning()) manager.stop();
+    		if (manager.isRunning()) {
+    			manager.stop();
+    			long time = System.currentTimeMillis();
+    			while(manager.isRunning()) {
+    				long now = System.currentTimeMillis();
+    				if (now - time > timeout) {
+    					manager.running = false;
+    					manager.workQueue.clear();
+    				}
+    			}
+    			JustMap.LOGGER.debug(manager.name + " stopped");
+    		}
     	});
     }
     

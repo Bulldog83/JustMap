@@ -46,6 +46,15 @@ public final class DimensionManager {
 	public static DimensionData getData(IMap map, World world, Identifier dimension) {
 		if (world == null) return null;
 		
+		DimensionData data = getData(world, dimension);
+		data.setLayer(map.getLayer(), map.getLevel());
+		
+		return data;
+	}
+	
+	public static DimensionData getData(World world, Identifier dimension) {
+		if (world == null) return null;
+		
 		DimensionData data;
 		if (DIMENSION_DATA.containsKey(dimension)) {
 			data = DIMENSION_DATA.get(dimension);
@@ -55,9 +64,8 @@ public final class DimensionManager {
 			} else {
 				data.clearCache();
 			}
-			data.setLayer(map.getLayer(), map.getLevel());
 		} else {
-			data = new DimensionData(world, map.getLayer(), map.getLevel());
+			data = new DimensionData(world);
 			DIMENSION_DATA.put(dimension, data);
 		}
 		
