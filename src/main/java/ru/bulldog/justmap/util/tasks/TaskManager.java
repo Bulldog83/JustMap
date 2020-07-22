@@ -117,7 +117,7 @@ public class TaskManager implements Executor {
     	while (running) {
     		Task nextTask = workQueue.poll();
     		if (nextTask != null) {
-    			JustMap.LOGGER.debug(nextTask);
+    			//JustMap.LOGGER.debug(nextTask);
     			nextTask.run();
             } else {
             	LockSupport.park(queueBlocker);

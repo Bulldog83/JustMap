@@ -9,7 +9,6 @@ import ru.bulldog.justmap.util.tasks.TaskManager;
 import net.minecraft.world.World;
 import net.minecraft.block.BlockState;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.registry.RegistryKey;
@@ -30,7 +29,6 @@ public class ChunkData {
 	
 	private final DimensionData mapData;
 	private final Map<Layer, ChunkLevel[]> levels = new ConcurrentHashMap<>();
-	private final Identifier dimension;
 	private final ChunkPos chunkPos;
 	private World world;
 	private SoftReference<WorldChunk> worldChunk;
@@ -53,19 +51,17 @@ public class ChunkData {
 	}
 	
 	public ChunkData(DimensionData data, World world, ChunkPos pos) {
-		RegistryKey<DimensionType> dimType = world.getDimensionRegistryKey();
-		
 		this.mapData = data;
 		this.world = world;
-		this.dimension = dimType.getValue();
 		this.chunkPos = pos;
 		this.worldChunk = new SoftReference<>(DataUtil.getClientWorld().getChunk(pos.x, pos.z));
 
+		RegistryKey<DimensionType> dimType = world.getDimensionRegistryKey();
 		if (Dimension.isOverworld(dimType) && (world instanceof ServerWorld)) {
 			this.slime = ChunkRandom.getSlimeRandom(chunkPos.x, chunkPos.z,
 					((ServerWorld) world).getSeed(), 987234911L).nextInt(10) == 0;
 		}		
-		if (dimension.equals(DimensionType.THE_NETHER_REGISTRY_KEY.getValue())) {
+		if (Dimension.isNether(dimType)) {
 			initLayer(Layer.NETHER);
 		} else {
 			initLayer(Layer.SURFACE);

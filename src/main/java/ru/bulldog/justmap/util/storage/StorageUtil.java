@@ -60,9 +60,8 @@ public final class StorageUtil {
 	}
 	
 	@Environment(EnvType.CLIENT)
-	public static File cacheDir() {
+	public static File cacheDir(World world) {
 		RegistryKey<DimensionType> dimKey = null;
-		World world = DataUtil.getWorld();
 		if (world != null) {
 			dimKey = world.getDimensionRegistryKey();			
 			String dimension = dimKey.getValue().getPath();
@@ -108,34 +107,6 @@ public final class StorageUtil {
 		}
 		
 		return filesDir;
-	}
-	
-	public static void clearCache(File dir) {
-		deleteDir(dir);
-		dir.mkdirs();
-	}
-	
-	public static void clearCache() {
-		clearCache(cacheDir());
-	}
-	
-	private static void deleteDir(File dir) {
-		if (!dir.exists()) return;
-		
-		File[] files = dir.listFiles();
-		if (files == null) {
-			dir.delete();
-			return;
-		}
-		
-		for (File file : files) {
-			if (file.isDirectory()) {
-				deleteDir(file);
-			} else {
-				file.delete();
-			}
-		}
-		dir.delete();
 	}
 
 	private static String scrubNameFile(String input) {

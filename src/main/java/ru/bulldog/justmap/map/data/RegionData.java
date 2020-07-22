@@ -27,7 +27,7 @@ public class RegionData {
 	private final DimensionData mapData;
 	private final RegionPos regPos;
 	private final Map<Layer, MapTexture> images = new ConcurrentHashMap<>();
-	private final File cacheDir;
+	private File cacheDir;
 	private MapTexture image;
 	private MapTexture texture;
 	private MapTexture overlay;
@@ -60,7 +60,7 @@ public class RegionData {
 		this.level = DataUtil.getLevel(layer, blockPos.getY());
 		this.regPos = new RegionPos(blockPos);
 		this.center = new ChunkPos(blockPos);
-		this.cacheDir = StorageUtil.cacheDir();
+		this.cacheDir = StorageUtil.cacheDir(world);
 		this.image = this.getImage(layer, level);
 		
 		int radius = DataUtil.getGameOptions().viewDistance;
@@ -68,6 +68,10 @@ public class RegionData {
 									center.x + radius, center.z + radius);
 		
 		this.updateImage(true);
+	}
+	
+	public RegionPos getPos() {
+		return this.regPos;
 	}
 	
 	public int getX() {
@@ -98,6 +102,7 @@ public class RegionData {
 	public void updateWorld(World world) {
 		if (world == null) return;
 		if (!world.equals(this.world)) {
+			this.cacheDir = StorageUtil.cacheDir(world);
 			this.world = world;
 			this.clear();
 			this.updateImage(true);
@@ -305,7 +310,7 @@ public class RegionData {
 		if (!dir.exists()) {
 			dir.mkdirs();
 		}
-		
+
 		return new File(dir, String.format("r%d.%d.png", regPos.x, regPos.z));
 	}
 	

@@ -3,9 +3,6 @@ package ru.bulldog.justmap.event;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import net.minecraft.util.math.ChunkPos;
-
-import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.util.tasks.TaskManager;
 
 public class ChunkUpdateListener {
@@ -22,10 +19,6 @@ public class ChunkUpdateListener {
 		
 		while(!updateQueue.isEmpty()) {
 			ChunkUpdateEvent event = updateQueue.poll();
-			
-			ChunkPos chunkPos = event.worldChunk.getPos();
-			JustMap.LOGGER.debug(String.format("Updating stored chunk %s from %s", chunkPos, event.source));
-			
 			event.mapChunk.updateWorldChunk(event.worldChunk);
 			event.mapChunk.update(event.layer, event.level, false);
 		}

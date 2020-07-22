@@ -57,11 +57,12 @@ public class JustMapClient implements ClientModInitializer {
 			this.isOnTitleScreen = isTitle;
 			if (isOnTitleScreen) return;
 			
-			DimensionManager.memoryControl();
-			JustMapClient.MAP.update();
-			AdvancedInfo.getInstance().updateInfo();
+			DataUtil.update();
 			KeyHandler.update();
+			JustMapClient.MAP.update();
 			ChunkUpdateListener.proceed();
+			DimensionManager.memoryControl();
+			AdvancedInfo.getInstance().updateInfo();
 		});
 		ClientLifecycleEvents.CLIENT_STOPPING.register(client -> {
 			JustMapClient.stop();
