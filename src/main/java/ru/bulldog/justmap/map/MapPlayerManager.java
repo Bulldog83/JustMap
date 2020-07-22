@@ -5,7 +5,8 @@ import java.util.Map;
 import java.util.UUID;
 
 import net.minecraft.entity.player.PlayerEntity;
-import ru.bulldog.justmap.client.JustMapClient;
+
+import ru.bulldog.justmap.util.DataUtil;
 
 public class MapPlayerManager {
 
@@ -19,7 +20,7 @@ public class MapPlayerManager {
 			return players.get(id);
 		}
 		
-		MapPlayer mapPlayer = new MapPlayer(JustMapClient.MINECRAFT.world, player);
+		MapPlayer mapPlayer = new MapPlayer(DataUtil.getClientWorld(), player);
 		players.put(id, mapPlayer);
 		
 		return mapPlayer;

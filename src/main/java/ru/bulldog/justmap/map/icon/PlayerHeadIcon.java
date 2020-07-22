@@ -6,10 +6,10 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
 
 import ru.bulldog.justmap.JustMap;
-import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.map.MapPlayer;
 import ru.bulldog.justmap.util.Colors;
+import ru.bulldog.justmap.util.DataUtil;
 import ru.bulldog.justmap.util.RenderUtil;
 
 import java.io.IOException;
@@ -62,7 +62,7 @@ public class PlayerHeadIcon {
 				this.playerSkin = skinTexture;
 
 				try {
-					this.playerSkin.load(JustMapClient.MINECRAFT.getResourceManager());
+					this.playerSkin.load(DataUtil.getMinecraft().getResourceManager());
 				} catch (IOException ex) {
 					JustMap.LOGGER.logWarning(ex.getLocalizedMessage());
 				}
@@ -73,7 +73,7 @@ public class PlayerHeadIcon {
 			this.success = false;
 			
 			try {
-				this.playerSkin.load(JustMapClient.MINECRAFT.getResourceManager());
+				this.playerSkin.load(DataUtil.getMinecraft().getResourceManager());
 			} catch (IOException ex) {
 				JustMap.LOGGER.logWarning(ex.getLocalizedMessage());
 			}

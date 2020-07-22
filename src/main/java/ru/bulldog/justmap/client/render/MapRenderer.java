@@ -20,10 +20,11 @@ import ru.bulldog.justmap.map.icon.WaypointIcon;
 import ru.bulldog.justmap.map.minimap.Minimap;
 import ru.bulldog.justmap.map.minimap.skin.MapSkin;
 import ru.bulldog.justmap.util.RenderUtil.TextAlignment;
+import ru.bulldog.justmap.util.RuleUtil;
 import ru.bulldog.justmap.util.Colors;
 import ru.bulldog.justmap.util.RenderUtil;
 import ru.bulldog.justmap.util.ScreenPosition;
-import ru.bulldog.justmap.util.PosUtil;
+import ru.bulldog.justmap.util.DataUtil;
 import ru.bulldog.justmap.util.math.Line;
 import ru.bulldog.justmap.util.math.MathUtil;
 import ru.bulldog.justmap.util.math.Point;
@@ -65,7 +66,7 @@ public class MapRenderer {
 	private InfoText dirE = new MapText(TextAlignment.CENTER, "E");
 	private InfoText dirW = new MapText(TextAlignment.CENTER, "W");
 	
-	private final MinecraftClient minecraft = JustMapClient.MINECRAFT;
+	private final MinecraftClient minecraft = DataUtil.getMinecraft();
 	private final Identifier roundMask = new Identifier(JustMap.MODID, "textures/round_mask.png");
 	
 	public static MapRenderer getInstance() {
@@ -270,8 +271,8 @@ public class MapRenderer {
 		GL11.glScissor(scaledX, scaledY, scaledW, scaledH);
 		
 		float mult = 1 / minimap.getScale();		
-		float offX = (float) (PosUtil.doubleCoordX() - this.lastX) * mult;
-		float offY = (float) (PosUtil.doubleCoordZ() - this.lastZ) * mult;
+		float offX = (float) (DataUtil.doubleCoordX() - this.lastX) * mult;
+		float offY = (float) (DataUtil.doubleCoordZ() - this.lastZ) * mult;
 		
 		if (isRound) {
 			RenderSystem.enableBlend();
@@ -298,13 +299,13 @@ public class MapRenderer {
 		this.drawMap();
 		RenderSystem.popMatrix();
 		
-		if (Minimap.allowEntityRadar()) {
-			if (Minimap.allowPlayerRadar()) {
+		if (RuleUtil.allowEntityRadar()) {
+			if (RuleUtil.allowPlayerRadar()) {
 				for (PlayerIcon player : minimap.getPlayerIcons()) {
 					player.draw(matrix, mapX, mapY, offX, offY, rotation);
 				}
 			}
-			if (Minimap.allowCreatureRadar() || Minimap.allowHostileRadar()) {
+			if (RuleUtil.allowCreatureRadar() || RuleUtil.allowHostileRadar()) {
 				for (EntityIcon entity : minimap.getEntities()) {
 					entity.draw(matrix, mapX, mapY, offX, offY, rotation);
 				}
@@ -343,12 +344,12 @@ public class MapRenderer {
 	}
 	
 	private void drawMap() {
-		DimensionData mapData = DimensionManager.getData(minimap);
+		DimensionData mapData = DimensionManager.getData();
 		
 		int scaledW = this.minimap.getScaledWidth();
 		int scaledH = this.minimap.getScaledHeight();
-		int cornerX = PosUtil.coordX() - scaledW / 2;
-		int cornerZ = PosUtil.coordZ() - scaledH / 2;		
+		int cornerX = DataUtil.coordX() - scaledW / 2;
+		int cornerZ = DataUtil.coordZ() - scaledH / 2;		
 		int right = this.imgX + scaledW;
 		
 		int bottom;
@@ -360,8 +361,9 @@ public class MapRenderer {
 		
 		float scale = this.minimap.getScale();
 		
-		BlockPos center = PosUtil.currentPos();
+		BlockPos center = DataUtil.currentPos();
 		BlockPos.Mutable currentPos = new BlockPos.Mutable();
+		int cY = center.getY();
 		
 		int picX = 0, picW = 0;
 		while(picX < scaledW) {
@@ -370,7 +372,8 @@ public class MapRenderer {
 			while (picY < scaledH ) {				
 				int cZ = cornerZ + picY;
 				
-				RegionData region = mapData.getRegion(currentPos.set(cX, 0, cZ), center);
+				RegionData region = mapData.getRegion(currentPos.set(cX, cY, cZ), center);
+				region.swapLayer(minimap.getLayer(), minimap.getLevel());
 				
 				picW = 512;
 				picH = 512;

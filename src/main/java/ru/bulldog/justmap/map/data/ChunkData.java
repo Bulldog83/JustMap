@@ -1,25 +1,24 @@
 package ru.bulldog.justmap.map.data;
 
-import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.util.ColorUtil;
+import ru.bulldog.justmap.util.DataUtil;
 import ru.bulldog.justmap.util.Dimension;
 import ru.bulldog.justmap.util.tasks.TaskManager;
 
 import net.minecraft.world.World;
 import net.minecraft.block.BlockState;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.registry.RegistryKey;
-import net.minecraft.world.chunk.ChunkManager;
+import net.minecraft.world.chunk.ChunkStatus;
 import net.minecraft.world.chunk.WorldChunk;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.gen.ChunkRandom;
 
-import java.lang.ref.WeakReference;
+import java.lang.ref.SoftReference;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -27,14 +26,14 @@ public class ChunkData {
 	
 	public final static ChunkLevel EMPTY_LEVEL = new ChunkLevel(-1);
 	
-	private final static TaskManager chunkUpdater = TaskManager.getManager("chunk-updater", 3);
+	private final static TaskManager chunkUpdater = TaskManager.getManager("chunk-updater", 2);
 	
 	private final DimensionData mapData;
 	private final Map<Layer, ChunkLevel[]> levels = new ConcurrentHashMap<>();
 	private final Identifier dimension;
 	private final ChunkPos chunkPos;
 	private World world;
-	private WeakReference<WorldChunk> worldChunk;
+	private SoftReference<WorldChunk> worldChunk;
 	private boolean outdated = false;
 	private boolean updating = false;
 	private boolean purged = false;
@@ -54,14 +53,13 @@ public class ChunkData {
 	}
 	
 	public ChunkData(DimensionData data, World world, ChunkPos pos) {
-		MinecraftClient minecraft = JustMapClient.MINECRAFT;
-		RegistryKey<DimensionType> dimType = minecraft.world.getDimensionRegistryKey();
+		RegistryKey<DimensionType> dimType = world.getDimensionRegistryKey();
 		
 		this.mapData = data;
 		this.world = world;
 		this.dimension = dimType.getValue();
 		this.chunkPos = pos;
-		this.worldChunk = new WeakReference<>(minecraft.world.getChunk(pos.x, pos.z));
+		this.worldChunk = new SoftReference<>(DataUtil.getClientWorld().getChunk(pos.x, pos.z));
 
 		if (Dimension.isOverworld(dimType) && (world instanceof ServerWorld)) {
 			this.slime = ChunkRandom.getSlimeRandom(chunkPos.x, chunkPos.z,
@@ -138,36 +136,36 @@ public class ChunkData {
 		return this.getChunkLevel(layer, level).setBlockState(pos.getX() & 15, pos.getY() & 15, pos.getZ() & 15, blockState);
 	}
 	
-	public void update(Layer layer, int level, boolean forceUpdate) {
-		if (updating || purged) return;
+	public boolean update(Layer layer, int level, boolean forceUpdate) {
+		if (updating || purged) return false;
 		if (!outdated && forceUpdate) {
 			this.outdated = forceUpdate;
 		}
 		long currentTime = System.currentTimeMillis();
-		if (!outdated && currentTime - updated < ClientParams.chunkUpdateInterval) return;
+		if (!outdated && currentTime - updated < ClientParams.chunkUpdateInterval) return false;
 		
+		WorldChunk worldChunk = this.updateWorldChunk();
 		chunkUpdater.execute("Updating Chunk: " + chunkPos, () -> {
-			WorldChunk worldChunk = this.updateWorldChunk();
 			if (worldChunk == null) return;
 			this.updateChunkData(worldChunk, layer, level);
 		});
+		
+		return true;
 	}
 	
 	public void updateWorldChunk(WorldChunk lifeChunk) {
 		if (lifeChunk != null && !lifeChunk.isEmpty()) {
-			this.worldChunk = new WeakReference<>(lifeChunk);
+			this.worldChunk = new SoftReference<>(lifeChunk);
 		}
 	}
 	
 	public WorldChunk updateWorldChunk() {
 		WorldChunk currentChunk = this.worldChunk.get();
 		if(currentChunk == null || currentChunk.isEmpty()) {
-			ChunkManager chunkManager = this.world.getChunkManager();
-			if (chunkManager == null) return null;
-			WorldChunk lifeChunk = chunkManager.getWorldChunk(getX(), getZ());
+			WorldChunk lifeChunk = (WorldChunk) this.world.getChunk(getX(), getZ(), ChunkStatus.FULL, false);
 			if (lifeChunk == null || lifeChunk.isEmpty()) {
-				lifeChunk = ChunkDataManager.callSavedChunk(world, chunkPos);
-				if (lifeChunk == null) return null;
+				this.mapData.callSavedChunk(chunkPos);
+				return null;
 			}
 			this.updateWorldChunk(lifeChunk);
 			return lifeChunk;
@@ -202,8 +200,11 @@ public class ChunkData {
 	private void updateChunkData(WorldChunk worldChunk, Layer layer, int level) {
 		this.updating = true;
 		
-		ChunkData eastChunk = this.mapData.getChunkManager().getChunk(chunkPos.x + 1, chunkPos.z);
-		ChunkData southChunk = this.mapData.getChunkManager().getChunk(chunkPos.x, chunkPos.z - 1);		
+		ChunkData eastChunk = this.mapData.getChunk(chunkPos.x + 1, chunkPos.z);
+		ChunkData southChunk = this.mapData.getChunk(chunkPos.x, chunkPos.z - 1);		
+		
+		if (eastChunk == null || southChunk == null) return;
+		
 		WorldChunk eastWorldChunk = eastChunk.updateWorldChunk();
 		WorldChunk southWorldChunk = southChunk.updateWorldChunk();
 		
@@ -276,7 +277,9 @@ public class ChunkData {
 		}
 		
 		if (saveNeeded()) {
-			RegionData region = this.mapData.getRegion(world, chunkPos.getCenterBlockPos());
+			BlockPos.Mutable chunkBlockPos = this.chunkPos.getCenterBlockPos().mutableCopy();
+			chunkBlockPos.setY(level * layer.height);
+			RegionData region = this.mapData.getRegion(world, chunkBlockPos);
 			if (region.getLayer().equals(layer) && region.getLevel() == level) {
 				region.writeChunkData(this);
 			}

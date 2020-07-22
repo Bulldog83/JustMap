@@ -32,7 +32,7 @@ import ru.bulldog.justmap.map.waypoint.Waypoint;
 import ru.bulldog.justmap.map.waypoint.WaypointKeeper;
 import ru.bulldog.justmap.map.waypoint.WaypointsList;
 import ru.bulldog.justmap.util.Colors;
-import ru.bulldog.justmap.util.PosUtil;
+import ru.bulldog.justmap.util.DataUtil;
 import ru.bulldog.justmap.util.math.MathUtil;
 
 public class Worldmap extends MapScreen implements IMap {
@@ -86,19 +86,19 @@ public class Worldmap extends MapScreen implements IMap {
 
 		Identifier dimId = client.world.getDimensionRegistryKey().getValue();
 		if (centerPos == null || !dimId.equals(dimension)) {
-			this.centerPos = PosUtil.currentPos();
+			this.centerPos = DataUtil.currentPos();
 			this.dimension = dimId;
 		} else if (playerTracking) {
-			this.centerPos = PosUtil.currentPos();
+			this.centerPos = DataUtil.currentPos();
 		}
-		this.cursorCoords = PosUtil.posToString(centerPos);
+		this.cursorCoords = DataUtil.posToString(centerPos);
 
 		this.addMapButtons();
 		this.updateScale();
 
 		if (dimension.equals(DimensionType.THE_NETHER_REGISTRY_KEY.getValue())) {
 			this.mapLayer = Layer.NETHER;
-			this.mapLevel = PosUtil.coordY() / mapLayer.height;
+			this.mapLevel = DataUtil.coordY() / mapLayer.height;
 		} else {
 			this.mapLayer = Layer.SURFACE;
 			this.mapLevel = 0;
@@ -164,13 +164,14 @@ public class Worldmap extends MapScreen implements IMap {
 	}
 	
 	private void drawMap() {		
-		DimensionData mapData = DimensionManager.getData(this);		
+		DimensionData mapData = DimensionManager.getData();		
 		boolean surfaceOnly = !this.mapLayer.equals(Layer.NETHER);
 		
 		int cornerX = centerPos.getX() - scaledWidth / 2;
 		int cornerZ = centerPos.getZ() - scaledHeight / 2;
 		
 		BlockPos.Mutable currentPos = new BlockPos.Mutable();
+		int cY = centerPos.getY();
 		
 		int picX = 0, picW = 0;
 		while(picX < scaledWidth) {
@@ -179,7 +180,8 @@ public class Worldmap extends MapScreen implements IMap {
 			while (picY < scaledHeight) {				
 				int cZ = cornerZ + picY;
 				
-				RegionData region = mapData.getRegion(currentPos.set(cX, 0, cZ), centerPos, surfaceOnly);
+				RegionData region = mapData.getRegion(currentPos.set(cX, cY, cZ), centerPos, surfaceOnly);
+				region.swapLayer(mapLayer, mapLevel);
 				
 				picW = 512;
 				picH = 512;
@@ -222,7 +224,7 @@ public class Worldmap extends MapScreen implements IMap {
 	
 	public void setCenterByPlayer() {
 		this.playerTracking = true;
-		this.centerPos = PosUtil.currentPos();  		
+		this.centerPos = DataUtil.currentPos();  		
 		this.calculateShift();
 	}
 	
@@ -346,8 +348,8 @@ public class Worldmap extends MapScreen implements IMap {
 		int chunkX = posX >> 4;
 		int chunkZ = posZ >> 4;
 		
-		DimensionData data = DimensionManager.getData(this);		
-		ChunkData mapChunk = data.getChunkManager().getChunk(chunkX, chunkZ);
+		DimensionData data = DimensionManager.getData();		
+		ChunkData mapChunk = data.getChunk(chunkX, chunkZ);
 		
 		int cx = posX - (chunkX << 4);
 		int cz = posZ - (chunkZ << 4);
@@ -360,7 +362,7 @@ public class Worldmap extends MapScreen implements IMap {
 	
 	@Override
 	public void mouseMoved(double d, double e) {		
-		this.cursorCoords = PosUtil.posToString(cursorBlockPos(d, e));
+		this.cursorCoords = DataUtil.posToString(cursorBlockPos(d, e));
 	}
 	
 	private int clicks = 0;
@@ -394,16 +396,6 @@ public class Worldmap extends MapScreen implements IMap {
 		boolean scrolled = super.mouseScrolled(d, e, f);
 		this.changeScale(f > 0 ? -0.25F : 0.25F);
 		return scrolled;
-	}
-	
-	@Override
-	public Layer getLayer() {
-		return this.mapLayer;
-	}
-
-	@Override
-	public int getLevel() {
-		return this.mapLevel;
 	}
 
 	@Override

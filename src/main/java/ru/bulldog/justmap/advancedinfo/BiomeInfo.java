@@ -4,7 +4,7 @@ import net.minecraft.client.resource.language.I18n;
 import net.minecraft.world.biome.Biome;
 import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.util.RenderUtil.TextAlignment;
-import ru.bulldog.justmap.util.PosUtil;
+import ru.bulldog.justmap.util.DataUtil;
 
 public class BiomeInfo extends InfoText {
 
@@ -24,7 +24,7 @@ public class BiomeInfo extends InfoText {
 	public void update() {
 		this.setVisible(ClientParams.showBiome);
 		if (visible && minecraft.world != null) {
-			Biome currentBiome = minecraft.world.getBiome(PosUtil.currentPos());
+			Biome currentBiome = minecraft.world.getBiome(DataUtil.currentPos());
 			this.setText(title + I18n.translate(currentBiome.getTranslationKey()));
 		}
 	}

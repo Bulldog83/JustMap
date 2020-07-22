@@ -18,9 +18,12 @@ import net.minecraft.world.chunk.WorldChunk;
 import net.minecraft.world.storage.VersionedChunkStorage;
 
 import ru.bulldog.justmap.JustMap;
+import ru.bulldog.justmap.util.DataUtil;
 import ru.bulldog.justmap.util.tasks.MemoryUtil;
+import ru.bulldog.justmap.util.tasks.TaskManager;
 
 public class ChunkDataManager {
+	private final static TaskManager chunkProcessor = TaskManager.getManager("chunk-processor");
 	private final Map<ChunkPos, ChunkData> mapChunks = new ConcurrentHashMap<>();
 	private final DimensionData mapData;
 	private World world;
@@ -34,21 +37,6 @@ public class ChunkDataManager {
 		this.world = world;
 	}
 
-	public void addLoadedChunk(World world, WorldChunk lifeChunk) {
-		if (world == null || lifeChunk == null || lifeChunk.isEmpty()) return;
-		
-		ChunkPos chunkPos = lifeChunk.getPos();
-		if (mapChunks.containsKey(chunkPos)) {
-			ChunkData mapChunk = mapChunks.get(chunkPos);
-			mapChunk.updateWorldChunk(lifeChunk);
-			mapChunk.update(mapData.getLayer(), mapData.getLevel(), true);
-		} else {
-			ChunkData mapChunk = new ChunkData(mapData, world, lifeChunk);
-			mapChunk.update(mapData.getLayer(), mapData.getLevel(), true);
-			this.mapChunks.put(chunkPos, mapChunk);
-		}
-	}
-	
 	public ChunkData getChunk(ChunkPos chunkPos) {
 		return this.getChunk(chunkPos.x, chunkPos.z);
 	}
@@ -94,13 +82,17 @@ public class ChunkDataManager {
 		this.mapChunks.clear();
 	}
 	
-	public static WorldChunk callSavedChunk(World world, ChunkPos chunkPos) {
-		if (!(world instanceof ServerWorld)) return null;
+	public void callSavedChunk(World world, ChunkPos chunkPos) {
+		chunkProcessor.execute("Call saves for chunk " + chunkPos, () -> this.callSaves(world, chunkPos));
+	}
+	
+	private void callSaves(World world, ChunkPos chunkPos) {
+		if (!(world instanceof ServerWorld)) return;
 		
 		long usedPct = MemoryUtil.getMemoryUsage();
 		if (usedPct > 85L) {
-			JustMap.LOGGER.logWarning("Not enough memory, can't load/generate more chunks.");
-			return null;
+			JustMap.LOGGER.logWarning("Not enough memory, can't load more chunks.");
+			return;
         }
 		
 		ServerWorld serverWorld = (ServerWorld) world;
@@ -108,21 +100,22 @@ public class ChunkDataManager {
 		VersionedChunkStorage storage = manager.threadedAnvilChunkStorage;
 		try {		
 			CompoundTag chunkTag = storage.getNbt(chunkPos);
-			if (chunkTag == null) return null;
+			if (chunkTag == null) return;
 			
 			Chunk chunk = ChunkSerializer.deserialize(
 					serverWorld, serverWorld.getStructureManager(), serverWorld.getPointOfInterestStorage(), chunkPos, chunkTag);
 			if (chunk instanceof ReadOnlyChunk) {
 				WorldChunk worldChunk = ((ReadOnlyChunk) chunk).getWrappedChunk();
 				worldChunk.setLoadedToWorld(true);
-				return worldChunk;
+				ChunkData mapChunk = this.getChunk(chunkPos);
+				mapChunk.updateWorldChunk(worldChunk);
+				mapChunk.update(DataUtil.getLayer(), DataUtil.getLevel(), false);
 			}
-			return null;
+			return;
 		} catch (Exception ex) {
 			if (ex instanceof IOException) {
 				JustMap.LOGGER.catching(ex);
 			}
-			return null;
 		}
 	}
 }

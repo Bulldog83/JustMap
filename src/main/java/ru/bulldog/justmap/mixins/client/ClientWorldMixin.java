@@ -6,26 +6,32 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import net.minecraft.block.BlockState;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
-import ru.bulldog.justmap.client.JustMapClient;
+import net.minecraft.world.chunk.WorldChunk;
+
 import ru.bulldog.justmap.event.ChunkUpdateEvent;
 import ru.bulldog.justmap.event.ChunkUpdateListener;
+import ru.bulldog.justmap.map.data.ChunkData;
+import ru.bulldog.justmap.map.data.DimensionData;
+import ru.bulldog.justmap.map.data.DimensionManager;
+import ru.bulldog.justmap.map.data.Layer;
+import ru.bulldog.justmap.util.DataUtil;
 
 @Mixin(ClientWorld.class)
 public abstract class ClientWorldMixin {
+	
 	@Inject(method = "setBlockStateWithoutNeighborUpdates", at = @At("TAIL"))
 	public void onSetBlockState(BlockPos pos, BlockState state, CallbackInfo info) {
-		MinecraftClient minecraft = JustMapClient.MINECRAFT;
-		World world = JustMapClient.MINECRAFT.world;
-		if (world != null) {
-			if (minecraft.isIntegratedServerRunning()) {
-				world = minecraft.getServer().getWorld(world.getRegistryKey());
-			}
-			ChunkUpdateListener.accept(new ChunkUpdateEvent(world, new ChunkPos(pos)));
+		World world = DataUtil.getClientWorld();
+		WorldChunk worldChunk = world.getWorldChunk(pos);
+		if (!worldChunk.isEmpty()) {
+			Layer layer = DataUtil.getLayer(world, pos);
+			int level = DataUtil.getLevel(layer, pos.getY());			
+			DimensionData mapData = DimensionManager.getData();
+			ChunkData mapChunk = mapData.getChunk(worldChunk.getPos());
+			ChunkUpdateListener.accept(new ChunkUpdateEvent(ClientWorld.class, worldChunk, mapChunk, layer, level));
 		}
 	}
 }

@@ -10,7 +10,6 @@ import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.client.config.ClientConfig;
 import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.map.IMap;
-import ru.bulldog.justmap.map.MapGameRules;
 import ru.bulldog.justmap.map.data.Layer;
 import ru.bulldog.justmap.map.icon.EntityIcon;
 import ru.bulldog.justmap.map.icon.PlayerIcon;
@@ -18,9 +17,10 @@ import ru.bulldog.justmap.map.icon.WaypointIcon;
 import ru.bulldog.justmap.map.waypoint.Waypoint;
 import ru.bulldog.justmap.map.waypoint.WaypointEditor;
 import ru.bulldog.justmap.map.waypoint.WaypointKeeper;
+import ru.bulldog.justmap.util.DataUtil;
 import ru.bulldog.justmap.util.Dimension;
 import ru.bulldog.justmap.util.RenderUtil.TextAlignment;
-import ru.bulldog.justmap.util.PosUtil;
+import ru.bulldog.justmap.util.RuleUtil;
 import ru.bulldog.justmap.util.math.MathUtil;
 import ru.bulldog.justmap.util.math.RandomUtil;
 
@@ -34,11 +34,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
-import net.minecraft.util.registry.RegistryKey;
-import net.minecraft.world.GameRules;
-import net.minecraft.world.LightType;
 import net.minecraft.world.World;
-import net.minecraft.world.dimension.DimensionType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,7 +46,7 @@ public class Minimap implements IMap{
 		SQUARE
 	}
 	
-	private static final MinecraftClient minecraft = JustMapClient.MINECRAFT;
+	private static final MinecraftClient minecraft = DataUtil.getMinecraft();
 	
 	private final TextManager textManager;	
 	private InfoText txtCoords = new CoordsInfo(TextAlignment.CENTER, "0, 0, 0");
@@ -165,58 +161,9 @@ public class Minimap implements IMap{
 		if (showTime) this.txtTime.update();
 	}
 	
-	private static boolean isAllowed(boolean param, GameRules.Key<GameRules.BooleanRule> rule) {
-		if (param) {
-			return minecraft.isInSingleplayer() || MapGameRules.isAllowed(rule);
-		}
-		
-		return false;
-	}
-	
-	private boolean needRenderCaves(World world, BlockPos playerPos) {
-		boolean allowCaves = isAllowed(ClientParams.drawCaves, MapGameRules.ALLOW_CAVES_MAP);
-		
-		DimensionType dimType = world.getDimension();
-		RegistryKey<DimensionType> dimKey = world.getDimensionRegistryKey();
-		if (Dimension.isEnd(dimKey)) {
-			return false;
-		}
-		if (!dimType.hasCeiling() && dimType.hasSkyLight()) {
-			return allowCaves && (!world.isSkyVisibleAllowingSea(playerPos) &&
-				   world.getLightLevel(LightType.SKY, playerPos) == 0 ||
-				   dimKey == DimensionType.OVERWORLD_CAVES_REGISTRY_KEY);
-		}
-		
-		return allowCaves;
-	}
-
-	public static boolean allowEntityRadar() {
-		return isAllowed(ClientParams.showEntities, MapGameRules.ALLOW_ENTITY_RADAR);
-	}
-
-	public static boolean allowHostileRadar() {
-		return isAllowed(ClientParams.showHostile, MapGameRules.ALLOW_HOSTILE_RADAR);
-	}
-
-	public static boolean allowCreatureRadar() {
-		return isAllowed(ClientParams.showCreatures, MapGameRules.ALLOW_CREATURE_RADAR);
-	}
-
-	public static boolean allowPlayerRadar() {
-		return isAllowed(ClientParams.showPlayers, MapGameRules.ALLOW_PLAYER_RADAR);
-	}
-	
-	public static boolean allowSlimeChunks() {
-		return isAllowed(ClientParams.showSlime, MapGameRules.ALLOW_SLIME_CHUNKS);
-	}
-	
-	public static boolean allowTeleportation() {
-		return isAllowed(ClientParams.jumpToWaypoints, MapGameRules.ALLOW_TELEPORTATION);
-	}
-	
 	public void prepareMap(PlayerEntity player) {
 		World world = player.world;
-		BlockPos pos = PosUtil.currentPos();
+		BlockPos pos = DataUtil.currentPos();
 		
 		int posX = pos.getX();
 		int posZ = pos.getZ();
@@ -229,7 +176,7 @@ public class Minimap implements IMap{
 		if (Dimension.isNether(world.getDimensionRegistryKey())) {
 			this.mapLayer = Layer.NETHER;
 			this.mapLevel = posY / mapLayer.height;
-		} else if (needRenderCaves(world, pos)) {
+		} else if (RuleUtil.needRenderCaves(world, pos)) {
 			this.mapLayer = Layer.CAVES;
 			this.mapLevel = posY / mapLayer.height;
 		} else {
@@ -253,7 +200,7 @@ public class Minimap implements IMap{
 		double endX = startX + scaledW;
 		double endZ = startZ + scaledH;
 		
-		if (allowEntityRadar()) {
+		if (RuleUtil.allowEntityRadar()) {
 			this.players.clear();
 			this.entities.clear();
 			
@@ -269,7 +216,7 @@ public class Minimap implements IMap{
 				double entZ = entity.prevZ + (entity.getZ() - entity.prevZ) * tick;
 				double iconX = MathUtil.screenPos(entX, startX, endX, mapWidth);
 				double iconY = MathUtil.screenPos(entZ, startZ, endZ, mapHeight);
-				if (entity instanceof PlayerEntity && allowPlayerRadar()) {
+				if (entity instanceof PlayerEntity && RuleUtil.allowPlayerRadar()) {
 					PlayerEntity pEntity  = (PlayerEntity) entity;
 					if (pEntity == player) continue;
 					PlayerIcon playerIcon = new PlayerIcon(this, pEntity, false);
@@ -278,12 +225,12 @@ public class Minimap implements IMap{
 				} else if (entity instanceof LivingEntity && !(entity instanceof PlayerEntity)) {
 					LivingEntity livingEntity = (LivingEntity) entity;
 					boolean hostile = livingEntity instanceof HostileEntity;
-					if (hostile && allowHostileRadar()) {
+					if (hostile && RuleUtil.allowHostileRadar()) {
 						EntityIcon entIcon = new EntityIcon(this, entity, hostile);	
 						entIcon.setPosition(iconX, iconY);
 						this.entities.add(entIcon);
 						amount++;
-					} else if (!hostile && allowCreatureRadar()) {
+					} else if (!hostile && RuleUtil.allowCreatureRadar()) {
 						EntityIcon entIcon = new EntityIcon(this, entity, hostile);	
 						entIcon.setPosition(iconX, iconY);
 						this.entities.add(entIcon);
@@ -327,7 +274,7 @@ public class Minimap implements IMap{
 	
 	public void createWaypoint() {
 		World world = minecraft.world;
-		createWaypoint(world.getDimensionRegistryKey().getValue(), PosUtil.currentPos());
+		createWaypoint(world.getDimensionRegistryKey().getValue(), DataUtil.currentPos());
 	}
 	
 	public float getScale() {
@@ -375,12 +322,10 @@ public class Minimap implements IMap{
 		return this.lastPosZ;
 	}
 	
-	@Override
 	public Layer getLayer() {
 		return this.mapLayer;
 	}
 
-	@Override
 	public int getLevel() {
 		return this.mapLevel;
 	}

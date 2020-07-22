@@ -1,12 +1,12 @@
 package ru.bulldog.justmap.client.render;
 
-import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.map.waypoint.Waypoint;
 import ru.bulldog.justmap.map.waypoint.WaypointKeeper;
 import ru.bulldog.justmap.map.waypoint.Waypoint.Icon;
 import ru.bulldog.justmap.util.ColorUtil;
 import ru.bulldog.justmap.util.Colors;
+import ru.bulldog.justmap.util.DataUtil;
 import ru.bulldog.justmap.util.RenderUtil;
 import ru.bulldog.justmap.util.math.MathUtil;
 
@@ -52,7 +52,7 @@ public class WaypointRenderer {
 		if (renderer == null) {
 			renderer = new WaypointRenderer();
 		}
-		MinecraftClient minecraft = JustMapClient.MINECRAFT;
+		MinecraftClient minecraft = DataUtil.getMinecraft();
 		if (minecraft.world == null || minecraft.player == null || minecraft.currentScreen != null) {
 			return;
 		}

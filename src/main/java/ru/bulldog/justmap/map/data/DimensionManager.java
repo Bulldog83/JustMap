@@ -3,34 +3,23 @@ package ru.bulldog.justmap.map.data;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
 
 import ru.bulldog.justmap.JustMap;
-import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.client.config.ClientParams;
-import ru.bulldog.justmap.map.IMap;
+import ru.bulldog.justmap.util.DataUtil;
 import ru.bulldog.justmap.util.tasks.MemoryUtil;
 
 public final class DimensionManager {
 
-	private final static MinecraftClient MINECRAFT = JustMapClient.MINECRAFT;
 	private final static Map<Identifier, DimensionData> DIMENSION_DATA = new ConcurrentHashMap<>();
 	private static Identifier currentDimension;
 	private static World currentWorld;
 	private static boolean cacheClearing = false;
 
-	public static DimensionData getData(IMap map) {
-		World world = MINECRAFT.world;
-		if (world != null) {
-			if (MINECRAFT.isIntegratedServerRunning()) {
-				World serverWorld = MINECRAFT.getServer().getWorld(world.getRegistryKey());
-				if (serverWorld != null) {
-					world = serverWorld;
-				}
-			}
-		}
+	public static DimensionData getData() {
+		World world = DataUtil.getWorld();
 		if (world == null) return null;
 		if (!world.equals(currentWorld)) {
 			currentWorld = world;
@@ -40,18 +29,9 @@ public final class DimensionManager {
 			currentDimension = dimId;
 		}
 		
-		return getData(map, currentWorld, currentDimension);
+		return getData(currentWorld, currentDimension);
 	}
 
-	public static DimensionData getData(IMap map, World world, Identifier dimension) {
-		if (world == null) return null;
-		
-		DimensionData data = getData(world, dimension);
-		data.setLayer(map.getLayer(), map.getLevel());
-		
-		return data;
-	}
-	
 	public static DimensionData getData(World world, Identifier dimension) {
 		if (world == null) return null;
 		

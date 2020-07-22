@@ -25,6 +25,7 @@ import ru.bulldog.justmap.util.ColorUtil;
 
 public class MapTexture {
 
+	private File imageFile;
 	private ByteBuffer buffer;
 	private byte[] bytes;
 	private int glId = -1;
@@ -35,21 +36,22 @@ public class MapTexture {
 	
 	private Object bufferLock = new Object();
 	
-	public MapTexture(int width, int height) {
+	public MapTexture(File imageFile, int width, int height) {
 		int size = 4 * width * (height - 1) + 4 * width;		
+		this.imageFile = imageFile;
 		this.bytes = new byte[size];
 		this.buffer = ByteBuffer.allocateDirect(bytes.length).order(ByteOrder.nativeOrder());
 		this.width = width;
 		this.height = height;
 	}
 	
-	public MapTexture(int width, int height, int color) {
-		this(width, height);
+	public MapTexture(File imageFile, int width, int height, int color) {
+		this(imageFile, width, height);
 		this.fill(color);
 	}
 	
-	public MapTexture(MapTexture source) {
-		this(source.getWidth(), source.getHeight());
+	public MapTexture(File imageFile, MapTexture source) {
+		this(imageFile, source.getWidth(), source.getHeight());
 		this.copyData(source);
 	}
 	
@@ -121,7 +123,6 @@ public class MapTexture {
 	
 	public void setColor(int x, int y, int color) {
 		if (this.bytes == null) return;
-		
 		if (x < 0 || x >= this.getWidth()) return;
 		if (y < 0 || y >= this.getHeight()) return;
 		
@@ -149,8 +150,7 @@ public class MapTexture {
 	}
 	
 	public int getColor(int x, int y) {
-		if (this.bytes == null) return -1;
-		
+		if (this.bytes == null) return -1;		
 		if (x < 0 || x >= this.getWidth()) return -1;
 		if (y < 0 || y >= this.getHeight()) return -1;
 		
@@ -166,8 +166,7 @@ public class MapTexture {
 	}
 	
 	public void applyTint(int x, int y, int tint) {
-		if (this.bytes == null) return;
-		
+		if (this.bytes == null) return;		
 		if (x < 0 || x >= this.getWidth()) return;
 		if (y < 0 || y >= this.getHeight()) return;
 		
@@ -183,8 +182,7 @@ public class MapTexture {
 	}
 	
 	public void fill(int x, int y, int w, int h, int color) {
-		if (this.bytes == null) return;
-		
+		if (this.bytes == null) return;		
 		if (x < 0 || y < 0) return;
 		
 		int width = this.getWidth();
@@ -225,9 +223,9 @@ public class MapTexture {
 		}
 	}
 	
-	public void saveImage(File png) {
-		if (this.bytes == null) return;
-		try (OutputStream fileOut = new FileOutputStream(png)) {
+	public void saveImage() {
+		if (imageFile == null || bytes == null) return;
+		try (OutputStream fileOut = new FileOutputStream(imageFile)) {
 			BufferedImage pngImage = new BufferedImage(width, height, BufferedImage.TYPE_4BYTE_ABGR);
 			byte[] data = ((DataBufferByte) pngImage.getTile(0, 0).getDataBuffer()).getData();
 			byte[] bytes = this.getBytes();
@@ -235,16 +233,17 @@ public class MapTexture {
 				data[i] = bytes[i];
 			}
 			ImageIO.write(pngImage, "png", fileOut);
-			JustMap.LOGGER.debug("Image saved: " + png);
+			JustMap.LOGGER.debug("Image saved: " + imageFile);
 			pngImage.flush();
 		} catch (Exception ex) {
-			JustMap.LOGGER.logWarning("Can't save image: " + png.toString());
+			JustMap.LOGGER.logWarning("Can't save image: " + imageFile.toString());
 			JustMap.LOGGER.logWarning(ex.getLocalizedMessage());
 		}
 	}
 	
 	public boolean loadImage(File png) {
 		if (!png.exists()) return false;
+		this.imageFile = png;
 		synchronized (bufferLock) {
 			try (InputStream fileInput = new FileInputStream(png)) {
 				BufferedImage pngImage = new BufferedImage(width, height, BufferedImage.TYPE_4BYTE_ABGR);

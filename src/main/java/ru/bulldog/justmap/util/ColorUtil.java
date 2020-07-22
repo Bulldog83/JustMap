@@ -31,14 +31,13 @@ import net.minecraft.world.World;
 import net.minecraft.world.chunk.WorldChunk;
 
 import ru.bulldog.justmap.JustMap;
-import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.mixins.client.BakedSpriteAccessor;
 import ru.bulldog.justmap.util.math.MathUtil;
 
 public class ColorUtil {
 	
-	private static MinecraftClient minecraft = JustMapClient.MINECRAFT;	
+	private static MinecraftClient minecraft = DataUtil.getMinecraft();	
 	private static BlockModels blockModels = minecraft.getBlockRenderManager().getModels();	
 	private static FluidRenderHandlerRegistryImpl fluidRenderHandlerRegistry = FluidRenderHandlerRegistryImpl.INSTANCE;	
 	private static Map<BlockState, Integer> colorCache = new HashMap<>();	
@@ -275,7 +274,7 @@ public class ColorUtil {
 	}
 	
 	public static int blockColor(WorldChunk worldChunk, BlockPos pos) {
-		World world = worldChunk.getWorld();
+		World world = DataUtil.getClientWorld();
 		BlockPos overPos = new BlockPos(pos.getX(), pos.getY() + 1, pos.getZ());
 		BlockState overState = worldChunk.getBlockState(overPos);
 		BlockState blockState = worldChunk.getBlockState(pos);

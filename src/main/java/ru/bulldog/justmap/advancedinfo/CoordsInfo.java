@@ -2,7 +2,7 @@ package ru.bulldog.justmap.advancedinfo;
 
 import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.util.RenderUtil.TextAlignment;
-import ru.bulldog.justmap.util.PosUtil;
+import ru.bulldog.justmap.util.DataUtil;
 
 public class CoordsInfo extends InfoText {
 
@@ -14,7 +14,7 @@ public class CoordsInfo extends InfoText {
 	public void update() {
 		this.setVisible(ClientParams.showPosition);
 		if (visible) {
-			this.setText(PosUtil.posToString(PosUtil.currentPos()));
+			this.setText(DataUtil.posToString(DataUtil.currentPos()));
 		}
 	}
 }

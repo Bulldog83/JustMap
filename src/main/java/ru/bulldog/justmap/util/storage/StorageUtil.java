@@ -6,14 +6,16 @@ import java.nio.file.Path;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.loader.api.FabricLoader;
+
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ServerInfo;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.registry.RegistryKey;
+import net.minecraft.world.World;
 import net.minecraft.world.dimension.DimensionType;
 
 import ru.bulldog.justmap.JustMap;
-import ru.bulldog.justmap.client.JustMapClient;
+import ru.bulldog.justmap.util.DataUtil;
 import ru.bulldog.justmap.util.Dimension;
 
 public final class StorageUtil {
@@ -60,9 +62,9 @@ public final class StorageUtil {
 	@Environment(EnvType.CLIENT)
 	public static File cacheDir() {
 		RegistryKey<DimensionType> dimKey = null;
-		MinecraftClient minecraft = JustMapClient.MINECRAFT;
-		if (minecraft.world != null) {
-			dimKey = minecraft.world.getDimensionRegistryKey();			
+		World world = DataUtil.getWorld();
+		if (world != null) {
+			dimKey = world.getDimensionRegistryKey();			
 			String dimension = dimKey.getValue().getPath();
 			if (!currentDim.equals(dimension)) {
 				currentDim = dimension;
@@ -89,7 +91,7 @@ public final class StorageUtil {
 	
 	@Environment(EnvType.CLIENT)
 	public static File filesDir() {
-		MinecraftClient minecraft = JustMapClient.MINECRAFT;		
+		MinecraftClient minecraft = DataUtil.getMinecraft();		
 		ServerInfo serverInfo = minecraft.getCurrentServerEntry();
 		File mapDataDir = MAP_DATA_DIR.toFile();
 		if (minecraft.isIntegratedServerRunning()) {

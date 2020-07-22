@@ -6,7 +6,6 @@ import ru.bulldog.justmap.client.config.ClientParams;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
-import net.minecraft.world.chunk.WorldChunk;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -15,8 +14,6 @@ public class DimensionData {
 	private World world;
 	private ChunkDataManager chunkManager;
 	private Map<RegionPos, RegionData> regions = new ConcurrentHashMap<>();
-	private Layer layer = Layer.SURFACE;
-	private int level = 0;
 	private long lastPurged = 0;
 	private long purgeDelay = 1000;
 	private int purgeAmount = 500;
@@ -25,18 +22,9 @@ public class DimensionData {
 		this.chunkManager = new ChunkDataManager(this, world);
 		this.world = world;
 	}
-	
-	public void setLayer(Layer layer, int level) {
-		this.layer = layer;
-		this.level = level;
-	}
-	
-	public Layer getLayer() {
-		return this.layer;
-	}
-	
-	public int getLevel() {
-		return this.level;
+
+	public ChunkDataManager getChunkManager() {
+		return this.chunkManager;
 	}
 	
 	public RegionData getRegion(BlockPos currentPos, BlockPos centerPos) {
@@ -48,9 +36,6 @@ public class DimensionData {
 	}
 	
 	public RegionData getRegion(World world, BlockPos currentPos, BlockPos centerPos, boolean surfaceOnly) {
-		Layer layer = surfaceOnly ? Layer.SURFACE : this.layer;
-		int level = surfaceOnly ? 0 : this.level;
-		
 		RegionData region = this.getRegion(world, currentPos);
 		region.surfaceOnly = surfaceOnly;
 		ChunkPos center = new ChunkPos(centerPos);
@@ -59,13 +44,9 @@ public class DimensionData {
 		}
 		
 		long time = System.currentTimeMillis();
-		if (layer != region.getLayer() ||
-			level != region.getLevel()) {
-			region.swapLayer(layer, level);
-		} else if (time - region.updated > 1000) {
+		if (time - region.updated > 1000) {
 			region.updateImage(ClientParams.forceUpdate);
 		}
-		region.updateWorld(world);
 		
 		return region;
 	}
@@ -76,28 +57,34 @@ public class DimensionData {
 		RegionData region;
 		if(regions.containsKey(regPos)) {
 			region = regions.get(regPos);
+			region.updateWorld(world);
 		} else {
-			region = new RegionData(this, world, currentPos, layer, level);
+			region = new RegionData(this, world, currentPos);
 			regions.put(regPos, region);
 		}
 		
 		return region;
 	}
-
-	public void addLoadedChunk(World world, WorldChunk lifeChunk) {
-		this.chunkManager.addLoadedChunk(world, lifeChunk);
+	
+	public ChunkData getChunk(ChunkPos chunkPos) {
+		return this.chunkManager.getChunk(chunkPos.x, chunkPos.z);
 	}
 	
+	public ChunkData getChunk(int x, int z) {
+		return this.chunkManager.getChunk(x, z);
+	}
+
+	public void callSavedChunk(ChunkPos chunkPos) {
+		this.chunkManager.callSavedChunk(world, chunkPos);
+	}
+
 	public World getWorld() {
 		return this.world;
 	}
 	
 	public void updateWorld(World world) {
+		this.chunkManager.updateWorld(world);
 		this.world = world;
-	}
-	
-	public ChunkDataManager getChunkManager() {
-		return this.chunkManager;
 	}
 	
 	public void clearCache() {

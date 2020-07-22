@@ -3,10 +3,9 @@ package ru.bulldog.justmap.event;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import net.minecraft.util.Identifier;
+import net.minecraft.util.math.ChunkPos;
 
-import ru.bulldog.justmap.map.data.DimensionData;
-import ru.bulldog.justmap.map.data.DimensionManager;
+import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.util.tasks.TaskManager;
 
 public class ChunkUpdateListener {
@@ -23,18 +22,18 @@ public class ChunkUpdateListener {
 		
 		while(!updateQueue.isEmpty()) {
 			ChunkUpdateEvent event = updateQueue.poll();
-			Identifier dimension = event.world.getDimensionRegistryKey().getValue();
-			DimensionData mapData = DimensionManager.getData(event.world, dimension);
-			if (mapData != null) {
-				mapData.getChunkManager().getChunk(event.chunkPos)
-				       .update(mapData.getLayer(), mapData.getLevel(), false);
-			}
+			
+			ChunkPos chunkPos = event.worldChunk.getPos();
+			JustMap.LOGGER.debug(String.format("Updating stored chunk %s from %s", chunkPos, event.source));
+			
+			event.mapChunk.updateWorldChunk(event.worldChunk);
+			event.mapChunk.update(event.layer, event.level, false);
 		}
 	}
 	
 	public static void proceed() {
 		if (updateQueue.isEmpty() || worker.queueSize() > 0) return;
-		worker.execute(ChunkUpdateListener::updateChunks);
+		worker.execute("Updating stored chunks...", ChunkUpdateListener::updateChunks);
 	}
 	
 	public static void stop() {
