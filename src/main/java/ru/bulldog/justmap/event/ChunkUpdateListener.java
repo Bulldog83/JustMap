@@ -11,22 +11,23 @@ public class ChunkUpdateListener {
 	
 	public static void accept(ChunkUpdateEvent event) {
 		if (updateQueue.contains(event)) return;
- 		updateQueue.offer(event);
+		updateQueue.offer(event);
 	}
 	
 	private static void updateChunks() {
 		if (updateQueue.isEmpty()) return;
-		
 		while(!updateQueue.isEmpty()) {
 			ChunkUpdateEvent event = updateQueue.poll();
 			event.mapChunk.updateWorldChunk(event.worldChunk);
-			event.mapChunk.update(event.layer, event.level, false);
+			if(!event.mapChunk.update(event.layer, event.level, true)) {
+				accept(event);
+			}
 		}
 	}
 	
 	public static void proceed() {
 		if (updateQueue.isEmpty() || worker.queueSize() > 0) return;
-		worker.execute("Updating stored chunks...", ChunkUpdateListener::updateChunks);
+		worker.execute(ChunkUpdateListener::updateChunks);
 	}
 	
 	public static void stop() {

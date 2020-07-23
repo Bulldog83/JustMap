@@ -22,7 +22,7 @@ import ru.bulldog.justmap.util.tasks.TaskManager;
 
 public class RegionData {
 	
-	private static TaskManager worker = TaskManager.getManager("region-data");
+	private static TaskManager worker = TaskManager.getManager("region-updater");
 	
 	private final DimensionData mapData;
 	private final RegionPos regPos;
@@ -112,7 +112,7 @@ public class RegionData {
 	public void updateImage(boolean needUpdate) {
 		if (updating) return;
 		this.updating = true;
-		worker.execute("Updating Region: " + regPos, () -> {
+		worker.execute(() -> {
 			this.updateMapParams(needUpdate);
 			this.update();
 		});
@@ -215,7 +215,7 @@ public class RegionData {
 	}
 	
 	public void writeChunkData(ChunkData mapChunk) {
-		worker.execute("Write data from chunk: " + mapChunk.getPos(), () -> {
+		worker.execute(() -> {
 			int x = (mapChunk.getX() << 4) - (this.getX() << 9);
 			int y = (mapChunk.getZ() << 4) - (this.getZ() << 9);
 			synchronized (imageLock) {

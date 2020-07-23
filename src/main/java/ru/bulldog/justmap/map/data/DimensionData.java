@@ -92,7 +92,7 @@ public class DimensionData {
 		
 		long currentTime = System.currentTimeMillis();
 		if (currentTime - lastPurged > purgeDelay) {
-			this.chunkManager.purge(purgeAmount, 30000);
+			this.chunkManager.purge(purgeAmount, 5000);
 			this.lastPurged = currentTime;
 		}
 	}

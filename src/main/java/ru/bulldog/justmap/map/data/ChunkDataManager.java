@@ -9,7 +9,6 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.server.world.ServerChunkManager;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.ChunkSerializer;
@@ -20,6 +19,8 @@ import net.minecraft.world.chunk.WorldChunk;
 import net.minecraft.world.storage.VersionedChunkStorage;
 
 import ru.bulldog.justmap.JustMap;
+import ru.bulldog.justmap.util.DataUtil;
+import ru.bulldog.justmap.util.storage.StorageUtil;
 import ru.bulldog.justmap.util.tasks.MemoryUtil;
 import ru.bulldog.justmap.util.tasks.TaskManager;
 
@@ -89,7 +90,6 @@ public class ChunkDataManager {
 		if (requestedChunks.add(chunkPos)) {
 			chunkProcessor.execute("Call saves for chunk " + chunkPos, () -> {
 				this.callSaves(world, chunkPos);
-				this.requestedChunks.remove(chunkPos);
 			});
 		}
 	}
@@ -102,17 +102,14 @@ public class ChunkDataManager {
         }
 		
 		ServerWorld serverWorld = (ServerWorld) world;
-		ServerChunkManager manager = serverWorld.getChunkManager();
-		VersionedChunkStorage storage = manager.threadedAnvilChunkStorage;
-		try {		
-			CompoundTag chunkTag = storage.getNbt(chunkPos);
+		try (VersionedChunkStorage storage = StorageUtil.getChunkStorage(serverWorld);) {		
+			CompoundTag chunkTag = storage.updateChunkTag(serverWorld.getRegistryKey(),
+					DataUtil.getPersistentSupplier(), storage.getNbt(chunkPos));
 			if (chunkTag == null) return;
-			
 			Chunk chunk = ChunkSerializer.deserialize(
 					serverWorld, serverWorld.getStructureManager(), serverWorld.getPointOfInterestStorage(), chunkPos, chunkTag);
 			if (chunk instanceof ReadOnlyChunk) {
 				WorldChunk worldChunk = ((ReadOnlyChunk) chunk).getWrappedChunk();
-				worldChunk.setLoadedToWorld(true);
 				ChunkData mapChunk = this.getChunk(chunkPos);
 				mapChunk.updateChunk(worldChunk);
 			}

@@ -1,11 +1,15 @@
 package ru.bulldog.justmap.util;
 
+import java.util.function.Supplier;
+
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.options.GameOptions;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.PersistentStateManager;
 import net.minecraft.world.World;
 
 import ru.bulldog.justmap.client.JustMapClient;
@@ -16,6 +20,7 @@ public class DataUtil {
 	private static BlockPos.Mutable currentPos = new BlockPos.Mutable();
 	private static ClientWorld clientWorld = null;
 	private static ServerWorld serverWorld = null;
+	private static Supplier<PersistentStateManager> persistentSupplier = null;
 	private static Layer currentLayer = Layer.SURFACE;
 	private static double doubleX = 0.0;
 	private static double doubleZ = 0.0;
@@ -27,7 +32,14 @@ public class DataUtil {
 	public static void updateWorld() {
 		clientWorld = minecraft.world;
 		if (minecraft.isIntegratedServerRunning()) {
+			MinecraftServer server = minecraft.getServer();
 			serverWorld = minecraft.getServer().getWorld(clientWorld.getRegistryKey());
+			persistentSupplier = () -> {
+				return server.getOverworld().getPersistentStateManager();
+			};
+		} else {
+			serverWorld = null;
+			persistentSupplier = null;
 		}
 	}
 	
@@ -47,10 +59,7 @@ public class DataUtil {
 		coordZ = (int) (posEntity.getZ() < 0.0 ? posEntity.getZ() - 1.0 : posEntity.getZ());
 		coordY = (int) (posEntity.getY());
 		
-		float tickDelta = minecraft.getTickDelta();
-		doubleX = posEntity.prevX + (posEntity.getX() - posEntity.prevX) * (double) tickDelta;
-		doubleZ = posEntity.prevZ + (posEntity.getZ() - posEntity.prevZ) * (double) tickDelta;
-		
+		if (clientWorld == null) return;
 		currentLayer = getLayer(clientWorld, currentPos());
 		currentLevel = getLevel(currentLayer, coordY);
 	}
@@ -65,6 +74,10 @@ public class DataUtil {
 	
 	public static ClientWorld getClientWorld() {
 		return clientWorld;
+	}
+	
+	public static Supplier<PersistentStateManager> getPersistentSupplier() {
+		return persistentSupplier;
 	}
 	
 	public static GameOptions getGameOptions() {
@@ -88,11 +101,13 @@ public class DataUtil {
 	}
 	
 	public static double doubleX() {
-		return doubleX;
+		Entity posEntity = getPosEntity();
+		return posEntity.prevX + (posEntity.getX() - posEntity.prevX) * (double) minecraft.getTickDelta();
 	}
 
 	public static double doubleZ() {
-		return doubleZ;
+		Entity posEntity = getPosEntity();
+		return posEntity.prevZ + (posEntity.getZ() - posEntity.prevZ) * (double) minecraft.getTickDelta();
 	}
 	
 	public static String posToString(BlockPos pos) {
@@ -116,9 +131,9 @@ public class DataUtil {
 			return Layer.NETHER;
 		} else if (RuleUtil.needRenderCaves(world, pos)) {
 			return Layer.CAVES;
-		} else {
-			return Layer.SURFACE;
 		}
+		
+		return Layer.SURFACE;
 	}
 	
 	public static int getLevel(Layer layer, int y) {

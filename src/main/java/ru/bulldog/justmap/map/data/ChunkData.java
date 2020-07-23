@@ -36,6 +36,7 @@ public class ChunkData {
 	private boolean purged = false;
 	private boolean slime = false;
 	private boolean saved = true;
+	private boolean empty = true;
 	private long refreshed = 0;
 	
 	public boolean saving = false;
@@ -139,28 +140,31 @@ public class ChunkData {
 		if (purged) return;
 		
 		this.updateWorldChunk(lifeChunk);
-		chunkUpdater.execute("Updating Chunk: " + chunkPos, () -> {
+		chunkUpdater.execute(() -> {
 			this.levels.forEach((layer, levels) -> {
 				for (int level = 0; level < levels.length; level++) {
 					if (checkUpdating(layer, level)) continue;
 					this.updateChunkData(lifeChunk, layer, level);
 				}
 			});
+			this.empty = false;
 		});
 	}
 	
-	public void update(Layer layer, int level, boolean forceUpdate) {
-		if (purged || checkUpdating(layer, level)) return;
+	public boolean update(Layer layer, int level, boolean forceUpdate) {
+		if (purged || checkUpdating(layer, level)) return false;
 		if (!outdated && forceUpdate) {
 			this.outdated = forceUpdate;
 		}
 		long currentTime = System.currentTimeMillis();
-		if (!outdated && currentTime - updated < ClientParams.chunkUpdateInterval) return;
+		if (!outdated && currentTime - updated < ClientParams.chunkUpdateInterval) return false;
 		
 		WorldChunk worldChunk = this.updateWorldChunk();
 		if (worldChunk == null) {
-			this.mapData.callSavedChunk(chunkPos);
-			return;
+			if (empty) {
+				this.mapData.callSavedChunk(chunkPos);
+			}
+			return false;
 		}
 		chunkUpdater.execute("Updating Chunk: " + chunkPos, () -> {
 			this.updateChunkData(worldChunk, layer, level);
@@ -173,6 +177,8 @@ public class ChunkData {
 				}
 			}
 		});
+		
+		return true;
 	}
 	
 	public void updateWorldChunk(WorldChunk lifeChunk) {

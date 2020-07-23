@@ -10,11 +10,14 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ServerInfo;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.World;
 import net.minecraft.world.dimension.DimensionType;
+import net.minecraft.world.storage.VersionedChunkStorage;
 
 import ru.bulldog.justmap.JustMap;
+import ru.bulldog.justmap.mixins.SessionAccessor;
 import ru.bulldog.justmap.util.DataUtil;
 import ru.bulldog.justmap.util.Dimension;
 
@@ -32,6 +35,16 @@ public final class StorageUtil {
 	
 	private static File filesDir = new File(MAP_DATA_DIR.toFile(), "undefined");
 	private static String currentDim = "unknown";
+	
+	public static VersionedChunkStorage getChunkStorage(ServerWorld world) {
+		File regionDir = new File(savesDir(world), "region");
+		return new VersionedChunkStorage(regionDir, world.getServer().getDataFixer(), true);
+	}
+	
+	public static File savesDir(ServerWorld world) {
+		if (world == null || !(world instanceof ServerWorld)) return null;
+		return ((SessionAccessor) world.getServer()).getServerSession().getWorldDirectory(world.getRegistryKey());
+	}
 	
 	public static File configDir() {
 		File mapConfigDir = MAP_CONFIG_DIR.toFile();

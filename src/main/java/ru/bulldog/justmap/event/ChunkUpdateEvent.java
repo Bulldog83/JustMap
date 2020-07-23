@@ -20,8 +20,15 @@ public class ChunkUpdateEvent {
 	
 	@Override
 	public boolean equals(Object obj) {
+		if (this == obj) return true;
 		if (!(obj instanceof ChunkUpdateEvent)) return false;		
 		ChunkUpdateEvent event = (ChunkUpdateEvent) obj;
-		return this.worldChunk.equals(event.worldChunk);
+		return this.chunkEquals(event.worldChunk) &&
+			   this.layer.equals(event.layer) &&
+			   this.level == event.level;
+	}
+	
+	private boolean chunkEquals(WorldChunk chunk) {
+		return this.worldChunk.getPos().equals(chunk.getPos());
 	}
 }

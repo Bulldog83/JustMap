@@ -345,7 +345,7 @@ public class MapRenderer {
 	
 	private void drawMap() {
 		DimensionData mapData = DimensionManager.getData();
-		
+	
 		int scaledW = this.minimap.getScaledWidth();
 		int scaledH = this.minimap.getScaledHeight();
 		int cornerX = DataUtil.coordX() - scaledW / 2;

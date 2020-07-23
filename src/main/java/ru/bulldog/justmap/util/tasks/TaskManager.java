@@ -86,11 +86,11 @@ public class TaskManager implements Executor {
 
     @Override
     public void execute(Runnable command) {
-    	this.execute("Common task", command);
+    	this.execute(null, command);
     }
     
     public <T> CompletableFuture<T> run(Function<CompletableFuture<T>, Runnable> function) {
-		return this.run("Future task", function);
+		return this.run(null, function);
 	}
     
     public <T> CompletableFuture<T> run(String reason, Function<CompletableFuture<T>, Runnable> function) {
@@ -117,6 +117,9 @@ public class TaskManager implements Executor {
     	while (running) {
     		Task nextTask = workQueue.poll();
     		if (nextTask != null) {
+    			if (nextTask.hasReason()) {
+    				JustMap.LOGGER.debug(nextTask);
+    			}
     			nextTask.run();
             } else {
             	LockSupport.park(queueBlocker);
@@ -136,6 +139,10 @@ public class TaskManager implements Executor {
     	
     	public String getReason() {
     		return this.reason;
+    	}
+    	
+    	public boolean hasReason() {
+    		return this.reason != null;
     	}
     	
     	@Override
