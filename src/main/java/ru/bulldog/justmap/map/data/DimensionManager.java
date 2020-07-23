@@ -41,8 +41,6 @@ public final class DimensionManager {
 			if (!data.getWorld().equals(world)) {
 				data.updateWorld(world);
 				data.clear();
-			} else {
-				data.clearCache();
 			}
 		} else {
 			data = new DimensionData(world);
@@ -69,6 +67,14 @@ public final class DimensionManager {
 			usedPct = MemoryUtil.getMemoryUsage();
 			JustMap.LOGGER.logWarning(String.format("Memory usage at %2d%%.", usedPct));
 		}
+	}
+	
+	public static void clearCache() {
+		JustMap.WORKER.execute("Remove unnecessary chunks...", () -> {
+			DIMENSION_DATA.forEach((id, data) -> {
+				data.clearCache();
+			});
+		});
 	}
 
 	public static void clearData() {

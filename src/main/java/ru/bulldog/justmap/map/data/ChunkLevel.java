@@ -24,6 +24,7 @@ public class ChunkLevel {
 	int[] levelmap;
 	int[] topomap;
 	
+	boolean updating = false;
 	long updated = 0;
 	long refreshed = 0;
 	int level;

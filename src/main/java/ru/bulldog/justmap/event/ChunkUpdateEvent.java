@@ -6,14 +6,12 @@ import ru.bulldog.justmap.map.data.ChunkData;
 import ru.bulldog.justmap.map.data.Layer;
 
 public class ChunkUpdateEvent {
-	public final Class<?> source;
 	public final WorldChunk worldChunk;
 	public final ChunkData mapChunk;
 	public final Layer layer;
 	public final int level;
 	
-	public ChunkUpdateEvent(Class<?> source, WorldChunk worldChunk, ChunkData mapChunk, Layer layer, int level) {
-		this.source = source;
+	public ChunkUpdateEvent(WorldChunk worldChunk, ChunkData mapChunk, Layer layer, int level) {
 		this.worldChunk = worldChunk;
 		this.mapChunk = mapChunk;
 		this.layer = layer;

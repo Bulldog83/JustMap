@@ -22,7 +22,6 @@ import net.minecraft.client.gui.screen.world.SelectWorldScreen;
 import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.advancedinfo.AdvancedInfo;
 import ru.bulldog.justmap.client.config.ClientConfig;
-import ru.bulldog.justmap.event.ChunkUpdateEvent;
 import ru.bulldog.justmap.event.ChunkUpdateListener;
 import ru.bulldog.justmap.map.data.ChunkData;
 import ru.bulldog.justmap.map.data.DimensionData;
@@ -43,10 +42,10 @@ public class JustMapClient implements ClientModInitializer {
 		KeyHandler.initKeyBindings();
 
 		ClientChunkEvents.CHUNK_LOAD.register((clientWorld, worldChunk) -> {
-			if (worldChunk != null) {
+			if (worldChunk != null && !worldChunk.isEmpty()) {
 				DimensionData mapData = DimensionManager.getData();
 				ChunkData mapChunk = mapData.getChunk(worldChunk.getPos());
-				ChunkUpdateListener.accept(new ChunkUpdateEvent(JustMapClient.class, worldChunk, mapChunk, DataUtil.getLayer(), DataUtil.getLevel()));
+				mapChunk.updateChunk(worldChunk);
 			}
 		});
 		ClientTickEvents.END_CLIENT_TICK.register(client -> {
@@ -60,9 +59,10 @@ public class JustMapClient implements ClientModInitializer {
 			DataUtil.update();
 			KeyHandler.update();
 			JustMapClient.MAP.update();
-			ChunkUpdateListener.proceed();
+			DimensionManager.clearCache();
 			DimensionManager.memoryControl();
 			AdvancedInfo.getInstance().updateInfo();
+			ChunkUpdateListener.proceed();
 		});
 		ClientLifecycleEvents.CLIENT_STOPPING.register(client -> {
 			JustMapClient.stop();

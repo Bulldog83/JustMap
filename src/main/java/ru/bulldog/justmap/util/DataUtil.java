@@ -17,31 +17,41 @@ public class DataUtil {
 	private static ClientWorld clientWorld = null;
 	private static ServerWorld serverWorld = null;
 	private static Layer currentLayer = Layer.SURFACE;
-	private static int currentLevel = 0;
 	private static double doubleX = 0.0;
 	private static double doubleZ = 0.0;
+	private static int currentLevel = 0;
 	private static int coordX = 0;
 	private static int coordY = 0;
 	private static int coordZ = 0;
 	
-	public static void update() {
-		if (clientWorld != minecraft.world) {
-			clientWorld = minecraft.world;
-			if (minecraft.isIntegratedServerRunning()) {
-				serverWorld = minecraft.getServer().getWorld(clientWorld.getRegistryKey());
-			} else {
-				serverWorld = null;
-			}
+	public static void updateWorld() {
+		clientWorld = minecraft.world;
+		if (minecraft.isIntegratedServerRunning()) {
+			serverWorld = minecraft.getServer().getWorld(clientWorld.getRegistryKey());
 		}
-		if (minecraft.getCameraEntity() == null && minecraft.player == null) return;
-		Entity posEntity = minecraft.getCameraEntity() != null ? minecraft.getCameraEntity() : minecraft.player;
+	}
+	
+	public static void update() {
+		currentLayer = Layer.SURFACE;
+		currentLevel = 0;
+		doubleX = 0.0;
+		doubleZ = 0.0;
+		coordX = 0;
+		coordY = 0;
+		coordZ = 0;
+		
+		Entity posEntity = getPosEntity();
+		if (posEntity == null) return;
+		
+		coordX = (int) (posEntity.getX() < 0.0 ? posEntity.getX() - 1.0 : posEntity.getX());
+		coordZ = (int) (posEntity.getZ() < 0.0 ? posEntity.getZ() - 1.0 : posEntity.getZ());
+		coordY = (int) (posEntity.getY());
+		
 		float tickDelta = minecraft.getTickDelta();
 		doubleX = posEntity.prevX + (posEntity.getX() - posEntity.prevX) * (double) tickDelta;
 		doubleZ = posEntity.prevZ + (posEntity.getZ() - posEntity.prevZ) * (double) tickDelta;
-		coordX = (int) (posEntity.getX() < 0.0 ? posEntity.getX() - 1.0 : posEntity.getX());
-		coordZ = (int) (posEntity.getZ() < 0.0 ? posEntity.getZ() - 1.0 : posEntity.getZ());
-		coordY = (int) (minecraft.getCameraEntity().getY());
-		currentLayer = getLayer(minecraft.world, currentPos());
+		
+		currentLayer = getLayer(clientWorld, currentPos());
 		currentLevel = getLevel(currentLayer, coordY);
 	}
 	
@@ -60,7 +70,7 @@ public class DataUtil {
 	public static GameOptions getGameOptions() {
 		return minecraft.options;
 	}
-
+	
 	public static int coordX() {
 		return coordX;
 	}
@@ -77,11 +87,11 @@ public class DataUtil {
 		return currentPos.set(coordX, coordY, coordZ);
 	}
 	
-	public static double doubleCoordX() {
+	public static double doubleX() {
 		return doubleX;
 	}
 
-	public static double doubleCoordZ() {
+	public static double doubleZ() {
 		return doubleZ;
 	}
 	
@@ -114,5 +124,9 @@ public class DataUtil {
 	public static int getLevel(Layer layer, int y) {
 		if (Layer.SURFACE.equals(layer)) return 0;
 		return y / layer.height;
+	}
+
+	private static Entity getPosEntity() {
+		return minecraft.getCameraEntity() != null ? minecraft.getCameraEntity() : minecraft.player;
 	}
 }

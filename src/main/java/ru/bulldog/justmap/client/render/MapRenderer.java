@@ -271,8 +271,8 @@ public class MapRenderer {
 		GL11.glScissor(scaledX, scaledY, scaledW, scaledH);
 		
 		float mult = 1 / minimap.getScale();		
-		float offX = (float) (DataUtil.doubleCoordX() - this.lastX) * mult;
-		float offY = (float) (DataUtil.doubleCoordZ() - this.lastZ) * mult;
+		float offX = (float) (DataUtil.doubleX() - this.lastX) * mult;
+		float offY = (float) (DataUtil.doubleZ() - this.lastZ) * mult;
 		
 		if (isRound) {
 			RenderSystem.enableBlend();

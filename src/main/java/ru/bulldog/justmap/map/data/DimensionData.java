@@ -1,6 +1,5 @@
 package ru.bulldog.justmap.map.data;
 
-import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.client.config.ClientParams;
 
 import net.minecraft.util.math.BlockPos;
@@ -93,7 +92,7 @@ public class DimensionData {
 		
 		long currentTime = System.currentTimeMillis();
 		if (currentTime - lastPurged > purgeDelay) {
-			JustMap.WORKER.execute("Remove unnecessary chunks...", () -> this.chunkManager.purge(purgeAmount, 60000));
+			this.chunkManager.purge(purgeAmount, 30000);
 			this.lastPurged = currentTime;
 		}
 	}
