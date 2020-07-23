@@ -117,7 +117,6 @@ public class TaskManager implements Executor {
     	while (running) {
     		Task nextTask = workQueue.poll();
     		if (nextTask != null) {
-    			JustMap.LOGGER.debug(nextTask);
     			nextTask.run();
             } else {
             	LockSupport.park(queueBlocker);
@@ -135,14 +134,14 @@ public class TaskManager implements Executor {
     		this.task = task;
     	}
     	
+    	public String getReason() {
+    		return this.reason;
+    	}
+    	
     	@Override
 		public void run() {
 			this.task.run();
 		}
-    	
-    	public String getReason() {
-    		return this.reason;
-    	}
     	
     	@Override
     	public String toString() {

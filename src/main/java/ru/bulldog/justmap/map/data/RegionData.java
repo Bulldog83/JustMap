@@ -174,19 +174,22 @@ public class RegionData {
 				int chunkZ = (regZ + y) >> 4;
 				
 				ChunkData mapChunk = this.mapData.getChunk(chunkX, chunkZ);
-				if (surfaceOnly) {
-					if (DataUtil.getLayer().equals(Layer.SURFACE) &&
-						updateArea.contains(Point.fromPos(mapChunk.getPos()))) {
-						
-						mapChunk.update(Layer.SURFACE, 0, needUpdate);
-					}
-				} else {
-					if (updateArea.contains(Point.fromPos(mapChunk.getPos()))) {
-						mapChunk.update(layer, level, needUpdate);
+				boolean updated = mapChunk.saveNeeded();
+				if (!updated) {
+					if (surfaceOnly) {
+						if (DataUtil.getLayer().equals(Layer.SURFACE) &&
+							updateArea.contains(Point.fromPos(mapChunk.getPos()))) {
+							
+							mapChunk.update(Layer.SURFACE, 0, needUpdate);
+						}
+					} else {
+						if (updateArea.contains(Point.fromPos(mapChunk.getPos()))) {
+							mapChunk.update(layer, level, needUpdate);
+						}
 					}
 				}
 				synchronized (imageLock) {
-					if (mapChunk.saveNeeded()) {
+					if (updated) {
 						this.image.writeChunkData(x, y, mapChunk.getColorData(layer, level));
 						mapChunk.setSaved();
 					}
