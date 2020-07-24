@@ -422,4 +422,14 @@ public class Worldmap extends MapScreen implements IMap {
 	public float getScale() {
 		return this.getScale();
 	}
+
+	@Override
+	public Layer getLayer() {
+		return this.mapLayer;
+	}
+
+	@Override
+	public int getLevel() {
+		return this.mapLevel;
+	}
 }

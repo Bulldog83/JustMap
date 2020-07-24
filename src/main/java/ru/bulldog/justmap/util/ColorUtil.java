@@ -274,7 +274,7 @@ public class ColorUtil {
 	}
 	
 	public static int blockColor(WorldChunk worldChunk, BlockPos pos) {
-		World world = DataUtil.getClientWorld();
+		World world = worldChunk.getWorld();
 		BlockPos overPos = new BlockPos(pos.getX(), pos.getY() + 1, pos.getZ());
 		BlockState overState = worldChunk.getBlockState(overPos);
 		BlockState blockState = worldChunk.getBlockState(pos);

@@ -46,28 +46,35 @@ public class RegionData {
 	private boolean slimeOverlay = false;
 	private boolean loadedOverlay = false;
 	private boolean gridOverlay = false;
-	private boolean imageChanged = false;
+	private boolean imageChanged = false;	
+	private boolean worldmap = false;
 	
-	public boolean surfaceOnly = false;	
 	public long updated = 0;
 	
 	private Object imageLock = new Object();
 	
-	public RegionData(DimensionData data, World world, BlockPos blockPos) {
+	public RegionData(DimensionData data, World world, BlockPos blockPos, boolean worldmap) {
 		this.mapData = data;
 		this.world = world;
-		this.layer = DataUtil.getLayer(world, blockPos);
-		this.level = DataUtil.getLevel(layer, blockPos.getY());
 		this.regPos = new RegionPos(blockPos);
 		this.center = new ChunkPos(blockPos);
 		this.cacheDir = StorageUtil.cacheDir(world);
 		this.image = this.getImage(layer, level);
+		this.worldmap = worldmap;
+		
+		if (worldmap) {
+			this.layer = Layer.SURFACE;
+			this.level = 0;
+		} else {
+			this.layer = DataUtil.getLayer(world, blockPos);
+			this.level = DataUtil.getLevel(layer, blockPos.getY());
+		}
 		
 		int radius = DataUtil.getGameOptions().viewDistance;
 		this.updateArea = new Plane(center.x - radius, center.z - radius,
 									center.x + radius, center.z + radius);
 		
-		this.updateImage(true);
+		this.updateImage(false);
 	}
 	
 	public RegionPos getPos() {
@@ -105,7 +112,7 @@ public class RegionData {
 			this.cacheDir = StorageUtil.cacheDir(world);
 			this.world = world;
 			this.clear();
-			this.updateImage(true);
+			this.updateImage(false);
 		}
 	}
 	
@@ -180,17 +187,9 @@ public class RegionData {
 				
 				ChunkData mapChunk = this.mapData.getChunk(chunkX, chunkZ);
 				boolean updated = mapChunk.saveNeeded();
-				if (!updated) {
-					if (surfaceOnly) {
-						if (DataUtil.getLayer().equals(Layer.SURFACE) &&
-							updateArea.contains(Point.fromPos(mapChunk.getPos()))) {
-							
-							mapChunk.update(Layer.SURFACE, 0, needUpdate);
-						}
-					} else {
-						if (updateArea.contains(Point.fromPos(mapChunk.getPos()))) {
-							mapChunk.update(layer, level, needUpdate);
-						}
+				if (!(worldmap && updated)) {
+					if (updateArea.contains(Point.fromPos(mapChunk.getPos()))) {
+						mapChunk.update(layer, level, needUpdate);
 					}
 				}
 				synchronized (imageLock) {

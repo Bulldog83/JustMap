@@ -5,6 +5,7 @@ import ru.bulldog.justmap.client.config.ClientParams;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
+import net.minecraft.world.chunk.WorldChunk;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -30,13 +31,12 @@ public class DimensionData {
 		return this.getRegion(world, currentPos, centerPos, false);
 	}
 	
-	public RegionData getRegion(BlockPos currentPos, BlockPos centerPos, boolean surfaceOnly) {
-		return this.getRegion(world, currentPos, centerPos, surfaceOnly);
+	public RegionData getRegion(BlockPos currentPos, BlockPos centerPos, boolean worldmap) {
+		return this.getRegion(world, currentPos, centerPos, worldmap);
 	}
 	
-	public RegionData getRegion(World world, BlockPos currentPos, BlockPos centerPos, boolean surfaceOnly) {
-		RegionData region = this.getRegion(world, currentPos);
-		region.surfaceOnly = surfaceOnly;
+	public RegionData getRegion(World world, BlockPos currentPos, BlockPos centerPos, boolean worldmap) {
+		RegionData region = this.getRegion(world, currentPos, worldmap);
 		ChunkPos center = new ChunkPos(centerPos);
 		if (!region.getCenter().equals(center)) {
 			region.setCenter(center);
@@ -50,7 +50,7 @@ public class DimensionData {
 		return region;
 	}
 	
-	public RegionData getRegion(World world, BlockPos currentPos) {
+	public RegionData getRegion(World world, BlockPos currentPos, boolean worldmap) {
 		RegionPos regPos = new RegionPos(currentPos);
 		
 		RegionData region;
@@ -58,7 +58,7 @@ public class DimensionData {
 			region = regions.get(regPos);
 			region.updateWorld(world);
 		} else {
-			region = new RegionData(this, world, currentPos);
+			region = new RegionData(this, world, currentPos, worldmap);
 			regions.put(regPos, region);
 		}
 		
@@ -72,9 +72,13 @@ public class DimensionData {
 	public ChunkData getChunk(int x, int z) {
 		return this.chunkManager.getChunk(x, z);
 	}
+	
+	public WorldChunk getEmptyChunk() {
+		return this.chunkManager.getEmptyChunk();
+	}
 
-	public void callSavedChunk(ChunkPos chunkPos) {
-		this.chunkManager.callSavedChunk(world, chunkPos);
+	public void callSavedChunk(ChunkPos chunkPos, Layer layer, int level) {
+		this.chunkManager.callSavedChunk(world, chunkPos, layer, level);
 	}
 
 	public World getWorld() {
@@ -98,10 +102,6 @@ public class DimensionData {
 	}
 	
 	public void clear() {
-		if (regions.size() > 0) {
-			regions.forEach((pos, region) -> region.close());
-			regions.clear();
-		}
 		this.chunkManager.clear();
 	}
 }

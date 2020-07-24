@@ -13,6 +13,8 @@ import net.minecraft.world.PersistentStateManager;
 import net.minecraft.world.World;
 
 import ru.bulldog.justmap.client.JustMapClient;
+import ru.bulldog.justmap.map.IMap;
+import ru.bulldog.justmap.map.Worldmap;
 import ru.bulldog.justmap.map.data.Layer;
 
 public class DataUtil {
@@ -22,8 +24,6 @@ public class DataUtil {
 	private static ServerWorld serverWorld = null;
 	private static Supplier<PersistentStateManager> persistentSupplier = null;
 	private static Layer currentLayer = Layer.SURFACE;
-	private static double doubleX = 0.0;
-	private static double doubleZ = 0.0;
 	private static int currentLevel = 0;
 	private static int coordX = 0;
 	private static int coordY = 0;
@@ -46,8 +46,6 @@ public class DataUtil {
 	public static void update() {
 		currentLayer = Layer.SURFACE;
 		currentLevel = 0;
-		doubleX = 0.0;
-		doubleZ = 0.0;
 		coordX = 0;
 		coordY = 0;
 		coordZ = 0;
@@ -62,6 +60,10 @@ public class DataUtil {
 		if (clientWorld == null) return;
 		currentLayer = getLayer(clientWorld, currentPos());
 		currentLevel = getLevel(currentLayer, coordY);
+	}
+	
+	public static IMap getMap() {
+		return minecraft.currentScreen instanceof Worldmap ? (Worldmap) minecraft.currentScreen : JustMapClient.MAP;
 	}
 	
 	public static MinecraftClient getMinecraft() {

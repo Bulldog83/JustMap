@@ -322,10 +322,12 @@ public class Minimap implements IMap{
 		return this.lastPosZ;
 	}
 	
+	@Override
 	public Layer getLayer() {
 		return this.mapLayer;
 	}
 
+	@Override
 	public int getLevel() {
 		return this.mapLevel;
 	}
