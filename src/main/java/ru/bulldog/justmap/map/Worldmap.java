@@ -432,4 +432,9 @@ public class Worldmap extends MapScreen implements IMap {
 	public int getLevel() {
 		return this.mapLevel;
 	}
+
+	@Override
+	public BlockPos getCenter() {
+		return this.centerPos;
+	}
 }

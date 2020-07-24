@@ -242,8 +242,8 @@ public class MapTexture {
 	}
 	
 	public boolean loadImage(File png) {
-		if (!png.exists()) return false;
 		this.imageFile = png;
+		if (!png.exists()) return false;
 		synchronized (bufferLock) {
 			try (InputStream fileInput = new FileInputStream(png)) {
 				BufferedImage pngImage = new BufferedImage(width, height, BufferedImage.TYPE_4BYTE_ABGR);

@@ -10,12 +10,14 @@ public class ChunkUpdateEvent {
 	public final ChunkData mapChunk;
 	public final Layer layer;
 	public final int level;
+	public final boolean update;
 	
-	public ChunkUpdateEvent(WorldChunk worldChunk, ChunkData mapChunk, Layer layer, int level) {
+	public ChunkUpdateEvent(WorldChunk worldChunk, ChunkData mapChunk, Layer layer, int level, boolean update) {
 		this.worldChunk = worldChunk;
 		this.mapChunk = mapChunk;
 		this.layer = layer;
 		this.level = level;
+		this.update = update;
 	}
 	
 	@Override

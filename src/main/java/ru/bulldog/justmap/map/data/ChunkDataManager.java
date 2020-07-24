@@ -101,7 +101,7 @@ public class ChunkDataManager {
 				WorldChunk worldChunk = this.callSaves(world, chunkPos);
 				if (!worldChunk.isEmpty()) {
 					ChunkData mapChunk = this.getChunk(chunkPos);
-					ChunkUpdateListener.accept(new ChunkUpdateEvent(worldChunk, mapChunk, layer, level));
+					ChunkUpdateListener.accept(new ChunkUpdateEvent(worldChunk, mapChunk, layer, level, true));
 				}
 				this.requestedChunks.remove(chunkPos);
 			});

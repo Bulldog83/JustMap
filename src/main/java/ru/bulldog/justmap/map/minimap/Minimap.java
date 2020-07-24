@@ -351,4 +351,9 @@ public class Minimap implements IMap{
 	public int getScaledHeight() {
 		return this.scaledHeight;
 	}
+
+	@Override
+	public BlockPos getCenter() {
+		return DataUtil.currentPos();
+	}
 }

@@ -13,6 +13,7 @@ import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.client.render.MapTexture;
 import ru.bulldog.justmap.util.Colors;
 import ru.bulldog.justmap.util.DataUtil;
+import ru.bulldog.justmap.util.Dimension;
 import ru.bulldog.justmap.util.RenderUtil;
 import ru.bulldog.justmap.util.RuleUtil;
 import ru.bulldog.justmap.util.math.Plane;
@@ -54,15 +55,7 @@ public class RegionData {
 	private Object imageLock = new Object();
 	
 	public RegionData(DimensionData data, World world, BlockPos blockPos, boolean worldmap) {
-		this.mapData = data;
-		this.world = world;
-		this.regPos = new RegionPos(blockPos);
-		this.center = new ChunkPos(blockPos);
-		this.cacheDir = StorageUtil.cacheDir(world);
-		this.image = this.getImage(layer, level);
-		this.worldmap = worldmap;
-		
-		if (worldmap) {
+		if (worldmap && !Dimension.isNether(world.getDimensionRegistryKey())) {
 			this.layer = Layer.SURFACE;
 			this.level = 0;
 		} else {
@@ -70,11 +63,19 @@ public class RegionData {
 			this.level = DataUtil.getLevel(layer, blockPos.getY());
 		}
 		
+		this.mapData = data;
+		this.world = world;
+		this.regPos = new RegionPos(blockPos);
+		this.center = new ChunkPos(DataUtil.currentPos());
+		this.cacheDir = StorageUtil.cacheDir(world);
+		this.image = this.getImage(layer, level);
+		this.worldmap = worldmap;
+		
 		int radius = DataUtil.getGameOptions().viewDistance;
 		this.updateArea = new Plane(center.x - radius, center.z - radius,
 									center.x + radius, center.z + radius);
 		
-		this.updateImage(false);
+		this.updateImage(true);
 	}
 	
 	public RegionPos getPos() {
@@ -112,7 +113,7 @@ public class RegionData {
 			this.cacheDir = StorageUtil.cacheDir(world);
 			this.world = world;
 			this.clear();
-			this.updateImage(false);
+			this.updateImage(true);
 		}
 	}
 	

@@ -19,7 +19,7 @@ public class ChunkUpdateListener {
 		while(!updateQueue.isEmpty()) {
 			ChunkUpdateEvent event = updateQueue.poll();
 			event.mapChunk.updateWorldChunk(event.worldChunk);
-			if(!event.mapChunk.update(event.layer, event.level, true)) {
+			if(!event.mapChunk.update(event.layer, event.level, event.update)) {
 				accept(event);
 			}
 		}

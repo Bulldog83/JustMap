@@ -1,5 +1,6 @@
 package ru.bulldog.justmap.map;
 
+import net.minecraft.util.math.BlockPos;
 import ru.bulldog.justmap.map.data.Layer;
 
 public interface IMap {
@@ -10,6 +11,7 @@ public interface IMap {
 	abstract float getScale();
 	abstract Layer getLayer();
 	abstract int getLevel();
+	abstract BlockPos getCenter();
 	
 	default boolean isWorldmap() {
 		return this instanceof Worldmap;

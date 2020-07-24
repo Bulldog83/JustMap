@@ -1,6 +1,7 @@
 package ru.bulldog.justmap.map.data;
 
 import ru.bulldog.justmap.client.config.ClientParams;
+import ru.bulldog.justmap.map.IMap;
 import ru.bulldog.justmap.util.ColorUtil;
 import ru.bulldog.justmap.util.Colors;
 import ru.bulldog.justmap.util.DataUtil;
@@ -160,11 +161,19 @@ public class ChunkData {
 		if (purged) return;
 		
 		this.updateWorldChunk(lifeChunk);
-		chunkUpdater.execute(() -> {
+		chunkUpdater.execute("Update loaded chunk " + chunkPos, () -> {
+			IMap map = DataUtil.getMap();
+			boolean worldmap = map.isWorldmap();
 			this.levels.forEach((layer, levels) -> {
 				for (int level = 0; level < levels.length; level++) {
 					if (checkUpdating(layer, level)) continue;
 					this.updateChunkData(lifeChunk, layer, level);
+					if (saveNeeded() && !worldmap && layer.equals(map.getLayer()) && level == map.getLevel()) {
+						BlockPos.Mutable chunkBlockPos = this.chunkPos.getCenterBlockPos().mutableCopy();
+						chunkBlockPos.setY(level * layer.height);
+						RegionData region = this.mapData.getRegion(world, chunkBlockPos, false);
+						region.writeChunkData(this);
+					}
 				}
 			});
 		});
@@ -180,7 +189,7 @@ public class ChunkData {
 		
 		WorldChunk worldChunk = this.updateWorldChunk(layer, level);
 		if (worldChunk.isEmpty()) return false;
-		chunkUpdater.execute("Updating Chunk: " + chunkPos, () -> {
+		chunkUpdater.execute(() -> {
 			this.updateChunkData(worldChunk, layer, level);
 			if (saveNeeded()) {
 				BlockPos.Mutable chunkBlockPos = this.chunkPos.getCenterBlockPos().mutableCopy();

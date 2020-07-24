@@ -70,7 +70,7 @@ public final class DimensionManager {
 	}
 	
 	public static void clearCache() {
-		JustMap.WORKER.execute("Remove unnecessary chunks...", () -> {
+		JustMap.WORKER.execute(() -> {
 			DIMENSION_DATA.forEach((id, data) -> {
 				data.clearCache();
 			});
@@ -79,7 +79,7 @@ public final class DimensionManager {
 
 	public static void clearData() {
 		if (DIMENSION_DATA.size() > 0) {
-			DIMENSION_DATA.forEach((id, data) -> data.clear());
+			DIMENSION_DATA.forEach((id, data) -> data.close());
 			DIMENSION_DATA.clear();
 		}
 	}
