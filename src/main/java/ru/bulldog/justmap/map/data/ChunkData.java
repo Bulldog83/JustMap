@@ -240,11 +240,12 @@ public class ChunkData {
 		long currentTime = System.currentTimeMillis();
 		if (currentTime - chunkLevel.updated > ClientParams.chunkLevelUpdateInterval) {
 			this.updateHeighmap(worldChunk, layer, level);
-			if (!(eastWorldChunk.isEmpty() && southWorldChunk.isEmpty())) {
+			if (!eastWorldChunk.isEmpty()) {
 				eastChunk.updateHeighmap(eastWorldChunk, layer, level);
+			}
+			if (!southWorldChunk.isEmpty()) {
 				southChunk.updateHeighmap(southWorldChunk, layer, level);
 			}
-			
 			chunkLevel.updated = currentTime;
 		}
 		

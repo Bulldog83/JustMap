@@ -188,7 +188,7 @@ public class RegionData {
 				
 				ChunkData mapChunk = this.mapData.getChunk(chunkX, chunkZ);
 				boolean updated = mapChunk.saveNeeded();
-				if (!(worldmap && updated)) {
+				if (!worldmap && !updated) {
 					if (updateArea.contains(Point.fromPos(mapChunk.getPos()))) {
 						mapChunk.update(layer, level, needUpdate);
 					}

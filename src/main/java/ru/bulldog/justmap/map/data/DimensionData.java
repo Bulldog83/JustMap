@@ -5,6 +5,7 @@ import ru.bulldog.justmap.event.ChunkUpdateEvent;
 import ru.bulldog.justmap.event.ChunkUpdateListener;
 import ru.bulldog.justmap.map.IMap;
 import ru.bulldog.justmap.util.DataUtil;
+import ru.bulldog.justmap.util.math.MathUtil;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
@@ -118,9 +119,10 @@ public class DimensionData {
 		int z = centerPos.getZ();
 		int distance = DataUtil.getGameOptions().viewDistance;
 		BlockPos.Mutable currentPos = centerPos.mutableCopy();
-		for (int step = 1; step < distance; step++) {
+		for (int step = 1; step < distance + 1; step++) {
+			boolean even = MathUtil.isEven(step);
 			for (int i = 0; i < step; i++) {
-				if (step % 2 == 0) {
+				if (even) {
 					currentPos.setX(x -= 16);
 				} else {
 					currentPos.setX(x += 16);
@@ -132,7 +134,7 @@ public class DimensionData {
 				}
 			}
 			for (int i = 0; i < step; i++) {
-				if (step % 2 == 0) {
+				if (even) {
 					currentPos.setZ(z -= 16);
 				} else {
 					currentPos.setZ(z += 16);
