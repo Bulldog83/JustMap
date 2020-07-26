@@ -71,7 +71,7 @@ public class RegionData {
 		this.image = this.getImage(layer, level);
 		this.worldmap = worldmap;
 		
-		int radius = DataUtil.getGameOptions().viewDistance;
+		int radius = DataUtil.getGameOptions().viewDistance - 1;
 		this.updateArea = new Plane(center.x - radius, center.z - radius,
 									center.x + radius, center.z + radius);
 		
@@ -107,7 +107,8 @@ public class RegionData {
 		return image;
 	}
 	
-	public void updateWorld(World world) {
+	public void updateWorld(World world, boolean worldmap) {
+		this.worldmap = worldmap;
 		if (world == null) return;
 		if (!world.equals(this.world)) {
 			this.cacheDir = StorageUtil.cacheDir(world);
@@ -127,7 +128,7 @@ public class RegionData {
 	}
 	
 	public void setCenter(ChunkPos centerPos) {
-		int radius = DataUtil.getGameOptions().viewDistance;
+		int radius = DataUtil.getGameOptions().viewDistance - 1;
 		this.center = centerPos;
 		this.updateArea = new Plane(center.x - radius, center.z - radius,
 									center.x + radius, center.z + radius);
@@ -184,23 +185,22 @@ public class RegionData {
 		for (int x = 0; x < 512; x += 16) {
 			int chunkX = (regX + x) >> 4;
 			for (int y = 0; y < 512; y += 16) {
-				int chunkZ = (regZ + y) >> 4;
-				
+				int chunkZ = (regZ + y) >> 4;				
 				ChunkData mapChunk = this.mapData.getChunk(chunkX, chunkZ);
-				boolean updated = mapChunk.saveNeeded();
-				if (!worldmap && !updated) {
-					if (updateArea.contains(Point.fromPos(mapChunk.getPos()))) {
+				if (!worldmap && updateArea.contains(Point.fromPos(mapChunk.getPos()))) {
+					boolean updated = mapChunk.saveNeeded();
+					if (!updated) {
 						mapChunk.update(layer, level, needUpdate);
 					}
+					synchronized (imageLock) {
+						if (updated) {
+							this.image.writeChunkData(x, y, mapChunk.getColorData(layer, level));
+							mapChunk.setSaved();
+						}
+					}
 				}
-				synchronized (imageLock) {
-					if (updated) {
-						this.image.writeChunkData(x, y, mapChunk.getColorData(layer, level));
-						mapChunk.setSaved();
-					}
-					if (overlayNeeded) {
-						this.updateOverlay(x, y, mapChunk);
-					}
+				if (overlayNeeded) {
+					this.updateOverlay(x, y, mapChunk);
 				}
 			}
 		}

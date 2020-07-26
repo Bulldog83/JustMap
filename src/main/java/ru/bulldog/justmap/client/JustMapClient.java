@@ -23,8 +23,6 @@ import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.advancedinfo.AdvancedInfo;
 import ru.bulldog.justmap.client.config.ClientConfig;
 import ru.bulldog.justmap.event.ChunkUpdateListener;
-import ru.bulldog.justmap.map.data.ChunkData;
-import ru.bulldog.justmap.map.data.DimensionData;
 import ru.bulldog.justmap.map.data.DimensionManager;
 import ru.bulldog.justmap.map.minimap.Minimap;
 import ru.bulldog.justmap.util.DataUtil;
@@ -41,20 +39,14 @@ public class JustMapClient implements ClientModInitializer {
 	public void onInitializeClient() {
 		KeyHandler.initKeyBindings();
 
-		ClientChunkEvents.CHUNK_LOAD.register((clientWorld, worldChunk) -> {
-			if (worldChunk != null && !worldChunk.isEmpty()) {
-				DimensionData mapData = DimensionManager.getData();
-				ChunkData mapChunk = mapData.getChunk(worldChunk.getPos());
-				mapChunk.updateChunk(worldChunk);
-			}
-		});
-		ClientTickEvents.END_CLIENT_TICK.register(client -> {
-			boolean isTitle = this.isOnTitleScreen(client.currentScreen);
+		ClientChunkEvents.CHUNK_LOAD.register(DimensionManager::onChunkLoad);
+		ClientTickEvents.END_CLIENT_TICK.register(minecraft -> {
+			boolean isTitle = this.isOnTitleScreen(minecraft.currentScreen);
 			if (isTitle && !isOnTitleScreen) {
 				JustMapClient.stop();
 			}
 			this.isOnTitleScreen = isTitle;
-			if (isOnTitleScreen || client.world == null) return;
+			if (isOnTitleScreen || !isMappingAllowed()) return;
 			
 			DataUtil.update();
 			KeyHandler.update();
@@ -74,6 +66,11 @@ public class JustMapClient implements ClientModInitializer {
 	private static void stop() {
 		ChunkUpdateListener.stop();
 		JustMap.WORKER.execute("Clearing map cache...", DimensionManager::clearData);
+	}
+	
+	public static boolean isMappingAllowed() {
+		MinecraftClient minecraft = DataUtil.getMinecraft();
+		return minecraft.world != null && (minecraft.getCameraEntity() != null || minecraft.player != null);
 	}
 	
 	private boolean isOnTitleScreen(Screen currentScreen) {

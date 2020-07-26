@@ -15,6 +15,6 @@ public abstract class MinecraftClientMixin {
 	
 	@Inject(method = "joinWorld", at = @At("TAIL"))
 	public void onJoinWorld(ClientWorld world, CallbackInfo cinfo) {
-		DataUtil.updateWorld();
+		DataUtil.updateWorld(world);
 	}
 }

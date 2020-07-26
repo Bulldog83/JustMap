@@ -5,9 +5,12 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
-
+import net.minecraft.world.chunk.WorldChunk;
 import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.client.config.ClientParams;
+import ru.bulldog.justmap.event.ChunkUpdateEvent;
+import ru.bulldog.justmap.event.ChunkUpdateListener;
+import ru.bulldog.justmap.map.IMap;
 import ru.bulldog.justmap.util.DataUtil;
 import ru.bulldog.justmap.util.tasks.MemoryUtil;
 
@@ -19,7 +22,10 @@ public final class DimensionManager {
 	private static boolean cacheClearing = false;
 
 	public static DimensionData getData() {
-		World world = DataUtil.getWorld();
+		return getData(DataUtil.getClientWorld());
+	}
+	
+	public static DimensionData getData(World world) {
 		if (world == null) return null;
 		if (!world.equals(currentWorld)) {
 			currentWorld = world;
@@ -48,6 +54,15 @@ public final class DimensionManager {
 		}
 		
 		return data;
+	}
+	
+	public static void onChunkLoad(World world, WorldChunk worldChunk) {
+		if (world == null || worldChunk == null || worldChunk.isEmpty()) return;
+		IMap map = DataUtil.getMap();
+		DimensionData mapData = DimensionManager.getData(world);
+		ChunkData mapChunk = mapData.getChunk(worldChunk.getPos());
+		ChunkUpdateEvent updateEvent = new ChunkUpdateEvent(worldChunk, mapChunk, map.getLayer(), map.getLevel(), true);
+		ChunkUpdateListener.accept(updateEvent);
 	}
 
 	public static void memoryControl() {

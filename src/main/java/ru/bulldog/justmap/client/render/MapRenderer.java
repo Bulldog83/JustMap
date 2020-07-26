@@ -244,9 +244,7 @@ public class MapRenderer {
 	}
 	
 	public void draw(MatrixStack matrix) {
-		if (!minimap.isMapVisible() || minecraft.player == null) {
-			return;
-		}
+		if (!minimap.isMapVisible() || !JustMapClient.isMappingAllowed()) return;
 		
 		this.updateParams();
 		

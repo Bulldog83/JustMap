@@ -31,12 +31,12 @@ public class DataUtil {
 	private static int coordY = 0;
 	private static int coordZ = 0;
 	
-	public static void updateWorld() {
-		clientWorld = minecraft.world;
-		dimension = clientWorld.getDimensionRegistryKey();
+	public static void updateWorld(ClientWorld world) {
+		clientWorld = world;
+		dimension = world.getDimensionRegistryKey();
 		if (minecraft.isIntegratedServerRunning()) {
 			MinecraftServer server = minecraft.getServer();
-			serverWorld = minecraft.getServer().getWorld(clientWorld.getRegistryKey());
+			serverWorld = minecraft.getServer().getWorld(world.getRegistryKey());
 			persistentSupplier = () -> {
 				return server.getOverworld().getPersistentStateManager();
 			};
@@ -79,6 +79,10 @@ public class DataUtil {
 	
 	public static ClientWorld getClientWorld() {
 		return clientWorld;
+	}
+	
+	public static ServerWorld getServerWorld() {
+		return serverWorld;
 	}
 	
 	public static RegistryKey<DimensionType> getDimension() {

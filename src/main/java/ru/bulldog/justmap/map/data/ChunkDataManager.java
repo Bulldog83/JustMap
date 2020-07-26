@@ -20,14 +20,12 @@ import net.minecraft.world.chunk.WorldChunk;
 import net.minecraft.world.storage.VersionedChunkStorage;
 
 import ru.bulldog.justmap.JustMap;
-import ru.bulldog.justmap.event.ChunkUpdateEvent;
-import ru.bulldog.justmap.event.ChunkUpdateListener;
 import ru.bulldog.justmap.util.DataUtil;
 import ru.bulldog.justmap.util.storage.StorageUtil;
 import ru.bulldog.justmap.util.tasks.MemoryUtil;
 import ru.bulldog.justmap.util.tasks.TaskManager;
 
-public class ChunkDataManager {
+class ChunkDataManager {
 	private final static TaskManager chunkProcessor = TaskManager.getManager("chunk-processor");
 	private final Map<ChunkPos, ChunkData> mapChunks = new ConcurrentHashMap<>();
 	private final Set<ChunkPos> requestedChunks = new HashSet<>();
@@ -35,25 +33,25 @@ public class ChunkDataManager {
 	private final WorldChunk emptyChunk;
 	private World world;
 	
-	public ChunkDataManager(DimensionData data, World world) {
+	ChunkDataManager(DimensionData data, World world) {
 		this.emptyChunk = new EmptyChunk(world, new ChunkPos(0, 0));
 		this.mapData = data;
 		this.world = world;
 	}
 	
-	public void updateWorld(World world) {
+	void updateWorld(World world) {
 		this.world = world;
 	}
 
-	public ChunkData getChunk(ChunkPos chunkPos) {
+	ChunkData getChunk(ChunkPos chunkPos) {
 		return this.getChunk(chunkPos.x, chunkPos.z);
 	}
 	
-	public ChunkData getChunk(int posX, int posZ) {
+	ChunkData getChunk(int posX, int posZ) {
 		ChunkPos chunkPos = new ChunkPos(posX, posZ);
 
 		ChunkData mapChunk;
-		if (mapChunks.containsKey(chunkPos)) {
+		if (this.hasChunk(chunkPos)) {
 			mapChunk = this.mapChunks.get(chunkPos);
 			mapChunk.updateWorld(world);
 		} else {
@@ -65,11 +63,21 @@ public class ChunkDataManager {
 		return mapChunk;
 	}
 	
-	public WorldChunk getEmptyChunk() {
+	WorldChunk getEmptyChunk() {
 		return this.emptyChunk;
 	}
 	
-	public void purge(int maxPurged, int timeLimit) {
+	void removeChunk(ChunkPos chunkPos) {
+		if (this.hasChunk(chunkPos)) {
+			this.mapChunks.remove(chunkPos);
+		}
+	}
+	
+	boolean hasChunk(ChunkPos chunkPos) {
+		return this.mapChunks.containsKey(chunkPos);
+	}
+	
+	void purge(int maxPurged, int timeLimit) {
 		long currentTime = System.currentTimeMillis();
 		int purged = 0;
 	
@@ -90,22 +98,21 @@ public class ChunkDataManager {
 		}
 	}
 
-	public void clear() {
+	void clear() {
 		this.mapChunks.clear();
 	}
 	
-	public void callSavedChunk(World world, ChunkPos chunkPos, Layer layer, int level) {
-		if (!(world instanceof ServerWorld)) return;
+	WorldChunk callSavedChunk(World world, ChunkPos chunkPos) {
+		if (!(world instanceof ServerWorld)) return this.emptyChunk;
 		if (requestedChunks.add(chunkPos)) {
-			chunkProcessor.execute("Call saves for chunk " + chunkPos, () -> {
-				WorldChunk worldChunk = this.callSaves(world, chunkPos);
-				if (!worldChunk.isEmpty()) {
-					ChunkData mapChunk = this.getChunk(chunkPos);
-					ChunkUpdateListener.accept(new ChunkUpdateEvent(worldChunk, mapChunk, layer, level, true));
-				}
-				this.requestedChunks.remove(chunkPos);
-			});
+			return (WorldChunk) chunkProcessor.run("Call saves for chunk " + chunkPos, (future) -> {
+				return () -> {
+					future.complete(this.callSaves(world, chunkPos));
+					this.requestedChunks.remove(chunkPos);
+				};
+			}).join();
 		}
+		return this.emptyChunk;
 	}
 	
 	private WorldChunk callSaves(World world, ChunkPos chunkPos) {

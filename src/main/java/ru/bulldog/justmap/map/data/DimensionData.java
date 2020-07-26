@@ -6,10 +6,10 @@ import ru.bulldog.justmap.event.ChunkUpdateListener;
 import ru.bulldog.justmap.map.IMap;
 import ru.bulldog.justmap.util.DataUtil;
 import ru.bulldog.justmap.util.math.MathUtil;
+
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
-import net.minecraft.world.chunk.ChunkStatus;
 import net.minecraft.world.chunk.WorldChunk;
 
 import java.util.Map;
@@ -17,8 +17,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class DimensionData {
 	private World world;
-	private ChunkDataManager chunkManager;
-	private Map<RegionPos, RegionData> regions = new ConcurrentHashMap<>();
+	private final ChunkDataManager chunkManager;
+	private final Map<RegionPos, RegionData> regions = new ConcurrentHashMap<>();
 	private long lastPurged = 0;
 	private long purgeDelay = 1000;
 	private int purgeAmount = 500;
@@ -61,13 +61,17 @@ public class DimensionData {
 		RegionData region;
 		if(regions.containsKey(regPos)) {
 			region = regions.get(regPos);
-			region.updateWorld(world);
+			region.updateWorld(world, worldmap);
 		} else {
 			region = new RegionData(this, world, currentPos, worldmap);
 			regions.put(regPos, region);
 		}
 		
 		return region;
+	}
+	
+	public ChunkData getChunk(BlockPos pos) {
+		return this.chunkManager.getChunk(pos.getX() >> 4, pos.getZ() >> 4);
 	}
 	
 	public ChunkData getChunk(ChunkPos chunkPos) {
@@ -78,20 +82,42 @@ public class DimensionData {
 		return this.chunkManager.getChunk(x, z);
 	}
 	
+	public void removeChunk(ChunkPos chunkPos) {
+		this.chunkManager.removeChunk(chunkPos);
+	}
+	
+	public boolean hasChunk(int x, int z) {
+		return this.hasChunk(new ChunkPos(x, z));
+	}
+	
+	public boolean hasChunk(ChunkPos chunkPos) {
+		return this.chunkManager.hasChunk(chunkPos);
+	}
+	
 	public WorldChunk getWorldChunk(BlockPos blockPos) {
-		int x = blockPos.getX() >> 4;
-		int z = blockPos.getZ() >> 4;
-		
-		WorldChunk worldChunk = (WorldChunk) this.world.getChunk(x, z, ChunkStatus.FULL, false);
-		return worldChunk != null ? worldChunk : this.getEmptyChunk();
+		return this.getWorldChunk(blockPos.getX() >> 4, blockPos.getZ() >> 4);
+	}
+	
+	public WorldChunk getWorldChunk(int x, int z) {
+		WorldChunk worldChunk = this.world.getChunk(x, z);
+		if (worldChunk.isEmpty()) {
+			worldChunk = this.callSavedChunk(worldChunk.getPos());
+		}
+		return worldChunk;
+	}
+	
+	public boolean isChunkLoaded(ChunkPos chunkPos) {
+		World world = DataUtil.getWorld();
+		return world.isChunkLoaded(chunkPos.x, chunkPos.z);
 	}
 	
 	public WorldChunk getEmptyChunk() {
 		return this.chunkManager.getEmptyChunk();
 	}
 
-	public void callSavedChunk(ChunkPos chunkPos, Layer layer, int level) {
-		this.chunkManager.callSavedChunk(world, chunkPos, layer, level);
+	public WorldChunk callSavedChunk(ChunkPos chunkPos) {
+		World world = DataUtil.getWorld();
+		return this.chunkManager.callSavedChunk(world, chunkPos);
 	}
 
 	public World getWorld() {
@@ -110,16 +136,19 @@ public class DimensionData {
 		int level = map.getLevel();
 		boolean update = ClientParams.forceUpdate;
 		
-		ChunkData mapChunk = this.getChunk(new ChunkPos(centerPos));
-		WorldChunk worldChunk = this.getWorldChunk(centerPos);
-		if (!worldChunk.isEmpty()) {
+		long time = System.currentTimeMillis();
+		long interval = ClientParams.chunkUpdateInterval;
+		ChunkData mapChunk = this.getChunk(centerPos);
+		WorldChunk worldChunk = this.world.getWorldChunk(centerPos);
+		boolean chunkLoaded = !worldChunk.isEmpty() && mapChunk.isChunkLoaded();
+		if (chunkLoaded && time - mapChunk.updated > interval) {
 			ChunkUpdateListener.accept(new ChunkUpdateEvent(worldChunk, mapChunk, layer, level, update));
 		}
 		int x = centerPos.getX();
 		int z = centerPos.getZ();
-		int distance = DataUtil.getGameOptions().viewDistance;
+		int distance = DataUtil.getGameOptions().viewDistance - 1;
 		BlockPos.Mutable currentPos = centerPos.mutableCopy();
-		for (int step = 1; step < distance + 1; step++) {
+		for (int step = 1; step < distance * 2; step++) {
 			boolean even = MathUtil.isEven(step);
 			for (int i = 0; i < step; i++) {
 				if (even) {
@@ -127,9 +156,10 @@ public class DimensionData {
 				} else {
 					currentPos.setX(x += 16);
 				}
-				mapChunk = this.getChunk(new ChunkPos(currentPos));
-				worldChunk = this.getWorldChunk(currentPos);
-				if (!worldChunk.isEmpty()) {
+				mapChunk = this.getChunk(currentPos);
+				worldChunk = this.world.getWorldChunk(currentPos);
+				chunkLoaded = !worldChunk.isEmpty() && mapChunk.isChunkLoaded();
+				if (chunkLoaded && time - mapChunk.updated > interval) {
 					ChunkUpdateListener.accept(new ChunkUpdateEvent(worldChunk, mapChunk, layer, level, update));
 				}
 			}
@@ -139,9 +169,10 @@ public class DimensionData {
 				} else {
 					currentPos.setZ(z += 16);
 				}
-				mapChunk = this.getChunk(new ChunkPos(currentPos));
+				mapChunk = this.getChunk(currentPos);
 				worldChunk = this.world.getWorldChunk(currentPos);
-				if (!worldChunk.isEmpty()) {
+				chunkLoaded = !worldChunk.isEmpty() && mapChunk.isChunkLoaded();
+				if (chunkLoaded && time - mapChunk.updated > interval) {
 					ChunkUpdateListener.accept(new ChunkUpdateEvent(worldChunk, mapChunk, layer, level, update));
 				}
 			}

@@ -83,6 +83,7 @@ public class MapGameRules {
 		if (minecraft.isIntegratedServerRunning()) {
 			allow = minecraft.getServer().getGameRules().getBoolean(rule);
 		} else if (!minecraft.isInSingleplayer()) {
+			if (minecraft.world == null) return false;
 			allow = minecraft.world.getGameRules().getBoolean(rule);
 		}
 		
