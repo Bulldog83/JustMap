@@ -56,7 +56,7 @@ public class TaskManager implements Executor {
     					manager.workQueue.clear();
     				}
     			}
-    			JustMap.LOGGER.debug(manager.name + " stopped");
+    			JustMap.LOGGER.debug("{} stopped", manager.name);
     		}
     	});
     }

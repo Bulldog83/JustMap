@@ -1,5 +1,6 @@
 package ru.bulldog.justmap.map.data;
 
+import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.util.ColorUtil;
 import ru.bulldog.justmap.util.Colors;
@@ -27,7 +28,7 @@ public class ChunkData {
 	
 	private final static TaskManager chunkUpdater = TaskManager.getManager("chunk-updater", 2);
 	
-	private final DimensionData mapData;
+	private final WorldData mapData;
 	private final Map<Layer, ChunkLevel[]> levels = new ConcurrentHashMap<>();
 	private final ChunkPos chunkPos;
 	private World world;
@@ -44,14 +45,14 @@ public class ChunkData {
 	
 	private Object levelLock = new Object();
 	
-	public ChunkData(DimensionData data, World world, WorldChunk lifeChunk) {
-		this(data, world, lifeChunk.getPos());
+	public ChunkData(WorldData data, WorldChunk lifeChunk) {
+		this(data, lifeChunk.getPos());
 		this.updateWorldChunk(lifeChunk);
 	}
 	
-	public ChunkData(DimensionData data, World world, ChunkPos pos) {
+	public ChunkData(WorldData data, ChunkPos pos) {
 		this.mapData = data;
-		this.world = world;
+		this.world = data.getWorld();
 		this.chunkPos = pos;
 		this.worldChunk = new SoftReference<>(world.getChunk(pos.x, pos.z));
 
@@ -84,7 +85,7 @@ public class ChunkData {
 		this.levels.put(layer, new ChunkLevel[levels]);
 	}
 	
-	private ChunkLevel getChunkLevel(Layer layer, int level) {
+	public ChunkLevel getChunkLevel(Layer layer, int level) {
 		synchronized (levelLock) {
 			if (!levels.containsKey(layer)) {
 				initLayer(layer);
@@ -114,10 +115,6 @@ public class ChunkData {
 	
 	public int getZ() {
 		return this.chunkPos.z;
-	}
-	
-	public int[] getHeighmap(Layer layer, int level) {
-		return this.getChunkLevel(layer, level).heightmap;
 	}
 	
 	public WorldChunk getWorldChunk() {
@@ -156,6 +153,7 @@ public class ChunkData {
 	}
 	
 	public boolean update(Layer layer, int level, boolean forceUpdate) {
+		if (!JustMapClient.isMappingAllowed()) return false;
 		if (purged || checkUpdating(layer, level)) return false;
 		if (!outdated && forceUpdate) {
 			this.outdated = forceUpdate;
@@ -167,10 +165,10 @@ public class ChunkData {
 		chunkUpdater.execute(() -> {
 			if (worldChunk.isEmpty() || !this.isChunkLoaded()) return;
 			this.updateChunkData(worldChunk, layer, level);
-			if (saveNeeded() && !DataUtil.getMap().isWorldmap()) {
+			if (saveNeeded()) {
 				BlockPos.Mutable chunkBlockPos = this.chunkPos.getCenterBlockPos().mutableCopy();
 				chunkBlockPos.setY(level * layer.height);
-				RegionData region = this.mapData.getRegion(world, chunkBlockPos, DataUtil.getMap().isWorldmap());
+				RegionData region = this.mapData.getRegion(chunkBlockPos);
 				if (region.getLayer().equals(layer) && region.getLevel() == level) {
 					region.writeChunkData(this);
 				}
@@ -181,16 +179,14 @@ public class ChunkData {
 	}
 	
 	public ChunkData updateHeighmap(WorldChunk worldChunk, Layer layer, int level, boolean skipWater) {
-		if (worldChunk.isEmpty()) return this;		
+		if (worldChunk.isEmpty()) return this;
 		for (int x = 0; x < 16; x++) {
 			for (int z = 0; z < 16; z++) {
 				int y = MapProcessor.getTopBlockY(worldChunk, layer, level, x, z, skipWater);
-				
-				int index = x + (z << 4);
 				ChunkLevel chunkLevel = this.getChunkLevel(layer, level);
 				if (y != -1) {
 					chunkLevel.updateHeightmap(x, z, y);
-				} else if (getHeighmap(layer, level)[index] != -1) {
+				} else if (chunkLevel.sampleHeightmap(x, z) != -1) {
 					chunkLevel.clear(x, z);					
 					this.saved = false;
 				}
@@ -217,7 +213,7 @@ public class ChunkData {
 				
 				int posX = x + (chunkPos.x << 4);
 				int posZ = z + (chunkPos.z << 4);
-				int posY = this.getHeighmap(layer, level)[index];
+				int posY = chunkLevel.sampleHeightmap(x, z);
 				
 				if (posY < 0) continue;
 				
@@ -226,32 +222,30 @@ public class ChunkData {
 				BlockState worldState = worldChunk.getBlockState(blockPos);
 				if(outdated || !blockState.equals(worldState) || currentTime - refreshed > 60000) {
 					int color = ColorUtil.blockColor(worldChunk, blockPos);
-					if (color != -1) {
-						int heightDiff = MapProcessor.heightDifference(this, layer, level, x, posY, z, skipWater);
-						
-						chunkLevel.setBlockState(x, z, worldState);
-						
-						int height = layer.height;
-						int bottom = 0, baseHeight = 0;
-						if (layer == Layer.NETHER) {
-							bottom = level * height;
-							baseHeight = 128;
-						} else if (layer == Layer.SURFACE) {
-							bottom = this.world.getSeaLevel();
-							baseHeight = 256;
-						} else {
-							bottom = level * height;
-							baseHeight = 32;
-						}
-						
-						float topoLevel = ((float) (posY - bottom) / baseHeight);						
-						
-						chunkLevel.topomap[index] = (int) (topoLevel * 100);
-						chunkLevel.colormap[index] = color;
-						chunkLevel.levelmap[index] = heightDiff;
-						
-						this.saved = false;
+					if (color == -1) continue;
+
+					int heightDiff = MapProcessor.heightDifference(this, layer, level, x, posY, z, skipWater);
+					chunkLevel.setBlockState(x, z, worldState);
+
+					int height = layer.height;
+					int bottom = 0, baseHeight = 0;
+					if (layer == Layer.NETHER) {
+						bottom = level * height;
+						baseHeight = 128;
+					} else if (layer == Layer.SURFACE) {
+						bottom = this.world.getSeaLevel();
+						baseHeight = 256;
+					} else {
+						bottom = level * height;
+						baseHeight = 32;
 					}
+
+					float topoLevel = ((float) (posY - bottom) / baseHeight);
+					chunkLevel.topomap[index] = (int) (topoLevel * 100);
+					chunkLevel.colormap[index] = color;
+					chunkLevel.levelmap[index] = heightDiff;
+
+					this.saved = false;
 				} else if (chunkLevel.colormap[index] != -1) {
 					int heightDiff = MapProcessor.heightDifference(this, layer, level, x, posY, z, skipWater);
 					if (chunkLevel.levelmap[index] != heightDiff) {

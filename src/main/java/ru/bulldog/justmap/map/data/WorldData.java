@@ -12,18 +12,18 @@ import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.WorldChunk;
 
+import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
-public class DimensionData {
+public class WorldData {
 	private World world;
 	private final ChunkDataManager chunkManager;
-	private final Map<RegionPos, RegionData> regions = new ConcurrentHashMap<>();
+	private final Map<RegionPos, RegionData> regions = new HashMap<>();
 	private long lastPurged = 0;
 	private long purgeDelay = 1000;
 	private int purgeAmount = 500;
 	
-	public DimensionData(World world) {
+	public WorldData(World world) {
 		this.chunkManager = new ChunkDataManager(this, world);
 		this.world = world;
 	}
@@ -32,39 +32,22 @@ public class DimensionData {
 		return this.chunkManager;
 	}
 	
-	public RegionData getRegion(BlockPos currentPos, BlockPos centerPos) {
-		return this.getRegion(world, currentPos, centerPos, false);
+	public RegionData getRegion(BlockPos blockPos) {
+		return this.getRegion(DataUtil.getMap(), blockPos);
 	}
 	
-	public RegionData getRegion(BlockPos currentPos, BlockPos centerPos, boolean worldmap) {
-		return this.getRegion(world, currentPos, centerPos, worldmap);
-	}
-	
-	public RegionData getRegion(World world, BlockPos currentPos, BlockPos centerPos, boolean worldmap) {
-		RegionData region = this.getRegion(world, currentPos, worldmap);
-		ChunkPos center = new ChunkPos(centerPos);
-		if (!region.getCenter().equals(center)) {
-			region.setCenter(center);
-		}
-		
-		long time = System.currentTimeMillis();
-		if (time - region.updated > 1000) {
-			region.updateImage(ClientParams.forceUpdate);
-		}
-		
-		return region;
-	}
-	
-	public RegionData getRegion(World world, BlockPos currentPos, boolean worldmap) {
-		RegionPos regPos = new RegionPos(currentPos);
-		
+	public RegionData getRegion(IMap map, BlockPos blockPos) {
+		RegionPos regPos = new RegionPos(blockPos);
 		RegionData region;
-		if(regions.containsKey(regPos)) {
-			region = regions.get(regPos);
-			region.updateWorld(world, worldmap);
-		} else {
-			region = new RegionData(this, world, currentPos, worldmap);
-			regions.put(regPos, region);
+		synchronized (regions) {
+			if(regions.containsKey(regPos)) {
+				region = this.regions.get(regPos);
+				region.setCenter(new ChunkPos(map.getCenter()));
+				region.updateWorld(world, map.isWorldmap());
+			} else {
+				region = new RegionData(map, this, regPos);
+				regions.put(regPos, region);
+			}
 		}
 		
 		return region;
@@ -80,18 +63,6 @@ public class DimensionData {
 	
 	public ChunkData getChunk(int x, int z) {
 		return this.chunkManager.getChunk(x, z);
-	}
-	
-	public void removeChunk(ChunkPos chunkPos) {
-		this.chunkManager.removeChunk(chunkPos);
-	}
-	
-	public boolean hasChunk(int x, int z) {
-		return this.hasChunk(new ChunkPos(x, z));
-	}
-	
-	public boolean hasChunk(ChunkPos chunkPos) {
-		return this.chunkManager.hasChunk(chunkPos);
 	}
 	
 	public WorldChunk getWorldChunk(BlockPos blockPos) {
@@ -196,8 +167,10 @@ public class DimensionData {
 	}
 	
 	public void close() {
-		this.regions.forEach((pos, region) -> region.close());
-		this.regions.clear();
+		synchronized (regions) {
+			this.regions.forEach((pos, region) -> region.close());
+			this.regions.clear();
+		}
 		this.clear();
 	}
 }

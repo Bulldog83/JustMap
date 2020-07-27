@@ -8,11 +8,14 @@ import org.spongepowered.asm.mixin.injection.At;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
+import net.minecraft.network.packet.s2c.play.GameJoinS2CPacket;
 import net.minecraft.network.packet.s2c.play.GameMessageS2CPacket;
 import net.minecraft.network.packet.s2c.play.HealthUpdateS2CPacket;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.network.MessageType;
+import ru.bulldog.justmap.client.JustMapClient;
+import ru.bulldog.justmap.client.network.DataRequest;
 import ru.bulldog.justmap.map.MapGameRules;
 import ru.bulldog.justmap.map.waypoint.Waypoint;
 
@@ -21,6 +24,11 @@ public abstract class ClientPlayNetworkHandlerMixin {
 	
 	@Shadow
 	private MinecraftClient client;
+	
+	@Inject(method = "onGameJoin", at = @At("TAIL"))
+	public void onGameJoin(GameJoinS2CPacket packet, CallbackInfo cinfo) {
+		JustMapClient.PACKET_REGISTRY.sendToServer(JustMapClient.PACKET_ID, new DataRequest('H', (byte) 2).getBuffer());
+	}
 	
 	@Inject(method = "onGameMessage", at = @At("HEAD"), cancellable = true)
 	public void onGameMessage(GameMessageS2CPacket gameMessageS2CPacket, CallbackInfo ci) {

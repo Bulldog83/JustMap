@@ -20,6 +20,8 @@ public class ChunkLevel {
 	long refreshed = 0;
 	int level;
 	
+	private Object arrayLock = new Object();
+	
 	ChunkLevel(int level) {
 		this.statemap = new int[256];
 		this.heightmap = new int[256];
@@ -37,33 +39,41 @@ public class ChunkLevel {
 	}
 	
 	public BlockState getBlockState(int x, int z) {
-		int index = index(x, z);
-		return Block.getStateFromRawId(statemap[index]);
+		return Block.getStateFromRawId(statemap[index(x, z)]);
 	}
 	
 	public void setBlockState(int x, int z, BlockState blockState) {
-		int index = index(x, z);
-		this.statemap[index] = Block.getRawIdFromState(blockState);
+		synchronized (arrayLock) {
+			this.statemap[index(x, z)] = Block.getRawIdFromState(blockState);
+		}
+	}
+	
+	public int sampleHeightmap(int x, int z) {
+		return this.heightmap[index(x, z)];
 	}
 	
 	public void updateHeightmap(int x, int z, int y) {
 		int index = index(x, z);
-		if (heightmap[index] != y) {
-			this.setBlockState(x, z, StateUtil.AIR);
-			heightmap[index] = y;
+		synchronized (arrayLock) {
+			if (heightmap[index] != y) {
+				this.setBlockState(x, z, StateUtil.AIR);
+				heightmap[index] = y;
+			}
 		}
 	}
 	
 	public void clear(int x, int z) {
 		int index = index(x, z);
-		if (heightmap[index] != -1) {
-			this.setBlockState(x, z, StateUtil.AIR);
-			this.heightmap[index] = -1;
+		synchronized (arrayLock) {
+			if (heightmap[index] != -1) {
+				this.setBlockState(x, z, StateUtil.AIR);
+				this.heightmap[index] = -1;
+			}
+			
+			this.colormap[index] = -1;
+			this.levelmap[index] = 0;
+			this.topomap[index] = 0;
 		}
-		
-		this.colormap[index] = -1;
-		this.levelmap[index] = 0;
-		this.topomap[index] = 0;
 	}
 	
 	private int index(int x, int z) {

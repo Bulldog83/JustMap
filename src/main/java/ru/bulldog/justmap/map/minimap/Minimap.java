@@ -10,6 +10,8 @@ import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.client.config.ClientConfig;
 import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.map.IMap;
+import ru.bulldog.justmap.map.data.WorldData;
+import ru.bulldog.justmap.map.data.DimensionManager;
 import ru.bulldog.justmap.map.data.Layer;
 import ru.bulldog.justmap.map.icon.EntityIcon;
 import ru.bulldog.justmap.map.icon.PlayerIcon;
@@ -57,6 +59,8 @@ public class Minimap implements IMap{
 	private List<EntityIcon> entities = new ArrayList<>();	
 	private PlayerEntity locPlayer = null;
 	private Layer mapLayer = Layer.SURFACE;
+	private WorldData worldData;
+	private World world;
 	private int mapLevel = 0;
 	private int mapWidth;
 	private int mapHeight;
@@ -90,8 +94,8 @@ public class Minimap implements IMap{
 				locPlayer = player;
 			}
 
-			prepareMap(player);
-			updateInfo(player);
+			this.prepareMap(player);
+			this.updateInfo(player);
 		} else {
 			locPlayer = null;
 		}
@@ -162,7 +166,8 @@ public class Minimap implements IMap{
 	}
 	
 	public void prepareMap(PlayerEntity player) {
-		World world = player.world;
+		this.world = player.world;
+		this.worldData = DimensionManager.getData(world);
 		BlockPos pos = DataUtil.currentPos();
 		
 		int posX = pos.getX();
@@ -207,7 +212,7 @@ public class Minimap implements IMap{
 			int checkHeight = 24;
 			BlockPos start = new BlockPos(startX, posY - checkHeight / 2, startZ);
 			BlockPos end = new BlockPos(endX, posY + checkHeight / 2, endZ);
-			List<Entity> entities = world.getEntities(null, new Box(start, end));
+			List<Entity> entities = this.world.getEntities(null, new Box(start, end));
 		
 			int amount = 0;				
 			for (Entity entity : entities) {
@@ -275,6 +280,14 @@ public class Minimap implements IMap{
 	public void createWaypoint() {
 		World world = minecraft.world;
 		createWaypoint(world.getDimensionRegistryKey().getValue(), DataUtil.currentPos());
+	}
+	
+	public World getWorld() {
+		return this.world;
+	}
+	
+	public WorldData getWorldData() {
+		return this.worldData;
 	}
 	
 	public float getScale() {

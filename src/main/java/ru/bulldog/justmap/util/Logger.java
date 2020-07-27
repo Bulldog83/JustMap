@@ -21,8 +21,16 @@ public final class Logger {
 		LOGGER.log(level, modPref + message);
 	}
 	
+	public void log(Level level, String message, Object... params) {
+		LOGGER.log(level, modPref + message, params);
+	}
+	
 	public void debug(Object message) {
 		this.log(Level.DEBUG, message.toString());
+	}
+	
+	public void debug(Object message, Object... params) {
+		this.log(Level.DEBUG, message.toString(), params);
 	}
 	
 	public void catching(Throwable ex) {

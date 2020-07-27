@@ -4,16 +4,15 @@ import java.io.File;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
 
 import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.client.render.MapTexture;
+import ru.bulldog.justmap.map.IMap;
 import ru.bulldog.justmap.util.Colors;
 import ru.bulldog.justmap.util.DataUtil;
-import ru.bulldog.justmap.util.Dimension;
 import ru.bulldog.justmap.util.RenderUtil;
 import ru.bulldog.justmap.util.RuleUtil;
 import ru.bulldog.justmap.util.math.Plane;
@@ -25,7 +24,7 @@ public class RegionData {
 	
 	private static TaskManager worker = TaskManager.getManager("region-updater");
 	
-	private final DimensionData mapData;
+	private final WorldData mapData;
 	private final RegionPos regPos;
 	private final Map<Layer, MapTexture> images = new ConcurrentHashMap<>();
 	private File cacheDir;
@@ -54,28 +53,27 @@ public class RegionData {
 	
 	private Object imageLock = new Object();
 	
-	public RegionData(DimensionData data, World world, BlockPos blockPos, boolean worldmap) {
-		if (worldmap && !Dimension.isNether(world.getDimensionRegistryKey())) {
-			this.layer = Layer.SURFACE;
-			this.level = 0;
-		} else {
-			this.layer = DataUtil.getLayer(world, blockPos);
-			this.level = DataUtil.getLevel(layer, blockPos.getY());
-		}
+	public RegionData(IMap map, WorldData data, RegionPos regPos) {
+		this(data, regPos);
 		
-		this.mapData = data;
-		this.world = world;
-		this.regPos = new RegionPos(blockPos);
-		this.center = new ChunkPos(DataUtil.currentPos());
-		this.cacheDir = StorageUtil.cacheDir(world);
+		this.layer = map.getLayer();
+		this.level = map.getLevel();
+		this.center = new ChunkPos(map.getCenter());
+		this.worldmap = map.isWorldmap();
 		this.image = this.getImage(layer, level);
-		this.worldmap = worldmap;
 		
 		int radius = DataUtil.getGameOptions().viewDistance - 1;
 		this.updateArea = new Plane(center.x - radius, center.z - radius,
 									center.x + radius, center.z + radius);
 		
 		this.updateImage(true);
+	}
+	
+	private RegionData(WorldData data, RegionPos regPos) {
+		this.mapData = data;
+		this.world = data.getWorld();
+		this.regPos = regPos;
+		this.cacheDir = StorageUtil.cacheDir(world);
 	}
 	
 	public RegionPos getPos() {
@@ -111,6 +109,9 @@ public class RegionData {
 		this.worldmap = worldmap;
 		if (world == null) return;
 		if (!world.equals(this.world)) {
+			JustMap.LOGGER.debug("Region {} ({}) world changed!", regPos, layer);
+			System.out.println(this.world.getRegistryKey());
+			System.out.println(world.getRegistryKey());
 			this.cacheDir = StorageUtil.cacheDir(world);
 			this.world = world;
 			this.clear();
@@ -270,8 +271,8 @@ public class RegionData {
 			
 			return;
 		}
-		JustMap.LOGGER.debug(String.format("Swap region %s (%s, %d) to: %s, level: %d",
-				regPos, this.layer, this.level, layer, level));
+		JustMap.LOGGER.debug("Swap region {} ({}, {}) to: {}, level: {}",
+				regPos, this.layer, this.level, layer, level);
 		synchronized (imageLock) {
 			this.image.saveImage();
 			this.layer = layer;
@@ -349,7 +350,7 @@ public class RegionData {
 	}
 	
 	public void close() {
-		JustMap.LOGGER.debug("Closing region: " + regPos);
+		JustMap.LOGGER.debug("Closing region: {}", regPos);
 		synchronized (imageLock) {
 			this.images.forEach((layer, image) -> {
 				image.saveImage();

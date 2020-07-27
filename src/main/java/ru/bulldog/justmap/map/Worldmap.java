@@ -23,7 +23,7 @@ import ru.bulldog.justmap.client.MapScreen;
 import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.client.config.ConfigFactory;
 import ru.bulldog.justmap.map.data.Layer;
-import ru.bulldog.justmap.map.data.DimensionData;
+import ru.bulldog.justmap.map.data.WorldData;
 import ru.bulldog.justmap.map.data.DimensionManager;
 import ru.bulldog.justmap.map.data.ChunkData;
 import ru.bulldog.justmap.map.data.RegionData;
@@ -64,6 +64,7 @@ public class Worldmap extends MapScreen implements IMap {
 	private long updateInterval = 50;
 	private long updated = 0;
 	private int mapLevel = 0;
+	private WorldData worldData;
 	private Identifier dimension;
 	private BlockPos centerPos;
 	private String cursorCoords;
@@ -84,6 +85,7 @@ public class Worldmap extends MapScreen implements IMap {
 		
 		PlayerEntity player = client.player;
 
+		this.worldData = DimensionManager.getData(client.world);
 		Identifier dimId = client.world.getDimensionRegistryKey().getValue();
 		if (centerPos == null || !dimId.equals(dimension)) {
 			this.centerPos = DataUtil.currentPos();
@@ -164,9 +166,6 @@ public class Worldmap extends MapScreen implements IMap {
 	}
 	
 	private void drawMap() {		
-		DimensionData mapData = DimensionManager.getData();		
-		boolean surfaceOnly = !this.mapLayer.equals(Layer.NETHER);
-		
 		int cornerX = centerPos.getX() - scaledWidth / 2;
 		int cornerZ = centerPos.getZ() - scaledHeight / 2;
 		
@@ -180,7 +179,7 @@ public class Worldmap extends MapScreen implements IMap {
 			while (picY < scaledHeight) {				
 				int cZ = cornerZ + picY;
 				
-				RegionData region = mapData.getRegion(currentPos.set(cX, cY, cZ), centerPos, surfaceOnly);
+				RegionData region = this.worldData.getRegion(this, currentPos.set(cX, cY, cZ));
 				region.swapLayer(mapLayer, mapLevel);
 				
 				picW = 512;
@@ -348,13 +347,12 @@ public class Worldmap extends MapScreen implements IMap {
 		int chunkX = posX >> 4;
 		int chunkZ = posZ >> 4;
 		
-		DimensionData data = DimensionManager.getData();		
-		ChunkData mapChunk = data.getChunk(chunkX, chunkZ);
+		ChunkData mapChunk = this.worldData.getChunk(chunkX, chunkZ);
 		
 		int cx = posX - (chunkX << 4);
 		int cz = posZ - (chunkZ << 4);
 		
-		int posY = mapChunk.getHeighmap(mapLayer, mapLevel)[cx + (cz << 4)];
+		int posY = mapChunk.getChunkLevel(mapLayer, mapLevel).sampleHeightmap(cx, cz);
 		posY = posY == -1 ? centerPos.getY() : posY;
 		
 		return new BlockPos(posX, posY, posZ);

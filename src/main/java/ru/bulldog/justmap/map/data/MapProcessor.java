@@ -81,13 +81,14 @@ public class MapProcessor {
 		int east, south;
 		ChunkPos pos = mapChunk.getPos();
 		World world = mapChunk.getWorldChunk().getWorld();
+		ChunkLevel chunkLevel = mapChunk.getChunkLevel(layer, level);
 		if (ex > 15) {			
 			ex -= 16;
 			WorldChunk eastChunk = world.getChunk(pos.x + 1, pos.z);
 			east = getTopBlockY(eastChunk, layer, level, ex, z, skipWater);
 			east = checkLiquids(eastChunk, layer, level, ex, east, z);
 		} else {
-			east = mapChunk.getHeighmap(layer, level)[ex + (z << 4)];
+			east = chunkLevel.sampleHeightmap(ex, z);
 			east = checkLiquids(mapChunk.getWorldChunk(), layer, level, ex, east, z);
 		}
 		if (sz < 0) {
@@ -96,7 +97,7 @@ public class MapProcessor {
 			south = getTopBlockY(southChunk, layer, level, x, sz, skipWater);
 			south = checkLiquids(southChunk, layer, level, x, south, sz);
 		} else {			
-			south = mapChunk.getHeighmap(layer, level)[x + (sz << 4)];
+			south = chunkLevel.sampleHeightmap(x, sz);
 			south = checkLiquids(mapChunk.getWorldChunk(), layer, level, x, south, sz);
 		}
 		

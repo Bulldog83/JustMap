@@ -16,16 +16,12 @@ import ru.bulldog.justmap.util.tasks.MemoryUtil;
 
 public final class DimensionManager {
 
-	private final static Map<Identifier, DimensionData> DIMENSION_DATA = new ConcurrentHashMap<>();
+	private final static Map<Identifier, WorldData> DIMENSION_DATA = new ConcurrentHashMap<>();
 	private static Identifier currentDimension;
 	private static World currentWorld;
 	private static boolean cacheClearing = false;
 
-	public static DimensionData getData() {
-		return getData(DataUtil.getClientWorld());
-	}
-	
-	public static DimensionData getData(World world) {
+	public static WorldData getData(World world) {
 		if (world == null) return null;
 		if (!world.equals(currentWorld)) {
 			currentWorld = world;
@@ -38,10 +34,10 @@ public final class DimensionManager {
 		return getData(currentWorld, currentDimension);
 	}
 
-	public static DimensionData getData(World world, Identifier dimension) {
+	public static WorldData getData(World world, Identifier dimension) {
 		if (world == null) return null;
 		
-		DimensionData data;
+		WorldData data;
 		if (DIMENSION_DATA.containsKey(dimension)) {
 			data = DIMENSION_DATA.get(dimension);
 			if (!data.getWorld().equals(world)) {
@@ -49,7 +45,7 @@ public final class DimensionManager {
 				data.clear();
 			}
 		} else {
-			data = new DimensionData(world);
+			data = new WorldData(world);
 			DIMENSION_DATA.put(dimension, data);
 		}
 		
@@ -59,7 +55,7 @@ public final class DimensionManager {
 	public static void onChunkLoad(World world, WorldChunk worldChunk) {
 		if (world == null || worldChunk == null || worldChunk.isEmpty()) return;
 		IMap map = DataUtil.getMap();
-		DimensionData mapData = DimensionManager.getData(world);
+		WorldData mapData = DimensionManager.getData(world);
 		ChunkData mapChunk = mapData.getChunk(worldChunk.getPos());
 		ChunkUpdateEvent updateEvent = new ChunkUpdateEvent(worldChunk, mapChunk, map.getLayer(), map.getLevel(), true);
 		ChunkUpdateListener.accept(updateEvent);

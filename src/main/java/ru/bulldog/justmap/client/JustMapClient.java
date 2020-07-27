@@ -7,7 +7,7 @@ import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientChunkEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-
+import net.fabricmc.fabric.api.network.ClientSidePacketRegistry;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.BackupPromptScreen;
 import net.minecraft.client.gui.screen.Screen;
@@ -18,10 +18,11 @@ import net.minecraft.client.gui.screen.world.CreateWorldScreen;
 import net.minecraft.client.gui.screen.world.EditGameRulesScreen;
 import net.minecraft.client.gui.screen.world.EditWorldScreen;
 import net.minecraft.client.gui.screen.world.SelectWorldScreen;
-
+import net.minecraft.util.Identifier;
 import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.advancedinfo.AdvancedInfo;
 import ru.bulldog.justmap.client.config.ClientConfig;
+import ru.bulldog.justmap.client.network.ServerDataConsumer;
 import ru.bulldog.justmap.event.ChunkUpdateListener;
 import ru.bulldog.justmap.map.data.DimensionManager;
 import ru.bulldog.justmap.map.minimap.Minimap;
@@ -30,6 +31,8 @@ import ru.bulldog.justmap.util.tasks.TaskManager;
 
 public class JustMapClient implements ClientModInitializer {
 	public final static MinecraftClient MINECRAFT = MinecraftClient.getInstance();
+	public final static ClientSidePacketRegistry PACKET_REGISTRY = ClientSidePacketRegistry.INSTANCE;
+	public final static Identifier PACKET_ID = new Identifier(JustMap.MODID, "network_api");
 	public final static ClientConfig CONFIG = ClientConfig.get();
 	public final static Minimap MAP = new Minimap();
 	
@@ -39,6 +42,7 @@ public class JustMapClient implements ClientModInitializer {
 	public void onInitializeClient() {
 		KeyHandler.initKeyBindings();
 
+		PACKET_REGISTRY.register(PACKET_ID, new ServerDataConsumer());
 		ClientChunkEvents.CHUNK_LOAD.register(DimensionManager::onChunkLoad);
 		ClientTickEvents.END_CLIENT_TICK.register(minecraft -> {
 			boolean isTitle = this.isOnTitleScreen(minecraft.currentScreen);
@@ -54,7 +58,7 @@ public class JustMapClient implements ClientModInitializer {
 			DimensionManager.clearCache();
 			DimensionManager.memoryControl();
 			AdvancedInfo.getInstance().updateInfo();
-			DimensionManager.getData().updateMap();
+			DimensionManager.getData(minecraft.world).updateMap();
 			ChunkUpdateListener.proceed();
 		});
 		ClientLifecycleEvents.CLIENT_STOPPING.register(client -> {

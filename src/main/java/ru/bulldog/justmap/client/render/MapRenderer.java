@@ -11,8 +11,7 @@ import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.map.DirectionArrow;
 import ru.bulldog.justmap.map.MapPlayerManager;
-import ru.bulldog.justmap.map.data.DimensionData;
-import ru.bulldog.justmap.map.data.DimensionManager;
+import ru.bulldog.justmap.map.data.WorldData;
 import ru.bulldog.justmap.map.data.RegionData;
 import ru.bulldog.justmap.map.icon.EntityIcon;
 import ru.bulldog.justmap.map.icon.PlayerIcon;
@@ -28,6 +27,7 @@ import ru.bulldog.justmap.util.DataUtil;
 import ru.bulldog.justmap.util.math.Line;
 import ru.bulldog.justmap.util.math.MathUtil;
 import ru.bulldog.justmap.util.math.Point;
+
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 
@@ -58,6 +58,7 @@ public class MapRenderer {
 	private boolean isRound = false;
 
 	private final Minimap minimap;
+	private WorldData worldData;
 	
 	private MapSkin mapSkin;
 	private TextManager textManager;	
@@ -97,6 +98,7 @@ public class MapRenderer {
 	
 	public void updateParams() {		
 		this.minimap.updateMapParams();
+		this.worldData = this.minimap.getWorldData();
 		
 		this.isRound = !minimap.isBigMap() && Minimap.isRound();
 		int border = 0;
@@ -248,6 +250,8 @@ public class MapRenderer {
 		
 		this.updateParams();
 		
+		if (worldData == null) return;
+		
 		int winH = minecraft.getWindow().getFramebufferHeight();
 		double scale = minecraft.getWindow().getScaleFactor();
 		
@@ -342,8 +346,6 @@ public class MapRenderer {
 	}
 	
 	private void drawMap() {
-		DimensionData mapData = DimensionManager.getData();
-	
 		int scaledW = this.minimap.getScaledWidth();
 		int scaledH = this.minimap.getScaledHeight();
 		int cornerX = DataUtil.coordX() - scaledW / 2;
@@ -370,7 +372,7 @@ public class MapRenderer {
 			while (picY < scaledH ) {				
 				int cZ = cornerZ + picY;
 				
-				RegionData region = mapData.getRegion(currentPos.set(cX, cY, cZ), center);
+				RegionData region = this.worldData.getRegion(minimap, currentPos.set(cX, cY, cZ));
 				region.swapLayer(minimap.getLayer(), minimap.getLevel());
 				
 				picW = 512;

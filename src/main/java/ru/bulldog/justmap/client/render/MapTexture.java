@@ -233,7 +233,7 @@ public class MapTexture {
 				data[i] = bytes[i];
 			}
 			ImageIO.write(pngImage, "png", fileOut);
-			JustMap.LOGGER.debug("Image saved: " + imageFile);
+			JustMap.LOGGER.debug("Image saved: {}", imageFile);
 			pngImage.flush();
 		} catch (Exception ex) {
 			JustMap.LOGGER.logWarning("Can't save image: " + imageFile.toString());
@@ -251,7 +251,7 @@ public class MapTexture {
 				this.bytes = ((DataBufferByte) pngImage.getTile(0, 0).getDataBuffer()).getData().clone();
 				this.changed = true;
 				pngImage.flush();			
-				JustMap.LOGGER.debug("Image loaded: " + png);
+				JustMap.LOGGER.debug("Image loaded: {}", png);
 				return true;
 			} catch (Exception ex) {
 				JustMap.LOGGER.logWarning("Can't load image: " + png.toString());
