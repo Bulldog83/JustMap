@@ -110,8 +110,6 @@ public class RegionData {
 		if (world == null) return;
 		if (!world.equals(this.world)) {
 			JustMap.LOGGER.debug("Region {} ({}) world changed!", regPos, layer);
-			System.out.println(this.world.getRegistryKey());
-			System.out.println(world.getRegistryKey());
 			this.cacheDir = StorageUtil.cacheDir(world);
 			this.world = world;
 			this.clear();

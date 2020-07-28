@@ -1,23 +1,22 @@
 package ru.bulldog.justmap.client.network;
 
 import io.netty.buffer.Unpooled;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.network.PacketByteBuf;
 
 public class DataRequest {
 
-	private final char id;
-	private final byte index;
-	private final PacketByteBuf byteBuff;
+	private final PacketByteBuf data;
 	
-	public DataRequest(char id, byte index) {
-		this.byteBuff = new PacketByteBuf(Unpooled.buffer());
-		this.id = id;
-		this.index = index;
+	public DataRequest() {
+		this.data = new PacketByteBuf(Unpooled.buffer());		
+		this.data.writeByte((byte) 2 & 0xFF);
+		this.data.writeChar((int) 'H');
 	}
 	
-	public PacketByteBuf getBuffer() {
-		this.byteBuff.writeByte(index & 0xFF);
-		this.byteBuff.writeChar((int) id);
-		return this.byteBuff;
+	@Environment(EnvType.CLIENT)
+	public PacketByteBuf getData() {
+		return new PacketByteBuf(data.copy());
 	}
 }

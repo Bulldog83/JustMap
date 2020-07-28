@@ -4,30 +4,65 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
 import org.spongepowered.asm.mixin.injection.At;
+
+import net.fabricmc.fabric.impl.networking.PacketTypes;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
-import net.minecraft.network.packet.s2c.play.GameJoinS2CPacket;
+import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
 import net.minecraft.network.packet.s2c.play.GameMessageS2CPacket;
 import net.minecraft.network.packet.s2c.play.HealthUpdateS2CPacket;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.network.MessageType;
-import ru.bulldog.justmap.client.JustMapClient;
-import ru.bulldog.justmap.client.network.DataRequest;
+import net.minecraft.network.PacketByteBuf;
+
 import ru.bulldog.justmap.map.MapGameRules;
 import ru.bulldog.justmap.map.waypoint.Waypoint;
 
-@Mixin(ClientPlayNetworkHandler.class)
+@Mixin(value = ClientPlayNetworkHandler.class, priority = 100)
 public abstract class ClientPlayNetworkHandlerMixin {
 	
 	@Shadow
 	private MinecraftClient client;
 	
-	@Inject(method = "onGameJoin", at = @At("TAIL"))
-	public void onGameJoin(GameJoinS2CPacket packet, CallbackInfo cinfo) {
-		JustMapClient.PACKET_REGISTRY.sendToServer(JustMapClient.PACKET_ID, new DataRequest('H', (byte) 2).getBuffer());
+	@Inject(method = "onCustomPayload", at = @At("HEAD"))
+	public void onCustomPayload(CustomPayloadS2CPacket packet, CallbackInfo cinfo) {
+		System.out.println(packet.getChannel());
+		PacketByteBuf buf = packet.getData();
+		if (packet.getChannel().equals(PacketTypes.BRAND)) {
+			System.out.println("Lenth: " + buf.readByte());
+		}
+		StringBuilder sb = new StringBuilder();
+		char c;
+
+		try {
+			while (buf.readerIndex() < buf.writerIndex()) {
+				c = (char) buf.readByte();
+
+				if (c == 0) {
+					String s = sb.toString();
+
+					if (!s.isEmpty()) {
+						System.out.println(s);
+					}
+
+					sb = new StringBuilder();
+				} else {
+					sb.append(c);
+				}
+			}
+		} finally {
+			buf.release();
+		}
+
+		String s = sb.toString();
+
+		if (!s.isEmpty()) {
+			System.out.println(s);
+		}
 	}
 	
 	@Inject(method = "onGameMessage", at = @At("HEAD"), cancellable = true)
