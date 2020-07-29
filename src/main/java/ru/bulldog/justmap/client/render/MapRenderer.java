@@ -9,6 +9,10 @@ import ru.bulldog.justmap.advancedinfo.MapText;
 import ru.bulldog.justmap.advancedinfo.TextManager;
 import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.client.config.ClientParams;
+import ru.bulldog.justmap.enums.ScreenPosition;
+import ru.bulldog.justmap.enums.TextAlignment;
+import ru.bulldog.justmap.enums.TextPosition;
+import ru.bulldog.justmap.enums.ArrowType;
 import ru.bulldog.justmap.map.DirectionArrow;
 import ru.bulldog.justmap.map.MapPlayerManager;
 import ru.bulldog.justmap.map.data.WorldData;
@@ -18,11 +22,9 @@ import ru.bulldog.justmap.map.icon.PlayerIcon;
 import ru.bulldog.justmap.map.icon.WaypointIcon;
 import ru.bulldog.justmap.map.minimap.Minimap;
 import ru.bulldog.justmap.map.minimap.skin.MapSkin;
-import ru.bulldog.justmap.util.RenderUtil.TextAlignment;
 import ru.bulldog.justmap.util.RuleUtil;
 import ru.bulldog.justmap.util.Colors;
 import ru.bulldog.justmap.util.RenderUtil;
-import ru.bulldog.justmap.util.ScreenPosition;
 import ru.bulldog.justmap.util.DataUtil;
 import ru.bulldog.justmap.util.math.Line;
 import ru.bulldog.justmap.util.math.MathUtil;
@@ -143,7 +145,7 @@ public class MapRenderer {
 			this.mapX = posX + border;
 			this.mapY = posY + border;			
 			
-			TextManager.TextPosition textPos = TextManager.TextPosition.UNDER;
+			TextPosition textPos = TextPosition.UNDER;
 
 			switch (mapPosition) {
 				case TOP_LEFT:
@@ -167,12 +169,12 @@ public class MapRenderer {
 					this.posY = mapY - border;
 					break;
 				case BOTTOM_LEFT:
-					textPos = TextManager.TextPosition.ABOVE;
+					textPos = TextPosition.ABOVE;
 					this.mapY = winH - offset - mapHeight - border;
 					this.posY = mapY - border;
 					break;
 				case BOTTOM_RIGHT:
-					textPos = TextManager.TextPosition.ABOVE;
+					textPos = TextPosition.ABOVE;
 					this.mapX = winW - offset - mapWidth - border;
 					this.posX = mapX - border;
 					this.mapY = winH - offset - mapHeight - border;
@@ -193,7 +195,7 @@ public class MapRenderer {
 			}
 			
 			this.textManager.updatePosition(textPos,
-				mapX, mapY + (textPos == TextManager.TextPosition.UNDER ?
+				mapX, mapY + (textPos == TextPosition.UNDER ?
 					mapHeight + border + 3 :
 					-(border + 3))
 			);
@@ -333,7 +335,7 @@ public class MapRenderer {
 		int centerX = mapX + mapWidth / 2;
 		int centerY = mapY + mapHeight / 2;
 		int iconSize = ClientParams.arrowIconSize;
-		if (ClientParams.arrowIconType == DirectionArrow.Type.DIRECTION_ARROW) {
+		if (ClientParams.arrowIconType == ArrowType.DIRECTION_ARROW) {
 			float direction = ClientParams.rotateMap ? 180 : rotation;
 			DirectionArrow.draw(centerX, centerY, iconSize, direction);
 		} else {

@@ -7,20 +7,12 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.util.math.MatrixStack;
 
 import ru.bulldog.justmap.client.config.ClientParams;
+import ru.bulldog.justmap.enums.ScreenPosition;
+import ru.bulldog.justmap.enums.TextAlignment;
+import ru.bulldog.justmap.enums.TextPosition;
 import ru.bulldog.justmap.util.DataUtil;
-import ru.bulldog.justmap.util.ScreenPosition;
-import ru.bulldog.justmap.util.RenderUtil.TextAlignment;
 
 public class TextManager {
-	public enum TextPosition {
-		ABOVE,
-		UNDER,
-		LEFT,
-		RIGHT,
-		ABOVE_LEFT,
-		ABOVE_RIGHT
-	}	
-
 	private TextPosition textPosition = TextPosition.RIGHT;
 	private List<InfoText> elements;
 	private int x, y;

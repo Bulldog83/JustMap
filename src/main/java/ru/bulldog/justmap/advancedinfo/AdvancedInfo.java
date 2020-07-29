@@ -11,8 +11,8 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.EquipmentSlot;
 
 import ru.bulldog.justmap.client.config.ClientParams;
+import ru.bulldog.justmap.enums.ScreenPosition;
 import ru.bulldog.justmap.util.DataUtil;
-import ru.bulldog.justmap.util.ScreenPosition;
 
 public class AdvancedInfo {
 

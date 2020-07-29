@@ -14,10 +14,11 @@ import net.minecraft.text.TranslatableText;
 
 import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.config.ConfigKeeper.EnumEntry;
-import ru.bulldog.justmap.map.DirectionArrow;
+import ru.bulldog.justmap.enums.ScreenPosition;
+import ru.bulldog.justmap.enums.MapShape;
+import ru.bulldog.justmap.enums.ArrowType;
 import ru.bulldog.justmap.map.minimap.Minimap;
 import ru.bulldog.justmap.map.minimap.skin.MapSkin;
-import ru.bulldog.justmap.util.ScreenPosition;
 
 public final class ConfigFactory {
 	
@@ -123,13 +124,13 @@ public final class ConfigFactory {
 				.build());
 		
 		@SuppressWarnings("unchecked")
-		EnumEntry<DirectionArrow.Type> arrowTypeConfig = (EnumEntry<DirectionArrow.Type>) JustMapClient.CONFIG.getEntry("arrow_type");
-		EnumSelectorBuilder<DirectionArrow.Type> arrowTypeEntry = entryBuilder.startEnumSelector(lang("arrow_type"), DirectionArrow.Type.class, arrowTypeConfig.getValue());
+		EnumEntry<ArrowType> arrowTypeConfig = (EnumEntry<ArrowType>) JustMapClient.CONFIG.getEntry("arrow_type");
+		EnumSelectorBuilder<ArrowType> arrowTypeEntry = entryBuilder.startEnumSelector(lang("arrow_type"), ArrowType.class, arrowTypeConfig.getValue());
 		arrowTypeEntry.setSaveConsumer(val -> arrowTypeConfig.setValue(val))
 					  .setDefaultValue(arrowTypeConfig.getDefault());
 		@SuppressWarnings("unchecked")
-		EnumEntry<Minimap.Shape> mapShapeConfig = (EnumEntry<Minimap.Shape>) JustMapClient.CONFIG.getEntry("map_shape");
-		EnumSelectorBuilder<Minimap.Shape> mapShapeEntry = entryBuilder.startEnumSelector(lang("map_shape"), Minimap.Shape.class, mapShapeConfig.getValue());
+		EnumEntry<MapShape> mapShapeConfig = (EnumEntry<MapShape>) JustMapClient.CONFIG.getEntry("map_shape");
+		EnumSelectorBuilder<MapShape> mapShapeEntry = entryBuilder.startEnumSelector(lang("map_shape"), MapShape.class, mapShapeConfig.getValue());
 		mapShapeEntry.setSaveConsumer(val -> mapShapeConfig.setValue(val))
 					 .setDefaultValue(mapShapeConfig.getDefault());
 		FloatSliderBuilder doubleSlider = new FloatSliderBuilder(entryBuilder.getResetButtonKey(), lang("skin_border_scale"), JustMapClient.CONFIG.getFloat("skin_scale"), 0.5F, 3.0F)

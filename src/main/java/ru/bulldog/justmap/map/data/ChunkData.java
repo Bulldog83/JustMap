@@ -304,11 +304,4 @@ public class ChunkData {
 	public boolean hasSlime() {
 		return this.slime;
 	}
-	
-	public void updateWorld(World world) {
-		if (!this.world.equals(world)) {
-			this.resetChunk();
-			this.world = world;
-		}
-	}
 }

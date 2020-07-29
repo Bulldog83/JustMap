@@ -106,7 +106,7 @@ public class MapSkin extends Image {
 		try {
 			return SKINS.get(id);
 		} catch(IndexOutOfBoundsException ex) {
-			JustMap.LOGGER.logWarning(ex.getMessage());
+			JustMap.LOGGER.warning(ex.getMessage());
 		}
 		
 		return SKINS.get(0);

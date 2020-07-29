@@ -9,6 +9,8 @@ import ru.bulldog.justmap.advancedinfo.TimeInfo;
 import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.client.config.ClientConfig;
 import ru.bulldog.justmap.client.config.ClientParams;
+import ru.bulldog.justmap.enums.MapShape;
+import ru.bulldog.justmap.enums.TextAlignment;
 import ru.bulldog.justmap.map.IMap;
 import ru.bulldog.justmap.map.data.WorldData;
 import ru.bulldog.justmap.map.data.DimensionManager;
@@ -21,7 +23,6 @@ import ru.bulldog.justmap.map.waypoint.WaypointEditor;
 import ru.bulldog.justmap.map.waypoint.WaypointKeeper;
 import ru.bulldog.justmap.util.DataUtil;
 import ru.bulldog.justmap.util.Dimension;
-import ru.bulldog.justmap.util.RenderUtil.TextAlignment;
 import ru.bulldog.justmap.util.RuleUtil;
 import ru.bulldog.justmap.util.math.MathUtil;
 import ru.bulldog.justmap.util.math.RandomUtil;
@@ -43,11 +44,6 @@ import java.util.List;
 import java.util.stream.Stream;
 
 public class Minimap implements IMap{	
-	public static enum Shape {
-		CIRCLE,
-		SQUARE
-	}
-	
 	private static final MinecraftClient minecraft = DataUtil.getMinecraft();
 	
 	private final TextManager textManager;	
@@ -315,7 +311,7 @@ public class Minimap implements IMap{
 	}
 	
 	public static boolean isRound() {
-		return !isBig() && (ClientParams.mapShape == Shape.CIRCLE);
+		return !isBig() && (ClientParams.mapShape == MapShape.CIRCLE);
 	}
 	
 	public boolean isMapVisible() {

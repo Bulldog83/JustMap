@@ -31,7 +31,7 @@ public final class ConfigKeeper {
 	public Entry<?> getEntry(String key) {
 		Entry<?> entry = configEntries.get(key);
 		if (entry == null) {
-			JustMap.LOGGER.logWarning(String.format("Entry '%s' doesn't exists.", key));			
+			JustMap.LOGGER.warning(String.format("Entry '%s' doesn't exists.", key));			
 			return null;
 		}
 		
@@ -41,7 +41,7 @@ public final class ConfigKeeper {
 	public Object getValue(String key) {
 		Entry<?> entry = getEntry(key);
 		if (entry == null) {
-			JustMap.LOGGER.logWarning(String.format("Empty value will be returned.", key));			
+			JustMap.LOGGER.warning(String.format("Empty value will be returned.", key));			
 			return null;
 		}
 		

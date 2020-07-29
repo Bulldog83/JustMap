@@ -105,18 +105,6 @@ public class RegionData {
 		return image;
 	}
 	
-	public void updateWorld(World world, boolean worldmap) {
-		this.worldmap = worldmap;
-		if (world == null) return;
-		if (!world.equals(this.world)) {
-			JustMap.LOGGER.debug("Region {} ({}) world changed!", regPos, layer);
-			this.cacheDir = StorageUtil.cacheDir(world);
-			this.world = world;
-			this.clear();
-			this.updateImage(true);
-		}
-	}
-	
 	public void updateImage(boolean needUpdate) {
 		if (updating) return;
 		this.updating = true;
@@ -279,16 +267,6 @@ public class RegionData {
 			this.updateImage(true);
 			if (texture != null) {
 				this.updateTexture();
-			}
-		}
-	}
-	
-	private void clear() {
-		synchronized (imageLock) {
-			this.image.fill(Colors.BLACK);
-			if (texture != null) {
-				this.overlay.fill(Colors.TRANSPARENT);
-				this.texture.fill(Colors.BLACK);
 			}
 		}
 	}

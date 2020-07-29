@@ -43,7 +43,6 @@ public class WorldData {
 			if(regions.containsKey(regPos)) {
 				region = this.regions.get(regPos);
 				region.setCenter(new ChunkPos(map.getCenter()));
-				region.updateWorld(world, map.isWorldmap());
 			} else {
 				region = new RegionData(map, this, regPos);
 				regions.put(regPos, region);
@@ -93,11 +92,6 @@ public class WorldData {
 
 	public World getWorld() {
 		return this.world;
-	}
-	
-	public void updateWorld(World world) {
-		this.chunkManager.updateWorld(world);
-		this.world = world;
 	}
 	
 	public void updateMap() {

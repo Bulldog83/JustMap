@@ -236,8 +236,8 @@ public class MapTexture {
 			JustMap.LOGGER.debug("Image saved: {}", imageFile);
 			pngImage.flush();
 		} catch (Exception ex) {
-			JustMap.LOGGER.logWarning("Can't save image: " + imageFile.toString());
-			JustMap.LOGGER.logWarning(ex.getLocalizedMessage());
+			JustMap.LOGGER.warning("Can't save image: " + imageFile.toString());
+			JustMap.LOGGER.warning(ex.getLocalizedMessage());
 		}
 	}
 	
@@ -254,8 +254,8 @@ public class MapTexture {
 				JustMap.LOGGER.debug("Image loaded: {}", png);
 				return true;
 			} catch (Exception ex) {
-				JustMap.LOGGER.logWarning("Can't load image: " + png.toString());
-				JustMap.LOGGER.logWarning(ex.getLocalizedMessage());
+				JustMap.LOGGER.warning("Can't load image: " + png.toString());
+				JustMap.LOGGER.warning(ex.getLocalizedMessage());
 				return false;
 			}
 		}

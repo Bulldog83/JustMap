@@ -1,15 +1,17 @@
 package ru.bulldog.justmap.client.config;
 
-import ru.bulldog.justmap.map.DirectionArrow;
-import ru.bulldog.justmap.map.minimap.Minimap;
-import ru.bulldog.justmap.util.ScreenPosition;
+import ru.bulldog.justmap.enums.ScreenPosition;
+import ru.bulldog.justmap.enums.MapShape;
+import ru.bulldog.justmap.enums.MultiworldDetection;
+import ru.bulldog.justmap.enums.ArrowType;
 
 public class ClientParams {
 	public static ScreenPosition mapPosition = ScreenPosition.TOP_RIGHT;
 	public static ScreenPosition infoPosition = ScreenPosition.TOP_LEFT;
 	public static ScreenPosition itemsPosition = ScreenPosition.MIDDLE_LEFT;
-	public static DirectionArrow.Type arrowIconType = DirectionArrow.Type.DIRECTION_ARROW;
-	public static Minimap.Shape mapShape = Minimap.Shape.SQUARE;
+	public static ArrowType arrowIconType = ArrowType.DIRECTION_ARROW;
+	public static MapShape mapShape = MapShape.SQUARE;
+	public static MultiworldDetection multiworldDetection = MultiworldDetection.AUTO;
 	
 	public static int positionOffset = 4;
 	public static int mapSize = 128;
@@ -79,6 +81,8 @@ public class ClientParams {
 	public static int purgeDelay = 60;
 	public static int purgeAmount = 1500;
 	public static boolean forceUpdate = false;
+	
+	public static boolean detectMultiworlds = true;
 	
 	public static boolean showWaypoints = true;
 	public static boolean jumpToWaypoints = true;

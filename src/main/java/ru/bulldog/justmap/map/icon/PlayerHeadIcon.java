@@ -64,7 +64,7 @@ public class PlayerHeadIcon {
 				try {
 					this.playerSkin.load(DataUtil.getMinecraft().getResourceManager());
 				} catch (IOException ex) {
-					JustMap.LOGGER.logWarning(ex.getLocalizedMessage());
+					JustMap.LOGGER.warning(ex.getLocalizedMessage());
 				}
 				this.success = true;
 			}
@@ -75,7 +75,7 @@ public class PlayerHeadIcon {
 			try {
 				this.playerSkin.load(DataUtil.getMinecraft().getResourceManager());
 			} catch (IOException ex) {
-				JustMap.LOGGER.logWarning(ex.getLocalizedMessage());
+				JustMap.LOGGER.warning(ex.getLocalizedMessage());
 			}
 		}
 	}

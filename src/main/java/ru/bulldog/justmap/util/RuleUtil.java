@@ -19,6 +19,10 @@ public class RuleUtil {
 		
 		return false;
 	}
+	
+	public static boolean detectMultiworlds() {
+		return DataUtil.isOnline() && ClientParams.detectMultiworlds;
+	}
 
 	public static boolean needRenderCaves(World world, BlockPos playerPos) {
 		boolean allowCaves = isAllowed(ClientParams.drawCaves, MapGameRules.ALLOW_CAVES_MAP);

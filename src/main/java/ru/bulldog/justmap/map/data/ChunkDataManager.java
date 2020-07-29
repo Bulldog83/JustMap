@@ -31,16 +31,10 @@ class ChunkDataManager {
 	private final Set<ChunkPos> requestedChunks = new HashSet<>();
 	private final WorldData mapData;
 	private final WorldChunk emptyChunk;
-	private World world;
 	
 	ChunkDataManager(WorldData data, World world) {
 		this.emptyChunk = new EmptyChunk(world, new ChunkPos(0, 0));
 		this.mapData = data;
-		this.world = world;
-	}
-	
-	void updateWorld(World world) {
-		this.world = world;
 	}
 
 	ChunkData getChunk(ChunkPos chunkPos) {
@@ -54,7 +48,6 @@ class ChunkDataManager {
 		synchronized (mapChunks) {
 			if (this.hasChunk(chunkPos)) {
 				mapChunk = this.mapChunks.get(chunkPos);
-				mapChunk.updateWorld(world);
 			} else {
 				mapChunk = new ChunkData(mapData, chunkPos);
 				this.mapChunks.put(chunkPos, mapChunk);
@@ -117,7 +110,7 @@ class ChunkDataManager {
 	private WorldChunk callSaves(World world, ChunkPos chunkPos) {
 		long usedPct = MemoryUtil.getMemoryUsage();
 		if (usedPct > 85L) {
-			JustMap.LOGGER.logWarning("Not enough memory, can't load more chunks.");
+			JustMap.LOGGER.warning("Not enough memory, can't load more chunks.");
 			return this.emptyChunk;
         }
 		

@@ -90,7 +90,7 @@ public class Waypoint {
 		waypoint.pos = pos;
 		waypoint.setIcon(Waypoint.getIcon(Icons.CROSS), Colors.RED);
 		
-		JustMap.LOGGER.logInfo("Created Death waypoint at " + waypoint.pos.toShortString());
+		JustMap.LOGGER.info("Created Death waypoint at " + waypoint.pos.toShortString());
 		
 		WaypointKeeper.getInstance().addNew(waypoint);
 		WaypointKeeper.getInstance().saveWaypoints();

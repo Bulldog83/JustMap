@@ -65,6 +65,10 @@ public class DataUtil {
 		currentLevel = getLevel(currentLayer, coordY);
 	}
 	
+	public static boolean isOnline() {
+		return !minecraft.isIntegratedServerRunning();
+	}
+	
 	public static IMap getMap() {
 		return minecraft.currentScreen instanceof Worldmap ? (Worldmap) minecraft.currentScreen : JustMapClient.MAP;
 	}

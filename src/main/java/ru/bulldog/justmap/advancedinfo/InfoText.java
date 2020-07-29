@@ -1,10 +1,9 @@
 package ru.bulldog.justmap.advancedinfo;
 
+import ru.bulldog.justmap.enums.TextAlignment;
 import ru.bulldog.justmap.util.Colors;
 import ru.bulldog.justmap.util.DataUtil;
 import ru.bulldog.justmap.util.RenderUtil;
-import ru.bulldog.justmap.util.RenderUtil.TextAlignment;
-
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.util.math.MatrixStack;

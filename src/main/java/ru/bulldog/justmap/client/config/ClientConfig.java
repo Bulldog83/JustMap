@@ -10,9 +10,10 @@ import ru.bulldog.justmap.config.ConfigKeeper.EnumEntry;
 import ru.bulldog.justmap.config.ConfigKeeper.FloatRange;
 import ru.bulldog.justmap.config.ConfigKeeper.IntegerEntry;
 import ru.bulldog.justmap.config.ConfigKeeper.IntegerRange;
-import ru.bulldog.justmap.map.DirectionArrow;
-import ru.bulldog.justmap.map.minimap.Minimap;
-import ru.bulldog.justmap.util.ScreenPosition;
+import ru.bulldog.justmap.enums.ScreenPosition;
+import ru.bulldog.justmap.map.data.DimensionManager;
+import ru.bulldog.justmap.enums.MapShape;
+import ru.bulldog.justmap.enums.ArrowType;
 
 public class ClientConfig extends Config {
 	
@@ -29,7 +30,7 @@ public class ClientConfig extends Config {
 	private ClientConfig() {
 		KEEPER.registerEntry("map_visible", new BooleanEntry(ClientParams.mapVisible, (b) -> ClientParams.mapVisible = b, () -> ClientParams.mapVisible));
 		KEEPER.registerEntry("map_position", new EnumEntry<ScreenPosition>(ClientParams.mapPosition, (e) -> ClientParams.mapPosition = e, () -> ClientParams.mapPosition));
-		KEEPER.registerEntry("arrow_type", new EnumEntry<DirectionArrow.Type>(ClientParams.arrowIconType, (e) -> ClientParams.arrowIconType = e, () -> ClientParams.arrowIconType));
+		KEEPER.registerEntry("arrow_type", new EnumEntry<ArrowType>(ClientParams.arrowIconType, (e) -> ClientParams.arrowIconType = e, () -> ClientParams.arrowIconType));
 		KEEPER.registerEntry("map_offset", new IntegerEntry(ClientParams.positionOffset, (i) -> ClientParams.positionOffset = i, () -> ClientParams.positionOffset));
 		KEEPER.registerEntry("map_size", new IntegerRange(ClientParams.mapSize, (i) -> ClientParams.mapSize = i, () -> ClientParams.mapSize, 16, 256));
 		KEEPER.registerEntry("big_map_size", new IntegerRange(ClientParams.bigMapSize, (i) -> ClientParams.bigMapSize = i, () -> ClientParams.bigMapSize, 256, 400));
@@ -102,7 +103,7 @@ public class ClientConfig extends Config {
 		KEEPER.registerEntry("worldmap_icon_size", new IntegerRange(ClientParams.worldmapIconSize, (i) -> ClientParams.worldmapIconSize = i, () -> ClientParams.worldmapIconSize, 8, 16));
 		KEEPER.registerEntry("info_position", new EnumEntry<ScreenPosition>(ClientParams.infoPosition, (e) -> ClientParams.infoPosition = e, () -> ClientParams.infoPosition));
 		KEEPER.registerEntry("items_position", new EnumEntry<ScreenPosition>(ClientParams.itemsPosition, (e) -> ClientParams.itemsPosition = e, () -> ClientParams.itemsPosition));
-		KEEPER.registerEntry("map_shape", new EnumEntry<Minimap.Shape>(ClientParams.mapShape, (e) -> ClientParams.mapShape = e, () -> ClientParams.mapShape));
+		KEEPER.registerEntry("map_shape", new EnumEntry<MapShape>(ClientParams.mapShape, (e) -> ClientParams.mapShape = e, () -> ClientParams.mapShape));
 		
 		JsonObject config = ConfigWriter.load();
 		if (config.size() > 0) {
@@ -114,7 +115,8 @@ public class ClientConfig extends Config {
 
 	@Override
 	public void saveChanges()  {
-		ConfigWriter.save(KEEPER.toJson());
+		DimensionManager.onConfigUpdate();
 		JustMapClient.MAP.updateMapParams();
+		ConfigWriter.save(KEEPER.toJson());
 	}
 }

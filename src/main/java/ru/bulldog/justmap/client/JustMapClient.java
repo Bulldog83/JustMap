@@ -22,7 +22,6 @@ import net.minecraft.client.gui.screen.world.SelectWorldScreen;
 import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.advancedinfo.AdvancedInfo;
 import ru.bulldog.justmap.client.config.ClientConfig;
-import ru.bulldog.justmap.client.network.SpigotAgent;
 import ru.bulldog.justmap.event.ChunkUpdateListener;
 import ru.bulldog.justmap.map.data.DimensionManager;
 import ru.bulldog.justmap.map.minimap.Minimap;
@@ -33,6 +32,7 @@ public class JustMapClient implements ClientModInitializer {
 	public final static MinecraftClient MINECRAFT = MinecraftClient.getInstance();
 	public final static ClientConfig CONFIG = ClientConfig.get();
 	public final static Minimap MAP = new Minimap();
+	public static boolean canMapping = false;
 	
 	private boolean isOnTitleScreen = true;
 	
@@ -40,7 +40,6 @@ public class JustMapClient implements ClientModInitializer {
 	public void onInitializeClient() {
 		KeyHandler.initKeyBindings();
 
-		SpigotAgent.PACKET_REGISTRY.register(SpigotAgent.CHANNEL_ID, SpigotAgent.CONSUMER);
 		ClientChunkEvents.CHUNK_LOAD.register(DimensionManager::onChunkLoad);
 		ClientTickEvents.END_CLIENT_TICK.register(minecraft -> {
 			boolean isTitle = this.isOnTitleScreen(minecraft.currentScreen);
@@ -50,13 +49,12 @@ public class JustMapClient implements ClientModInitializer {
 			this.isOnTitleScreen = isTitle;
 			if (isOnTitleScreen || !isMappingAllowed()) return;
 
-			SpigotAgent.sendRequest("GetServer");
 			DataUtil.update();
 			KeyHandler.update();
 			JustMapClient.MAP.update();
+			AdvancedInfo.getInstance().updateInfo();
 			DimensionManager.clearCache();
 			DimensionManager.memoryControl();
-			AdvancedInfo.getInstance().updateInfo();
 			DimensionManager.getData(minecraft.world).updateMap();
 			ChunkUpdateListener.proceed();
 		});
@@ -68,12 +66,13 @@ public class JustMapClient implements ClientModInitializer {
 	
 	private static void stop() {
 		ChunkUpdateListener.stop();
-		JustMap.WORKER.execute("Clearing map cache...", DimensionManager::clearData);
+		JustMap.WORKER.execute("Clearing map cache...", DimensionManager::close);
 	}
 	
 	public static boolean isMappingAllowed() {
 		MinecraftClient minecraft = DataUtil.getMinecraft();
-		return minecraft.world != null && (minecraft.getCameraEntity() != null || minecraft.player != null);
+		return canMapping && minecraft.world != null &&
+			   (minecraft.getCameraEntity() != null || minecraft.player != null);
 	}
 	
 	private boolean isOnTitleScreen(Screen currentScreen) {

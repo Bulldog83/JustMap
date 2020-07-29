@@ -34,8 +34,8 @@ public final class SkinLoader extends JsonFactory {
 			try {
 				loadSkin(folder, skinFile);
 			} catch (Exception ex) {
-				JustMap.LOGGER.logWarning("Can't load skin: " + skinFile.getPath());
-				JustMap.LOGGER.logWarning(ex.getLocalizedMessage());
+				JustMap.LOGGER.warning("Can't load skin: " + skinFile.getPath());
+				JustMap.LOGGER.warning(ex.getLocalizedMessage());
 			}
 		}
 	}

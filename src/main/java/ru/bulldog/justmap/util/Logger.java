@@ -34,31 +34,31 @@ public final class Logger {
 	}
 	
 	public void catching(Throwable ex) {
-		this.logError(ex.getLocalizedMessage());
+		this.error(ex.getLocalizedMessage());
 		LOGGER.catching(ex);
 	}
 	
-	public void logInfo(String message) {
+	public void info(String message) {
 		this.log(Level.INFO, message);
 	}
 	
-	public void logWarning(String message) {
+	public void warning(String message) {
 		this.log(Level.WARN, message);
 	}
 	
-	public void logWarning(String message, Object obj, Exception ex) {
+	public void warning(String message, Object obj, Exception ex) {
 		LOGGER.warn(modPref + message, obj, ex);
 	}
 	
-	public void logError(String message) {
+	public void error(String message) {
 		this.log(Level.ERROR, message);
 	}
 	
-	public void logError(String message, Object obj, Exception ex) {
+	public void error(String message, Object obj, Exception ex) {
 		LOGGER.error(modPref + message, obj, ex);
 	}
 	
-	public void logError(String message, Exception ex) {
+	public void error(String message, Exception ex) {
 		LOGGER.error(modPref + message, ex);
 	}
 }

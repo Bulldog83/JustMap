@@ -39,8 +39,8 @@ public class ImageUtil {
 			try (InputStream fis = new FileInputStream(image)) {
 				return NativeImage.read(fis);
 			} catch (IOException ex) {
-				JustMap.LOGGER.logWarning(String.format("Can't load texture image: %s. Will be created empty image.", image));
-				JustMap.LOGGER.logWarning(String.format("Cause: %s.", ex.getMessage()));
+				JustMap.LOGGER.warning(String.format("Can't load texture image: %s. Will be created empty image.", image));
+				JustMap.LOGGER.warning(String.format("Cause: %s.", ex.getMessage()));
 			}
 		}		
 		return new NativeImage(w, h, false);
@@ -52,8 +52,8 @@ public class ImageUtil {
 			try (Resource resource = resourceManager.getResource(image)) {
 				return NativeImage.read(resource.getInputStream());			
 			} catch (IOException e) {
-				JustMap.LOGGER.logWarning(String.format("Can't load texture image: %s. Will be created empty image.", image));
-				JustMap.LOGGER.logWarning(String.format("Cause: %s.", e.getMessage()));
+				JustMap.LOGGER.warning(String.format("Can't load texture image: %s. Will be created empty image.", image));
+				JustMap.LOGGER.warning(String.format("Cause: %s.", e.getMessage()));
 			}
 		}		
 		return new NativeImage(w, h, false);

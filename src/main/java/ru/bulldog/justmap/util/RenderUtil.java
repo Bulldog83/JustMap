@@ -25,11 +25,6 @@ import ru.bulldog.justmap.map.minimap.skin.MapSkin.RenderData;
 import org.lwjgl.opengl.GL11;
 
 public class RenderUtil extends DrawableHelper {	
-	public static enum TextAlignment {
-		LEFT,
-		CENTER,
-		RIGHT
-	}
 	
 	private RenderUtil() {}
 	
