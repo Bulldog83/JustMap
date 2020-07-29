@@ -163,7 +163,7 @@ public class Minimap implements IMap{
 	
 	public void prepareMap(PlayerEntity player) {
 		this.world = player.world;
-		this.worldData = DimensionManager.getData(world);
+		this.worldData = DimensionManager.getData();
 		BlockPos pos = DataUtil.currentPos();
 		
 		int posX = pos.getX();

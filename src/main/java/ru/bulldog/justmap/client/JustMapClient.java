@@ -53,9 +53,8 @@ public class JustMapClient implements ClientModInitializer {
 			KeyHandler.update();
 			JustMapClient.MAP.update();
 			AdvancedInfo.getInstance().updateInfo();
-			DimensionManager.clearCache();
+			DimensionManager.update();
 			DimensionManager.memoryControl();
-			DimensionManager.getData(minecraft.world).updateMap();
 			ChunkUpdateListener.proceed();
 		});
 		ClientLifecycleEvents.CLIENT_STOPPING.register(client -> {

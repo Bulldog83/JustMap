@@ -85,7 +85,7 @@ public class Worldmap extends MapScreen implements IMap {
 		
 		PlayerEntity player = client.player;
 
-		this.worldData = DimensionManager.getData(client.world);
+		this.worldData = DimensionManager.getData();
 		Identifier dimId = client.world.getDimensionRegistryKey().getValue();
 		if (centerPos == null || !dimId.equals(dimension)) {
 			this.centerPos = DataUtil.currentPos();
