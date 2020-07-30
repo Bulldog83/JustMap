@@ -4,6 +4,7 @@ import ru.bulldog.justmap.client.config.ClientParams;
 
 public enum MultiworldDetection {
 	MANUAL,
+	MIXED,
 	AUTO;
 	
 	public static boolean isManual() {

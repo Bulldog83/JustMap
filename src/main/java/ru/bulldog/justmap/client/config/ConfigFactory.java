@@ -10,20 +10,21 @@ import me.shedaniel.clothconfig2.impl.builders.EnumSelectorBuilder;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
 
 import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.config.ConfigKeeper.EnumEntry;
 import ru.bulldog.justmap.enums.ScreenPosition;
 import ru.bulldog.justmap.enums.MapShape;
+import ru.bulldog.justmap.enums.MultiworldDetection;
 import ru.bulldog.justmap.enums.ArrowType;
 import ru.bulldog.justmap.map.minimap.Minimap;
 import ru.bulldog.justmap.map.minimap.skin.MapSkin;
+import ru.bulldog.justmap.util.LangUtil;
 
 public final class ConfigFactory {
 	
 	private static Text lang(String key) {
-		return new TranslatableText("justmap.configuration." + key);
+		return LangUtil.getText("configuration", key);
 	}
 	
 	public static Screen getConfigScreen(Screen parent) {
@@ -44,6 +45,11 @@ public final class ConfigFactory {
 		EnumSelectorBuilder<ScreenPosition> drawPosEntry = entryBuilder.startEnumSelector(lang("map_position"), ScreenPosition.class, drawPosConfig.getValue());
 		drawPosEntry.setSaveConsumer(val -> drawPosConfig.setValue(val))
 					.setDefaultValue(drawPosConfig.getDefault());
+		@SuppressWarnings("unchecked")
+		EnumEntry<MultiworldDetection> mwDetectConfig = (EnumEntry<MultiworldDetection>) JustMapClient.CONFIG.getEntry("multiworld_detection");
+		EnumSelectorBuilder<MultiworldDetection> mwDetectEntry = entryBuilder.startEnumSelector(lang("multiworld_detection_type"), MultiworldDetection.class, mwDetectConfig.getValue());
+		mwDetectEntry.setSaveConsumer(val -> mwDetectConfig.setValue(val))
+					 .setDefaultValue(mwDetectConfig.getDefault());
 		
 		general.addEntry(drawPosEntry.build());
 		general.addEntry(entryBuilder.startIntField(lang("map_offset"), JustMapClient.CONFIG.getInt("map_offset"))
@@ -84,7 +90,12 @@ public final class ConfigFactory {
 				.setSaveConsumer(val -> JustMapClient.CONFIG.setBoolean("rotate_map", val))
 				.setDefaultValue((boolean) JustMapClient.CONFIG.getDefault("rotate_map"))
 				.build());
-		
+		general.addEntry(entryBuilder.startBooleanToggle(lang("detect_multiworlds"), JustMapClient.CONFIG.getBoolean("detect_multiworlds"))
+				.setSaveConsumer(val -> JustMapClient.CONFIG.setBoolean("detect_multiworlds", val))
+				.setDefaultValue((boolean) JustMapClient.CONFIG.getDefault("detect_multiworlds"))
+				.build());
+		general.addEntry(mwDetectEntry.build());
+
 		ConfigCategory mapDetails = configBuilder.getOrCreateCategory(lang("category.details"));
 		mapDetails.addEntry(entryBuilder.startBooleanToggle(lang("show_caves"), JustMapClient.CONFIG.getBoolean("show_caves"))
 				.setSaveConsumer(val -> JustMapClient.CONFIG.setBoolean("show_caves", val))

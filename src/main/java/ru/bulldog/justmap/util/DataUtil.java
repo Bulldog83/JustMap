@@ -127,6 +127,10 @@ public class DataUtil {
 		return posEntity.prevZ + (posEntity.getZ() - posEntity.prevZ) * (double) minecraft.getTickDelta();
 	}
 	
+	public static String shortPosString(BlockPos pos) {
+		return String.format("%d.%d.%d", pos.getX(), pos.getY(), pos.getZ());
+	}
+	
 	public static String posToString(BlockPos pos) {
 		return posToString(pos.getX(), pos.getY(), pos.getZ());
 	}

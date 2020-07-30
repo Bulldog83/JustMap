@@ -2,7 +2,8 @@ package ru.bulldog.justmap.map.waypoint;
 
 import com.mojang.datafixers.util.Pair;
 
-import ru.bulldog.justmap.client.MapScreen;
+import ru.bulldog.justmap.JustMap;
+import ru.bulldog.justmap.client.screen.MapScreen;
 import ru.bulldog.justmap.map.waypoint.Waypoint.Icon;
 import ru.bulldog.justmap.util.Colors;
 import ru.bulldog.justmap.util.DataUtil;
@@ -21,11 +22,14 @@ import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
+import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.dimension.DimensionType;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import org.lwjgl.glfw.GLFW;
 
 public class WaypointsList extends MapScreen {
 	private static class Entry implements Element {
@@ -126,7 +130,7 @@ public class WaypointsList extends MapScreen {
 		}
 	}
 	
-	private static final Text title = new LiteralText("Waypoints");
+	private static final Text TITLE = new TranslatableText(JustMap.MODID + ".gui.screen.waypoints_list");
 	
 	private WaypointKeeper keeper = WaypointKeeper.getInstance();
 	private Identifier currentDim;
@@ -143,7 +147,7 @@ public class WaypointsList extends MapScreen {
 	private ButtonWidget addButton, closeButton;
 	
 	public WaypointsList(Screen parent) {
-		super(title, parent);
+		super(TITLE, parent);
 		
 		this.dimensions = keeper.getDimensions();
 		
@@ -164,10 +168,10 @@ public class WaypointsList extends MapScreen {
 	@Override
 	protected void init() {
 		this.center = width / 2;		
-		this.screenWidth = Math.max(480, center);		
+		this.screenWidth = center > 480 ? center : width > 480 ? 480 : width;
 		this.x = center - screenWidth / 2;		
-		this.prevDimensionButton = new ButtonWidget(x + 10, 10, 20, 20, new LiteralText("<"), (b) -> cycleDimension(-1));
-		this.nextDimensionButton = new ButtonWidget(x + screenWidth - 30, 10, 20, 20, new LiteralText(">"), (b) -> cycleDimension(1));		
+		this.prevDimensionButton = new ButtonWidget(x + 10, 6, 20, 20, new LiteralText("<"), (b) -> cycleDimension(-1));
+		this.nextDimensionButton = new ButtonWidget(x + screenWidth - 30, 6, 20, 20, new LiteralText(">"), (b) -> cycleDimension(1));		
 		this.addButton = new ButtonWidget(center - 62, height - 26, 60, 20, lang("create"), (b) -> add());
 		this.closeButton = new ButtonWidget(center + 2, height - 26, 60, 20, lang("close"), (b) -> onClose());
 		this.currentDim = client.world.getDimensionRegistryKey().getValue();
@@ -236,9 +240,8 @@ public class WaypointsList extends MapScreen {
 		entries.forEach(e -> e.render(matrixStack, mouseX, mouseY, delta));
 		
 		String dimensionName = info == null ? lang("unknown").getString() : I18n.translate(info.getFirst());
-		drawCenteredString(matrixStack, textRenderer, dimensionName, center, 15, Colors.WHITE);
-		
-		drawScrollBar();
+		this.drawCenteredString(matrixStack, textRenderer, dimensionName, center, 15, Colors.WHITE);
+		this.drawScrollBar();
 	}
 	
 	private Pair<String, Identifier> getDimensionInfo(Identifier dim) {
@@ -284,5 +287,14 @@ public class WaypointsList extends MapScreen {
 		updateEntries();
 		
 		return true;
+	}
+	
+	@Override
+	public boolean keyPressed(int int_1, int int_2, int int_3) {
+		if (int_1 == GLFW.GLFW_KEY_U) {
+			this.onClose();
+			return true;
+		}		
+		return super.keyPressed(int_1, int_2, int_3);
 	}
 }

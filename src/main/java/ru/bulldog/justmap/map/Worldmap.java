@@ -19,12 +19,12 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.world.dimension.DimensionType;
 
 import ru.bulldog.justmap.client.JustMapClient;
-import ru.bulldog.justmap.client.MapScreen;
 import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.client.config.ConfigFactory;
+import ru.bulldog.justmap.client.screen.MapScreen;
 import ru.bulldog.justmap.map.data.Layer;
 import ru.bulldog.justmap.map.data.WorldData;
-import ru.bulldog.justmap.map.data.DimensionManager;
+import ru.bulldog.justmap.map.data.WorldManager;
 import ru.bulldog.justmap.map.data.ChunkData;
 import ru.bulldog.justmap.map.data.RegionData;
 import ru.bulldog.justmap.map.icon.WaypointIcon;
@@ -85,7 +85,7 @@ public class Worldmap extends MapScreen implements IMap {
 		
 		PlayerEntity player = client.player;
 
-		this.worldData = DimensionManager.getData();
+		this.worldData = WorldManager.getData();
 		Identifier dimId = client.world.getDimensionRegistryKey().getValue();
 		if (centerPos == null || !dimId.equals(dimension)) {
 			this.centerPos = DataUtil.currentPos();

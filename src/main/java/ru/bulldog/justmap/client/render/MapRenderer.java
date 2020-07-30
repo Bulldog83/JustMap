@@ -248,7 +248,7 @@ public class MapRenderer {
 	}
 	
 	public void draw(MatrixStack matrix) {
-		if (!minimap.isMapVisible() || !JustMapClient.isMappingAllowed()) return;
+		if (!minimap.isMapVisible() || !JustMapClient.canMapping()) return;
 		
 		this.updateParams();
 		

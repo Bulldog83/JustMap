@@ -6,7 +6,6 @@ import java.nio.file.Path;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.loader.api.FabricLoader;
-
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ServerInfo;
 import net.minecraft.server.MinecraftServer;
@@ -17,6 +16,8 @@ import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.storage.VersionedChunkStorage;
 
 import ru.bulldog.justmap.JustMap;
+import ru.bulldog.justmap.map.data.WorldManager;
+import ru.bulldog.justmap.map.data.WorldKey;
 import ru.bulldog.justmap.mixins.SessionAccessor;
 import ru.bulldog.justmap.util.DataUtil;
 import ru.bulldog.justmap.util.Dimension;
@@ -34,7 +35,6 @@ public final class StorageUtil {
 	private final static Path MAP_ICONS_DIR = MAP_CONFIG_DIR.resolve("icons");
 	
 	private static File filesDir = new File(MAP_DATA_DIR.toFile(), "undefined");
-	private static String currentDim = "unknown";
 	
 	public static VersionedChunkStorage getChunkStorage(ServerWorld world) {
 		File regionDir = new File(savesDir(world), "region");
@@ -74,16 +74,16 @@ public final class StorageUtil {
 	
 	@Environment(EnvType.CLIENT)
 	public static File cacheDir(World world) {
+		String dimension = "undefined";
 		RegistryKey<DimensionType> dimKey = null;
 		if (world != null) {
 			dimKey = world.getDimensionRegistryKey();			
-			String dimension = dimKey.getValue().getPath();
-			if (!currentDim.equals(dimension)) {
-				currentDim = dimension;
-			}			
+			dimension = dimKey.getValue().getPath();			
 		}
 
-		File cacheDir = new File(filesDir(), String.format("cache/%s", currentDim));
+		WorldKey worldKey = WorldManager.getWorldKey();
+		File cacheDir = new File(filesDir(), worldKey.toFolder());
+		File oldCacheDir = new File(filesDir(), String.format("cache/%s", dimension));
 		if (dimKey != null) {
 			int dimId = Dimension.getId(dimKey);
 			if (dimId != Integer.MIN_VALUE) {
@@ -93,8 +93,9 @@ public final class StorageUtil {
 				}				
 			}
 		}
-		
-		if (!cacheDir.exists()) {
+		if (oldCacheDir.exists()) {
+			oldCacheDir.renameTo(cacheDir);
+		} else if (!cacheDir.exists()) {
 			cacheDir.mkdirs();
 		}
 		
@@ -108,11 +109,20 @@ public final class StorageUtil {
 		File mapDataDir = MAP_DATA_DIR.toFile();
 		if (minecraft.isIntegratedServerRunning()) {
 			MinecraftServer server = minecraft.getServer();
-			String name = scrubNameFile(server.getSaveProperties().getLevelName());
+			String name = scrubFileName(server.getSaveProperties().getLevelName());
 			filesDir = new File(mapDataDir, String.format("local/%s", name));
 		} else if (serverInfo != null) {
-			String name = scrubNameFile(serverInfo.name);
-			filesDir = new File(mapDataDir, String.format("servers/%s", name));
+			String name = scrubFileName(serverInfo.name);
+			String address = serverInfo.address;
+			if (address.contains(":")) {
+				int end = address.indexOf(":") - 1;
+				address = address.substring(0, end);
+			}
+			filesDir = new File(mapDataDir, String.format("servers/%s_(%s)", name, address));
+			File oldDir = new File(mapDataDir, String.format("servers/%s", name));
+			if (oldDir.exists()) {
+				oldDir.renameTo(filesDir);
+			}
 		}
 		
 		if (!filesDir.exists()) {
@@ -122,9 +132,9 @@ public final class StorageUtil {
 		return filesDir;
 	}
 
-	private static String scrubNameFile(String input) {
+	private static String scrubFileName(String input) {
 		input = input.replaceAll("[/\\ ]+", "_");
-		input = input.replaceAll("[,:|\\<\\>\"\\?\\*]", "_");
+		input = input.replaceAll("[,:&\"\\|\\<\\>\\?\\*]", "_");
 
 		return input;
 	}

@@ -23,7 +23,7 @@ import net.minecraft.network.ClientConnection;
 import net.minecraft.network.MessageType;
 import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.map.MapGameRules;
-import ru.bulldog.justmap.map.data.DimensionManager;
+import ru.bulldog.justmap.map.data.WorldManager;
 import ru.bulldog.justmap.map.waypoint.Waypoint;
 
 @Mixin(value = ClientPlayNetworkHandler.class, priority = 100)
@@ -50,7 +50,7 @@ public abstract class ClientPlayNetworkHandlerMixin {
 	@Inject(method = "onPlayerSpawnPosition", at = @At("TAIL"))
 	public void onPlayerSpawnPosition(PlayerSpawnPositionS2CPacket packet, CallbackInfo cinfo) {
 		JustMap.LOGGER.debug("World spawn position set to {}", packet.getPos().toShortString());
-		DimensionManager.onWorldPosChanged(packet.getPos());
+		WorldManager.onWorldPosChanged(packet.getPos());
 	}
 	
 	@Inject(method = "onGameMessage", at = @At("HEAD"), cancellable = true)

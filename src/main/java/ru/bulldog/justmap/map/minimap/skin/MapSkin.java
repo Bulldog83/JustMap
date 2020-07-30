@@ -297,6 +297,7 @@ public class MapSkin extends Image {
 	
 	static {
 		addSquareSkin("Minecraft Map", new Identifier(JustMap.MODID, "textures/skin/skin_def_map.png"), 64, 64, 5, false, true);
+		addSquareSkin("Minecraft LaF", new Identifier(JustMap.MODID, "textures/skin/skin_gui_laf.png"), 64, 64, 3, false, true);
 		addSquareSkin("Minecraft Gui", new Identifier(JustMap.MODID, "textures/skin/skin_def_gui.png"), 64, 64, 5, true);
 		addSquareSkin("Minecraft Gui Fancy", new Identifier(JustMap.MODID, "textures/skin/skin_def_gui_fancy.png"), 64, 64, 7, true);
 		addSquareSkin("Metal Frame", new Identifier(JustMap.MODID, "textures/skin/skin_simple_metal.png"), 64, 64, 4, true);

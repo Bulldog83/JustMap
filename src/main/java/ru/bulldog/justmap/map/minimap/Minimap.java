@@ -13,7 +13,7 @@ import ru.bulldog.justmap.enums.MapShape;
 import ru.bulldog.justmap.enums.TextAlignment;
 import ru.bulldog.justmap.map.IMap;
 import ru.bulldog.justmap.map.data.WorldData;
-import ru.bulldog.justmap.map.data.DimensionManager;
+import ru.bulldog.justmap.map.data.WorldManager;
 import ru.bulldog.justmap.map.data.Layer;
 import ru.bulldog.justmap.map.icon.EntityIcon;
 import ru.bulldog.justmap.map.icon.PlayerIcon;
@@ -163,7 +163,7 @@ public class Minimap implements IMap{
 	
 	public void prepareMap(PlayerEntity player) {
 		this.world = player.world;
-		this.worldData = DimensionManager.getData();
+		this.worldData = WorldManager.getData();
 		BlockPos pos = DataUtil.currentPos();
 		
 		int posX = pos.getX();

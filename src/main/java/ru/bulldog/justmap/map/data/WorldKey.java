@@ -4,12 +4,13 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.World;
+import ru.bulldog.justmap.util.DataUtil;
 
 public class WorldKey {
+	private final Identifier dimension;
 	private String worldId;
 	private String worldName;
 	private BlockPos worldPos;
-	private final Identifier dimension;
 	
 	public WorldKey(RegistryKey<World> worldKey) {
 		this.dimension = worldKey.getValue();
@@ -19,7 +20,7 @@ public class WorldKey {
 	public void setWorldName(String name) {
 		this.worldName = name;
 		if (worldPos != null) {
-			this.worldId = String.format("%s_%s_%s", worldName, dimension, worldPos.toShortString());
+			this.worldId = String.format("%s_%s_%s", worldName, dimension, DataUtil.shortPosString(worldPos));
 		} else {
 			this.worldId = String.format("%s_%s", worldName, dimension);
 		}
@@ -28,9 +29,9 @@ public class WorldKey {
 	public void setWorldPos(BlockPos worldPos) {
 		this.worldPos = worldPos;
 		if (worldName != null) {
-			this.worldId = String.format("%s_%s_%s", worldName, dimension, worldPos.toShortString());
+			this.worldId = String.format("%s_%s_%s", worldName, dimension, DataUtil.shortPosString(worldPos));
 		} else {
-			this.worldId = String.format("%s_%s", dimension, worldPos.toShortString());
+			this.worldId = String.format("%s_%s", dimension, DataUtil.shortPosString(worldPos));
 		}
 		
 	}
@@ -43,14 +44,10 @@ public class WorldKey {
 		return this.worldPos;
 	}
 	
-	public String getWorldId() {
-		return this.worldId;
-	}
-	
 	public void clearName() {
 		this.worldName = null;
 		if (worldPos != null) {
-			this.worldId = String.format("%s_%s", dimension, worldPos.toShortString());
+			this.worldId = String.format("%s_%s", dimension, DataUtil.shortPosString(worldPos));
 		} else {
 			this.worldId = dimension.toString();
 		}
@@ -66,9 +63,8 @@ public class WorldKey {
 	}
 	
 	public String toFolder() {
-		String folder = this.worldId.replaceAll(", ", "_");
-		folder = folder.replaceAll("[\\/]+", "_");
-		folder = folder.replaceAll("[,:|\\<\\>\"\\?\\*]", "_");
+		String folder = this.worldId.replaceAll("[\\/ ]+", "_");
+		folder = folder.replaceAll("[,:&\"\\|\\<\\>\\?\\*]", "_");
 		
 		return folder;
 	}

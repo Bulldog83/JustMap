@@ -153,7 +153,7 @@ public class ChunkData {
 	}
 	
 	public boolean update(Layer layer, int level, boolean forceUpdate) {
-		if (!JustMapClient.isMappingAllowed()) return false;
+		if (!JustMapClient.canMapping()) return false;
 		if (purged || checkUpdating(layer, level)) return false;
 		if (!outdated && forceUpdate) {
 			this.outdated = forceUpdate;
