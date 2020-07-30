@@ -1,5 +1,7 @@
 package ru.bulldog.justmap.client.screen;
 
+import com.mojang.blaze3d.systems.RenderSystem;
+
 import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.screen.Screen;
@@ -48,24 +50,23 @@ public class WorldnameScreen extends Screen {
 			this.y = 0;
 		} else {
 			this.frameHeight = (frameWidth * 10) / 16;
-			btnY = (y + frameHeight) - 25;
 			this.x = center - frameWidth / 2;
 			this.y = height / 2 - frameHeight / 2;
+			btnY = (y + frameHeight) - 25;
 		}
 		Text defaultText = new LiteralText(WorldManager.currentWorldName());
 		this.nameField = new TextFieldWidget(textRenderer, x + 20, y + 40, frameWidth - 40, 20, defaultText);
-		this.saveButton = new ButtonWidget(center - 20, btnY, 40, 20, LangUtil.getText("gui", "save"), (b) -> { this.save(); });
-		this.buttons.add(saveButton);
-		this.children.add(nameField);
+		this.saveButton = new ButtonWidget(center - 30, btnY, 60, 20, LangUtil.getText("gui", "save"), this::onPressSave);
+		this.addButton(saveButton);
+		this.addChild(nameField);
 	}
 	
-	private void save() {
-		String worldName = saveButton.getMessage().getString();
+	private void onPressSave(ButtonWidget button) {
+		String worldName = nameField.getText();
 		worldName = worldName.trim().replaceAll(" +", " ");
 		if (worldName == "") {
 			worldName = "Default";
 		}
-		System.out.println(worldName);
 		WorldManager.setCurrentWorldName(worldName);
 		this.success = true;
 		this.onClose();
@@ -80,16 +81,19 @@ public class WorldnameScreen extends Screen {
 				((Drawable) child).render(matrices, mouseX, mouseY, delta);
 			}
 		}
-		this.buttons.forEach(element -> element.render(matrices, mouseX, mouseY, delta));
+		super.render(matrices, mouseX, mouseY, delta);
 	}
 	
 	@Override
 	public void renderBackground(MatrixStack matrices) {
 		super.renderBackground(matrices);
+		RenderSystem.enableBlend();
+		RenderSystem.defaultBlendFunc();
 		RenderUtil.bindTexture(FRAME_TEXTURE);
 		RenderUtil.startDraw();
 		RenderUtil.addQuad(x, y, frameWidth, frameHeight);
 		RenderUtil.endDraw();
+		RenderSystem.disableBlend();
 	}
 
 	@Override

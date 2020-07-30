@@ -57,21 +57,28 @@ public final class WorldManager {
 				currentWorldName = null;
 				updateWorldKey();
 				close();
+				JustMapClient.startMapping();
 			}
 		} else if (MultiworldDetection.isManual()) {
 			if (currentWorldPos != null) {
 				currentWorldPos = null;
-				updateWorldKey();
 				close();
+				if (currentWorldName == null) {
+					requestWorldName = true;
+				} else {
+					updateWorldKey();
+					JustMapClient.startMapping();
+				}
 			}
 		} else if (MultiworldDetection.isAuto()) {
 			if (currentWorldName != null) {
 				currentWorldName = null;
-				updateWorldKey();
 				close();
 			}
+			onWorldPosChanged(minecraft.world.getSpawnPos());
+		} else if (MultiworldDetection.isMixed()) {
+			onWorldPosChanged(minecraft.world.getSpawnPos());
 		}
-		JustMapClient.startMapping();
 	}
 	
 	public static void onWorldChanged(World world) {
@@ -108,7 +115,7 @@ public final class WorldManager {
 			}
 		}
 		currentWorldPos = newPos;
-		if (!MultiworldDetection.isAuto()) {
+		if (MultiworldDetection.isMixed()) {
 			if (registeredWorlds.containsKey(newPos)) {
 				currentWorldName = registeredWorlds.get(newPos);
 				updateWorldKey();
@@ -137,7 +144,7 @@ public final class WorldManager {
 		}
 		registeredNames.add(name);
 		currentWorldName = name;
-		if (!MultiworldDetection.isManual()) {
+		if (MultiworldDetection.isMixed()) {
 			if (!registeredWorlds.containsKey(currentWorldPos)) {
 				registeredWorlds.put(currentWorldPos, name);
 			}

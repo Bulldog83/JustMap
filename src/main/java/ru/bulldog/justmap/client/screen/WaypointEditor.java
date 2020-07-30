@@ -1,8 +1,9 @@
-package ru.bulldog.justmap.map.waypoint;
+package ru.bulldog.justmap.client.screen;
 
 import ru.bulldog.justmap.JustMap;
-import ru.bulldog.justmap.client.screen.MapScreen;
 import ru.bulldog.justmap.client.widget.TitledWidget;
+import ru.bulldog.justmap.map.waypoint.Waypoint;
+import ru.bulldog.justmap.map.waypoint.WaypointKeeper;
 import ru.bulldog.justmap.map.waypoint.Waypoint.Icon;
 import ru.bulldog.justmap.util.Colors;
 import ru.bulldog.justmap.util.Predicates;

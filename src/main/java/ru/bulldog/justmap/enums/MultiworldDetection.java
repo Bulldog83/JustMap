@@ -14,4 +14,8 @@ public enum MultiworldDetection {
 	public static boolean isAuto() {
 		return ClientParams.multiworldDetection.equals(AUTO);
 	}
+	
+	public static boolean isMixed() {
+		return ClientParams.multiworldDetection.equals(MIXED);
+	}
 }
