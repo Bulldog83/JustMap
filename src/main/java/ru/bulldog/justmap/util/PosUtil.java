@@ -1,49 +1,38 @@
 package ru.bulldog.justmap.util;
 
-import net.minecraft.client.MinecraftClient;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+
+import net.minecraft.util.JsonHelper;
 import net.minecraft.util.math.BlockPos;
-import ru.bulldog.justmap.client.JustMapClient;
 
 public class PosUtil {
-	private static MinecraftClient minecraft = JustMapClient.MINECRAFT;
-	private static BlockPos.Mutable currentPos = new BlockPos.Mutable();
-
-	public static int coordX() {
-		if (minecraft.getCameraEntity() == null) return 0;
-		return (int) Math.ceil(minecraft.getCameraEntity().getX() < 0.0 ? minecraft.getCameraEntity().getX() - 1.0 : minecraft.getCameraEntity().getX());
+	public static String shortPosString(BlockPos pos) {
+		return String.format("%d.%d.%d", pos.getX(), pos.getY(), pos.getZ());
 	}
 
-	public static int coordZ() {
-		if (minecraft.getCameraEntity() == null) return 0;
-		return (int) Math.ceil(minecraft.getCameraEntity().getZ() < 0.0 ? minecraft.getCameraEntity().getZ() - 1.0 : minecraft.getCameraEntity().getZ());
-	}
-
-	public static int coordY() {
-		if (minecraft.getCameraEntity() == null) return 0;
-		return (int) Math.ceil(minecraft.getCameraEntity().getY());
-	}
-
-	public static BlockPos currentPos() {
-		return currentPos.set(coordX(), coordY(), coordZ());
-	}
-	
-	public static double doubleCoordX() {
-		return minecraft.getCameraEntity().prevX + (minecraft.getCameraEntity().getX() - minecraft.getCameraEntity().prevX) * (double) minecraft.getTickDelta();
-	}
-
-	public static double doubleCoordZ() {
-		return minecraft.getCameraEntity().prevZ + (minecraft.getCameraEntity().getZ() - minecraft.getCameraEntity().prevZ) * (double) minecraft.getTickDelta();
-	}
-	
 	public static String posToString(BlockPos pos) {
-		return posToString(pos.getX(), pos.getY(), pos.getZ());
+		return PosUtil.posToString(pos.getX(), pos.getY(), pos.getZ());
 	}
-	
+
 	public static String posToString(double x, double y, double z) {
-		int posX = (int) Math.round(x);
-		int posY = (int) Math.round(y);
-		int posZ = (int) Math.round(z);
+		return String.format("%d, %d, %d", (int) x, (int) y, (int) z);
+	}
+
+	public static JsonElement toJson(BlockPos blockPos) {
+		JsonObject position = new JsonObject();
+		position.addProperty("x", blockPos.getX());
+		position.addProperty("y", blockPos.getY());
+		position.addProperty("z", blockPos.getZ());
 		
-		return String.format("%d, %d, %d", posX, posY, posZ);
+		return position;
+	}
+
+	public static BlockPos fromJson(JsonObject element) {
+		int x = JsonHelper.getInt(element, "x", 0);
+		int y = JsonHelper.getInt(element, "y", 0);
+		int z = JsonHelper.getInt(element, "z", 0);
+		
+		return new BlockPos(x, y, z);
 	}
 }

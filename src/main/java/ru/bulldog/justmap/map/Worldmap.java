@@ -13,25 +13,26 @@ import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.text.LiteralText;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
-import net.minecraft.world.dimension.DimensionType;
 
 import ru.bulldog.justmap.client.JustMapClient;
-import ru.bulldog.justmap.client.MapScreen;
 import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.client.config.ConfigFactory;
+import ru.bulldog.justmap.client.screen.MapScreen;
+import ru.bulldog.justmap.client.screen.WaypointsList;
 import ru.bulldog.justmap.map.data.Layer;
-import ru.bulldog.justmap.map.data.DimensionData;
-import ru.bulldog.justmap.map.data.DimensionManager;
+import ru.bulldog.justmap.map.data.WorldData;
+import ru.bulldog.justmap.map.data.WorldKey;
+import ru.bulldog.justmap.map.data.WorldManager;
 import ru.bulldog.justmap.map.data.ChunkData;
 import ru.bulldog.justmap.map.data.RegionData;
 import ru.bulldog.justmap.map.icon.WaypointIcon;
 import ru.bulldog.justmap.map.waypoint.Waypoint;
 import ru.bulldog.justmap.map.waypoint.WaypointKeeper;
-import ru.bulldog.justmap.map.waypoint.WaypointsList;
 import ru.bulldog.justmap.util.Colors;
+import ru.bulldog.justmap.util.DataUtil;
+import ru.bulldog.justmap.util.Dimension;
 import ru.bulldog.justmap.util.PosUtil;
 import ru.bulldog.justmap.util.math.MathUtil;
 
@@ -64,7 +65,8 @@ public class Worldmap extends MapScreen implements IMap {
 	private long updateInterval = 50;
 	private long updated = 0;
 	private int mapLevel = 0;
-	private Identifier dimension;
+	private WorldData worldData;
+	private WorldKey world;
 	private BlockPos centerPos;
 	private String cursorCoords;
 	private Layer mapLayer;
@@ -84,21 +86,22 @@ public class Worldmap extends MapScreen implements IMap {
 		
 		PlayerEntity player = client.player;
 
-		Identifier dimId = client.world.getDimensionRegistryKey().getValue();
-		if (centerPos == null || !dimId.equals(dimension)) {
-			this.centerPos = PosUtil.currentPos();
-			this.dimension = dimId;
+		this.worldData = WorldManager.getData();
+		WorldKey worldKey = WorldManager.getWorldKey();
+		if (centerPos == null || !worldKey.equals(world)) {
+			this.centerPos = DataUtil.currentPos();
+			this.world = worldKey;
 		} else if (playerTracking) {
-			this.centerPos = PosUtil.currentPos();
+			this.centerPos = DataUtil.currentPos();
 		}
 		this.cursorCoords = PosUtil.posToString(centerPos);
 
 		this.addMapButtons();
 		this.updateScale();
 
-		if (dimension.equals(DimensionType.THE_NETHER_REGISTRY_KEY.getValue())) {
+		if (Dimension.isNether(world.getDimension())) {
 			this.mapLayer = Layer.NETHER;
-			this.mapLevel = PosUtil.coordY() / mapLayer.height;
+			this.mapLevel = DataUtil.coordY() / mapLayer.height;
 		} else {
 			this.mapLayer = Layer.SURFACE;
 			this.mapLevel = 0;
@@ -106,7 +109,7 @@ public class Worldmap extends MapScreen implements IMap {
 		
 		
 		this.waypoints.clear();
-		List<Waypoint> wps = WaypointKeeper.getInstance().getWaypoints(dimension, true);
+		List<Waypoint> wps = WaypointKeeper.getInstance().getWaypoints(world, true);
 		if (wps != null) {
 			Stream<Waypoint> stream = wps.stream().filter(wp -> MathUtil.getDistance(player.getBlockPos(), wp.pos) <= wp.showRange);
 			for (Waypoint wp : stream.toArray(Waypoint[]::new)) {
@@ -164,13 +167,11 @@ public class Worldmap extends MapScreen implements IMap {
 	}
 	
 	private void drawMap() {		
-		DimensionData mapData = DimensionManager.getData(this);		
-		boolean surfaceOnly = !this.mapLayer.equals(Layer.NETHER);
-		
 		int cornerX = centerPos.getX() - scaledWidth / 2;
 		int cornerZ = centerPos.getZ() - scaledHeight / 2;
 		
 		BlockPos.Mutable currentPos = new BlockPos.Mutable();
+		int cY = centerPos.getY();
 		
 		int picX = 0, picW = 0;
 		while(picX < scaledWidth) {
@@ -179,7 +180,8 @@ public class Worldmap extends MapScreen implements IMap {
 			while (picY < scaledHeight) {				
 				int cZ = cornerZ + picY;
 				
-				RegionData region = mapData.getRegion(currentPos.set(cX, 0, cZ), centerPos, surfaceOnly);
+				RegionData region = this.worldData.getRegion(this, currentPos.set(cX, cY, cZ));
+				region.swapLayer(mapLayer, mapLevel);
 				
 				picW = 512;
 				picH = 512;
@@ -222,7 +224,7 @@ public class Worldmap extends MapScreen implements IMap {
 	
 	public void setCenterByPlayer() {
 		this.playerTracking = true;
-		this.centerPos = PosUtil.currentPos();  		
+		this.centerPos = DataUtil.currentPos();  		
 		this.calculateShift();
 	}
 	
@@ -346,13 +348,12 @@ public class Worldmap extends MapScreen implements IMap {
 		int chunkX = posX >> 4;
 		int chunkZ = posZ >> 4;
 		
-		DimensionData data = DimensionManager.getData(this);		
-		ChunkData mapChunk = data.getChunkManager().getChunk(chunkX, chunkZ);
+		ChunkData mapChunk = this.worldData.getChunk(chunkX, chunkZ);
 		
 		int cx = posX - (chunkX << 4);
 		int cz = posZ - (chunkZ << 4);
 		
-		int posY = mapChunk.getHeighmap(mapLayer, mapLevel)[cx + (cz << 4)];
+		int posY = mapChunk.getChunkLevel(mapLayer, mapLevel).sampleHeightmap(cx, cz);
 		posY = posY == -1 ? centerPos.getY() : posY;
 		
 		return new BlockPos(posX, posY, posZ);
@@ -375,7 +376,7 @@ public class Worldmap extends MapScreen implements IMap {
 			if (time - clicked > 300) clicks = 0;
 			
 			if (++clicks == 2) {			
-				JustMapClient.MAP.createWaypoint(dimension, cursorBlockPos(d, e));
+				JustMapClient.MAP.createWaypoint(world, cursorBlockPos(d, e));
 				
 				clicked = 0;
 				clicks = 0;
@@ -394,16 +395,6 @@ public class Worldmap extends MapScreen implements IMap {
 		boolean scrolled = super.mouseScrolled(d, e, f);
 		this.changeScale(f > 0 ? -0.25F : 0.25F);
 		return scrolled;
-	}
-	
-	@Override
-	public Layer getLayer() {
-		return this.mapLayer;
-	}
-
-	@Override
-	public int getLevel() {
-		return this.mapLevel;
 	}
 
 	@Override
@@ -429,5 +420,20 @@ public class Worldmap extends MapScreen implements IMap {
 	@Override
 	public float getScale() {
 		return this.getScale();
+	}
+
+	@Override
+	public Layer getLayer() {
+		return this.mapLayer;
+	}
+
+	@Override
+	public int getLevel() {
+		return this.mapLevel;
+	}
+
+	@Override
+	public BlockPos getCenter() {
+		return this.centerPos;
 	}
 }

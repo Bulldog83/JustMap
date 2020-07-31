@@ -7,6 +7,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.Heightmap;
+import net.minecraft.world.World;
 import net.minecraft.world.chunk.WorldChunk;
 
 public class MapProcessor {
@@ -73,25 +74,30 @@ public class MapProcessor {
 		return y;
 	}
 	
-	public static int heightDifference(ChunkData mapChunk, ChunkData eastChunk, ChunkData southChunk, Layer layer, int level, int x, int y, int z) {
+	public static int heightDifference(ChunkData mapChunk, Layer layer, int level, int x, int y, int z, boolean skipWater) {
 		int ex = x + 1;
 		int sz = z - 1;
 		
 		int east, south;
+		ChunkPos pos = mapChunk.getPos();
+		World world = mapChunk.getWorldChunk().getWorld();
+		ChunkLevel chunkLevel = mapChunk.getChunkLevel(layer, level);
 		if (ex > 15) {			
 			ex -= 16;
-			east = eastChunk.getHeighmap(layer, level)[ex + (z << 4)];			
-			east = checkLiquids(eastChunk.getWorldChunk(), layer, level, ex, east, z);
+			WorldChunk eastChunk = world.getChunk(pos.x + 1, pos.z);
+			east = getTopBlockY(eastChunk, layer, level, ex, z, skipWater);
+			east = checkLiquids(eastChunk, layer, level, ex, east, z);
 		} else {
-			east = mapChunk.getHeighmap(layer, level)[ex + (z << 4)];
+			east = chunkLevel.sampleHeightmap(ex, z);
 			east = checkLiquids(mapChunk.getWorldChunk(), layer, level, ex, east, z);
 		}
-		if (sz < 0) {			
+		if (sz < 0) {
 			sz += 16;
-			south = southChunk.getHeighmap(layer, level)[x + (sz << 4)];
-			south = checkLiquids(southChunk.getWorldChunk(), layer, level, x, south, sz);
+			WorldChunk southChunk = world.getChunk(pos.x, pos.z - 1);
+			south = getTopBlockY(southChunk, layer, level, x, sz, skipWater);
+			south = checkLiquids(southChunk, layer, level, x, south, sz);
 		} else {			
-			south = mapChunk.getHeighmap(layer, level)[x + (sz << 4)];
+			south = chunkLevel.sampleHeightmap(x, sz);
 			south = checkLiquids(mapChunk.getWorldChunk(), layer, level, x, south, sz);
 		}
 		

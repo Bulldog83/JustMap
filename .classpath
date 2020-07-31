@@ -229,7 +229,7 @@
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="C:/Users/bulld/.gradle/caches/fabric-loom/1.16.1-mapped-net.fabricmc.yarn-1.16.1+build.21-v2/minecraft-1.16.1-mapped-net.fabricmc.yarn-1.16.1+build.21-v2.jar">
+	<classpathentry sourcepath="C:/Users/bulld/.gradle/caches/fabric-loom/1.16.1-mapped-net.fabricmc.yarn-1.16.1+build.21-v2/minecraft-1.16.1-mapped-net.fabricmc.yarn-1.16.1+build.21-v2-sources.jar" kind="lib" path="C:/Users/bulld/.gradle/caches/fabric-loom/1.16.1-mapped-net.fabricmc.yarn-1.16.1+build.21-v2/minecraft-1.16.1-mapped-net.fabricmc.yarn-1.16.1+build.21-v2.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
@@ -244,7 +244,7 @@
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry sourcepath="F:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-api-0.15.1+build.380-1.16.1@net.fabricmc.yarn.1_16_1.1.16.1+build.21-v2-sources.jar" kind="lib" path="F:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-api-0.15.1+build.380-1.16.1@net.fabricmc.yarn.1_16_1.1.16.1+build.21-v2.jar">
+	<classpathentry sourcepath="F:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-api-0.16.2+build.385-1.16.1@net.fabricmc.yarn.1_16_1.1.16.1+build.21-v2-sources.jar" kind="lib" path="F:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-api-0.16.2+build.385-1.16.1@net.fabricmc.yarn.1_16_1.1.16.1+build.21-v2.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
@@ -304,6 +304,11 @@
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry sourcepath="F:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-game-rule-api-v1-1.0.0+fe81e12502@net.fabricmc.yarn.1_16_1.1.16.1+build.21-v2-sources.jar" kind="lib" path="F:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-game-rule-api-v1-1.0.0+fe81e12502@net.fabricmc.yarn.1_16_1.1.16.1+build.21-v2.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry sourcepath="F:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-item-api-v1-1.0.0+16acbe5b02@net.fabricmc.yarn.1_16_1.1.16.1+build.21-v2-sources.jar" kind="lib" path="F:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-item-api-v1-1.0.0+16acbe5b02@net.fabricmc.yarn.1_16_1.1.16.1+build.21-v2.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
@@ -324,7 +329,7 @@
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry sourcepath="F:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-lifecycle-events-v1-1.1.0+013e49d202@net.fabricmc.yarn.1_16_1.1.16.1+build.21-v2-sources.jar" kind="lib" path="F:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-lifecycle-events-v1-1.1.0+013e49d202@net.fabricmc.yarn.1_16_1.1.16.1+build.21-v2.jar">
+	<classpathentry sourcepath="F:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-lifecycle-events-v1-1.2.0+e83e061c02@net.fabricmc.yarn.1_16_1.1.16.1+build.21-v2-sources.jar" kind="lib" path="F:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-lifecycle-events-v1-1.2.0+e83e061c02@net.fabricmc.yarn.1_16_1.1.16.1+build.21-v2.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
@@ -379,7 +384,7 @@
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry sourcepath="F:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-renderer-indigo-0.3.3+0a55f37902@net.fabricmc.yarn.1_16_1.1.16.1+build.21-v2-sources.jar" kind="lib" path="F:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-renderer-indigo-0.3.3+0a55f37902@net.fabricmc.yarn.1_16_1.1.16.1+build.21-v2.jar">
+	<classpathentry sourcepath="F:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-renderer-indigo-0.3.4+34d6c87102@net.fabricmc.yarn.1_16_1.1.16.1+build.21-v2-sources.jar" kind="lib" path="F:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-renderer-indigo-0.3.4+34d6c87102@net.fabricmc.yarn.1_16_1.1.16.1+build.21-v2.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
@@ -429,7 +434,7 @@
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry sourcepath="F:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-tool-attribute-api-v1-1.1.4+5794386e02@net.fabricmc.yarn.1_16_1.1.16.1+build.21-v2-sources.jar" kind="lib" path="F:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-tool-attribute-api-v1-1.1.4+5794386e02@net.fabricmc.yarn.1_16_1.1.16.1+build.21-v2.jar">
+	<classpathentry sourcepath="F:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-tool-attribute-api-v1-1.2.0+55e0cc5f02@net.fabricmc.yarn.1_16_1.1.16.1+build.21-v2-sources.jar" kind="lib" path="F:/Eclipse/projects/JustMap/.gradle/loom-cache/remapped_mods/fabric-tool-attribute-api-v1-1.2.0+55e0cc5f02@net.fabricmc.yarn.1_16_1.1.16.1+build.21-v2.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>

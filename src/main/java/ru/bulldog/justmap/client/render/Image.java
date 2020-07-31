@@ -5,12 +5,12 @@ import net.minecraft.client.texture.TextureManager;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
 
-import ru.bulldog.justmap.client.JustMapClient;
+import ru.bulldog.justmap.util.DataUtil;
 import ru.bulldog.justmap.util.RenderUtil;
 
 public abstract class Image {
 
-	protected static TextureManager textureManager = JustMapClient.MINECRAFT.getTextureManager();
+	protected static TextureManager textureManager = DataUtil.getMinecraft().getTextureManager();
 	
 	protected final NativeImage image;
 	protected Identifier textureId;
