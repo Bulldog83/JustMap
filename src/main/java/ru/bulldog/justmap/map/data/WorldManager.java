@@ -271,7 +271,7 @@ public final class WorldManager {
 		}
 	}
 	
-	public static void loadWorlds() {
+	public static void load() {
 		File worldsFile = new File(StorageUtil.filesDir(), "worlds.json");
 		if (!worldsFile.exists()) return;
 		JsonObject jsonObject = JsonFactory.loadJson(worldsFile);
