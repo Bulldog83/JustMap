@@ -9,17 +9,17 @@ public abstract class Config {
 	
 	public abstract void saveChanges();
 	
-	public <T extends Entry<?>> T getEntry(String key) {
+	public <E extends Entry<?>> E getEntry(String key) {
 		return KEEPER.getEntry(key);
 	}
 	
-	public Object getDefault(String key) {
-		Entry<?> entry = KEEPER.getEntry(key);
+	public <T> T getDefault(String key) {
+		Entry<T> entry = KEEPER.getEntry(key);
 		return entry != null ? entry.getDefault() : null;
 	}
 	
 	public String getString(String key) {
-		String str = (String) KEEPER.getValue(key);		
+		String str = KEEPER.getValue(key);
 		return str != null ? str : "";
 	}
 	
@@ -38,7 +38,7 @@ public abstract class Config {
 	}
 	
 	public int getInt(String key) {
-		Integer val = (Integer) KEEPER.getValue(key);		
+		Integer val = KEEPER.getValue(key);		
 		return val != null ? val : 0;
 	}
 	
@@ -71,7 +71,7 @@ public abstract class Config {
 	}
 	
 	public float getFloat(String key) {
-		Float val = (Float) KEEPER.getValue(key);		
+		Float val = KEEPER.getValue(key);		
 		return val != null ? val : 0.0F;
 	}
 	
@@ -90,7 +90,7 @@ public abstract class Config {
 	}
 	
 	public boolean getBoolean(String key) {
-		Boolean val = (Boolean) KEEPER.getValue(key);		
+		Boolean val = KEEPER.getValue(key);		
 		return val != null ? val : false;
 	}
 	

@@ -14,38 +14,34 @@ import ru.bulldog.justmap.JustMap;
 
 public final class ConfigKeeper {
 	
-	private Map<String, Entry<?>> configEntries = new HashMap<>();
-	
 	private static ConfigKeeper instance;
-	
 	public static ConfigKeeper getInstance() {
 		if (instance == null) {
 			instance = new ConfigKeeper();
 		}
-		
 		return instance;
 	}
+	
+	private Map<String, Entry<?>> configEntries = new HashMap<>();
 	
 	private ConfigKeeper() {}
 	
 	@SuppressWarnings("unchecked")
-	public <T extends Entry<?>> T getEntry(String key) {
+	public <E extends Entry<?>> E getEntry(String key) {
 		Entry<?> entry = this.configEntries.get(key);
 		if (entry == null) {
 			JustMap.LOGGER.warning(String.format("Entry '%s' doesn't exists.", key));			
 			return null;
 		}
-		
-		return (T) entry;
+		return (E) entry;
 	}
 	
-	public Object getValue(String key) {
-		Entry<?> entry = this.getEntry(key);
+	public <T> T getValue(String key) {
+		Entry<T> entry = this.getEntry(key);
 		if (entry == null) {
 			JustMap.LOGGER.warning(String.format("Empty value will be returned.", key));			
 			return null;
 		}
-		
 		return entry.getValue();
 	}
 	
