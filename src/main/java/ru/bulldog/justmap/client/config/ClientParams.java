@@ -23,6 +23,7 @@ public class ClientParams {
 	public static boolean rotateMap = false;
 	public static boolean showInChat = false;
 	public static boolean showBigMap = false;
+	public static boolean detectMultiworlds = false;
 
 	public static boolean drawCaves = true;
 	public static boolean hidePlants = false;
@@ -81,8 +82,6 @@ public class ClientParams {
 	public static int purgeDelay = 60;
 	public static int purgeAmount = 1500;
 	public static boolean forceUpdate = false;
-	
-	public static boolean detectMultiworlds = true;
 	
 	public static boolean showWaypoints = true;
 	public static boolean jumpToWaypoints = true;

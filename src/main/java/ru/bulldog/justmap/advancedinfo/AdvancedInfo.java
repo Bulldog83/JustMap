@@ -96,6 +96,8 @@ public class AdvancedInfo {
 	
 	public void draw(MatrixStack matrixStack) {
 		if (!ClientParams.advancedInfo) return;
+		if (minecraft.currentScreen != null &&
+		  !(minecraft.currentScreen instanceof ChatScreen)) return;
 		RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
 		this.managers.forEach((position, manager) -> manager.draw(matrixStack));
 	}

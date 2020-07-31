@@ -1,10 +1,14 @@
 package ru.bulldog.justmap.map.data;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+
 import net.minecraft.util.Identifier;
+import net.minecraft.util.JsonHelper;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.World;
-import ru.bulldog.justmap.util.DataUtil;
+import ru.bulldog.justmap.util.PosUtil;
 
 public class WorldKey {
 	private final Identifier dimension;
@@ -12,28 +16,36 @@ public class WorldKey {
 	private String worldName;
 	private BlockPos worldPos;
 	
-	public WorldKey(RegistryKey<World> worldKey) {
-		this.dimension = worldKey.getValue();
+	public WorldKey(Identifier dimension) {
+		this.dimension = dimension;
 		this.worldId = this.dimension.toString();
+	}
+	
+	public WorldKey(RegistryKey<World> worldKey) {
+		this(worldKey.getValue());
 	}
 	
 	public void setWorldName(String name) {
 		this.worldName = name;
 		if (worldPos != null) {
-			this.worldId = String.format("%s_%s_%s", worldName, dimension, DataUtil.shortPosString(worldPos));
+			this.worldId = String.format("%s_%s", worldName, PosUtil.shortPosString(worldPos));
 		} else {
-			this.worldId = String.format("%s_%s", worldName, dimension);
+			this.worldId = worldName;
 		}
 	}
 	
 	public void setWorldPos(BlockPos worldPos) {
 		this.worldPos = worldPos;
 		if (worldName != null) {
-			this.worldId = String.format("%s_%s_%s", worldName, dimension, DataUtil.shortPosString(worldPos));
+			this.worldId = String.format("%s_%s", worldName, PosUtil.shortPosString(worldPos));
 		} else {
-			this.worldId = String.format("%s_%s", dimension, DataUtil.shortPosString(worldPos));
+			this.worldId = String.format("%s_%s", dimension, PosUtil.shortPosString(worldPos));
 		}
 		
+	}
+	
+	public Identifier getDimension() {
+		return this.dimension;
 	}
 	
 	public String getName() {
@@ -47,7 +59,7 @@ public class WorldKey {
 	public void clearName() {
 		this.worldName = null;
 		if (worldPos != null) {
-			this.worldId = String.format("%s_%s", dimension, DataUtil.shortPosString(worldPos));
+			this.worldId = String.format("%s_%s", dimension, PosUtil.shortPosString(worldPos));
 		} else {
 			this.worldId = dimension.toString();
 		}
@@ -56,7 +68,7 @@ public class WorldKey {
 	public void clearWorldPos() {
 		this.worldPos = null;
 		if (worldName != null) {
-			this.worldId = String.format("%s_%s", worldName, dimension);
+			this.worldId = worldName;
 		} else {
 			this.worldId = dimension.toString();
 		}
@@ -67,6 +79,33 @@ public class WorldKey {
 		folder = folder.replaceAll("[,:&\"\\|\\<\\>\\?\\*]", "_");
 		
 		return folder;
+	}
+	
+	public JsonElement toJson() {
+		JsonObject jsonKey = new JsonObject();
+		jsonKey.addProperty("dimension", this.dimension.toString());
+		if (worldName != null) {
+			jsonKey.addProperty("name", worldName);
+		}
+		if (worldPos != null) {
+			jsonKey.add("position", PosUtil.toJson(worldPos));
+		}
+		return jsonKey;
+	}
+	
+	public static WorldKey fromJson(JsonObject element) {
+		if (!element.has("dimension")) return null;
+		Identifier dimension = new Identifier(JsonHelper.getString(element, "dimension"));
+		WorldKey worldKey = new WorldKey(dimension);
+		if (element.has("name")) {
+			worldKey.setWorldName(JsonHelper.getString(element, "name"));
+		}
+		if (element.has("position")) {
+			BlockPos worldPos = PosUtil.fromJson(JsonHelper.getObject(element, "position"));
+			worldKey.setWorldPos(worldPos);
+		}
+		
+		return worldKey;
 	}
 	
 	@Override

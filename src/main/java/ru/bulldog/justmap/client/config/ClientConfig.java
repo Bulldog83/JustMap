@@ -115,11 +115,18 @@ public class ClientConfig extends Config {
 			ConfigWriter.save(KEEPER.toJson());
 		}
 	}
+	
+	public void reloadFromDisk() {
+		JsonObject config = ConfigWriter.load();
+		if (config.size() > 0) {
+			KEEPER.fromJson(config);
+		}
+	}
 
 	@Override
-	public void saveChanges()  {
-		WorldManager.onConfigUpdate();
-		JustMapClient.MAP.updateMapParams();
+	public void saveChanges() {
 		ConfigWriter.save(KEEPER.toJson());
+		JustMapClient.MAP.updateMapParams();
+		WorldManager.onConfigUpdate();
 	}
 }

@@ -12,17 +12,16 @@ import org.spongepowered.asm.mixin.injection.At;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
-import net.minecraft.network.packet.s2c.play.DisconnectS2CPacket;
 import net.minecraft.network.packet.s2c.play.GameMessageS2CPacket;
 import net.minecraft.network.packet.s2c.play.HealthUpdateS2CPacket;
 import net.minecraft.network.packet.s2c.play.PlayerSpawnPositionS2CPacket;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.network.ClientConnection;
 import net.minecraft.network.MessageType;
+
 import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.map.MapGameRules;
+import ru.bulldog.justmap.map.data.WorldKey;
 import ru.bulldog.justmap.map.data.WorldManager;
 import ru.bulldog.justmap.map.waypoint.Waypoint;
 
@@ -34,17 +33,7 @@ public abstract class ClientPlayNetworkHandlerMixin {
 	
 	@Inject(method = "<init>", at = @At("TAIL"))
 	public void onConnect(MinecraftClient client, Screen screen, ClientConnection connection, GameProfile profile, CallbackInfo cinfo) {
-		System.out.println("Connection initialized!");
-	}
-	
-	@Inject(method = "onDisconnect", at = @At("TAIL"))
-	public void onDisconnect(DisconnectS2CPacket packet, CallbackInfo cinfo) {
-		System.out.println("Disconnecting...");
-	}
-	
-	@Inject(method = "onDisconnected", at = @At("TAIL"))
-	public void onDisconnected(Text reason, CallbackInfo cinfo) {
-		System.out.println("Disconnected!");
+		WorldManager.loadWorlds();
 	}
 	
 	@Inject(method = "onPlayerSpawnPosition", at = @At("TAIL"))
@@ -76,9 +65,9 @@ public abstract class ClientPlayNetworkHandlerMixin {
 	public void onHealthUpdate(HealthUpdateS2CPacket healthUpdateS2CPacket, CallbackInfo cinfo) {
 		float health = healthUpdateS2CPacket.getHealth();
 		if (health <= 0.0F) {
-	    	Identifier dimension = this.client.world.getDimensionRegistryKey().getValue();
+	    	WorldKey world = WorldManager.getWorldKey();
 	    	BlockPos playerPos = this.client.player.getBlockPos();
-	    	Waypoint.createOnDeath(dimension, playerPos);
+	    	Waypoint.createOnDeath(world, playerPos);
 	    }
 	}
 }

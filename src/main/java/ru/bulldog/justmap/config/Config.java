@@ -9,7 +9,7 @@ public abstract class Config {
 	
 	public abstract void saveChanges();
 	
-	public Entry<?> getEntry(String key) {
+	public <T extends Entry<?>> T getEntry(String key) {
 		return KEEPER.getEntry(key);
 	}
 	
@@ -25,7 +25,7 @@ public abstract class Config {
 	
 	public boolean setString(String key, String value) {
 		try {
-			StringEntry entry = (StringEntry) KEEPER.getEntry(key);
+			StringEntry entry = KEEPER.getEntry(key);
 			entry.setValue(value);
 			KEEPER.set(key, entry);
 			
@@ -44,7 +44,7 @@ public abstract class Config {
 	
 	public boolean setInt(String key, int value) {
 		try {
-			IntegerEntry entry = (IntegerEntry) KEEPER.getEntry(key);
+			IntegerEntry entry = KEEPER.getEntry(key);
 			entry.setValue(value);
 			KEEPER.set(key, entry);
 			
@@ -58,18 +58,11 @@ public abstract class Config {
 	
 	public <T extends Comparable<T>> boolean setRanged(String key, T value) {
 		try {
-			Entry<?> entry = KEEPER.getEntry(key);
-			if (entry instanceof RangeEntry) {
-				@SuppressWarnings("unchecked")
-				RangeEntry<T> range = (RangeEntry<T>) entry;
-				
-				range.setValue(value);
-				KEEPER.set(key, range);
-				
-				return true;
-			}
+			RangeEntry<T> entry = KEEPER.getEntry(key);
+			entry.setValue(value);
+			KEEPER.set(key, entry);
 			
-			return false;
+			return true;
 		} catch (NullPointerException | ClassCastException ex) {
 			JustMap.LOGGER.catching(ex);
 		}
@@ -84,7 +77,7 @@ public abstract class Config {
 	
 	public boolean setFloat(String key, float value) {
 		try {
-			FloatEntry entry = (FloatEntry) KEEPER.getEntry(key);
+			FloatEntry entry = KEEPER.getEntry(key);
 			entry.setValue(value);
 			KEEPER.set(key, entry);
 			
@@ -103,7 +96,7 @@ public abstract class Config {
 	
 	public boolean setBoolean(String key, boolean value) {
 		try {
-			BooleanEntry entry = (BooleanEntry) KEEPER.getEntry(key);
+			BooleanEntry entry = KEEPER.getEntry(key);
 			entry.setValue(value);
 			KEEPER.set(key, entry);
 			

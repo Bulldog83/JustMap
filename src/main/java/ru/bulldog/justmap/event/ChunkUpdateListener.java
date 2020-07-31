@@ -3,6 +3,7 @@ package ru.bulldog.justmap.event;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.util.tasks.TaskManager;
 
 public class ChunkUpdateListener {
@@ -16,6 +17,10 @@ public class ChunkUpdateListener {
 	
 	private static void updateChunks() {
 		if (updateQueue.isEmpty()) return;
+		if (!JustMapClient.canMapping()) {
+			updateQueue.clear();
+			return;
+		}
 		while(!updateQueue.isEmpty()) {
 			ChunkUpdateEvent event = updateQueue.poll();
 			if (event == null) break;

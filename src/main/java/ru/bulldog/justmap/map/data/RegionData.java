@@ -5,7 +5,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import net.minecraft.util.math.ChunkPos;
-import net.minecraft.world.World;
 
 import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.client.config.ClientParams;
@@ -31,7 +30,6 @@ public class RegionData {
 	private MapTexture image;
 	private MapTexture texture;
 	private MapTexture overlay;
-	private World world;
 	private Layer layer;
 	private ChunkPos center;
 	private Plane updateArea;
@@ -71,9 +69,8 @@ public class RegionData {
 	
 	private RegionData(WorldData data, RegionPos regPos) {
 		this.mapData = data;
-		this.world = data.getWorld();
 		this.regPos = regPos;
-		this.cacheDir = StorageUtil.cacheDir(world);
+		this.cacheDir = StorageUtil.cacheDir();
 	}
 	
 	public RegionPos getPos() {

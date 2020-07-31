@@ -73,8 +73,9 @@ public final class StorageUtil {
 	}
 	
 	@Environment(EnvType.CLIENT)
-	public static File cacheDir(World world) {
+	public static File cacheDir() {
 		String dimension = "undefined";
+		World world = DataUtil.getClientWorld();
 		RegistryKey<DimensionType> dimKey = null;
 		if (world != null) {
 			dimKey = world.getDimensionRegistryKey();			

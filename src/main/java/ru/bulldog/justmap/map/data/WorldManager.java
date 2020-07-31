@@ -1,37 +1,45 @@
 package ru.bulldog.justmap.map.data;
 
+import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
-import com.google.common.collect.Lists;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ProgressScreen;
+import net.minecraft.util.JsonHelper;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.WorldChunk;
 
 import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.client.JustMapClient;
+import ru.bulldog.justmap.client.config.ClientConfig;
 import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.client.screen.WorldnameScreen;
+import ru.bulldog.justmap.config.ConfigKeeper.BooleanEntry;
+import ru.bulldog.justmap.config.ConfigKeeper.EnumEntry;
 import ru.bulldog.justmap.enums.MultiworldDetection;
 import ru.bulldog.justmap.event.ChunkUpdateEvent;
 import ru.bulldog.justmap.event.ChunkUpdateListener;
 import ru.bulldog.justmap.map.IMap;
 import ru.bulldog.justmap.util.DataUtil;
+import ru.bulldog.justmap.util.JsonFactory;
 import ru.bulldog.justmap.util.RuleUtil;
+import ru.bulldog.justmap.util.storage.StorageUtil;
 import ru.bulldog.justmap.util.tasks.MemoryUtil;
 
 public final class WorldManager {
 
 	private final static Map<WorldKey, WorldData> worldsData = new HashMap<>();
-	private final static MinecraftClient minecraft = DataUtil.getMinecraft();
 	private final static Map<BlockPos, String> registeredWorlds = new HashMap<>();
-	private final static Set<String> registeredNames = new HashSet<>();
+	private final static MinecraftClient minecraft = DataUtil.getMinecraft();
+	private final static ClientConfig modConfig = JustMapClient.CONFIG;
 
 	private static World currentWorld;
 	private static WorldKey currentWorldKey;
@@ -40,8 +48,8 @@ public final class WorldManager {
 	private static boolean cacheClearing = false;
 	private static boolean requestWorldName = false;
 	
-	public static List<String> getRegisteredNames() {
-		return Lists.newArrayList(registeredNames);
+	public static List<WorldKey> registeredWorlds() {
+		return new ArrayList<>(worldsData.keySet());
 	}
 	
 	public static String currentWorldName() {
@@ -50,40 +58,52 @@ public final class WorldManager {
 	
 	public static void onConfigUpdate() {
 		if (currentWorld == null) return;
+		if (DataUtil.isOnline()) saveConfig();
 		JustMapClient.stopMapping();
 		if (!RuleUtil.detectMultiworlds()) {
 			if (currentWorldPos != null || currentWorldName != null) {
 				currentWorldPos = null;
 				currentWorldName = null;
-				updateWorldKey();
-				close();
-				JustMapClient.startMapping();
+				clearData();
 			}
+			updateWorldKey();
+			JustMapClient.startMapping();
+			return;
 		} else if (MultiworldDetection.isManual()) {
 			if (currentWorldPos != null) {
 				currentWorldPos = null;
-				close();
-				if (currentWorldName == null) {
-					requestWorldName = true;
-				} else {
-					updateWorldKey();
-					JustMapClient.startMapping();
-				}
+				clearData();
 			}
+			if (currentWorldName == null) {
+				requestWorldName = true;
+			} else {
+				updateWorldKey();
+				JustMapClient.startMapping();
+			}
+			return;
 		} else if (MultiworldDetection.isAuto()) {
 			if (currentWorldName != null) {
 				currentWorldName = null;
-				close();
+				clearData();
 			}
 			onWorldPosChanged(minecraft.world.getSpawnPos());
+			return;
 		} else if (MultiworldDetection.isMixed()) {
-			onWorldPosChanged(minecraft.world.getSpawnPos());
+			if (currentWorldPos == null) {
+				onWorldPosChanged(minecraft.world.getSpawnPos());
+			} else if (currentWorldName == null) {
+				requestWorldName = true;
+			} else {
+				updateWorldKey();
+				JustMapClient.startMapping();
+			}
+			return;
 		}
+		JustMapClient.startMapping();
 	}
 	
 	public static void onWorldChanged(World world) {
 		currentWorld = world;
-		updateWorldKey();
 		if (RuleUtil.detectMultiworlds()) {
 			JustMap.LOGGER.debug("World changed, stop mapping!");
 			JustMapClient.stopMapping();
@@ -91,6 +111,7 @@ public final class WorldManager {
 				requestWorldName = true;
 			}
 		} else {
+			updateWorldKey();
 			JustMapClient.startMapping();
 		}
 	}
@@ -142,7 +163,6 @@ public final class WorldManager {
 				});
 			}
 		}
-		registeredNames.add(name);
 		currentWorldName = name;
 		if (MultiworldDetection.isMixed()) {
 			if (!registeredWorlds.containsKey(currentWorldPos)) {
@@ -188,13 +208,18 @@ public final class WorldManager {
 		WorldData data;
 		synchronized (worldsData) {
 			if (worldsData.containsKey(worldKey)) {
-				return worldsData.get(worldKey);
-			} else {
+				data = worldsData.get(worldKey);
+				if (data != null) {
+					return data;
+				}
 				data = new WorldData(world);
-				worldsData.put(worldKey, data);
+				worldsData.replace(worldKey, data);
+				
+				return data;
 			}
+			data = new WorldData(world);
+			worldsData.put(worldKey, data);
 		}
-		
 		return data;
 	}
 	
@@ -217,7 +242,7 @@ public final class WorldManager {
 		JustMap.WORKER.execute(() -> {
 			synchronized (worldsData) {
 				worldsData.forEach((id, data) -> {
-					data.clearCache();
+					if (data != null) data.clearCache();
 				});
 			}
 		});
@@ -233,7 +258,9 @@ public final class WorldManager {
 				int amount = ClientParams.purgeAmount * 10;
 				synchronized (worldsData) {
 					worldsData.forEach((id, world) -> {
-						world.getChunkManager().purge(amount, 1000);
+						if (world != null) {
+							world.getChunkManager().purge(amount, 1000);
+						}
 					});
 				}
 				System.gc();
@@ -244,12 +271,71 @@ public final class WorldManager {
 		}
 	}
 	
-	public static void close() {
+	public static void loadWorlds() {
+		File worldsFile = new File(StorageUtil.filesDir(), "worlds.json");
+		if (!worldsFile.exists()) return;
+		JsonObject jsonObject = JsonFactory.loadJson(worldsFile);
+		if (jsonObject.has("worlds")) {
+			JsonArray worldsArray = jsonObject.getAsJsonArray("worlds");
+			synchronized (worldsData) {
+				for(JsonElement elem : worldsArray) {
+					WorldKey world = WorldKey.fromJson((JsonObject) elem);
+					worldsData.put(world, null);
+				}
+			}
+		}
+		loadConfig();
+	}
+	
+	private static void saveWorlds() {
+		if (worldsData.size() == 0) return;
+		JsonArray worldsArray = new JsonArray();
+		synchronized (worldsData) {
+			worldsData.keySet().forEach(world -> {
+				worldsArray.add(world.toJson());
+			});
+		}
+		JsonObject jsonObject = new JsonObject();
+		jsonObject.add("worlds", worldsArray);
+		File worldsFile = new File(StorageUtil.filesDir(), "worlds.json");
+		JsonFactory.storeJson(worldsFile, jsonObject);
+	}
+	
+	private static void saveConfig() {
+		EnumEntry<MultiworldDetection> detectionType = modConfig.getEntry("multiworld_detection");
+		BooleanEntry detectMultiworlds = modConfig.getEntry("detect_multiworlds");
+		File configFile = new File(StorageUtil.filesDir(), "config.json");
+		JsonObject configObject = new JsonObject();
+		configObject.addProperty("detect_multiworlds", detectMultiworlds.asString());
+		configObject.addProperty("multiworld_detection_type", detectionType.asString());
+		JsonFactory.storeJson(configFile, configObject);
+	}
+	
+	private static void loadConfig() {
+		File configFile = new File(StorageUtil.filesDir(), "config.json");
+		if (!configFile.exists()) return;
+		JsonObject configObject = JsonFactory.loadJson(configFile);
+		EnumEntry<MultiworldDetection> detectionType = modConfig.getEntry("multiworld_detection");
+		BooleanEntry detectMultiworlds = modConfig.getEntry("detect_multiworlds");
+		detectMultiworlds.fromString(JsonHelper.getString(configObject, "detect_multiworlds"));
+		detectionType.fromString(JsonHelper.getString(configObject, "multiworld_detection_type"));
+	}
+	
+	private static void clearData() {
 		synchronized (worldsData) {
 			if (worldsData.size() > 0) {
-				worldsData.forEach((id, data) -> data.close());
+				worldsData.forEach((id, data) -> {
+					if (data != null) data.close();
+				});
 				worldsData.clear();
 			}
 		}
+	}
+	
+	public static void close() {
+		modConfig.reloadFromDisk();
+		currentWorld = null;
+		saveWorlds();
+		clearData();
 	}
 }

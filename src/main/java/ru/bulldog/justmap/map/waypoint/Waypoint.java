@@ -8,10 +8,12 @@ import com.google.gson.JsonObject;
 
 import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.client.render.Image;
+import ru.bulldog.justmap.map.data.WorldKey;
 import ru.bulldog.justmap.util.ColorUtil;
 import ru.bulldog.justmap.util.Colors;
 import ru.bulldog.justmap.util.Dimension;
 import ru.bulldog.justmap.util.ImageUtil;
+import ru.bulldog.justmap.util.PosUtil;
 import ru.bulldog.justmap.util.math.RandomUtil;
 
 import net.minecraft.client.texture.NativeImage;
@@ -73,7 +75,7 @@ public class Waypoint {
 	
 	public String name = "";
 	public BlockPos pos = new BlockPos(0, 0, 0);
-	public Identifier dimension;
+	public WorldKey world;
 	public int color;
 	public boolean showAlways;
 	public boolean hidden = false;
@@ -83,9 +85,9 @@ public class Waypoint {
 	
 	private int icon = -1;
 	
-	public static void createOnDeath(Identifier dimension, BlockPos pos) {
+	public static void createOnDeath(WorldKey world, BlockPos pos) {
 		Waypoint waypoint = new Waypoint();
-		waypoint.dimension = dimension;
+		waypoint.world = world;
 		waypoint.name = "Player Death";
 		waypoint.pos = pos;
 		waypoint.setIcon(Waypoint.getIcon(Icons.CROSS), Colors.RED);
@@ -137,7 +139,6 @@ public class Waypoint {
 		JsonObject waypoint = new JsonObject();
 		
 		waypoint.addProperty("name", this.name);
-		waypoint.addProperty("dimension", this.dimension.toString());
 		waypoint.addProperty("show_always", this.showAlways);
 		waypoint.addProperty("hidden", this.hidden);
 		waypoint.addProperty("tracking", this.tracking);
@@ -145,13 +146,8 @@ public class Waypoint {
 		waypoint.addProperty("show_range", this.showRange);
 		waypoint.addProperty("color", Integer.toHexString(this.color).toUpperCase());
 		waypoint.addProperty("icon", this.icon);
-		
-		JsonObject position = new JsonObject();
-		position.addProperty("x", pos.getX());
-		position.addProperty("y", pos.getY());
-		position.addProperty("z", pos.getZ());
-		
-		waypoint.add("position", position);
+		waypoint.add("world", this.world.toJson());
+		waypoint.add("position", PosUtil.toJson(pos));
 		
 		return waypoint;
 	}
@@ -160,9 +156,7 @@ public class Waypoint {
 		Waypoint waypoint = new Waypoint();
 
 		JsonObject position = JsonHelper.getObject(jsonObject, "position", new JsonObject());		
-		waypoint.pos = new BlockPos(JsonHelper.getInt(position, "x", 0),
-									JsonHelper.getInt(position, "y", 0),
-									JsonHelper.getInt(position, "z", 0));
+		waypoint.pos = PosUtil.fromJson(position);
 		waypoint.name = JsonHelper.getString(jsonObject, "name", "Waypoint");
 		waypoint.showAlways = JsonHelper.getBoolean(jsonObject, "show_always", false);
 		waypoint.hidden = JsonHelper.getBoolean(jsonObject, "hidden", false);
@@ -173,10 +167,15 @@ public class Waypoint {
 											Integer.toHexString(RandomUtil.getElement(WAYPOINT_COLORS))));
 		waypoint.icon = JsonHelper.getInt(jsonObject, "icon", -1);
 		
-		try {
-			waypoint.dimension = Dimension.fromId(JsonHelper.getInt(jsonObject, "dimension", 0));
-		} catch (Exception ex) {
-			waypoint.dimension = new Identifier(JsonHelper.getString(jsonObject, "dimension", "unknown"));
+		if (jsonObject.has("dimension")) {
+			try {
+				waypoint.world = new WorldKey(Dimension.fromId(JsonHelper.getInt(jsonObject, "dimension", 0)));
+			} catch (Exception ex) {
+				Identifier dimension = new Identifier(JsonHelper.getString(jsonObject, "dimension", "unknown"));
+				waypoint.world = new WorldKey(dimension);
+			}
+		} else {
+			waypoint.world = WorldKey.fromJson(JsonHelper.getObject(jsonObject, "world", new JsonObject()));
 		}
 		
 		return waypoint;

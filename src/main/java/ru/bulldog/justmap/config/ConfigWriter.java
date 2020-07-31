@@ -9,7 +9,7 @@ import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.util.JsonFactory;
 import ru.bulldog.justmap.util.storage.StorageUtil;
 
-public class ConfigWriter extends JsonFactory {
+public class ConfigWriter {
 	
 	private final static File CONFIG_FILE = new File(StorageUtil.configDir(), JustMap.MODID + ".json");
 	
@@ -19,13 +19,13 @@ public class ConfigWriter extends JsonFactory {
 	
 	public static JsonObject load() {
 		if (configObject == null) {
-			configObject = loadJson(CONFIG_FILE);
+			configObject = JsonFactory.loadJson(CONFIG_FILE);
 		}
 		
 		return configObject;
 	}
 	
 	public static void save(JsonElement config) {
-		storeJson(CONFIG_FILE, config);
+		JsonFactory.storeJson(CONFIG_FILE, config);
 	}
 }

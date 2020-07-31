@@ -47,13 +47,15 @@ public class JustMapClient implements ClientModInitializer {
 				JustMapClient.stop();
 			}
 			isOnTitleScreen = isTitle;
+			
+			AdvancedInfo.getInstance().updateInfo();
 			WorldManager.update();
+			KeyHandler.update();
+
 			if (!canMapping()) return;
 
 			DataUtil.update();
-			KeyHandler.update();
 			JustMapClient.MAP.update();
-			AdvancedInfo.getInstance().updateInfo();
 			WorldManager.memoryControl();
 			ChunkUpdateListener.proceed();
 		});
@@ -64,9 +66,9 @@ public class JustMapClient implements ClientModInitializer {
 	}
 	
 	private static void stop() {
+		stopMapping();
 		ChunkUpdateListener.stop();
 		JustMap.WORKER.execute("Clearing map cache...", WorldManager::close);
-		stopMapping();
 	}
 	
 	public static void startMapping() {

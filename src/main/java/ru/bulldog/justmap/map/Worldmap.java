@@ -13,10 +13,8 @@ import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.text.LiteralText;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
-import net.minecraft.world.dimension.DimensionType;
 
 import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.client.config.ClientParams;
@@ -25,6 +23,7 @@ import ru.bulldog.justmap.client.screen.MapScreen;
 import ru.bulldog.justmap.client.screen.WaypointsList;
 import ru.bulldog.justmap.map.data.Layer;
 import ru.bulldog.justmap.map.data.WorldData;
+import ru.bulldog.justmap.map.data.WorldKey;
 import ru.bulldog.justmap.map.data.WorldManager;
 import ru.bulldog.justmap.map.data.ChunkData;
 import ru.bulldog.justmap.map.data.RegionData;
@@ -33,6 +32,8 @@ import ru.bulldog.justmap.map.waypoint.Waypoint;
 import ru.bulldog.justmap.map.waypoint.WaypointKeeper;
 import ru.bulldog.justmap.util.Colors;
 import ru.bulldog.justmap.util.DataUtil;
+import ru.bulldog.justmap.util.Dimension;
+import ru.bulldog.justmap.util.PosUtil;
 import ru.bulldog.justmap.util.math.MathUtil;
 
 public class Worldmap extends MapScreen implements IMap {
@@ -65,7 +66,7 @@ public class Worldmap extends MapScreen implements IMap {
 	private long updated = 0;
 	private int mapLevel = 0;
 	private WorldData worldData;
-	private Identifier dimension;
+	private WorldKey world;
 	private BlockPos centerPos;
 	private String cursorCoords;
 	private Layer mapLayer;
@@ -86,19 +87,19 @@ public class Worldmap extends MapScreen implements IMap {
 		PlayerEntity player = client.player;
 
 		this.worldData = WorldManager.getData();
-		Identifier dimId = client.world.getDimensionRegistryKey().getValue();
-		if (centerPos == null || !dimId.equals(dimension)) {
+		WorldKey worldKey = WorldManager.getWorldKey();
+		if (centerPos == null || !worldKey.equals(world)) {
 			this.centerPos = DataUtil.currentPos();
-			this.dimension = dimId;
+			this.world = worldKey;
 		} else if (playerTracking) {
 			this.centerPos = DataUtil.currentPos();
 		}
-		this.cursorCoords = DataUtil.posToString(centerPos);
+		this.cursorCoords = PosUtil.posToString(centerPos);
 
 		this.addMapButtons();
 		this.updateScale();
 
-		if (dimension.equals(DimensionType.THE_NETHER_REGISTRY_KEY.getValue())) {
+		if (Dimension.isNether(world.getDimension())) {
 			this.mapLayer = Layer.NETHER;
 			this.mapLevel = DataUtil.coordY() / mapLayer.height;
 		} else {
@@ -108,7 +109,7 @@ public class Worldmap extends MapScreen implements IMap {
 		
 		
 		this.waypoints.clear();
-		List<Waypoint> wps = WaypointKeeper.getInstance().getWaypoints(dimension, true);
+		List<Waypoint> wps = WaypointKeeper.getInstance().getWaypoints(world, true);
 		if (wps != null) {
 			Stream<Waypoint> stream = wps.stream().filter(wp -> MathUtil.getDistance(player.getBlockPos(), wp.pos) <= wp.showRange);
 			for (Waypoint wp : stream.toArray(Waypoint[]::new)) {
@@ -360,7 +361,7 @@ public class Worldmap extends MapScreen implements IMap {
 	
 	@Override
 	public void mouseMoved(double d, double e) {		
-		this.cursorCoords = DataUtil.posToString(cursorBlockPos(d, e));
+		this.cursorCoords = PosUtil.posToString(cursorBlockPos(d, e));
 	}
 	
 	private int clicks = 0;
@@ -375,7 +376,7 @@ public class Worldmap extends MapScreen implements IMap {
 			if (time - clicked > 300) clicks = 0;
 			
 			if (++clicks == 2) {			
-				JustMapClient.MAP.createWaypoint(dimension, cursorBlockPos(d, e));
+				JustMapClient.MAP.createWaypoint(world, cursorBlockPos(d, e));
 				
 				clicked = 0;
 				clicks = 0;

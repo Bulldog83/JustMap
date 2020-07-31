@@ -14,6 +14,7 @@ import ru.bulldog.justmap.enums.MapShape;
 import ru.bulldog.justmap.enums.TextAlignment;
 import ru.bulldog.justmap.map.IMap;
 import ru.bulldog.justmap.map.data.WorldData;
+import ru.bulldog.justmap.map.data.WorldKey;
 import ru.bulldog.justmap.map.data.WorldManager;
 import ru.bulldog.justmap.map.data.Layer;
 import ru.bulldog.justmap.map.icon.EntityIcon;
@@ -34,7 +35,6 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.world.World;
@@ -244,7 +244,7 @@ public class Minimap implements IMap{
 		
 		waypoints.clear();
 		if (ClientParams.showWaypoints) {
-			List<Waypoint> wps = WaypointKeeper.getInstance().getWaypoints(world.getDimensionRegistryKey().getValue(), true);
+			List<Waypoint> wps = WaypointKeeper.getInstance().getWaypoints(WorldManager.getWorldKey(), true);
 			if (wps != null) {
 				Stream<Waypoint> stream = wps.stream().filter(wp -> MathUtil.getDistance(pos, wp.pos, false) <= wp.showRange);
 				for (Waypoint wp : stream.toArray(Waypoint[]::new)) {
@@ -263,9 +263,9 @@ public class Minimap implements IMap{
 		return waypoints;
 	}
 	
-	public void createWaypoint(Identifier dimension, BlockPos pos) {
+	public void createWaypoint(WorldKey world, BlockPos pos) {
 		Waypoint waypoint = new Waypoint();
-		waypoint.dimension = dimension;
+		waypoint.world = world;
 		waypoint.name = "Waypoint";
 		waypoint.color = RandomUtil.getElement(Waypoint.WAYPOINT_COLORS);
 		waypoint.pos = pos;
@@ -274,8 +274,7 @@ public class Minimap implements IMap{
 	}
 	
 	public void createWaypoint() {
-		World world = minecraft.world;
-		createWaypoint(world.getDimensionRegistryKey().getValue(), DataUtil.currentPos());
+		this.createWaypoint(WorldManager.getWorldKey(), DataUtil.currentPos());
 	}
 	
 	public World getWorld() {

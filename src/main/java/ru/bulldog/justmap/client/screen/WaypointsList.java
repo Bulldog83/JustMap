@@ -3,6 +3,8 @@ package ru.bulldog.justmap.client.screen;
 import com.mojang.datafixers.util.Pair;
 
 import ru.bulldog.justmap.JustMap;
+import ru.bulldog.justmap.map.data.WorldKey;
+import ru.bulldog.justmap.map.data.WorldManager;
 import ru.bulldog.justmap.map.waypoint.Waypoint;
 import ru.bulldog.justmap.map.waypoint.WaypointKeeper;
 import ru.bulldog.justmap.map.waypoint.Waypoint.Icon;
@@ -25,7 +27,6 @@ import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Identifier;
-import net.minecraft.world.dimension.DimensionType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -97,24 +98,24 @@ public class WaypointsList extends MapScreen {
 			RenderUtil.drawRightAlignedString(matrixStack, waypoint.pos.toShortString(), posX, stringY, Colors.WHITE);
 			
 			if (RuleUtil.allowTeleportation()) {
-				tpButton.render(matrixStack, mouseX, mouseY, delta);
+				this.tpButton.render(matrixStack, mouseX, mouseY, delta);
 			}
-			editButton.render(matrixStack, mouseX, mouseY, delta);
-			deleteButton.render(matrixStack, mouseX, mouseY, delta);
+			this.editButton.render(matrixStack, mouseX, mouseY, delta);
+			this.deleteButton.render(matrixStack, mouseX, mouseY, delta);
 		}
 	
 		@Override
 		public boolean mouseClicked(double double_1, double double_2, int int_1) {
-			return editButton.mouseClicked(double_1, double_2, int_1) ||
-				   deleteButton.mouseClicked(double_1, double_2, int_1) ||
-				   tpButton.mouseClicked(double_1, double_2, int_1);
+			return this.editButton.mouseClicked(double_1, double_2, int_1) ||
+				   this.deleteButton.mouseClicked(double_1, double_2, int_1) ||
+				   this.tpButton.mouseClicked(double_1, double_2, int_1);
 		}
 	
 		@Override
 		public boolean mouseReleased(double double_1, double double_2, int int_1) {
-			return editButton.mouseReleased(double_1, double_2, int_1) ||
-				   deleteButton.mouseReleased(double_1, double_2, int_1) ||
-				   tpButton.mouseReleased(double_1, double_2, int_1);
+			return this.editButton.mouseReleased(double_1, double_2, int_1) ||
+				   this.deleteButton.mouseReleased(double_1, double_2, int_1) ||
+				   this.tpButton.mouseReleased(double_1, double_2, int_1);
 		}
 	
 		@Override
@@ -134,10 +135,10 @@ public class WaypointsList extends MapScreen {
 	private static final Text TITLE = new TranslatableText(JustMap.MODID + ".gui.screen.waypoints_list");
 	
 	private WaypointKeeper keeper = WaypointKeeper.getInstance();
-	private Identifier currentDim;
-	private int currentDimIndex = 0;
-	private List<Identifier> dimensions;
-	private List<Waypoint> wayPoints;
+	private WorldKey currentWorld;
+	private int currentIndex = 0;
+	private List<WorldKey> worlds;
+	private List<Waypoint> waypoints;
 	private List<Entry> entries = new ArrayList<>();
 
 	private int scrollAmount = 0;
@@ -149,25 +150,16 @@ public class WaypointsList extends MapScreen {
 	
 	public WaypointsList(Screen parent) {
 		super(TITLE, parent);
-		
-		this.dimensions = keeper.getDimensions();
-		
-		Identifier overworld = DimensionType.OVERWORLD_REGISTRY_KEY.getValue();
-		Identifier nether = DimensionType.THE_NETHER_REGISTRY_KEY.getValue();
-		Identifier theEnd = DimensionType.THE_END_REGISTRY_KEY.getValue();
-		if (!dimensions.contains(overworld)) {
-			dimensions.add(overworld);
-		}		
-		if (!dimensions.contains(nether)) {
-			dimensions.add(nether);
-		}		
-		if (!dimensions.contains(theEnd)) {
-			dimensions.add(theEnd);
-		}
+		this.worlds = this.keeper.getWorlds();
 	}
 
 	@Override
 	protected void init() {
+		WorldManager.registeredWorlds().forEach(world -> {
+			if (!worlds.contains(world)) {
+				this.worlds.add(world);
+			}
+		});
 		this.center = width / 2;		
 		this.screenWidth = center > 480 ? center : width > 480 ? 480 : width;
 		this.x = center - screenWidth / 2;		
@@ -175,19 +167,19 @@ public class WaypointsList extends MapScreen {
 		this.nextDimensionButton = new ButtonWidget(x + screenWidth - 30, 6, 20, 20, new LiteralText(">"), (b) -> cycleDimension(1));		
 		this.addButton = new ButtonWidget(center - 62, height - 26, 60, 20, lang("create"), (b) -> add());
 		this.closeButton = new ButtonWidget(center + 2, height - 26, 60, 20, lang("close"), (b) -> onClose());
-		this.currentDim = client.world.getDimensionRegistryKey().getValue();
-		this.currentDimIndex = getDimIndex(currentDim);
+		this.currentWorld = WorldManager.getWorldKey();
+		this.currentIndex = this.getIndex(currentWorld);
 		
-		reset();
+		this.reset();
 	}
 	
 	private void createEntries() {
-		entries.clear();
+		this.entries.clear();
 	
 		int y = 40;
-		for (Waypoint wp : wayPoints) {
+		for (Waypoint wp : waypoints) {
 			Entry entry = new Entry(this, x + 10, scrollAmount + y, screenWidth - 20, 20, wp);
-			entries.add(entry);
+			this.entries.add(entry);
 			
 			y += entry.height;
 		}
@@ -203,29 +195,28 @@ public class WaypointsList extends MapScreen {
 	
 	
 	private void cycleDimension(int i) {
-		currentDimIndex += i;
-		if (currentDimIndex >= dimensions.size()) {
-			currentDimIndex = 0;
+		this.currentIndex += i;
+		if (currentIndex >= worlds.size()) {
+			this.currentIndex = 0;
 		}
-		else if (currentDimIndex < 0) {
-			currentDimIndex = dimensions.size() - 1;
+		else if (currentIndex < 0) {
+			this.currentIndex = worlds.size() - 1;
 		}
 		
-		currentDim = dimensions.get(currentDimIndex);
-		reset();
+		this.currentWorld = this.worlds.get(currentIndex);
+		this.reset();
 	}
 	
-	private int getDimIndex(Identifier dim) {
-		return dimensions.indexOf(dim);
+	private int getIndex(WorldKey world) {
+		return this.worlds.indexOf(world);
 	}
 	
 	public void reset() {
-		this.info = this.getDimensionInfo(currentDim);
+		this.info = this.getDimensionInfo(currentWorld.getDimension());
+		this.waypoints = this.keeper.getWaypoints(currentWorld, false);
+		this.createEntries();
 		
-		this.wayPoints = keeper.getWaypoints(currentDim, false);
-		createEntries();
-		this.maxScroll = wayPoints.size() * 20;
-		
+		this.maxScroll = waypoints.size() * 20;
 		this.children.clear();
 		this.children.addAll(entries);
 		this.children.add(addButton);
@@ -238,10 +229,13 @@ public class WaypointsList extends MapScreen {
 	public void render(MatrixStack matrixStack, int mouseX, int mouseY, float delta) {
 		super.render(matrixStack, mouseX, mouseY, delta);
 		
-		entries.forEach(e -> e.render(matrixStack, mouseX, mouseY, delta));
+		this.entries.forEach(e -> e.render(matrixStack, mouseX, mouseY, delta));
 		
-		String dimensionName = info == null ? lang("unknown").getString() : I18n.translate(info.getFirst());
-		this.drawCenteredString(matrixStack, textRenderer, dimensionName, center, 15, Colors.WHITE);
+		String screenTitle = this.currentWorld.getName();
+		if (screenTitle == null) {
+			screenTitle = info == null ? lang("unknown").getString() : I18n.translate(info.getFirst());
+		}
+		this.drawCenteredString(matrixStack, textRenderer, screenTitle, center, 15, Colors.WHITE);
 		this.drawScrollBar();
 	}
 	
@@ -256,27 +250,27 @@ public class WaypointsList extends MapScreen {
 	private void drawScrollBar() {}
 	
 	private void edit(Waypoint waypoint) {
-		client.openScreen(new WaypointEditor(waypoint, this, null));
+		this.client.openScreen(new WaypointEditor(waypoint, this, null));
 	}
 	
 	private void add() {
 		Waypoint waypoint = new Waypoint();
-		waypoint.dimension = currentDim;
+		waypoint.world = currentWorld;
 		waypoint.color = RandomUtil.getElement(Waypoint.WAYPOINT_COLORS);
 		waypoint.pos = client.player.getBlockPos();
 		waypoint.name = "Waypoint";
 		
-		client.openScreen(new WaypointEditor(waypoint, this, keeper::addNew));
+		this.client.openScreen(new WaypointEditor(waypoint, this, keeper::addNew));
 	}
 	
 	private void delete(Waypoint waypoint) {
-		keeper.remove(waypoint);
-		keeper.saveWaypoints();
-		reset();
+		this.keeper.remove(waypoint);
+		this.keeper.saveWaypoints();
+		this.reset();
 	}
 	
 	public void teleport(Waypoint waypoint) {
-		if (!client.world.getDimensionRegistryKey().getValue().equals(currentDim)) return;
+		if (!WorldManager.getWorldKey().equals(currentWorld)) return;
 		int y = waypoint.pos.getY() > 0 ? waypoint.pos.getY() : (Dimension.isNether(client.world.getDimensionRegistryKey()) ? 128 : 64);
 		this.client.player.sendChatMessage("/tp " + this.client.player.getName().asString() + " " + waypoint.pos.getX() + " " + y + " " + waypoint.pos.getZ());
 		this.onClose();
@@ -285,7 +279,7 @@ public class WaypointsList extends MapScreen {
 	@Override
 	public boolean mouseScrolled(double double_1, double double_2, double double_3) {
 		scrollAmount = MathUtil.clamp(scrollAmount + (int) (double_3 * 12), -maxScroll + 80, 0);
-		updateEntries();
+		this.updateEntries();
 		
 		return true;
 	}
