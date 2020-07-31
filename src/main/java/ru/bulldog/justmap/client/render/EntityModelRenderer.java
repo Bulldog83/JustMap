@@ -5,6 +5,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.util.Colors;
+import ru.bulldog.justmap.util.DataUtil;
 import ru.bulldog.justmap.util.math.MathUtil;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.DiffuseLighting;
@@ -20,7 +21,7 @@ import net.minecraft.entity.LivingEntity;
 
 public class EntityModelRenderer {	
 
-	private static MinecraftClient minecraft = JustMapClient.MINECRAFT;
+	private static MinecraftClient minecraft = DataUtil.getMinecraft();
 	private static EntityRenderDispatcher renderDispatcher = minecraft.getEntityRenderManager();
 	private static VertexConsumerProvider.Immediate consumerProvider = minecraft.getBufferBuilders().getEntityVertexConsumers();
 	

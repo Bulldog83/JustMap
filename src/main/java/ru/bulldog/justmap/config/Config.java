@@ -9,23 +9,23 @@ public abstract class Config {
 	
 	public abstract void saveChanges();
 	
-	public Entry<?> getEntry(String key) {
+	public <E extends Entry<?>> E getEntry(String key) {
 		return KEEPER.getEntry(key);
 	}
 	
-	public Object getDefault(String key) {
-		Entry<?> entry = KEEPER.getEntry(key);
+	public <T> T getDefault(String key) {
+		Entry<T> entry = KEEPER.getEntry(key);
 		return entry != null ? entry.getDefault() : null;
 	}
 	
 	public String getString(String key) {
-		String str = (String) KEEPER.getValue(key);		
+		String str = KEEPER.getValue(key);
 		return str != null ? str : "";
 	}
 	
 	public boolean setString(String key, String value) {
 		try {
-			StringEntry entry = (StringEntry) KEEPER.getEntry(key);
+			StringEntry entry = KEEPER.getEntry(key);
 			entry.setValue(value);
 			KEEPER.set(key, entry);
 			
@@ -38,13 +38,13 @@ public abstract class Config {
 	}
 	
 	public int getInt(String key) {
-		Integer val = (Integer) KEEPER.getValue(key);		
+		Integer val = KEEPER.getValue(key);		
 		return val != null ? val : 0;
 	}
 	
 	public boolean setInt(String key, int value) {
 		try {
-			IntegerEntry entry = (IntegerEntry) KEEPER.getEntry(key);
+			IntegerEntry entry = KEEPER.getEntry(key);
 			entry.setValue(value);
 			KEEPER.set(key, entry);
 			
@@ -58,18 +58,11 @@ public abstract class Config {
 	
 	public <T extends Comparable<T>> boolean setRanged(String key, T value) {
 		try {
-			Entry<?> entry = KEEPER.getEntry(key);
-			if (entry instanceof RangeEntry) {
-				@SuppressWarnings("unchecked")
-				RangeEntry<T> range = (RangeEntry<T>) entry;
-				
-				range.setValue(value);
-				KEEPER.set(key, range);
-				
-				return true;
-			}
+			RangeEntry<T> entry = KEEPER.getEntry(key);
+			entry.setValue(value);
+			KEEPER.set(key, entry);
 			
-			return false;
+			return true;
 		} catch (NullPointerException | ClassCastException ex) {
 			JustMap.LOGGER.catching(ex);
 		}
@@ -78,13 +71,13 @@ public abstract class Config {
 	}
 	
 	public float getFloat(String key) {
-		Float val = (Float) KEEPER.getValue(key);		
+		Float val = KEEPER.getValue(key);		
 		return val != null ? val : 0.0F;
 	}
 	
 	public boolean setFloat(String key, float value) {
 		try {
-			FloatEntry entry = (FloatEntry) KEEPER.getEntry(key);
+			FloatEntry entry = KEEPER.getEntry(key);
 			entry.setValue(value);
 			KEEPER.set(key, entry);
 			
@@ -97,13 +90,13 @@ public abstract class Config {
 	}
 	
 	public boolean getBoolean(String key) {
-		Boolean val = (Boolean) KEEPER.getValue(key);		
+		Boolean val = KEEPER.getValue(key);		
 		return val != null ? val : false;
 	}
 	
 	public boolean setBoolean(String key, boolean value) {
 		try {
-			BooleanEntry entry = (BooleanEntry) KEEPER.getEntry(key);
+			BooleanEntry entry = KEEPER.getEntry(key);
 			entry.setValue(value);
 			KEEPER.set(key, entry);
 			

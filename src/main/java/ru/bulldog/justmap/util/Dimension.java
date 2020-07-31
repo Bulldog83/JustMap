@@ -24,14 +24,26 @@ public class Dimension {
 	}
 	
 	public static boolean isEnd(RegistryKey<DimensionType> dimType) {
-		return dimType.equals(DimensionType.THE_END_REGISTRY_KEY);
+		return isEnd(dimType.getValue());
 	}
 
 	public static boolean isNether(RegistryKey<DimensionType> dimType) {
-		return dimType.equals(DimensionType.THE_NETHER_REGISTRY_KEY);
+		return isNether(dimType.getValue());
 	}
 	
 	public static boolean isOverworld(RegistryKey<DimensionType> dimType) {
-		return dimType.equals(DimensionType.OVERWORLD_REGISTRY_KEY);
+		return isOverworld(dimType.getValue());
+	}
+	
+	public static boolean isEnd(Identifier dimId) {
+		return dimId.equals(DimensionType.THE_END_REGISTRY_KEY.getValue());
+	}
+	
+	public static boolean isNether(Identifier dimId) {
+		return dimId.equals(DimensionType.THE_NETHER_REGISTRY_KEY.getValue());
+	}
+	
+	public static boolean isOverworld(Identifier dimId) {
+		return dimId.equals(DimensionType.OVERWORLD_REGISTRY_KEY.getValue());
 	}
 }

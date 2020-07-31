@@ -14,37 +14,34 @@ import ru.bulldog.justmap.JustMap;
 
 public final class ConfigKeeper {
 	
-	private Map<String, Entry<?>> configEntries = new HashMap<>();
-	
 	private static ConfigKeeper instance;
-	
 	public static ConfigKeeper getInstance() {
 		if (instance == null) {
 			instance = new ConfigKeeper();
 		}
-		
 		return instance;
 	}
 	
+	private Map<String, Entry<?>> configEntries = new HashMap<>();
+	
 	private ConfigKeeper() {}
 	
-	public Entry<?> getEntry(String key) {
-		Entry<?> entry = configEntries.get(key);
+	@SuppressWarnings("unchecked")
+	public <E extends Entry<?>> E getEntry(String key) {
+		Entry<?> entry = this.configEntries.get(key);
 		if (entry == null) {
-			JustMap.LOGGER.logWarning(String.format("Entry '%s' doesn't exists.", key));			
+			JustMap.LOGGER.warning(String.format("Entry '%s' doesn't exists.", key));			
 			return null;
 		}
-		
-		return entry;
+		return (E) entry;
 	}
 	
-	public Object getValue(String key) {
-		Entry<?> entry = getEntry(key);
+	public <T> T getValue(String key) {
+		Entry<T> entry = this.getEntry(key);
 		if (entry == null) {
-			JustMap.LOGGER.logWarning(String.format("Empty value will be returned.", key));			
+			JustMap.LOGGER.warning(String.format("Empty value will be returned.", key));			
 			return null;
 		}
-		
 		return entry.getValue();
 	}
 	
@@ -71,7 +68,6 @@ public final class ConfigKeeper {
 			if (jsonObject.has(param)) {
 				Entry<?> entry = configEntries.get(param);
 				entry.fromString(JsonHelper.getString(jsonObject, param));
-				configEntries.put(param, entry);
 			}
 		}
 	}
@@ -304,7 +300,7 @@ public final class ConfigKeeper {
 
 		@Override
 		public void fromString(String value) {
-			setValue(value);
+			this.setValue(value);
 		}		
 	}
 	
@@ -334,7 +330,6 @@ public final class ConfigKeeper {
 		
 		public Entry (T defaultValue, Consumer<T> consumer, Supplier<T> supplier) {
 			this.defaultValue = defaultValue;
-			
 			this.setter = consumer;
 			this.getter = supplier;
 		}

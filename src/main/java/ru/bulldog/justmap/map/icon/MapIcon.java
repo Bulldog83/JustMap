@@ -1,9 +1,10 @@
 package ru.bulldog.justmap.map.icon;
 
-import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.map.IMap;
+import ru.bulldog.justmap.util.DataUtil;
 import ru.bulldog.justmap.util.math.MathUtil;
 import ru.bulldog.justmap.util.math.Point;
+
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.util.math.MatrixStack;
 
@@ -12,7 +13,7 @@ public abstract class MapIcon<T extends MapIcon<T>> {
 	protected IMap map;
 	public double x, y;
 	
-	protected static final MinecraftClient minecraft = JustMapClient.MINECRAFT;
+	protected static final MinecraftClient minecraft = DataUtil.getMinecraft();
 	
 	public MapIcon(IMap map) {
 		this.map = map;

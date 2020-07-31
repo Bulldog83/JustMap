@@ -9,9 +9,10 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ChatScreen;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.EquipmentSlot;
-import ru.bulldog.justmap.client.JustMapClient;
+
 import ru.bulldog.justmap.client.config.ClientParams;
-import ru.bulldog.justmap.util.ScreenPosition;
+import ru.bulldog.justmap.enums.ScreenPosition;
+import ru.bulldog.justmap.util.DataUtil;
 
 public class AdvancedInfo {
 
@@ -25,7 +26,7 @@ public class AdvancedInfo {
 		return INSTANCE;
 	}
 	
-	private MinecraftClient minecraft = JustMapClient.MINECRAFT;
+	private MinecraftClient minecraft = DataUtil.getMinecraft();
 	private Map<ScreenPosition, TextManager> managers;
 	private TextManager mapTextManager;
 	private ScreenPosition infoPos;
@@ -95,6 +96,8 @@ public class AdvancedInfo {
 	
 	public void draw(MatrixStack matrixStack) {
 		if (!ClientParams.advancedInfo) return;
+		if (minecraft.currentScreen != null &&
+		  !(minecraft.currentScreen instanceof ChatScreen)) return;
 		RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
 		this.managers.forEach((position, manager) -> manager.draw(matrixStack));
 	}

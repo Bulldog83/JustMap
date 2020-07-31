@@ -14,11 +14,11 @@ import com.google.gson.JsonObject;
 
 import ru.bulldog.justmap.JustMap;
 
-public abstract class JsonFactory {
+public class JsonFactory {
 	
-	protected final static Gson GSON = new GsonBuilder().setPrettyPrinting().create();
+	public final static Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 	
-	protected static JsonObject loadJson(File jsonFile) {
+	public static JsonObject loadJson(File jsonFile) {
 		if (jsonFile.exists()) {
 			try {
 				Reader reader = new FileReader(jsonFile);
@@ -36,7 +36,7 @@ public abstract class JsonFactory {
 		return new JsonObject();
 	}
 	
-	protected static void storeJson(File jsonFile, JsonElement jsonObject) {
+	public static void storeJson(File jsonFile, JsonElement jsonObject) {
 		try(FileWriter writer = new FileWriter(jsonFile)) {			
 			String json = GSON.toJson(jsonObject);
 			writer.write(json);

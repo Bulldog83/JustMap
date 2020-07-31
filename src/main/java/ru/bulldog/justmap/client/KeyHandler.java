@@ -5,8 +5,8 @@ import net.minecraft.client.options.KeyBinding;
 
 import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.client.config.ConfigFactory;
+import ru.bulldog.justmap.client.screen.WaypointsList;
 import ru.bulldog.justmap.map.Worldmap;
-import ru.bulldog.justmap.map.waypoint.WaypointsList;
 
 import java.util.ArrayList;
 import java.util.List;
