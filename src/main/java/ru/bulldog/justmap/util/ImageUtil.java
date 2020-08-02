@@ -117,7 +117,10 @@ public class ImageUtil {
 			int x = 0;
 			while(x < width) {
 				if (imgX >= imgW) imgX = 0;
-				int len = (int) new Line(centerX, centerY, x, y).lenght();
+				int len = 0;
+				if (centerX != x || centerY != y) {
+					len = (int) new Line(centerX, centerY, x, y).lenght();
+				}
 				if (len <= rOut && len >= rIn) {							
 					int pixel = texture.getPixelColor(imgX, imgY);
 					roundSkin.setPixelColor(x, y, pixel);
