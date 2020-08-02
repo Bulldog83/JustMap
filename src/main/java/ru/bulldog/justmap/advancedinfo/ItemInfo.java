@@ -5,7 +5,6 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.Util;
 
 import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.util.RenderUtil;
