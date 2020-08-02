@@ -6,7 +6,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import ru.bulldog.justmap.map.data.RegionPos;
 
-public class Point implements Comparable<Point> {
+public class Point {
+	
 	public double x;
 	public double y;
 	
@@ -28,7 +29,7 @@ public class Point implements Comparable<Point> {
 	}
 	
 	public double distance(Point target) {
-		return Math.sqrt(MathUtil.pow2(target.x - x) + MathUtil.pow2(target.y - y));
+		return Line.length(x, y, target.x, target.y);
 	}
 	
 	@Override
@@ -43,13 +44,6 @@ public class Point implements Comparable<Point> {
 		
 		Point point = (Point) obj;
 		return this.x == point.x && this.y == point.y;
-	}
-
-	@Override
-	public int compareTo(Point point) {
-		if (x < point.x || y < point.y) return -1;
-		if (x > point.x || y > point.y) return 1;
-		return 0;
 	}
 	
 	@Override

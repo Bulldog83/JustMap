@@ -7,7 +7,7 @@ public class Line {
 	private double lenght;
 	
 	public static double length(double sx, double sy, double ex, double ey) {
-		return new Line(sx, sy, ex, ey).lenght();
+		return Math.sqrt(MathUtil.pow2(ex - sx) + MathUtil.pow2(ey - sy));
 	}
 	
 	public Line(double sx, double sy, double ex, double ey) {
