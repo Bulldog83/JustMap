@@ -6,6 +6,10 @@ public class Line {
 	
 	private double lenght;
 	
+	public static double length(double sx, double sy, double ex, double ey) {
+		return new Line(sx, sy, ex, ey).lenght();
+	}
+	
 	public Line(double sx, double sy, double ex, double ey) {
 		this(new Point(sx, sy),
 			 new Point(ex, ey));

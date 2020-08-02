@@ -27,8 +27,8 @@ public class Point implements Comparable<Point> {
 		this.y = y;
 	}
 	
-	public int distance(Point target) {
-		return (int) Math.sqrt(MathUtil.pow2(target.x - x) + MathUtil.pow2(target.y - y));
+	public double distance(Point target) {
+		return Math.sqrt(MathUtil.pow2(target.x - x) + MathUtil.pow2(target.y - y));
 	}
 	
 	@Override
