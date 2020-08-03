@@ -19,12 +19,6 @@ public class Line {
 		this.first = first;
 		this.second = second;
 		this.lenght = first.distance(second);
-		
-		if (lenght <= 0) {
-			String error = String.format("Invalid Line: %s: %s! Lenght: %f.",
-					first.toString(), second.toString(), lenght);
-			throw new IllegalArgumentException(error);
-		}
 	}
 	
 	public double lenght() {

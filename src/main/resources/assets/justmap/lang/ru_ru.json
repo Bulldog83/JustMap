@@ -93,6 +93,8 @@
   "justmap.configuration.entity_outline_thickness": "Толщина обводки",
   "justmap.configuration.entity_icon_size": "Размер иконки сущностей",
   "justmap.configuration.entity_model_size": "Размер модели сущностей",
+  "justmap.configuration.detect_multiworlds": "Определять мультимиры",
+  "justmap.configuration.multiworld_detection_type": "Тип определения мультимира",
   
   "justmap.configuration.chunk_update_interval": "Интервал обновления чанка (миллисекунд)",
   "justmap.configuration.chunk_level_update_interval": "Интервал обновления уровней чанка (миллисекунд)",
