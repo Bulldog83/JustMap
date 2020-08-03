@@ -146,7 +146,7 @@ public class WaypointEditor extends MapScreen {
 	public void render(MatrixStack matrixStack, int mouseX, int mouseY, float delta) {
 		super.render(matrixStack, mouseX, mouseY, delta);
 		String dimensionName = info == null ? lang("unknown").asString() : I18n.translate(info.getFirst());
-		this.drawCenteredString(matrixStack, textRenderer, dimensionName, center, 15, Colors.WHITE);
+		drawCenteredString(matrixStack, textRenderer, dimensionName, center, 15, Colors.WHITE);
 	}
 	
 	private void cycleColor(int i) {

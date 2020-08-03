@@ -33,7 +33,6 @@ public class RegionData {
 	private Layer layer;
 	private ChunkPos center;
 	private Plane updateArea;
-	private File regionFile;
 	private int level;
 	private boolean needUpdate = false;
 	private boolean renewOverlay = false;

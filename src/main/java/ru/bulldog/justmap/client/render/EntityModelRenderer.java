@@ -22,7 +22,7 @@ import net.minecraft.entity.LivingEntity;
 public class EntityModelRenderer {	
 
 	private static MinecraftClient minecraft = DataUtil.getMinecraft();
-	private static EntityRenderDispatcher renderDispatcher = minecraft.getEntityRenderManager();
+	private static EntityRenderDispatcher renderDispatcher = minecraft.getEntityRenderDispatcher();
 	private static VertexConsumerProvider.Immediate consumerProvider = minecraft.getBufferBuilders().getEntityVertexConsumers();
 	
 	public static void renderModel(Entity entity, double x, double y) {
