@@ -119,7 +119,7 @@ public class ImageUtil {
 				if (imgX >= imgW) imgX = 0;
 				int len = 0;
 				if (centerX != x || centerY != y) {
-					len = (int) new Line(centerX, centerY, x, y).lenght();
+					len = (int) Line.length(centerX, centerY, x, y);
 				}
 				if (len <= rOut && len >= rIn) {							
 					int pixel = texture.getPixelColor(imgX, imgY);
