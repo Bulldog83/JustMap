@@ -4,11 +4,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 import ru.bulldog.justmap.JustMap;
-import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.mixins.BooleanRuleAccessor;
 import ru.bulldog.justmap.mixins.GameRulesAccessor;
+import ru.bulldog.justmap.util.DataUtil;
+
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.world.GameRules;
 import net.minecraft.world.GameRules.Key;
@@ -26,7 +28,7 @@ public class MapGameRules {
 	private MapGameRules() {}
 	
 	public static void init() {
-		JustMap.LOGGER.logInfo("Map gamerules loaded.");
+		JustMap.LOGGER.info("Map gamerules loaded.");
 	}
 
 	private static GameRules.Key<GameRules.BooleanRule> register(String name, boolean defaultValue) {
@@ -64,25 +66,25 @@ public class MapGameRules {
 	 */	
 	@Environment(EnvType.CLIENT)
 	public static void parseCommand(String command) {
-		GameRules gameRules = JustMapClient.MINECRAFT.world.getGameRules();
+		GameRules gameRules = DataUtil.getWorld().getGameRules();
 		codes.forEach((key, rule) -> {
 			if (command.contains(key)) {
 				int valPos = command.indexOf(key) + 2;
 				boolean value = command.substring(valPos, valPos + 2).equals("§1");
 				gameRules.get(rule).set(value, null);
-				JustMap.LOGGER.logInfo(String.format("Map rule %s switched to: %s.", rule, value));
+				JustMap.LOGGER.info(String.format("Map rule %s switched to: %s.", rule, value));
 			}
 		});
 	}
 	
 	@Environment(EnvType.CLIENT)
 	public static boolean isAllowed(GameRules.Key<GameRules.BooleanRule> rule) {
-		MinecraftClient minecraft = JustMapClient.MINECRAFT;
-		
+		MinecraftClient minecraft = DataUtil.getMinecraft();		
 		boolean allow = true;
 		if (minecraft.isIntegratedServerRunning()) {
 			allow = minecraft.getServer().getGameRules().getBoolean(rule);
 		} else if (!minecraft.isInSingleplayer()) {
+			if (minecraft.world == null) return false;
 			allow = minecraft.world.getGameRules().getBoolean(rule);
 		}
 		

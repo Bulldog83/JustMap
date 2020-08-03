@@ -1,10 +1,9 @@
 package ru.bulldog.justmap.advancedinfo;
 
-import ru.bulldog.justmap.client.JustMapClient;
+import ru.bulldog.justmap.enums.TextAlignment;
 import ru.bulldog.justmap.util.Colors;
+import ru.bulldog.justmap.util.DataUtil;
 import ru.bulldog.justmap.util.RenderUtil;
-import ru.bulldog.justmap.util.RenderUtil.TextAlignment;
-
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.util.math.MatrixStack;
@@ -22,7 +21,7 @@ public abstract class InfoText {
 	  int offsetY;
 	  int x, y;
   
-	  protected static final MinecraftClient minecraft = JustMapClient.MINECRAFT;
+	  protected static final MinecraftClient minecraft = DataUtil.getMinecraft();
 	  
 	  public abstract void update();
 	  
@@ -55,7 +54,7 @@ public abstract class InfoText {
 		
 		  switch (alignment) {
 			 case LEFT:
-				 RenderUtil.DRAWER.drawStringWithShadow(matrixStack, textRenderer, text.getString(), x, y, color);
+				 RenderUtil.drawStringWithShadow(matrixStack, textRenderer, text.getString(), x, y, color);
 			 break;
 			 case CENTER:
 				 RenderUtil.drawBoundedString(matrixStack, text.getString(), x, y, 0, width - 2, color);

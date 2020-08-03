@@ -18,9 +18,22 @@ public class Plane {
 	}
 	
 	public boolean contains(Point point) {
-		return (first.compareTo(point) >= 0 &&
-			    second.compareTo(point) <= 0) ||
-			   (first.compareTo(point) <= 0 &&
-				second.compareTo(point) >= 0);
+		if (second.x > first.x && second.y > first.y) {
+			return first.x <= point.x && first.y <= point.y &&
+				   second.x >= point.x && second.y >= point.y;
+		}
+		if (second.x > first.x && first.y > second.y) {
+			return first.x <= point.x && first.y >= point.y &&
+				   second.x >= point.x && second.y <= point.y;
+		}
+		if (first.x > second.x && second.y > first.y) {
+			return first.x >= point.x && first.y <= point.y &&
+				   second.x <= point.x && second.y >= point.y;
+		}
+		if (first.x > second.x && first.y > second.y) {
+			return first.x >= point.x && first.y >= point.y &&
+				   second.x <= point.x && second.y <= point.y;
+		}
+		return false;
 	}
 }

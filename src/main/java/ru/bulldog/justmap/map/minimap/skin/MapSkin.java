@@ -8,10 +8,10 @@ import java.util.stream.Collectors;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import ru.bulldog.justmap.JustMap;
-import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.client.render.Image;
 import ru.bulldog.justmap.map.minimap.Minimap;
+import ru.bulldog.justmap.util.DataUtil;
 import ru.bulldog.justmap.util.ImageUtil;
 import ru.bulldog.justmap.util.RenderUtil;
 
@@ -35,7 +35,7 @@ public class MapSkin extends Image {
 	}
 
 	private final static List<MapSkin> SKINS = new ArrayList<>();
-	private final static TextureManager textureManager = JustMapClient.MINECRAFT.getTextureManager();
+	private final static TextureManager textureManager = DataUtil.getMinecraft().getTextureManager();
 	
 	private final RenderData renderData;
 	
@@ -106,7 +106,7 @@ public class MapSkin extends Image {
 		try {
 			return SKINS.get(id);
 		} catch(IndexOutOfBoundsException ex) {
-			JustMap.LOGGER.logWarning(ex.getMessage());
+			JustMap.LOGGER.warning(ex.getMessage());
 		}
 		
 		return SKINS.get(0);
@@ -297,6 +297,7 @@ public class MapSkin extends Image {
 	
 	static {
 		addSquareSkin("Minecraft Map", new Identifier(JustMap.MODID, "textures/skin/skin_def_map.png"), 64, 64, 5, false, true);
+		addSquareSkin("Minecraft LaF", new Identifier(JustMap.MODID, "textures/skin/skin_gui_laf.png"), 64, 64, 3, false, true);
 		addSquareSkin("Minecraft Gui", new Identifier(JustMap.MODID, "textures/skin/skin_def_gui.png"), 64, 64, 5, true);
 		addSquareSkin("Minecraft Gui Fancy", new Identifier(JustMap.MODID, "textures/skin/skin_def_gui_fancy.png"), 64, 64, 7, true);
 		addSquareSkin("Metal Frame", new Identifier(JustMap.MODID, "textures/skin/skin_simple_metal.png"), 64, 64, 4, true);

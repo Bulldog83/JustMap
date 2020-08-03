@@ -10,9 +10,11 @@ import ru.bulldog.justmap.config.ConfigKeeper.EnumEntry;
 import ru.bulldog.justmap.config.ConfigKeeper.FloatRange;
 import ru.bulldog.justmap.config.ConfigKeeper.IntegerEntry;
 import ru.bulldog.justmap.config.ConfigKeeper.IntegerRange;
-import ru.bulldog.justmap.map.DirectionArrow;
-import ru.bulldog.justmap.map.minimap.Minimap;
-import ru.bulldog.justmap.util.ScreenPosition;
+import ru.bulldog.justmap.enums.ArrowType;
+import ru.bulldog.justmap.enums.MapShape;
+import ru.bulldog.justmap.enums.MultiworldDetection;
+import ru.bulldog.justmap.enums.ScreenPosition;
+import ru.bulldog.justmap.map.data.WorldManager;
 
 public class ClientConfig extends Config {
 	
@@ -29,7 +31,7 @@ public class ClientConfig extends Config {
 	private ClientConfig() {
 		KEEPER.registerEntry("map_visible", new BooleanEntry(ClientParams.mapVisible, (b) -> ClientParams.mapVisible = b, () -> ClientParams.mapVisible));
 		KEEPER.registerEntry("map_position", new EnumEntry<ScreenPosition>(ClientParams.mapPosition, (e) -> ClientParams.mapPosition = e, () -> ClientParams.mapPosition));
-		KEEPER.registerEntry("arrow_type", new EnumEntry<DirectionArrow.Type>(ClientParams.arrowIconType, (e) -> ClientParams.arrowIconType = e, () -> ClientParams.arrowIconType));
+		KEEPER.registerEntry("arrow_type", new EnumEntry<ArrowType>(ClientParams.arrowIconType, (e) -> ClientParams.arrowIconType = e, () -> ClientParams.arrowIconType));
 		KEEPER.registerEntry("map_offset", new IntegerEntry(ClientParams.positionOffset, (i) -> ClientParams.positionOffset = i, () -> ClientParams.positionOffset));
 		KEEPER.registerEntry("map_size", new IntegerRange(ClientParams.mapSize, (i) -> ClientParams.mapSize = i, () -> ClientParams.mapSize, 16, 256));
 		KEEPER.registerEntry("big_map_size", new IntegerRange(ClientParams.bigMapSize, (i) -> ClientParams.bigMapSize = i, () -> ClientParams.bigMapSize, 256, 400));
@@ -95,6 +97,7 @@ public class ClientConfig extends Config {
 		KEEPER.registerEntry("force_map_update", new BooleanEntry(ClientParams.forceUpdate, (b) -> ClientParams.forceUpdate = b, () -> ClientParams.forceUpdate));
 		KEEPER.registerEntry("show_slime", new BooleanEntry(ClientParams.showSlime, (b) -> ClientParams.showSlime = b, () -> ClientParams.showSlime));
 		KEEPER.registerEntry("show_loaded_chunks", new BooleanEntry(ClientParams.showLoadedChunks, (b) -> ClientParams.showLoadedChunks = b, () -> ClientParams.showLoadedChunks));
+		KEEPER.registerEntry("detect_multiworlds", new BooleanEntry(ClientParams.detectMultiworlds, (b) -> ClientParams.detectMultiworlds = b, () -> ClientParams.detectMultiworlds));
 		KEEPER.registerEntry("entity_icon_size", new IntegerRange(ClientParams.entityIconSize, (i) -> ClientParams.entityIconSize = i, () -> ClientParams.entityIconSize, 2, 16));
 		KEEPER.registerEntry("entity_model_size", new IntegerRange(ClientParams.entityModelSize, (i) -> ClientParams.entityModelSize = i, () -> ClientParams.entityModelSize, 2, 16));
 		KEEPER.registerEntry("entity_outline_size", new IntegerRange(ClientParams.entityOutlineSize, (i) -> ClientParams.entityOutlineSize = i, () -> ClientParams.entityOutlineSize, 1, 5));
@@ -102,7 +105,8 @@ public class ClientConfig extends Config {
 		KEEPER.registerEntry("worldmap_icon_size", new IntegerRange(ClientParams.worldmapIconSize, (i) -> ClientParams.worldmapIconSize = i, () -> ClientParams.worldmapIconSize, 8, 16));
 		KEEPER.registerEntry("info_position", new EnumEntry<ScreenPosition>(ClientParams.infoPosition, (e) -> ClientParams.infoPosition = e, () -> ClientParams.infoPosition));
 		KEEPER.registerEntry("items_position", new EnumEntry<ScreenPosition>(ClientParams.itemsPosition, (e) -> ClientParams.itemsPosition = e, () -> ClientParams.itemsPosition));
-		KEEPER.registerEntry("map_shape", new EnumEntry<Minimap.Shape>(ClientParams.mapShape, (e) -> ClientParams.mapShape = e, () -> ClientParams.mapShape));
+		KEEPER.registerEntry("map_shape", new EnumEntry<MapShape>(ClientParams.mapShape, (e) -> ClientParams.mapShape = e, () -> ClientParams.mapShape));
+		KEEPER.registerEntry("multiworld_detection", new EnumEntry<MultiworldDetection>(ClientParams.multiworldDetection, (e) -> ClientParams.multiworldDetection = e, () -> ClientParams.multiworldDetection));
 		
 		JsonObject config = ConfigWriter.load();
 		if (config.size() > 0) {
@@ -111,10 +115,18 @@ public class ClientConfig extends Config {
 			ConfigWriter.save(KEEPER.toJson());
 		}
 	}
+	
+	public void reloadFromDisk() {
+		JsonObject config = ConfigWriter.load();
+		if (config.size() > 0) {
+			KEEPER.fromJson(config);
+		}
+	}
 
 	@Override
-	public void saveChanges()  {
+	public void saveChanges() {
 		ConfigWriter.save(KEEPER.toJson());
 		JustMapClient.MAP.updateMapParams();
+		WorldManager.onConfigUpdate();
 	}
 }

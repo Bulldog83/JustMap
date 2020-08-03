@@ -8,6 +8,8 @@
 	    "WorldRendererMixin",
 		"BakedSpriteAccessor",
 		"BufferBuilderMixin",
+		"ClientWorldMixin",
+		"MinecraftClientMixin",
 		"ClientPlayNetworkHandlerMixin",
 		"LivingEntityRendererMixin"
     ],

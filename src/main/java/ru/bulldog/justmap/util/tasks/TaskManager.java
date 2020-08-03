@@ -44,8 +44,20 @@ public class TaskManager implements Executor {
     }
     
     public static void shutdown() {
+    	long timeout = 5000;
     	managers.forEach((name, manager) -> {
-    		if (manager.isRunning()) manager.stop();
+    		if (manager.isRunning()) {
+    			manager.stop();
+    			long time = System.currentTimeMillis();
+    			while(manager.isRunning()) {
+    				long now = System.currentTimeMillis();
+    				if (now - time > timeout) {
+    					manager.running = false;
+    					manager.workQueue.clear();
+    				}
+    			}
+    			JustMap.LOGGER.debug("{} stopped", manager.name);
+    		}
     	});
     }
     
@@ -74,11 +86,11 @@ public class TaskManager implements Executor {
 
     @Override
     public void execute(Runnable command) {
-    	this.execute("Common task", command);
+    	this.execute(null, command);
     }
     
     public <T> CompletableFuture<T> run(Function<CompletableFuture<T>, Runnable> function) {
-		return this.run("Future task", function);
+		return this.run(null, function);
 	}
     
     public <T> CompletableFuture<T> run(String reason, Function<CompletableFuture<T>, Runnable> function) {
@@ -105,7 +117,9 @@ public class TaskManager implements Executor {
     	while (running) {
     		Task nextTask = workQueue.poll();
     		if (nextTask != null) {
-    			JustMap.LOGGER.debug(nextTask);
+    			if (nextTask.hasReason()) {
+    				JustMap.LOGGER.debug(nextTask);
+    			}
     			nextTask.run();
             } else {
             	LockSupport.park(queueBlocker);
@@ -123,14 +137,18 @@ public class TaskManager implements Executor {
     		this.task = task;
     	}
     	
+    	public String getReason() {
+    		return this.reason;
+    	}
+    	
+    	public boolean hasReason() {
+    		return this.reason != null;
+    	}
+    	
     	@Override
 		public void run() {
 			this.task.run();
 		}
-    	
-    	public String getReason() {
-    		return this.reason;
-    	}
     	
     	@Override
     	public String toString() {

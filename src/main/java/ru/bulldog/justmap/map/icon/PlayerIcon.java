@@ -4,13 +4,14 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.util.Window;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerEntity;
-import ru.bulldog.justmap.client.JustMapClient;
+
 import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.client.render.EntityModelRenderer;
 import ru.bulldog.justmap.map.IMap;
 import ru.bulldog.justmap.map.MapPlayerManager;
 import ru.bulldog.justmap.util.ColorUtil;
 import ru.bulldog.justmap.util.Colors;
+import ru.bulldog.justmap.util.DataUtil;
 import ru.bulldog.justmap.util.RenderUtil;
 import ru.bulldog.justmap.util.math.Point;
 
@@ -52,7 +53,7 @@ public class PlayerIcon extends MapIcon<PlayerIcon> {
 		}
 			
 		if (ClientParams.showPlayerNames) {
-			MinecraftClient minecraft = JustMapClient.MINECRAFT;
+			MinecraftClient minecraft = DataUtil.getMinecraft();
 			Window window = minecraft.getWindow();
 			double sf = window.getScaleFactor();
 			float scale = (float) (1.0 / sf);

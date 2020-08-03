@@ -12,13 +12,13 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-import net.minecraft.util.Identifier;
+import ru.bulldog.justmap.map.data.WorldKey;
 import ru.bulldog.justmap.util.JsonFactory;
 import ru.bulldog.justmap.util.storage.StorageUtil;
 
-public class WaypointKeeper extends JsonFactory {
+public class WaypointKeeper {
 	
-	private static Map<Identifier, List<Waypoint>> waypoints;	
+	private static Map<WorldKey, List<Waypoint>> waypoints;	
 	
 	private static WaypointKeeper instance;
 	private static File currentStorage;
@@ -32,7 +32,7 @@ public class WaypointKeeper extends JsonFactory {
 		if (currentStorage == null || !currentStorage.equals(waypointsFile)) {
 			currentStorage = waypointsFile;
 			instance.loadWaypoints();
-		}		
+		}
 		
 		return instance;
 	}
@@ -42,12 +42,12 @@ public class WaypointKeeper extends JsonFactory {
 	private void loadWaypoints() {
 		waypoints = new HashMap<>();		
 		if (currentStorage.exists()) {
-			JsonObject jsonObject = loadJson(currentStorage);
+			JsonObject jsonObject = JsonFactory.loadJson(currentStorage);
 			if (jsonObject.has("waypoints")) {
 				JsonArray waypointObject = jsonObject.getAsJsonArray("waypoints");
 				for(JsonElement elem : waypointObject) {
 					Waypoint wp = Waypoint.fromJson((JsonObject) elem);				
-					getWaypoints(wp.dimension, false).add(wp);
+					this.getWaypoints(wp.world, false).add(wp);
 				}
 			}
 		}
@@ -55,7 +55,7 @@ public class WaypointKeeper extends JsonFactory {
 	
 	public void saveWaypoints() {
 		JsonArray waypointArray = new JsonArray();
-		for (Entry<Identifier, List<Waypoint>> entry : waypoints.entrySet()) {
+		for (Entry<WorldKey, List<Waypoint>> entry : waypoints.entrySet()) {
 			List<Waypoint> list = entry.getValue();			
 			for (Waypoint wp : list) {
 				waypointArray.add(wp.toJson());
@@ -66,24 +66,24 @@ public class WaypointKeeper extends JsonFactory {
 		jsonObject.add("waypoints", waypointArray);
 		
 		File waypointsFile = new File(StorageUtil.filesDir(), "waypoints.json");
-		storeJson(waypointsFile, jsonObject);
+		JsonFactory.storeJson(waypointsFile, jsonObject);
 	}
 	
 	public void addNew(Waypoint waypoint) {
-		getWaypoints(waypoint.dimension, false).add(waypoint);
+		this.getWaypoints(waypoint.world, false).add(waypoint);
 	}
 	
 	public void remove(Waypoint waypoint) {
-		getWaypoints(waypoint.dimension, false).remove(waypoint);
+		this.getWaypoints(waypoint.world, false).remove(waypoint);
 	}
 	
-	public List<Waypoint> getWaypoints(Identifier dimension, boolean hiddenFilter) {
+	public List<Waypoint> getWaypoints(WorldKey worldKey, boolean hiddenFilter) {
 		List<Waypoint> list;
-		if (waypoints.get(dimension) == null) {
+		if (waypoints.get(worldKey) == null) {
 			list = new ArrayList<>();
-			waypoints.put(dimension, list);
+			waypoints.put(worldKey, list);
 		} else {
-			list = waypoints.get(dimension);
+			list = waypoints.get(worldKey);
 		}
 		
 		if (hiddenFilter) {
@@ -94,7 +94,7 @@ public class WaypointKeeper extends JsonFactory {
 		return list;
 	}
 	
-	public List<Identifier> getDimensions() {
+	public List<WorldKey> getWorlds() {
 		return new ArrayList<>(waypoints.keySet());
 	}
 }
