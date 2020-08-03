@@ -3,7 +3,6 @@ package ru.bulldog.justmap.util;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.GameRules;
-import net.minecraft.world.LightType;
 import net.minecraft.world.World;
 import net.minecraft.world.dimension.DimensionType;
 
@@ -24,7 +23,7 @@ public class RuleUtil {
 		return DataUtil.isOnline() && ClientParams.detectMultiworlds;
 	}
 
-	public static boolean needRenderCaves(World world, BlockPos playerPos) {
+	public static boolean needRenderCaves(World world, BlockPos pos) {
 		boolean allowCaves = isAllowed(ClientParams.drawCaves, MapGameRules.ALLOW_CAVES_MAP);
 		
 		DimensionType dimType = world.getDimension();
@@ -33,14 +32,13 @@ public class RuleUtil {
 			return false;
 		}
 		if (!dimType.hasCeiling() && dimType.hasSkyLight()) {
-			return allowCaves && (!world.isSkyVisibleAllowingSea(playerPos) &&
-				   world.getLightLevel(LightType.SKY, playerPos) == 0 ||
+			return allowCaves && (!world.isSkyVisibleAllowingSea(pos) && !DataUtil.hasSkyLight(world, pos) ||
 				   dimKey == DimensionType.OVERWORLD_CAVES_REGISTRY_KEY);
 		}
 		
 		return allowCaves;
 	}
-
+	
 	public static boolean allowEntityRadar() {
 		return isAllowed(ClientParams.showEntities, MapGameRules.ALLOW_ENTITY_RADAR);
 	}
