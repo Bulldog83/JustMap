@@ -9,6 +9,7 @@ import ru.bulldog.justmap.map.IMap;
 import ru.bulldog.justmap.map.minimap.Minimap;
 import ru.bulldog.justmap.util.Colors;
 import ru.bulldog.justmap.util.RenderUtil;
+import ru.bulldog.justmap.util.RuleUtil;
 import ru.bulldog.justmap.util.math.Line;
 import ru.bulldog.justmap.util.math.MathUtil;
 import ru.bulldog.justmap.util.math.Point;
@@ -27,8 +28,8 @@ public class EntityIcon extends MapIcon<EntityIcon> {
 	
 	@Override
 	public void draw(MatrixStack matrixStack, int mapX, int mapY, double offX, double offY, float rotation) {
-		if (!Minimap.allowCreatureRadar() && !hostile) { return; }
-		if (!Minimap.allowHostileRadar() && hostile) { return; }
+		if (!RuleUtil.allowCreatureRadar() && !hostile) { return; }
+		if (!RuleUtil.allowHostileRadar() && hostile) { return; }
 		
 		int size = ClientParams.showEntityHeads ? ClientParams.entityIconSize : 4;
 		

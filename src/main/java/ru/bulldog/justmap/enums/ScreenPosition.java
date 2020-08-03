@@ -1,4 +1,4 @@
-package ru.bulldog.justmap.util;
+package ru.bulldog.justmap.enums;
 
 public enum ScreenPosition {
 	TOP_LEFT,

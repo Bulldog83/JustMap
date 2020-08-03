@@ -7,8 +7,8 @@ import net.minecraft.util.registry.BuiltinRegistries;
 import net.minecraft.world.biome.Biome;
 
 import ru.bulldog.justmap.client.config.ClientParams;
-import ru.bulldog.justmap.util.RenderUtil.TextAlignment;
-import ru.bulldog.justmap.util.PosUtil;
+import ru.bulldog.justmap.enums.TextAlignment;
+import ru.bulldog.justmap.util.DataUtil;
 
 public class BiomeInfo extends InfoText {
 
@@ -29,7 +29,7 @@ public class BiomeInfo extends InfoText {
 	public void update() {
 		this.setVisible(ClientParams.showBiome);
 		if (visible && minecraft.world != null) {
-			Biome biome = minecraft.world.getBiome(PosUtil.currentPos());
+			Biome biome = minecraft.world.getBiome(DataUtil.currentPos());
 			Identifier biomeId = BuiltinRegistries.BIOME.getId(biome);
 			if (biomeId != null && !biomeId.equals(currentBiome)) {
 				this.currentBiome = biomeId;

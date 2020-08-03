@@ -17,7 +17,7 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Matrix3f;
 import net.minecraft.util.math.Matrix4f;
 import net.minecraft.text.Text;
-import ru.bulldog.justmap.client.JustMapClient;
+
 import ru.bulldog.justmap.client.render.Image;
 import ru.bulldog.justmap.map.minimap.skin.MapSkin;
 import ru.bulldog.justmap.map.minimap.skin.MapSkin.RenderData;
@@ -25,11 +25,6 @@ import ru.bulldog.justmap.map.minimap.skin.MapSkin.RenderData;
 import org.lwjgl.opengl.GL11;
 
 public class RenderUtil extends DrawableHelper {	
-	public static enum TextAlignment {
-		LEFT,
-		CENTER,
-		RIGHT
-	}
 	
 	private RenderUtil() {}
 	
@@ -38,8 +33,8 @@ public class RenderUtil extends DrawableHelper {
 	private final static VertexFormat VF_POS_TEX_NORMAL = new VertexFormat(ImmutableList.of(VertexFormats.POSITION_ELEMENT, VertexFormats.TEXTURE_ELEMENT, VertexFormats.NORMAL_ELEMENT, VertexFormats.PADDING_ELEMENT));
 	private final static Tessellator tessellator = Tessellator.getInstance();
 	private final static BufferBuilder vertexBuffer = tessellator.getBuffer();
-	private final static TextRenderer textRenderer = JustMapClient.MINECRAFT.textRenderer;
-	private final static TextureManager textureManager = JustMapClient.MINECRAFT.getTextureManager();
+	private final static TextRenderer textRenderer = DataUtil.getMinecraft().textRenderer;
+	private final static TextureManager textureManager = DataUtil.getMinecraft().getTextureManager();
 
 	public static int getWidth(Text text) {
 		return textRenderer.getWidth(text);
@@ -78,7 +73,7 @@ public class RenderUtil extends DrawableHelper {
 			drawX = rightBound - stringWidth;
 		}
 
-		DRAWER.drawStringWithShadow(matrix, textRenderer, string, drawX, y, color);
+		drawStringWithShadow(matrix, textRenderer, string, drawX, y, color);
 	}
 
 	public static void drawRightAlignedString(MatrixStack matrix, String string, int x, int y, int color) {
