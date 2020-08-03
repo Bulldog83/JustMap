@@ -20,7 +20,7 @@ public class MathUtil {
 	}
 	
 	public static double pow2(double n) {
-		return Math.pow(n, 2);
+		return n * n;
 	}
 	
 	public static boolean isEven(int num) {

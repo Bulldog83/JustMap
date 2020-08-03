@@ -10,6 +10,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.registry.RegistryKey;
+import net.minecraft.world.LightType;
 import net.minecraft.world.PersistentStateManager;
 import net.minecraft.world.World;
 import net.minecraft.world.dimension.DimensionType;
@@ -125,6 +126,17 @@ public class DataUtil {
 	public static double doubleZ() {
 		Entity posEntity = getPosEntity();
 		return posEntity.prevZ + (posEntity.getZ() - posEntity.prevZ) * (double) minecraft.getTickDelta();
+	}
+
+	static boolean hasSkyLight(World world, BlockPos pos) {
+		if (world.getLightLevel(LightType.SKY, pos) > 0) return true;
+		if (world.getLightLevel(LightType.SKY, pos.up()) > 0) return true;
+		if (world.getLightLevel(LightType.SKY, pos.north()) > 0) return true;
+		if (world.getLightLevel(LightType.SKY, pos.east()) > 0) return true;
+		if (world.getLightLevel(LightType.SKY, pos.south()) > 0) return true;
+		if (world.getLightLevel(LightType.SKY, pos.west()) > 0) return true;
+		
+		return false;
 	}
 	
 	public static Layer getLayer() {
