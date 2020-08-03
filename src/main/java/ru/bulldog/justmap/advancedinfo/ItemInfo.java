@@ -1,9 +1,9 @@
 package ru.bulldog.justmap.advancedinfo;
 
-import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.item.ItemStack;
+
 import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.util.RenderUtil;
 
@@ -53,7 +53,7 @@ public class ItemInfo extends InfoText {
 			} else if (this.itemStack.isStackable()) {
 				itemString = String.format("%d", this.itemStack.getCount());
 			} else {
-				itemString = I18n.translate(this.itemStack.getTranslationKey());
+				itemString = this.getTranslation();
 			}
 			this.setText(itemString);
 		}
@@ -71,5 +71,9 @@ public class ItemInfo extends InfoText {
 		}
 		
 		return true;
+	}
+	
+	private String getTranslation() {
+		return this.itemStack.getItem().getName(itemStack).getString();
 	}
 }

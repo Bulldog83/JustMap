@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import ru.bulldog.justmap.JustMap;
-import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.util.math.Line;
 
 import net.fabricmc.fabric.impl.client.indigo.renderer.helper.ColorHelper;
@@ -22,7 +21,7 @@ public class ImageUtil {
 	private static ResourceManager resourceManager;
 	
 	private static void checkResourceManager() {
-		if (resourceManager == null) resourceManager = JustMapClient.MINECRAFT.getResourceManager();
+		if (resourceManager == null) resourceManager = DataUtil.getMinecraft().getResourceManager();
 	}
 	
 	public static boolean imageExists(Identifier image) {
@@ -40,8 +39,8 @@ public class ImageUtil {
 			try (InputStream fis = new FileInputStream(image)) {
 				return NativeImage.read(fis);
 			} catch (IOException ex) {
-				JustMap.LOGGER.logWarning(String.format("Can't load texture image: %s. Will be created empty image.", image));
-				JustMap.LOGGER.logWarning(String.format("Cause: %s.", ex.getMessage()));
+				JustMap.LOGGER.warning(String.format("Can't load texture image: %s. Will be created empty image.", image));
+				JustMap.LOGGER.warning(String.format("Cause: %s.", ex.getMessage()));
 			}
 		}		
 		return new NativeImage(w, h, false);
@@ -53,8 +52,8 @@ public class ImageUtil {
 			try (Resource resource = resourceManager.getResource(image)) {
 				return NativeImage.read(resource.getInputStream());			
 			} catch (IOException e) {
-				JustMap.LOGGER.logWarning(String.format("Can't load texture image: %s. Will be created empty image.", image));
-				JustMap.LOGGER.logWarning(String.format("Cause: %s.", e.getMessage()));
+				JustMap.LOGGER.warning(String.format("Can't load texture image: %s. Will be created empty image.", image));
+				JustMap.LOGGER.warning(String.format("Cause: %s.", e.getMessage()));
 			}
 		}		
 		return new NativeImage(w, h, false);
@@ -118,7 +117,10 @@ public class ImageUtil {
 			int x = 0;
 			while(x < width) {
 				if (imgX >= imgW) imgX = 0;
-				int len = (int) new Line(centerX, centerY, x, y).lenght();
+				int len = 0;
+				if (centerX != x || centerY != y) {
+					len = (int) Line.length(centerX, centerY, x, y);
+				}
 				if (len <= rOut && len >= rIn) {							
 					int pixel = texture.getPixelColor(imgX, imgY);
 					roundSkin.setPixelColor(x, y, pixel);

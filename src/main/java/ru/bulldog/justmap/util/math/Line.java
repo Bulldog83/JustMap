@@ -6,6 +6,10 @@ public class Line {
 	
 	private double lenght;
 	
+	public static double length(double sx, double sy, double ex, double ey) {
+		return Math.sqrt(MathUtil.pow2(ex - sx) + MathUtil.pow2(ey - sy));
+	}
+	
 	public Line(double sx, double sy, double ex, double ey) {
 		this(new Point(sx, sy),
 			 new Point(ex, ey));
@@ -15,12 +19,6 @@ public class Line {
 		this.first = first;
 		this.second = second;
 		this.lenght = first.distance(second);
-		
-		if (lenght <= 0) {
-			String error = String.format("Invalid Line: %s: %s! Lenght: %f.",
-					first.toString(), second.toString(), lenght);
-			throw new IllegalArgumentException(error);
-		}
 	}
 	
 	public double lenght() {

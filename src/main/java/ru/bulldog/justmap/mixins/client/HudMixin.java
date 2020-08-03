@@ -7,9 +7,8 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import ru.bulldog.justmap.advancedinfo.AdvancedInfo;
 import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.client.render.MapRenderer;
+import ru.bulldog.justmap.enums.ScreenPosition;
 import ru.bulldog.justmap.util.Colors;
-import ru.bulldog.justmap.util.ScreenPosition;
-
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.hud.InGameHud;

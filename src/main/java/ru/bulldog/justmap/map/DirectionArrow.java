@@ -24,13 +24,7 @@ import ru.bulldog.justmap.util.ImageUtil;
 import ru.bulldog.justmap.util.SpriteAtlas;
 
 public class DirectionArrow extends Sprite {
-	public static enum Type {
-		DIRECTION_ARROW,
-		PLAYER_HEAD
-	}
-	
 	private final static VertexFormat vertexFormat = new VertexFormat(ImmutableList.of(VertexFormats.POSITION_ELEMENT, VertexFormats.TEXTURE_ELEMENT, VertexFormats.NORMAL_ELEMENT, VertexFormats.PADDING_ELEMENT));
-	
 	private static DirectionArrow ARROW;
 	
 	private DirectionArrow(Identifier texture, int w, int h) {
