@@ -93,7 +93,7 @@ public class MapRenderer {
 		this.mapW = minimap.getWidth();
 		this.mapH = minimap.getHeight();
 		
-		int scaledBorder = this.border;
+		int border = this.border;
 		if (ClientParams.useSkins) {
 			this.mapSkin = MapSkin.getSkin(ClientParams.currentSkin);			
 			this.border = this.mapSkin.border;
@@ -101,7 +101,7 @@ public class MapRenderer {
 			this.mapSkin.getRenderData().updateScale();
 			
 			double scale = this.mapSkin.getRenderData().scaleFactor;
-			scaledBorder = (int) (border * scale);
+			border = (int) (this.border * scale);
 		}
 		
 		int winW = client.getWindow().getScaledWidth();
@@ -112,8 +112,8 @@ public class MapRenderer {
 		
 		this.posX = offset;
 		this.posY = offset;
-		this.mapX = posX + scaledBorder;
-		this.mapY = posY + scaledBorder;
+		this.mapX = posX + border;
+		this.mapY = posY + border;
 		
 		this.rotation = client.player.headYaw;
 		
@@ -127,8 +127,8 @@ public class MapRenderer {
 				this.posX = mapX - border;
 				break;
 			case TOP_RIGHT:
-				this.mapX = winW - offset - mapW - scaledBorder;
-				this.posX = mapX - scaledBorder;
+				this.mapX = winW - offset - mapW - border;
+				this.posX = mapX - border;
 				break;
 			case MIDDLE_RIGHT:
 				this.mapX = winW - offset - mapW - border;
@@ -168,8 +168,8 @@ public class MapRenderer {
 		
 		this.textManager.setPosition(
 			mapX, mapY + (textPos == TextManager.TextPosition.UNDER && minimap.isMapVisible() ?
-				mapH + scaledBorder + 3 :
-				-(scaledBorder + 3))
+				mapH + border + 3 :
+				-(border + 3))
 		);
 		this.textManager.setDirection(textPos);
 		this.textManager.setSpacing(12);

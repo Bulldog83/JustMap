@@ -1,10 +1,13 @@
 package ru.bulldog.justmap.map.icon;
 
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.texture.*;
 import net.minecraft.client.util.DefaultSkinHelper;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.client.world.ClientWorld;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.Identifier;
 
 import ru.bulldog.justmap.JustMap;
@@ -17,6 +20,8 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.UUID;
 
+import com.mojang.authlib.GameProfile;
+
 public class PlayerHeadIcon {
 	private static Map<UUID, PlayerHeadIcon> playerIcons = new HashMap<>();
 	
@@ -25,13 +30,14 @@ public class PlayerHeadIcon {
 	private boolean success = false;
 	
 	private ResourceTexture playerSkin;
-	private ClientPlayerEntity player;
+	private MapPlayer player;
 	
-	private PlayerHeadIcon(ClientPlayerEntity player) {
-		this.player = player;
+	private PlayerHeadIcon(PlayerEntity player) {
+		ClientWorld world = MinecraftClient.getInstance().world;
+		this.player = new MapPlayer(world, player.getGameProfile());
 	}
 	
-	public static PlayerHeadIcon getIcon(ClientPlayerEntity player) {
+	public static PlayerHeadIcon getIcon(PlayerEntity player) {
 		PlayerHeadIcon icon;
 		long now = System.currentTimeMillis();
 		
@@ -114,5 +120,11 @@ public class PlayerHeadIcon {
 				JustMap.LOGGER.logWarning(ex.getLocalizedMessage());
 			}
 		}
+	}
+	
+	private static class MapPlayer extends AbstractClientPlayerEntity {
+		public MapPlayer(ClientWorld world, GameProfile profile) {
+			super(world, profile);
+		}		
 	}
 }

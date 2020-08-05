@@ -1,7 +1,7 @@
 package ru.bulldog.justmap.map.icon;
 
-import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.entity.player.PlayerEntity;
 
 import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.client.render.EntityModelRenderer;
@@ -11,12 +11,10 @@ import ru.bulldog.justmap.util.DrawHelper;
 
 public class PlayerIcon extends MapIcon<PlayerIcon> {
 	
-	protected boolean self;
-	protected ClientPlayerEntity player;
+	private PlayerEntity player;
 	
-	public PlayerIcon(IMap map, ClientPlayerEntity player, boolean self) {
+	public PlayerIcon(IMap map, PlayerEntity player, boolean self) {
 		super(map);
-		this.self = self;
 		this.player = player;
 	}
 
