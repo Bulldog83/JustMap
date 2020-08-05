@@ -1,12 +1,14 @@
 package ru.bulldog.justmap.client.render;
 
 import ru.bulldog.justmap.client.config.ClientParams;
+import ru.bulldog.justmap.map.data.WorldManager;
 import ru.bulldog.justmap.map.waypoint.Waypoint;
 import ru.bulldog.justmap.map.waypoint.WaypointKeeper;
 import ru.bulldog.justmap.map.waypoint.Waypoint.Icon;
 import ru.bulldog.justmap.util.ColorUtil;
 import ru.bulldog.justmap.util.Colors;
-import ru.bulldog.justmap.util.DrawHelper;
+import ru.bulldog.justmap.util.DataUtil;
+import ru.bulldog.justmap.util.RenderUtil;
 import ru.bulldog.justmap.util.math.MathUtil;
 
 import net.fabricmc.api.EnvType;
@@ -19,13 +21,13 @@ import net.minecraft.client.render.OverlayTexture;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexFormats;
-import net.minecraft.client.util.math.Matrix3f;
-import net.minecraft.client.util.math.Matrix4f;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.client.util.math.Vector3f;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Matrix3f;
+import net.minecraft.util.math.Matrix4f;
 import net.minecraft.util.math.Vec3d;
 
 import java.util.List;
@@ -47,21 +49,20 @@ public class WaypointRenderer {
 	}
 	
 	public static void renderHUD(float delta, float fov) {
-		if (ClientParams.waypointsTracking) {
-			if (renderer == null) {
-				renderer = new WaypointRenderer();
-			}
-			MinecraftClient client = MinecraftClient.getInstance();
-			if (client.world == null || client.player == null || client.currentScreen != null) {
-				return;
-			}
-		
-			List<Waypoint> wayPoints = WaypointKeeper.getInstance().getWaypoints(client.world.dimension.getType().getRawId(), true);
-			for (Waypoint wp : wayPoints) {
-				int dist = (int) MathUtil.getDistance(wp.pos, client.player.getBlockPos(), false);
-				if (wp.tracking && dist <= wp.showRange) {
-					renderer.renderHUD(wp, client, delta, fov, dist);
-				}
+		if (!ClientParams.showWaypoints || !ClientParams.waypointsTracking) return;
+		if (renderer == null) {
+			renderer = new WaypointRenderer();
+		}
+		MinecraftClient minecraft = DataUtil.getMinecraft();
+		if (minecraft.world == null || minecraft.player == null || minecraft.currentScreen != null) {
+			return;
+		}
+	
+		List<Waypoint> wayPoints = WaypointKeeper.getInstance().getWaypoints(WorldManager.getWorldKey(), true);
+		for (Waypoint wp : wayPoints) {
+			int dist = (int) MathUtil.getDistance(wp.pos, minecraft.player.getBlockPos(), false);
+			if (wp.tracking && dist <= wp.showRange) {
+				renderer.renderHUD(wp, minecraft, delta, fov, dist);
 			}
 		}
 	}
@@ -90,38 +91,38 @@ public class WaypointRenderer {
 		if (icon != null) {
 			icon.draw(x, y);
 		} else {
-			DrawHelper.drawDiamond(x, y, size, size, waypoint.color);
+			RenderUtil.drawDiamond(x, y, size, size, waypoint.color);
 		}
-		DrawHelper.drawBoundedString((int) dist + "m", x + size / 2, y + size + 2, 0, screenWidth, Colors.WHITE);
+		RenderUtil.drawBoundedString((int) dist + "m", x + size / 2, y + size + 2, 0, screenWidth, Colors.WHITE);
 	}
 	
 	public static void renderWaypoints(MatrixStack matrixStack, MinecraftClient client, Camera camera, float tickDelta) {
-		if (ClientParams.waypointsWorldRender) {
-			if (renderer == null) {
-				renderer = new WaypointRenderer();
-			}
-			
-			long time = client.player.world.getTime();			
-			float tick = (float) Math.floorMod(time, 125L) + tickDelta;
-			
-			BlockPos playerPos = client.player.getBlockPos();
-			
-			RenderSystem.enableBlend();
-			RenderSystem.defaultBlendFunc();
-			RenderSystem.enableDepthTest();
-			RenderSystem.depthMask(false);
-			
-			List<Waypoint> wayPoints = WaypointKeeper.getInstance().getWaypoints(client.world.dimension.getType().getRawId(), true);			
-			for (Waypoint wp : wayPoints) {
-				int dist = (int) MathUtil.getDistance(wp.pos, playerPos, false);
-				if (wp.render && dist > ClientParams.minRenderDist && dist < ClientParams.maxRenderDist) {
-					renderer.renderWaypoint(matrixStack, wp, client, camera, tick, dist);
-				}
-			}
-			
-			RenderSystem.depthMask(true);
-			RenderSystem.disableBlend();
+		if (!ClientParams.showWaypoints || !ClientParams.waypointsWorldRender) return;
+		if (renderer == null) {
+			renderer = new WaypointRenderer();
 		}
+		
+		long time = client.player.world.getTime();
+		float tick = (float) Math.floorMod(time, 125L) + tickDelta;
+		
+		BlockPos playerPos = client.player.getBlockPos();
+		
+		RenderSystem.enableBlend();
+		RenderSystem.defaultBlendFunc();
+		RenderSystem.enableAlphaTest();
+		RenderSystem.enableDepthTest();
+		RenderSystem.enableTexture();
+		RenderSystem.depthMask(false);
+		
+		List<Waypoint> wayPoints = WaypointKeeper.getInstance().getWaypoints(WorldManager.getWorldKey(), true);
+		for (Waypoint wp : wayPoints) {
+			int dist = (int) MathUtil.getDistance(wp.pos, playerPos, false);
+			if (wp.render && dist > ClientParams.minRenderDist && dist < ClientParams.maxRenderDist) {
+				renderer.renderWaypoint(matrixStack, wp, client, camera, tick, dist);
+			}
+		}
+		
+		RenderSystem.depthMask(true);
 	}
 	
 	private void renderWaypoint(MatrixStack matrixStack, Waypoint waypoint, MinecraftClient client, Camera camera, float tick, int dist) {
@@ -148,7 +149,7 @@ public class WaypointRenderer {
 			matrixStack.push();
 			matrixStack.translate(0.0, 1.0, 0.0);
 			if (ClientParams.renderAnimation) {
-				double swing = 0.25 * Math.sin((tick * 2.25 - 45.0) / 15.0);		
+				double swing = 0.25 * Math.sin((tick * 2.25 - 45.0) / 15.0);
 				matrixStack.translate(0.0, swing, 0.0);
 			}
 			matrixStack.multiply(camera.getRotation());
@@ -198,7 +199,7 @@ public class WaypointRenderer {
 		
 		initBuffer();
 		
-		MinecraftClient.getInstance().getTextureManager().bindTexture(BEAM_TEX);
+		RenderUtil.bindTexture(BEAM_TEX);
 		this.renderBeam(matrixStack, builder, red, green, blue, alpha, i, m, 0.0F, h, h, 0.0F, aj, 0.0F, 0.0F, aa, 0.0F, 1.0F, aq, ap);
 		matrixStack.pop();
 		

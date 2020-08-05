@@ -1,17 +1,24 @@
 package ru.bulldog.justmap.map.icon;
 
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.util.Window;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerEntity;
 
 import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.client.render.EntityModelRenderer;
 import ru.bulldog.justmap.map.IMap;
+import ru.bulldog.justmap.map.MapPlayerManager;
+import ru.bulldog.justmap.util.ColorUtil;
 import ru.bulldog.justmap.util.Colors;
-import ru.bulldog.justmap.util.DrawHelper;
+import ru.bulldog.justmap.util.DataUtil;
+import ru.bulldog.justmap.util.RenderUtil;
+import ru.bulldog.justmap.util.math.Point;
 
 public class PlayerIcon extends MapIcon<PlayerIcon> {
 	
-	private PlayerEntity player;
+	private PlayerEntity player;	
+	private int color = Colors.GREEN;
 	
 	public PlayerIcon(IMap map, PlayerEntity player, boolean self) {
 		super(map);
@@ -19,10 +26,14 @@ public class PlayerIcon extends MapIcon<PlayerIcon> {
 	}
 
 	@Override
-	public void draw(int mapX, int mapY, double offX, double offY, float rotation) {
+	public void draw(MatrixStack matrixStack, int mapX, int mapY, double offX, double offY, float rotation) {
 		int size = ClientParams.entityIconSize;
 		
-		IconPos pos = new IconPos(mapX + x, mapY + y);
+		Point pos = new Point(mapX + x, mapY + y);
+		
+		if (ClientParams.rotateMap) {
+			this.rotatePos(pos, map.getWidth(), map.getHeight(), mapX, mapY, rotation);
+		}
 		
 		pos.x -= size / 2 + offX;
 		pos.y -= size / 2 + offY;
@@ -30,23 +41,29 @@ public class PlayerIcon extends MapIcon<PlayerIcon> {
 		if (pos.x < mapX + size || pos.x > (mapX + map.getWidth()) - size ||
 			pos.y < mapY + size || pos.y > (mapY + map.getHeight()) - size) return;
 		
-		if (ClientParams.rotateMap) {
-			this.rotatePos(pos, map.getWidth(), map.getHeight(), mapX, mapY, rotation);
-		}
-		
-		if (ClientParams.showPlayerHeads) {
-			if (ClientParams.renderEntityModel) {
-				EntityModelRenderer.renderModel(player, pos.x, pos.y);
-			} else {
-				MatrixStack matrix = new MatrixStack();			
-				PlayerHeadIcon.getIcon(player).draw(matrix, pos.x, pos.y);
-			}
+		MatrixStack matrix = new MatrixStack();
+		 if (ClientParams.renderEntityModel) {
+			EntityModelRenderer.renderModel(player, pos.x, pos.y);
+		} else if (ClientParams.showPlayerHeads) {
+			MapPlayerManager.getPlayer(player).getIcon().draw(matrix, pos.x, pos.y);
 		} else {
-			DrawHelper.fill(pos.x, pos.y, pos.x, pos.y, Colors.GREEN);
+			int darken = ColorUtil.colorBrigtness(this.color, -3);
+			RenderUtil.fill(pos.x - 0.5, pos.y - 0.5, size + 1, size + 1, darken);
+			RenderUtil.fill(pos.x, pos.y, size, size, this.color);
 		}
 			
 		if (ClientParams.showPlayerNames) {
-			DrawHelper.drawBoundedString(player.getName().getString(), (int) pos.x, (int) pos.y + 12, 0, client.getWindow().getScaledWidth(), Colors.WHITE);
+			MinecraftClient minecraft = DataUtil.getMinecraft();
+			Window window = minecraft.getWindow();
+			double sf = window.getScaleFactor();
+			float scale = (float) (1.0 / sf);
+			matrix.push();
+			if (sf > 1.0 && !minecraft.options.forceUnicodeFont) {
+				matrix.scale(scale, scale, 1.0F);
+				matrix.translate(pos.x * (sf - 1), pos.y * (sf - 1), 0.0);
+			}
+			RenderUtil.drawCenteredText(matrix, player.getName(), pos.x, pos.y + 12, Colors.WHITE);
+			matrix.pop();
 		}
 	}
 }

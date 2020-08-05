@@ -1,15 +1,12 @@
 package ru.bulldog.justmap.client;
 
-import net.fabricmc.fabric.api.client.keybinding.FabricKeyBinding;
-import net.fabricmc.fabric.api.client.keybinding.KeyBindingRegistry;
-
-import net.minecraft.client.util.InputUtil;
-import net.minecraft.util.Identifier;
+import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
+import net.minecraft.client.options.KeyBinding;
 
 import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.client.config.ConfigFactory;
+import ru.bulldog.justmap.client.screen.WaypointsList;
 import ru.bulldog.justmap.map.Worldmap;
-import ru.bulldog.justmap.map.waypoint.WaypointsList;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,8 +21,6 @@ public final class KeyHandler {
 	
 	public static void initKeyBindings() {
 		parsers = new ArrayList<>();
-		
-		KeyBindingRegistry.INSTANCE.addCategory(JustMap.MODID);
 		
 		registerKey(new KeyParser(createKeyBinding("create_waypoint", GLFW.GLFW_KEY_B)) {
 			@Override
@@ -78,6 +73,14 @@ public final class KeyHandler {
 			@Override
 			public boolean isListening() {
 				return JustMapClient.MAP.isMapVisible();
+			}
+		});
+		
+		registerKey(new KeyParser(createKeyBinding("toggle_show_waypoints", GLFW.GLFW_KEY_P)) {
+			@Override
+			public void onKeyUp() {
+				JustMapClient.CONFIG.setBoolean("show_waypoints", !JustMapClient.CONFIG.getBoolean("show_waypoints"));
+				JustMapClient.CONFIG.saveChanges();
 			}
 		});
 		
@@ -157,11 +160,11 @@ public final class KeyHandler {
 	}
 	
 	private static void registerKey(KeyParser parser) {
-		KeyBindingRegistry.INSTANCE.register(parser.keyBinding);
+		KeyBindingHelper.registerKeyBinding(parser.keyBinding);
 		parsers.add(parser);
 	}
 	
-	private static FabricKeyBinding createKeyBinding(String name, int key) {
-		return FabricKeyBinding.Builder.create(new Identifier(JustMap.MODID, name), InputUtil.Type.KEYSYM, key, JustMap.MODID).build();
+	private static KeyBinding createKeyBinding(String name, int key) {
+		return new KeyBinding(String.format("key.%s.%s", JustMap.MODID, name), key, JustMap.MODID);
 	}
 }

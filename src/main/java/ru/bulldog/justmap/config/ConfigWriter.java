@@ -5,14 +5,13 @@ import java.io.File;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-import net.fabricmc.loader.api.FabricLoader;
 import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.util.JsonFactory;
+import ru.bulldog.justmap.util.storage.StorageUtil;
 
-public class ConfigWriter extends JsonFactory {
+public class ConfigWriter {
 	
-	private final static File CONFIG_DIR = FabricLoader.getInstance().getConfigDirectory();
-	private final static File CONFIG_FILE = new File(CONFIG_DIR, "/" + JustMap.MODID + ".json");
+	private final static File CONFIG_FILE = new File(StorageUtil.configDir(), JustMap.MODID + ".json");
 	
 	private static JsonObject configObject;
 	
@@ -20,13 +19,13 @@ public class ConfigWriter extends JsonFactory {
 	
 	public static JsonObject load() {
 		if (configObject == null) {
-			configObject = loadJson(CONFIG_FILE);
+			configObject = JsonFactory.loadJson(CONFIG_FILE);
 		}
 		
 		return configObject;
 	}
 	
 	public static void save(JsonElement config) {
-		storeJson(CONFIG_FILE, config);
+		JsonFactory.storeJson(CONFIG_FILE, config);
 	}
 }

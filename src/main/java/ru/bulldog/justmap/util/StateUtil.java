@@ -3,7 +3,6 @@ package ru.bulldog.justmap.util;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.Material;
-import net.minecraft.block.Waterloggable;
 import net.minecraft.state.property.Properties;
 import net.minecraft.tag.FluidTags;
 
@@ -26,7 +25,7 @@ public class StateUtil {
 	}
 	
 	public static boolean isWater(BlockState state) {
-		return !isSeaweed(state) && state.getFluidState().matches(FluidTags.WATER);
+		return !isSeaweed(state) && state.getFluidState().isIn(FluidTags.WATER);
 	}
 	
 	public static boolean isPlant(BlockState state) {
@@ -37,11 +36,11 @@ public class StateUtil {
 	
 	public static boolean isSeaweed(BlockState state) {
 		Material material = state.getMaterial();
-		return material == Material.UNDERWATER_PLANT || material == Material.SEAGRASS;
+		return material == Material.UNDERWATER_PLANT || material == Material.REPLACEABLE_UNDERWATER_PLANT;
 	}
 	
 	public static boolean isWaterlogged(BlockState state) {
-		if (state.getBlock() instanceof Waterloggable)
+		if (state.contains(Properties.WATERLOGGED))
 			return state.get(Properties.WATERLOGGED);
 		
 		return isSeaweed(state);

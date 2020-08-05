@@ -2,12 +2,16 @@ package ru.bulldog.justmap.server.config;
 
 import com.google.gson.JsonObject;
 
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import ru.bulldog.justmap.config.Config;
 import ru.bulldog.justmap.config.ConfigWriter;
 import ru.bulldog.justmap.config.ConfigKeeper.BooleanEntry;
 
-public class ServerConfig extends Config{
-private static ServerConfig instance;
+@Environment(EnvType.SERVER)
+public class ServerConfig extends Config {
+	
+	private static ServerConfig instance;
 	
 	public static ServerConfig get() {
 		if (instance == null) {
@@ -24,6 +28,8 @@ private static ServerConfig instance;
 		KEEPER.registerEntry("allow_hostile_radar", new BooleanEntry(ServerParams.allowHostile, (b) -> ServerParams.allowHostile = b, () -> ServerParams.allowHostile));
 		KEEPER.registerEntry("allow_creatures_radar", new BooleanEntry(ServerParams.allowCreatures, (b) -> ServerParams.allowCreatures = b, () -> ServerParams.allowCreatures));
 		KEEPER.registerEntry("allow_players_radar", new BooleanEntry(ServerParams.allowPlayers, (b) -> ServerParams.allowPlayers = b, () -> ServerParams.allowPlayers));
+		KEEPER.registerEntry("allow_slime_chunks", new BooleanEntry(ServerParams.allowSlime, (b) -> ServerParams.allowSlime = b, () -> ServerParams.allowSlime));
+		KEEPER.registerEntry("allow_waypoints_jumps", new BooleanEntry(ServerParams.allowTeleportation, (b) -> ServerParams.allowTeleportation = b, () -> ServerParams.allowTeleportation));
 		
 		JsonObject config = ConfigWriter.load();
 		if (config.size() > 0) {

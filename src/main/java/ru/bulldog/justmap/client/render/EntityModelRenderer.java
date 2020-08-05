@@ -5,6 +5,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.util.Colors;
+import ru.bulldog.justmap.util.DataUtil;
 import ru.bulldog.justmap.util.math.MathUtil;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.DiffuseLighting;
@@ -20,9 +21,9 @@ import net.minecraft.entity.LivingEntity;
 
 public class EntityModelRenderer {	
 
-	private static MinecraftClient minecraftClient = MinecraftClient.getInstance();
-	private static EntityRenderDispatcher renderDispatcher = minecraftClient.getEntityRenderManager();
-	private static VertexConsumerProvider.Immediate consumerProvider = minecraftClient.getBufferBuilders().getEntityVertexConsumers();
+	private static MinecraftClient minecraft = DataUtil.getMinecraft();
+	private static EntityRenderDispatcher renderDispatcher = minecraft.getEntityRenderManager();
+	private static VertexConsumerProvider.Immediate consumerProvider = minecraft.getBufferBuilders().getEntityVertexConsumers();
 	
 	public static void renderModel(Entity entity, double x, double y) {
 		
@@ -47,11 +48,11 @@ public class EntityModelRenderer {
 		matrixStack.translate(x, y, 0);
 		matrixStack.translate(modelSize / 4, modelSize / 2, 0);
 		if (ClientParams.rotateMap) {
-			float rotation = MathUtil.correctAngle(minecraftClient.player.headYaw);
+			float rotation = MathUtil.correctAngle(minecraft.player.headYaw);
 			matrixStack.multiply(Vector3f.POSITIVE_Z.getDegreesQuaternion(rotation));
 		} else {
 			matrixStack.multiply(Vector3f.POSITIVE_X.getDegreesQuaternion(180.0F));
-		}		
+		}
 		matrixStack.push();
 		matrixStack.scale(scale, scale, scale);
 		

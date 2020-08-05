@@ -32,11 +32,12 @@ import net.minecraft.world.chunk.WorldChunk;
 
 import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.client.config.ClientParams;
+import ru.bulldog.justmap.mixins.client.BakedSpriteAccessor;
 import ru.bulldog.justmap.util.math.MathUtil;
 
 public class ColorUtil {
 	
-	private static MinecraftClient minecraft = MinecraftClient.getInstance();	
+	private static MinecraftClient minecraft = DataUtil.getMinecraft();	
 	private static BlockModels blockModels = minecraft.getBlockRenderManager().getModels();	
 	private static FluidRenderHandlerRegistryImpl fluidRenderHandlerRegistry = FluidRenderHandlerRegistryImpl.INSTANCE;	
 	private static Map<BlockState, Integer> colorCache = new HashMap<>();	
@@ -191,6 +192,10 @@ public class ColorUtil {
 		return HSBtoRGB(floatBuffer[0], floatBuffer[1], floatBuffer[2]);
 	}
 	
+	public static int applyTint(int color, int tint) {
+		return colorBrigtness(ColorHelper.multiplyColor(color, tint), 1.5F);
+	}
+	
 	private static int getStateColor(BlockState state) {
 		if (colorCache.containsKey(state)) {
 			return colorCache.get(state);
@@ -199,11 +204,11 @@ public class ColorUtil {
 	}
 	
 	private static int extractColor(BlockState state) {
-		List<BakedQuad> quads = blockModels.getModel(state).getQuads(state, Direction.UP, new Random());		
+		List<BakedQuad> quads = blockModels.getModel(state).getQuads(state, Direction.UP, new Random());
 		
 		Identifier blockSprite;
 		if (quads.size() > 0) {
-			blockSprite = ((BakedData) quads.get(0)).getSprite().getId();
+			blockSprite = ((BakedSpriteAccessor) quads.get(0)).getSprite().getId();
 		} else {
 			blockSprite = blockModels.getSprite(state).getId();
 		}
@@ -215,7 +220,7 @@ public class ColorUtil {
 		int pixels = 0;
 		for (int i = 0; i < image.getWidth(); i++) {
 			for (int j = 0; j < image.getHeight(); j++) {
-				int col = image.getPixelRgba(i, j);
+				int col = image.getPixelColor(i, j);
 				if ((int) (col >> 24 & 255) > 0) {
 					b += (col >> 16) & 255;
 					g += (col >> 8) & 255;
@@ -236,7 +241,7 @@ public class ColorUtil {
 		return -1;
 	}
 	
-	public static int proccessColor(int color, int heightDiff) {
+	public static int proccessColor(int color, int heightDiff, float topoLevel) {
 		RGBtoHSB((color >> 16) & 255, (color >> 8) & 255, color & 255, floatBuffer);
 		floatBuffer[1] += ClientParams.mapSaturation / 100.0F;
 		floatBuffer[1] = MathUtil.clamp(floatBuffer[1], 0.0F, 1.0F);
@@ -244,6 +249,10 @@ public class ColorUtil {
 		floatBuffer[2] = MathUtil.clamp(floatBuffer[2], 0.0F, 1.0F);
 		if (ClientParams.showTerrain && heightDiff != 0) {
 			floatBuffer[2] += heightDiff / 10.0F;
+			floatBuffer[2] = MathUtil.clamp(floatBuffer[2], 0.0F, 1.0F);
+		}
+		if (ClientParams.showTopography && topoLevel != 0) {
+			floatBuffer[2] += MathUtil.clamp(topoLevel, -0.75F, 0.1F);
 			floatBuffer[2] = MathUtil.clamp(floatBuffer[2], 0.0F, 1.0F);
 		}
 		return HSBtoRGB(floatBuffer[0], floatBuffer[1], floatBuffer[2]);
@@ -264,10 +273,6 @@ public class ColorUtil {
 		return fcolor != -1 ? fcolor : defColor;
 	}
 	
-	public static int applyTint(int color, int tint) {
-		return colorBrigtness(ColorHelper.multiplyColor(color, tint), 1.5F);
-	}
-	
 	public static int blockColor(WorldChunk worldChunk, BlockPos pos) {
 		World world = worldChunk.getWorld();
 		BlockPos overPos = new BlockPos(pos.getX(), pos.getY() + 1, pos.getZ());
@@ -281,8 +286,7 @@ public class ColorUtil {
 				int color = blockColor(world, blockState, pos);
 				return applyTint(color, BiomeColors.getWaterColor(world, pos));
 			}
-			return blockColor(world, Blocks.WATER.getDefaultState(), pos);
-			
+			return blockColor(world, Blocks.WATER.getDefaultState(), pos);			
 		} else if (!StateUtil.isAir(blockState) && StateUtil.checkState(overState, skipWater, !ClientParams.hidePlants)) {			
 			int color = blockColor(world, blockState, pos);
 			if (ClientParams.hideWater) return color;
@@ -298,7 +302,7 @@ public class ColorUtil {
 	public static int blockColor(World world, BlockState state, BlockPos pos) {
 		int materialColor = state.getTopMaterialColor(world, pos).color;
 		if (ClientParams.alternateColorRender) {
-			int blockColor = minecraft.getBlockColorMap().getColor(state, world, pos, Colors.LIGHT);
+			int blockColor = minecraft.getBlockColors().getColor(state, world, pos, Colors.LIGHT);
 			int textureColor = getStateColor(state);
 			
 			Block block = state.getBlock();

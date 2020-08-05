@@ -1,51 +1,63 @@
 package ru.bulldog.justmap.map.minimap;
 
+import ru.bulldog.justmap.advancedinfo.AdvancedInfo;
+import ru.bulldog.justmap.advancedinfo.BiomeInfo;
+import ru.bulldog.justmap.advancedinfo.CoordsInfo;
+import ru.bulldog.justmap.advancedinfo.InfoText;
+import ru.bulldog.justmap.advancedinfo.TextManager;
+import ru.bulldog.justmap.advancedinfo.TimeInfo;
 import ru.bulldog.justmap.client.JustMapClient;
+import ru.bulldog.justmap.client.config.ClientConfig;
 import ru.bulldog.justmap.client.config.ClientParams;
+import ru.bulldog.justmap.client.screen.WaypointEditor;
+import ru.bulldog.justmap.enums.MapShape;
+import ru.bulldog.justmap.enums.TextAlignment;
 import ru.bulldog.justmap.map.IMap;
-import ru.bulldog.justmap.map.data.Layer.Type;
-import ru.bulldog.justmap.map.data.MapCache;
+import ru.bulldog.justmap.map.data.WorldData;
+import ru.bulldog.justmap.map.data.WorldKey;
+import ru.bulldog.justmap.map.data.WorldManager;
+import ru.bulldog.justmap.map.data.Layer;
 import ru.bulldog.justmap.map.icon.EntityIcon;
 import ru.bulldog.justmap.map.icon.PlayerIcon;
 import ru.bulldog.justmap.map.icon.WaypointIcon;
 import ru.bulldog.justmap.map.waypoint.Waypoint;
-import ru.bulldog.justmap.map.waypoint.WaypointEditor;
 import ru.bulldog.justmap.map.waypoint.WaypointKeeper;
-import ru.bulldog.justmap.util.DrawHelper.TextAlignment;
-import ru.bulldog.justmap.util.PosUtil;
+import ru.bulldog.justmap.util.DataUtil;
+import ru.bulldog.justmap.util.Dimension;
+import ru.bulldog.justmap.util.RuleUtil;
 import ru.bulldog.justmap.util.math.MathUtil;
 import ru.bulldog.justmap.util.math.RandomUtil;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ChatScreen;
-import net.minecraft.client.resource.language.I18n;
+import net.minecraft.client.util.Window;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
-import net.minecraft.world.GameRules;
-import net.minecraft.world.LightType;
 import net.minecraft.world.World;
-import net.minecraft.world.biome.Biome;
-import net.minecraft.world.dimension.DimensionType;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
-public class Minimap implements IMap{
+public class Minimap implements IMap{	
+	private static final MinecraftClient minecraft = DataUtil.getMinecraft();
 	
-	private static final MinecraftClient minecraftClient = MinecraftClient.getInstance();
-	
-	private final TextManager textManager;
-	
-	private MapText txtCoords = new MapText(TextAlignment.CENTER, "0, 0, 0");
-	private MapText txtBiome = new MapText(TextAlignment.CENTER, "Void");
-	private MapText txtTime = new MapText(TextAlignment.CENTER, "00:00");
-	private MapText txtFPS = new MapText(TextAlignment.CENTER, "00 fps");
-	
+	private final TextManager textManager;	
+	private InfoText txtCoords = new CoordsInfo(TextAlignment.CENTER, "0, 0, 0");
+	private InfoText txtBiome = new BiomeInfo(TextAlignment.CENTER, "");
+	private InfoText txtTime = new TimeInfo(TextAlignment.CENTER, "");
+	private List<WaypointIcon> waypoints = new ArrayList<>();
+	private List<PlayerIcon> players = new ArrayList<>();
+	private List<EntityIcon> entities = new ArrayList<>();	
+	private PlayerEntity locPlayer = null;
+	private Layer mapLayer = Layer.SURFACE;
+	private WorldData worldData;
+	private World world;
+	private int mapLevel = 0;
 	private int mapWidth;
 	private int mapHeight;
 	private int scaledWidth;
@@ -54,13 +66,6 @@ public class Minimap implements IMap{
 	private int lastPosX = 0;
 	private int lastPosZ = 0;
 	
-	private Biome currentBiome;	
-	
-	private List<WaypointIcon> waypoints = new ArrayList<>();
-	private List<PlayerIcon> players = new ArrayList<>();
-	private List<EntityIcon> entities = new ArrayList<>();	
-	private PlayerEntity locPlayer = null;
-	
 	private boolean isMapVisible = true;
 	private boolean rotateMap = false;
 	private boolean bigMap = false;
@@ -68,37 +73,51 @@ public class Minimap implements IMap{
 	public boolean posChanged = false;
 	
 	public Minimap() {
-		this.textManager = new TextManager(this);
+		this.textManager = AdvancedInfo.getInstance().getMapTextManager();
+		this.textManager.add(txtCoords);
+		this.textManager.add(txtBiome);
+		this.textManager.add(txtTime);
+		
 		this.updateMapParams();
 	}
 	
 	public void update() {
 		if (!this.isMapVisible()) { return; }
 	
-		PlayerEntity player = minecraftClient.player;
+		PlayerEntity player = minecraft.player;
 		if (player != null) {
 			if (locPlayer == null) {
 				locPlayer = player;
 			}
 
-			prepareMap(player);
-			updateInfo(player);
+			this.prepareMap(player);
+			this.updateInfo(player);
 		} else {
 			locPlayer = null;
 		}
 	}
 	
 	public void updateMapParams() {
-		int configSize = JustMapClient.CONFIG.getInt("map_size");
-		float configScale = JustMapClient.CONFIG.getFloat("map_scale");		
-		boolean needRotate = JustMapClient.CONFIG.getBoolean("rotate_map");
-		boolean bigMap = JustMapClient.CONFIG.getBoolean("show_big_map");
+		ClientConfig config = JustMapClient.CONFIG;
+		int configSize = config.getInt("map_size");
+		float configScale = config.getFloat("map_scale");		
+		boolean needRotate = config.getBoolean("rotate_map");
+		boolean bigMap = config.getBoolean("show_big_map");
+		
+		Window window = minecraft.getWindow();
+		if (window != null) {
+			int winWidth = window.getScaledWidth();
+			int guiScale = minecraft.options.guiScale;
+			double winScale = window.getScaleFactor();
+			if (guiScale == 0 && winScale > 2) {
+				configSize *= configSize / (winWidth / winScale);
+			}
+		}
 		
 		if (configSize != mapWidth || configScale != mapScale ||
-			this.rotateMap != needRotate || this.bigMap != bigMap) {
-			
+			this.rotateMap != needRotate || this.bigMap != bigMap) {			
 			if (bigMap) {
-				this.mapWidth = JustMapClient.CONFIG.getInt("big_map_size");
+				this.mapWidth = config.getInt("big_map_size");
 				this.mapHeight = (mapWidth * 10) / 16;
 			} else {
 				this.mapWidth = configSize;
@@ -115,88 +134,37 @@ public class Minimap implements IMap{
 				this.scaledWidth = (int) ((mapWidth * mapScale) + 8);
 				this.scaledHeight = (int) ((mapHeight * mapScale) + 8);
 			}
+			
+			this.textManager.setLineWidth(this.mapWidth);
 		}
 		
-		this.isMapVisible = JustMapClient.CONFIG.getBoolean("map_visible");
+		this.isMapVisible = config.getBoolean("map_visible");
 	}
 	
 	private void updateInfo(PlayerEntity player) {
-		textManager.clear();
-		
+		if (!ClientParams.mapInfo) {
+			this.txtCoords.setVisible(false);
+			this.txtBiome.setVisible(false);
+			this.txtTime.setVisible(false);
+			
+			return;
+		}
+		this.txtCoords.setVisible(ClientParams.showPosition);
 		if (ClientParams.showPosition) {
-			Entity camera = minecraftClient.cameraEntity;
-			txtCoords.setText(PosUtil.posToString(camera.getX(), camera.getY(), camera.getZ()));
-			textManager.add(txtCoords);
+			this.txtCoords.update();
 		}		
-		if (ClientParams.showBiome) {
-			txtBiome.setText(I18n.translate(currentBiome.getTranslationKey()));
-			textManager.add(txtBiome);
-		}		
-		if (ClientParams.showFPS) {
-			txtFPS.setText(minecraftClient.fpsDebugString.substring(0, minecraftClient.fpsDebugString.indexOf("fps") + 3));
-			textManager.add(txtFPS);
-		}		
-		if (ClientParams.showTime) {
-			txtTime.setText(this.timeString(minecraftClient.world.getTimeOfDay()));
-			textManager.add(txtTime);
-		}
-	}
-	
-	private String timeString(long time) {
-		time = time > 24000 ? time % 24000 : time;
-	
-		int h = (int) time / 1000 + 6;
-		int m = (int) (((time % 1000) / 1000.0F) * 60);
-		
-		h = h >= 24 ? h - 24 : h;
-	
-		return String.format("%02d:%02d", h, m);
-	}
-	
-	private static boolean isAllowed(boolean param, GameRules.RuleKey<GameRules.BooleanRule> rule) {
-		if (param) {
-			return minecraftClient.isInSingleplayer() || MapGameRules.isAllowed(rule);
-		}
-		
-		return false;
-	}
-	
-	private boolean needRenderCaves(World world, BlockPos playerPos) {
-		boolean allowCaves = isAllowed(ClientParams.drawCaves, MapGameRules.ALLOW_CAVES_MAP);
-		
-		DimensionType dimType = world.getDimension().getType();
-		if (dimType == DimensionType.THE_END) {
-			return false;
-		}
-		if (dimType.hasSkyLight()) {
-			return allowCaves && !world.isSkyVisibleAllowingSea(playerPos) &&
-				   world.getLightLevel(LightType.SKY, playerPos) == 0;
-		}
-		
-		return allowCaves;
-	}
-	
-	public static boolean allowEntityRadar() {
-		return isAllowed(ClientParams.showEntities, MapGameRules.ALLOW_ENTITY_RADAR);
-	}
-	
-	public static boolean allowHostileRadar() {
-		return isAllowed(ClientParams.showHostile, MapGameRules.ALLOW_HOSTILE_RADAR);
-	}
-	
-	public static boolean allowCreatureRadar() {
-		return isAllowed(ClientParams.showCreatures, MapGameRules.ALLOW_CREATURE_RADAR);
-	}
-	
-	public static boolean allowPlayerRadar() {
-		return isAllowed(ClientParams.showPlayers, MapGameRules.ALLOW_PLAYER_RADAR);
+		boolean showBiome = !ClientParams.advancedInfo && ClientParams.showBiome;
+		boolean showTime = !ClientParams.advancedInfo && ClientParams.showTime;		
+		this.txtBiome.setVisible(showBiome);
+		this.txtTime.setVisible(showTime);		
+		if (showBiome) this.txtBiome.update();
+		if (showTime) this.txtTime.update();
 	}
 	
 	public void prepareMap(PlayerEntity player) {
-		World world = player.world;
-		BlockPos pos = PosUtil.currentPos();
-		
-		currentBiome = world.getBiome(pos);
+		this.world = player.world;
+		this.worldData = WorldManager.getData();
+		BlockPos pos = DataUtil.currentPos();
 		
 		int posX = pos.getX();
 		int posZ = pos.getZ();
@@ -206,12 +174,15 @@ public class Minimap implements IMap{
 		double startX = posX - scaledW / 2;
 		double startZ = posZ - scaledH / 2;
 
-		if (world.dimension.isNether()) {
-			MapCache.setCurrentLayer(Type.NETHER, posY);
-		} else if (needRenderCaves(world, pos)) {
-			MapCache.setCurrentLayer(Type.CAVES, posY);
+		if (Dimension.isNether(world.getDimensionRegistryKey())) {
+			this.mapLayer = Layer.NETHER;
+			this.mapLevel = posY / mapLayer.height;
+		} else if (RuleUtil.needRenderCaves(world, pos)) {
+			this.mapLayer = Layer.CAVES;
+			this.mapLevel = posY / mapLayer.height;
 		} else {
-			MapCache.setCurrentLayer(Type.SURFACE, posY);
+			this.mapLayer = Layer.SURFACE;
+			this.mapLevel = 0;
 		}
 		
 		if (lastPosX != posX || lastPosZ != posZ) { 
@@ -230,23 +201,23 @@ public class Minimap implements IMap{
 		double endX = startX + scaledW;
 		double endZ = startZ + scaledH;
 		
-		if (allowEntityRadar()) {
+		if (RuleUtil.allowEntityRadar()) {
 			this.players.clear();
 			this.entities.clear();
 			
 			int checkHeight = 24;
 			BlockPos start = new BlockPos(startX, posY - checkHeight / 2, startZ);
 			BlockPos end = new BlockPos(endX, posY + checkHeight / 2, endZ);
-			List<Entity> entities = world.getEntities(null, new Box(start, end));
+			List<Entity> entities = this.world.getEntities(null, new Box(start, end));
 		
 			int amount = 0;				
 			for (Entity entity : entities) {
-				float tick = minecraftClient.getTickDelta();
+				float tick = minecraft.getTickDelta();
 				double entX = entity.prevX + (entity.getX() - entity.prevX) * tick;
 				double entZ = entity.prevZ + (entity.getZ() - entity.prevZ) * tick;
 				double iconX = MathUtil.screenPos(entX, startX, endX, mapWidth);
 				double iconY = MathUtil.screenPos(entZ, startZ, endZ, mapHeight);
-				if (entity instanceof PlayerEntity && allowPlayerRadar()) {
+				if (entity instanceof PlayerEntity && RuleUtil.allowPlayerRadar()) {
 					PlayerEntity pEntity  = (PlayerEntity) entity;
 					if (pEntity == player) continue;
 					PlayerIcon playerIcon = new PlayerIcon(this, pEntity, false);
@@ -255,12 +226,12 @@ public class Minimap implements IMap{
 				} else if (entity instanceof LivingEntity && !(entity instanceof PlayerEntity)) {
 					LivingEntity livingEntity = (LivingEntity) entity;
 					boolean hostile = livingEntity instanceof HostileEntity;
-					if (hostile && allowHostileRadar()) {
+					if (hostile && RuleUtil.allowHostileRadar()) {
 						EntityIcon entIcon = new EntityIcon(this, entity, hostile);	
 						entIcon.setPosition(iconX, iconY);
 						this.entities.add(entIcon);
 						amount++;
-					} else if (!hostile && allowCreatureRadar()) {
+					} else if (!hostile && RuleUtil.allowCreatureRadar()) {
 						EntityIcon entIcon = new EntityIcon(this, entity, hostile);	
 						entIcon.setPosition(iconX, iconY);
 						this.entities.add(entIcon);
@@ -272,16 +243,18 @@ public class Minimap implements IMap{
 		}
 		
 		waypoints.clear();
-		List<Waypoint> wps = WaypointKeeper.getInstance().getWaypoints(world.dimension.getType().getRawId(), true);
-		if (wps != null) {
-			Stream<Waypoint> stream = wps.stream().filter(wp -> MathUtil.getDistance(pos, wp.pos, false) <= wp.showRange);
-			for (Waypoint wp : stream.toArray(Waypoint[]::new)) {
-				WaypointIcon waypoint = new WaypointIcon(this, wp);
-				waypoint.setPosition(
-					MathUtil.screenPos(wp.pos.getX(), startX, endX, mapWidth),
-					MathUtil.screenPos(wp.pos.getZ(), startZ, endZ, mapHeight)
-				);
-				this.waypoints.add(waypoint);
+		if (ClientParams.showWaypoints) {
+			List<Waypoint> wps = WaypointKeeper.getInstance().getWaypoints(WorldManager.getWorldKey(), true);
+			if (wps != null) {
+				Stream<Waypoint> stream = wps.stream().filter(wp -> MathUtil.getDistance(pos, wp.pos, false) <= wp.showRange);
+				for (Waypoint wp : stream.toArray(Waypoint[]::new)) {
+					WaypointIcon waypoint = new WaypointIcon(this, wp);
+					waypoint.setPosition(
+						MathUtil.screenPos(wp.pos.getX(), startX, endX, mapWidth),
+						MathUtil.screenPos(wp.pos.getZ(), startZ, endZ, mapHeight)
+					);
+					this.waypoints.add(waypoint);
+				}
 			}
 		}
 	}
@@ -290,19 +263,26 @@ public class Minimap implements IMap{
 		return waypoints;
 	}
 	
-	public void createWaypoint(int dimension, BlockPos pos) {
+	public void createWaypoint(WorldKey world, BlockPos pos) {
 		Waypoint waypoint = new Waypoint();
-		waypoint.dimension = dimension;
+		waypoint.world = world;
 		waypoint.name = "Waypoint";
 		waypoint.color = RandomUtil.getElement(Waypoint.WAYPOINT_COLORS);
 		waypoint.pos = pos;
 		
-		minecraftClient.openScreen(new WaypointEditor(waypoint, minecraftClient.currentScreen, WaypointKeeper.getInstance()::addNew));
+		minecraft.openScreen(new WaypointEditor(waypoint, minecraft.currentScreen, WaypointKeeper.getInstance()::addNew));
 	}
 	
 	public void createWaypoint() {
-		PlayerEntity player = minecraftClient.player;
-		createWaypoint(player.world.dimension.getType().getRawId(), player.getBlockPos());
+		this.createWaypoint(WorldManager.getWorldKey(), DataUtil.currentPos());
+	}
+	
+	public World getWorld() {
+		return this.world;
+	}
+	
+	public WorldData getWorldData() {
+		return this.worldData;
 	}
 	
 	public float getScale() {
@@ -321,10 +301,22 @@ public class Minimap implements IMap{
 		return this.textManager;
 	}
 	
+	public boolean isBigMap() {
+		return this.bigMap;
+	}
+	
+	public static boolean isBig() {
+		return ClientParams.showBigMap;
+	}
+	
+	public static boolean isRound() {
+		return !isBig() && (ClientParams.mapShape == MapShape.CIRCLE);
+	}
+	
 	public boolean isMapVisible() {
-		if (minecraftClient.currentScreen != null) {
-			return this.isMapVisible && !minecraftClient.isPaused() &&
-				   ClientParams.showInChat && minecraftClient.currentScreen instanceof ChatScreen;
+		if (minecraft.currentScreen != null) {
+			return this.isMapVisible && !minecraft.isPaused() &&
+				   ClientParams.showInChat && minecraft.currentScreen instanceof ChatScreen;
 		}
 		
 		return this.isMapVisible;
@@ -336,6 +328,16 @@ public class Minimap implements IMap{
 	
 	public int getLastZ() {
 		return this.lastPosZ;
+	}
+	
+	@Override
+	public Layer getLayer() {
+		return this.mapLayer;
+	}
+
+	@Override
+	public int getLevel() {
+		return this.mapLevel;
 	}
 
 	@Override
@@ -356,5 +358,10 @@ public class Minimap implements IMap{
 	@Override
 	public int getScaledHeight() {
 		return this.scaledHeight;
+	}
+
+	@Override
+	public BlockPos getCenter() {
+		return DataUtil.currentPos();
 	}
 }

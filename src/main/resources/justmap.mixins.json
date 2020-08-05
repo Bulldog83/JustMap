@@ -3,8 +3,9 @@
     "package": "ru.bulldog.justmap.mixins",
     "compatibilityLevel": "JAVA_8",
     "mixins": [
-		"BooleanRuleProcessor",
-		"GameRulesProcessor",
+		"SessionAccessor",
+		"BooleanRuleAccessor",
+		"GameRulesAccessor",
 		"GameRulesMixin"
     ],
     "injectors": {

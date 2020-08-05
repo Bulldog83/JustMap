@@ -20,6 +20,9 @@ public final class Colors {
 	public static final int LIGHT_GRAY = 0xFFBBBBBB;
 	public static final int GRAY = 0xFF676676;
 	
-	public static final int LIGHT = 15728880;
-	public static final int TRANSPARENT = 0x00000000;
+	public static final int GRID = 0xFF666666;
+	public static final int LOADED_OVERLAY = 0xFFA264E2;
+	public static final int SLIME_OVERLAY = 0xFF00FF00;
+	public static final int LIGHT = 0xFFF000F0;
+	public static final int TRANSPARENT = 0x0;
 }

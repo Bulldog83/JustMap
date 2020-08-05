@@ -20,7 +20,35 @@ public class MathUtil {
 	}
 	
 	public static double pow2(double n) {
-		return Math.pow(n, 2);
+		return n * n;
+	}
+	
+	public static boolean isEven(int num) {
+		return num % 2 == 0;
+	}
+	
+	public static boolean isOdd(int num) {
+		return !isEven(num);
+	}
+	
+	public static double min(double... args) {
+		if (args.length == 0) return 0.0;
+		double min = Double.POSITIVE_INFINITY;
+		for(double arg : args) {
+			min = Math.min(min, arg);
+		}
+		
+		return min;
+	}
+	
+	public static double max(double... args) {
+		if (args.length == 0) return 0.0;
+		double max = Double.NEGATIVE_INFINITY;
+		for(double arg : args) {
+			max = Math.max(max, arg);
+		}
+		
+		return max;
 	}
 	
 	public static float correctAngle(float angle) {
@@ -37,6 +65,13 @@ public class MathUtil {
 	
 	public static int worldPos(double val, double x1, double x2, double range) {
 		return (int) Math.round((val * (x2 - x1) + range * x1) / range);
+	}
+
+	public static Point circlePos(Point pos, Point center, double angle) {
+		int posX = (int) (center.x + (pos.x - center.x) * Math.cos(angle) - (pos.y - center.y) * Math.sin(angle));
+		int posY = (int) (center.y + (pos.y - center.y) * Math.cos(angle) + (pos.x - center.x) * Math.sin(angle));
+		
+		return new Point(posX, posY);
 	}
 	
 	public static double getDistance(BlockPos a, BlockPos b) {

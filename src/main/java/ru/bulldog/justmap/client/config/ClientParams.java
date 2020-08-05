@@ -1,11 +1,17 @@
 package ru.bulldog.justmap.client.config;
 
-import ru.bulldog.justmap.map.DirectionArrow;
-import ru.bulldog.justmap.map.minimap.MapPosition;
+import ru.bulldog.justmap.enums.ScreenPosition;
+import ru.bulldog.justmap.enums.MapShape;
+import ru.bulldog.justmap.enums.MultiworldDetection;
+import ru.bulldog.justmap.enums.ArrowType;
 
 public class ClientParams {
-	public static MapPosition mapPosition = MapPosition.TOP_RIGHT;
-	public static DirectionArrow.Type arrowIconType = DirectionArrow.Type.DIRECTION_ARROW;
+	public static ScreenPosition mapPosition = ScreenPosition.TOP_RIGHT;
+	public static ScreenPosition infoPosition = ScreenPosition.TOP_LEFT;
+	public static ScreenPosition itemsPosition = ScreenPosition.MIDDLE_LEFT;
+	public static ArrowType arrowIconType = ArrowType.DIRECTION_ARROW;
+	public static MapShape mapShape = MapShape.SQUARE;
+	public static MultiworldDetection multiworldDetection = MultiworldDetection.AUTO;
 	
 	public static int positionOffset = 4;
 	public static int mapSize = 128;
@@ -17,12 +23,17 @@ public class ClientParams {
 	public static boolean rotateMap = false;
 	public static boolean showInChat = false;
 	public static boolean showBigMap = false;
+	public static boolean detectMultiworlds = false;
 
 	public static boolean drawCaves = true;
 	public static boolean hidePlants = false;
 	public static boolean hideWater = false;
 	public static boolean showGrid = false;
 	public static boolean showTerrain = true;
+	public static boolean showTopography = true;
+	public static boolean showSlime = false;
+	public static boolean showLoadedChunks = false;
+	public static boolean showMobSpawn = false;
 	public static int terrainStrength = 4;
 
 	public static boolean useSkins = true;
@@ -30,16 +41,28 @@ public class ClientParams {
 	public static boolean waterTint = true;
 	public static boolean simpleArrow = false;
 	public static boolean textureFilter = false;
+	public static float skinScale = 2.0F;
 	public static int currentSkin = 0;
+	public static int bigMapSkin = 0;
 	public static int mapSaturation = 0;
 	public static int mapBrightness = 0;
 	public static int arrowIconSize = 12;
 	public static int worldmapIconSize = 12;
 	
+	public static boolean advancedInfo = true;
+	public static boolean mapInfo = true;
 	public static boolean showPosition = true;
-	public static boolean showFPS = false;
+	public static boolean showFPS = true;
 	public static boolean showBiome = true;
 	public static boolean showTime = true;
+	public static boolean showLight = true;
+	public static boolean showItems = true;
+	public static boolean showMainhand = true;
+	public static boolean showOffhand = true;
+	public static boolean showHead = true;
+	public static boolean showChest = true;
+	public static boolean showLegs = true;
+	public static boolean showFeet = true;
 	
 	public static boolean showEntities = true;
 	public static boolean showEntityHeads = true;
@@ -52,12 +75,16 @@ public class ClientParams {
 	public static boolean renderEntityModel = false;
 	public static int entityIconSize = 8;
 	public static int entityModelSize = 5;
-	
+	public static int entityOutlineSize = 1;
+
 	public static int chunkUpdateInterval = 1000;
 	public static int chunkLevelUpdateInterval = 3000;
 	public static int purgeDelay = 60;
 	public static int purgeAmount = 1500;
+	public static boolean forceUpdate = false;
 	
+	public static boolean showWaypoints = true;
+	public static boolean jumpToWaypoints = true;
 	public static boolean waypointsTracking = true;
 	public static boolean waypointsWorldRender = true;
 	public static boolean renderLightBeam = true;

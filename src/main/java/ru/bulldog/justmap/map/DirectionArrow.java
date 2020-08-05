@@ -3,7 +3,6 @@ package ru.bulldog.justmap.map;
 import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.systems.RenderSystem;
 
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexConsumer;
@@ -11,28 +10,21 @@ import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.resource.metadata.AnimationResourceMetadata;
 import net.minecraft.client.texture.Sprite;
-import net.minecraft.client.texture.TextureManager;
-import net.minecraft.client.util.math.Matrix3f;
-import net.minecraft.client.util.math.Matrix4f;
+import net.minecraft.util.math.Matrix3f;
+import net.minecraft.util.math.Matrix4f;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.client.util.math.Vector3f;
 import net.minecraft.util.Identifier;
+
 import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.util.Colors;
-import ru.bulldog.justmap.util.DrawHelper;
+import ru.bulldog.justmap.util.RenderUtil;
 import ru.bulldog.justmap.util.ImageUtil;
 import ru.bulldog.justmap.util.SpriteAtlas;
 
 public class DirectionArrow extends Sprite {
-	public static enum Type {
-		DIRECTION_ARROW,
-		PLAYER_HEAD
-	}
-	
-	private final static TextureManager textureManager = MinecraftClient.getInstance().getTextureManager();
 	private final static VertexFormat vertexFormat = new VertexFormat(ImmutableList.of(VertexFormats.POSITION_ELEMENT, VertexFormats.TEXTURE_ELEMENT, VertexFormats.NORMAL_ELEMENT, VertexFormats.PADDING_ELEMENT));
-	
 	private static DirectionArrow ARROW;
 	
 	private DirectionArrow(Identifier texture, int w, int h) {
@@ -57,7 +49,7 @@ public class DirectionArrow extends Sprite {
 			
 			VertexConsumer vertexConsumer = ARROW.getTextureSpecificVertexConsumer(builder);
 			
-			textureManager.bindTexture(ARROW.getId());
+			RenderUtil.bindTexture(ARROW.getId());
 			
 			RenderSystem.enableAlphaTest();
 			RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
@@ -86,7 +78,7 @@ public class DirectionArrow extends Sprite {
 			double x3 = x + Math.cos(a3) * l;
 			double y3 = y + Math.sin(a3) * l;
 			
-			DrawHelper.drawTriangle(x1, y1, x2, y2, x3, y3, Colors.RED);
+			RenderUtil.drawTriangle(x1, y1, x2, y2, x3, y3, Colors.RED);
 		}
 	}
 	

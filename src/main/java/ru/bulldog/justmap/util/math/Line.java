@@ -4,9 +4,13 @@ public class Line {
 	public final Point first;
 	public final Point second;
 	
-	private int lenght;
+	private double lenght;
 	
-	public Line(int sx, int sy, int ex, int ey) {
+	public static double length(double sx, double sy, double ex, double ey) {
+		return Math.sqrt(MathUtil.pow2(ex - sx) + MathUtil.pow2(ey - sy));
+	}
+	
+	public Line(double sx, double sy, double ex, double ey) {
 		this(new Point(sx, sy),
 			 new Point(ex, ey));
 	}
@@ -17,17 +21,17 @@ public class Line {
 		this.lenght = first.distance(second);
 	}
 	
-	public int lenght() {
-		return lenght;
+	public double lenght() {
+		return this.lenght;
 	}
 	
-	public void add(int length) {
-		int len = this.lenght + length;
+	public void add(double length) {
+		double len = this.lenght + length;
 		
-		if (len <= 0) return;
+		if (len <= 0.0) return;
 		
-		int cx = second.x + (second.x - first.x) / this.lenght * length;
-		int cy = second.y + (second.y - first.y) / this.lenght * length;
+		double cx = second.x + (second.x - first.x) / this.lenght * length;
+		double cy = second.y + (second.y - first.y) / this.lenght * length;
 		
 		this.second.x = cx;
 		this.second.y = cy;			
@@ -35,7 +39,19 @@ public class Line {
 	}
 	
 	public void add(Line line) {
-		this.add(line.lenght());
+		this.add(line.lenght);
+	}
+	
+	public void subtract(double length) {
+		this.add(-length);
+	}
+	
+	public void subtract(Line line) {
+		this.subtract(line.lenght);
+	}
+	
+	public double difference(Line line) {
+		return this.lenght - line.lenght;
 	}
 	
 	@Override
@@ -46,28 +62,5 @@ public class Line {
 		Line line = (Line) obj;
 		return this.first.equals(line.first) &&
 			   this.second.equals(line.second);
-	}
-	
-	public static class Point {
-		public int x;
-		public int y;
-		
-		public Point(int x, int y) {
-			this.x = x;
-			this.y = y;
-		}
-		
-		public int distance(Point target) {
-			return (int) Math.sqrt(MathUtil.pow2(target.x - x) + MathUtil.pow2(target.y - y));
-		}
-		
-		@Override
-		public boolean equals(Object obj) {
-			if (this == obj) return true;
-			if(!(obj instanceof Point)) return false;
-			
-			Point point = (Point) obj;
-			return this.x == point.x && this.y == point.y;
-		}
 	}
 }

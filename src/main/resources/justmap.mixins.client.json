@@ -6,8 +6,10 @@
 	    "HudMixin",
 	    "GameRenderMixin",
 	    "WorldRendererMixin",
-		"BakedQuadMixin",
+		"BakedSpriteAccessor",
 		"BufferBuilderMixin",
+		"ClientWorldMixin",
+		"MinecraftClientMixin",
 		"ClientPlayNetworkHandlerMixin",
 		"LivingEntityRendererMixin"
     ],
