@@ -61,7 +61,7 @@ public class MapTexture {
 	
 	public void upload() {
 		if (this.glId == -1) {
-			this.glId = TextureUtil.generateId();
+			this.glId = TextureUtil.generateTextureId();
 		}
 		
 		this.refillBuffer();
@@ -279,12 +279,12 @@ public class MapTexture {
 		if (!RenderSystem.isOnRenderThread()) {
 			RenderSystem.recordRenderCall(() -> {
 				if (this.glId != -1) {
-					TextureUtil.deleteId(this.glId);
+					TextureUtil.releaseTextureId(this.glId);
 					this.glId = -1;
 				}
 			});
 		} else if (this.glId != -1) {
-			TextureUtil.deleteId(this.glId);
+			TextureUtil.releaseTextureId(this.glId);
 			this.glId = -1;
 		}
 	}

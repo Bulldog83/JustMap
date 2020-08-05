@@ -33,7 +33,7 @@ public class ItemInfo extends InfoText {
 			default:
 				posX = x - offsetX;	
 		}
-		minecraft.getItemRenderer().renderInGuiWithOverrides(itemStack, posX, y - 5);
+		minecraft.getItemRenderer().renderGuiItemIcon(itemStack, posX, y - 5);
 	}
 
 	@Override

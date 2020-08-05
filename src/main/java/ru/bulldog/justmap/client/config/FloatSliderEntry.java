@@ -16,11 +16,7 @@ import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.SliderWidget;
-import net.minecraft.client.util.NarratorManager;
 import net.minecraft.client.util.Window;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.LiteralText;
-import net.minecraft.text.Text;
 import net.minecraft.util.math.MathHelper;
 
 import ru.bulldog.justmap.util.DataUtil;
@@ -34,22 +30,22 @@ public class FloatSliderEntry extends TooltipListEntry<Float> {
 	private float minimum, maximum;
 	private Consumer<Float> saveConsumer;
 	private Supplier<Float> defaultValue;
-	private Function<Float, Text> textGetter = value -> new LiteralText(String.format("Value: %.1f", value));
+	private Function<Float, String> textGetter = value -> String.format("Value: %.1f", value);
 	private List<Element> widgets;	
 	private TextRenderer textRenderer;
 	
 	@Deprecated
-	public FloatSliderEntry(Text fieldName, float minimum, float maximum, float value, Text resetButtonKey, Supplier<Float> defaultValue, Consumer<Float> saveConsumer) {
+	public FloatSliderEntry(String fieldName, float minimum, float maximum, float value, String resetButtonKey, Supplier<Float> defaultValue, Consumer<Float> saveConsumer) {
 		this(fieldName, minimum, maximum, value, resetButtonKey, defaultValue, saveConsumer, null);
 	}
 	
 	@Deprecated
-	public FloatSliderEntry(Text fieldName, float minimum, float maximum, float value, Text resetButtonKey, Supplier<Float> defaultValue, Consumer<Float> saveConsumer, Supplier<Optional<Text[]>> tooltipSupplier) {
+	public FloatSliderEntry(String fieldName, float minimum, float maximum, float value, String resetButtonKey, Supplier<Float> defaultValue, Consumer<Float> saveConsumer, Supplier<Optional<String[]>> tooltipSupplier) {
 		this(fieldName, minimum, maximum, value, resetButtonKey, defaultValue, saveConsumer, tooltipSupplier, false);
 	}
 	
 	@Deprecated
-	public FloatSliderEntry(Text fieldName, float minimum, float maximum, float value, Text resetButtonKey, Supplier<Float> defaultValue, Consumer<Float> saveConsumer, Supplier<Optional<Text[]>> tooltipSupplier, boolean requiresRestart) {
+	public FloatSliderEntry(String fieldName, float minimum, float maximum, float value, String resetButtonKey, Supplier<Float> defaultValue, Consumer<Float> saveConsumer, Supplier<Optional<String[]>> tooltipSupplier, boolean requiresRestart) {
 		super(fieldName, tooltipSupplier, requiresRestart);
 		MinecraftClient client = MinecraftClient.getInstance();		
 		this.textRenderer = client.textRenderer;
@@ -60,7 +56,7 @@ public class FloatSliderEntry extends TooltipListEntry<Float> {
 		this.maximum = maximum;
 		this.minimum = minimum;
 		this.sliderWidget = new Slider(0, 0, 152, 20, ((double) this.value.get() - minimum) / Math.abs(maximum - minimum));
-		int width = textRenderer.getWidth(resetButtonKey);
+		int width = textRenderer.getStringWidth(resetButtonKey);
 		this.resetButton = new ButtonWidget(0, 0, width + 6, 20, resetButtonKey, widget -> {
 			setValue(defaultValue.get());
 		});
@@ -74,11 +70,11 @@ public class FloatSliderEntry extends TooltipListEntry<Float> {
 			saveConsumer.accept(getValue());
 	}
 	
-	public Function<Float, Text> getTextGetter() {
+	public Function<Float, String> getTextGetter() {
 		return textGetter;
 	}
 	
-	public FloatSliderEntry setTextGetter(Function<Float, Text> textGetter) {
+	public FloatSliderEntry setTextGetter(Function<Float, String> textGetter) {
 		this.textGetter = textGetter;
 		this.sliderWidget.setMessage(textGetter.apply((float) FloatSliderEntry.this.value.get()));
 		return this;
@@ -97,8 +93,8 @@ public class FloatSliderEntry extends TooltipListEntry<Float> {
 	}
 	
 	@Override
-	public boolean isEdited() {
-		return super.isEdited() || getValue() != orginial;
+	public boolean isEditable() {
+		return super.isEditable() || getValue() != orginial;
 	}
 	
 	@Override
@@ -122,31 +118,31 @@ public class FloatSliderEntry extends TooltipListEntry<Float> {
 	}
 	
 	@Override
-	public void render(MatrixStack matrices, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isSelected, float delta) {
-		super.render(matrices, index, y, x, entryWidth, entryHeight, mouseX, mouseY, isSelected, delta);
+	public void render(int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isSelected, float delta) {
+		super.render(index, y, x, entryWidth, entryHeight, mouseX, mouseY, isSelected, delta);
 		Window window = DataUtil.getMinecraft().getWindow();
 		this.resetButton.active = isEditable() && getDefaultValue().isPresent() && defaultValue.get() != value.get();
 		this.resetButton.y = y;
 		this.sliderWidget.active = isEditable();
 		this.sliderWidget.y = y;
-		Text displayedFieldName = getDisplayedFieldName();
+		String displayedFieldName = this.getFieldName();
 		if (textRenderer.isRightToLeft()) {
-			textRenderer.drawWithShadow(matrices, displayedFieldName, window.getScaledWidth() - x - textRenderer.getWidth(displayedFieldName), y + 5, getPreferredTextColor());
+			textRenderer.drawWithShadow(displayedFieldName, window.getScaledWidth() - x - textRenderer.getStringWidth(displayedFieldName), y + 5, getPreferredTextColor());
 			this.resetButton.x = x;
 			this.sliderWidget.x = x + resetButton.getWidth() + 1;
 		} else {
-			textRenderer.drawWithShadow(matrices, displayedFieldName, x, y + 5, getPreferredTextColor());
+			textRenderer.drawWithShadow(displayedFieldName, x, y + 5, getPreferredTextColor());
 			this.resetButton.x = x + entryWidth - resetButton.getWidth();
 			this.sliderWidget.x = x + entryWidth - 150;
 		}
 		this.sliderWidget.setWidth(150 - resetButton.getWidth() - 2);
-		resetButton.render(matrices, mouseX, mouseY, delta);
-		sliderWidget.render(matrices, mouseX, mouseY, delta);
+		resetButton.render(mouseX, mouseY, delta);
+		sliderWidget.render(mouseX, mouseY, delta);
 	}
 	
 	private class Slider extends SliderWidget {
 		protected Slider(int x, int y, int width, int height, double value) {
-			super(x, y, width, height, NarratorManager.EMPTY, value);
+			super(x, y, width, height, value);
 		}
 		
 		@Override

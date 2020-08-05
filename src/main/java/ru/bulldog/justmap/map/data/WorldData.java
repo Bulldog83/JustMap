@@ -112,7 +112,7 @@ public class WorldData {
 		int x = centerPos.getX();
 		int z = centerPos.getZ();
 		int distance = DataUtil.getGameOptions().viewDistance - 1;
-		BlockPos.Mutable currentPos = centerPos.mutableCopy();
+		BlockPos.Mutable currentPos = new BlockPos.Mutable(centerPos);
 		for (int step = 1; step < distance * 2; step++) {
 			boolean even = MathUtil.isEven(step);
 			for (int i = 0; i < step; i++) {

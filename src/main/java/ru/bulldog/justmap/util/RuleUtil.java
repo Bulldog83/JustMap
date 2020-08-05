@@ -28,7 +28,7 @@ public class RuleUtil {
 		
 		DimensionType dimType = world.getDimension();
 		RegistryKey<DimensionType> dimKey = world.getDimensionRegistryKey();
-		if (Dimension.isEnd(dimKey)) {
+		if (DimensionUtil.isEnd(dimKey)) {
 			return false;
 		}
 		if (!dimType.hasCeiling() && dimType.hasSkyLight()) {

@@ -3,13 +3,11 @@ package ru.bulldog.justmap.client.screen;
 import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.registry.RegistryKey;
-import net.minecraft.world.dimension.DimensionType;
 
 import ru.bulldog.justmap.JustMap;
+import ru.bulldog.justmap.util.DimensionUtil;
 import ru.bulldog.justmap.util.LangUtil;
 import ru.bulldog.justmap.util.RenderUtil;
 
@@ -48,31 +46,31 @@ public class MapScreen extends Screen {
 	
 	@Override
 	protected void init() {
-		RegistryKey<DimensionType> dimKey = client.world.getDimensionRegistryKey();
-		this.info = DIMENSION_INFO.getOrDefault(dimKey.getValue().toString(), null);
+		Identifier dimKey = DimensionUtil.getId(minecraft.world);
+		this.info = DIMENSION_INFO.getOrDefault(dimKey.getPath(), null);
 	}
 	
 	@Override
-	public void render(MatrixStack matrixStack, int int_1, int int_2, float float_1) {
-		this.renderBackground(matrixStack);
-		this.renderForeground(matrixStack);
+	public void render(int int_1, int int_2, float float_1) {
+		this.renderBackground();
+		this.renderForeground();
 		for (Element e : children) {
 			if (e instanceof Drawable) {
-				((Drawable) e).render(matrixStack, int_1, int_2, float_1);
+				((Drawable) e).render(int_1, int_2, float_1);
 			}
 		}
 	}
 	
-	public void renderBackground(MatrixStack matrixStack) {
-		fill(matrixStack, 0, 0, width, height, 0x88444444);		
+	public void renderBackground() {
+		fill(0, 0, width, height, 0x88444444);		
 		this.drawBorders();
 	}
 	
-	public void renderForeground(MatrixStack matrixStack) {}
+	public void renderForeground() {}
 	
 	@Override
 	public void onClose() {
-		this.client.openScreen(parent);
+		this.minecraft.openScreen(parent);
 	}
 	
 	public void renderTexture(int x, int y, int width, int height, float u, float v, Identifier id) {

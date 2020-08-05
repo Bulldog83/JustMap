@@ -5,7 +5,7 @@ import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.util.ColorUtil;
 import ru.bulldog.justmap.util.Colors;
 import ru.bulldog.justmap.util.DataUtil;
-import ru.bulldog.justmap.util.Dimension;
+import ru.bulldog.justmap.util.DimensionUtil;
 import ru.bulldog.justmap.util.tasks.TaskManager;
 
 import net.minecraft.world.World;
@@ -13,7 +13,6 @@ import net.minecraft.block.BlockState;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
-import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.chunk.WorldChunk;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.gen.ChunkRandom;
@@ -58,11 +57,11 @@ public class ChunkData {
 
 		RegistryKey<DimensionType> dimType = world.getDimensionRegistryKey();
 		ServerWorld serverWorld = DataUtil.getServerWorld();
-		if (serverWorld != null && Dimension.isOverworld(dimType)) {
+		if (serverWorld != null && DimensionUtil.isOverworld(dimType)) {
 			this.slime = ChunkRandom.getSlimeRandom(chunkPos.x, chunkPos.z,
 					serverWorld.getSeed(), 987234911L).nextInt(10) == 0;
 		}		
-		if (Dimension.isNether(dimType)) {
+		if (DimensionUtil.isNether(dimType)) {
 			initLayer(Layer.NETHER);
 		} else {
 			initLayer(Layer.SURFACE);
@@ -81,7 +80,7 @@ public class ChunkData {
 	}
 	
 	private void initLayer(Layer layer) {
-		int levels = this.world.getDimensionHeight() / layer.height;		
+		int levels = this.world.getEffectiveHeight() / layer.height;		
 		this.levels.put(layer, new ChunkLevel[levels]);
 	}
 	
@@ -166,7 +165,7 @@ public class ChunkData {
 			if (worldChunk.isEmpty() || !this.isChunkLoaded()) return;
 			this.updateChunkData(worldChunk, layer, level);
 			if (saveNeeded()) {
-				BlockPos.Mutable chunkBlockPos = this.chunkPos.getCenterBlockPos().mutableCopy();
+				BlockPos.Mutable chunkBlockPos = new BlockPos.Mutable(this.chunkPos.getCenterBlockPos());
 				chunkBlockPos.setY(level * layer.height);
 				RegionData region = this.mapData.getRegion(chunkBlockPos);
 				if (region.getLayer().equals(layer) && region.getLevel() == level) {

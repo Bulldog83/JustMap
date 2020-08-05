@@ -10,7 +10,6 @@ import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.text.LiteralText;
 import net.minecraft.util.math.BlockPos;
@@ -32,7 +31,7 @@ import ru.bulldog.justmap.map.waypoint.Waypoint;
 import ru.bulldog.justmap.map.waypoint.WaypointKeeper;
 import ru.bulldog.justmap.util.Colors;
 import ru.bulldog.justmap.util.DataUtil;
-import ru.bulldog.justmap.util.Dimension;
+import ru.bulldog.justmap.util.DimensionUtil;
 import ru.bulldog.justmap.util.PosUtil;
 import ru.bulldog.justmap.util.math.MathUtil;
 
@@ -84,7 +83,7 @@ public class Worldmap extends MapScreen implements IMap {
 		this.paddingTop = 8;
 		this.paddingBottom = 8;
 		
-		PlayerEntity player = client.player;
+		PlayerEntity player = this.minecraft.player;
 
 		this.worldData = WorldManager.getData();
 		WorldKey worldKey = WorldManager.getWorldKey();
@@ -99,7 +98,7 @@ public class Worldmap extends MapScreen implements IMap {
 		this.addMapButtons();
 		this.updateScale();
 
-		if (Dimension.isNether(world.getDimension())) {
+		if (DimensionUtil.isNether(world.getDimension())) {
 			this.mapLayer = Layer.NETHER;
 			this.mapLevel = DataUtil.coordY() / mapLayer.height;
 		} else {
@@ -120,26 +119,26 @@ public class Worldmap extends MapScreen implements IMap {
 	}
 	
 	private void addMapButtons() {
-		this.children.add(new ButtonWidget(width - 24, 10, 20, 20, new LiteralText("x"), (b) -> onClose()));		
-		this.children.add(new ButtonWidget(width / 2 - 10, height - paddingBottom - 44, 20, 20, new LiteralText("\u2191"), (b) -> moveMap(Direction.NORTH)));
-		this.children.add(new ButtonWidget(width / 2 - 10, height - paddingBottom - 22, 20, 20, new LiteralText("\u2193"), (b) -> moveMap(Direction.SOUTH)));
-		this.children.add(new ButtonWidget(width / 2 - 32, height - paddingBottom - 32, 20, 20, new LiteralText("\u2190"), (b) -> moveMap(Direction.WEST)));
-		this.children.add(new ButtonWidget(width / 2 + 12, height - paddingBottom - 32, 20, 20, new LiteralText("\u2192"), (b) -> moveMap(Direction.EAST)));		
-		this.children.add(new ButtonWidget(width - 24, height / 2 - 21, 20, 20, new LiteralText("+"), (b) -> changeScale(-0.25F)));
-		this.children.add(new ButtonWidget(width - 24, height / 2 + 1, 20, 20, new LiteralText("-"), (b) -> changeScale(+0.25F)));		
-		this.children.add(new ButtonWidget(width - 24, height - paddingBottom - 22, 20, 20, new LiteralText("\u271C"), (b) -> setCenterByPlayer()));
-		this.children.add(new ButtonWidget(4, paddingTop + 2, 20, 20, new LiteralText("\u2630"), (b) -> client.openScreen(ConfigFactory.getConfigScreen(this))));
-		this.children.add(new ButtonWidget(4, height - paddingBottom - 22, 20, 20, new LiteralText("\u2726"), (b) -> client.openScreen(new WaypointsList(this))));
+		this.children.add(new ButtonWidget(width - 24, 10, 20, 20, "x", (b) -> onClose()));		
+		this.children.add(new ButtonWidget(width / 2 - 10, height - paddingBottom - 44, 20, 20, "\u2191", (b) -> moveMap(Direction.NORTH)));
+		this.children.add(new ButtonWidget(width / 2 - 10, height - paddingBottom - 22, 20, 20, "\u2193", (b) -> moveMap(Direction.SOUTH)));
+		this.children.add(new ButtonWidget(width / 2 - 32, height - paddingBottom - 32, 20, 20, "\u2190", (b) -> moveMap(Direction.WEST)));
+		this.children.add(new ButtonWidget(width / 2 + 12, height - paddingBottom - 32, 20, 20, "\u2192", (b) -> moveMap(Direction.EAST)));		
+		this.children.add(new ButtonWidget(width - 24, height / 2 - 21, 20, 20, "+", (b) -> changeScale(-0.25F)));
+		this.children.add(new ButtonWidget(width - 24, height / 2 + 1, 20, 20, "-", (b) -> changeScale(+0.25F)));		
+		this.children.add(new ButtonWidget(width - 24, height - paddingBottom - 22, 20, 20, "\u271C", (b) -> setCenterByPlayer()));
+		this.children.add(new ButtonWidget(4, paddingTop + 2, 20, 20, "\u2630", (b) -> minecraft.openScreen(ConfigFactory.getConfigScreen(this))));
+		this.children.add(new ButtonWidget(4, height - paddingBottom - 22, 20, 20, "\u2726", (b) -> minecraft.openScreen(new WaypointsList(this))));
 	}
 	
 	@Override
-	public void renderBackground(MatrixStack matrixStack) {
-		fill(matrixStack, x, 0, x + width, height, 0xFF444444);		
+	public void renderBackground() {
+		fill(x, 0, x + width, height, 0xFF444444);		
 		this.drawMap();
 	}
 	
 	@Override
-	public void renderForeground(MatrixStack matrixStack) {
+	public void renderForeground() {
 		RenderSystem.disableDepthTest();
 		int iconSize = (int) (ClientParams.worldmapIconSize / imageScale);
 		iconSize = iconSize % 2 != 0 ? iconSize + 1 : iconSize;
@@ -152,7 +151,7 @@ public class Worldmap extends MapScreen implements IMap {
 			icon.draw(iconSize);
 		}
 		
-		ClientPlayerEntity player = client.player;
+		ClientPlayerEntity player = this.minecraft.player;
 		
 		double playerX = player.getX();
 		double playerZ = player.getZ();
@@ -162,7 +161,7 @@ public class Worldmap extends MapScreen implements IMap {
 		MapPlayerManager.getPlayer(player).getIcon().draw(arrowX, arrowY, iconSize, true);
 		
 		this.drawBorders(paddingTop, paddingBottom);
-		this.drawCenteredString(matrixStack, client.textRenderer, cursorCoords, width / 2, paddingTop + 4, Colors.WHITE);
+		this.drawCenteredString(minecraft.textRenderer, cursorCoords, width / 2, paddingTop + 4, Colors.WHITE);
 		RenderSystem.enableDepthTest();
 	}
 	

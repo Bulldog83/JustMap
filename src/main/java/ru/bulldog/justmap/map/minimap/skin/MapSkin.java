@@ -22,8 +22,6 @@ import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.texture.NativeImageBackedTexture;
 import net.minecraft.client.texture.TextureManager;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.LiteralText;
-import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
 @Environment(EnvType.CLIENT)
@@ -154,13 +152,13 @@ public class MapSkin extends Image {
 		return this.type != SkinType.ROUND;
 	}
 	
-	public Text getName() {
-		return new LiteralText(this.name);
+	public String getName() {
+		return this.name;
 	}
 	
 	@Override
 	public String toString() {
-		return this.getName().asString();
+		return this.getName();
 	}
 	
 	public static MapSkin getDefaultSkin() {

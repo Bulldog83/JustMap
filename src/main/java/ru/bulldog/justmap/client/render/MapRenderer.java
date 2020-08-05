@@ -329,7 +329,7 @@ public class MapRenderer {
 		}
 		
 		RenderUtil.drawRightAlignedString(
-				matrix, Float.toString(minimap.getScale()),
+				Float.toString(minimap.getScale()),
 				mapX + mapWidth - 3, mapY + mapHeight - 10, Colors.WHITE);
 		
 		int centerX = mapX + mapWidth / 2;

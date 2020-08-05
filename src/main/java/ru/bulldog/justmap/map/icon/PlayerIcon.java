@@ -62,7 +62,7 @@ public class PlayerIcon extends MapIcon<PlayerIcon> {
 				matrix.scale(scale, scale, 1.0F);
 				matrix.translate(pos.x * (sf - 1), pos.y * (sf - 1), 0.0);
 			}
-			RenderUtil.drawCenteredText(matrix, player.getName(), pos.x, pos.y + 12, Colors.WHITE);
+			RenderUtil.drawCenteredText(player.getName(), pos.x, pos.y + 12, Colors.WHITE);
 			matrix.pop();
 		}
 	}

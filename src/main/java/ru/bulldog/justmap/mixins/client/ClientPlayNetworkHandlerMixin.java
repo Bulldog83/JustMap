@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
-import net.minecraft.network.packet.s2c.play.GameMessageS2CPacket;
+import net.minecraft.network.packet.s2c.play.ChatMessageS2CPacket;
 import net.minecraft.network.packet.s2c.play.HealthUpdateS2CPacket;
 import net.minecraft.network.packet.s2c.play.PlayerSpawnPositionS2CPacket;
 import net.minecraft.util.math.BlockPos;
@@ -42,11 +42,11 @@ public abstract class ClientPlayNetworkHandlerMixin {
 		WorldManager.onWorldPosChanged(packet.getPos());
 	}
 	
-	@Inject(method = "onGameMessage", at = @At("HEAD"), cancellable = true)
-	public void onGameMessage(GameMessageS2CPacket gameMessageS2CPacket, CallbackInfo cinfo) {
-		if (gameMessageS2CPacket.getLocation() == MessageType.SYSTEM) {
+	@Inject(method = "onChatMessage", at = @At("HEAD"), cancellable = true)
+	public void onChatMessage(ChatMessageS2CPacket packet, CallbackInfo cinfo) {
+		if (packet.getLocation() == MessageType.SYSTEM) {
 			String pref = "§0§0", suff = "§f§f";
-			String message = gameMessageS2CPacket.getMessage().getString().replaceAll("[&\\$]", "§");
+			String message = packet.getMessage().getString().replaceAll("[&\\$]", "§");
 			
 			if (message.contains(pref) && message.contains(suff)) {
 				int start = message.indexOf(pref) + 4;

@@ -11,11 +11,11 @@ import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.texture.TextureManager;
-import net.minecraft.client.util.math.AffineTransformation;
+import net.minecraft.client.util.math.Matrix3f;
+import net.minecraft.client.util.math.Matrix4f;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.client.util.math.Rotation3;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.math.Matrix3f;
-import net.minecraft.util.math.Matrix4f;
 import net.minecraft.text.Text;
 
 import ru.bulldog.justmap.client.render.Image;
@@ -37,35 +37,25 @@ public class RenderUtil extends DrawableHelper {
 	private final static TextureManager textureManager = DataUtil.getMinecraft().getTextureManager();
 
 	public static int getWidth(Text text) {
-		return textRenderer.getWidth(text);
+		return textRenderer.getStringWidth(text.getString());
 	}
 
 	public static int getWidth(String string) {
-		return textRenderer.getWidth(string);
+		return textRenderer.getStringWidth(string);
 	}
 	
 	public static void drawCenteredString(String string, double x, double y, int color) {
-		MatrixStack matrix = new MatrixStack();
-		drawCenteredString(matrix, string, x, y, color);
+		textRenderer.drawWithShadow(string, (float) (x - getWidth(string) / 2), (float) y, color);
 	}
 	
-	public static void drawCenteredString(MatrixStack matrix, String string, double x, double y, int color) {
-		textRenderer.drawWithShadow(matrix, string, (float) (x - textRenderer.getWidth(string) / 2), (float) y, color);
-	}
-	
-	public static void drawCenteredText(MatrixStack matrix, Text text, double x, double y, int color) {
-		textRenderer.drawWithShadow(matrix, text, (float) (x - textRenderer.getWidth(text) / 2), (float) y, color);
+	public static void drawCenteredText(Text text, double x, double y, int color) {
+		textRenderer.drawWithShadow(text.getString(), (float) (x - getWidth(text) / 2), (float) y, color);
 	}
 	
 	public static void drawBoundedString(String string, int x, int y, int leftBound, int rightBound, int color) {
-		MatrixStack matrix = new MatrixStack();
-		drawBoundedString(matrix, string, x, y, leftBound, rightBound, color);
-	}
-	
-	public static void drawBoundedString(MatrixStack matrix, String string, int x, int y, int leftBound, int rightBound, int color) {
 		if (string == null) return;
 		
-		int stringWidth = textRenderer.getWidth(string);
+		int stringWidth = textRenderer.getStringWidth(string);
 		int drawX = x - stringWidth / 2;
 		if (drawX < leftBound) {
 			drawX = leftBound;
@@ -73,11 +63,11 @@ public class RenderUtil extends DrawableHelper {
 			drawX = rightBound - stringWidth;
 		}
 
-		DRAWER.drawStringWithShadow(matrix, textRenderer, string, drawX, y, color);
+		DRAWER.drawString(textRenderer, string, drawX, y, color);
 	}
 
-	public static void drawRightAlignedString(MatrixStack matrix, String string, int x, int y, int color) {
-		textRenderer.drawWithShadow(matrix, string, x - textRenderer.getWidth(string), y, color);
+	public static void drawRightAlignedString(String string, int x, int y, int color) {
+		textRenderer.drawWithShadow(string, x - textRenderer.getStringWidth(string), y, color);
 	}
 	
 	public static void drawDiamond(double x, double y, int width, int height, int color) {
@@ -191,7 +181,7 @@ public class RenderUtil extends DrawableHelper {
 	}
 
 	public static void fill(double x, double y, double w, double h, int color) {
-		fill(AffineTransformation.identity().getMatrix(), x, y, w, h, color);
+		fill(Rotation3.identity().getMatrix(), x, y, w, h, color);
 	}
 	
 	public static void fill(MatrixStack matrix, double x, double y, double w, double h, int color) {

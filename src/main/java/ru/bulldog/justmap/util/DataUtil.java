@@ -148,7 +148,7 @@ public class DataUtil {
 	}
 	
 	public static Layer getLayer(World world, BlockPos pos) {
-		if (Dimension.isNether(world.getDimensionRegistryKey())) {
+		if (DimensionUtil.isNether(world.getDimensionRegistryKey())) {
 			return Layer.NETHER;
 		} else if (RuleUtil.needRenderCaves(world, pos)) {
 			return Layer.CAVES;

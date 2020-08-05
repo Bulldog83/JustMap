@@ -10,7 +10,7 @@ import ru.bulldog.justmap.map.waypoint.WaypointKeeper;
 import ru.bulldog.justmap.map.waypoint.Waypoint.Icon;
 import ru.bulldog.justmap.util.Colors;
 import ru.bulldog.justmap.util.DataUtil;
-import ru.bulldog.justmap.util.Dimension;
+import ru.bulldog.justmap.util.DimensionUtil;
 import ru.bulldog.justmap.util.RenderUtil;
 import ru.bulldog.justmap.util.RuleUtil;
 import ru.bulldog.justmap.util.math.MathUtil;
@@ -271,7 +271,7 @@ public class WaypointsList extends MapScreen {
 	
 	public void teleport(Waypoint waypoint) {
 		if (!WorldManager.getWorldKey().equals(currentWorld)) return;
-		int y = waypoint.pos.getY() > 0 ? waypoint.pos.getY() : (Dimension.isNether(client.world.getDimensionRegistryKey()) ? 128 : 64);
+		int y = waypoint.pos.getY() > 0 ? waypoint.pos.getY() : (DimensionUtil.isNether(client.world.getDimensionRegistryKey()) ? 128 : 64);
 		this.client.player.sendChatMessage("/tp " + this.client.player.getName().asString() + " " + waypoint.pos.getX() + " " + y + " " + waypoint.pos.getZ());
 		this.onClose();
 	}

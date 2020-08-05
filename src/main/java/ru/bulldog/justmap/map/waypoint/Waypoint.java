@@ -11,7 +11,7 @@ import ru.bulldog.justmap.client.render.Image;
 import ru.bulldog.justmap.map.data.WorldKey;
 import ru.bulldog.justmap.util.ColorUtil;
 import ru.bulldog.justmap.util.Colors;
-import ru.bulldog.justmap.util.Dimension;
+import ru.bulldog.justmap.util.DimensionUtil;
 import ru.bulldog.justmap.util.ImageUtil;
 import ru.bulldog.justmap.util.PosUtil;
 import ru.bulldog.justmap.util.math.RandomUtil;
@@ -169,7 +169,7 @@ public class Waypoint {
 		
 		if (jsonObject.has("dimension")) {
 			try {
-				waypoint.world = new WorldKey(Dimension.fromId(JsonHelper.getInt(jsonObject, "dimension", 0)));
+				waypoint.world = new WorldKey(DimensionUtil.fromRawId(JsonHelper.getInt(jsonObject, "dimension", 0)));
 			} catch (Exception ex) {
 				Identifier dimension = new Identifier(JsonHelper.getString(jsonObject, "dimension", "unknown"));
 				waypoint.world = new WorldKey(dimension);

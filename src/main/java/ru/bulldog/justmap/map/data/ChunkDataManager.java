@@ -116,7 +116,7 @@ class ChunkDataManager {
 		
 		ServerWorld serverWorld = (ServerWorld) world;
 		try (VersionedChunkStorage storage = StorageUtil.getChunkStorage(serverWorld);) {		
-			CompoundTag chunkTag = storage.updateChunkTag(serverWorld.getRegistryKey(),
+			CompoundTag chunkTag = storage.updateChunkTag(serverWorld.dimension.getType(),
 					DataUtil.getPersistentSupplier(), storage.getNbt(chunkPos));
 			if (chunkTag == null) return this.emptyChunk;
 			Chunk chunk = ChunkSerializer.deserialize(

@@ -20,7 +20,7 @@ import ru.bulldog.justmap.map.data.WorldManager;
 import ru.bulldog.justmap.map.data.WorldKey;
 import ru.bulldog.justmap.mixins.SessionAccessor;
 import ru.bulldog.justmap.util.DataUtil;
-import ru.bulldog.justmap.util.Dimension;
+import ru.bulldog.justmap.util.DimensionUtil;
 
 public final class StorageUtil {
 	
@@ -38,7 +38,7 @@ public final class StorageUtil {
 	
 	public static VersionedChunkStorage getChunkStorage(ServerWorld world) {
 		File regionDir = new File(savesDir(world), "region");
-		return new VersionedChunkStorage(regionDir, world.getServer().getDataFixer(), true);
+		return new VersionedChunkStorage(regionDir, world.getServer().getDataFixer());
 	}
 	
 	public static File savesDir(ServerWorld world) {
@@ -86,7 +86,7 @@ public final class StorageUtil {
 		File cacheDir = new File(filesDir(), worldKey.toFolder());
 		File oldCacheDir = new File(filesDir(), String.format("cache/%s", dimension));
 		if (dimKey != null) {
-			int dimId = Dimension.getId(dimKey);
+			int dimId = world.dimension.getType().getRawId();
 			if (dimId != Integer.MIN_VALUE) {
 				File oldDir = new File(filesDir(), String.format("cache/DIM%d", dimId));
 				if (oldDir.exists()) {
@@ -110,7 +110,7 @@ public final class StorageUtil {
 		File mapDataDir = MAP_DATA_DIR.toFile();
 		if (minecraft.isIntegratedServerRunning()) {
 			MinecraftServer server = minecraft.getServer();
-			String name = scrubFileName(server.getSaveProperties().getLevelName());
+			String name = scrubFileName(server.getLevelName());
 			filesDir = new File(mapDataDir, String.format("local/%s", name));
 		} else if (serverInfo != null) {
 			String name = scrubFileName(serverInfo.name);

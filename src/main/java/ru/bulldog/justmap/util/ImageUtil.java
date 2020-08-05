@@ -63,8 +63,8 @@ public class ImageUtil {
 		for (int i = 0; i < image.getWidth(); i++) {
 			for (int j = 0; j < image.getHeight(); j++) {
 				if (image.getPixelOpacity(i, j) == -1) {
-					int newColor = ColorHelper.multiplyColor(image.getPixelColor(i, j), color);
-					image.setPixelColor(i, j, ColorUtil.toABGR(newColor));
+					int newColor = ColorHelper.multiplyColor(image.getPixelRgba(i, j), color);
+					image.setPixelRgba(i, j, ColorUtil.toABGR(newColor));
 				}
 			}
 		}
@@ -88,8 +88,8 @@ public class ImageUtil {
 				if (imgX >= imgW) imgX = 0;
 				if ((x >= width - border || x <= border) ||
 					(y >= height - border || y <= border)) {							
-					int pixel = texture.getPixelColor(imgX, imgY);
-					squareSkin.setPixelColor(x, y, pixel);
+					int pixel = texture.getPixelRgba(imgX, imgY);
+					squareSkin.setPixelRgba(x, y, pixel);
 				}				
 				imgX++;
 				if (imgX >= imgW) imgX = 0;
@@ -122,8 +122,8 @@ public class ImageUtil {
 					len = (int) Line.length(centerX, centerY, x, y);
 				}
 				if (len <= rOut && len >= rIn) {							
-					int pixel = texture.getPixelColor(imgX, imgY);
-					roundSkin.setPixelColor(x, y, pixel);
+					int pixel = texture.getPixelRgba(imgX, imgY);
+					roundSkin.setPixelRgba(x, y, pixel);
 				}
 				imgX++;
 				if (imgX >= imgW) imgX = 0;

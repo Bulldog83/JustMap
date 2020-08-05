@@ -54,13 +54,13 @@ public abstract class InfoText {
 		
 		  switch (alignment) {
 			 case LEFT:
-				 RenderUtil.DRAWER.drawStringWithShadow(matrixStack, textRenderer, text.getString(), x, y, color);
+				 RenderUtil.DRAWER.drawString(textRenderer, text.getString(), x, y, color);
 			 break;
 			 case CENTER:
-				 RenderUtil.drawBoundedString(matrixStack, text.getString(), x, y, 0, width - 2, color);
+				 RenderUtil.drawBoundedString(text.getString(), x, y, 0, width - 2, color);
 			 break;
 			 case RIGHT:
-				 RenderUtil.drawRightAlignedString(matrixStack, text.getString(), x, y, color);
+				 RenderUtil.drawRightAlignedString(text.getString(), x, y, color);
 			 break;
 		  }
 	  }

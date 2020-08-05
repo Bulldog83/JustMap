@@ -1,8 +1,5 @@
 package ru.bulldog.justmap.client;
 
-import com.mojang.realmsclient.RealmsMainScreen;
-import com.mojang.realmsclient.gui.screens.RealmsGenericErrorScreen;
-
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientChunkEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
@@ -13,9 +10,7 @@ import net.minecraft.client.gui.screen.BackupPromptScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.TitleScreen;
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen;
-import net.minecraft.client.gui.screen.pack.DataPackScreen;
 import net.minecraft.client.gui.screen.world.CreateWorldScreen;
-import net.minecraft.client.gui.screen.world.EditGameRulesScreen;
 import net.minecraft.client.gui.screen.world.EditWorldScreen;
 import net.minecraft.client.gui.screen.world.SelectWorldScreen;
 
@@ -91,10 +86,6 @@ public class JustMapClient implements ClientModInitializer {
 		       currentScreen instanceof MultiplayerScreen ||
 		       currentScreen instanceof BackupPromptScreen ||
 		       currentScreen instanceof CreateWorldScreen ||
-		       currentScreen instanceof DataPackScreen ||
-		       currentScreen instanceof EditGameRulesScreen ||
-		       currentScreen instanceof EditWorldScreen ||
-		       currentScreen instanceof RealmsMainScreen ||
-		       currentScreen instanceof RealmsGenericErrorScreen;
+		       currentScreen instanceof EditWorldScreen;
 	}
 }

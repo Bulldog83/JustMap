@@ -9,10 +9,10 @@ import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.client.render.MapRenderer;
 import ru.bulldog.justmap.enums.ScreenPosition;
 import ru.bulldog.justmap.util.Colors;
+
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.hud.InGameHud;
-import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.texture.Sprite;
 import net.minecraft.client.texture.StatusEffectSpriteManager;
 import net.minecraft.client.util.math.MatrixStack;

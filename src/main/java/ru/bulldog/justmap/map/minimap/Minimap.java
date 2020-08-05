@@ -23,7 +23,7 @@ import ru.bulldog.justmap.map.icon.WaypointIcon;
 import ru.bulldog.justmap.map.waypoint.Waypoint;
 import ru.bulldog.justmap.map.waypoint.WaypointKeeper;
 import ru.bulldog.justmap.util.DataUtil;
-import ru.bulldog.justmap.util.Dimension;
+import ru.bulldog.justmap.util.DimensionUtil;
 import ru.bulldog.justmap.util.RuleUtil;
 import ru.bulldog.justmap.util.math.MathUtil;
 import ru.bulldog.justmap.util.math.RandomUtil;
@@ -174,7 +174,7 @@ public class Minimap implements IMap{
 		double startX = posX - scaledW / 2;
 		double startZ = posZ - scaledH / 2;
 
-		if (Dimension.isNether(world.getDimensionRegistryKey())) {
+		if (DimensionUtil.isNether(world.getDimensionRegistryKey())) {
 			this.mapLayer = Layer.NETHER;
 			this.mapLevel = posY / mapLayer.height;
 		} else if (RuleUtil.needRenderCaves(world, pos)) {

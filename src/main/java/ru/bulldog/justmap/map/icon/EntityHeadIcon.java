@@ -94,7 +94,7 @@ public class EntityHeadIcon extends Image {
 		boolean solid = true;
 		for (int i = 0; i < width; i++) {
 			for (int j = 0; j < height; j++) {
-				int alpha = (icon.getPixelColor(i, j) >> 24) & 255;
+				int alpha = (icon.getPixelRgba(i, j) >> 24) & 255;
 				solid = alpha > 0;
 				if (!solid) break;
 			}
@@ -117,7 +117,7 @@ public class EntityHeadIcon extends Image {
 			int left = x - 1;
 			int right = x + 1;
 			for (int y = 0; y < height; y++) {
-				int alpha = (image.getPixelColor(x, y) >> 24) & 255;
+				int alpha = (image.getPixelRgba(x, y) >> 24) & 255;
 				if (alpha == 0) continue;
 				
 				outlinePixels.add(new Point(x + 2, y + 2));
@@ -125,7 +125,7 @@ public class EntityHeadIcon extends Image {
 				int top = y - 1;
 				int bottom = y + 1;					
 				if (top >= 0) {
-					alpha = (image.getPixelColor(x, top) >> 24) & 255;
+					alpha = (image.getPixelRgba(x, top) >> 24) & 255;
 					if (alpha == 0) {
 						Point pixel = new Point(x + 2, y);
 						if (!outlinePixels.contains(pixel)) {
@@ -134,7 +134,7 @@ public class EntityHeadIcon extends Image {
 						}
 					}
 					if (left >= 0) {
-						alpha = (image.getPixelColor(left, top) >> 24) & 255;
+						alpha = (image.getPixelRgba(left, top) >> 24) & 255;
 						if (alpha == 0) {
 							Point pixel = new Point(x, y);
 							if (!outlinePixels.contains(pixel)) {
@@ -146,7 +146,7 @@ public class EntityHeadIcon extends Image {
 						}
 					}
 					if (right < width) {
-						alpha = (image.getPixelColor(right, top) >> 24) & 255;
+						alpha = (image.getPixelRgba(right, top) >> 24) & 255;
 						if (alpha == 0) {
 							Point pixel = new Point(right + 2, y);
 							if (!outlinePixels.contains(pixel)) {
@@ -165,7 +165,7 @@ public class EntityHeadIcon extends Image {
 					}
 				}
 				if (bottom < height) {
-					alpha = (image.getPixelColor(x, bottom) >> 24) & 255;
+					alpha = (image.getPixelRgba(x, bottom) >> 24) & 255;
 					if (alpha == 0) {
 						Point pixel = new Point(x + 2, bottom + 1);
 						if (!outlinePixels.contains(pixel)) {
@@ -174,7 +174,7 @@ public class EntityHeadIcon extends Image {
 						}
 					}
 					if (left >= 0) {
-						alpha = (image.getPixelColor(left, bottom) >> 24) & 255;
+						alpha = (image.getPixelRgba(left, bottom) >> 24) & 255;
 						if (alpha == 0) {
 							Point pixel = new Point(x, bottom + 2);
 							if (!outlinePixels.contains(pixel)) {
@@ -186,7 +186,7 @@ public class EntityHeadIcon extends Image {
 						}
 					}
 					if (right < width) {
-						alpha = (image.getPixelColor(right, bottom) >> 24) & 255;
+						alpha = (image.getPixelRgba(right, bottom) >> 24) & 255;
 						if (alpha == 0) {
 							Point pixel = new Point(right + 2, bottom + 2);
 							if (!outlinePixels.contains(pixel)) {
@@ -205,7 +205,7 @@ public class EntityHeadIcon extends Image {
 					}
 				}
 				if (left >= 0) {
-					alpha = (image.getPixelColor(left, y) >> 24) & 255;
+					alpha = (image.getPixelRgba(left, y) >> 24) & 255;
 					if (alpha == 0) {
 						Point pixel = new Point(x, y + 2);
 						if (!outlinePixels.contains(pixel)) {
@@ -221,7 +221,7 @@ public class EntityHeadIcon extends Image {
 					}
 				}
 				if (right < width) {
-					alpha = (image.getPixelColor(right, y) >> 24) & 255;
+					alpha = (image.getPixelRgba(right, y) >> 24) & 255;
 					if (alpha == 0) {
 						Point pixel = new Point(right + 1, y + 2);
 						if (!outlinePixels.contains(pixel)) {
@@ -239,7 +239,7 @@ public class EntityHeadIcon extends Image {
 			}
 		}
 		outlinePixels.forEach(pixel -> {
-			outline.setPixelColor((int) pixel.x, (int) pixel.y, outlineColor);
+			outline.setPixelRgba((int) pixel.x, (int) pixel.y, outlineColor);
 		});
 		
 		return outline;
