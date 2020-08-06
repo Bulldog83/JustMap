@@ -13,9 +13,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
-import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.chunk.WorldChunk;
-import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.gen.ChunkRandom;
 
 import java.lang.ref.SoftReference;
@@ -56,13 +54,12 @@ public class ChunkData {
 		this.chunkPos = pos;
 		this.worldChunk = new SoftReference<>(world.getChunk(pos.x, pos.z));
 
-		RegistryKey<DimensionType> dimType = world.getDimensionRegistryKey();
 		ServerWorld serverWorld = DataUtil.getServerWorld();
-		if (serverWorld != null && Dimension.isOverworld(dimType)) {
+		if (serverWorld != null && Dimension.isOverworld(world)) {
 			this.slime = ChunkRandom.getSlimeRandom(chunkPos.x, chunkPos.z,
 					serverWorld.getSeed(), 987234911L).nextInt(10) == 0;
 		}		
-		if (Dimension.isNether(dimType)) {
+		if (Dimension.isNether(world)) {
 			initLayer(Layer.NETHER);
 		} else {
 			initLayer(Layer.SURFACE);

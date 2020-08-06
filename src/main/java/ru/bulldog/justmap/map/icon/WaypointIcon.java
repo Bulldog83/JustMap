@@ -1,5 +1,6 @@
 package ru.bulldog.justmap.map.icon;
 
+import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.util.math.MatrixStack;
 
 import ru.bulldog.justmap.client.config.ClientParams;
@@ -30,7 +31,7 @@ public class WaypointIcon extends MapIcon<WaypointIcon> {
 	}
 	
 	@Override
-	public void draw(MatrixStack matrixStack, int mapX, int mapY, double offX, double offY, float rotation) {
+	public void draw(MatrixStack matrixStack, VertexConsumerProvider consumerProvider, int mapX, int mapY, double offX, double offY, float rotation) {
 		int size = 8;
 		int halfSize = size / 2;
 		
