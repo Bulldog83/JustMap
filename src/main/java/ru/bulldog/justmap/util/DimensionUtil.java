@@ -12,7 +12,6 @@ public class DimensionUtil {
 			case 0: return DimensionType.getId(DimensionType.OVERWORLD);
 			case 1: return DimensionType.getId(DimensionType.THE_END);
 		}
-		
 		return new Identifier("unknown");
 	}
 	
@@ -41,10 +40,10 @@ public class DimensionUtil {
 	}
 	
 	public static boolean isNether(Dimension dimension) {
-		return isEnd(getId(dimension));
+		return isNether(getId(dimension));
 	}
 	
 	public static boolean isOverworld(Dimension dimension) {
-		return isEnd(getId(dimension));
+		return isOverworld(getId(dimension));
 	}
 }

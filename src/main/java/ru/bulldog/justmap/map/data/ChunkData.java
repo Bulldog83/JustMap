@@ -4,13 +4,11 @@ import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.util.ColorUtil;
 import ru.bulldog.justmap.util.Colors;
-import ru.bulldog.justmap.util.DataUtil;
 import ru.bulldog.justmap.util.DimensionUtil;
 import ru.bulldog.justmap.util.tasks.TaskManager;
 
 import net.minecraft.world.World;
 import net.minecraft.block.BlockState;
-import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.chunk.WorldChunk;
@@ -54,10 +52,8 @@ public class ChunkData {
 		this.chunkPos = pos;
 		this.worldChunk = new SoftReference<>(world.getChunk(pos.x, pos.z));
 
-		ServerWorld serverWorld = DataUtil.getServerWorld();
-		if (serverWorld != null && DimensionUtil.isOverworld(world.dimension)) {
-			this.slime = ChunkRandom.create(chunkPos.x, chunkPos.z,
-					serverWorld.getSeed(), 987234911L).nextInt(10) == 0;
+		if (DimensionUtil.isOverworld(world.dimension)) {
+			this.slime = ChunkRandom.create(chunkPos.x, chunkPos.z, world.getSeed(), 987234911L).nextInt(10) == 0;
 		}		
 		if (DimensionUtil.isNether(world.dimension)) {
 			initLayer(Layer.NETHER);

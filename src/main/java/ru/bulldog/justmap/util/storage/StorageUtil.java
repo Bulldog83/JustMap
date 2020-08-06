@@ -6,19 +6,17 @@ import java.nio.file.Path;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.loader.api.FabricLoader;
+
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ServerInfo;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.World;
-import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.storage.VersionedChunkStorage;
 
 import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.map.data.WorldManager;
 import ru.bulldog.justmap.map.data.WorldKey;
-import ru.bulldog.justmap.mixins.SessionAccessor;
 import ru.bulldog.justmap.util.DataUtil;
 import ru.bulldog.justmap.util.DimensionUtil;
 
@@ -42,8 +40,9 @@ public final class StorageUtil {
 	}
 	
 	public static File savesDir(ServerWorld world) {
-		if (world == null || !(world instanceof ServerWorld)) return null;
-		return ((SessionAccessor) world.getServer()).getServerSession().getWorldDirectory(world.getRegistryKey());
+		if (world == null) return null;
+		File worldDir = world.getSaveHandler().getWorldDir();
+		return world.dimension.getType().getSaveDirectory(worldDir);
 	}
 	
 	public static File configDir() {
@@ -76,16 +75,14 @@ public final class StorageUtil {
 	public static File cacheDir() {
 		String dimension = "undefined";
 		World world = DataUtil.getClientWorld();
-		RegistryKey<DimensionType> dimKey = null;
 		if (world != null) {
-			dimKey = world.getDimensionRegistryKey();			
-			dimension = dimKey.getValue().getPath();			
+			DimensionUtil.getId(world);			
 		}
 
 		WorldKey worldKey = WorldManager.getWorldKey();
 		File cacheDir = new File(filesDir(), worldKey.toFolder());
 		File oldCacheDir = new File(filesDir(), String.format("cache/%s", dimension));
-		if (dimKey != null) {
+		if (world != null) {
 			int dimId = world.dimension.getType().getRawId();
 			if (dimId != Integer.MIN_VALUE) {
 				File oldDir = new File(filesDir(), String.format("cache/DIM%d", dimId));

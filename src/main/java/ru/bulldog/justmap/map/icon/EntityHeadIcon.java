@@ -41,10 +41,9 @@ public class EntityHeadIcon extends Image {
 				if (ImageUtil.imageExists(iconId)) {
 					return registerIcon(entity, id, iconId);
 				}
+				return null;
 			}
 		}
-		
-		return null;
 	}
 	
 	private final Identifier id;

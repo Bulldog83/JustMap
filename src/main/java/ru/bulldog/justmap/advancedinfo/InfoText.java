@@ -4,9 +4,9 @@ import ru.bulldog.justmap.enums.TextAlignment;
 import ru.bulldog.justmap.util.Colors;
 import ru.bulldog.justmap.util.DataUtil;
 import ru.bulldog.justmap.util.RenderUtil;
+
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 
@@ -43,11 +43,11 @@ public abstract class InfoText {
 		  this.color = color;
 	  }
 	  
-	  public void draw(MatrixStack matrixStack) {
-		  this.draw(matrixStack, x, y);
+	  public void draw() {
+		  this.draw(x, y);
 	  }
 	  
-	  public void draw(MatrixStack matrixStack, int x, int y) {
+	  public void draw(int x, int y) {
 		  TextRenderer textRenderer = minecraft.textRenderer;
 		
 		  int width = minecraft.getWindow().getScaledWidth();

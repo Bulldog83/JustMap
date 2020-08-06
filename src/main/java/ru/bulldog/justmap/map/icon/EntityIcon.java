@@ -31,8 +31,6 @@ public class EntityIcon extends MapIcon<EntityIcon> {
 		if (!RuleUtil.allowCreatureRadar() && !hostile) { return; }
 		if (!RuleUtil.allowHostileRadar() && hostile) { return; }
 		
-		int size = ClientParams.showEntityHeads ? ClientParams.entityIconSize : 4;
-		
 		int color;
 		if (entity instanceof TameableEntity) {
 			TameableEntity tameable = (TameableEntity) entity;
@@ -43,6 +41,7 @@ public class EntityIcon extends MapIcon<EntityIcon> {
 		
 		Point iconPos = new Point(mapX + x, mapY + y);
 		
+		int size = ClientParams.entityIconSize;
 		iconPos.x -= size / 2 + offX;
 		iconPos.y -= size / 2 + offY;
 		

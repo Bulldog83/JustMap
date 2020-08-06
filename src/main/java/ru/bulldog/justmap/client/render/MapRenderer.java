@@ -247,7 +247,7 @@ public class MapRenderer {
 		dir.x = posX; dir.y = posY;
 	}
 	
-	public void draw(MatrixStack matrix) {
+	public void draw() {
 		if (!minimap.isMapVisible() || !JustMapClient.canMapping()) return;
 		
 		this.updateParams();
@@ -262,8 +262,6 @@ public class MapRenderer {
 		int scaledW = (int) (mapWidth * scale);
 		int scaledH = (int) (mapHeight * scale);
 		
-		RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
-		RenderSystem.disableDepthTest();
 		
 		if (this.minimap.posChanged) {
 			this.lastX = minimap.getLasX();
@@ -271,8 +269,10 @@ public class MapRenderer {
 			this.minimap.posChanged = false;
 		}
 		
+		RenderSystem.disableDepthTest();
 		GL11.glEnable(GL11.GL_SCISSOR_TEST);
 		GL11.glScissor(scaledX, scaledY, scaledW, scaledH);
+		RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
 		
 		float mult = 1 / minimap.getScale();		
 		float offX = (float) (DataUtil.doubleX() - this.lastX) * mult;
@@ -303,29 +303,30 @@ public class MapRenderer {
 		this.drawMap();
 		RenderSystem.popMatrix();
 		
+		MatrixStack matrices = new MatrixStack();
 		if (RuleUtil.allowEntityRadar()) {
 			if (RuleUtil.allowPlayerRadar()) {
 				for (PlayerIcon player : minimap.getPlayerIcons()) {
-					player.draw(matrix, mapX, mapY, offX, offY, rotation);
+					player.draw(matrices, mapX, mapY, offX, offY, rotation);
 				}
 			}
 			if (RuleUtil.allowCreatureRadar() || RuleUtil.allowHostileRadar()) {
 				for (EntityIcon entity : minimap.getEntities()) {
-					entity.draw(matrix, mapX, mapY, offX, offY, rotation);
+					entity.draw(matrices, mapX, mapY, offX, offY, rotation);
 				}
 			}
 		}
 		
 		for (WaypointIcon waypoint : minimap.getWaypoints()) {
 			if (!waypoint.isHidden()) {
-				waypoint.draw(matrix, mapX, mapY, offX, offY, rotation);
+				waypoint.draw(matrices, mapX, mapY, offX, offY, rotation);
 			}
 		}
 		GL11.glDisable(GL11.GL_SCISSOR_TEST);
 		
 		if (ClientParams.useSkins) {
 			int brd = border * 2;
-			this.mapSkin.draw(matrix, posX, posY, mapWidth + brd, mapHeight + brd);
+			this.mapSkin.draw(matrices, posX, posY, mapWidth + brd, mapHeight + brd);
 		}
 		
 		RenderUtil.drawRightAlignedString(
@@ -342,7 +343,7 @@ public class MapRenderer {
 			MapPlayerManager.getPlayer(minecraft.player).getIcon().draw(centerX, centerY, iconSize, true);
 		}
 		
-		this.textManager.draw(matrix);
+		this.textManager.draw();
 		
 		RenderSystem.enableDepthTest();
 	}

@@ -140,7 +140,7 @@ public final class ConfigFactory {
 		EnumSelectorBuilder<MapShape> mapShapeEntry = entryBuilder.startEnumSelector(lang("map_shape"), MapShape.class, mapShapeConfig.getValue());
 		mapShapeEntry.setSaveConsumer(val -> mapShapeConfig.setValue(val))
 					 .setDefaultValue(mapShapeConfig.getDefault());
-		FloatSliderBuilder doubleSlider = new FloatSliderBuilder(entryBuilder.getResetButtonKey(), lang("skin_border_scale"), modConfig.getFloat("skin_scale"), 0.5F, 3.0F)
+		FloatSliderBuilder floatSlider = new FloatSliderBuilder(entryBuilder.getResetButtonKey(), lang("skin_border_scale"), modConfig.getFloat("skin_scale"), 0.5F, 3.0F)
 				.setSaveConsumer(val -> modConfig.setRanged("skin_scale", val))
 				.setDefaultValue((float) modConfig.getDefault("skin_scale"));
 		
@@ -166,7 +166,7 @@ public final class ConfigFactory {
 				.setDefaultValue(MapSkin.getDefaultSquareSkin())
 				.setSelections(MapSkin.getSquareSkins())
 				.build());
-		mapAppearance.addEntry(doubleSlider.build());
+		mapAppearance.addEntry(floatSlider.build());
 		mapAppearance.addEntry(arrowTypeEntry.build());
 		mapAppearance.addEntry(entryBuilder.startBooleanToggle(lang("simple_arrow"), modConfig.getBoolean("simple_direction_arrow"))
 				.setSaveConsumer(val -> modConfig.setBoolean("simple_direction_arrow", val))

@@ -1,14 +1,11 @@
 package ru.bulldog.justmap.client.render;
 
-import com.mojang.blaze3d.systems.RenderSystem;
-
 import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.client.config.ClientParams;
-import ru.bulldog.justmap.util.Colors;
 import ru.bulldog.justmap.util.DataUtil;
 import ru.bulldog.justmap.util.math.MathUtil;
+
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.DiffuseLighting;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.EntityRenderDispatcher;
 import net.minecraft.client.util.math.MatrixStack;
@@ -38,11 +35,9 @@ public class EntityModelRenderer {
 		
 		setPitchAndYaw(livingEntity);
 		
-		float scale = getScale(livingEntity);
-		
-		MatrixStack matrixStack = new MatrixStack();
-		
+		float scale = getScale(livingEntity);		
 		int modelSize = ClientParams.entityModelSize;
+		MatrixStack matrixStack = new MatrixStack();
 		
 		matrixStack.push();
 		matrixStack.translate(x, y, 0);
@@ -55,12 +50,10 @@ public class EntityModelRenderer {
 		}
 		matrixStack.push();
 		matrixStack.scale(scale, scale, scale);
-		
-		DiffuseLighting.enable();
-		RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
-		renderDispatcher.getRenderer(livingEntity).render(livingEntity, 0.0F, 0.0F, matrixStack, consumerProvider, Colors.LIGHT);
-		DiffuseLighting.disable();
-		
+		renderDispatcher.setRenderShadows(false);
+	    renderDispatcher.render(livingEntity, 0.0D, 0.0D, 0.0D, 0.0F, 1.0F, matrixStack, consumerProvider, 240);
+	    consumerProvider.draw();
+	    renderDispatcher.setRenderShadows(true);
 		matrixStack.pop();
 		matrixStack.pop();
 		

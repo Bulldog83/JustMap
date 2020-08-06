@@ -16,6 +16,7 @@ import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.SliderWidget;
+import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.util.Window;
 import net.minecraft.util.math.MathHelper;
 
@@ -35,16 +36,6 @@ public class FloatSliderEntry extends TooltipListEntry<Float> {
 	private TextRenderer textRenderer;
 	
 	@Deprecated
-	public FloatSliderEntry(String fieldName, float minimum, float maximum, float value, String resetButtonKey, Supplier<Float> defaultValue, Consumer<Float> saveConsumer) {
-		this(fieldName, minimum, maximum, value, resetButtonKey, defaultValue, saveConsumer, null);
-	}
-	
-	@Deprecated
-	public FloatSliderEntry(String fieldName, float minimum, float maximum, float value, String resetButtonKey, Supplier<Float> defaultValue, Consumer<Float> saveConsumer, Supplier<Optional<String[]>> tooltipSupplier) {
-		this(fieldName, minimum, maximum, value, resetButtonKey, defaultValue, saveConsumer, tooltipSupplier, false);
-	}
-	
-	@Deprecated
 	public FloatSliderEntry(String fieldName, float minimum, float maximum, float value, String resetButtonKey, Supplier<Float> defaultValue, Consumer<Float> saveConsumer, Supplier<Optional<String[]>> tooltipSupplier, boolean requiresRestart) {
 		super(fieldName, tooltipSupplier, requiresRestart);
 		MinecraftClient client = MinecraftClient.getInstance();		
@@ -56,8 +47,9 @@ public class FloatSliderEntry extends TooltipListEntry<Float> {
 		this.maximum = maximum;
 		this.minimum = minimum;
 		this.sliderWidget = new Slider(0, 0, 152, 20, ((double) this.value.get() - minimum) / Math.abs(maximum - minimum));
-		int width = textRenderer.getStringWidth(resetButtonKey);
-		this.resetButton = new ButtonWidget(0, 0, width + 6, 20, resetButtonKey, widget -> {
+		String resetString = I18n.translate(resetButtonKey);
+		int width = textRenderer.getStringWidth(resetString);
+		this.resetButton = new ButtonWidget(0, 0, width + 6, 20, resetString, widget -> {
 			setValue(defaultValue.get());
 		});
 		this.sliderWidget.setMessage(textGetter.apply((float) FloatSliderEntry.this.value.get()));
@@ -136,8 +128,8 @@ public class FloatSliderEntry extends TooltipListEntry<Float> {
 			this.sliderWidget.x = x + entryWidth - 150;
 		}
 		this.sliderWidget.setWidth(150 - resetButton.getWidth() - 2);
-		resetButton.render(mouseX, mouseY, delta);
-		sliderWidget.render(mouseX, mouseY, delta);
+		this.resetButton.render(mouseX, mouseY, delta);
+		this.sliderWidget.render(mouseX, mouseY, delta);
 	}
 	
 	private class Slider extends SliderWidget {
@@ -158,15 +150,13 @@ public class FloatSliderEntry extends TooltipListEntry<Float> {
 		
 		@Override
 		public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-			if (!isEditable())
-				return false;
+			if (!isEditable()) return false;
 			return super.keyPressed(keyCode, scanCode, modifiers);
 		}
 		
 		@Override
 		public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
-			if (!isEditable())
-				return false;
+			if (!isEditable()) return false;
 			return super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
 		}
 		

@@ -1,6 +1,5 @@
 package ru.bulldog.justmap.advancedinfo;
 
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.item.ItemStack;
 
@@ -19,8 +18,8 @@ public class ItemInfo extends InfoText {
 	}
 
 	@Override
-	public void draw(MatrixStack matrix) {
-		super.draw(matrix);
+	public void draw() {
+		super.draw();
 		int posX;
 		switch (alignment) {
 			case RIGHT:

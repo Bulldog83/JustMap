@@ -1,17 +1,15 @@
 package ru.bulldog.justmap.util;
 
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.GameRules;
 import net.minecraft.world.World;
-import net.minecraft.world.dimension.DimensionType;
 
 import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.map.MapGameRules;
 
 public class RuleUtil {
 
-	public static boolean isAllowed(boolean param, GameRules.Key<GameRules.BooleanRule> rule) {
+	public static boolean isAllowed(boolean param, GameRules.RuleKey<GameRules.BooleanRule> rule) {
 		if (param) {
 			return DataUtil.getMinecraft().isInSingleplayer() || MapGameRules.isAllowed(rule);
 		}
@@ -26,14 +24,12 @@ public class RuleUtil {
 	public static boolean needRenderCaves(World world, BlockPos pos) {
 		boolean allowCaves = isAllowed(ClientParams.drawCaves, MapGameRules.ALLOW_CAVES_MAP);
 		
-		DimensionType dimType = world.getDimension();
-		RegistryKey<DimensionType> dimKey = world.getDimensionRegistryKey();
-		if (DimensionUtil.isEnd(dimKey)) {
+		if (DimensionUtil.isEnd(world.dimension)) {
 			return false;
 		}
-		if (!dimType.hasCeiling() && dimType.hasSkyLight()) {
-			return allowCaves && (!world.isSkyVisibleAllowingSea(pos) && !DataUtil.hasSkyLight(world, pos) ||
-				   dimKey == DimensionType.OVERWORLD_CAVES_REGISTRY_KEY);
+		if (world.dimension.hasSkyLight()) {
+			return allowCaves && (!world.isSkyVisibleAllowingSea(pos) &&
+					!DataUtil.hasSkyLight(world, pos));
 		}
 		
 		return allowCaves;
