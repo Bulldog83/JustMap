@@ -16,13 +16,10 @@ import ru.bulldog.justmap.enums.ArrowType;
 import ru.bulldog.justmap.map.DirectionArrow;
 import ru.bulldog.justmap.map.MapPlayerManager;
 import ru.bulldog.justmap.map.data.WorldData;
+import ru.bulldog.justmap.map.icon.MapIcon;
 import ru.bulldog.justmap.map.data.RegionData;
-import ru.bulldog.justmap.map.icon.EntityIcon;
-import ru.bulldog.justmap.map.icon.PlayerIcon;
-import ru.bulldog.justmap.map.icon.WaypointIcon;
 import ru.bulldog.justmap.map.minimap.Minimap;
 import ru.bulldog.justmap.map.minimap.skin.MapSkin;
-import ru.bulldog.justmap.util.RuleUtil;
 import ru.bulldog.justmap.util.Colors;
 import ru.bulldog.justmap.util.RenderUtil;
 import ru.bulldog.justmap.util.DataUtil;
@@ -34,6 +31,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.util.Window;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
@@ -303,24 +301,12 @@ public class MapRenderer {
 		this.drawMap();
 		RenderSystem.popMatrix();
 		
-		if (RuleUtil.allowEntityRadar()) {
-			if (RuleUtil.allowPlayerRadar()) {
-				for (PlayerIcon player : minimap.getPlayerIcons()) {
-					player.draw(matrix, mapX, mapY, offX, offY, rotation);
-				}
-			}
-			if (RuleUtil.allowCreatureRadar() || RuleUtil.allowHostileRadar()) {
-				for (EntityIcon entity : minimap.getEntities()) {
-					entity.draw(matrix, mapX, mapY, offX, offY, rotation);
-				}
-			}
+		VertexConsumerProvider.Immediate consumerProvider = minecraft.getBufferBuilders().getEntityVertexConsumers();
+		for (MapIcon<?> icon : minimap.getDrawedIcons()) {
+			icon.draw(matrix, consumerProvider, mapX, mapY, offX, offY, rotation);
 		}
+		consumerProvider.draw();
 		
-		for (WaypointIcon waypoint : minimap.getWaypoints()) {
-			if (!waypoint.isHidden()) {
-				waypoint.draw(matrix, mapX, mapY, offX, offY, rotation);
-			}
-		}
 		GL11.glDisable(GL11.GL_SCISSOR_TEST);
 		
 		if (ClientParams.useSkins) {

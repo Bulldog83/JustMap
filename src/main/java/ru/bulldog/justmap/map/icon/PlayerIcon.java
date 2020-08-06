@@ -1,6 +1,7 @@
 package ru.bulldog.justmap.map.icon;
 
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.util.Window;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerEntity;
@@ -26,7 +27,7 @@ public class PlayerIcon extends MapIcon<PlayerIcon> {
 	}
 
 	@Override
-	public void draw(MatrixStack matrixStack, int mapX, int mapY, double offX, double offY, float rotation) {
+	public void draw(MatrixStack matrices, VertexConsumerProvider consumerProvider, int mapX, int mapY, double offX, double offY, float rotation) {
 		int size = ClientParams.entityIconSize;
 		
 		Point pos = new Point(mapX + x, mapY + y);
@@ -41,11 +42,10 @@ public class PlayerIcon extends MapIcon<PlayerIcon> {
 		if (pos.x < mapX + size || pos.x > (mapX + map.getWidth()) - size ||
 			pos.y < mapY + size || pos.y > (mapY + map.getHeight()) - size) return;
 		
-		MatrixStack matrix = new MatrixStack();
-		 if (ClientParams.renderEntityModel) {
-			EntityModelRenderer.renderModel(player, pos.x, pos.y);
+		if (ClientParams.renderEntityModel) {
+			EntityModelRenderer.renderModel(matrices, consumerProvider, player, pos.x, pos.y);
 		} else if (ClientParams.showPlayerHeads) {
-			MapPlayerManager.getPlayer(player).getIcon().draw(matrix, pos.x, pos.y);
+			MapPlayerManager.getPlayer(player).getIcon().draw(matrices, pos.x, pos.y);
 		} else {
 			int darken = ColorUtil.colorBrigtness(this.color, -3);
 			RenderUtil.fill(pos.x - 0.5, pos.y - 0.5, size + 1, size + 1, darken);
@@ -57,13 +57,13 @@ public class PlayerIcon extends MapIcon<PlayerIcon> {
 			Window window = minecraft.getWindow();
 			double sf = window.getScaleFactor();
 			float scale = (float) (1.0 / sf);
-			matrix.push();
+			matrices.push();
 			if (sf > 1.0 && !minecraft.options.forceUnicodeFont) {
-				matrix.scale(scale, scale, 1.0F);
-				matrix.translate(pos.x * (sf - 1), pos.y * (sf - 1), 0.0);
+				matrices.scale(scale, scale, 1.0F);
+				matrices.translate(pos.x * (sf - 1), pos.y * (sf - 1), 0.0);
 			}
-			RenderUtil.drawCenteredText(matrix, player.getName(), pos.x, pos.y + 12, Colors.WHITE);
-			matrix.pop();
+			RenderUtil.drawCenteredText(matrices, player.getName(), pos.x, pos.y + 12, Colors.WHITE);
+			matrices.pop();
 		}
 	}
 }
