@@ -75,6 +75,6 @@ public class WaypointIcon extends MapIcon<WaypointIcon> {
 	}
 	
 	public boolean isHidden() {
-		return waypoint.hidden;
+		return this.waypoint.hidden;
 	}
 }

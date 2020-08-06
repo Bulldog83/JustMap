@@ -17,12 +17,9 @@ import ru.bulldog.justmap.map.DirectionArrow;
 import ru.bulldog.justmap.map.MapPlayerManager;
 import ru.bulldog.justmap.map.data.WorldData;
 import ru.bulldog.justmap.map.data.RegionData;
-import ru.bulldog.justmap.map.icon.EntityIcon;
-import ru.bulldog.justmap.map.icon.PlayerIcon;
-import ru.bulldog.justmap.map.icon.WaypointIcon;
+import ru.bulldog.justmap.map.icon.MapIcon;
 import ru.bulldog.justmap.map.minimap.Minimap;
 import ru.bulldog.justmap.map.minimap.skin.MapSkin;
-import ru.bulldog.justmap.util.RuleUtil;
 import ru.bulldog.justmap.util.Colors;
 import ru.bulldog.justmap.util.RenderUtil;
 import ru.bulldog.justmap.util.DataUtil;
@@ -304,23 +301,8 @@ public class MapRenderer {
 		RenderSystem.popMatrix();
 		
 		MatrixStack matrices = new MatrixStack();
-		if (RuleUtil.allowEntityRadar()) {
-			if (RuleUtil.allowPlayerRadar()) {
-				for (PlayerIcon player : minimap.getPlayerIcons()) {
-					player.draw(matrices, mapX, mapY, offX, offY, rotation);
-				}
-			}
-			if (RuleUtil.allowCreatureRadar() || RuleUtil.allowHostileRadar()) {
-				for (EntityIcon entity : minimap.getEntities()) {
-					entity.draw(matrices, mapX, mapY, offX, offY, rotation);
-				}
-			}
-		}
-		
-		for (WaypointIcon waypoint : minimap.getWaypoints()) {
-			if (!waypoint.isHidden()) {
-				waypoint.draw(matrices, mapX, mapY, offX, offY, rotation);
-			}
+		for (MapIcon<?> icon : minimap.getDrawedIcons()) {
+			icon.draw(matrices, mapX, mapY, offX, offY, rotation);
 		}
 		GL11.glDisable(GL11.GL_SCISSOR_TEST);
 		
