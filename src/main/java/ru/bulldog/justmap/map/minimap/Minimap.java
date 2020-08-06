@@ -18,6 +18,7 @@ import ru.bulldog.justmap.map.data.WorldKey;
 import ru.bulldog.justmap.map.data.WorldManager;
 import ru.bulldog.justmap.map.data.Layer;
 import ru.bulldog.justmap.map.icon.EntityIcon;
+import ru.bulldog.justmap.map.icon.MapIcon;
 import ru.bulldog.justmap.map.icon.PlayerIcon;
 import ru.bulldog.justmap.map.icon.WaypointIcon;
 import ru.bulldog.justmap.map.waypoint.Waypoint;
@@ -50,9 +51,7 @@ public class Minimap implements IMap{
 	private InfoText txtCoords = new CoordsInfo(TextAlignment.CENTER, "0, 0, 0");
 	private InfoText txtBiome = new BiomeInfo(TextAlignment.CENTER, "");
 	private InfoText txtTime = new TimeInfo(TextAlignment.CENTER, "");
-	private List<WaypointIcon> waypoints = new ArrayList<>();
-	private List<PlayerIcon> players = new ArrayList<>();
-	private List<EntityIcon> entities = new ArrayList<>();	
+	private List<MapIcon<?>> drawedIcons = new ArrayList<>();	
 	private PlayerEntity locPlayer = null;
 	private Layer mapLayer = Layer.SURFACE;
 	private WorldData worldData;
@@ -202,8 +201,7 @@ public class Minimap implements IMap{
 		double endZ = startZ + scaledH;
 		
 		if (RuleUtil.allowEntityRadar()) {
-			this.players.clear();
-			this.entities.clear();
+			this.drawedIcons.clear();
 			
 			int checkHeight = 24;
 			BlockPos start = new BlockPos(startX, posY - checkHeight / 2, startZ);
@@ -222,27 +220,25 @@ public class Minimap implements IMap{
 					if (pEntity == player) continue;
 					PlayerIcon playerIcon = new PlayerIcon(this, pEntity, false);
 					playerIcon.setPosition(iconX, iconY);
-					this.players.add(playerIcon);
+					this.drawedIcons.add(playerIcon);
 				} else if (entity instanceof LivingEntity && !(entity instanceof PlayerEntity)) {
 					LivingEntity livingEntity = (LivingEntity) entity;
 					boolean hostile = livingEntity instanceof HostileEntity;
 					if (hostile && RuleUtil.allowHostileRadar()) {
 						EntityIcon entIcon = new EntityIcon(this, entity, hostile);	
 						entIcon.setPosition(iconX, iconY);
-						this.entities.add(entIcon);
+						this.drawedIcons.add(entIcon);
 						amount++;
 					} else if (!hostile && RuleUtil.allowCreatureRadar()) {
 						EntityIcon entIcon = new EntityIcon(this, entity, hostile);	
 						entIcon.setPosition(iconX, iconY);
-						this.entities.add(entIcon);
+						this.drawedIcons.add(entIcon);
 						amount++;
 					}
 				}
 				if (amount >= 250) break;
 			}
 		}
-		
-		waypoints.clear();
 		if (ClientParams.showWaypoints) {
 			List<Waypoint> wps = WaypointKeeper.getInstance().getWaypoints(WorldManager.getWorldKey(), true);
 			if (wps != null) {
@@ -253,14 +249,10 @@ public class Minimap implements IMap{
 						MathUtil.screenPos(wp.pos.getX(), startX, endX, mapWidth),
 						MathUtil.screenPos(wp.pos.getZ(), startZ, endZ, mapHeight)
 					);
-					this.waypoints.add(waypoint);
+					this.drawedIcons.add(waypoint);
 				}
 			}
 		}
-	}
-	
-	public List<WaypointIcon> getWaypoints() {
-		return waypoints;
 	}
 	
 	public void createWaypoint(WorldKey world, BlockPos pos) {
@@ -289,12 +281,8 @@ public class Minimap implements IMap{
 		return this.mapScale;
 	}
 	
-	public List<PlayerIcon> getPlayerIcons() {
-		return this.players;
-	}
-	
-	public List<EntityIcon> getEntities() {
-		return this.entities;
+	public List<MapIcon<?>> getDrawedIcons() {
+		return this.drawedIcons;
 	}
 	
 	public TextManager getTextManager() {
