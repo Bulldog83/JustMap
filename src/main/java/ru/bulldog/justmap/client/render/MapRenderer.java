@@ -69,7 +69,6 @@ public class MapRenderer {
 	
 	private final MinecraftClient minecraft = DataUtil.getMinecraft();
 	private final Identifier roundMask = new Identifier(JustMap.MODID, "textures/round_mask.png");
-	private final VertexConsumerProvider.Immediate consumerProvider = minecraft.getBufferBuilders().getEntityVertexConsumers();
 	
 	public static MapRenderer getInstance() {
 		if (instance == null) {
@@ -302,6 +301,7 @@ public class MapRenderer {
 		this.drawMap();
 		RenderSystem.popMatrix();
 		
+		VertexConsumerProvider.Immediate consumerProvider = minecraft.getBufferBuilders().getEntityVertexConsumers();
 		for (MapIcon<?> icon : minimap.getDrawedIcons()) {
 			icon.draw(matrix, consumerProvider, mapX, mapY, offX, offY, rotation);
 		}
