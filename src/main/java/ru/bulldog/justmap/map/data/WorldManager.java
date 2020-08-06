@@ -178,7 +178,7 @@ public final class WorldManager {
 	}
 	
 	public static WorldKey createWorldKey(World world, BlockPos blockPos, String worldName) {
-		WorldKey newKey = new WorldKey(world.getRegistryKey());
+		WorldKey newKey = new WorldKey(world);
 		if (RuleUtil.detectMultiworlds()) {
 			if (blockPos != null) {
 				newKey.setWorldPos(blockPos);

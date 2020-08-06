@@ -7,8 +7,6 @@ import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
@@ -54,11 +52,10 @@ public class WorldnameScreen extends Screen {
 			this.y = height / 2 - frameHeight / 2;
 			btnY = (y + frameHeight) - 40;
 		}
-		Text defaultText = new LiteralText("Default");
-		this.nameField = new TextFieldWidget(textRenderer, x + 20, y + 50, frameWidth - 40, 20, defaultText);
-		this.saveButton = new ButtonWidget(center - 30, btnY, 60, 20, LangUtil.getText("gui", "save"), this::onPressSave);
-		this.addButton(saveButton);
-		this.addChild(nameField);
+		this.nameField = new TextFieldWidget(font, x + 20, y + 50, frameWidth - 40, 20, "Default");
+		this.saveButton = new ButtonWidget(center - 30, btnY, 60, 20, LangUtil.getString("gui", "save"), this::onPressSave);
+		this.buttons.add(saveButton);
+		this.children.add(nameField);
 	}
 	
 	private void onPressSave(ButtonWidget button) {
@@ -73,20 +70,20 @@ public class WorldnameScreen extends Screen {
 	}
 	
 	@Override
-	public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
-		this.renderBackground(matrices);
-		this.drawCenteredString(matrices, textRenderer, LangUtil.getString("gui", "worldname_title"), center, y + 25, Colors.WHITE);
+	public void render(int mouseX, int mouseY, float delta) {
+		this.renderBackground();
+		this.drawCenteredString(font, LangUtil.getString("gui", "worldname_title"), center, y + 25, Colors.WHITE);
 		for (Element child : children) {
 			if (child instanceof Drawable) {
-				((Drawable) child).render(matrices, mouseX, mouseY, delta);
+				((Drawable) child).render(mouseX, mouseY, delta);
 			}
 		}
-		super.render(matrices, mouseX, mouseY, delta);
+		super.render(mouseX, mouseY, delta);
 	}
 	
 	@Override
-	public void renderBackground(MatrixStack matrices) {
-		super.renderBackground(matrices);
+	public void renderBackground() {
+		super.renderBackground();
 		RenderSystem.enableBlend();
 		RenderSystem.defaultBlendFunc();
 		RenderUtil.bindTexture(FRAME_TEXTURE);
@@ -101,6 +98,6 @@ public class WorldnameScreen extends Screen {
 		if (!success) {
 			WorldManager.setCurrentWorldName("Default");
 		}
-		this.client.openScreen(parent);
+		this.minecraft.openScreen(parent);
 	}
 }

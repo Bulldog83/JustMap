@@ -17,13 +17,10 @@ import ru.bulldog.justmap.util.math.MathUtil;
 import ru.bulldog.justmap.util.math.RandomUtil;
 
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.resource.language.I18n;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Identifier;
@@ -74,17 +71,15 @@ public class WaypointsList extends MapScreen {
 			}
 		}		
 		
-		public void render(MatrixStack matrixStack, int mouseX, int mouseY, float delta) {
-			TextRenderer font = minecraft.textRenderer;
-			
+		public void render(int mouseX, int mouseY, float delta) {
 			boolean hover = isMouseOver(mouseX, mouseY);
 			int bgColor = hover ? 0x88AAAAAA : 0x88333333;
-			fill(matrixStack, x, y, x + width, y + height, bgColor);
+			fill(x, y, x + width, y + height, bgColor);
 			
 			int iconSize = height - 2;
 			Icon icon = waypoint.getIcon();
 			if (icon != null) {
-				icon.draw(matrixStack, x, y + 1, iconSize, iconSize);
+				icon.draw(x, y + 1, iconSize);
 			} else {
 				RenderUtil.drawDiamond(x, y + 1, iconSize, iconSize, waypoint.color);
 			}
@@ -92,16 +87,16 @@ public class WaypointsList extends MapScreen {
 			int stringY = y + 7;			
 			int nameX = x + iconSize + 2;
 
-			RenderUtil.DRAWER.drawStringWithShadow(matrixStack, font, waypoint.name, nameX, stringY, Colors.WHITE);
+			RenderUtil.DRAWER.drawString(minecraft.textRenderer, waypoint.name, nameX, stringY, Colors.WHITE);
 			
 			int posX = tpButton.x - 5;
-			RenderUtil.drawRightAlignedString(matrixStack, waypoint.pos.toShortString(), posX, stringY, Colors.WHITE);
+			RenderUtil.drawRightAlignedString(waypoint.pos.toShortString(), posX, stringY, Colors.WHITE);
 			
 			if (RuleUtil.allowTeleportation()) {
-				this.tpButton.render(matrixStack, mouseX, mouseY, delta);
+				this.tpButton.render(mouseX, mouseY, delta);
 			}
-			this.editButton.render(matrixStack, mouseX, mouseY, delta);
-			this.deleteButton.render(matrixStack, mouseX, mouseY, delta);
+			this.editButton.render(mouseX, mouseY, delta);
+			this.deleteButton.render(mouseX, mouseY, delta);
 		}
 	
 		@Override
@@ -163,8 +158,8 @@ public class WaypointsList extends MapScreen {
 		this.center = width / 2;		
 		this.screenWidth = center > 480 ? center : width > 480 ? 480 : width;
 		this.x = center - screenWidth / 2;		
-		this.prevDimensionButton = new ButtonWidget(x + 10, 6, 20, 20, new LiteralText("<"), (b) -> cycleDimension(-1));
-		this.nextDimensionButton = new ButtonWidget(x + screenWidth - 30, 6, 20, 20, new LiteralText(">"), (b) -> cycleDimension(1));		
+		this.prevDimensionButton = new ButtonWidget(x + 10, 6, 20, 20, "<", (b) -> cycleDimension(-1));
+		this.nextDimensionButton = new ButtonWidget(x + screenWidth - 30, 6, 20, 20, ">", (b) -> cycleDimension(1));		
 		this.addButton = new ButtonWidget(center - 62, height - 26, 60, 20, lang("create"), (b) -> add());
 		this.closeButton = new ButtonWidget(center + 2, height - 26, 60, 20, lang("close"), (b) -> onClose());
 		this.currentWorld = WorldManager.getWorldKey();
@@ -226,16 +221,16 @@ public class WaypointsList extends MapScreen {
 	}
 	
 	@Override
-	public void render(MatrixStack matrixStack, int mouseX, int mouseY, float delta) {
-		super.render(matrixStack, mouseX, mouseY, delta);
+	public void render(int mouseX, int mouseY, float delta) {
+		super.render(mouseX, mouseY, delta);
 		
-		this.entries.forEach(e -> e.render(matrixStack, mouseX, mouseY, delta));
+		this.entries.forEach(e -> e.render(mouseX, mouseY, delta));
 		
 		String screenTitle = this.currentWorld.getName();
 		if (screenTitle == null) {
-			screenTitle = info == null ? lang("unknown").getString() : I18n.translate(info.getFirst());
+			screenTitle = info == null ? lang("unknown") : I18n.translate(info.getFirst());
 		}
-		this.drawCenteredString(matrixStack, textRenderer, screenTitle, center, 15, Colors.WHITE);
+		this.drawCenteredString(font, screenTitle, center, 15, Colors.WHITE);
 		this.drawScrollBar();
 	}
 	
@@ -250,17 +245,17 @@ public class WaypointsList extends MapScreen {
 	private void drawScrollBar() {}
 	
 	private void edit(Waypoint waypoint) {
-		this.client.openScreen(new WaypointEditor(waypoint, this, null));
+		this.minecraft.openScreen(new WaypointEditor(waypoint, this, null));
 	}
 	
 	private void add() {
 		Waypoint waypoint = new Waypoint();
 		waypoint.world = currentWorld;
 		waypoint.color = RandomUtil.getElement(Waypoint.WAYPOINT_COLORS);
-		waypoint.pos = client.player.getBlockPos();
+		waypoint.pos = this.minecraft.player.getBlockPos();
 		waypoint.name = "Waypoint";
 		
-		this.client.openScreen(new WaypointEditor(waypoint, this, keeper::addNew));
+		this.minecraft.openScreen(new WaypointEditor(waypoint, this, keeper::addNew));
 	}
 	
 	private void delete(Waypoint waypoint) {
@@ -271,8 +266,8 @@ public class WaypointsList extends MapScreen {
 	
 	public void teleport(Waypoint waypoint) {
 		if (!WorldManager.getWorldKey().equals(currentWorld)) return;
-		int y = waypoint.pos.getY() > 0 ? waypoint.pos.getY() : (DimensionUtil.isNether(client.world.getDimensionRegistryKey()) ? 128 : 64);
-		this.client.player.sendChatMessage("/tp " + this.client.player.getName().asString() + " " + waypoint.pos.getX() + " " + y + " " + waypoint.pos.getZ());
+		int y = waypoint.pos.getY() > 0 ? waypoint.pos.getY() : (DimensionUtil.isNether(minecraft.world.dimension) ? 128 : 64);
+		this.minecraft.player.sendChatMessage("/tp " + minecraft.player.getName().asString() + " " + waypoint.pos.getX() + " " + y + " " + waypoint.pos.getZ());
 		this.onClose();
 	}
 	

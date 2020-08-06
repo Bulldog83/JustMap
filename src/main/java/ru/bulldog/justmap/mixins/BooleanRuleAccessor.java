@@ -8,7 +8,7 @@ import net.minecraft.world.GameRules;
 @Mixin(GameRules.BooleanRule.class)
 public interface BooleanRuleAccessor {
 	@Invoker
-	static GameRules.Type<GameRules.BooleanRule> callCreate(boolean value) {
+	static GameRules.RuleType<GameRules.BooleanRule> callCreate(boolean value) {
 		throw new AssertionError("@Invoker dummy body called");
 	}
 }

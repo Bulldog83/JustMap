@@ -13,8 +13,6 @@ import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.CheckboxWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.resource.language.I18n;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.math.BlockPos;
@@ -72,7 +70,7 @@ public class WaypointEditor extends MapScreen {
 		int ex = x + padding;
 		int ey = y;
 		int ew = screenW - padding * 2;
-		this.nameField = new TitledWidget<>(textRenderer, new TextFieldWidget(textRenderer, 0, 0, ew - 30, 12, new LiteralText("Name")), ex, ey, ew, rowH, "", lang("name").asString());
+		this.nameField = new TitledWidget<>(font, new TextFieldWidget(font, 0, 0, ew - 30, 12, "Name"), ex, ey, ew, rowH, "", lang("name"));
 		this.nameField.changeFocus(true);
 		this.nameField.widget.setMaxLength(48);
 		this.nameField.widget.setText(waypoint.name);
@@ -86,17 +84,17 @@ public class WaypointEditor extends MapScreen {
 		
 		ey += row;
 		
-		this.xField = new TextFieldWidget(textRenderer, px, ey, ew, rowH, new LiteralText(""));
+		this.xField = new TextFieldWidget(font, px, ey, ew, rowH, "");
 		this.xField.setTextPredicate(validNumber);
 		this.xField.setMaxLength(7);
 		this.xField.setText(waypoint.pos.getX() + "");
 		
-		this.yField = new TextFieldWidget(textRenderer, px + ew, ey, ew, rowH, new LiteralText(""));
+		this.yField = new TextFieldWidget(font, px + ew, ey, ew, rowH, "");
 		this.yField.setTextPredicate(validNumber);
 		this.yField.setMaxLength(7);
 		this.yField.setText(waypoint.pos.getY() + "");
 		
-		this.zField = new TextFieldWidget(textRenderer, px + 2 * ew, ey, ew, rowH, new LiteralText(""));
+		this.zField = new TextFieldWidget(font, px + 2 * ew, ey, ew, rowH, "");
 		this.zField.setTextPredicate(validNumber);
 		this.zField.setMaxLength(7);
 		this.zField.setText(waypoint.pos.getZ() + "");
@@ -108,18 +106,18 @@ public class WaypointEditor extends MapScreen {
 		ey += row;
 		
 		ew = 20;
-		this.prevColorButton = new ButtonWidget(ex, ey, ew, rowH, new LiteralText("<"), (b) -> cycleColor(-1));
+		this.prevColorButton = new ButtonWidget(ex, ey, ew, rowH, "<", (b) -> cycleColor(-1));
 		this.children.add(prevColorButton);
 		
-		this.nextColorButton = new ButtonWidget(x + screenW - ew - padding, ey, ew, rowH, new LiteralText(">"), (b) -> cycleColor(1));
+		this.nextColorButton = new ButtonWidget(x + screenW - ew - padding, ey, ew, rowH, ">", (b) -> cycleColor(1));
 		this.children.add(nextColorButton);
 		
 		ey += row;
 		
-		this.prevIconButton = new ButtonWidget(ex, ey, ew, rowH, new LiteralText("<"), (b) -> cycleIcon(-1));
+		this.prevIconButton = new ButtonWidget(ex, ey, ew, rowH, "<", (b) -> cycleIcon(-1));
 		this.children.add(prevIconButton);
 		
-		this.nextIconButton = new ButtonWidget(x + screenW - ew - padding, ey, ew, rowH, new LiteralText(">"), (b) -> cycleIcon(1));
+		this.nextIconButton = new ButtonWidget(x + screenW - ew - padding, ey, ew, rowH, ">", (b) -> cycleIcon(1));
 		this.children.add(nextIconButton);
 		
 		ey += row * 1.5;
@@ -143,10 +141,10 @@ public class WaypointEditor extends MapScreen {
 	}
 	
 	@Override
-	public void render(MatrixStack matrixStack, int mouseX, int mouseY, float delta) {
-		super.render(matrixStack, mouseX, mouseY, delta);
-		String dimensionName = info == null ? lang("unknown").asString() : I18n.translate(info.getFirst());
-		this.drawCenteredString(matrixStack, textRenderer, dimensionName, center, 15, Colors.WHITE);
+	public void render(int mouseX, int mouseY, float delta) {
+		super.render(mouseX, mouseY, delta);
+		String dimensionName = info == null ? lang("unknown") : I18n.translate(info.getFirst());
+		this.drawCenteredString(font, dimensionName, center, 15, Colors.WHITE);
 	}
 	
 	private void cycleColor(int i) {
@@ -194,11 +192,11 @@ public class WaypointEditor extends MapScreen {
 	
 	@Override
 	public void onClose() {
-		this.client.openScreen(parent);
+		this.minecraft.openScreen(parent);
 	}
 	
 	@Override
-	public void renderForeground(MatrixStack matrixStack) {
+	public void renderForeground() {
 		int x = prevColorButton.x + prevColorButton.getWidth() + 2;
 		int y = prevColorButton.y + 3;
 		int w = nextColorButton.x - x - 2;
@@ -215,21 +213,21 @@ public class WaypointEditor extends MapScreen {
 		int ix = center - icon.getWidth() / 2;
 		int iy = y + rowH + (rowH / 2 - icon.getHeight() / 2);
 		int color = iconIndex > 0 ? icon.color : col;
-		this.borderedRect(matrixStack, x, y, w, h, color, 2, 0xFFCCCCCC);
+		this.borderedRect(x, y, w, h, color, 2, 0xFFCCCCCC);
 		icon.draw(ix, iy);
 	}
 	
 	@Override
 	public void tick() {}
 	
-	private void rect(MatrixStack matrixStack, int x, int y, int w, int h, int color) {
-		fill(matrixStack, x, y, x + w, y + h, color);
+	private void rect(int x, int y, int w, int h, int color) {
+		fill(x, y, x + w, y + h, color);
 	}
 	
-	private void borderedRect(MatrixStack matrixStack, int x, int y, int w, int h, int color, int border, int borderColor) {
+	private void borderedRect(int x, int y, int w, int h, int color, int border, int borderColor) {
 		int hb = border >> 1;
-		this.rect(matrixStack, x, y, w, h, borderColor);
-		this.rect(matrixStack, x + hb, y + hb, w - border, h - border, color);
+		this.rect(x, y, w, h, borderColor);
+		this.rect(x + hb, y + hb, w - border, h - border, color);
 	}
 	
 	private int getColorIndex(int color) {

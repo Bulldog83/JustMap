@@ -7,7 +7,7 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.JsonHelper;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-
+import ru.bulldog.justmap.util.DimensionUtil;
 import ru.bulldog.justmap.util.PosUtil;
 
 public class WorldKey {
@@ -21,8 +21,8 @@ public class WorldKey {
 		this.worldId = this.dimension.toString();
 	}
 	
-	public WorldKey(RegistryKey<World> worldKey) {
-		this(worldKey.getValue());
+	public WorldKey(World world) {
+		this(DimensionUtil.getId(world));
 	}
 	
 	public void setWorldName(String name) {

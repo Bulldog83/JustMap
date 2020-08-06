@@ -35,4 +35,16 @@ public class DimensionUtil {
 	public static boolean isOverworld(Identifier dimId) {
 		return dimId.equals(DimensionType.getId(DimensionType.OVERWORLD));
 	}
+	
+	public static boolean isEnd(Dimension dimension) {
+		return isEnd(getId(dimension));
+	}
+	
+	public static boolean isNether(Dimension dimension) {
+		return isEnd(getId(dimension));
+	}
+	
+	public static boolean isOverworld(Dimension dimension) {
+		return isEnd(getId(dimension));
+	}
 }

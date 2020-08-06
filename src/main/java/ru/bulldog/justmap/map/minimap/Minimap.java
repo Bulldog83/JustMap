@@ -174,7 +174,7 @@ public class Minimap implements IMap{
 		double startX = posX - scaledW / 2;
 		double startZ = posZ - scaledH / 2;
 
-		if (DimensionUtil.isNether(world.getDimensionRegistryKey())) {
+		if (DimensionUtil.isNether(world.dimension)) {
 			this.mapLayer = Layer.NETHER;
 			this.mapLevel = posY / mapLayer.height;
 		} else if (RuleUtil.needRenderCaves(world, pos)) {

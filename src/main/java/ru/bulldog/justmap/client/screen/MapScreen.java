@@ -109,7 +109,7 @@ public class MapScreen extends Screen {
 		this.renderTextureRepeating(0, height - bottom, width, bottom, 16, 16, id);		
 	}
 	
-	public Text lang(String key) {
-		return langUtil.getText(key);
+	public String lang(String key) {
+		return langUtil.getString(key);
 	}	
 }

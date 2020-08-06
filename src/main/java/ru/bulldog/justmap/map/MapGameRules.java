@@ -13,17 +13,17 @@ import net.fabricmc.api.Environment;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.world.GameRules;
-import net.minecraft.world.GameRules.Key;
+import net.minecraft.world.GameRules.RuleKey;
 
 public class MapGameRules {
 
-	public final static GameRules.Key<GameRules.BooleanRule> ALLOW_CAVES_MAP = register("allowCavesMap", false);
-	public final static GameRules.Key<GameRules.BooleanRule> ALLOW_ENTITY_RADAR = register("allowEntityRadar", false);
-	public final static GameRules.Key<GameRules.BooleanRule> ALLOW_PLAYER_RADAR = register("allowPlayerRadar", false);
-	public final static GameRules.Key<GameRules.BooleanRule> ALLOW_CREATURE_RADAR = register("allowCreatureRadar", false);
-	public final static GameRules.Key<GameRules.BooleanRule> ALLOW_HOSTILE_RADAR = register("allowHostileRadar", false);
-	public final static GameRules.Key<GameRules.BooleanRule> ALLOW_SLIME_CHUNKS = register("allowSlimeChunks", false);
-	public final static GameRules.Key<GameRules.BooleanRule> ALLOW_TELEPORTATION = register("allowWaypointsJump", false);
+	public final static GameRules.RuleKey<GameRules.BooleanRule> ALLOW_CAVES_MAP = register("allowCavesMap", false);
+	public final static GameRules.RuleKey<GameRules.BooleanRule> ALLOW_ENTITY_RADAR = register("allowEntityRadar", false);
+	public final static GameRules.RuleKey<GameRules.BooleanRule> ALLOW_PLAYER_RADAR = register("allowPlayerRadar", false);
+	public final static GameRules.RuleKey<GameRules.BooleanRule> ALLOW_CREATURE_RADAR = register("allowCreatureRadar", false);
+	public final static GameRules.RuleKey<GameRules.BooleanRule> ALLOW_HOSTILE_RADAR = register("allowHostileRadar", false);
+	public final static GameRules.RuleKey<GameRules.BooleanRule> ALLOW_SLIME_CHUNKS = register("allowSlimeChunks", false);
+	public final static GameRules.RuleKey<GameRules.BooleanRule> ALLOW_TELEPORTATION = register("allowWaypointsJump", false);
 	
 	private MapGameRules() {}
 	
@@ -31,11 +31,11 @@ public class MapGameRules {
 		JustMap.LOGGER.info("Map gamerules loaded.");
 	}
 
-	private static GameRules.Key<GameRules.BooleanRule> register(String name, boolean defaultValue) {
-		return GameRulesAccessor.callRegister(name, GameRules.Category.MISC, BooleanRuleAccessor.callCreate(defaultValue));
+	private static GameRules.RuleKey<GameRules.BooleanRule> register(String name, boolean defaultValue) {
+		return GameRulesAccessor.callRegister(name, BooleanRuleAccessor.callCreate(defaultValue));
 	}
 	
-	private static Map<String, Key<GameRules.BooleanRule>> codes;
+	private static Map<String, RuleKey<GameRules.BooleanRule>> codes;
 	
 	static {
 		codes = new HashMap<>();
@@ -77,7 +77,7 @@ public class MapGameRules {
 	}
 	
 	@Environment(EnvType.CLIENT)
-	public static boolean isAllowed(GameRules.Key<GameRules.BooleanRule> rule) {
+	public static boolean isAllowed(GameRules.RuleKey<GameRules.BooleanRule> rule) {
 		MinecraftClient minecraft = DataUtil.getMinecraft();		
 		boolean allow = true;
 		if (minecraft.isIntegratedServerRunning()) {
