@@ -1,7 +1,6 @@
 package ru.bulldog.justmap.util;
 
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.GameRules;
 import net.minecraft.world.World;
 import net.minecraft.world.dimension.DimensionType;
@@ -26,14 +25,13 @@ public class RuleUtil {
 	public static boolean needRenderCaves(World world, BlockPos pos) {
 		boolean allowCaves = isAllowed(ClientParams.drawCaves, MapGameRules.ALLOW_CAVES_MAP);
 		
-		DimensionType dimType = world.getDimension();
-		RegistryKey<DimensionType> dimKey = world.getDimensionRegistryKey();
-		if (Dimension.isEnd(dimKey)) {
+		if (Dimension.isEnd(world)) {
 			return false;
 		}
+		DimensionType dimType = world.getDimension();
 		if (!dimType.hasCeiling() && dimType.hasSkyLight()) {
 			return allowCaves && (!world.isSkyVisibleAllowingSea(pos) && !DataUtil.hasSkyLight(world, pos) ||
-				   dimKey == DimensionType.OVERWORLD_CAVES_REGISTRY_KEY);
+				   world.getRegistryKey().getValue().equals(DimensionType.OVERWORLD_CAVES_REGISTRY_KEY.getValue()));
 		}
 		
 		return allowCaves;

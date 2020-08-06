@@ -7,7 +7,7 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.RegistryKey;
-import net.minecraft.world.dimension.DimensionType;
+import net.minecraft.world.World;
 
 import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.util.LangUtil;
@@ -48,7 +48,7 @@ public class MapScreen extends Screen {
 	
 	@Override
 	protected void init() {
-		RegistryKey<DimensionType> dimKey = client.world.getDimensionRegistryKey();
+		RegistryKey<World> dimKey = client.world.getRegistryKey();
 		this.info = DIMENSION_INFO.getOrDefault(dimKey.getValue().toString(), null);
 	}
 	
