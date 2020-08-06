@@ -17,13 +17,13 @@ import net.minecraft.world.GameRules.RuleKey;
 
 public class MapGameRules {
 
-	public final static GameRules.RuleKey<GameRules.BooleanRule> ALLOW_CAVES_MAP = register("allowCavesMap", false);
-	public final static GameRules.RuleKey<GameRules.BooleanRule> ALLOW_ENTITY_RADAR = register("allowEntityRadar", false);
-	public final static GameRules.RuleKey<GameRules.BooleanRule> ALLOW_PLAYER_RADAR = register("allowPlayerRadar", false);
-	public final static GameRules.RuleKey<GameRules.BooleanRule> ALLOW_CREATURE_RADAR = register("allowCreatureRadar", false);
-	public final static GameRules.RuleKey<GameRules.BooleanRule> ALLOW_HOSTILE_RADAR = register("allowHostileRadar", false);
-	public final static GameRules.RuleKey<GameRules.BooleanRule> ALLOW_SLIME_CHUNKS = register("allowSlimeChunks", false);
-	public final static GameRules.RuleKey<GameRules.BooleanRule> ALLOW_TELEPORTATION = register("allowWaypointsJump", false);
+	public final static GameRules.RuleKey<GameRules.BooleanRule> ALLOW_CAVES_MAP = register("allowCavesMap", true);
+	public final static GameRules.RuleKey<GameRules.BooleanRule> ALLOW_ENTITY_RADAR = register("allowEntityRadar", true);
+	public final static GameRules.RuleKey<GameRules.BooleanRule> ALLOW_PLAYER_RADAR = register("allowPlayerRadar", true);
+	public final static GameRules.RuleKey<GameRules.BooleanRule> ALLOW_CREATURE_RADAR = register("allowCreatureRadar", true);
+	public final static GameRules.RuleKey<GameRules.BooleanRule> ALLOW_HOSTILE_RADAR = register("allowHostileRadar", true);
+	public final static GameRules.RuleKey<GameRules.BooleanRule> ALLOW_SLIME_CHUNKS = register("allowSlimeChunks", true);
+	public final static GameRules.RuleKey<GameRules.BooleanRule> ALLOW_TELEPORTATION = register("allowWaypointsJump", true);
 	
 	private MapGameRules() {}
 	
