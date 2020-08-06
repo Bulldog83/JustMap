@@ -85,5 +85,5 @@ assemble {
 		versionProps.store(versionPropsFile.newWriter(), null)
 	}
 
-	version = "${major}.${minor}.${build}-${project.minecraft_version}-beta"
+	version = "${major}.${minor}.${build}-${project.minecraft_version}-release"
 }
