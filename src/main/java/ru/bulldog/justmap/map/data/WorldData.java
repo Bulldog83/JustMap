@@ -48,6 +48,10 @@ public class WorldData {
 				regions.put(regPos, region);
 			}
 		}
+		long time = System.currentTimeMillis();
+		if (time - region.updated > 1000) {
+			region.updateImage(ClientParams.forceUpdate);
+		}
 		
 		return region;
 	}
