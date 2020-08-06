@@ -1,14 +1,11 @@
 package ru.bulldog.justmap.client.render;
 
-import com.mojang.blaze3d.systems.RenderSystem;
-
 import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.client.config.ClientParams;
-import ru.bulldog.justmap.util.Colors;
 import ru.bulldog.justmap.util.DataUtil;
 import ru.bulldog.justmap.util.math.MathUtil;
+
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.DiffuseLighting;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.EntityRenderDispatcher;
 import net.minecraft.client.util.math.MatrixStack;
@@ -23,9 +20,8 @@ public class EntityModelRenderer {
 
 	private static MinecraftClient minecraft = DataUtil.getMinecraft();
 	private static EntityRenderDispatcher renderDispatcher = minecraft.getEntityRenderDispatcher();
-	private static VertexConsumerProvider.Immediate consumerProvider = minecraft.getBufferBuilders().getEntityVertexConsumers();
 	
-	public static void renderModel(Entity entity, double x, double y) {
+	public static void renderModel(MatrixStack matrices, VertexConsumerProvider consumerProvider, Entity entity, double x, double y) {
 		
 		LivingEntity livingEntity = (LivingEntity) entity;
 		
@@ -39,30 +35,24 @@ public class EntityModelRenderer {
 		setPitchAndYaw(livingEntity);
 		
 		float scale = getScale(livingEntity);
-		
-		MatrixStack matrixStack = new MatrixStack();
-		
 		int modelSize = ClientParams.entityModelSize;
 		
-		matrixStack.push();
-		matrixStack.translate(x, y, 0);
-		matrixStack.translate(modelSize / 4, modelSize / 2, 0);
+		matrices.push();
+		matrices.translate(x, y, 0);
+		matrices.translate(modelSize / 4, modelSize / 2, 0);
 		if (ClientParams.rotateMap) {
 			float rotation = MathUtil.correctAngle(minecraft.player.headYaw);
-			matrixStack.multiply(Vector3f.POSITIVE_Z.getDegreesQuaternion(rotation));
+			matrices.multiply(Vector3f.POSITIVE_Z.getDegreesQuaternion(rotation));
 		} else {
-			matrixStack.multiply(Vector3f.POSITIVE_X.getDegreesQuaternion(180.0F));
+			matrices.multiply(Vector3f.POSITIVE_X.getDegreesQuaternion(180.0F));
 		}
-		matrixStack.push();
-		matrixStack.scale(scale, scale, scale);
-		
-		DiffuseLighting.enable();
-		RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
-		renderDispatcher.getRenderer(livingEntity).render(livingEntity, 0.0F, 0.0F, matrixStack, consumerProvider, Colors.LIGHT);
-		DiffuseLighting.disable();
-		
-		matrixStack.pop();
-		matrixStack.pop();
+		matrices.push();
+		matrices.scale(scale, scale, scale);
+		renderDispatcher.setRenderShadows(false);
+		renderDispatcher.render(livingEntity, 0, 0, 0, 0, 1.0F, matrices, consumerProvider, 240);
+		renderDispatcher.setRenderShadows(true);
+		matrices.pop();
+		matrices.pop();
 		
 		livingEntity.pitch = pitch;
 		livingEntity.headYaw = headYaw;

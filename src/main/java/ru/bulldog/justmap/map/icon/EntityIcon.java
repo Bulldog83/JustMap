@@ -1,8 +1,10 @@
 package ru.bulldog.justmap.map.icon;
 
+import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.passive.TameableEntity;
+
 import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.client.render.EntityModelRenderer;
 import ru.bulldog.justmap.map.IMap;
@@ -27,11 +29,9 @@ public class EntityIcon extends MapIcon<EntityIcon> {
 	}
 	
 	@Override
-	public void draw(MatrixStack matrixStack, int mapX, int mapY, double offX, double offY, float rotation) {
+	public void draw(MatrixStack matrices, VertexConsumerProvider consumerProvider, int mapX, int mapY, double offX, double offY, float rotation) {
 		if (!RuleUtil.allowCreatureRadar() && !hostile) { return; }
 		if (!RuleUtil.allowHostileRadar() && hostile) { return; }
-		
-		int size = ClientParams.showEntityHeads ? ClientParams.entityIconSize : 4;
 		
 		int color;
 		if (entity instanceof TameableEntity) {
@@ -43,6 +43,7 @@ public class EntityIcon extends MapIcon<EntityIcon> {
 		
 		Point iconPos = new Point(mapX + x, mapY + y);
 		
+		int size = ClientParams.entityIconSize;
 		iconPos.x -= size / 2 + offX;
 		iconPos.y -= size / 2 + offY;
 		
@@ -72,11 +73,11 @@ public class EntityIcon extends MapIcon<EntityIcon> {
 		}
 		
 		if (ClientParams.renderEntityModel) {
-			EntityModelRenderer.renderModel(entity, iconPos.x, iconPos.y);
+			EntityModelRenderer.renderModel(matrices, consumerProvider, entity, iconPos.x, iconPos.y);
 		} else if (ClientParams.showEntityHeads) {
 			EntityHeadIcon icon = EntityHeadIcon.getIcon(entity);
 			if (icon != null) {					
-				icon.draw(matrixStack, iconPos.x, iconPos.y, size);
+				icon.draw(matrices, iconPos.x, iconPos.y, size);
 			} else {
 				RenderUtil.drawOutlineCircle(iconPos.x, iconPos.y, size / 3, 0.6, color);
 			}
