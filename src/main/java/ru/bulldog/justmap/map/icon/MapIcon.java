@@ -6,6 +6,7 @@ import ru.bulldog.justmap.util.math.MathUtil;
 import ru.bulldog.justmap.util.math.Point;
 
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.util.math.MatrixStack;
 
 public abstract class MapIcon<T extends MapIcon<T>> {
@@ -41,5 +42,5 @@ public abstract class MapIcon<T extends MapIcon<T>> {
 		pos.y = posY;
 	}
 	
-	public abstract void draw(MatrixStack matrixStack, int mapX, int mapY, double offX, double offY, float rotation);
+	public abstract void draw(MatrixStack matrixStack, VertexConsumerProvider consumerProvider, int mapX, int mapY, double offX, double offY, float rotation);
 }
