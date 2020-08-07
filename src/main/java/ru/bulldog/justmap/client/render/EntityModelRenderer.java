@@ -49,7 +49,7 @@ public class EntityModelRenderer {
 		matrices.push();
 		matrices.scale(scale, scale, scale);
 		renderDispatcher.setRenderShadows(false);
-		renderDispatcher.render(livingEntity, 0, 0, 0, 0, 1.0F, matrices, consumerProvider, 240);
+		renderDispatcher.render(livingEntity, 0.0, 0.0, 0.0, 0.0F, 1.0F, matrices, consumerProvider, 240);
 		renderDispatcher.setRenderShadows(true);
 		matrices.pop();
 		matrices.pop();

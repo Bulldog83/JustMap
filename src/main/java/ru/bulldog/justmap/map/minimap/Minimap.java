@@ -222,7 +222,7 @@ public class Minimap implements IMap {
 				if (entity instanceof PlayerEntity && RuleUtil.allowPlayerRadar()) {
 					PlayerEntity pEntity = (PlayerEntity) entity;
 					if (pEntity == player) continue;
-					PlayerIcon playerIcon = new PlayerIcon(this, pEntity, false);
+					PlayerIcon playerIcon = new PlayerIcon(this, pEntity);
 					playerIcon.setPosition(iconX, iconY);
 					this.drawedIcons.add(playerIcon);
 				} else if (entity instanceof LivingEntity && !(entity instanceof PlayerEntity)) {
@@ -322,6 +322,11 @@ public class Minimap implements IMap {
 
 	public int getLastZ() {
 		return this.lastPosZ;
+	}
+	
+	@Override
+	public boolean isRotated() {
+		return ClientParams.rotateMap;
 	}
 
 	@Override
