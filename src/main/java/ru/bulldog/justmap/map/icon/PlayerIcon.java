@@ -18,12 +18,33 @@ import ru.bulldog.justmap.util.math.Point;
 
 public class PlayerIcon extends MapIcon<PlayerIcon> {
 	
-	private PlayerEntity player;	
+	private PlayerEntity player;
 	private int color = Colors.GREEN;
 	
-	public PlayerIcon(IMap map, PlayerEntity player, boolean self) {
+	public PlayerIcon(IMap map, PlayerEntity player) {
 		super(map);
 		this.player = player;
+	}
+	
+	public double getX() {
+		return this.player.getX();
+	}
+	
+	public double getZ() {
+		return this.player.getZ();
+	}
+	
+	public void draw(MatrixStack matrices, int size) {
+		double x = this.x - size / 2;
+		double y = this.y - size / 2;
+		if (ClientParams.showPlayerHeads) {
+			MapPlayerManager.getPlayer(player).getIcon().draw(matrices, x, y, size, true);
+		} else {
+			int darken = ColorUtil.colorBrigtness(color, -3);
+			RenderUtil.fill(x - 0.5, y - 0.5, size + 1, size + 1, darken);
+			RenderUtil.fill(x, y, size, size, color);
+		}
+		this.drawPlayerName(matrices, x, y);
 	}
 
 	@Override
@@ -32,7 +53,7 @@ public class PlayerIcon extends MapIcon<PlayerIcon> {
 		
 		Point pos = new Point(mapX + x, mapY + y);
 		
-		if (ClientParams.rotateMap) {
+		if (map.isRotated()) {
 			this.rotatePos(pos, map.getWidth(), map.getHeight(), mapX, mapY, rotation);
 		}
 		
@@ -47,23 +68,25 @@ public class PlayerIcon extends MapIcon<PlayerIcon> {
 		} else if (ClientParams.showPlayerHeads) {
 			MapPlayerManager.getPlayer(player).getIcon().draw(matrices, pos.x, pos.y);
 		} else {
-			int darken = ColorUtil.colorBrigtness(this.color, -3);
+			int darken = ColorUtil.colorBrigtness(color, -3);
 			RenderUtil.fill(pos.x - 0.5, pos.y - 0.5, size + 1, size + 1, darken);
-			RenderUtil.fill(pos.x, pos.y, size, size, this.color);
+			RenderUtil.fill(pos.x, pos.y, size, size, color);
 		}
-			
-		if (ClientParams.showPlayerNames) {
-			MinecraftClient minecraft = DataUtil.getMinecraft();
-			Window window = minecraft.getWindow();
-			double sf = window.getScaleFactor();
-			float scale = (float) (1.0 / sf);
-			matrices.push();
-			if (sf > 1.0 && !minecraft.options.forceUnicodeFont) {
-				matrices.scale(scale, scale, 1.0F);
-				matrices.translate(pos.x * (sf - 1), pos.y * (sf - 1), 0.0);
-			}
-			RenderUtil.drawCenteredText(matrices, player.getName(), pos.x, pos.y + 12, Colors.WHITE);
-			matrices.pop();
+		this.drawPlayerName(matrices, pos.x, pos.y);
+	}
+	
+	private void drawPlayerName(MatrixStack matrices, double x, double y) {
+		if (!ClientParams.showPlayerNames) return;
+		MinecraftClient minecraft = DataUtil.getMinecraft();
+		Window window = minecraft.getWindow();
+		double sf = window.getScaleFactor();
+		float scale = (float) (1.0 / sf);
+		matrices.push();
+		if (sf > 1.0 && !minecraft.options.forceUnicodeFont) {
+			matrices.scale(scale, scale, 1.0F);
+			matrices.translate(x * (sf - 1), y * (sf - 1), 0.0);
 		}
+		RenderUtil.drawCenteredText(matrices, player.getName(), x, y + 12, Colors.WHITE);
+		matrices.pop();
 	}
 }
