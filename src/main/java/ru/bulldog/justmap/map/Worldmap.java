@@ -11,6 +11,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.text.LiteralText;
 import net.minecraft.util.math.BlockPos;
@@ -118,9 +119,9 @@ public class Worldmap extends MapScreen implements IMap {
 		}
 		this.players.clear();
 		if (RuleUtil.allowPlayerRadar()) {
-			List<AbstractClientPlayerEntity> players = this.client.world.getPlayers();
+			List<AbstractClientPlayerEntity> players = this.minecraft.world.getPlayers();
 			for (PlayerEntity player : players) {
-				if (player == client.player) continue;
+				if (player == minecraft.player) continue;
 				this.players.add(new PlayerIcon(this, player));
 			}
 		}
@@ -158,6 +159,7 @@ public class Worldmap extends MapScreen implements IMap {
 			);
 			icon.draw(iconSize);
 		}
+		MatrixStack matrices = new MatrixStack();
 		for (PlayerIcon icon : players) {
 			icon.setPosition(
 					MathUtil.screenPos(icon.getX(), startX, endX, width) - shiftW,

@@ -36,7 +36,6 @@ public class EntityModelRenderer {
 		
 		float scale = getScale(livingEntity);		
 		int modelSize = ClientParams.entityModelSize;
-		MatrixStack matrixStack = new MatrixStack();
 		
 		matrices.push();
 		matrices.translate(x, y, 0);
@@ -47,14 +46,13 @@ public class EntityModelRenderer {
 		} else {
 			matrices.multiply(Vector3f.POSITIVE_X.getDegreesQuaternion(180.0F));
 		}
-		matrixStack.push();
-		matrixStack.scale(scale, scale, scale);
+		matrices.push();
+		matrices.scale(scale, scale, scale);
 		renderDispatcher.setRenderShadows(false);
-	    renderDispatcher.render(livingEntity, 0.0D, 0.0D, 0.0D, 0.0F, 1.0F, matrixStack, consumerProvider, 240);
-	    consumerProvider.draw();
+	    renderDispatcher.render(livingEntity, 0.0, 0.0, 0.0, 0.0F, 1.0F, matrices, consumerProvider, 240);
 	    renderDispatcher.setRenderShadows(true);
-		matrixStack.pop();
-		matrixStack.pop();
+		matrices.pop();
+		matrices.pop();
 		
 		livingEntity.pitch = pitch;
 		livingEntity.headYaw = headYaw;

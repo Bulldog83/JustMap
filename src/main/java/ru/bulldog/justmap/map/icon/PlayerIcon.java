@@ -1,8 +1,6 @@
 package ru.bulldog.justmap.map.icon;
 
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.util.Window;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerEntity;
 
@@ -12,7 +10,6 @@ import ru.bulldog.justmap.map.IMap;
 import ru.bulldog.justmap.map.MapPlayerManager;
 import ru.bulldog.justmap.util.ColorUtil;
 import ru.bulldog.justmap.util.Colors;
-import ru.bulldog.justmap.util.DataUtil;
 import ru.bulldog.justmap.util.RenderUtil;
 import ru.bulldog.justmap.util.math.Point;
 
@@ -44,7 +41,7 @@ public class PlayerIcon extends MapIcon<PlayerIcon> {
 			RenderUtil.fill(x - 0.5, y - 0.5, size + 1, size + 1, darken);
 			RenderUtil.fill(x, y, size, size, color);
 		}
-		this.drawPlayerName(matrices, x, y);
+		this.drawPlayerName(x, y);
 	}
 
 	@Override
@@ -72,21 +69,11 @@ public class PlayerIcon extends MapIcon<PlayerIcon> {
 			RenderUtil.fill(pos.x - 0.5, pos.y - 0.5, size + 1, size + 1, darken);
 			RenderUtil.fill(pos.x, pos.y, size, size, color);
 		}
-		this.drawPlayerName(matrices, pos.x, pos.y);
+		this.drawPlayerName(pos.x, pos.y);
 	}
 	
-	private void drawPlayerName(MatrixStack matrices, double x, double y) {
+	private void drawPlayerName(double x, double y) {
 		if (!ClientParams.showPlayerNames) return;
-		MinecraftClient minecraft = DataUtil.getMinecraft();
-		Window window = minecraft.getWindow();
-		double sf = window.getScaleFactor();
-		float scale = (float) (1.0 / sf);
-		matrices.push();
-		if (sf > 1.0 && !minecraft.options.forceUnicodeFont) {
-			matrices.scale(scale, scale, 1.0F);
-			matrices.translate(x * (sf - 1), y * (sf - 1), 0.0);
-		}
-		RenderUtil.drawCenteredText(matrices, player.getName(), x, y + 12, Colors.WHITE);
-		matrices.pop();
+		RenderUtil.drawCenteredText(player.getName(), x, y + 12, Colors.WHITE);
 	}
 }

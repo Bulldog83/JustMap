@@ -302,9 +302,11 @@ public class MapRenderer {
 		RenderSystem.popMatrix();
 		
 		MatrixStack matrices = new MatrixStack();
+		VertexConsumerProvider.Immediate consumerProvider = minecraft.getBufferBuilders().getEntityVertexConsumers();
 		for (MapIcon<?> icon : minimap.getDrawedIcons()) {
-			icon.draw(matrices, mapX, mapY, offX, offY, rotation);
+			icon.draw(matrices, consumerProvider, mapX, mapY, offX, offY, rotation);
 		}
+		consumerProvider.draw();
 		GL11.glDisable(GL11.GL_SCISSOR_TEST);
 		
 		if (ClientParams.useSkins) {

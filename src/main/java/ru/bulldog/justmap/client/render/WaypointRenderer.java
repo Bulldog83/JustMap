@@ -19,7 +19,7 @@ import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.OverlayTexture;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.render.VertexFormats;
+import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.util.math.Matrix3f;
 import net.minecraft.client.util.math.Matrix4f;
 import net.minecraft.client.util.math.MatrixStack;
@@ -84,7 +84,7 @@ public class WaypointRenderer {
 		RenderUtil.drawBoundedString((int) dist + "m", x + size / 2, y + size + 2, 0, screenWidth, Colors.WHITE);
 	}
 	
-	public static void renderWaypoints(MatrixStack matrixStack, Camera camera, float tickDelta) {
+	public static void renderWaypoints(MatrixStack matrices, Camera camera, float tickDelta) {
 		if (!ClientParams.showWaypoints || !ClientParams.waypointsWorldRender) return;
 		
 		long time = minecraft.player.world.getTime();
@@ -104,7 +104,7 @@ public class WaypointRenderer {
 		for (Waypoint wp : wayPoints) {
 			int dist = (int) MathUtil.getDistance(wp.pos, playerPos, false);
 			if (wp.render && dist > ClientParams.minRenderDist && dist < ClientParams.maxRenderDist) {
-				renderer.renderWaypoint(matrixStack, consumerProvider, wp, minecraft, camera, tick, dist);
+				renderer.renderWaypoint(matrices, consumerProvider, wp, minecraft, camera, tick, dist);
 			}
 		}
 		consumerProvider.draw();
@@ -112,7 +112,7 @@ public class WaypointRenderer {
 		RenderSystem.depthMask(true);
 	}
 	
-	private void renderWaypoint(MatrixStack matrixStack, VertexConsumerProvider consumerProvider, Waypoint waypoint, MinecraftClient client, Camera camera, float tick, int dist) {
+	private void renderWaypoint(MatrixStack matrices, VertexConsumerProvider consumerProvider, Waypoint waypoint, MinecraftClient client, Camera camera, float tick, int dist) {
 		int wpX = waypoint.pos.getX();
 		int wpY = waypoint.pos.getY();
 		int wpZ = waypoint.pos.getZ();
@@ -126,32 +126,32 @@ public class WaypointRenderer {
 		float[] colors = ColorUtil.toFloatArray(waypoint.color);
 		float alpha = MathUtil.clamp(0.125F * ((float) dist / 10), 0.11F, 0.275F);
 		
-		matrixStack.push();
-		matrixStack.translate((double) wpX - camX, (double) wpY - camY, (double) wpZ - camZ);
-		matrixStack.translate(0.5, 0.5, 0.5);
+		matrices.push();
+		matrices.translate((double) wpX - camX, (double) wpY - camY, (double) wpZ - camZ);
+		matrices.translate(0.5, 0.5, 0.5);
 		if (ClientParams.renderLightBeam) {
 			VertexConsumer vertexConsumer = consumerProvider.getBuffer(RenderLayer.getBeaconBeam(BEAM_TEX, true));
-			this.renderLightBeam(matrixStack, vertexConsumer, tick, -wpY, 1024 - wpY, colors, alpha, 0.15F, 0.2F);
+			this.renderLightBeam(matrices, vertexConsumer, tick, -wpY, 1024 - wpY, colors, alpha, 0.15F, 0.2F);
 		}
 		if (ClientParams.renderMarkers) {
-			matrixStack.push();
-			matrixStack.translate(0.0, 1.0, 0.0);
+			matrices.push();
+			matrices.translate(0.0, 1.0, 0.0);
 			if (ClientParams.renderAnimation) {
 				double swing = 0.25 * Math.sin((tick * 2.25 - 45.0) / 15.0);
-				matrixStack.translate(0.0, swing, 0.0);
+				matrices.translate(0.0, swing, 0.0);
 			}
-			matrixStack.multiply(camera.getRotation());
-   	 		matrixStack.multiply(Vector3f.POSITIVE_Y.getDegreesQuaternion(180.0F));
-   	 		matrixStack.multiply(Vector3f.POSITIVE_Z.getDegreesQuaternion(-90.0F));
+			matrices.multiply(camera.getRotation());
+   	 		matrices.multiply(Vector3f.POSITIVE_Y.getDegreesQuaternion(180.0F));
+   	 		matrices.multiply(Vector3f.POSITIVE_Z.getDegreesQuaternion(-90.0F));
    	 		
    	 		alpha = MathUtil.clamp(alpha * 3, 0.0F, 1.0F);
    	 		
    	 		Identifier texture = waypoint.getIcon().getTexture();
    	 		VertexConsumer vertexConsumer = consumerProvider.getBuffer(RenderLayer.getBeaconBeam(texture, true));
-   	 		this.renderIcon(matrixStack, vertexConsumer, colors, alpha, waypoint.getIcon().getWidth());
-   	 		matrixStack.pop();
+   	 		this.renderIcon(matrices, vertexConsumer, colors, alpha, waypoint.getIcon().getWidth());
+   	 		matrices.pop();
 		}
-		matrixStack.pop();
+		matrices.pop();
 	}
 	
 	private void renderIcon(MatrixStack matrixStack, VertexConsumer vertexConsumer, float[] colors, float alpha, int size) {

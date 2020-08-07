@@ -31,7 +31,7 @@ public class WaypointIcon extends MapIcon<WaypointIcon> {
 	}
 	
 	@Override
-	public void draw(MatrixStack matrixStack, VertexConsumerProvider consumerProvider, int mapX, int mapY, double offX, double offY, float rotation) {
+	public void draw(MatrixStack matrices, VertexConsumerProvider consumerProvider, int mapX, int mapY, double offX, double offY, float rotation) {
 		int size = 8;
 		int halfSize = size / 2;
 		
