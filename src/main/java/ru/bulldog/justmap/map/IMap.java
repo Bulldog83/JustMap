@@ -12,6 +12,7 @@ public interface IMap {
 	abstract Layer getLayer();
 	abstract int getLevel();
 	abstract BlockPos getCenter();
+	abstract boolean isRotated();
 	
 	default boolean isWorldmap() {
 		return this instanceof Worldmap;

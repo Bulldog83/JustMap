@@ -15,12 +15,11 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.OverlayTexture;
-import net.minecraft.client.render.Tessellator;
+import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.render.VertexFormats;
+import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.util.math.Matrix3f;
 import net.minecraft.client.util.math.Matrix4f;
 import net.minecraft.client.util.math.MatrixStack;
@@ -32,28 +31,17 @@ import net.minecraft.util.math.Vec3d;
 
 import java.util.List;
 
-import org.lwjgl.opengl.GL11;
-
 import com.mojang.blaze3d.systems.RenderSystem;
 
 @Environment(EnvType.CLIENT)
 public class WaypointRenderer {
-	private static WaypointRenderer renderer;
+	private static WaypointRenderer renderer = new WaypointRenderer();
 	
 	private final static Identifier BEAM_TEX = new Identifier("textures/entity/beacon_beam.png");
-	private final static Tessellator tessellator = Tessellator.getInstance();
-	private final static BufferBuilder builder = tessellator.getBuffer();
-	
-	private static void initBuffer() {
-		builder.begin(GL11.GL_QUADS, VertexFormats.POSITION_COLOR_TEXTURE_OVERLAY_LIGHT_NORMAL);
-	}
+	private final static MinecraftClient minecraft = DataUtil.getMinecraft();
 	
 	public static void renderHUD(float delta, float fov) {
 		if (!ClientParams.showWaypoints || !ClientParams.waypointsTracking) return;
-		if (renderer == null) {
-			renderer = new WaypointRenderer();
-		}
-		MinecraftClient minecraft = DataUtil.getMinecraft();
 		if (minecraft.world == null || minecraft.player == null || minecraft.currentScreen != null) {
 			return;
 		}
@@ -67,19 +55,19 @@ public class WaypointRenderer {
 		}
 	}
 	
-	private void renderHUD(Waypoint waypoint, MinecraftClient client, float delta, float fov, int dist) {
+	private void renderHUD(Waypoint waypoint, MinecraftClient minecraft, float delta, float fov, int dist) {
 		int wpX = waypoint.pos.getX();
 		int wpZ = waypoint.pos.getZ();
 		
 		Icon icon = waypoint.getIcon();
 		
 		int size = icon != null ? icon.getWidth() : 18;
-		int screenWidth = client.getWindow().getScaledWidth();
+		int screenWidth = minecraft.getWindow().getScaledWidth();
 		
-		double dx = client.player.getX() - wpX;
-		double dy = wpZ - client.player.getZ();		
+		double dx = minecraft.player.getX() - wpX;
+		double dy = wpZ - minecraft.player.getZ();		
 		double wfi = correctAngle((float) (Math.atan2(dx, dy) * (180 / Math.PI)));		
-		double pfi = correctAngle(client.player.getYaw(delta) % 360);		
+		double pfi = correctAngle(minecraft.player.getYaw(delta) % 360);		
 		double a0 = pfi - fov / 2;
 		double a1 = pfi + fov / 2;		
 		double ax = correctAngle((float) (2 * pfi - wfi));		
@@ -96,16 +84,13 @@ public class WaypointRenderer {
 		RenderUtil.drawBoundedString((int) dist + "m", x + size / 2, y + size + 2, 0, screenWidth, Colors.WHITE);
 	}
 	
-	public static void renderWaypoints(MatrixStack matrixStack, MinecraftClient client, Camera camera, float tickDelta) {
+	public static void renderWaypoints(MatrixStack matrices, Camera camera, float tickDelta) {
 		if (!ClientParams.showWaypoints || !ClientParams.waypointsWorldRender) return;
-		if (renderer == null) {
-			renderer = new WaypointRenderer();
-		}
 		
-		long time = client.player.world.getTime();
+		long time = minecraft.player.world.getTime();
 		float tick = (float) Math.floorMod(time, 125L) + tickDelta;
 		
-		BlockPos playerPos = client.player.getBlockPos();
+		BlockPos playerPos = minecraft.player.getBlockPos();
 		
 		RenderSystem.enableBlend();
 		RenderSystem.defaultBlendFunc();
@@ -114,18 +99,20 @@ public class WaypointRenderer {
 		RenderSystem.enableTexture();
 		RenderSystem.depthMask(false);
 		
+		VertexConsumerProvider.Immediate consumerProvider = minecraft.getBufferBuilders().getEntityVertexConsumers();
 		List<Waypoint> wayPoints = WaypointKeeper.getInstance().getWaypoints(WorldManager.getWorldKey(), true);
 		for (Waypoint wp : wayPoints) {
 			int dist = (int) MathUtil.getDistance(wp.pos, playerPos, false);
 			if (wp.render && dist > ClientParams.minRenderDist && dist < ClientParams.maxRenderDist) {
-				renderer.renderWaypoint(matrixStack, wp, client, camera, tick, dist);
+				renderer.renderWaypoint(matrices, consumerProvider, wp, minecraft, camera, tick, dist);
 			}
 		}
+		consumerProvider.draw();
 		
 		RenderSystem.depthMask(true);
 	}
 	
-	private void renderWaypoint(MatrixStack matrixStack, Waypoint waypoint, MinecraftClient client, Camera camera, float tick, int dist) {
+	private void renderWaypoint(MatrixStack matrices, VertexConsumerProvider consumerProvider, Waypoint waypoint, MinecraftClient client, Camera camera, float tick, int dist) {
 		int wpX = waypoint.pos.getX();
 		int wpY = waypoint.pos.getY();
 		int wpZ = waypoint.pos.getZ();
@@ -139,33 +126,32 @@ public class WaypointRenderer {
 		float[] colors = ColorUtil.toFloatArray(waypoint.color);
 		float alpha = MathUtil.clamp(0.125F * ((float) dist / 10), 0.11F, 0.275F);
 		
-		matrixStack.push();
-		matrixStack.translate((double) wpX - camX, (double) wpY - camY, (double) wpZ - camZ);
-		matrixStack.translate(0.5, 0.5, 0.5);
+		matrices.push();
+		matrices.translate((double) wpX - camX, (double) wpY - camY, (double) wpZ - camZ);
+		matrices.translate(0.5, 0.5, 0.5);
 		if (ClientParams.renderLightBeam) {
-			this.renderLightBeam(matrixStack, tick, -wpY, 1024 - wpY, colors, alpha, 0.15F, 0.2F);
+			VertexConsumer vertexConsumer = consumerProvider.getBuffer(RenderLayer.getBeaconBeam(BEAM_TEX, true));
+			this.renderLightBeam(matrices, vertexConsumer, tick, -wpY, 1024 - wpY, colors, alpha, 0.15F, 0.2F);
 		}
 		if (ClientParams.renderMarkers) {
-			matrixStack.push();
-			matrixStack.translate(0.0, 1.0, 0.0);
+			matrices.push();
+			matrices.translate(0.0, 1.0, 0.0);
 			if (ClientParams.renderAnimation) {
 				double swing = 0.25 * Math.sin((tick * 2.25 - 45.0) / 15.0);
-				matrixStack.translate(0.0, swing, 0.0);
+				matrices.translate(0.0, swing, 0.0);
 			}
-			matrixStack.multiply(camera.getRotation());
-   	 		matrixStack.multiply(Vector3f.POSITIVE_Y.getDegreesQuaternion(180.0F));
-   	 		matrixStack.multiply(Vector3f.POSITIVE_Z.getDegreesQuaternion(-90.0F));
+			matrices.multiply(camera.getRotation());
+   	 		matrices.multiply(Vector3f.POSITIVE_Y.getDegreesQuaternion(180.0F));
+   	 		matrices.multiply(Vector3f.POSITIVE_Z.getDegreesQuaternion(-90.0F));
    	 		
    	 		alpha = MathUtil.clamp(alpha * 3, 0.0F, 1.0F);
    	 		
-   	 		initBuffer();
-   	 		waypoint.getIcon().bindTexture();
-   	 		this.renderIcon(matrixStack, builder, colors, alpha, waypoint.getIcon().getWidth());
-   	 		tessellator.draw();
-   	 		
-   	 		matrixStack.pop();
+   	 		Identifier texture = waypoint.getIcon().getTexture();
+   	 		VertexConsumer vertexConsumer = consumerProvider.getBuffer(RenderLayer.getBeaconBeam(texture, true));
+   	 		this.renderIcon(matrices, vertexConsumer, colors, alpha, waypoint.getIcon().getWidth());
+   	 		matrices.pop();
 		}
-		matrixStack.pop();
+		matrices.pop();
 	}
 	
 	private void renderIcon(MatrixStack matrixStack, VertexConsumer vertexConsumer, float[] colors, float alpha, int size) {
@@ -179,7 +165,7 @@ public class WaypointRenderer {
 		this.addVertex(matrix4f, matrix3f, vertexConsumer, colors[0], colors[1], colors[2], alpha, 0.5F, -0.5F, 0.0F, 1.0F, 0.0F);
 	}
 	
-	private void renderLightBeam(MatrixStack matrixStack, float tick, int i, int j, float[] colors, float alpha, float h, float k) {
+	private void renderLightBeam(MatrixStack matrixStack, VertexConsumer vertexConsumer, float tick, int i, int j, float[] colors, float alpha, float h, float k) {
 		int m = i + j;
 		
 		float o = j < 0 ? tick : -tick;
@@ -197,10 +183,7 @@ public class WaypointRenderer {
 		float ap = -1.0F + p;
 		float aq = (float) j * (0.5F / h) + ap;
 		
-		initBuffer();
-		
-		RenderUtil.bindTexture(BEAM_TEX);
-		this.renderBeam(matrixStack, builder, red, green, blue, alpha, i, m, 0.0F, h, h, 0.0F, aj, 0.0F, 0.0F, aa, 0.0F, 1.0F, aq, ap);
+		this.renderBeam(matrixStack, vertexConsumer, red, green, blue, alpha, i, m, 0.0F, h, h, 0.0F, aj, 0.0F, 0.0F, aa, 0.0F, 1.0F, aq, ap);
 		matrixStack.pop();
 		
 		af = -k;
@@ -209,9 +192,7 @@ public class WaypointRenderer {
 		aj = -k;
 		ap = -1.0F + p;
 		aq = (float) j + ap;
-		this.renderBeam(matrixStack, builder, red, green, blue, alpha, i, m, af, ag, k, ai, aj, k, k, k, 0.0F, 1.0F, aq, ap);
-		
-		tessellator.draw();
+		this.renderBeam(matrixStack, vertexConsumer, red, green, blue, alpha, i, m, af, ag, k, ai, aj, k, k, k, 0.0F, 1.0F, aq, ap);
 	}
 
 	private void renderBeam(MatrixStack matrixStack, VertexConsumer vertexConsumer, float red, float green, float blue, float alpha, int j, int k, float l, float m, float n, float o, float p, float q, float r, float s, float t, float u, float v, float w) {

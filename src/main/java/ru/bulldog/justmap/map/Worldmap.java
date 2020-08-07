@@ -9,7 +9,9 @@ import org.lwjgl.glfw.GLFW;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.text.LiteralText;
 import net.minecraft.util.math.BlockPos;
@@ -26,6 +28,7 @@ import ru.bulldog.justmap.map.data.WorldKey;
 import ru.bulldog.justmap.map.data.WorldManager;
 import ru.bulldog.justmap.map.data.ChunkData;
 import ru.bulldog.justmap.map.data.RegionData;
+import ru.bulldog.justmap.map.icon.PlayerIcon;
 import ru.bulldog.justmap.map.icon.WaypointIcon;
 import ru.bulldog.justmap.map.waypoint.Waypoint;
 import ru.bulldog.justmap.map.waypoint.WaypointKeeper;
@@ -33,6 +36,7 @@ import ru.bulldog.justmap.util.Colors;
 import ru.bulldog.justmap.util.DataUtil;
 import ru.bulldog.justmap.util.DimensionUtil;
 import ru.bulldog.justmap.util.PosUtil;
+import ru.bulldog.justmap.util.RuleUtil;
 import ru.bulldog.justmap.util.math.MathUtil;
 
 public class Worldmap extends MapScreen implements IMap {
@@ -45,7 +49,6 @@ public class Worldmap extends MapScreen implements IMap {
 		if (worldmap == null) {
 			worldmap = new Worldmap();
 		}
-		
 		return worldmap;
 	}
 	
@@ -71,6 +74,7 @@ public class Worldmap extends MapScreen implements IMap {
 	private Layer mapLayer;
 	
 	private List<WaypointIcon> waypoints = new ArrayList<>();
+	private List<PlayerIcon> players = new ArrayList<>();
 	
 	private Worldmap() {
 		super(TITLE);
@@ -83,8 +87,6 @@ public class Worldmap extends MapScreen implements IMap {
 		this.paddingTop = 8;
 		this.paddingBottom = 8;
 		
-		PlayerEntity player = this.minecraft.player;
-
 		this.worldData = WorldManager.getData();
 		WorldKey worldKey = WorldManager.getWorldKey();
 		if (centerPos == null || !worldKey.equals(world)) {
@@ -106,14 +108,21 @@ public class Worldmap extends MapScreen implements IMap {
 			this.mapLevel = 0;
 		}
 		
-		
 		this.waypoints.clear();
 		List<Waypoint> wps = WaypointKeeper.getInstance().getWaypoints(world, true);
 		if (wps != null) {
-			Stream<Waypoint> stream = wps.stream().filter(wp -> MathUtil.getDistance(player.getBlockPos(), wp.pos) <= wp.showRange);
+			Stream<Waypoint> stream = wps.stream().filter(wp -> MathUtil.getDistance(centerPos, wp.pos) <= wp.showRange);
 			for (Waypoint wp : stream.toArray(Waypoint[]::new)) {
 				WaypointIcon waypoint = new WaypointIcon(this, wp);
 				this.waypoints.add(waypoint);
+			}
+		}
+		this.players.clear();
+		if (RuleUtil.allowPlayerRadar()) {
+			List<AbstractClientPlayerEntity> players = this.minecraft.world.getPlayers();
+			for (PlayerEntity player : players) {
+				if (player == minecraft.player) continue;
+				this.players.add(new PlayerIcon(this, player));
 			}
 		}
 	}
@@ -149,6 +158,14 @@ public class Worldmap extends MapScreen implements IMap {
 				MathUtil.screenPos(icon.waypoint.pos.getZ(), startZ, endZ, height) - shiftH
 			);
 			icon.draw(iconSize);
+		}
+		MatrixStack matrices = new MatrixStack();
+		for (PlayerIcon icon : players) {
+			icon.setPosition(
+					MathUtil.screenPos(icon.getX(), startX, endX, width) - shiftW,
+					MathUtil.screenPos(icon.getZ(), startZ, endZ, height) - shiftH
+			);
+			icon.draw(matrices, iconSize);
 		}
 		
 		ClientPlayerEntity player = this.minecraft.player;
@@ -269,8 +286,8 @@ public class Worldmap extends MapScreen implements IMap {
 	}
 	
 	@Override
-	public boolean keyPressed(int i, int j, int k) {
-		switch(i) {
+	public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+		switch(keyCode) {
 			case GLFW.GLFW_KEY_W:
 			case GLFW.GLFW_KEY_UP:
 				this.moveMap(Direction.NORTH);
@@ -302,7 +319,7 @@ public class Worldmap extends MapScreen implements IMap {
 		  		this.onClose();
 		  		return true;
 		  	default:
-		  		return super.keyPressed(i, j, k);
+		  		return super.keyPressed(keyCode, scanCode, modifiers);
 		}
 	}
 	
@@ -386,6 +403,11 @@ public class Worldmap extends MapScreen implements IMap {
 			return true;
 		}
 		
+		return false;
+	}
+	
+	@Override
+	public boolean isRotated() {
 		return false;
 	}
 	

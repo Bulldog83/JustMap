@@ -16,8 +16,8 @@ import ru.bulldog.justmap.enums.ArrowType;
 import ru.bulldog.justmap.map.DirectionArrow;
 import ru.bulldog.justmap.map.MapPlayerManager;
 import ru.bulldog.justmap.map.data.WorldData;
-import ru.bulldog.justmap.map.data.RegionData;
 import ru.bulldog.justmap.map.icon.MapIcon;
+import ru.bulldog.justmap.map.data.RegionData;
 import ru.bulldog.justmap.map.minimap.Minimap;
 import ru.bulldog.justmap.map.minimap.skin.MapSkin;
 import ru.bulldog.justmap.util.Colors;
@@ -31,6 +31,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.util.Window;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
@@ -301,9 +302,11 @@ public class MapRenderer {
 		RenderSystem.popMatrix();
 		
 		MatrixStack matrices = new MatrixStack();
+		VertexConsumerProvider.Immediate consumerProvider = minecraft.getBufferBuilders().getEntityVertexConsumers();
 		for (MapIcon<?> icon : minimap.getDrawedIcons()) {
-			icon.draw(matrices, mapX, mapY, offX, offY, rotation);
+			icon.draw(matrices, consumerProvider, mapX, mapY, offX, offY, rotation);
 		}
+		consumerProvider.draw();
 		GL11.glDisable(GL11.GL_SCISSOR_TEST);
 		
 		if (ClientParams.useSkins) {

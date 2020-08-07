@@ -1,5 +1,7 @@
 package ru.bulldog.justmap.client.screen;
 
+import org.lwjgl.glfw.GLFW;
+
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.gui.Drawable;
@@ -91,6 +93,16 @@ public class WorldnameScreen extends Screen {
 		RenderUtil.addQuad(x, y, frameWidth, frameHeight);
 		RenderUtil.endDraw();
 		RenderSystem.disableBlend();
+	}
+	
+	@Override
+	public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+		switch(keyCode) {
+			case GLFW.GLFW_KEY_ENTER:
+				this.onPressSave(null);
+		  	default:
+		  		return super.keyPressed(keyCode, scanCode, modifiers);
+		}
 	}
 
 	@Override
