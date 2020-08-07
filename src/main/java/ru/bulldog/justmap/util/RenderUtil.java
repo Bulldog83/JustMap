@@ -45,24 +45,24 @@ public class RenderUtil extends DrawableHelper {
 	}
 	
 	public static void drawCenteredString(String string, double x, double y, int color) {
-		MatrixStack matrix = new MatrixStack();
-		drawCenteredString(matrix, string, x, y, color);
+		MatrixStack matrices = new MatrixStack();
+		drawCenteredString(matrices, string, x, y, color);
 	}
 	
-	public static void drawCenteredString(MatrixStack matrix, String string, double x, double y, int color) {
-		textRenderer.drawWithShadow(matrix, string, (float) (x - textRenderer.getWidth(string) / 2), (float) y, color);
+	public static void drawCenteredString(MatrixStack matrices, String string, double x, double y, int color) {
+		textRenderer.drawWithShadow(matrices, string, (float) (x - textRenderer.getWidth(string) / 2), (float) y, color);
 	}
 	
-	public static void drawCenteredText(MatrixStack matrix, Text text, double x, double y, int color) {
-		textRenderer.drawWithShadow(matrix, text, (float) (x - textRenderer.getWidth(text) / 2), (float) y, color);
+	public static void drawCenteredText(MatrixStack matrices, Text text, double x, double y, int color) {
+		textRenderer.drawWithShadow(matrices, text, (float) (x - textRenderer.getWidth(text) / 2), (float) y, color);
 	}
 	
 	public static void drawBoundedString(String string, int x, int y, int leftBound, int rightBound, int color) {
-		MatrixStack matrix = new MatrixStack();
-		drawBoundedString(matrix, string, x, y, leftBound, rightBound, color);
+		MatrixStack matrices = new MatrixStack();
+		drawBoundedString(matrices, string, x, y, leftBound, rightBound, color);
 	}
 	
-	public static void drawBoundedString(MatrixStack matrix, String string, int x, int y, int leftBound, int rightBound, int color) {
+	public static void drawBoundedString(MatrixStack matrices, String string, int x, int y, int leftBound, int rightBound, int color) {
 		if (string == null) return;
 		
 		int stringWidth = textRenderer.getWidth(string);
@@ -73,11 +73,11 @@ public class RenderUtil extends DrawableHelper {
 			drawX = rightBound - stringWidth;
 		}
 
-		drawStringWithShadow(matrix, textRenderer, string, drawX, y, color);
+		DRAWER.drawStringWithShadow(matrices, textRenderer, string, drawX, y, color);
 	}
 
-	public static void drawRightAlignedString(MatrixStack matrix, String string, int x, int y, int color) {
-		textRenderer.drawWithShadow(matrix, string, x - textRenderer.getWidth(string), y, color);
+	public static void drawRightAlignedString(MatrixStack matrices, String string, int x, int y, int color) {
+		textRenderer.drawWithShadow(matrices, string, x - textRenderer.getWidth(string), y, color);
 	}
 	
 	public static void drawDiamond(double x, double y, int width, int height, int color) {
@@ -194,8 +194,8 @@ public class RenderUtil extends DrawableHelper {
 		fill(AffineTransformation.identity().getMatrix(), x, y, w, h, color);
 	}
 	
-	public static void fill(MatrixStack matrix, double x, double y, double w, double h, int color) {
-		fill(matrix.peek().getModel(), x, y, w, h, color);
+	public static void fill(MatrixStack matrices, double x, double y, double w, double h, int color) {
+		fill(matrices.peek().getModel(), x, y, w, h, color);
 	}
 
 	public static void fill(Matrix4f matrix4f, double x, double y, double w, double h, int color) {
@@ -230,38 +230,38 @@ public class RenderUtil extends DrawableHelper {
 	}
 	
 	public static void draw(double x, double y, float w, float h) {
-		MatrixStack matrix = new MatrixStack();		
+		MatrixStack matrices = new MatrixStack();		
 		startDrawNormal();
-		draw(matrix, vertexBuffer, x, y, w, h, 0.0F, 0.0F, 1.0F, 1.0F);
+		draw(matrices, vertexBuffer, x, y, w, h, 0.0F, 0.0F, 1.0F, 1.0F);
 		endDraw();
 	}
 	
-	public static void drawPlayerHead(MatrixStack matrix, double x, double y, int w, int h) {
+	public static void drawPlayerHead(MatrixStack matrices, double x, double y, int w, int h) {
 		RenderSystem.enableBlend();
 		RenderSystem.defaultBlendFunc();
 		RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
 		startDrawNormal();
-		draw(matrix, vertexBuffer, x, y, w, h, 0.125F, 0.125F, 0.25F, 0.25F);
-		draw(matrix, vertexBuffer, x, y, w, h, 0.625F, 0.125F, 0.75F, 0.25F);
+		draw(matrices, vertexBuffer, x, y, w, h, 0.125F, 0.125F, 0.25F, 0.25F);
+		draw(matrices, vertexBuffer, x, y, w, h, 0.625F, 0.125F, 0.75F, 0.25F);
 		endDraw();
 	}
 	
-	public static void draw(MatrixStack matrix, double x, double y, int size, int isize, int ix, int iy, int tw, int th) {
-		draw(matrix, x, y, size, size, ix, iy, isize, isize, tw, th);
+	public static void draw(MatrixStack matrices, double x, double y, int size, int isize, int ix, int iy, int tw, int th) {
+		draw(matrices, x, y, size, size, ix, iy, isize, isize, tw, th);
 	}
 	
-	public static void draw(MatrixStack matrix, double x, double y, int w, int h, int ix, int iy, int iw, int ih, int tw, int th) {
+	public static void draw(MatrixStack matrices, double x, double y, int w, int h, int ix, int iy, int iw, int ih, int tw, int th) {
 		float minU = (float) ix / tw;
 		float minV = (float) iy / th;
 		float maxU = (float) (ix + iw) / tw;
 		float maxV = (float) (iy + ih) / th;
 		
 		startDrawNormal();
-		draw(matrix, vertexBuffer, x, y, w, h, minU, minV, maxU, maxV);
+		draw(matrices, vertexBuffer, x, y, w, h, minU, minV, maxU, maxV);
 		endDraw();
 	}
 	
-	public static void drawSkin(MatrixStack matrix, MapSkin skin, double x, double y, float w, float h) {
+	public static void drawSkin(MatrixStack matrices, MapSkin skin, double x, double y, float w, float h) {
 		RenderData renderData = skin.getRenderData();
 		
 		if (renderData.scaleChanged || renderData.x != x || renderData.y != y ||
@@ -293,39 +293,39 @@ public class RenderUtil extends DrawableHelper {
 		skin.bindTexture();		
 		startDrawNormal();
 		
-		draw(matrix, vertexBuffer, x, y, scaledBrd, scaledBrd, sMinU, sMinV, leftU, topV);
-		draw(matrix, vertexBuffer, rightC, y, scaledBrd, scaledBrd, rightU, sMinV, sMaxU, topV);
-		draw(matrix, vertexBuffer, x, bottomC, scaledBrd, scaledBrd, sMinU, bottomV, leftU, sMaxV);
-		draw(matrix, vertexBuffer, rightC, bottomC, scaledBrd, scaledBrd, rightU, bottomV, sMaxU, sMaxV);
+		draw(matrices, vertexBuffer, x, y, scaledBrd, scaledBrd, sMinU, sMinV, leftU, topV);
+		draw(matrices, vertexBuffer, rightC, y, scaledBrd, scaledBrd, rightU, sMinV, sMaxU, topV);
+		draw(matrices, vertexBuffer, x, bottomC, scaledBrd, scaledBrd, sMinU, bottomV, leftU, sMaxV);
+		draw(matrices, vertexBuffer, rightC, bottomC, scaledBrd, scaledBrd, rightU, bottomV, sMaxU, sMaxV);
 		
 		if (skin.resizable) {
-			draw(matrix, vertexBuffer, rightC, topC, scaledBrd, vSide, rightU, topV, sMaxU, bottomV);
-			draw(matrix, vertexBuffer, x, topC, scaledBrd, vSide, sMinU, topV, leftU, bottomV);
-			draw(matrix, vertexBuffer, leftC, topC, hSide, vSide, leftU, topV, rightU, bottomV);
+			draw(matrices, vertexBuffer, rightC, topC, scaledBrd, vSide, rightU, topV, sMaxU, bottomV);
+			draw(matrices, vertexBuffer, x, topC, scaledBrd, vSide, sMinU, topV, leftU, bottomV);
+			draw(matrices, vertexBuffer, leftC, topC, hSide, vSide, leftU, topV, rightU, bottomV);
 			if (skin.repeating) {
 				float tail = renderData.tail;
 				float tailU = renderData.tailU;
 				hSide = vSide;
 				
-				draw(matrix, vertexBuffer, leftC + hSide, y, tail, scaledBrd, leftU, sMinV, tailU, topV);
-				draw(matrix, vertexBuffer, leftC + hSide, bottomC, tail, scaledBrd, leftU, bottomV, tailU, sMaxV);
+				draw(matrices, vertexBuffer, leftC + hSide, y, tail, scaledBrd, leftU, sMinV, tailU, topV);
+				draw(matrices, vertexBuffer, leftC + hSide, bottomC, tail, scaledBrd, leftU, bottomV, tailU, sMaxV);
 			}
 		
-			draw(matrix, vertexBuffer, leftC, y, hSide, scaledBrd, leftU, sMinV, rightU, topV);
-			draw(matrix, vertexBuffer, leftC, bottomC, hSide, scaledBrd, leftU, bottomV, rightU, sMaxV);
+			draw(matrices, vertexBuffer, leftC, y, hSide, scaledBrd, leftU, sMinV, rightU, topV);
+			draw(matrices, vertexBuffer, leftC, bottomC, hSide, scaledBrd, leftU, bottomV, rightU, sMaxV);
 		} else {
 			double left = leftC;
 			int segments = renderData.hSegments;
 			for (int i = 0; i < segments; i++) {
-				draw(matrix, vertexBuffer, left, y, hSide, scaledBrd, leftU, sMinV, rightU, topV);
-				draw(matrix, vertexBuffer, left, bottomC, hSide, scaledBrd, leftU, bottomV, rightU, sMaxV);
+				draw(matrices, vertexBuffer, left, y, hSide, scaledBrd, leftU, sMinV, rightU, topV);
+				draw(matrices, vertexBuffer, left, bottomC, hSide, scaledBrd, leftU, bottomV, rightU, sMaxV);
 				left += hSide;
 			}
 			double top = topC;
 			segments = renderData.vSegments;
 			for (int i = 0; i < segments; i++) {
-				draw(matrix, vertexBuffer, x, top, scaledBrd, vSide, sMinU, topV, leftU, bottomV);
-				draw(matrix, vertexBuffer, rightC, top, scaledBrd, vSide, rightU, topV, sMaxU, bottomV);
+				draw(matrices, vertexBuffer, x, top, scaledBrd, vSide, sMinU, topV, leftU, bottomV);
+				draw(matrices, vertexBuffer, rightC, top, scaledBrd, vSide, rightU, topV, sMaxU, bottomV);
 				top += vSide;
 			}
 			
@@ -334,23 +334,23 @@ public class RenderUtil extends DrawableHelper {
 			float hTailU = renderData.hTailU;
 			float vTailV = renderData.vTailV;
 			
-			draw(matrix, vertexBuffer, left, y, hTail, scaledBrd, leftU, sMinV, hTailU, topV);
-			draw(matrix, vertexBuffer, left, bottomC, hTail, scaledBrd, leftU, bottomV, hTailU, sMaxV);
-			draw(matrix, vertexBuffer, x, top, scaledBrd, vTail, sMinU, topV, leftU, vTailV);
-			draw(matrix, vertexBuffer, rightC, top, scaledBrd, vTail, rightU, topV, sMaxU, vTailV);
+			draw(matrices, vertexBuffer, left, y, hTail, scaledBrd, leftU, sMinV, hTailU, topV);
+			draw(matrices, vertexBuffer, left, bottomC, hTail, scaledBrd, leftU, bottomV, hTailU, sMaxV);
+			draw(matrices, vertexBuffer, x, top, scaledBrd, vTail, sMinU, topV, leftU, vTailV);
+			draw(matrices, vertexBuffer, rightC, top, scaledBrd, vTail, rightU, topV, sMaxU, vTailV);
 		}
 		
 		endDraw();
 	}
 	
-	public static void drawImage(MatrixStack matrix, Image image, double x, double y, float w, float h) {
+	public static void drawImage(MatrixStack matrices, Image image, double x, double y, float w, float h) {
 		RenderSystem.enableBlend();
 		RenderSystem.enableAlphaTest();		
 		RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
 		
 		image.bindTexture();
 		startDrawNormal();
-		draw(matrix, vertexBuffer, x, y, w, h, 0.0F, 0.0F, 1.0F, 1.0F);
+		draw(matrices, vertexBuffer, x, y, w, h, 0.0F, 0.0F, 1.0F, 1.0F);
 		endDraw();
 	}
 	
