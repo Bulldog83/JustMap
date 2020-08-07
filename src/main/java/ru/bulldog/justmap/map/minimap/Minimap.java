@@ -44,10 +44,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
-public class Minimap implements IMap{	
+public class Minimap implements IMap {
 	private static final MinecraftClient minecraft = DataUtil.getMinecraft();
-	
-	private final TextManager textManager;	
+
+	private final TextManager textManager;
 	private InfoText txtCoords = new CoordsInfo(TextAlignment.CENTER, "0, 0, 0");
 	private InfoText txtBiome = new BiomeInfo(TextAlignment.CENTER, "");
 	private InfoText txtTime = new TimeInfo(TextAlignment.CENTER, "");
@@ -64,25 +64,27 @@ public class Minimap implements IMap{
 	private float mapScale;
 	private int lastPosX = 0;
 	private int lastPosZ = 0;
-	
+
 	private boolean isMapVisible = true;
 	private boolean rotateMap = false;
 	private boolean bigMap = false;
 
 	public boolean posChanged = false;
-	
+
 	public Minimap() {
 		this.textManager = AdvancedInfo.getInstance().getMapTextManager();
 		this.textManager.add(txtCoords);
 		this.textManager.add(txtBiome);
 		this.textManager.add(txtTime);
-		
+
 		this.updateMapParams();
 	}
-	
+
 	public void update() {
-		if (!this.isMapVisible()) { return; }
-	
+		if (!this.isMapVisible()) {
+			return;
+		}
+
 		PlayerEntity player = minecraft.player;
 		if (player != null) {
 			if (locPlayer == null) {
@@ -95,14 +97,14 @@ public class Minimap implements IMap{
 			locPlayer = null;
 		}
 	}
-	
+
 	public void updateMapParams() {
 		ClientConfig config = JustMapClient.CONFIG;
 		int configSize = config.getInt("map_size");
-		float configScale = config.getFloat("map_scale");		
+		float configScale = config.getFloat("map_scale");
 		boolean needRotate = config.getBoolean("rotate_map");
 		boolean bigMap = config.getBoolean("show_big_map");
-		
+
 		Window window = minecraft.getWindow();
 		if (window != null) {
 			int winWidth = window.getScaledWidth();
@@ -112,20 +114,20 @@ public class Minimap implements IMap{
 				configSize *= configSize / (winWidth / winScale);
 			}
 		}
-		
-		if (configSize != mapWidth || configScale != mapScale ||
-			this.rotateMap != needRotate || this.bigMap != bigMap) {			
+
+		if (configSize != mapWidth || configScale != mapScale || this.rotateMap != needRotate
+				|| this.bigMap != bigMap) {
 			if (bigMap) {
 				this.mapWidth = config.getInt("big_map_size");
 				this.mapHeight = (mapWidth * 10) / 16;
 			} else {
 				this.mapWidth = configSize;
-				this.mapHeight = configSize;				
+				this.mapHeight = configSize;
 			}
 			this.mapScale = configScale;
 			this.rotateMap = needRotate;
 			this.bigMap = bigMap;
-			
+
 			if (rotateMap) {
 				this.scaledWidth = (int) ((mapWidth * mapScale) * 1.42 + 8);
 				this.scaledHeight = (int) ((mapHeight * mapScale) * 1.42 + 8);
@@ -133,38 +135,40 @@ public class Minimap implements IMap{
 				this.scaledWidth = (int) ((mapWidth * mapScale) + 8);
 				this.scaledHeight = (int) ((mapHeight * mapScale) + 8);
 			}
-			
+
 			this.textManager.setLineWidth(this.mapWidth);
 		}
-		
+
 		this.isMapVisible = config.getBoolean("map_visible");
 	}
-	
+
 	private void updateInfo(PlayerEntity player) {
 		if (!ClientParams.mapInfo) {
 			this.txtCoords.setVisible(false);
 			this.txtBiome.setVisible(false);
 			this.txtTime.setVisible(false);
-			
+
 			return;
 		}
 		this.txtCoords.setVisible(ClientParams.showPosition);
 		if (ClientParams.showPosition) {
 			this.txtCoords.update();
-		}		
+		}
 		boolean showBiome = !ClientParams.advancedInfo && ClientParams.showBiome;
-		boolean showTime = !ClientParams.advancedInfo && ClientParams.showTime;		
+		boolean showTime = !ClientParams.advancedInfo && ClientParams.showTime;
 		this.txtBiome.setVisible(showBiome);
-		this.txtTime.setVisible(showTime);		
-		if (showBiome) this.txtBiome.update();
-		if (showTime) this.txtTime.update();
+		this.txtTime.setVisible(showTime);
+		if (showBiome)
+			this.txtBiome.update();
+		if (showTime)
+			this.txtTime.update();
 	}
-	
+
 	public void prepareMap(PlayerEntity player) {
 		this.world = player.world;
 		this.worldData = WorldManager.getData();
 		BlockPos pos = DataUtil.currentPos();
-		
+
 		int posX = pos.getX();
 		int posZ = pos.getZ();
 		int posY = pos.getY();
@@ -183,23 +187,23 @@ public class Minimap implements IMap{
 			this.mapLayer = Layer.SURFACE;
 			this.mapLevel = 0;
 		}
-		
-		if (lastPosX != posX || lastPosZ != posZ) { 
+
+		if (lastPosX != posX || lastPosZ != posZ) {
 			this.lastPosX = posX;
 			this.lastPosZ = posZ;
 			this.posChanged = true;
 		}
-		
+
 		if (ClientParams.rotateMap) {
 			scaledW = (int) (mapWidth * mapScale);
 			scaledH = (int) (mapHeight * mapScale);
 			startX = posX - scaledW / 2;
 			startZ = posZ - scaledH / 2;
-		}		
-		
+		}
+
 		double endX = startX + scaledW;
 		double endZ = startZ + scaledH;
-		
+
 		if (RuleUtil.allowEntityRadar()) {
 			this.drawedIcons.clear();
 			
@@ -207,8 +211,8 @@ public class Minimap implements IMap{
 			BlockPos start = new BlockPos(startX, posY - checkHeight / 2, startZ);
 			BlockPos end = new BlockPos(endX, posY + checkHeight / 2, endZ);
 			List<Entity> entities = this.world.getEntities(null, new Box(start, end));
-		
-			int amount = 0;				
+
+			int amount = 0;
 			for (Entity entity : entities) {
 				float tick = minecraft.getTickDelta();
 				double entX = entity.prevX + (entity.getX() - entity.prevX) * tick;
@@ -216,33 +220,35 @@ public class Minimap implements IMap{
 				double iconX = MathUtil.screenPos(entX, startX, endX, mapWidth);
 				double iconY = MathUtil.screenPos(entZ, startZ, endZ, mapHeight);
 				if (entity instanceof PlayerEntity && RuleUtil.allowPlayerRadar()) {
-					PlayerEntity pEntity  = (PlayerEntity) entity;
+					PlayerEntity pEntity = (PlayerEntity) entity;
 					if (pEntity == player) continue;
-					PlayerIcon playerIcon = new PlayerIcon(this, pEntity, false);
+					PlayerIcon playerIcon = new PlayerIcon(this, pEntity);
 					playerIcon.setPosition(iconX, iconY);
 					this.drawedIcons.add(playerIcon);
 				} else if (entity instanceof LivingEntity && !(entity instanceof PlayerEntity)) {
 					LivingEntity livingEntity = (LivingEntity) entity;
 					boolean hostile = livingEntity instanceof HostileEntity;
 					if (hostile && RuleUtil.allowHostileRadar()) {
-						EntityIcon entIcon = new EntityIcon(this, entity, hostile);	
+						EntityIcon entIcon = new EntityIcon(this, entity, hostile);
 						entIcon.setPosition(iconX, iconY);
 						this.drawedIcons.add(entIcon);
 						amount++;
 					} else if (!hostile && RuleUtil.allowCreatureRadar()) {
-						EntityIcon entIcon = new EntityIcon(this, entity, hostile);	
+						EntityIcon entIcon = new EntityIcon(this, entity, hostile);
 						entIcon.setPosition(iconX, iconY);
 						this.drawedIcons.add(entIcon);
 						amount++;
 					}
 				}
-				if (amount >= 250) break;
+				if (amount >= 250)
+					break;
 			}
 		}
 		if (ClientParams.showWaypoints) {
 			List<Waypoint> wps = WaypointKeeper.getInstance().getWaypoints(WorldManager.getWorldKey(), true);
 			if (wps != null) {
-				Stream<Waypoint> stream = wps.stream().filter(wp -> MathUtil.getDistance(pos, wp.pos, false) <= wp.showRange);
+				Stream<Waypoint> stream = wps.stream()
+						.filter(wp -> MathUtil.getDistance(pos, wp.pos, false) <= wp.showRange);
 				for (Waypoint wp : stream.toArray(Waypoint[]::new)) {
 					WaypointIcon waypoint = new WaypointIcon(this, wp);
 					waypoint.setPosition(
@@ -261,22 +267,23 @@ public class Minimap implements IMap{
 		waypoint.name = "Waypoint";
 		waypoint.color = RandomUtil.getElement(Waypoint.WAYPOINT_COLORS);
 		waypoint.pos = pos;
-		
-		minecraft.openScreen(new WaypointEditor(waypoint, minecraft.currentScreen, WaypointKeeper.getInstance()::addNew));
+
+		minecraft.openScreen(
+				new WaypointEditor(waypoint, minecraft.currentScreen, WaypointKeeper.getInstance()::addNew));
 	}
-	
+
 	public void createWaypoint() {
 		this.createWaypoint(WorldManager.getWorldKey(), DataUtil.currentPos());
 	}
-	
+
 	public World getWorld() {
 		return this.world;
 	}
-	
+
 	public WorldData getWorldData() {
 		return this.worldData;
 	}
-	
+
 	public float getScale() {
 		return this.mapScale;
 	}
@@ -284,40 +291,45 @@ public class Minimap implements IMap{
 	public List<MapIcon<?>> getDrawedIcons() {
 		return this.drawedIcons;
 	}
-	
+
 	public TextManager getTextManager() {
 		return this.textManager;
 	}
-	
+
 	public boolean isBigMap() {
 		return this.bigMap;
 	}
-	
+
 	public static boolean isBig() {
 		return ClientParams.showBigMap;
 	}
-	
+
 	public static boolean isRound() {
 		return !isBig() && (ClientParams.mapShape == MapShape.CIRCLE);
 	}
-	
+
 	public boolean isMapVisible() {
 		if (minecraft.currentScreen != null) {
-			return this.isMapVisible && !minecraft.isPaused() &&
-				   ClientParams.showInChat && minecraft.currentScreen instanceof ChatScreen;
+			return this.isMapVisible && !minecraft.isPaused() && ClientParams.showInChat
+					&& minecraft.currentScreen instanceof ChatScreen;
 		}
-		
+
 		return this.isMapVisible;
 	}
-	
+
 	public int getLasX() {
 		return this.lastPosX;
 	}
-	
+
 	public int getLastZ() {
 		return this.lastPosZ;
 	}
 	
+	@Override
+	public boolean isRotated() {
+		return ClientParams.rotateMap;
+	}
+
 	@Override
 	public Layer getLayer() {
 		return this.mapLayer;

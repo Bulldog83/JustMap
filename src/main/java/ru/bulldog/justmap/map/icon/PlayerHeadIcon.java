@@ -22,9 +22,9 @@ public class PlayerHeadIcon {
 	
 	private ResourceTexture playerSkin;
 	
-	public void draw(MatrixStack matrix, double x, double y) {
+	public void draw(MatrixStack matrices, double x, double y) {
 		int size = ClientParams.entityIconSize;
-		this.draw(matrix, x, y, size, ClientParams.showIconsOutline);
+		this.draw(matrices, x, y, size, ClientParams.showIconsOutline);
 	}
 	
 	public void draw(double x, double y, int size, boolean outline) {
@@ -32,7 +32,7 @@ public class PlayerHeadIcon {
 		this.draw(matrix, x, y, size, outline);
 	}
 
-	public void draw(MatrixStack matrix, double x, double y, int size, boolean outline) {		
+	public void draw(MatrixStack matrices, double x, double y, int size, boolean outline) {		
 		double drawX = x - size / 2;
 		double drawY = y - size / 2;
 		y -= size / 2;
@@ -41,7 +41,7 @@ public class PlayerHeadIcon {
 			RenderUtil.fill(drawX - thickness / 2, drawY - thickness / 2, size + thickness, size + thickness, Colors.LIGHT_GRAY);
 		}
 		this.playerSkin.bindTexture();	
-		RenderUtil.drawPlayerHead(matrix, drawX, drawY, size, size);
+		RenderUtil.drawPlayerHead(matrices, drawX, drawY, size, size);
 	}
 	
 	public void updatePlayerSkin(MapPlayer player) {

@@ -171,9 +171,9 @@ public class RegionData {
 			for (int y = 0; y < 512; y += 16) {
 				int chunkZ = (regZ + y) >> 4;				
 				ChunkData mapChunk = this.mapData.getChunk(chunkX, chunkZ);
-				if (!worldmap && updateArea.contains(Point.fromPos(mapChunk.getPos()))) {
+				if (updateArea.contains(Point.fromPos(mapChunk.getPos()))) {
 					boolean updated = mapChunk.saveNeeded();
-					if (!updated) {
+					if (!worldmap && !updated) {
 						mapChunk.update(layer, level, needUpdate);
 					}
 					synchronized (imageLock) {

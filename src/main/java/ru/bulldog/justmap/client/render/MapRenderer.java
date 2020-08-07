@@ -16,8 +16,8 @@ import ru.bulldog.justmap.enums.ArrowType;
 import ru.bulldog.justmap.map.DirectionArrow;
 import ru.bulldog.justmap.map.MapPlayerManager;
 import ru.bulldog.justmap.map.data.WorldData;
-import ru.bulldog.justmap.map.data.RegionData;
 import ru.bulldog.justmap.map.icon.MapIcon;
+import ru.bulldog.justmap.map.data.RegionData;
 import ru.bulldog.justmap.map.minimap.Minimap;
 import ru.bulldog.justmap.map.minimap.skin.MapSkin;
 import ru.bulldog.justmap.util.Colors;
@@ -31,6 +31,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.util.Window;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;

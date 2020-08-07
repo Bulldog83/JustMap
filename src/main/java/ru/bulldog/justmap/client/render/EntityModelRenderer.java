@@ -20,9 +20,8 @@ public class EntityModelRenderer {
 
 	private static MinecraftClient minecraft = DataUtil.getMinecraft();
 	private static EntityRenderDispatcher renderDispatcher = minecraft.getEntityRenderManager();
-	private static VertexConsumerProvider.Immediate consumerProvider = minecraft.getBufferBuilders().getEntityVertexConsumers();
 	
-	public static void renderModel(Entity entity, double x, double y) {
+	public static void renderModel(MatrixStack matrices, VertexConsumerProvider consumerProvider, Entity entity, double x, double y) {
 		
 		LivingEntity livingEntity = (LivingEntity) entity;
 		
@@ -39,14 +38,14 @@ public class EntityModelRenderer {
 		int modelSize = ClientParams.entityModelSize;
 		MatrixStack matrixStack = new MatrixStack();
 		
-		matrixStack.push();
-		matrixStack.translate(x, y, 0);
-		matrixStack.translate(modelSize / 4, modelSize / 2, 0);
+		matrices.push();
+		matrices.translate(x, y, 0);
+		matrices.translate(modelSize / 4, modelSize / 2, 0);
 		if (ClientParams.rotateMap) {
 			float rotation = MathUtil.correctAngle(minecraft.player.headYaw);
-			matrixStack.multiply(Vector3f.POSITIVE_Z.getDegreesQuaternion(rotation));
+			matrices.multiply(Vector3f.POSITIVE_Z.getDegreesQuaternion(rotation));
 		} else {
-			matrixStack.multiply(Vector3f.POSITIVE_X.getDegreesQuaternion(180.0F));
+			matrices.multiply(Vector3f.POSITIVE_X.getDegreesQuaternion(180.0F));
 		}
 		matrixStack.push();
 		matrixStack.scale(scale, scale, scale);
