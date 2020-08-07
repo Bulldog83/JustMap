@@ -36,6 +36,7 @@ import ru.bulldog.justmap.util.Colors;
 import ru.bulldog.justmap.util.DataUtil;
 import ru.bulldog.justmap.util.Dimension;
 import ru.bulldog.justmap.util.PosUtil;
+import ru.bulldog.justmap.util.RuleUtil;
 import ru.bulldog.justmap.util.math.MathUtil;
 
 public class Worldmap extends MapScreen implements IMap {
@@ -118,10 +119,12 @@ public class Worldmap extends MapScreen implements IMap {
 			}
 		}
 		this.players.clear();
-		List<AbstractClientPlayerEntity> players = this.client.world.getPlayers();
-		for (PlayerEntity player : players) {
-			if (player == client.player) continue;
-			this.players.add(new PlayerIcon(this, player));
+		if (RuleUtil.allowPlayerRadar()) {
+			List<AbstractClientPlayerEntity> players = this.client.world.getPlayers();
+			for (PlayerEntity player : players) {
+				if (player == client.player) continue;
+				this.players.add(new PlayerIcon(this, player));
+			}
 		}
 	}
 	

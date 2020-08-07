@@ -18,7 +18,7 @@ import ru.bulldog.justmap.util.math.Point;
 
 public class PlayerIcon extends MapIcon<PlayerIcon> {
 	
-	private PlayerEntity player;	
+	private PlayerEntity player;
 	private int color = Colors.GREEN;
 	
 	public PlayerIcon(IMap map, PlayerEntity player) {
