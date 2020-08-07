@@ -49,7 +49,6 @@ public class Worldmap extends MapScreen implements IMap {
 		if (worldmap == null) {
 			worldmap = new Worldmap();
 		}
-		
 		return worldmap;
 	}
 	
@@ -143,7 +142,7 @@ public class Worldmap extends MapScreen implements IMap {
 	
 	@Override
 	public void renderBackground(MatrixStack matrixStack) {
-		fill(matrixStack, x, 0, x + width, height, 0xFF444444);		
+		fill(matrixStack, x, 0, x + width, height, 0xFF444444);
 		this.drawMap();
 	}
 	
@@ -286,8 +285,8 @@ public class Worldmap extends MapScreen implements IMap {
 	}
 	
 	@Override
-	public boolean keyPressed(int i, int j, int k) {
-		switch(i) {
+	public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+		switch(keyCode) {
 			case GLFW.GLFW_KEY_W:
 			case GLFW.GLFW_KEY_UP:
 				this.moveMap(Direction.NORTH);
@@ -319,7 +318,7 @@ public class Worldmap extends MapScreen implements IMap {
 		  		this.onClose();
 		  		return true;
 		  	default:
-		  		return super.keyPressed(i, j, k);
+		  		return super.keyPressed(keyCode, scanCode, modifiers);
 		}
 	}
 	
