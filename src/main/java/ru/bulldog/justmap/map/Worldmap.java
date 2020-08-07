@@ -9,6 +9,7 @@ import org.lwjgl.glfw.GLFW;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerEntity;
@@ -27,6 +28,7 @@ import ru.bulldog.justmap.map.data.WorldKey;
 import ru.bulldog.justmap.map.data.WorldManager;
 import ru.bulldog.justmap.map.data.ChunkData;
 import ru.bulldog.justmap.map.data.RegionData;
+import ru.bulldog.justmap.map.icon.PlayerIcon;
 import ru.bulldog.justmap.map.icon.WaypointIcon;
 import ru.bulldog.justmap.map.waypoint.Waypoint;
 import ru.bulldog.justmap.map.waypoint.WaypointKeeper;
@@ -72,6 +74,7 @@ public class Worldmap extends MapScreen implements IMap {
 	private Layer mapLayer;
 	
 	private List<WaypointIcon> waypoints = new ArrayList<>();
+	private List<PlayerIcon> players = new ArrayList<>();
 	
 	private Worldmap() {
 		super(TITLE);
@@ -84,8 +87,6 @@ public class Worldmap extends MapScreen implements IMap {
 		this.paddingTop = 8;
 		this.paddingBottom = 8;
 		
-		PlayerEntity player = client.player;
-
 		this.worldData = WorldManager.getData();
 		WorldKey worldKey = WorldManager.getWorldKey();
 		if (centerPos == null || !worldKey.equals(world)) {
@@ -107,15 +108,20 @@ public class Worldmap extends MapScreen implements IMap {
 			this.mapLevel = 0;
 		}
 		
-		
 		this.waypoints.clear();
 		List<Waypoint> wps = WaypointKeeper.getInstance().getWaypoints(world, true);
 		if (wps != null) {
-			Stream<Waypoint> stream = wps.stream().filter(wp -> MathUtil.getDistance(player.getBlockPos(), wp.pos) <= wp.showRange);
+			Stream<Waypoint> stream = wps.stream().filter(wp -> MathUtil.getDistance(centerPos, wp.pos) <= wp.showRange);
 			for (Waypoint wp : stream.toArray(Waypoint[]::new)) {
 				WaypointIcon waypoint = new WaypointIcon(this, wp);
 				this.waypoints.add(waypoint);
 			}
+		}
+		this.players.clear();
+		List<AbstractClientPlayerEntity> players = this.client.world.getPlayers();
+		for (PlayerEntity player : players) {
+			if (player == client.player) continue;
+			this.players.add(new PlayerIcon(this, player));
 		}
 	}
 	
@@ -139,7 +145,7 @@ public class Worldmap extends MapScreen implements IMap {
 	}
 	
 	@Override
-	public void renderForeground(MatrixStack matrixStack) {
+	public void renderForeground(MatrixStack matrices) {
 		RenderSystem.disableDepthTest();
 		int iconSize = (int) (ClientParams.worldmapIconSize / imageScale);
 		iconSize = iconSize % 2 != 0 ? iconSize + 1 : iconSize;
@@ -150,6 +156,13 @@ public class Worldmap extends MapScreen implements IMap {
 				MathUtil.screenPos(icon.waypoint.pos.getZ(), startZ, endZ, height) - shiftH
 			);
 			icon.draw(iconSize);
+		}
+		for (PlayerIcon icon : players) {
+			icon.setPosition(
+					MathUtil.screenPos(icon.getX(), startX, endX, width) - shiftW,
+					MathUtil.screenPos(icon.getZ(), startZ, endZ, height) - shiftH
+			);
+			icon.draw(matrices, iconSize);
 		}
 		
 		ClientPlayerEntity player = client.player;
@@ -162,7 +175,7 @@ public class Worldmap extends MapScreen implements IMap {
 		MapPlayerManager.getPlayer(player).getIcon().draw(arrowX, arrowY, iconSize, true);
 		
 		this.drawBorders(paddingTop, paddingBottom);
-		this.drawCenteredString(matrixStack, client.textRenderer, cursorCoords, width / 2, paddingTop + 4, Colors.WHITE);
+		this.drawCenteredString(matrices, client.textRenderer, cursorCoords, width / 2, paddingTop + 4, Colors.WHITE);
 		RenderSystem.enableDepthTest();
 	}
 	
@@ -387,6 +400,11 @@ public class Worldmap extends MapScreen implements IMap {
 			return true;
 		}
 		
+		return false;
+	}
+	
+	@Override
+	public boolean isRotated() {
 		return false;
 	}
 	
