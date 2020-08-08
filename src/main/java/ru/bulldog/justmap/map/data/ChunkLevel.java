@@ -49,7 +49,11 @@ public class ChunkLevel {
 	}
 	
 	public int sampleHeightmap(int x, int z) {
-		return this.heightmap[index(x, z)];
+		return this.sampleHeightmap(index(x, z));
+	}
+	
+	public int sampleHeightmap(int index) {
+		return this.heightmap[index];
 	}
 	
 	public void updateHeightmap(int x, int z, int y) {

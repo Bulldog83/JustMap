@@ -204,9 +204,8 @@ public class Minimap implements IMap {
 		double endX = startX + scaledW;
 		double endZ = startZ + scaledH;
 
+		this.drawedIcons.clear();
 		if (RuleUtil.allowEntityRadar()) {
-			this.drawedIcons.clear();
-
 			int checkHeight = 24;
 			BlockPos start = new BlockPos(startX, posY - checkHeight / 2, startZ);
 			BlockPos end = new BlockPos(endX, posY + checkHeight / 2, endZ);
