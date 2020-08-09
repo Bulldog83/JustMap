@@ -72,7 +72,7 @@ public class Minimap implements IMap {
 	public boolean posChanged = false;
 
 	public Minimap() {
-		this.textManager = AdvancedInfo.getInstance().getMapTextManager();
+		this.textManager = AdvancedInfo.getMapTextManager();
 		this.textManager.add(txtCoords);
 		this.textManager.add(txtBiome);
 		this.textManager.add(txtTime);
@@ -115,8 +115,8 @@ public class Minimap implements IMap {
 			}
 		}
 
-		if (configSize != mapWidth || configScale != mapScale || this.rotateMap != needRotate
-				|| this.bigMap != bigMap) {
+		if (configSize != mapWidth || configScale != mapScale ||
+			this.rotateMap != needRotate || this.bigMap != bigMap) {
 			if (bigMap) {
 				this.mapWidth = config.getInt("big_map_size");
 				this.mapHeight = (mapWidth * 10) / 16;
@@ -129,8 +129,9 @@ public class Minimap implements IMap {
 			this.bigMap = bigMap;
 
 			if (rotateMap) {
-				this.scaledWidth = (int) ((mapWidth * mapScale) * 1.42 + 8);
-				this.scaledHeight = (int) ((mapHeight * mapScale) * 1.42 + 8);
+				double mult = (bigMap) ? 1.8 : 1.42;
+				this.scaledWidth = (int) ((mapWidth * mapScale) * mult + 8);
+				this.scaledHeight = (int) ((mapHeight * mapScale) * mult + 8);
 			} else {
 				this.scaledWidth = (int) ((mapWidth * mapScale) + 8);
 				this.scaledHeight = (int) ((mapHeight * mapScale) + 8);
@@ -204,9 +205,8 @@ public class Minimap implements IMap {
 		double endX = startX + scaledW;
 		double endZ = startZ + scaledH;
 
+		this.drawedIcons.clear();
 		if (RuleUtil.allowEntityRadar()) {
-			this.drawedIcons.clear();
-			
 			int checkHeight = 24;
 			BlockPos start = new BlockPos(startX, posY - checkHeight / 2, startZ);
 			BlockPos end = new BlockPos(endX, posY + checkHeight / 2, endZ);
@@ -240,8 +240,7 @@ public class Minimap implements IMap {
 						amount++;
 					}
 				}
-				if (amount >= 250)
-					break;
+				if (amount >= 250) break;
 			}
 		}
 		if (ClientParams.showWaypoints) {
@@ -251,10 +250,8 @@ public class Minimap implements IMap {
 						.filter(wp -> MathUtil.getDistance(pos, wp.pos, false) <= wp.showRange);
 				for (Waypoint wp : stream.toArray(Waypoint[]::new)) {
 					WaypointIcon waypoint = new WaypointIcon(this, wp);
-					waypoint.setPosition(
-						MathUtil.screenPos(wp.pos.getX(), startX, endX, mapWidth),
-						MathUtil.screenPos(wp.pos.getZ(), startZ, endZ, mapHeight)
-					);
+					waypoint.setPosition(MathUtil.screenPos(wp.pos.getX(), startX, endX, mapWidth),
+										 MathUtil.screenPos(wp.pos.getZ(), startZ, endZ, mapHeight));
 					this.drawedIcons.add(waypoint);
 				}
 			}
