@@ -14,7 +14,6 @@ import ru.bulldog.justmap.util.ColorUtil;
 import ru.bulldog.justmap.util.Colors;
 import ru.bulldog.justmap.util.DataUtil;
 import ru.bulldog.justmap.util.RenderUtil;
-import ru.bulldog.justmap.util.math.Point;
 
 public class PlayerIcon extends MapIcon<PlayerIcon> {
 	
@@ -50,29 +49,18 @@ public class PlayerIcon extends MapIcon<PlayerIcon> {
 	@Override
 	public void draw(MatrixStack matrices, VertexConsumerProvider consumerProvider, int mapX, int mapY, double offX, double offY, float rotation) {
 		int size = ClientParams.entityIconSize;
-		
-		Point pos = new Point(mapX + x, mapY + y);
-		
-		if (map.isRotated()) {
-			this.rotatePos(pos, map.getWidth(), map.getHeight(), mapX, mapY, rotation);
-		}
-		
-		pos.x -= size / 2 + offX;
-		pos.y -= size / 2 + offY;
-		
-		if (pos.x < mapX + size || pos.x > (mapX + map.getWidth()) - size ||
-			pos.y < mapY + size || pos.y > (mapY + map.getHeight()) - size) return;
-		
+		this.updatePos(size, mapX, mapY, offX, offY, rotation);
+		if (!allowRender) return;
 		if (ClientParams.renderEntityModel) {
-			EntityModelRenderer.renderModel(matrices, consumerProvider, player, pos.x, pos.y);
+			EntityModelRenderer.renderModel(matrices, consumerProvider, player, iconPos.x, iconPos.y);
 		} else if (ClientParams.showPlayerHeads) {
-			MapPlayerManager.getPlayer(player).getIcon().draw(matrices, pos.x, pos.y);
+			MapPlayerManager.getPlayer(player).getIcon().draw(matrices, iconPos.x, iconPos.y);
 		} else {
 			int darken = ColorUtil.colorBrigtness(color, -3);
-			RenderUtil.fill(pos.x - 0.5, pos.y - 0.5, size + 1, size + 1, darken);
-			RenderUtil.fill(pos.x, pos.y, size, size, color);
+			RenderUtil.fill(iconPos.x - 0.5, iconPos.y - 0.5, size + 1, size + 1, darken);
+			RenderUtil.fill(iconPos.x, iconPos.y, size, size, color);
 		}
-		this.drawPlayerName(matrices, pos.x, pos.y);
+		this.drawPlayerName(matrices, iconPos.x, iconPos.y);
 	}
 	
 	private void drawPlayerName(MatrixStack matrices, double x, double y) {
