@@ -44,7 +44,7 @@ public class WaypointIcon extends MapIcon<WaypointIcon> {
 		int mapW = map.getWidth();
 		int mapH = map.getHeight();
 		int halfSize = size / 2;
-		if (iconPos == null || x != lastX || y != lastY || mapX != lastMapX || mapY != lastMapY) {
+		if (iconPos == null || x != lastX || y != lastY || mapX != lastMapX || mapY != lastMapY || offX != lastOffX || offY != lastOffY) {
 			this.iconPos = new Point(mapX + x, mapY + y);
 			this.iconPos.x -= halfSize + offX;
 			this.iconPos.y -= halfSize + offY;
@@ -70,6 +70,8 @@ public class WaypointIcon extends MapIcon<WaypointIcon> {
 				this.iconPos.x = MathUtil.clamp(iconPos.x, mapX, (mapX + mapW) - size);
 				this.iconPos.y = MathUtil.clamp(iconPos.y, mapY, (mapY + mapH) - size);
 			}
+			this.lastOffX = offX;
+			this.lastOffY = offY;
 			this.lastMapX = mapX;
 			this.lastMapY = mapY;
 			this.lastX = x;
