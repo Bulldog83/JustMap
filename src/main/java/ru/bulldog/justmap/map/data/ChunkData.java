@@ -285,7 +285,7 @@ public class ChunkData {
 			float topoLevel = chunkLevel.topomap[index] / 100F;
 			color = ColorUtil.proccessColor(color, heightDiff, topoLevel);
 			if (ClientParams.showTopography) {
-				return chunkLevel.sampleHeightmap(index) % 2 == 0 ?
+				return chunkLevel.sampleHeightmap(index) % 2 != 0 ?
 						ColorUtil.colorBrigtness(color, -0.6F) : color;
 			}
 			return color;
