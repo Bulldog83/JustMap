@@ -239,11 +239,9 @@ public class Minimap implements IMap {
 						amount++;
 					}
 				}
-				if (amount >= 250)
-					break;
+				if (amount >= 250) break;
 			}
 		}
-
 		if (ClientParams.showWaypoints) {
 			List<Waypoint> wps = WaypointKeeper.getInstance().getWaypoints(WorldManager.getWorldKey(), true);
 			if (wps != null) {
@@ -252,7 +250,7 @@ public class Minimap implements IMap {
 				for (Waypoint wp : stream.toArray(Waypoint[]::new)) {
 					WaypointIcon waypoint = new WaypointIcon(this, wp);
 					waypoint.setPosition(MathUtil.screenPos(wp.pos.getX(), startX, endX, mapWidth),
-							MathUtil.screenPos(wp.pos.getZ(), startZ, endZ, mapHeight));
+										 MathUtil.screenPos(wp.pos.getZ(), startZ, endZ, mapHeight));
 					this.drawedIcons.add(waypoint);
 				}
 			}
