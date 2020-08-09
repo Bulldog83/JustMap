@@ -17,7 +17,7 @@ public class MapProcessor {
 		int ymb = worldChunk.sampleHeightmap(Heightmap.Type.MOTION_BLOCKING, x, z);
 		int y = Math.max(yws, ymb);
 		
-		if (y <= 0) return -1;
+		if (y < 0) return -1;
 		
 		return getTopBlockY(worldChunk, layer, level, x, y, z, liquids);
 	}
@@ -30,7 +30,6 @@ public class MapProcessor {
 		int posZ = z + (chunkPos.z << 4);
 		
 		boolean plants = !ClientParams.hidePlants;
-		
 		if ((layer.equals(Layer.NETHER) || layer.equals(Layer.CAVES))) {
 			int floor = level * layer.height;
 			for (int i = floor + (layer.height - 1); i >= floor; i--) {

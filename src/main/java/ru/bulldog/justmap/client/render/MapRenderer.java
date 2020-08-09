@@ -55,6 +55,7 @@ public class MapRenderer {
 	private float rotation;
 	private int lastX;
 	private int lastZ;
+	private boolean mapRotation = false;
 	private boolean isRound = false;
 
 	private final Minimap minimap;
@@ -125,9 +126,10 @@ public class MapRenderer {
 		int mapW = this.minimap.getWidth();
 		int mapH = this.minimap.getHeight();
 		int off = ClientParams.positionOffset;
+		boolean rotateMap = ClientParams.rotateMap;
 		ScreenPosition mapPos = ClientParams.mapPosition;
 		if (mapWidth != mapW || mapHeight != mapH || mapPosition != mapPos ||
-			this.border != border || offset != off ||
+			this.border != border || offset != off || mapRotation != rotateMap ||
 			winWidth != winW || winHeight != winH) {
 			
 			this.winWidth = winW;
@@ -137,6 +139,7 @@ public class MapRenderer {
 			this.mapPosition = mapPos;
 			this.offset = off;
 			this.border = border;
+			this.mapRotation = rotateMap;
 			
 			this.posX = offset;
 			this.posY = offset;
@@ -180,9 +183,9 @@ public class MapRenderer {
 					break;
 			}
 			
-			if (ClientParams.rotateMap) {
-				this.imgW = (int) (mapWidth * 1.42);
-				this.imgH = (int) (mapHeight * 1.42);
+			if (mapRotation) {
+				this.imgW = minimap.getScaledWidth();
+				this.imgH = minimap.getScaledHeight();
 				this.imgX = mapX - (imgW - mapWidth) / 2;
 				this.imgY = mapY - (imgH - mapHeight) / 2;
 			} else {
@@ -210,9 +213,9 @@ public class MapRenderer {
 		Point pointE = new Point(mapR, centerY);
 		Point pointW = new Point(mapX, centerY);
 		
-		this.rotation = minecraft.player.headYaw;
-		
-		if (ClientParams.rotateMap) {
+		this.rotation = 180;
+		if (mapRotation) {
+			this.rotation = minecraft.player.headYaw;
 			float rotate = MathUtil.correctAngle(rotation) + 180;
 			double angle = Math.toRadians(-rotate);
 			
@@ -290,7 +293,7 @@ public class MapRenderer {
 		}
 		
 		RenderSystem.pushMatrix();
-		if (ClientParams.rotateMap) {
+		if (mapRotation) {
 			float moveX = imgX + imgW / 2;
 			float moveY = imgY + imgH / 2;
 			RenderSystem.translatef(moveX, moveY, 0.0F);
@@ -322,7 +325,7 @@ public class MapRenderer {
 		int centerY = mapY + mapHeight / 2;
 		int iconSize = ClientParams.arrowIconSize;
 		if (ClientParams.arrowIconType == ArrowType.DIRECTION_ARROW) {
-			float direction = ClientParams.rotateMap ? 180 : rotation;
+			float direction = mapRotation ? 180 : minecraft.player.headYaw;
 			DirectionArrow.draw(centerX, centerY, iconSize, direction);
 		} else {
 			MapPlayerManager.getPlayer(minecraft.player).getIcon().draw(centerX, centerY, iconSize, true);
@@ -341,7 +344,7 @@ public class MapRenderer {
 		int right = this.imgX + scaledW;
 		
 		int bottom;
-		if (ClientParams.rotateMap) {
+		if (mapRotation) {
 			bottom = (int) (this.imgY + scaledH * 1.42);
 		} else {
 			bottom = this.imgY + scaledH;
