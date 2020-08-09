@@ -195,7 +195,6 @@ public class ChunkData {
 	private void updateChunkData(WorldChunk worldChunk, Layer layer, int level) {
 		ChunkLevel chunkLevel = this.getChunkLevel(layer, level);
 		chunkLevel.updating = true;
-		
 
 		boolean waterTint = ClientParams.alternateColorRender && ClientParams.waterTint;
 		boolean skipWater = !(ClientParams.hideWater || waterTint);
@@ -221,7 +220,6 @@ public class ChunkData {
 					int color = ColorUtil.blockColor(worldChunk, blockPos);
 					if (color == -1) continue;
 
-					int heightDiff = MapProcessor.heightDifference(this, layer, level, x, posY, z, skipWater);
 					chunkLevel.setBlockState(x, z, worldState);
 
 					int height = layer.height;
@@ -238,9 +236,10 @@ public class ChunkData {
 					}
 
 					float topoLevel = ((float) (posY - bottom) / baseHeight);
+					int heightDiff = MapProcessor.heightDifference(this, layer, level, x, posY, z, skipWater);
 					chunkLevel.topomap[index] = (int) (topoLevel * 100);
-					chunkLevel.colormap[index] = color;
 					chunkLevel.levelmap[index] = heightDiff;
+					chunkLevel.colormap[index] = color;
 
 					this.saved = false;
 				} else if (chunkLevel.colormap[index] != -1) {
@@ -281,7 +280,12 @@ public class ChunkData {
 		if (color != -1) {
 			int heightDiff = chunkLevel.levelmap[index];
 			float topoLevel = chunkLevel.topomap[index] / 100F;
-			return ColorUtil.proccessColor(color, heightDiff, topoLevel);
+			color = ColorUtil.proccessColor(color, heightDiff, topoLevel);
+			if (ClientParams.showTopography) {
+				return chunkLevel.sampleHeightmap(index) % 2 != 0 ?
+						ColorUtil.colorBrigtness(color, -0.6F) : color;
+			}
+			return color;
 		}
 		return Colors.BLACK;
 	}
