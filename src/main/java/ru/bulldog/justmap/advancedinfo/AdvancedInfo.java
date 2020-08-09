@@ -16,6 +16,7 @@ import ru.bulldog.justmap.util.DataUtil;
 public class AdvancedInfo {
 
 	private static AdvancedInfo INSTANCE;
+	private static TextManager mapTextManager = new TextManager();
 	
 	public static AdvancedInfo getInstance() {
 		if (INSTANCE == null) {
@@ -25,28 +26,24 @@ public class AdvancedInfo {
 		return INSTANCE;
 	}
 	
+	public static TextManager getMapTextManager() {
+		return mapTextManager;
+	}
+	
 	private MinecraftClient minecraft = DataUtil.getMinecraft();
 	private Map<ScreenPosition, TextManager> managers;
-	private TextManager mapTextManager;
 	private ScreenPosition infoPos;
 	private ScreenPosition itemsPos;
 	
 	private AdvancedInfo() {
-		this.managers = new HashMap<>();		
-		this.mapTextManager = new TextManager();
-	}
-	
-	public TextManager getMapTextManager() {
-		return this.mapTextManager;
+		this.managers = new HashMap<>();
 	}
 	
 	public TextManager getTextManager(ScreenPosition position) {
 		if (managers.containsKey(position)) {
 			return this.managers.get(position);
 		}
-		
 		int lineWidth = 128;
-		
 		TextManager textManager = new TextManager();
 		textManager.setLineWidth(lineWidth);
 		this.managers.put(position, textManager);
