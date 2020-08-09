@@ -57,7 +57,7 @@ public class PlayerIcon extends MapIcon<PlayerIcon> {
 			RenderUtil.fill(iconPos.x - 0.5, iconPos.y - 0.5, size + 1, size + 1, darken);
 			RenderUtil.fill(iconPos.x, iconPos.y, size, size, color);
 		}
-		this.drawPlayerName(pos.x, pos.y);
+		this.drawPlayerName(iconPos.x, iconPos.y);
 	}
 	
 	private void drawPlayerName(double x, double y) {
