@@ -13,10 +13,12 @@ public class ListElementWidget implements Drawable, Element {
 	
 	private Text text;
 	private final Consumer<ListElementWidget> onPress;
+	int padding = 2;
 	int width, height;
 	int x, y;
 	
 	public ListElementWidget(Text text, Consumer<ListElementWidget> action) {
+		this.width = RenderUtil.getWidth(text) + padding * 2;
 		this.onPress = action;
 		this.text = text;
 	}
@@ -28,7 +30,7 @@ public class ListElementWidget implements Drawable, Element {
 		} else {
 			RenderUtil.fill(matrices, x, y, width, height, 0x33666666);
 		}
-		RenderUtil.drawCenteredText(matrices, text, x + width / 2, y + height / 2, Colors.WHITE);
+		RenderUtil.drawCenteredText(matrices, text, x + width / 2, y + height / 2 - 5, Colors.WHITE);
 	}
 	
 	@Override

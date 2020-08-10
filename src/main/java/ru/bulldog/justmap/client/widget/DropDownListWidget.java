@@ -55,8 +55,8 @@ public class DropDownListWidget implements Drawable, ParentElement {
 	}
 	
 	public void addElement(ListElementWidget element) {
-		element.width = elemWidth;
 		element.height = elemHeight;
+		this.width = Math.max(width, element.width + padding * 2);
 		this.children.add(element);
 		this.height = children.size() * elemHeight + padding * 2;
 	}
