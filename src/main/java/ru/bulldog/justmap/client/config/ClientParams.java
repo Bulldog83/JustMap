@@ -10,10 +10,12 @@ public class ClientParams {
 	public static ScreenPosition infoPosition = ScreenPosition.TOP_LEFT;
 	public static ScreenPosition itemsPosition = ScreenPosition.MIDDLE_LEFT;
 	public static ArrowType arrowIconType = ArrowType.DIRECTION_ARROW;
-	public static MapShape mapShape = MapShape.SQUARE;
 	public static MultiworldDetection multiworldDetection = MultiworldDetection.AUTO;
+	public static MapShape mapShape = MapShape.SQUARE;
 	
 	public static int positionOffset = 4;
+	public static int mapPositionX = positionOffset;
+	public static int mapPositionY = positionOffset;
 	public static int mapSize = 128;
 	public static int bigMapSize = 320;
 	public static float mapScale = 1.0F;

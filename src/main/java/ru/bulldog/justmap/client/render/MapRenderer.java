@@ -9,9 +9,7 @@ import ru.bulldog.justmap.advancedinfo.MapText;
 import ru.bulldog.justmap.advancedinfo.TextManager;
 import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.client.config.ClientParams;
-import ru.bulldog.justmap.enums.ScreenPosition;
 import ru.bulldog.justmap.enums.TextAlignment;
-import ru.bulldog.justmap.enums.TextPosition;
 import ru.bulldog.justmap.enums.ArrowType;
 import ru.bulldog.justmap.map.DirectionArrow;
 import ru.bulldog.justmap.map.MapPlayerManager;
@@ -32,7 +30,6 @@ import net.fabricmc.api.Environment;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.util.Window;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
@@ -40,13 +37,6 @@ import net.minecraft.util.math.BlockPos;
 @Environment(EnvType.CLIENT)
 public class MapRenderer {
 	
-	private static MapRenderer instance;
-	
-	protected ScreenPosition mapPosition;
-	protected int border = 0;
-	
-	private int offset;
-	private int posX, posY;
 	private int mapX, mapY;
 	private int winWidth, winHeight;
 	private int mapWidth, mapHeight;
@@ -56,7 +46,6 @@ public class MapRenderer {
 	private int lastX;
 	private int lastZ;
 	private boolean mapRotation = false;
-	private boolean isRound = false;
 
 	private final Minimap minimap;
 	private WorldData worldData;
@@ -71,117 +60,42 @@ public class MapRenderer {
 	private final MinecraftClient minecraft = DataUtil.getMinecraft();
 	private final Identifier roundMask = new Identifier(JustMap.MODID, "textures/round_mask.png");
 	
-	public static MapRenderer getInstance() {
-		if (instance == null) {
-			instance = new MapRenderer();
-		}
-		
-		return instance;
-	}
-	
-	private MapRenderer() {
-		this.minimap = JustMapClient.MAP;
-		this.textManager = this.minimap.getTextManager();
-		this.textManager.setSpacing(12);		
+	public MapRenderer(Minimap map) {
+		this.minimap = map;
+		this.textManager = minimap.getTextManager();
+		this.textManager.setSpacing(12);
 		this.textManager.add(dirN);
 		this.textManager.add(dirS);
 		this.textManager.add(dirE);
 		this.textManager.add(dirW);
 	}
 	
-	public int getX() {
-		return this.posX;
-	}
-	
-	public int getY() {
-		return this.posY;
-	}
-	
 	public void updateParams() {		
-		this.minimap.updateMapParams();
-		this.worldData = this.minimap.getWorldData();
+		this.worldData = minimap.getWorldData();
+		this.mapSkin = minimap.getSkin();
 		
-		this.isRound = !minimap.isBigMap() && Minimap.isRound();
-		int border = 0;
-		if (ClientParams.useSkins) {
-			if (minimap.isBigMap()) {
-				this.mapSkin = MapSkin.getBigMapSkin();
-			} else {
-				this.mapSkin = MapSkin.getCurrentSkin();
-			}
-			if (isRound) {
-				double scale = (double) mapWidth / mapSkin.getWidth();
-				this.mapSkin.getRenderData().updateScale(scale);
-				border = (int) (mapSkin.border * scale);
-			} else {
-				this.mapSkin.getRenderData().updateScale();
-				double scale = mapSkin.getRenderData().scaleFactor;
-				border = (int) (mapSkin.border * scale);
-			}
-		}
-		
-		Window window = minecraft.getWindow();
-		int winW = window.getScaledWidth();
-		int winH = window.getScaledHeight();
-		int mapW = this.minimap.getWidth();
-		int mapH = this.minimap.getHeight();
-		int off = ClientParams.positionOffset;
-		boolean rotateMap = ClientParams.rotateMap;
-		ScreenPosition mapPos = ClientParams.mapPosition;
-		if (mapWidth != mapW || mapHeight != mapH || mapPosition != mapPos ||
-			this.border != border || offset != off || mapRotation != rotateMap ||
-			winWidth != winW || winHeight != winH) {
-			
+		int winW = minecraft.getWindow().getWidth();
+		int winH = minecraft.getWindow().getHeight();
+		if (winWidth != winW || winHeight != winH) {
+			minimap.updateMapParams();
 			this.winWidth = winW;
 			this.winHeight = winH;
+		}
+		
+		int mapW = minimap.getWidth();
+		int mapH = minimap.getHeight();
+		int mapX = minimap.getMapX();
+		int mapY = minimap.getMapY();
+		boolean rotateMap = minimap.isRotated();
+		if (mapWidth != mapW || mapHeight != mapH ||
+			this.mapX != mapX || this.mapY != mapY ||
+			mapRotation != rotateMap) {
+			
 			this.mapWidth = mapW;
 			this.mapHeight = mapH;
-			this.mapPosition = mapPos;
-			this.offset = off;
-			this.border = border;
 			this.mapRotation = rotateMap;
-			
-			this.posX = offset;
-			this.posY = offset;
-			this.mapX = posX + border;
-			this.mapY = posY + border;			
-			
-			TextPosition textPos = TextPosition.UNDER;
-
-			switch (mapPosition) {
-				case TOP_LEFT:
-					break;
-				case TOP_CENTER:
-					this.mapX = winW / 2 - mapWidth / 2;
-					this.posX = mapX - border;
-					break;
-				case TOP_RIGHT:
-					this.mapX = winW - offset - mapWidth - border;
-					this.posX = mapX - border;
-					break;
-				case MIDDLE_RIGHT:
-					this.mapX = winW - offset - mapWidth - border;
-					this.mapY = winH / 2 - mapHeight / 2;
-					this.posX = mapX - border;
-					this.posY = mapY - border;
-					break;
-				case MIDDLE_LEFT:
-					this.mapY = winH / 2 - mapHeight / 2;
-					this.posY = mapY - border;
-					break;
-				case BOTTOM_LEFT:
-					textPos = TextPosition.ABOVE;
-					this.mapY = winH - offset - mapHeight - border;
-					this.posY = mapY - border;
-					break;
-				case BOTTOM_RIGHT:
-					textPos = TextPosition.ABOVE;
-					this.mapX = winW - offset - mapWidth - border;
-					this.posX = mapX - border;
-					this.mapY = winH - offset - mapHeight - border;
-					this.posY = mapY - border;
-					break;
-			}
+			this.mapX = minimap.getMapX();
+			this.mapY = minimap.getMapY();			
 			
 			if (mapRotation) {
 				this.imgW = minimap.getScaledWidth();
@@ -194,12 +108,6 @@ public class MapRenderer {
 				this.imgX = this.mapX;
 				this.imgY = this.mapY;
 			}
-			
-			this.textManager.updatePosition(textPos,
-				mapX, mapY + (textPos == TextPosition.UNDER ?
-					mapHeight + border + 3 :
-					-(border + 3))
-			);
 		}
 		
 		int centerX = mapX + mapWidth / 2;
@@ -266,7 +174,7 @@ public class MapRenderer {
 		RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
 		RenderSystem.disableDepthTest();
 		
-		if (this.minimap.posChanged) {
+		if (minimap.posChanged) {
 			this.lastX = minimap.getLasX();
 			this.lastZ = minimap.getLastZ();
 			this.minimap.posChanged = false;
@@ -279,7 +187,7 @@ public class MapRenderer {
 		float offX = (float) (DataUtil.doubleX() - this.lastX) * mult;
 		float offY = (float) (DataUtil.doubleZ() - this.lastZ) * mult;
 		
-		if (isRound) {
+		if (Minimap.isRound()) {
 			RenderSystem.enableBlend();
 			RenderSystem.colorMask(false, false, false, true);
 			RenderSystem.clearColor(0.0F, 0.0F, 0.0F, 0.0F);
@@ -312,9 +220,11 @@ public class MapRenderer {
 		
 		GL11.glDisable(GL11.GL_SCISSOR_TEST);
 		
-		if (ClientParams.useSkins) {
-			int brd = border * 2;
-			this.mapSkin.draw(matrix, posX, posY, mapWidth + brd, mapHeight + brd);
+		if (mapSkin != null) {
+			int skinX = minimap.getSkinX();
+			int skinY = minimap.getSkinY();
+			int brd = minimap.getBorder() * 2;
+			this.mapSkin.draw(matrix, skinX, skinY, mapWidth + brd, mapHeight + brd);
 		}
 		
 		RenderUtil.drawRightAlignedString(
@@ -337,20 +247,20 @@ public class MapRenderer {
 	}
 	
 	private void drawMap() {
-		int scaledW = this.minimap.getScaledWidth();
-		int scaledH = this.minimap.getScaledHeight();
+		int scaledW = minimap.getScaledWidth();
+		int scaledH = minimap.getScaledHeight();
 		int cornerX = DataUtil.coordX() - scaledW / 2;
 		int cornerZ = DataUtil.coordZ() - scaledH / 2;		
-		int right = this.imgX + scaledW;
+		int right = imgX + scaledW;
 		
 		int bottom;
 		if (mapRotation) {
-			bottom = (int) (this.imgY + scaledH * 1.42);
+			bottom = (int) (imgY + scaledH * 1.42);
 		} else {
-			bottom = this.imgY + scaledH;
+			bottom = imgY + scaledH;
 		}
 		
-		float scale = this.minimap.getScale();
+		float scale = minimap.getScale();
 		
 		BlockPos center = DataUtil.currentPos();
 		BlockPos.Mutable currentPos = new BlockPos.Mutable();
@@ -363,7 +273,7 @@ public class MapRenderer {
 			while (picY < scaledH ) {				
 				int cZ = cornerZ + picY;
 				
-				RegionData region = this.worldData.getRegion(minimap, currentPos.set(cX, cY, cZ));
+				RegionData region = worldData.getRegion(minimap, currentPos.set(cX, cY, cZ));
 				region.swapLayer(minimap.getLayer(), minimap.getLevel());
 				
 				picW = 512;
