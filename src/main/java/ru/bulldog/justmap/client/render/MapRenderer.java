@@ -156,7 +156,7 @@ public class MapRenderer {
 		dir.x = posX; dir.y = posY;
 	}
 	
-	public void draw(MatrixStack matrix) {
+	public void draw(MatrixStack matrices) {
 		if (!minimap.isMapVisible() || !JustMapClient.canMapping()) return;
 		
 		this.updateParams();
@@ -214,7 +214,7 @@ public class MapRenderer {
 		
 		VertexConsumerProvider.Immediate consumerProvider = minecraft.getBufferBuilders().getEntityVertexConsumers();
 		for (MapIcon<?> icon : minimap.getDrawedIcons()) {
-			icon.draw(matrix, consumerProvider, mapX, mapY, offX, offY, rotation);
+			icon.draw(matrices, consumerProvider, mapX, mapY, offX, offY, rotation);
 		}
 		consumerProvider.draw();
 		
@@ -224,11 +224,11 @@ public class MapRenderer {
 			int skinX = minimap.getSkinX();
 			int skinY = minimap.getSkinY();
 			int brd = minimap.getBorder() * 2;
-			this.mapSkin.draw(matrix, skinX, skinY, mapWidth + brd, mapHeight + brd);
+			this.mapSkin.draw(matrices, skinX, skinY, mapWidth + brd, mapHeight + brd);
 		}
 		
 		RenderUtil.drawRightAlignedString(
-				matrix, Float.toString(minimap.getScale()),
+				matrices, Float.toString(minimap.getScale()),
 				mapX + mapWidth - 3, mapY + mapHeight - 10, Colors.WHITE);
 		
 		int centerX = mapX + mapWidth / 2;
@@ -241,7 +241,7 @@ public class MapRenderer {
 			MapPlayerManager.getPlayer(minecraft.player).getIcon().draw(centerX, centerY, iconSize, true);
 		}
 		
-		this.textManager.draw(matrix);
+		this.textManager.draw(matrices);
 		
 		RenderSystem.enableDepthTest();
 	}

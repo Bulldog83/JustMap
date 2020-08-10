@@ -130,17 +130,16 @@ public class Worldmap extends MapScreen implements IMap {
 		}
 		
 		LangUtil langUtil = new LangUtil("gui");
-		this.mapMenu = new DropDownListWidget(25, paddingTop + 2, 100, 22);
+		this.mapMenu = this.addChild(new DropDownListWidget(25, paddingTop + 2, 100, 22));
 		this.mapMenu.addElement(new ListElementWidget(langUtil.getText("worldmap.add_waypoint"), elem -> {
 			JustMapClient.MAP.createWaypoint(world, centerPos);
 		}));
 		this.mapMenu.addElement(new ListElementWidget(langUtil.getText("worldmap.set_map_pos"), elem -> {
-			
+			client.openScreen(new MapPositionScreen(this));
 		}));
 		this.mapMenu.addElement(new ListElementWidget(langUtil.getText("worldmap.open_map_config"), elem -> {
-			ConfigFactory.getConfigScreen(this);
+			client.openScreen(ConfigFactory.getConfigScreen(this));
 		}));
-		this.addChild(mapMenu);
 		this.addMapButtons();
 	}
 	

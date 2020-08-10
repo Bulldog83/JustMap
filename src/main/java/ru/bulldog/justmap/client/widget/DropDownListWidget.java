@@ -5,17 +5,16 @@ import java.util.List;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
+import net.minecraft.client.gui.AbstractParentElement;
 import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.Element;
-import net.minecraft.client.gui.ParentElement;
 import net.minecraft.client.util.math.MatrixStack;
 import ru.bulldog.justmap.util.Colors;
 import ru.bulldog.justmap.util.RenderUtil;
 
-public class DropDownListWidget implements Drawable, ParentElement {
+public class DropDownListWidget extends AbstractParentElement implements Drawable {
 
 	private List<ListElementWidget> children = new ArrayList<>();
-	private ListElementWidget focused;
 	private boolean visible = false;
 	private int x, y;
 	private int width, height;
@@ -35,7 +34,8 @@ public class DropDownListWidget implements Drawable, ParentElement {
 	public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
 		if (!visible) return;
 		RenderSystem.enableBlend();
-		this.renderBackground();
+		RenderSystem.defaultBlendFunc();
+		this.renderBackground(matrices);
 		int x = this.x + padding;
 		int y = this.y + padding;
 		for (ListElementWidget element : children) {
@@ -46,8 +46,8 @@ public class DropDownListWidget implements Drawable, ParentElement {
 		}
 	}
 	
-	private void renderBackground() {
-		RenderUtil.fill(x, y, width, height, 0x66000000);
+	private void renderBackground(MatrixStack matrices) {
+		RenderUtil.fill(matrices, x, y, x + width, y + height, 0xAA000000);
 		RenderUtil.drawLine(x, y, x + width, y, Colors.LIGHT_GRAY);
 		RenderUtil.drawLine(x, y, x, y + height, Colors.LIGHT_GRAY);
 		RenderUtil.drawLine(x + width, y, x + width, y + height, Colors.LIGHT_GRAY);
@@ -58,37 +58,29 @@ public class DropDownListWidget implements Drawable, ParentElement {
 		element.height = elemHeight;
 		this.width = Math.max(width, element.width + padding * 2);
 		this.children.add(element);
-		this.height = children.size() * elemHeight + padding * 2;
+		this.children.forEach(elem -> elem.width = width - padding * 2);
+		this.height = children.size() * (elemHeight + spacing) + padding * 2;
 	}
 	
 	public void toggleVisible() {
 		this.visible = !visible;
+	}
+	
+	@Override
+	public boolean isMouseOver(double mouseX, double mouseY) {
+		for (Element elem : children) {
+			if (elem.isMouseOver(mouseX, mouseY)) return true;
+		}
+		return false;
+	}
+	
+	@Override
+	public boolean mouseReleased(double mouseX, double mouseY, int button) {
+		return super.mouseReleased(mouseX, mouseY, button);
 	}
 
 	@Override
 	public List<? extends Element> children() {
 		return this.children;
 	}
-
-	@Override
-	public boolean isDragging() {
-		return false;
-	}
-
-	@Override
-	public void setDragging(boolean dragging) {}
-
-	@Override
-	public Element getFocused() {
-		return this.focused;
-	}
-
-	@Override
-	public void setFocused(Element focused) {
-		if (!(focused instanceof ListElementWidget)) return;
-		if (children.contains(focused)) {
-			this.focused = (ListElementWidget) focused;
-		}
-	}
-
 }

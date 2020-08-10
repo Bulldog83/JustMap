@@ -26,9 +26,7 @@ public class ListElementWidget implements Drawable, Element {
 	@Override
 	public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
 		if (isMouseOver(mouseX, mouseY)) {
-			RenderUtil.fill(matrices, x, y, width, height, 0x33FFFFFF);
-		} else {
-			RenderUtil.fill(matrices, x, y, width, height, 0x33666666);
+			RenderUtil.fill(matrices, x, y, x + width, y + height, 0x33FFFFFF);
 		}
 		RenderUtil.drawCenteredText(matrices, text, x + width / 2, y + height / 2 - 5, Colors.WHITE);
 	}

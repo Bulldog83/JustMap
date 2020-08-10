@@ -61,7 +61,6 @@ public class MapScreen extends Screen {
 			}
 		}
 		this.renderForeground(matrices);
-		super.render(matrices, mouseX, mouseY, delta);
 	}
 	
 	public void renderBackground(MatrixStack matrixStack) {

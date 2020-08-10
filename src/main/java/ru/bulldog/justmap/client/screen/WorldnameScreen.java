@@ -27,7 +27,6 @@ public class WorldnameScreen extends Screen {
 	
 	private final Screen parent;
 	private TextFieldWidget nameField;
-	private ButtonWidget saveButton;
 	private boolean success = false;
 	private int center;
 	private int frameWidth;
@@ -58,8 +57,7 @@ public class WorldnameScreen extends Screen {
 		}
 		Text defaultText = new LiteralText("Default");
 		this.nameField = new TextFieldWidget(textRenderer, x + 20, y + 50, frameWidth - 40, 20, defaultText);
-		this.saveButton = new ButtonWidget(center - 30, btnY, 60, 20, LangUtil.getText("gui", "save"), this::onPressSave);
-		this.addButton(saveButton);
+		this.addButton(new ButtonWidget(center - 30, btnY, 60, 20, LangUtil.getText("gui", "save"), this::onPressSave));
 		this.addChild(nameField);
 	}
 	
