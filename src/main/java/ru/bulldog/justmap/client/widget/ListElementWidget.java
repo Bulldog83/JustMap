@@ -4,7 +4,6 @@ import java.util.function.Supplier;
 
 import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.Element;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 
 import ru.bulldog.justmap.util.Colors;
@@ -25,11 +24,11 @@ public class ListElementWidget implements Drawable, Element {
 	}
 
 	@Override
-	public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+	public void render(int mouseX, int mouseY, float delta) {
 		if (isMouseOver(mouseX, mouseY)) {
-			RenderUtil.fill(matrices, x, y, x + width, y + height, 0x33FFFFFF);
+			RenderUtil.fill(x, y, x + width, y + height, 0x33FFFFFF);
 		}
-		RenderUtil.drawCenteredText(matrices, text, x + width / 2, y + height / 2 - 5, Colors.WHITE);
+		RenderUtil.drawCenteredText(text, x + width / 2, y + height / 2 - 5, Colors.WHITE);
 	}
 	
 	@Override
@@ -41,5 +40,4 @@ public class ListElementWidget implements Drawable, Element {
 	public boolean mouseReleased(double mouseX, double mouseY, int button) {
 		return this.onPress.get();
 	}
-
 }

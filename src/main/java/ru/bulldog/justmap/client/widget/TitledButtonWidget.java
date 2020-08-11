@@ -13,7 +13,7 @@ public class TitledButtonWidget<W extends AbstractButtonWidget> extends Abstract
 	private int spacing = 3;
 	
 	public TitledButtonWidget(TextRenderer font, W widget, int x, int y, int width, int height, String message, String title) {
-		super(x, y, width, height, new LiteralText(message));
+		super(x, y, width, height, message);
 		this.widget = widget;
 		this.title = title;
 		this.font = font;

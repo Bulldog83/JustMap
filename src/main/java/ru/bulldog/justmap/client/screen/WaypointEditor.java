@@ -70,7 +70,7 @@ public class WaypointEditor extends MapScreen {
 		int ex = x + padding;
 		int ey = y;
 		int ew = screenW - padding * 2;
-		this.nameField = new TitledWidget<>(font, new TextFieldWidget(font, 0, 0, ew - 30, 12, "Name"), ex, ey, ew, rowH, "", lang("name"));
+		this.nameField = new TitledButtonWidget<>(font, new TextFieldWidget(font, 0, 0, ew - 30, 12, "Name"), ex, ey, ew, rowH, "", lang("name"));
 		this.nameField.changeFocus(true);
 		this.nameField.widget.setMaxLength(48);
 		this.nameField.widget.setText(waypoint.name);

@@ -49,10 +49,10 @@ public class MapWidget implements Element, Drawable {
 	}
 
 	@Override
-	public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
-		RenderUtil.fill(matrices, x + border, y + border, bgW, bgH, 0xDD00AA00);
+	public void render(int mouseX, int mouseY, float delta) {
+		RenderUtil.fill(x + border, y + border, bgW, bgH, 0xDD00AA00);
 		if (map.getSkin() != null) {
-			map.getSkin().draw(matrices, x, y, width, height);
+			map.getSkin().draw(new MatrixStack(), x, y, width, height);
 		}
 	}
 	

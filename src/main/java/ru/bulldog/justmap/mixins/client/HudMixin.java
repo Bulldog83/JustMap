@@ -40,10 +40,10 @@ abstract class HudMixin extends DrawableHelper {
 	private int scaledWidth;
 	
 	@Inject(at = @At("RETURN"), method = "render")
-	public void draw(MatrixStack matrices, float delta, CallbackInfo info) {
+	public void draw(float delta, CallbackInfo info) {
 		if (!client.options.debugEnabled) {
-			JustMapClient.MAP.getRenderer().draw(matrices);
-			AdvancedInfo.getInstance().draw(matrices);
+			JustMapClient.MAP.getRenderer().draw();
+			AdvancedInfo.getInstance().draw();
 		}
 	}
 	

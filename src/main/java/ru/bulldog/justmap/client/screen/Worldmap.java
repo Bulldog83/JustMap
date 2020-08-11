@@ -135,17 +135,18 @@ public class Worldmap extends MapScreen implements IMap {
 	
 	private void addMapMenu() {
 		LangUtil langUtil = new LangUtil("gui.worldmap");
-		this.mapMenu = this.addChild(new DropDownListWidget(25, paddingTop + 2, 100, 22));
+		this.mapMenu = new DropDownListWidget(25, paddingTop + 2, 100, 22);
+		this.children.add(mapMenu);
 		this.mapMenu.addElement(new ListElementWidget(langUtil.getText("add_waypoint"), () -> {
 			JustMapClient.MAP.createWaypoint(world, centerPos);
 			return true;
 		}));
 		this.mapMenu.addElement(new ListElementWidget(langUtil.getText("set_map_pos"), () -> {
-			client.openScreen(new MapPositionScreen(this));
+			this.minecraft.openScreen(new MapPositionScreen(this));
 			return true;
 		}));
 		this.mapMenu.addElement(new ListElementWidget(langUtil.getText("open_map_config"), () -> {
-			client.openScreen(ConfigFactory.getConfigScreen(this));
+			this.minecraft.openScreen(ConfigFactory.getConfigScreen(this));
 			return true;
 		}));
 	}
@@ -159,7 +160,7 @@ public class Worldmap extends MapScreen implements IMap {
 		this.children.add(new ButtonWidget(width - 24, height / 2 - 21, 20, 20, "+", (b) -> changeScale(-0.25F)));
 		this.children.add(new ButtonWidget(width - 24, height / 2 + 1, 20, 20, "-", (b) -> changeScale(+0.25F)));		
 		this.children.add(new ButtonWidget(width - 24, height - paddingBottom - 22, 20, 20, "\u271C", (b) -> setCenterByPlayer()));
-		this.children.add(new ButtonWidget(4, paddingTop + 2, 20, 20, "\u2630", (b) -> minecraft.openScreen(ConfigFactory.getConfigScreen(this))));
+		this.children.add(new ButtonWidget(4, paddingTop + 2, 20, 20, "\u2630", (b) -> mapMenu.toggleVisible()));
 		this.children.add(new ButtonWidget(4, height - paddingBottom - 22, 20, 20, "\u2726", (b) -> minecraft.openScreen(new WaypointsList(this))));
 	}
 	

@@ -54,8 +54,7 @@ public class WorldnameScreen extends Screen {
 			btnY = (y + frameHeight) - 40;
 		}
 		this.nameField = new TextFieldWidget(font, x + 20, y + 50, frameWidth - 40, 20, "Default");
-		this.saveButton = new ButtonWidget(center - 30, btnY, 80, 20, LangUtil.getString("gui", "save"), this::onPressSave);
-		this.buttons.add(saveButton);
+		this.buttons.add(new ButtonWidget(center - 30, btnY, 80, 20, LangUtil.getString("gui", "save"), this::onPressSave));
 		this.children.add(nameField);
 	}
 	

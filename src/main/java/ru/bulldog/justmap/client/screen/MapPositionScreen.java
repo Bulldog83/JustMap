@@ -1,8 +1,8 @@
 package ru.bulldog.justmap.client.screen;
 
+import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 
 import ru.bulldog.justmap.client.JustMapClient;
@@ -27,11 +27,16 @@ public class MapPositionScreen extends Screen {
 	
 	@Override
 	public void init() {
-		this.addButton(new ButtonWidget(width / 2 - 85, height - 60, 80, 20, LangUtil.getText("gui", "save"), this::onPressSave));
-		this.addButton(new ButtonWidget(width / 2 + 5, height - 60, 80, 20, LangUtil.getText("gui", "reset"), this::onPressReset));
+		this.addButton(new ButtonWidget(width / 2 - 85, height - 60, 80, 20, LangUtil.getString("gui", "save"), this::onPressSave));
+		this.addButton(new ButtonWidget(width / 2 + 5, height - 60, 80, 20, LangUtil.getString("gui", "reset"), this::onPressReset));
 		this.mapHolder = this.addChild(new MapWidget(this, JustMapClient.MAP));
 	}
 	
+	private <T extends Element> T addChild(T element) {
+		this.children.add(element);
+		return element;
+	}
+
 	private void onPressReset(ButtonWidget button) {
 		this.mapHolder.resetPosition();
 	}
@@ -46,14 +51,14 @@ public class MapPositionScreen extends Screen {
 	}
 	
 	@Override
-	public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
-		fill(matrices, 0, 0, width, height, 0x66000000);
-		this.mapHolder.render(matrices, mouseX, mouseY, delta);
-		super.render(matrices, mouseX, mouseY, delta);
+	public void render(int mouseX, int mouseY, float delta) {
+		fill(0, 0, width, height, 0x66000000);
+		this.mapHolder.render(mouseX, mouseY, delta);
+		super.render(mouseX, mouseY, delta);
 	}
 
 	@Override
 	public void onClose() {
-		this.client.openScreen(parent);
+		this.minecraft.openScreen(parent);
 	}
 }
