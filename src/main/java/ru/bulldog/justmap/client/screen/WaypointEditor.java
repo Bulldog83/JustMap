@@ -1,7 +1,7 @@
 package ru.bulldog.justmap.client.screen;
 
 import ru.bulldog.justmap.JustMap;
-import ru.bulldog.justmap.client.widget.TitledWidget;
+import ru.bulldog.justmap.client.widget.TitledButtonWidget;
 import ru.bulldog.justmap.map.waypoint.Waypoint;
 import ru.bulldog.justmap.map.waypoint.WaypointKeeper;
 import ru.bulldog.justmap.map.waypoint.Waypoint.Icon;
@@ -35,7 +35,7 @@ public class WaypointEditor extends MapScreen {
 	private int padding = 10;
 	private int rowH = 20;
 	
-	private TitledWidget<TextFieldWidget> nameField;
+	private TitledButtonWidget<TextFieldWidget> nameField;
 	private CheckboxWidget isHidden;
 	private CheckboxWidget isTrackable;
 	private CheckboxWidget isRenderable;
@@ -70,7 +70,7 @@ public class WaypointEditor extends MapScreen {
 		int ex = x + padding;
 		int ey = y;
 		int ew = screenW - padding * 2;
-		this.nameField = new TitledWidget<>(font, new TextFieldWidget(font, 0, 0, ew - 30, 12, "Name"), ex, ey, ew, rowH, "", lang("name"));
+		this.nameField = new TitledButtonWidget<>(font, new TextFieldWidget(font, 0, 0, ew - 30, 12, "Name"), ex, ey, ew, rowH, "", lang("name"));
 		this.nameField.changeFocus(true);
 		this.nameField.widget.setMaxLength(48);
 		this.nameField.widget.setText(waypoint.name);

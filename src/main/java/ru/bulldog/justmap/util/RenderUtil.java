@@ -189,18 +189,6 @@ public class RenderUtil extends DrawableHelper {
 	}
 
 	public static void fill(Matrix4f matrix4f, double x, double y, double w, double h, int color) {
-		double o;
-		if (x < w) {
-			o = x;
-			x = w;
-			w = o;
-		}
-		if (y < h) {
-			o = y;
-			y = h;
-			h = o;
-		}
-
 		float a = (float)(color >> 24 & 255) / 255.0F;
 		float r = (float)(color >> 16 & 255) / 255.0F;
 		float g = (float)(color >> 8 & 255) / 255.0F;
