@@ -5,8 +5,8 @@ import com.google.common.collect.Ordering;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import ru.bulldog.justmap.advancedinfo.AdvancedInfo;
+import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.client.config.ClientParams;
-import ru.bulldog.justmap.client.render.MapRenderer;
 import ru.bulldog.justmap.enums.ScreenPosition;
 import ru.bulldog.justmap.util.Colors;
 
@@ -40,9 +40,9 @@ abstract class HudMixin extends DrawableHelper {
 	private int scaledWidth;
 	
 	@Inject(at = @At("RETURN"), method = "render")
-	public void draw(float tickDelta, CallbackInfo info) {
+	public void draw(float delta, CallbackInfo info) {
 		if (!client.options.debugEnabled) {
-			MapRenderer.getInstance().draw();
+			JustMapClient.MAP.getRenderer().draw();
 			AdvancedInfo.getInstance().draw();
 		}
 	}
@@ -53,7 +53,7 @@ abstract class HudMixin extends DrawableHelper {
 			int posX = this.scaledWidth;
 			int posY = ClientParams.positionOffset;
 			if (ClientParams.mapPosition == ScreenPosition.TOP_RIGHT) {
-				posX = MapRenderer.getInstance().getX();
+				posX = JustMapClient.MAP.getSkinX();
 			}
 			
 			this.drawMovedEffects(posX, posY);			
