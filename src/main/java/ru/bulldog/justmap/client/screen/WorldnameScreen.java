@@ -57,7 +57,7 @@ public class WorldnameScreen extends Screen {
 		}
 		Text defaultText = new LiteralText("Default");
 		this.nameField = new TextFieldWidget(textRenderer, x + 20, y + 50, frameWidth - 40, 20, defaultText);
-		this.addButton(new ButtonWidget(center - 30, btnY, 60, 20, LangUtil.getText("gui", "save"), this::onPressSave));
+		this.addButton(new ButtonWidget(center - 30, btnY, 80, 20, LangUtil.getText("gui", "save"), this::onPressSave));
 		this.addChild(nameField);
 	}
 	

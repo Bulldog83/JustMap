@@ -10,20 +10,25 @@ import ru.bulldog.justmap.util.RenderUtil;
 
 public class MapWidget implements Element, Drawable {
 
-	final Screen parent;
 	final Minimap map;
-	int top, left, right, bottom;
+	int left, right;
+	int top, bottom;
 	int width, height;
+	int bgW, bgH;
+	int border;
+	double initX, initY;
 	double x, y;
 	
 	public MapWidget(Screen parent, Minimap map) {
-		this.parent = parent;
 		this.map = map;
-		this.x = map.getSkinX();
-		this.y = map.getSkinY();
-		int border = map.getBorder();
+		this.initX = x = map.getSkinX();
+		this.initY = y = map.getSkinY();
+		this.border = map.getBorder();
 		this.width = map.getWidth() + border * 2;
 		this.height = map.getHeight() + border * 2;
+		this.bgW = width - border * 2;
+		this.bgH = height - border * 2;
+
 		int offset = map.getOffset();
 		this.top = right = offset;
 		this.left = parent.width - width - offset;
@@ -37,10 +42,15 @@ public class MapWidget implements Element, Drawable {
 	public int getY() {
 		return (int) this.y;
 	}
+	
+	public void resetPosition() {
+		this.x = initX;
+		this.y = initY;
+	}
 
 	@Override
 	public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
-		RenderUtil.fill(matrices, x, y, width, height, 0x9900AA00);
+		RenderUtil.fill(matrices, x + border, y + border, bgW, bgH, 0xDD00AA00);
 		if (map.getSkin() != null) {
 			map.getSkin().draw(matrices, x, y, width, height);
 		}
@@ -61,9 +71,9 @@ public class MapWidget implements Element, Drawable {
 		this.x += deltaX;
 		this.y += deltaY;
 		
+		if (x > left) x = left;
 		if (x < right) x = right;
 		if (y < top) y = top;
-		if (x > left) x = left;
 		if (y > bottom) y = bottom;
 		
 		return true;

@@ -1,23 +1,24 @@
 package ru.bulldog.justmap.client.widget;
 
-import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
+
 import ru.bulldog.justmap.util.Colors;
 import ru.bulldog.justmap.util.RenderUtil;
 
 public class ListElementWidget implements Drawable, Element {
 	
+	private final Supplier<Boolean> onPress;
 	private Text text;
-	private final Consumer<ListElementWidget> onPress;
 	int padding = 2;
 	int width, height;
 	int x, y;
 	
-	public ListElementWidget(Text text, Consumer<ListElementWidget> action) {
+	public ListElementWidget(Text text, Supplier<Boolean> action) {
 		this.width = RenderUtil.getWidth(text) + padding * 2;
 		this.onPress = action;
 		this.text = text;
@@ -38,8 +39,7 @@ public class ListElementWidget implements Drawable, Element {
 	
 	@Override
 	public boolean mouseReleased(double mouseX, double mouseY, int button) {
-		this.onPress.accept(this);
-		return true;
+		return this.onPress.get();
 	}
 
 }

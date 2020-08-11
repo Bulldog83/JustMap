@@ -129,18 +129,25 @@ public class Worldmap extends MapScreen implements IMap {
 			}
 		}
 		
-		LangUtil langUtil = new LangUtil("gui");
-		this.mapMenu = this.addChild(new DropDownListWidget(25, paddingTop + 2, 100, 22));
-		this.mapMenu.addElement(new ListElementWidget(langUtil.getText("worldmap.add_waypoint"), elem -> {
-			JustMapClient.MAP.createWaypoint(world, centerPos);
-		}));
-		this.mapMenu.addElement(new ListElementWidget(langUtil.getText("worldmap.set_map_pos"), elem -> {
-			client.openScreen(new MapPositionScreen(this));
-		}));
-		this.mapMenu.addElement(new ListElementWidget(langUtil.getText("worldmap.open_map_config"), elem -> {
-			client.openScreen(ConfigFactory.getConfigScreen(this));
-		}));
+		this.addMapMenu();
 		this.addMapButtons();
+	}
+	
+	private void addMapMenu() {
+		LangUtil langUtil = new LangUtil("gui.worldmap");
+		this.mapMenu = this.addChild(new DropDownListWidget(25, paddingTop + 2, 100, 22));
+		this.mapMenu.addElement(new ListElementWidget(langUtil.getText("add_waypoint"), () -> {
+			JustMapClient.MAP.createWaypoint(world, centerPos);
+			return true;
+		}));
+		this.mapMenu.addElement(new ListElementWidget(langUtil.getText("set_map_pos"), () -> {
+			client.openScreen(new MapPositionScreen(this));
+			return true;
+		}));
+		this.mapMenu.addElement(new ListElementWidget(langUtil.getText("open_map_config"), () -> {
+			client.openScreen(ConfigFactory.getConfigScreen(this));
+			return true;
+		}));
 	}
 	
 	private void addMapButtons() {
