@@ -5,10 +5,11 @@ import com.google.common.collect.Ordering;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import ru.bulldog.justmap.advancedinfo.AdvancedInfo;
+import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.client.config.ClientParams;
-import ru.bulldog.justmap.client.render.MapRenderer;
 import ru.bulldog.justmap.enums.ScreenPosition;
 import ru.bulldog.justmap.util.Colors;
+
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.hud.InGameHud;
@@ -40,23 +41,23 @@ abstract class HudMixin extends DrawableHelper {
 	private int scaledWidth;
 	
 	@Inject(at = @At("RETURN"), method = "render")
-	public void draw(MatrixStack matrixStack, float delta, CallbackInfo info) {
+	public void draw(MatrixStack matrices, float delta, CallbackInfo info) {
 		if (!client.options.debugEnabled) {
-			MapRenderer.getInstance().draw(matrixStack);
-			AdvancedInfo.getInstance().draw(matrixStack);
+			JustMapClient.MAP.getRenderer().draw(matrices);
+			AdvancedInfo.getInstance().draw(matrices);
 		}
 	}
 	
 	@Inject(at = @At("HEAD"), method = "renderStatusEffectOverlay", cancellable = true)
-	protected void renderStatusEffects(MatrixStack matrixStack, CallbackInfo info) {
+	protected void renderStatusEffects(MatrixStack matrices, CallbackInfo info) {
 		if (ClientParams.moveEffects) {
 			int posX = this.scaledWidth;
 			int posY = ClientParams.positionOffset;
 			if (ClientParams.mapPosition == ScreenPosition.TOP_RIGHT) {
-				posX = MapRenderer.getInstance().getX();
+				posX = JustMapClient.MAP.getSkinX();
 			}
 			
-			this.drawMovedEffects(matrixStack, posX, posY);			
+			this.drawMovedEffects(matrices, posX, posY);			
 			info.cancel();
 		}
 	}
