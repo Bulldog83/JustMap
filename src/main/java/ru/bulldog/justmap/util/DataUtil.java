@@ -16,8 +16,8 @@ import net.minecraft.world.dimension.Dimension;
 import net.minecraft.world.dimension.DimensionType;
 
 import ru.bulldog.justmap.client.JustMapClient;
+import ru.bulldog.justmap.client.screen.Worldmap;
 import ru.bulldog.justmap.map.IMap;
-import ru.bulldog.justmap.map.Worldmap;
 import ru.bulldog.justmap.map.data.Layer;
 
 public class DataUtil {

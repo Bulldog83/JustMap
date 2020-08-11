@@ -1,4 +1,4 @@
-package ru.bulldog.justmap.map;
+package ru.bulldog.justmap.client.screen;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,12 +20,14 @@ import net.minecraft.util.math.Direction;
 import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.client.config.ConfigFactory;
-import ru.bulldog.justmap.client.screen.MapScreen;
-import ru.bulldog.justmap.client.screen.WaypointsList;
+import ru.bulldog.justmap.client.widget.DropDownListWidget;
+import ru.bulldog.justmap.client.widget.ListElementWidget;
 import ru.bulldog.justmap.map.data.Layer;
 import ru.bulldog.justmap.map.data.WorldData;
 import ru.bulldog.justmap.map.data.WorldKey;
 import ru.bulldog.justmap.map.data.WorldManager;
+import ru.bulldog.justmap.map.IMap;
+import ru.bulldog.justmap.map.MapPlayerManager;
 import ru.bulldog.justmap.map.data.ChunkData;
 import ru.bulldog.justmap.map.data.RegionData;
 import ru.bulldog.justmap.map.icon.PlayerIcon;
@@ -35,6 +37,7 @@ import ru.bulldog.justmap.map.waypoint.WaypointKeeper;
 import ru.bulldog.justmap.util.Colors;
 import ru.bulldog.justmap.util.DataUtil;
 import ru.bulldog.justmap.util.DimensionUtil;
+import ru.bulldog.justmap.util.LangUtil;
 import ru.bulldog.justmap.util.PosUtil;
 import ru.bulldog.justmap.util.RuleUtil;
 import ru.bulldog.justmap.util.math.MathUtil;
@@ -67,6 +70,7 @@ public class Worldmap extends MapScreen implements IMap {
 	private long updateInterval = 50;
 	private long updated = 0;
 	private int mapLevel = 0;
+	private DropDownListWidget mapMenu;
 	private WorldData worldData;
 	private WorldKey world;
 	private BlockPos centerPos;
@@ -97,7 +101,6 @@ public class Worldmap extends MapScreen implements IMap {
 		}
 		this.cursorCoords = PosUtil.posToString(centerPos);
 
-		this.addMapButtons();
 		this.updateScale();
 
 		if (DimensionUtil.isNether(world.getDimension())) {
@@ -125,6 +128,26 @@ public class Worldmap extends MapScreen implements IMap {
 				this.players.add(new PlayerIcon(this, player));
 			}
 		}
+		
+		this.addMapMenu();
+		this.addMapButtons();
+	}
+	
+	private void addMapMenu() {
+		LangUtil langUtil = new LangUtil("gui.worldmap");
+		this.mapMenu = this.addChild(new DropDownListWidget(25, paddingTop + 2, 100, 22));
+		this.mapMenu.addElement(new ListElementWidget(langUtil.getText("add_waypoint"), () -> {
+			JustMapClient.MAP.createWaypoint(world, centerPos);
+			return true;
+		}));
+		this.mapMenu.addElement(new ListElementWidget(langUtil.getText("set_map_pos"), () -> {
+			client.openScreen(new MapPositionScreen(this));
+			return true;
+		}));
+		this.mapMenu.addElement(new ListElementWidget(langUtil.getText("open_map_config"), () -> {
+			client.openScreen(ConfigFactory.getConfigScreen(this));
+			return true;
+		}));
 	}
 	
 	private void addMapButtons() {
