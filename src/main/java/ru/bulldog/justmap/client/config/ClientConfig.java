@@ -33,6 +33,8 @@ public class ClientConfig extends Config {
 		KEEPER.registerEntry("map_position", new EnumEntry<ScreenPosition>(ClientParams.mapPosition, (e) -> ClientParams.mapPosition = e, () -> ClientParams.mapPosition));
 		KEEPER.registerEntry("arrow_type", new EnumEntry<ArrowType>(ClientParams.arrowIconType, (e) -> ClientParams.arrowIconType = e, () -> ClientParams.arrowIconType));
 		KEEPER.registerEntry("map_offset", new IntegerEntry(ClientParams.positionOffset, (i) -> ClientParams.positionOffset = i, () -> ClientParams.positionOffset));
+		KEEPER.registerEntry("map_position_x", new IntegerEntry(ClientParams.mapPositionX, (i) -> ClientParams.mapPositionX = i, () -> ClientParams.mapPositionX));
+		KEEPER.registerEntry("map_position_y", new IntegerEntry(ClientParams.mapPositionY, (i) -> ClientParams.mapPositionY = i, () -> ClientParams.mapPositionY));
 		KEEPER.registerEntry("map_size", new IntegerRange(ClientParams.mapSize, (i) -> ClientParams.mapSize = i, () -> ClientParams.mapSize, 16, 256));
 		KEEPER.registerEntry("big_map_size", new IntegerRange(ClientParams.bigMapSize, (i) -> ClientParams.bigMapSize = i, () -> ClientParams.bigMapSize, 256, 400));
 		KEEPER.registerEntry("map_scale", new FloatRange(ClientParams.mapScale, (f) -> ClientParams.mapScale = f, () -> ClientParams.mapScale, 0.25F, 2.0F));

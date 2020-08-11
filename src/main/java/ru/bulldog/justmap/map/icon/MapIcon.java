@@ -17,6 +17,7 @@ public abstract class MapIcon<T extends MapIcon<T>> {
 	protected Point iconPos;
 	protected boolean allowRender = true;
 	protected int lastMapX, lastMapY;
+	protected double lastOffX, lastOffY;
 	protected double lastX, lastY;
 	protected double x, y;
 	
@@ -34,7 +35,7 @@ public abstract class MapIcon<T extends MapIcon<T>> {
 	protected void updatePos(int size, int mapX, int mapY, double offX, double offY, float rotation) {
 		int mapW = map.getWidth();
 		int mapH = map.getHeight();
-		if (iconPos == null || x != lastX || y != lastY || mapX != lastMapX || mapY != lastMapY) {
+		if (iconPos == null || x != lastX || y != lastY || mapX != lastMapX || mapY != lastMapY || offX != lastOffX || offY != lastOffY) {
 			this.iconPos = new Point(mapX + x, mapY + y);
 			this.iconPos.x -= size / 2 + offX;
 			this.iconPos.y -= size / 2 + offY;
@@ -61,6 +62,8 @@ public abstract class MapIcon<T extends MapIcon<T>> {
 				
 				this.allowRender = false;
 			}
+			this.lastOffX = offX;
+			this.lastOffY = offY;
 			this.lastMapX = mapX;
 			this.lastMapY = mapY;
 			this.lastX = x;

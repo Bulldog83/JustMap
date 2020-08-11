@@ -48,6 +48,7 @@ public class TextManager {
 		int screenW = minecraft.getWindow().getScaledWidth();
 		int screenH = minecraft.getWindow().getScaledHeight();
 		switch(position) {
+			case USER_DEFINED:
 			case TOP_LEFT:
 				this.updatePosition(TextPosition.RIGHT, offset, offset);
 				break;
@@ -76,7 +77,6 @@ public class TextManager {
 						screenW - offset, screenH - offset - spacing);
 				break;
 		}
-		
 		return this;
 	}
 	

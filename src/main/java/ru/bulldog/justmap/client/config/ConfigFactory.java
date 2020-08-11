@@ -6,7 +6,7 @@ import me.shedaniel.clothconfig2.api.ConfigBuilder;
 import me.shedaniel.clothconfig2.api.ConfigCategory;
 import me.shedaniel.clothconfig2.api.ConfigEntryBuilder;
 import me.shedaniel.clothconfig2.impl.builders.EnumSelectorBuilder;
-
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
@@ -19,11 +19,13 @@ import ru.bulldog.justmap.enums.MultiworldDetection;
 import ru.bulldog.justmap.enums.ArrowType;
 import ru.bulldog.justmap.map.minimap.Minimap;
 import ru.bulldog.justmap.map.minimap.skin.MapSkin;
+import ru.bulldog.justmap.util.DataUtil;
 import ru.bulldog.justmap.util.LangUtil;
 
 public final class ConfigFactory {
 	
 	private final static ClientConfig modConfig = JustMapClient.CONFIG;
+	private final static MinecraftClient minecraft = DataUtil.getMinecraft();
 	
 	private static Text lang(String key) {
 		return LangUtil.getText("configuration", key);
@@ -51,10 +53,22 @@ public final class ConfigFactory {
 		mwDetectEntry.setSaveConsumer(val -> mwDetectConfig.setValue(val))
 					 .setDefaultValue(mwDetectConfig.getDefault());
 		
+		int offset = modConfig.getInt("map_offset");
+		int maxX = minecraft.getWindow().getScaledWidth();
+		int maxY = minecraft.getWindow().getScaledHeight();
+		
 		general.addEntry(drawPosEntry.build());
-		general.addEntry(entryBuilder.startIntField(lang("map_offset"), modConfig.getInt("map_offset"))
+		general.addEntry(entryBuilder.startIntField(lang("map_offset"), offset)
 				.setSaveConsumer(val -> modConfig.setInt("map_offset", val))
 				.setDefaultValue((int) modConfig.getDefault("map_offset"))
+				.build());
+		general.addEntry(entryBuilder.startIntSlider(lang("map_position_x"), modConfig.getInt("map_position_x"), offset, maxX)
+				.setSaveConsumer(val -> modConfig.setInt("map_position_x", val))
+				.setDefaultValue((int) modConfig.getDefault("map_position_x"))
+				.build());
+		general.addEntry(entryBuilder.startIntSlider(lang("map_position_y"), modConfig.getInt("map_position_y"), offset, maxY)
+				.setSaveConsumer(val -> modConfig.setInt("map_position_y", val))
+				.setDefaultValue((int) modConfig.getDefault("map_position_y"))
 				.build());
 		general.addEntry(entryBuilder.startDropdownMenu(lang("map_size"), modConfig.getInt("map_size"), (val) -> {
 					return getIntValue(val, (int) modConfig.getDefault("map_size"));
@@ -293,11 +307,21 @@ public final class ConfigFactory {
 		
 		EnumEntry<ScreenPosition> infoPosConfig = modConfig.getEntry("info_position");
 		EnumSelectorBuilder<ScreenPosition> infoPosEntry = entryBuilder.startEnumSelector(lang("info_position"), ScreenPosition.class, infoPosConfig.getValue());
-		infoPosEntry.setSaveConsumer(val -> infoPosConfig.setValue(val))
-					.setDefaultValue(infoPosConfig.getDefault());
+		infoPosEntry.setSaveConsumer(val -> {
+					if (val == ScreenPosition.USER_DEFINED) {
+						val = infoPosConfig.getDefault();
+					}
+					infoPosConfig.setValue(val);
+				})
+				.setDefaultValue(infoPosConfig.getDefault());
 		EnumEntry<ScreenPosition> itemsPosConfig = modConfig.getEntry("items_position");
 		EnumSelectorBuilder<ScreenPosition> itemsPosEntry = entryBuilder.startEnumSelector(lang("equipment_position"), ScreenPosition.class, itemsPosConfig.getValue());
-		itemsPosEntry.setSaveConsumer(val -> itemsPosConfig.setValue(val))
+		itemsPosEntry.setSaveConsumer(val -> {
+			if (val == ScreenPosition.USER_DEFINED) {
+				val = itemsPosConfig.getDefault();
+			}
+			itemsPosConfig.setValue(val);
+		})
 		.setDefaultValue(itemsPosConfig.getDefault());
 		
 		ConfigCategory mapInfo = configBuilder.getOrCreateCategory(lang("category.info"));
