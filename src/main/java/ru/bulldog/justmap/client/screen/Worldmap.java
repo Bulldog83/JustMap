@@ -1,4 +1,4 @@
-package ru.bulldog.justmap.map;
+package ru.bulldog.justmap.client.screen;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,12 +20,14 @@ import net.minecraft.util.math.Direction;
 import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.client.config.ConfigFactory;
-import ru.bulldog.justmap.client.screen.MapScreen;
-import ru.bulldog.justmap.client.screen.WaypointsList;
+import ru.bulldog.justmap.client.widget.DropDownListWidget;
+import ru.bulldog.justmap.client.widget.ListElementWidget;
 import ru.bulldog.justmap.map.data.Layer;
 import ru.bulldog.justmap.map.data.WorldData;
 import ru.bulldog.justmap.map.data.WorldKey;
 import ru.bulldog.justmap.map.data.WorldManager;
+import ru.bulldog.justmap.map.IMap;
+import ru.bulldog.justmap.map.MapPlayerManager;
 import ru.bulldog.justmap.map.data.ChunkData;
 import ru.bulldog.justmap.map.data.RegionData;
 import ru.bulldog.justmap.map.icon.PlayerIcon;
@@ -35,6 +37,7 @@ import ru.bulldog.justmap.map.waypoint.WaypointKeeper;
 import ru.bulldog.justmap.util.Colors;
 import ru.bulldog.justmap.util.DataUtil;
 import ru.bulldog.justmap.util.Dimension;
+import ru.bulldog.justmap.util.LangUtil;
 import ru.bulldog.justmap.util.PosUtil;
 import ru.bulldog.justmap.util.RuleUtil;
 import ru.bulldog.justmap.util.math.MathUtil;
@@ -67,6 +70,7 @@ public class Worldmap extends MapScreen implements IMap {
 	private long updateInterval = 50;
 	private long updated = 0;
 	private int mapLevel = 0;
+	private DropDownListWidget mapMenu;
 	private WorldData worldData;
 	private WorldKey world;
 	private BlockPos centerPos;
@@ -97,7 +101,6 @@ public class Worldmap extends MapScreen implements IMap {
 		}
 		this.cursorCoords = PosUtil.posToString(centerPos);
 
-		this.addMapButtons();
 		this.updateScale();
 
 		if (Dimension.isNether(world.getDimension())) {
@@ -125,19 +128,39 @@ public class Worldmap extends MapScreen implements IMap {
 				this.players.add(new PlayerIcon(this, player));
 			}
 		}
+		
+		this.addMapMenu();
+		this.addMapButtons();
+	}
+	
+	private void addMapMenu() {
+		LangUtil langUtil = new LangUtil("gui.worldmap");
+		this.mapMenu = this.addChild(new DropDownListWidget(25, paddingTop + 2, 100, 22));
+		this.mapMenu.addElement(new ListElementWidget(langUtil.getText("add_waypoint"), () -> {
+			JustMapClient.MAP.createWaypoint(world, centerPos);
+			return true;
+		}));
+		this.mapMenu.addElement(new ListElementWidget(langUtil.getText("set_map_pos"), () -> {
+			client.openScreen(new MapPositionScreen(this));
+			return true;
+		}));
+		this.mapMenu.addElement(new ListElementWidget(langUtil.getText("open_map_config"), () -> {
+			client.openScreen(ConfigFactory.getConfigScreen(this));
+			return true;
+		}));
 	}
 	
 	private void addMapButtons() {
-		this.children.add(new ButtonWidget(width - 24, 10, 20, 20, new LiteralText("x"), (b) -> onClose()));		
-		this.children.add(new ButtonWidget(width / 2 - 10, height - paddingBottom - 44, 20, 20, new LiteralText("\u2191"), (b) -> moveMap(Direction.NORTH)));
-		this.children.add(new ButtonWidget(width / 2 - 10, height - paddingBottom - 22, 20, 20, new LiteralText("\u2193"), (b) -> moveMap(Direction.SOUTH)));
-		this.children.add(new ButtonWidget(width / 2 - 32, height - paddingBottom - 32, 20, 20, new LiteralText("\u2190"), (b) -> moveMap(Direction.WEST)));
-		this.children.add(new ButtonWidget(width / 2 + 12, height - paddingBottom - 32, 20, 20, new LiteralText("\u2192"), (b) -> moveMap(Direction.EAST)));		
-		this.children.add(new ButtonWidget(width - 24, height / 2 - 21, 20, 20, new LiteralText("+"), (b) -> changeScale(-0.25F)));
-		this.children.add(new ButtonWidget(width - 24, height / 2 + 1, 20, 20, new LiteralText("-"), (b) -> changeScale(+0.25F)));		
-		this.children.add(new ButtonWidget(width - 24, height - paddingBottom - 22, 20, 20, new LiteralText("\u271C"), (b) -> setCenterByPlayer()));
-		this.children.add(new ButtonWidget(4, paddingTop + 2, 20, 20, new LiteralText("\u2630"), (b) -> client.openScreen(ConfigFactory.getConfigScreen(this))));
-		this.children.add(new ButtonWidget(4, height - paddingBottom - 22, 20, 20, new LiteralText("\u2726"), (b) -> client.openScreen(new WaypointsList(this))));
+		this.addButton(new ButtonWidget(width - 24, 10, 20, 20, new LiteralText("x"), (b) -> onClose()));		
+		this.addButton(new ButtonWidget(width / 2 - 10, height - paddingBottom - 44, 20, 20, new LiteralText("\u2191"), (b) -> moveMap(Direction.NORTH)));
+		this.addButton(new ButtonWidget(width / 2 - 10, height - paddingBottom - 22, 20, 20, new LiteralText("\u2193"), (b) -> moveMap(Direction.SOUTH)));
+		this.addButton(new ButtonWidget(width / 2 - 32, height - paddingBottom - 32, 20, 20, new LiteralText("\u2190"), (b) -> moveMap(Direction.WEST)));
+		this.addButton(new ButtonWidget(width / 2 + 12, height - paddingBottom - 32, 20, 20, new LiteralText("\u2192"), (b) -> moveMap(Direction.EAST)));		
+		this.addButton(new ButtonWidget(width - 24, height / 2 - 21, 20, 20, new LiteralText("+"), (b) -> changeScale(-0.25F)));
+		this.addButton(new ButtonWidget(width - 24, height / 2 + 1, 20, 20, new LiteralText("-"), (b) -> changeScale(+0.25F)));		
+		this.addButton(new ButtonWidget(width - 24, height - paddingBottom - 22, 20, 20, new LiteralText("\u271C"), (b) -> setCenterByPlayer()));
+		this.addButton(new ButtonWidget(4, paddingTop + 2, 20, 20, new LiteralText("\u2630"), (b) -> mapMenu.toggleVisible()));
+		this.addButton(new ButtonWidget(4, height - paddingBottom - 22, 20, 20, new LiteralText("\u2726"), (b) -> client.openScreen(new WaypointsList(this))));
 	}
 	
 	@Override

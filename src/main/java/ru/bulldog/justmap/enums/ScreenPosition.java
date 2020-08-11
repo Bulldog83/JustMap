@@ -7,7 +7,8 @@ public enum ScreenPosition {
 	MIDDLE_LEFT,
 	MIDDLE_RIGHT,
 	BOTTOM_LEFT,
-	BOTTOM_RIGHT;
+	BOTTOM_RIGHT,
+	USER_DEFINED;
   
 	public static ScreenPosition get(int i) {
 		return values()[i];
