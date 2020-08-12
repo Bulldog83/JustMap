@@ -111,14 +111,22 @@ public class DataUtil {
 		return currentPos.set(coordX, coordY, coordZ);
 	}
 	
-	public static double doubleX() {
-		Entity posEntity = getPosEntity();
+	public static double doubleX(Entity posEntity) {
+		if (posEntity == null) return 0.0;
 		return posEntity.prevX + (posEntity.getX() - posEntity.prevX) * (double) minecraft.getTickDelta();
 	}
 
-	public static double doubleZ() {
-		Entity posEntity = getPosEntity();
+	public static double doubleZ(Entity posEntity) {
+		if (posEntity == null) return 0.0;
 		return posEntity.prevZ + (posEntity.getZ() - posEntity.prevZ) * (double) minecraft.getTickDelta();
+	}
+	
+	public static double doubleX() {
+		return doubleX(getPosEntity());
+	}
+	
+	public static double doubleZ() {
+		return doubleZ(getPosEntity());
 	}
 
 	static boolean hasSkyLight(World world, BlockPos pos) {

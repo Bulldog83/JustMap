@@ -17,7 +17,6 @@ public abstract class MapIcon<T extends MapIcon<T>> {
 	protected Point iconPos;
 	protected boolean allowRender = true;
 	protected int lastMapX, lastMapY;
-	protected double lastOffX, lastOffY;
 	protected double lastX, lastY;
 	protected double x, y;
 	
@@ -32,15 +31,14 @@ public abstract class MapIcon<T extends MapIcon<T>> {
 		this.y = y;
 	}
 	
-	protected void updatePos(int size, int mapX, int mapY, double offX, double offY, float rotation) {
+	protected void updatePos(int size, int mapX, int mapY, float rotation) {
 		int mapW = map.getWidth();
 		int mapH = map.getHeight();
-		if (iconPos == null || x != lastX || y != lastY || mapX != lastMapX || mapY != lastMapY || offX != lastOffX || offY != lastOffY) {
+		if (iconPos == null || x != lastX || y != lastY || mapX != lastMapX || mapY != lastMapY) {
 			this.iconPos = new Point(mapX + x, mapY + y);
-			this.iconPos.x -= size / 2 + offX;
-			this.iconPos.y -= size / 2 + offY;
+			this.iconPos.x -= size / 2;
+			this.iconPos.y -= size / 2;
 			this.allowRender = true;
-			this.correctRotation(mapW, mapH, mapX, mapY, rotation);
 			if (Minimap.isRound()) {
 				int centerX = mapX + mapW / 2;
 				int centerY = mapY + mapH / 2;
@@ -62,8 +60,6 @@ public abstract class MapIcon<T extends MapIcon<T>> {
 				
 				this.allowRender = false;
 			}
-			this.lastOffX = offX;
-			this.lastOffY = offY;
 			this.lastMapX = mapX;
 			this.lastMapY = mapY;
 			this.lastX = x;
@@ -71,19 +67,5 @@ public abstract class MapIcon<T extends MapIcon<T>> {
 		}
 	}
 	
-	protected void correctRotation(int mapW, int mapH, int mapX, int mapY, float rotation) {
-		double centerX = mapX + mapW / 2.0;
-		double centerY = mapY + mapH / 2.0;
-		
-		rotation = MathUtil.correctAngle(rotation) + 180;
-		
-		double angle = Math.toRadians(-rotation);		
-		double posX = centerX + (iconPos.x - centerX) * Math.cos(angle) - (iconPos.y - centerY) * Math.sin(angle);
-		double posY = centerY + (iconPos.y - centerY) * Math.cos(angle) + (iconPos.x - centerX) * Math.sin(angle);
-		
-		this.iconPos.x = posX;
-		this.iconPos.y = posY;
-	}
-	
-	public abstract void draw(MatrixStack matrixStack, VertexConsumerProvider consumerProvider, int mapX, int mapY, double offX, double offY, float rotation);
+	public abstract void draw(MatrixStack matrixStack, VertexConsumerProvider consumerProvider, int mapX, int mapY, float rotation);
 }

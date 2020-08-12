@@ -7,18 +7,22 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import ru.bulldog.justmap.JustMap;
+import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.client.render.Image;
 import ru.bulldog.justmap.map.data.WorldKey;
 import ru.bulldog.justmap.util.ColorUtil;
 import ru.bulldog.justmap.util.Colors;
+import ru.bulldog.justmap.util.DataUtil;
 import ru.bulldog.justmap.util.Dimension;
 import ru.bulldog.justmap.util.ImageUtil;
 import ru.bulldog.justmap.util.PosUtil;
+import ru.bulldog.justmap.util.math.MathUtil;
 import ru.bulldog.justmap.util.math.RandomUtil;
-
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.texture.NativeImageBackedTexture;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.client.util.math.Vector3f;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.JsonHelper;
 import net.minecraft.util.math.BlockPos;
@@ -185,6 +189,7 @@ public class Waypoint {
 		
 		public final static Identifier DEFAULT_ICON = new Identifier(JustMap.MODID, "textures/icon/default.png");
 		private final static NativeImage DEFAULT_TEXTURE = ImageUtil.loadImage(DEFAULT_ICON, 18, 18);
+		private final static MinecraftClient minecraft = DataUtil.getMinecraft();
 		
 		public final int key;
 		public final int color;
@@ -225,9 +230,9 @@ public class Waypoint {
 		}
 		
 		@Override
-		public void draw(MatrixStack matrix, double x, double y, int w, int h) {
+		public void draw(MatrixStack matrices, double x, double y, int w, int h) {
 			this.bindTexture();
-			this.draw(matrix, x, y, (float) w, (float) h);
+			this.draw(matrices, x, y, (float) w, (float) h);
 		}
 		
 		private Identifier getColoredTexture() {

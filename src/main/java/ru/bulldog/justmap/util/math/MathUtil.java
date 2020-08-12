@@ -64,7 +64,7 @@ public class MathUtil {
 	}
 	
 	public static int worldPos(double val, double x1, double x2, double range) {
-		return (int) Math.round((val * (x2 - x1) + range * x1) / range);
+		return (int) ((val * (x2 - x1) + range * x1) / range);
 	}
 
 	public static Point circlePos(Point pos, Point center, double angle) {
@@ -72,6 +72,55 @@ public class MathUtil {
 		int posY = (int) (center.y + (pos.y - center.y) * Math.cos(angle) + (pos.x - center.x) * Math.sin(angle));
 		
 		return new Point(posX, posY);
+	}
+	
+	public static Point getCross(Line line1, Line line2) {
+		double x1 = line1.first.x;
+		double x2 = line1.second.x;
+		double x3 = line2.first.x;
+		double x4 = line2.second.x;
+		double y1, y2, y3, y4;
+		if (x1 >= x2) {
+			x1 = line1.second.x;
+			y1 = line1.second.y;
+			x2 = line1.first.x;
+			y2 = line1.first.y;
+		} else {
+			y1 = line1.first.y;
+			y2 = line1.second.y;
+		}
+		if (x3 >= x4) {
+			x3 = line2.second.x;
+			y3 = line2.second.y;
+			x4 = line2.first.x;
+			y4 = line2.first.y;
+		} else {
+			y3 = line2.first.y;
+			y4 = line2.second.y;
+		}
+		if (x1 <= x4 && x4 <= x2 || x1 <= x3 && x3 <= x2) {
+			float k1, k2;
+			if (x1 == x2 || y1 == y2) {
+				k1 = 0;
+			} else {
+				k1 = (float) ((y2 - y1) / (x2 - x1));
+			}
+			if (x3 == x4 || y3 == y4) {
+				k2 = 0;
+			} else {
+				k2 = (float) ((y4 - y3) / (x4 - x3));
+			}
+			if (k1 == k2) return null;
+			
+			double b1 = y1 - k1 * x1;
+			double b2 = y3 - k2 * x3;
+			double x = (b2 - b1) / (k1 - k2);
+			double y = k1 * x + b1;
+			
+			return new Point(x, y);
+		}
+		
+		return null;
 	}
 	
 	public static double getDistance(BlockPos a, BlockPos b) {

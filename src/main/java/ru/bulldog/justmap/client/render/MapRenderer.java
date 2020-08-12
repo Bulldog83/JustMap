@@ -37,14 +37,15 @@ import net.minecraft.util.math.BlockPos;
 @Environment(EnvType.CLIENT)
 public class MapRenderer {
 	
+	private final static MinecraftClient minecraft = DataUtil.getMinecraft();
+	private final static Identifier roundMask = new Identifier(JustMap.MODID, "textures/round_mask.png");
+	
 	private int mapX, mapY;
 	private int winWidth, winHeight;
 	private int mapWidth, mapHeight;
 	private int imgX, imgY;
 	private int imgW, imgH;
 	private float rotation;
-	private int lastX;
-	private int lastZ;
 	private boolean mapRotation = false;
 
 	private final Minimap minimap;
@@ -56,9 +57,6 @@ public class MapRenderer {
 	private InfoText dirS = new MapText(TextAlignment.CENTER, "S");
 	private InfoText dirE = new MapText(TextAlignment.CENTER, "E");
 	private InfoText dirW = new MapText(TextAlignment.CENTER, "W");
-	
-	private final MinecraftClient minecraft = DataUtil.getMinecraft();
-	private final Identifier roundMask = new Identifier(JustMap.MODID, "textures/round_mask.png");
 	
 	public MapRenderer(Minimap map) {
 		this.minimap = map;
@@ -174,18 +172,12 @@ public class MapRenderer {
 		RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
 		RenderSystem.disableDepthTest();
 		
-		if (minimap.posChanged) {
-			this.lastX = minimap.getLasX();
-			this.lastZ = minimap.getLastZ();
-			this.minimap.posChanged = false;
-		}
+		//GL11.glEnable(GL11.GL_SCISSOR_TEST);
+		//GL11.glScissor(scaledX, scaledY, scaledW, scaledH);
 		
-		GL11.glEnable(GL11.GL_SCISSOR_TEST);
-		GL11.glScissor(scaledX, scaledY, scaledW, scaledH);
-		
-		float mult = 1 / minimap.getScale();		
-		float offX = (float) (DataUtil.doubleX() - this.lastX) * mult;
-		float offY = (float) (DataUtil.doubleZ() - this.lastZ) * mult;
+		float mult = 1.0F / minimap.getScale();		
+		float offX = (float) (DataUtil.doubleX() - minimap.getLasX()) * mult;
+		float offY = (float) (DataUtil.doubleZ() - minimap.getLastZ()) * mult;
 		
 		if (Minimap.isRound()) {
 			RenderSystem.enableBlend();
@@ -193,32 +185,31 @@ public class MapRenderer {
 			RenderSystem.clearColor(0.0F, 0.0F, 0.0F, 0.0F);
 			RenderSystem.clear(GL11.GL_COLOR_BUFFER_BIT, false);
 			RenderSystem.colorMask(true, true, true, true);
-			RenderUtil.bindTexture(this.roundMask);
+			RenderUtil.bindTexture(roundMask);
 			RenderUtil.startDraw();
 			RenderUtil.addQuad(mapX, mapY, mapWidth, mapHeight);
 			RenderUtil.endDraw();
 			RenderSystem.blendFunc(GL11.GL_DST_ALPHA, GL11.GL_ONE_MINUS_DST_ALPHA);
 		}
 		
+		float moveX = imgX + imgW / 2;
+		float moveY = imgY + imgH / 2;
 		RenderSystem.pushMatrix();
 		if (mapRotation) {
-			float moveX = imgX + imgW / 2;
-			float moveY = imgY + imgH / 2;
 			RenderSystem.translatef(moveX, moveY, 0.0F);
 			RenderSystem.rotatef(-rotation + 180, 0, 0, 1.0F);
 			RenderSystem.translatef(-moveX, -moveY, 0.0F);
 		}
 		RenderSystem.translatef(-offX, -offY, 0.0F);		
 		this.drawMap();
-		RenderSystem.popMatrix();
-		
 		VertexConsumerProvider.Immediate consumerProvider = minecraft.getBufferBuilders().getEntityVertexConsumers();
 		for (MapIcon<?> icon : minimap.getDrawedIcons()) {
-			icon.draw(matrices, consumerProvider, mapX, mapY, offX, offY, rotation);
+			icon.draw(matrices, consumerProvider, mapX, mapY, rotation);
 		}
 		consumerProvider.draw();
+		RenderSystem.popMatrix();
 		
-		GL11.glDisable(GL11.GL_SCISSOR_TEST);
+		//GL11.glDisable(GL11.GL_SCISSOR_TEST);
 		
 		if (mapSkin != null) {
 			int skinX = minimap.getSkinX();
@@ -260,12 +251,11 @@ public class MapRenderer {
 			bottom = imgY + scaledH;
 		}
 		
-		float scale = minimap.getScale();
-		
 		BlockPos center = DataUtil.currentPos();
 		BlockPos.Mutable currentPos = new BlockPos.Mutable();
-		int cY = center.getY();
 		
+		int cY = center.getY();
+		float scale = minimap.getScale();
 		int picX = 0, picW = 0;
 		while(picX < scaledW) {
 			int cX = cornerX + picX;
@@ -281,8 +271,8 @@ public class MapRenderer {
 				int imgX = cX - (region.getX() << 9);
 				int imgY = cZ - (region.getZ() << 9);
 				
-				if (picX + picW >= right) picW = right - picX;
-				if (picY + picH >= bottom) picH = bottom - picY;
+				if (picX + picW >= right) picW = (int) (right - picX);
+				if (picY + picH >= bottom) picH = (int) (bottom - picY);
 				if (imgX + picW >= 512) picW = 512 - imgX;
 				if (imgY + picH >= 512) picH = 512 - imgY;
 				

@@ -217,8 +217,7 @@ public class RenderUtil extends DrawableHelper {
 		RenderSystem.disableBlend();
 	}
 	
-	public static void draw(double x, double y, float w, float h) {
-		MatrixStack matrices = new MatrixStack();		
+	public static void draw(MatrixStack matrices, double x, double y, float w, float h) {
 		startDrawNormal();
 		draw(matrices, vertexBuffer, x, y, w, h, 0.0F, 0.0F, 1.0F, 1.0F);
 		endDraw();

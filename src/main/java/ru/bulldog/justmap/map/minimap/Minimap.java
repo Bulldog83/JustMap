@@ -67,6 +67,8 @@ public class Minimap implements IMap {
 	private boolean rotateMap = false;
 	private boolean bigMap = false;
 	private float mapScale;
+	private int lastPosX;
+	private int lastPosZ;
 	private int skinX, skinY;
 	private int mapX, mapY;
 	private int offset;
@@ -76,10 +78,6 @@ public class Minimap implements IMap {
 	private int mapHeight;
 	private int scaledWidth;
 	private int scaledHeight;
-	private int lastPosX;
-	private int lastPosZ;
-
-	public boolean posChanged = false;
 
 	public Minimap() {
 		this.textManager = AdvancedInfo.getMapTextManager();
@@ -294,14 +292,13 @@ public class Minimap implements IMap {
 		if (lastPosX != posX || lastPosZ != posZ) {
 			this.lastPosX = posX;
 			this.lastPosZ = posZ;
-			this.posChanged = true;
 		}
 
 		if (ClientParams.rotateMap) {
 			scaledW = (int) (mapWidth * mapScale);
 			scaledH = (int) (mapHeight * mapScale);
-			startX = posX - scaledW / 2;
-			startZ = posZ - scaledH / 2;
+			startX = posX - (double) scaledW / 2;
+			startZ = posZ - (double) scaledH / 2;
 		}
 
 		double endX = startX + scaledW;
@@ -316,11 +313,8 @@ public class Minimap implements IMap {
 		
 			int amount = 0;				
 			for (Entity entity : entities) {
-				float tick = minecraft.getTickDelta();
-				double entX = entity.prevX + (entity.getX() - entity.prevX) * tick;
-				double entZ = entity.prevZ + (entity.getZ() - entity.prevZ) * tick;
-				double iconX = MathUtil.screenPos(entX, startX, endX, mapWidth);
-				double iconY = MathUtil.screenPos(entZ, startZ, endZ, mapHeight);
+				double iconX = MathUtil.screenPos(DataUtil.doubleX(entity), startX, endX, mapWidth);
+				double iconY = MathUtil.screenPos(DataUtil.doubleZ(entity), startZ, endZ, mapHeight);
 				if (entity instanceof PlayerEntity && RuleUtil.allowPlayerRadar()) {
 					PlayerEntity pEntity = (PlayerEntity) entity;
 					if (pEntity == player) continue;
