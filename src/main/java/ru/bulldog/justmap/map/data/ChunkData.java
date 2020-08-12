@@ -17,6 +17,7 @@ import net.minecraft.world.chunk.WorldChunk;
 import net.minecraft.world.gen.ChunkRandom;
 
 import java.lang.ref.SoftReference;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -96,8 +97,15 @@ public class ChunkData {
 					this.levels.get(layer)[level] = chunkLevel;
 				}
 			} catch (ArrayIndexOutOfBoundsException ex) {
-				chunkLevel = EMPTY_LEVEL;
+				if (level < 0) {
+					chunkLevel = EMPTY_LEVEL;
+				} else {
+					ChunkLevel[] levels = this.levels.get(layer);
+					this.levels.replace(layer, Arrays.copyOf(levels, levels.length + 1));
+					chunkLevel = this.getChunkLevel(layer, level);
+				}
 			}
+
 			return chunkLevel;
 		}
 	}
