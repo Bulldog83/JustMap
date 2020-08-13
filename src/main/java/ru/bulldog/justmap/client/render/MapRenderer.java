@@ -15,6 +15,7 @@ import ru.bulldog.justmap.map.DirectionArrow;
 import ru.bulldog.justmap.map.MapPlayerManager;
 import ru.bulldog.justmap.map.data.WorldData;
 import ru.bulldog.justmap.map.icon.MapIcon;
+import ru.bulldog.justmap.map.icon.WaypointIcon;
 import ru.bulldog.justmap.map.data.RegionData;
 import ru.bulldog.justmap.map.minimap.Minimap;
 import ru.bulldog.justmap.map.minimap.skin.MapSkin;
@@ -172,8 +173,8 @@ public class MapRenderer {
 		RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
 		RenderSystem.disableDepthTest();
 		
-		//GL11.glEnable(GL11.GL_SCISSOR_TEST);
-		//GL11.glScissor(scaledX, scaledY, scaledW, scaledH);
+		GL11.glEnable(GL11.GL_SCISSOR_TEST);
+		GL11.glScissor(scaledX, scaledY, scaledW, scaledH);
 		
 		float mult = 1.0F / minimap.getScale();		
 		float offX = (float) (DataUtil.doubleX() - minimap.getLasX()) * mult;
@@ -208,8 +209,12 @@ public class MapRenderer {
 		}
 		consumerProvider.draw();
 		RenderSystem.popMatrix();
+		for (WaypointIcon icon : minimap.getWaypoints()) {
+			icon.draw(matrices, consumerProvider, mapX, mapY, rotation);
+		}
+		consumerProvider.draw();
 		
-		//GL11.glDisable(GL11.GL_SCISSOR_TEST);
+		GL11.glDisable(GL11.GL_SCISSOR_TEST);
 		
 		if (mapSkin != null) {
 			int skinX = minimap.getSkinX();

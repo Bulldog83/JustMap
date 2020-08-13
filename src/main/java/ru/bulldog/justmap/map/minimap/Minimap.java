@@ -57,6 +57,7 @@ public class Minimap implements IMap {
 	private InfoText txtBiome = new BiomeInfo(TextAlignment.CENTER, "");
 	private InfoText txtTime = new TimeInfo(TextAlignment.CENTER, "");
 	private List<MapIcon<?>> drawedIcons = new ArrayList<>();
+	private List<WaypointIcon> waypoints = new ArrayList<>();
 	private PlayerEntity locPlayer = null;
 	private Layer mapLayer = Layer.SURFACE;
 	private WorldData worldData;
@@ -275,8 +276,8 @@ public class Minimap implements IMap {
 		int posY = pos.getY();
 		int scaledW = scaledWidth;
 		int scaledH = scaledHeight;
-		double startX = posX - scaledW / 2;
-		double startZ = posZ - scaledH / 2;
+		int startX = posX - scaledW / 2;
+		int startZ = posZ - scaledH / 2;
 
 		if (Dimension.isNether(world)) {
 			this.mapLayer = Layer.NETHER;
@@ -297,8 +298,8 @@ public class Minimap implements IMap {
 		if (ClientParams.rotateMap) {
 			scaledW = (int) (mapWidth * mapScale);
 			scaledH = (int) (mapHeight * mapScale);
-			startX = posX - (double) scaledW / 2;
-			startZ = posZ - (double) scaledH / 2;
+			startX = posX - scaledW / 2;
+			startZ = posZ - scaledH / 2;
 		}
 
 		double endX = startX + scaledW;
@@ -339,6 +340,7 @@ public class Minimap implements IMap {
 				if (amount >= 250) break;
 			}
 		}
+		this.waypoints.clear();
 		if (ClientParams.showWaypoints) {
 			List<Waypoint> wps = WaypointKeeper.getInstance().getWaypoints(WorldManager.getWorldKey(), true);
 			if (wps != null) {
@@ -348,7 +350,7 @@ public class Minimap implements IMap {
 					WaypointIcon waypoint = new WaypointIcon(this, wp);
 					waypoint.setPosition(MathUtil.screenPos(wp.pos.getX(), startX, endX, mapWidth),
 										 MathUtil.screenPos(wp.pos.getZ(), startZ, endZ, mapHeight));
-					this.drawedIcons.add(waypoint);
+					this.waypoints.add(waypoint);
 				}
 			}
 		}
@@ -391,6 +393,10 @@ public class Minimap implements IMap {
 
 	public List<MapIcon<?>> getDrawedIcons() {
 		return this.drawedIcons;
+	}
+	
+	public List<WaypointIcon> getWaypoints() {
+		return this.waypoints;
 	}
 
 	public TextManager getTextManager() {
