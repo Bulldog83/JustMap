@@ -1,5 +1,7 @@
 package ru.bulldog.justmap.client.screen;
 
+import net.minecraft.client.gui.widget.SliderWidget;
+import net.minecraft.util.math.MathHelper;
 import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.client.widget.TitledButtonWidget;
 import ru.bulldog.justmap.map.waypoint.Waypoint;
@@ -32,6 +34,7 @@ public class WaypointEditor extends MapScreen {
 	
 	private int colorIndex;
 	private int iconIndex;
+	private int showRange;
 	
 	private int spacing = 2;
 	private int padding = 10;
@@ -79,7 +82,7 @@ public class WaypointEditor extends MapScreen {
 		
 		this.children.add(nameField);
 		
-		Predicate<String> validNumber = (s) -> Predicates.or(s, Predicates.isInteger, Predicates.isEmpty);
+		Predicate<String> validNumber = (s) -> Predicates.or(s, Predicates.isInteger, Predicates.isEmpty, "-"::equals);
 		
 		ew = 60;
 		int px = center - (ew * 3) / 2;
@@ -129,7 +132,28 @@ public class WaypointEditor extends MapScreen {
 		this.isRenderable = new CheckboxWidget(ex + 180, ey, ew, rowH, lang("wp_render"), waypoint.render);
 		this.children.add(isHidden);
 		this.children.add(isTrackable);
-		this.children.add(isRenderable);		
+		this.children.add(isRenderable);
+
+		ey += row * 1.25;
+
+		final int SHOW_RANGE_MAX = 5000;
+		this.showRange = waypoint.showRange;
+		this.children.add(new SliderWidget(ex, ey, screenW / 2, rowH, LiteralText.EMPTY, (double) this.showRange / SHOW_RANGE_MAX) {
+			{
+				this.updateMessage();
+			}
+
+			@Override
+			protected void updateMessage() {
+				// TODO: localize this somehow???
+				this.setMessage(new LiteralText("Max render distance: " + WaypointEditor.this.showRange));
+			}
+
+			@Override
+			protected void applyValue() {
+				WaypointEditor.this.showRange = MathHelper.floor(MathHelper.clampedLerp(0, SHOW_RANGE_MAX, this.value));
+			}
+		});
 		
 		ew = 60;
 		ey = height - (rowH / 2 + 16);
@@ -179,11 +203,13 @@ public class WaypointEditor extends MapScreen {
 		this.waypoint.tracking = isTrackable.isChecked();
 		this.waypoint.render = isRenderable.isChecked();
 		
-		int xPos = xField.getText().isEmpty() ? 0 : Integer.parseInt(xField.getText());
-		int yPos = yField.getText().isEmpty() ? 0 : Integer.parseInt(yField.getText());
-		int zPos = zField.getText().isEmpty() ? 0 : Integer.parseInt(zField.getText());
+		int xPos = (xField.getText().isEmpty() || xField.getText().equals("-")) ? 0 : Integer.parseInt(xField.getText());
+		int yPos = (yField.getText().isEmpty() || yField.getText().equals("-")) ? 0 : Integer.parseInt(yField.getText());
+		int zPos = (zField.getText().isEmpty() || zField.getText().equals("-")) ? 0 : Integer.parseInt(zField.getText());
 		
 		this.waypoint.pos = new BlockPos(xPos, yPos, zPos);
+
+		this.waypoint.showRange = this.showRange;
 		
 		if (onSaveCallback != null) {
 			this.onSaveCallback.accept(waypoint);
