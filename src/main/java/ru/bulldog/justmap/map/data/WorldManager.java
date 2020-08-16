@@ -281,7 +281,11 @@ public final class WorldManager {
 			synchronized (worldsData) {
 				for(JsonElement elem : worldsArray) {
 					WorldKey world = WorldKey.fromJson((JsonObject) elem);
+					if (world == null) continue;
 					worldsData.put(world, null);
+					if (MultiworldDetection.isMixed() && world.getWorldPos() != null && world.getName() != null) {
+						registeredWorlds.put(world.getWorldPos(), world.getName());
+					}
 				}
 			}
 		}
@@ -331,6 +335,7 @@ public final class WorldManager {
 				worldsData.clear();
 			}
 		}
+		registeredWorlds.clear();
 	}
 	
 	public static void close() {
