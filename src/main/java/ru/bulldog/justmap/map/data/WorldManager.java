@@ -128,13 +128,6 @@ public final class WorldManager {
 			return;
 		}
 		JustMapClient.stopMapping();
-		if (currentWorldPos == null) {
-			synchronized (worldsData) {
-				worldsData.keySet().forEach(key -> {
-					key.setWorldPos(newPos);
-				});
-			}
-		}
 		currentWorldPos = newPos;
 		if (MultiworldDetection.isMixed()) {
 			if (registeredWorlds.containsKey(newPos)) {
