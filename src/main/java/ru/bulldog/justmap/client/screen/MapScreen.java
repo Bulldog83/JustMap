@@ -43,7 +43,7 @@ public class MapScreen extends Screen {
 	public MapScreen(Text title, Screen parent) {
 		super(title);
 		this.parent = parent;
-		this.langUtil = new LangUtil("gui");
+		this.langUtil = new LangUtil(LangUtil.GUI_ELEMENT);
 	}
 	
 	@Override

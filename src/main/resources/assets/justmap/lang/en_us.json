@@ -132,6 +132,7 @@
   "justmap.gui.wp_hidden": "Hidden",
   "justmap.gui.wp_tracking": "Screen Edge",
   "justmap.gui.wp_render": "In World",
+  "justmap.gui.wp_render_dist": "Max render distance: ",
 
   "gamerule.allowCavesMap": "(Just Map) Caves mapping",
   "gamerule.allowEntityRadar": "(Just Map) Entities radar",
