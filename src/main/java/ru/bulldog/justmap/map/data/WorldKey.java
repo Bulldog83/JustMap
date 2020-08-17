@@ -36,7 +36,6 @@ public class WorldKey {
 		if (worldName == null) {
 			this.worldId = String.format("%s_%s", dimension, PosUtil.shortPosString(worldPos));
 		}
-		
 	}
 	
 	public Identifier getDimension() {

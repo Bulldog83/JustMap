@@ -2,8 +2,11 @@ package ru.bulldog.justmap.client.screen;
 
 import net.minecraft.client.gui.widget.SliderWidget;
 import net.minecraft.util.math.MathHelper;
+
 import ru.bulldog.justmap.JustMap;
+import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.client.widget.TitledButtonWidget;
+import ru.bulldog.justmap.config.ConfigKeeper.IntegerRange;
 import ru.bulldog.justmap.map.waypoint.Waypoint;
 import ru.bulldog.justmap.map.waypoint.WaypointKeeper;
 import ru.bulldog.justmap.map.waypoint.Waypoint.Icon;
@@ -127,26 +130,29 @@ public class WaypointEditor extends MapScreen {
 		
 		ey += row * 1.5;
 		
-		this.isHidden = new CheckboxWidget(ex, ey, ew, rowH, lang("wp_hidden"), waypoint.hidden);
-		this.isTrackable = new CheckboxWidget(ex + 90, ey, ew, rowH, lang("wp_tracking"), waypoint.tracking);
-		this.isRenderable = new CheckboxWidget(ex + 180, ey, ew, rowH, lang("wp_render"), waypoint.render);
+		int sliderW = (int) (screenW * 0.6);
+		int elemX = width / 2 - sliderW / 2;
+		
+		this.isHidden = new CheckboxWidget(elemX, ey, ew, rowH, lang("wp_hidden"), waypoint.hidden);
+		this.isTrackable = new CheckboxWidget(elemX + 100, ey, ew, rowH, lang("wp_tracking"), waypoint.tracking);
+		this.isRenderable = new CheckboxWidget(elemX + 200, ey, ew, rowH, lang("wp_render"), waypoint.render);
 		this.children.add(isHidden);
 		this.children.add(isTrackable);
 		this.children.add(isRenderable);
 
 		ey += row * 1.25;
 
-		final int SHOW_RANGE_MAX = 5000;
+		IntegerRange maxRangeConfig = JustMapClient.CONFIG.getEntry("max_render_dist");
+		final int SHOW_RANGE_MAX = maxRangeConfig.maxValue();
 		this.showRange = waypoint.showRange;
-		this.children.add(new SliderWidget(ex, ey, screenW / 2, rowH, LiteralText.EMPTY, (double) this.showRange / SHOW_RANGE_MAX) {
+		this.children.add(new SliderWidget(elemX, ey, sliderW, rowH, LiteralText.EMPTY, (double) this.showRange / SHOW_RANGE_MAX) {
 			{
 				this.updateMessage();
 			}
 
 			@Override
 			protected void updateMessage() {
-				// TODO: localize this somehow???
-				this.setMessage(new LiteralText("Max render distance: " + WaypointEditor.this.showRange));
+				this.setMessage(new LiteralText(lang("wp_render_dist").getString() + WaypointEditor.this.showRange));
 			}
 
 			@Override
