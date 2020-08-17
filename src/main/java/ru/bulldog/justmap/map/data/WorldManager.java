@@ -346,13 +346,13 @@ public final class WorldManager {
 				worldsData.clear();
 			}
 		}
-		worldAssociations.clear();
 	}
 	
 	public static void close() {
 		modConfig.reloadFromDisk();
 		currentWorld = null;
 		saveWorlds();
+		worldAssociations.clear();
 		clearData();
 	}
 }
