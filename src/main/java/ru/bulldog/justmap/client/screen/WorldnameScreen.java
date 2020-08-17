@@ -57,6 +57,8 @@ public class WorldnameScreen extends Screen {
 		}
 		Text defaultText = new LiteralText("Default");
 		this.nameField = new TextFieldWidget(textRenderer, x + 20, y + 50, frameWidth - 40, 20, defaultText);
+		this.setFocused(this.nameField);
+		this.nameField.setSelected(true);
 		this.addButton(new ButtonWidget(center - 30, btnY, 80, 20, LangUtil.getText("gui", "save"), this::onPressSave));
 		this.addChild(nameField);
 	}
@@ -98,9 +100,10 @@ public class WorldnameScreen extends Screen {
 	
 	@Override
 	public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-		switch(keyCode) {
+		switch (keyCode) {
 			case GLFW.GLFW_KEY_ENTER:
 				this.onPressSave(null);
+				return true;
 		  	default:
 		  		return super.keyPressed(keyCode, scanCode, modifiers);
 		}

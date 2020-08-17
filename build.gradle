@@ -85,5 +85,5 @@ jar {
 }
 
 assemble {
-	version = "-${project.minecraft_version}-beta"
+	version += "-${project.minecraft_version}-release"
 }
