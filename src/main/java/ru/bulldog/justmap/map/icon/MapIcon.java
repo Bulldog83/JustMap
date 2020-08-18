@@ -31,11 +31,11 @@ public abstract class MapIcon<T extends MapIcon<T>> {
 		this.y = y;
 	}
 	
-	protected void updatePos(int size, int mapX, int mapY, float rotation) {
+	protected void updatePos(int size, int mapX, int mapY) {
 		int mapW = map.getWidth();
 		int mapH = map.getHeight();
 		if (iconPos == null || x != lastX || y != lastY || mapX != lastMapX || mapY != lastMapY) {
-			this.iconPos = new Point(mapX + x, mapY + y);
+			this.iconPos = new Point(x, y);
 			this.iconPos.x -= size / 2;
 			this.iconPos.y -= size / 2;
 			this.allowRender = true;

@@ -276,8 +276,13 @@ public class Minimap implements IMap {
 		int posY = pos.getY();
 		int scaledW = scaledWidth;
 		int scaledH = scaledHeight;
-		int startX = posX - scaledW / 2;
-		int startZ = posZ - scaledH / 2;
+		double startX = posX - scaledW / 2.0;
+		double startZ = posZ - scaledH / 2.0;
+
+		if (lastPosX != posX || lastPosZ != posZ) {
+			this.lastPosX = posX;
+			this.lastPosZ = posZ;
+		}
 
 		if (Dimension.isNether(world)) {
 			this.mapLayer = Layer.NETHER;
@@ -290,20 +295,18 @@ public class Minimap implements IMap {
 			this.mapLevel = 0;
 		}
 
-		if (lastPosX != posX || lastPosZ != posZ) {
-			this.lastPosX = posX;
-			this.lastPosZ = posZ;
-		}
-
 		if (ClientParams.rotateMap) {
 			scaledW = (int) (mapWidth * mapScale);
 			scaledH = (int) (mapHeight * mapScale);
-			startX = posX - scaledW / 2;
-			startZ = posZ - scaledH / 2;
+			startX = posX - scaledW / 2.0;
+			startZ = posZ - scaledH / 2.0;
 		}
 
 		double endX = startX + scaledW;
 		double endZ = startZ + scaledH;
+		
+		int centerX = mapX + mapWidth / 2;
+		int centerY = mapY + mapHeight / 2;
 
 		this.drawedIcons.clear();
 		if (RuleUtil.allowEntityRadar()) {
@@ -314,8 +317,8 @@ public class Minimap implements IMap {
 		
 			int amount = 0;				
 			for (Entity entity : entities) {
-				double iconX = MathUtil.screenPos(DataUtil.doubleX(entity), startX, endX, mapWidth);
-				double iconY = MathUtil.screenPos(DataUtil.doubleZ(entity), startZ, endZ, mapHeight);
+				double iconX = MathUtil.screenPos(entity.getX(), pos.getX(), centerX, mapScale);
+				double iconY = MathUtil.screenPos(entity.getZ(), pos.getZ(), centerY, mapScale);
 				if (entity instanceof PlayerEntity && RuleUtil.allowPlayerRadar()) {
 					PlayerEntity pEntity = (PlayerEntity) entity;
 					if (pEntity == player) continue;
@@ -348,8 +351,8 @@ public class Minimap implements IMap {
 						.filter(wp -> MathUtil.getDistance(pos, wp.pos, false) <= wp.showRange);
 				for (Waypoint wp : stream.toArray(Waypoint[]::new)) {
 					WaypointIcon waypoint = new WaypointIcon(this, wp);
-					waypoint.setPosition(MathUtil.screenPos(wp.pos.getX(), startX, endX, mapWidth),
-										 MathUtil.screenPos(wp.pos.getZ(), startZ, endZ, mapHeight));
+					waypoint.setPosition(MathUtil.screenPos(wp.pos.getX(), pos.getX(), centerX, mapScale),
+										 MathUtil.screenPos(wp.pos.getZ(), pos.getZ(), centerY, mapScale));
 					this.waypoints.add(waypoint);
 				}
 			}
@@ -444,7 +447,7 @@ public class Minimap implements IMap {
 		return this.skinY;
 	}
 
-	public int getLasX() {
+	public int getLastX() {
 		return this.lastPosX;
 	}
 

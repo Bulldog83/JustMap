@@ -38,7 +38,7 @@ public class EntityIcon extends MapIcon<EntityIcon> {
 			color = (hostile) ? Colors.DARK_RED : Colors.YELLOW;
 		}
 		int size = ClientParams.entityIconSize;
-		this.updatePos(size, mapX, mapY, rotation);
+		this.updatePos(size, mapX, mapY);
 		if (!allowRender) return;
 		if (ClientParams.renderEntityModel) {
 			EntityModelRenderer.renderModel(matrices, consumerProvider, entity, iconPos.x, iconPos.y);

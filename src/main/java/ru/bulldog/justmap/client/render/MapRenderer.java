@@ -176,10 +176,6 @@ public class MapRenderer {
 		GL11.glEnable(GL11.GL_SCISSOR_TEST);
 		GL11.glScissor(scaledX, scaledY, scaledW, scaledH);
 		
-		float mult = 1.0F / minimap.getScale();		
-		float offX = (float) (DataUtil.doubleX() - minimap.getLasX()) * mult;
-		float offY = (float) (DataUtil.doubleZ() - minimap.getLastZ()) * mult;
-		
 		if (Minimap.isRound()) {
 			RenderSystem.enableBlend();
 			RenderSystem.colorMask(false, false, false, true);
@@ -193,15 +189,17 @@ public class MapRenderer {
 			RenderSystem.blendFunc(GL11.GL_DST_ALPHA, GL11.GL_ONE_MINUS_DST_ALPHA);
 		}
 		
+		float offX = (float) (DataUtil.doubleX() - minimap.getLastX()) / minimap.getScale();
+		float offY = (float) (DataUtil.doubleZ() - minimap.getLastZ()) / minimap.getScale();
 		float moveX = imgX + imgW / 2;
 		float moveY = imgY + imgH / 2;
 		RenderSystem.pushMatrix();
 		if (mapRotation) {
 			RenderSystem.translatef(moveX, moveY, 0.0F);
-			RenderSystem.rotatef(-rotation + 180, 0, 0, 1.0F);
+			RenderSystem.rotatef(-rotation + 180, 0.0F, 0.0F, 1.0F);
 			RenderSystem.translatef(-moveX, -moveY, 0.0F);
 		}
-		RenderSystem.translatef(-offX, -offY, 0.0F);		
+		RenderSystem.translatef(-offX, -offY, 0.0F);
 		this.drawMap();
 		VertexConsumerProvider.Immediate consumerProvider = minecraft.getBufferBuilders().getEntityVertexConsumers();
 		for (MapIcon<?> icon : minimap.getDrawedIcons()) {
@@ -210,7 +208,7 @@ public class MapRenderer {
 		consumerProvider.draw();
 		RenderSystem.popMatrix();
 		for (WaypointIcon icon : minimap.getWaypoints()) {
-			icon.draw(matrices, consumerProvider, mapX, mapY, rotation);
+			icon.draw(matrices, consumerProvider, mapX, mapY, offX, offY, rotation);
 		}
 		consumerProvider.draw();
 		

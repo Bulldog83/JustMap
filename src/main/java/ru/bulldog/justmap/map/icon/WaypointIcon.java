@@ -14,6 +14,11 @@ public class WaypointIcon extends MapIcon<WaypointIcon> {
 	
 	public final Waypoint waypoint;
 	
+	private int iconSize = 8;
+	private float lastRotation;
+	private float offX;
+	private float offY;
+	
 	public WaypointIcon(IMap map, Waypoint waypoint) {
 		super(map);
 		this.waypoint = waypoint;
@@ -29,31 +34,35 @@ public class WaypointIcon extends MapIcon<WaypointIcon> {
 		}
 	}
 	
-	@Override
-	public void draw(MatrixStack matrices, VertexConsumerProvider consumerProvider, int mapX, int mapY, float rotation) {
-		int size = 8;
-		this.updatePos(size, mapX, mapY, rotation);
-		Waypoint.Icon icon = waypoint.getIcon();
-		if (icon != null) {
-			icon.draw(matrices, iconPos.x, iconPos.y, size);
-		}
+	public void draw(MatrixStack matrices, VertexConsumerProvider consumerProvider, int mapX, int mapY, float offX, float offY, float rotation) {
+		rotation = MathUtil.correctAngle(rotation + 180);
+		this.applyOffset(offX, offY, rotation);
+		this.updatePos(iconSize, mapX, mapY, rotation);
+		this.draw(matrices, consumerProvider, mapX, mapY, rotation);
 	}
 	
 	@Override
-	protected void updatePos(int size, int mapX, int mapY, float rotation) {
-		int mapW = map.getWidth();
-		int mapH = map.getHeight();
-		int halfSize = size / 2;
-		if (iconPos == null || x != lastX || y != lastY || mapX != lastMapX || mapY != lastMapY) {
-			this.iconPos = new Point(mapX + x, mapY + y);
+	public void draw(MatrixStack matrices, VertexConsumerProvider consumerProvider, int mapX, int mapY, float rotation) {
+		Waypoint.Icon icon = waypoint.getIcon();
+		if (icon != null) {
+			icon.draw(matrices, iconPos.x - offX, iconPos.y - offY, iconSize);
+		}
+	}
+	
+	private void updatePos(int size, int mapX, int mapY, float rotation) {
+		if (iconPos == null || x != lastX || y != lastY || mapX != lastMapX || mapY != lastMapY || rotation != lastRotation) {
+			int mapW = map.getWidth();
+			int mapH = map.getHeight();
+			int centerX = mapX + mapW / 2;
+			int centerY = mapY + mapH / 2;
+			this.iconPos = new Point(x, y);
+			if (map.isRotated()) {
+				this.correctRotation(centerX, centerY, rotation);
+			}
+			int halfSize = size / 2;
 			this.iconPos.x -= halfSize;
 			this.iconPos.y -= halfSize;
-			if (map.isRotated()) {
-				this.correctRotation(mapW, mapH, mapX, mapY, rotation);
-			}
 			if (Minimap.isRound()) {
-				int centerX = mapX + mapW / 2;
-				int centerY = mapY + mapH / 2;
 				Line radius = new Line(centerX, centerY, centerX, mapY);
 				Line rayTL = new Line(centerX, centerY, iconPos.x, iconPos.y);
 				Line rayTR = new Line(centerX, centerY, iconPos.x + halfSize, iconPos.y);
@@ -72,6 +81,7 @@ public class WaypointIcon extends MapIcon<WaypointIcon> {
 				this.iconPos.x = MathUtil.clamp(iconPos.x, mapX, (mapX + mapW) - size);
 				this.iconPos.y = MathUtil.clamp(iconPos.y, mapY, (mapY + mapH) - size);
 			}
+			this.lastRotation = rotation;
 			this.lastMapX = mapX;
 			this.lastMapY = mapY;
 			this.lastX = x;
@@ -79,18 +89,19 @@ public class WaypointIcon extends MapIcon<WaypointIcon> {
 		}
 	}
 
-	private void correctRotation(int mapW, int mapH, int mapX, int mapY, float rotation) {
-		double centerX = mapX + mapW / 2.0;
-		double centerY = mapY + mapH / 2.0;
-		
-		rotation = MathUtil.correctAngle(rotation) + 180;
-		
-		double angle = Math.toRadians(-rotation);		
+	private void correctRotation(int centerX, int centerY, float rotation) {
+		double angle = Math.toRadians(-rotation);
 		double posX = centerX + (iconPos.x - centerX) * Math.cos(angle) - (iconPos.y - centerY) * Math.sin(angle);
 		double posY = centerY + (iconPos.y - centerY) * Math.cos(angle) + (iconPos.x - centerX) * Math.sin(angle);
 		
 		this.iconPos.x = posX;
 		this.iconPos.y = posY;
+	}
+	
+	private void applyOffset(float offX, float offY, float rotation) {
+		double angle = Math.toRadians(-rotation);
+		this.offX = (float) (offX * Math.cos(angle) - offY * Math.sin(angle));
+		this.offY = (float) (offY * Math.cos(angle) + offX * Math.sin(angle));
 	}
 
 	public boolean isHidden() {
