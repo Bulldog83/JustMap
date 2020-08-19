@@ -111,14 +111,14 @@ public class DataUtil {
 		return currentPos.set(coordX, coordY, coordZ);
 	}
 	
-	public static double doubleX(Entity posEntity) {
-		if (posEntity == null) return 0.0;
-		return posEntity.prevX + (posEntity.getX() - posEntity.prevX) * (double) minecraft.getTickDelta();
+	public static double doubleX(Entity entity) {
+		if (entity == null) return 0.0;
+		return entity.prevX + (entity.getX() - entity.prevX) * (double) minecraft.getTickDelta();
 	}
 
-	public static double doubleZ(Entity posEntity) {
-		if (posEntity == null) return 0.0;
-		return posEntity.prevZ + (posEntity.getZ() - posEntity.prevZ) * (double) minecraft.getTickDelta();
+	public static double doubleZ(Entity entity) {
+		if (entity == null) return 0.0;
+		return entity.prevZ + (entity.getZ() - entity.prevZ) * (double) minecraft.getTickDelta();
 	}
 	
 	public static double doubleX() {

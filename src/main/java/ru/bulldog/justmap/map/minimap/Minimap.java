@@ -141,12 +141,12 @@ public class Minimap implements IMap {
 			this.bigMap = bigMap;
 
 			if (rotateMap) {
-				double mult = (bigMap) ? 1.8 : 1.42;
-				this.scaledWidth = (int) ((mapWidth * mapScale) * mult + 8);
-				this.scaledHeight = (int) ((mapHeight * mapScale) * mult + 8);
+				double mult = ((bigMap) ? 1.88 : 1.42) / mapScale;
+				this.scaledWidth = (int) ((mapWidth * mapScale) * mult);
+				this.scaledHeight = (int) ((mapHeight * mapScale) * mult);
 			} else {
-				this.scaledWidth = (int) ((mapWidth * mapScale) + 8);
-				this.scaledHeight = (int) ((mapHeight * mapScale) + 8);
+				this.scaledWidth = (int) ((mapWidth * mapScale));
+				this.scaledHeight = (int) ((mapHeight * mapScale));
 			}
 
 			this.textManager.setLineWidth(this.mapWidth);
@@ -274,10 +274,6 @@ public class Minimap implements IMap {
 		int posX = pos.getX();
 		int posZ = pos.getZ();
 		int posY = pos.getY();
-		int scaledW = scaledWidth;
-		int scaledH = scaledHeight;
-		double startX = posX - scaledW / 2.0;
-		double startZ = posZ - scaledH / 2.0;
 
 		if (lastPosX != posX || lastPosZ != posZ) {
 			this.lastPosX = posX;
@@ -295,16 +291,18 @@ public class Minimap implements IMap {
 			this.mapLevel = 0;
 		}
 
+		int scaledW = scaledWidth;
+		int scaledH = scaledHeight;
+		double startX = posX - scaledW / 2.0;
+		double startZ = posZ - scaledH / 2.0;
 		if (ClientParams.rotateMap) {
 			scaledW = (int) (mapWidth * mapScale);
 			scaledH = (int) (mapHeight * mapScale);
 			startX = posX - scaledW / 2.0;
 			startZ = posZ - scaledH / 2.0;
 		}
-
 		double endX = startX + scaledW;
 		double endZ = startZ + scaledH;
-		
 		int centerX = mapX + mapWidth / 2;
 		int centerY = mapY + mapHeight / 2;
 

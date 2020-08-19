@@ -47,6 +47,7 @@ public class MapRenderer {
 	private int imgX, imgY;
 	private int imgW, imgH;
 	private float rotation;
+	private float mapScale;
 	private boolean mapRotation = false;
 
 	private final Minimap minimap;
@@ -85,28 +86,32 @@ public class MapRenderer {
 		int mapH = minimap.getHeight();
 		int mapX = minimap.getMapX();
 		int mapY = minimap.getMapY();
+		float scale = minimap.getScale();
 		boolean rotateMap = minimap.isRotated();
 		if (mapWidth != mapW || mapHeight != mapH ||
 			this.mapX != mapX || this.mapY != mapY ||
-			mapRotation != rotateMap) {
+			mapScale != scale || mapRotation != rotateMap) {
 			
 			this.mapWidth = mapW;
 			this.mapHeight = mapH;
 			this.mapRotation = rotateMap;
+			this.mapScale = scale;
 			this.mapX = minimap.getMapX();
 			this.mapY = minimap.getMapY();			
-			
-			if (mapRotation) {
-				this.imgW = minimap.getScaledWidth();
-				this.imgH = minimap.getScaledHeight();
-				this.imgX = mapX - (imgW - mapWidth) / 2;
-				this.imgY = mapY - (imgH - mapHeight) / 2;
-			} else {
-				this.imgW = this.mapWidth;
-				this.imgH = this.mapHeight;
-				this.imgX = this.mapX;
-				this.imgY = this.mapY;
+			this.imgW = minimap.getScaledWidth();
+			if (imgW < mapWidth) {
+				imgW = mapWidth;
 			}
+			this.imgH = minimap.getScaledHeight();
+			if (imgH < mapHeight) {
+				imgH = mapHeight;
+			}
+			this.imgX = mapX - (imgW - mapWidth) / 2;
+			this.imgY = mapY - (imgH - mapHeight) / 2;
+			this.imgW += 8;
+			this.imgH += 8;
+			this.imgX -= 4;
+			this.imgY -= 4;
 		}
 		
 		int centerX = mapX + mapWidth / 2;
@@ -172,9 +177,8 @@ public class MapRenderer {
 		
 		RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
 		RenderSystem.disableDepthTest();
-		
-		GL11.glEnable(GL11.GL_SCISSOR_TEST);
-		GL11.glScissor(scaledX, scaledY, scaledW, scaledH);
+		//RenderUtil.enableScissor();
+		//RenderUtil.applyScissor(scaledX, scaledY, scaledW, scaledH);
 		
 		if (Minimap.isRound()) {
 			RenderSystem.enableBlend();
@@ -188,17 +192,17 @@ public class MapRenderer {
 			RenderUtil.endDraw();
 			RenderSystem.blendFunc(GL11.GL_DST_ALPHA, GL11.GL_ONE_MINUS_DST_ALPHA);
 		}
-		
-		float offX = (float) (DataUtil.doubleX() - minimap.getLastX()) / minimap.getScale();
-		float offY = (float) (DataUtil.doubleZ() - minimap.getLastZ()) / minimap.getScale();
-		float moveX = imgX + imgW / 2;
-		float moveY = imgY + imgH / 2;
+
 		RenderSystem.pushMatrix();
 		if (mapRotation) {
+			float moveX = mapX + mapWidth / 2.0F;
+			float moveY = mapY + mapHeight / 2.0F;
 			RenderSystem.translatef(moveX, moveY, 0.0F);
 			RenderSystem.rotatef(-rotation + 180, 0.0F, 0.0F, 1.0F);
 			RenderSystem.translatef(-moveX, -moveY, 0.0F);
 		}
+		float offX = (float) (DataUtil.doubleX() - minimap.getLastX()) / mapScale;
+		float offY = (float) (DataUtil.doubleZ() - minimap.getLastZ()) / mapScale;
 		RenderSystem.translatef(-offX, -offY, 0.0F);
 		this.drawMap();
 		VertexConsumerProvider.Immediate consumerProvider = minecraft.getBufferBuilders().getEntityVertexConsumers();
@@ -212,7 +216,7 @@ public class MapRenderer {
 		}
 		consumerProvider.draw();
 		
-		GL11.glDisable(GL11.GL_SCISSOR_TEST);
+		//RenderUtil.disableScissor();
 		
 		if (mapSkin != null) {
 			int skinX = minimap.getSkinX();
@@ -222,11 +226,11 @@ public class MapRenderer {
 		}
 		
 		RenderUtil.drawRightAlignedString(
-				matrices, Float.toString(minimap.getScale()),
+				matrices, Float.toString(mapScale),
 				mapX + mapWidth - 3, mapY + mapHeight - 10, Colors.WHITE);
 		
-		int centerX = mapX + mapWidth / 2;
-		int centerY = mapY + mapHeight / 2;
+		double centerX = mapX + mapWidth / 2.0;
+		double centerY = mapY + mapHeight / 2.0;
 		int iconSize = ClientParams.arrowIconSize;
 		if (ClientParams.arrowIconType == ArrowType.DIRECTION_ARROW) {
 			float direction = mapRotation ? 180 : minecraft.player.headYaw;
@@ -241,53 +245,49 @@ public class MapRenderer {
 	}
 	
 	private void drawMap() {
-		int scaledW = minimap.getScaledWidth();
-		int scaledH = minimap.getScaledHeight();
-		int cornerX = DataUtil.coordX() - scaledW / 2;
-		int cornerZ = DataUtil.coordZ() - scaledH / 2;		
-		int right = imgX + scaledW;
-		
-		int bottom;
-		if (mapRotation) {
-			bottom = (int) (imgY + scaledH * 1.42);
-		} else {
-			bottom = imgY + scaledH;
-		}
-		
 		BlockPos center = DataUtil.currentPos();
-		BlockPos.Mutable currentPos = new BlockPos.Mutable();
-		
+		int cornerX = center.getX() - minimap.getScaledWidth() / 2 - 4;
+		int cornerZ = center.getZ() - minimap.getScaledHeight() / 2 - 4;
+		int right = imgX + imgW;
+		int bottom = imgY + imgH;
 		int cY = center.getY();
-		float scale = minimap.getScale();
 		int picX = 0, picW = 0;
-		while(picX < scaledW) {
+		double drawX = imgX + picX;
+		BlockPos.Mutable currentPos = new BlockPos.Mutable();
+		while(drawX < right) {
 			int cX = cornerX + picX;
 			int picY = 0, picH = 0;
-			while (picY < scaledH ) {				
+			double drawY = imgY + picY;
+			while (drawY < bottom) {				
 				int cZ = cornerZ + picY;
 				
 				RegionData region = worldData.getRegion(minimap, currentPos.set(cX, cY, cZ));
 				region.swapLayer(minimap.getLayer(), minimap.getLevel());
 				
+				int textureX = cX - (region.getX() << 9);
+				int textureY = cZ - (region.getZ() << 9);
+				
 				picW = 512;
 				picH = 512;
-				int imgX = cX - (region.getX() << 9);
-				int imgY = cZ - (region.getZ() << 9);
+				if (textureX + picW >= 512) picW = 512 - textureX;
+				if (textureY + picH >= 512) picH = 512 - textureY;
+				if (drawX + picW >= right) picW = (int) (right - drawX);
+				if (drawY + picH >= bottom) picH = (int) (bottom - drawY);
 				
-				if (picX + picW >= right) picW = (int) (right - picX);
-				if (picY + picH >= bottom) picH = (int) (bottom - picY);
-				if (imgX + picW >= 512) picW = 512 - imgX;
-				if (imgY + picH >= 512) picH = 512 - imgY;
+				region.draw(drawX, drawY, textureX, textureY, picW, picH, mapScale);
 				
-				double scX = (picX - 4) / scale;
-				double scY = (picY - 4) / scale;
-				
-				region.draw(this.imgX + scX, this.imgY + scY, imgX, imgY, picW, picH, scale);
+				RenderUtil.drawLine(drawX, imgY, drawX, imgY + imgH, Colors.YELLOW);
+				RenderUtil.drawLine(imgX, drawY, imgX + imgW, drawY, Colors.YELLOW);
 				
 				picY += picH > 0 ? picH : 512;
+				drawY = imgY + picY;
 			}
-			
 			picX += picW > 0 ? picW : 512;
+			drawX = imgX + picX;
 		}
+		RenderUtil.drawLine(imgX, imgY, imgX + imgW, imgY, Colors.RED);
+		RenderUtil.drawLine(imgX, imgY, imgX, imgY + imgH, Colors.RED);
+		RenderUtil.drawLine(imgX, imgY + imgH, imgX + imgW, imgY + imgH, Colors.RED);
+		RenderUtil.drawLine(imgX + imgW, imgY, imgX + imgW, imgY + imgH, Colors.RED);
 	}
 }

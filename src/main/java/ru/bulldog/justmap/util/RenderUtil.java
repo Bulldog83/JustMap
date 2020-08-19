@@ -104,6 +104,21 @@ public class RenderUtil extends DrawableHelper {
 		RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
 	}
 	
+	public static void enableScissor() {
+		RenderSystem.assertThread(RenderSystem::isOnRenderThread);
+		GL11.glEnable(GL11.GL_SCISSOR_TEST);
+	}
+	
+	public static void disableScissor() {
+		RenderSystem.assertThread(RenderSystem::isOnRenderThread);
+		GL11.glDisable(GL11.GL_SCISSOR_TEST);
+	}
+	
+	public static void applyScissor(int x, int y, int width, int height) {
+		RenderSystem.assertThread(RenderSystem::isOnRenderThread);
+		GL11.glScissor(x, y, width, height);
+	}
+	
     public static void startDraw() {
     	startDraw(VertexFormats.POSITION_TEXTURE);
     }
@@ -152,6 +167,7 @@ public class RenderUtil extends DrawableHelper {
 		vertexBuffer.vertex(x1, y1, 0).next();
 		vertexBuffer.vertex(x2, y2, 0).next();
 		endDraw();
+		RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
 		RenderSystem.enableTexture();
 	}	
 	
