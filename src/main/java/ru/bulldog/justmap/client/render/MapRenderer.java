@@ -251,6 +251,7 @@ public class MapRenderer {
 		int right = imgX + imgW;
 		int bottom = imgY + imgH;
 		int cY = center.getY();
+		
 		int picX = 0, picW = 0;
 		double drawX = imgX + picX;
 		BlockPos.Mutable currentPos = new BlockPos.Mutable();
@@ -267,8 +268,8 @@ public class MapRenderer {
 				int textureX = cX - (region.getX() << 9);
 				int textureY = cZ - (region.getZ() << 9);
 				
-				picW = 512;
-				picH = 512;
+				picW = (int) (512 * mapScale);
+				picH = (int) (512 * mapScale);
 				if (textureX + picW >= 512) picW = 512 - textureX;
 				if (textureY + picH >= 512) picH = 512 - textureY;
 				if (drawX + picW >= right) picW = (int) (right - drawX);
@@ -280,10 +281,10 @@ public class MapRenderer {
 				RenderUtil.drawLine(imgX, drawY, imgX + imgW, drawY, Colors.YELLOW);
 				
 				picY += picH > 0 ? picH : 512;
-				drawY = imgY + picY;
+				drawY = imgY + (picY / mapScale);
 			}
 			picX += picW > 0 ? picW : 512;
-			drawX = imgX + picX;
+			drawX = imgX + (picX / mapScale);
 		}
 		RenderUtil.drawLine(imgX, imgY, imgX + imgW, imgY, Colors.RED);
 		RenderUtil.drawLine(imgX, imgY, imgX, imgY + imgH, Colors.RED);

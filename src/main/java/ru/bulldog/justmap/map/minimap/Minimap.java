@@ -141,14 +141,14 @@ public class Minimap implements IMap {
 			this.bigMap = bigMap;
 
 			if (rotateMap) {
-				double mult = ((bigMap) ? 1.88 : 1.42) / mapScale;
+				double mult = (bigMap) ? 1.88 : 1.42;
 				this.scaledWidth = (int) ((mapWidth * mapScale) * mult);
 				this.scaledHeight = (int) ((mapHeight * mapScale) * mult);
 			} else {
 				this.scaledWidth = (int) ((mapWidth * mapScale));
 				this.scaledHeight = (int) ((mapHeight * mapScale));
 			}
-
+			
 			this.textManager.setLineWidth(this.mapWidth);
 		}
 		
