@@ -64,6 +64,7 @@ public class Minimap implements IMap {
 	private MapSkin mapSkin;
 	private World world;
 	private ScreenPosition mapPosition;
+	private double winScale;
 	private boolean isMapVisible = true;
 	private boolean rotateMap = false;
 	private boolean bigMap = false;
@@ -104,6 +105,15 @@ public class Minimap implements IMap {
 		} else {
 			locPlayer = null;
 		}
+		
+		Window window = minecraft.getWindow();
+		if (window != null) {
+			double scale = window.getScaleFactor();
+			if (winScale != scale) {
+				winScale = scale;
+				this.updateMapParams();
+			}
+		}
 	}
 
 	public void updateMapParams() {
@@ -111,46 +121,6 @@ public class Minimap implements IMap {
 		this.isMapVisible = config.getBoolean("map_visible");
 		
 		if (!isMapVisible) return;
-		
-		int configSize = config.getInt("map_size");
-		float configScale = config.getFloat("map_scale");
-		boolean needRotate = config.getBoolean("rotate_map");
-		boolean bigMap = config.getBoolean("show_big_map");
-
-		Window window = minecraft.getWindow();
-		if (window != null) {
-			int winWidth = window.getScaledWidth();
-			int guiScale = minecraft.options.guiScale;
-			double winScale = window.getScaleFactor();
-			if (guiScale == 0 && winScale > 2) {
-				configSize *= configSize / (winWidth / winScale);
-			}
-		}
-
-		if (configSize != mapWidth || configScale != mapScale ||
-			rotateMap != needRotate || this.bigMap != bigMap) {
-			if (bigMap) {
-				this.mapWidth = config.getInt("big_map_size");
-				this.mapHeight = (mapWidth * 10) / 16;
-			} else {
-				this.mapWidth = configSize;
-				this.mapHeight = configSize;
-			}
-			this.mapScale = configScale;
-			this.rotateMap = needRotate;
-			this.bigMap = bigMap;
-
-			if (rotateMap) {
-				double mult = (bigMap) ? 1.88 : 1.42;
-				this.scaledWidth = (int) ((mapWidth * mapScale) * mult);
-				this.scaledHeight = (int) ((mapHeight * mapScale) * mult);
-			} else {
-				this.scaledWidth = (int) ((mapWidth * mapScale));
-				this.scaledHeight = (int) ((mapHeight * mapScale));
-			}
-			
-			this.textManager.setLineWidth(this.mapWidth);
-		}
 		
 		this.border = 0;
 		if (ClientParams.useSkins) {
@@ -171,6 +141,39 @@ public class Minimap implements IMap {
 		} else {
 			this.mapSkin = null;
 		}
+		
+		int configSize = config.getInt("map_size");
+		float configScale = config.getFloat("map_scale");
+		boolean needRotate = config.getBoolean("rotate_map");
+		boolean bigMap = config.getBoolean("show_big_map");
+		
+		configSize *= winScale;
+
+		if (configSize != mapWidth || configScale != mapScale ||
+			rotateMap != needRotate || this.bigMap != bigMap) {
+			if (bigMap) {
+				this.mapWidth = config.getInt("big_map_size");
+				this.mapHeight = (mapWidth * 10) / 16;
+			} else {
+				this.mapWidth = configSize;
+				this.mapHeight = configSize;
+			}
+			this.mapScale = configScale;
+			this.rotateMap = needRotate;
+			this.bigMap = bigMap;
+
+			if (rotateMap) {
+				float mult = ((bigMap) ? 1.88F : 1.42F) / mapScale;
+				this.scaledWidth = (int) (mapWidth * mapScale * mult);
+				this.scaledHeight = (int) (mapHeight * mapScale * mult);
+			} else {
+				this.scaledWidth = (int) (mapWidth * mapScale);
+				this.scaledHeight = (int) (mapHeight * mapScale);
+			}
+			
+			this.textManager.setLineWidth(this.mapWidth);
+		}
+		
 		this.updateMapPosition();
 	}
 	

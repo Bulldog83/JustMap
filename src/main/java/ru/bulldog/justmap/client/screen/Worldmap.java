@@ -207,37 +207,39 @@ public class Worldmap extends MapScreen implements IMap {
 		BlockPos.Mutable currentPos = new BlockPos.Mutable();
 		int cY = centerPos.getY();
 		
-		int picX = 0, picW = 0;
+		int picX = 0, imgW = 0;
 		while(picX < scaledWidth) {
 			int cX = cornerX + picX;
-			int picY = 0, picH = 0;
+			int picY = 0, imgH = 0;
 			while (picY < scaledHeight) {				
 				int cZ = cornerZ + picY;
 				
 				RegionData region = this.worldData.getRegion(this, currentPos.set(cX, cY, cZ));
 				region.swapLayer(mapLayer, mapLevel);
 				
-				picW = 512;
-				picH = 512;
+				imgW = 512;
+				imgH = 512;
 				int imgX = cX - (region.getX() << 9);
 				int imgY = cZ - (region.getZ() << 9);
 				
-				if (picX + picW >= scaledWidth) picW = (int) (scaledWidth - picX);
-				if (picY + picH >= scaledHeight) picH = (int) (scaledHeight - picY);
-				if (imgX + picW >= 512) picW = 512 - imgX;
-				if (imgY + picH >= 512) picH = 512 - imgY;
+				if (picX + imgW >= scaledWidth) imgW = (int) (scaledWidth - picX);
+				if (picY + imgH >= scaledHeight) imgH = (int) (scaledHeight - picY);
+				if (imgX + imgW >= 512) imgW = 512 - imgX;
+				if (imgY + imgH >= 512) imgH = 512 - imgY;
 				
 				double scX = picX / imageScale;
 				double scY = picY / imageScale;
+				double scW = imgW / imageScale;
+				double scH = imgH / imageScale;
 				
 				RenderSystem.enableBlend();
 				RenderSystem.defaultBlendFunc();
-				region.draw(scX, scY, imgX, imgY, picW, picH, imageScale);
+				region.draw(scX, scY, scW, scH, imgX, imgY, imgW, imgH);
 				
-				picY += picH > 0 ? picH : 512;
+				picY += imgH > 0 ? imgH : 512;
 			}
 			
-			picX += picW > 0 ? picW : 512;
+			picX += imgW > 0 ? imgW : 512;
 		}
 	}
 	

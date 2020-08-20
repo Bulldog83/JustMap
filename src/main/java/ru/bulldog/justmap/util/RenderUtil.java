@@ -138,6 +138,10 @@ public class RenderUtil extends DrawableHelper {
     public static void endDraw() {
     	tessellator.draw();
     }
+    
+    public static BufferBuilder getBuffer() {
+    	return vertexBuffer;
+    }
 	
 	public static void drawTriangle(double x1, double y1, double x2, double y2, double x3, double y3, int color) {
 		float a = (float)(color >> 24 & 255) / 255.0F;
