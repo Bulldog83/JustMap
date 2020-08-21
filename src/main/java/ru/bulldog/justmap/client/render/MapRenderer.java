@@ -47,6 +47,7 @@ public class MapRenderer {
 	private int mapWidth, mapHeight;
 	private int scaledW, scaledH;
 	private int centerX, centerY;
+	private int lastX, lastZ;
 	private int imgX, imgY;
 	private int imgW, imgH;
 	private float rotation;
@@ -55,7 +56,7 @@ public class MapRenderer {
 
 	private final Minimap minimap;
 	private WorldData worldData;
-	
+	private ChunkGrid chunkGrid;
 	private MapSkin mapSkin;
 	private TextManager textManager;	
 	private InfoText dirN = new MapText(TextAlignment.CENTER, "N");
@@ -89,6 +90,8 @@ public class MapRenderer {
 		int mapH = minimap.getHeight();
 		int mapX = minimap.getMapX();
 		int mapY = minimap.getMapY();
+		int lastX = minimap.getLastX();
+		int lastZ = minimap.getLastZ();
 		float scale = minimap.getScale();
 		boolean rotateMap = minimap.isRotated();
 		if (mapWidth != mapW || mapHeight != mapH ||
@@ -105,27 +108,41 @@ public class MapRenderer {
 			this.centerY = mapY + mapHeight / 2;
 			
 			if (mapRotation) {
-				float mult = minimap.isBigMap() ? 1.88F : 1.42F;
-				this.scaledW = (int) (mapWidth * mapScale * mult);
-				this.scaledH = (int) (mapHeight * mapScale * mult);
+				float mult = minimap.isBigMap() ? 1.9F : 1.44F;
+				this.scaledW = (int) Math.ceil(mapWidth * mapScale * mult);
+				this.scaledH = (int) Math.ceil(mapHeight * mapScale * mult);
 				this.imgW = minimap.getScaledWidth();
 				this.imgH = minimap.getScaledHeight();
-				this.imgX = mapX - (imgW - mapWidth) / 2;
-				this.imgY = mapY - (imgH - mapHeight) / 2;
+				this.imgX = (int) Math.ceil(mapX - (imgW - mapWidth) / 2.0);
+				this.imgY = (int) Math.ceil(mapY - (imgH - mapHeight) / 2.0);
 			} else {
 				this.scaledW = minimap.getScaledWidth();
 				this.scaledH = minimap.getScaledHeight();
 				this.imgX = mapX;
 				this.imgY = mapY;
 				this.imgW = mapW;
-				this.imgW = mapH;
+				this.imgH = mapH;
 			}
-			this.scaledW += (8 * mapScale);
-			this.scaledH += (8 * mapScale);
-			this.imgW += 8;
-			this.imgH += 8;
-			this.imgX -= 4;
-			this.imgY -= 4;
+			this.scaledW += (16 * mapScale);
+			this.scaledH += (16 * mapScale);
+			this.imgW += 16;
+			this.imgH += 16;
+			this.imgX -= 8;
+			this.imgY -= 8;
+			
+			if (chunkGrid == null) {
+				this.chunkGrid = new ChunkGrid(lastX, lastZ, imgX, imgY, imgW, imgH, mapScale);
+			} else {
+				this.chunkGrid.updateRange(imgX, imgY, imgW, imgH, mapScale);
+				this.chunkGrid.updateGrid();
+			}
+		}
+		
+		if (this.lastX != lastX || this.lastZ != lastZ) {
+			this.lastX = lastX;
+			this.lastZ = lastZ;
+			this.chunkGrid.updateCenter(lastX, lastZ);
+			this.chunkGrid.updateGrid();
 		}
 		
 		int mapR = mapX + mapWidth;
@@ -189,8 +206,8 @@ public class MapRenderer {
 		
 		RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
 		RenderSystem.disableDepthTest();
-		//RenderUtil.enableScissor();
-		//RenderUtil.applyScissor(scaledX, scaledY, scaledW, scaledH);
+		RenderUtil.enableScissor();
+		RenderUtil.applyScissor(scaledX, scaledY, scaledW, scaledH);
 		
 		if (Minimap.isRound()) {
 			RenderSystem.enableBlend();
@@ -213,12 +230,12 @@ public class MapRenderer {
 			RenderSystem.rotatef(-rotation + 180, 0.0F, 0.0F, 1.0F);
 			RenderSystem.translatef(-moveX, -moveY, 0.0F);
 		}
-		float offX = (float) (DataUtil.doubleX() - minimap.getLastX()) / mapScale;
-		float offY = (float) (DataUtil.doubleZ() - minimap.getLastZ()) / mapScale;
+		float offX = (float) (DataUtil.doubleX() - lastX) / mapScale;
+		float offY = (float) (DataUtil.doubleZ() - lastZ) / mapScale;
 		RenderSystem.translatef(-offX, -offY, 0.0F);
 		this.drawMap();
 		if (ClientParams.showGrid) {
-			(new ChunkGrid(DataUtil.currentPos(), imgX, imgY, imgW, imgH, mapScale)).draw();
+			this.chunkGrid.draw();
 		}
 		VertexConsumerProvider.Immediate consumerProvider = minecraft.getBufferBuilders().getEntityVertexConsumers();
 		for (MapIcon<?> icon : minimap.getDrawedIcons()) {
@@ -231,7 +248,7 @@ public class MapRenderer {
 		}
 		consumerProvider.draw();
 		
-		//RenderUtil.disableScissor();
+		RenderUtil.disableScissor();
 		
 		if (mapSkin != null) {
 			int skinX = minimap.getSkinX();
@@ -258,12 +275,10 @@ public class MapRenderer {
 	}
 	
 	private void drawMap() {
-		BlockPos center = DataUtil.currentPos();
-		int cornerX = center.getX() - scaledW / 2;
-		int cornerZ = center.getZ() - scaledH / 2;
+		int cornerX = lastX - scaledW / 2;
+		int cornerZ = lastZ - scaledH / 2;
 		
 		BlockPos.Mutable currentPos = new BlockPos.Mutable();
-		int cY = center.getY();
 		
 		int picX = 0;
 		while(picX < scaledW) {
@@ -277,7 +292,7 @@ public class MapRenderer {
 				if (picY + texH > scaledH) texH = (int) (scaledH - picY);
 				
 				int cZ = cornerZ + picY;
-				RegionData region = this.worldData.getRegion(minimap, currentPos.set(cX, cY, cZ));
+				RegionData region = worldData.getRegion(minimap, currentPos.set(cX, 0, cZ));
 				region.swapLayer(minimap.getLayer(), minimap.getLevel());
 				
 				int texX = cX - (region.getX() << 9);

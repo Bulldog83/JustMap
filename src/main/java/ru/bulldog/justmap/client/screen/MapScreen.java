@@ -54,13 +54,15 @@ public class MapScreen extends Screen {
 	
 	@Override
 	public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+		RenderSystem.disableDepthTest();
 		this.renderBackground(matrices);
+		this.renderForeground(matrices);
 		for (Element e : children) {
 			if (e instanceof Drawable) {
 				((Drawable) e).render(matrices, mouseX, mouseY, delta);
 			}
 		}
-		this.renderForeground(matrices);
+		RenderSystem.enableDepthTest();
 	}
 	
 	public void renderBackground(MatrixStack matrixStack) {

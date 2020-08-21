@@ -163,7 +163,7 @@ public class Minimap implements IMap {
 			this.bigMap = bigMap;
 
 			if (rotateMap) {
-				float mult = ((bigMap) ? 1.88F : 1.42F) / mapScale;
+				float mult = ((bigMap) ? 1.9F : 1.44F) / mapScale;
 				this.scaledWidth = (int) (mapWidth * mapScale * mult);
 				this.scaledHeight = (int) (mapHeight * mapScale * mult);
 			} else {

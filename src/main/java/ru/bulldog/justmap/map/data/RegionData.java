@@ -137,10 +137,6 @@ public class RegionData {
 			this.alternateRender = ClientParams.alternateColorRender;
 			this.needUpdate = true;
 		}
-		if (ClientParams.showGrid != gridOverlay) {
-			this.gridOverlay = ClientParams.showGrid;
-			this.renewOverlay = true;
-		}
 		if (slimeOverlay != RuleUtil.allowSlimeChunks()) {
 			this.slimeOverlay = RuleUtil.allowSlimeChunks();
 			this.renewOverlay = true;
@@ -230,13 +226,6 @@ public class RegionData {
 		}
 		if (slimeOverlay && mapChunk.hasSlime()) {
 			this.overlay.fill(x, y, 16, 16, Colors.SLIME_OVERLAY);
-		}
-		if (gridOverlay) {
-			this.overlay.setColor(x, y, Colors.GRID);
-			for (int i = 1; i < 16; i++) {
-				this.overlay.setColor(x + i, y, Colors.GRID);
-				this.overlay.setColor(x, y + i, Colors.GRID);
-			}
 		}
 	}
 	

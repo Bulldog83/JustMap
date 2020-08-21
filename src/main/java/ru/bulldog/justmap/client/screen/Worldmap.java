@@ -26,6 +26,7 @@ import ru.bulldog.justmap.map.data.Layer;
 import ru.bulldog.justmap.map.data.WorldData;
 import ru.bulldog.justmap.map.data.WorldKey;
 import ru.bulldog.justmap.map.data.WorldManager;
+import ru.bulldog.justmap.map.ChunkGrid;
 import ru.bulldog.justmap.map.IMap;
 import ru.bulldog.justmap.map.MapPlayerManager;
 import ru.bulldog.justmap.map.data.ChunkData;
@@ -61,8 +62,6 @@ public class Worldmap extends MapScreen implements IMap {
 	private double centerY;
 	private float imageScale = 1.0F;
 	private boolean playerTracking = true;
-	private long updateInterval = 50;
-	private long updated = 0;
 	private int mapLevel = 0;
 	private DropDownListWidget mapMenu;
 	private WorldData worldData;
@@ -70,6 +69,7 @@ public class Worldmap extends MapScreen implements IMap {
 	private BlockPos centerPos;
 	private String cursorCoords;
 	private Layer mapLayer;
+	private ChunkGrid chunkGrid;
 	
 	private List<WaypointIcon> waypoints = new ArrayList<>();
 	private List<PlayerIcon> players = new ArrayList<>();
@@ -96,6 +96,7 @@ public class Worldmap extends MapScreen implements IMap {
 			this.centerPos = DataUtil.currentPos();
 		}
 		this.cursorCoords = PosUtil.posToString(centerPos);
+		this.chunkGrid = new ChunkGrid(centerPos.getX(), centerPos.getZ(), x, y, width, height, imageScale);
 
 		this.updateScale();
 
@@ -167,7 +168,9 @@ public class Worldmap extends MapScreen implements IMap {
 	
 	@Override
 	public void renderForeground(MatrixStack matrices) {
-		RenderSystem.disableDepthTest();
+		if (ClientParams.showGrid) {
+			this.chunkGrid.draw();
+		}
 		int iconSize = (int) (ClientParams.worldmapIconSize / imageScale);
 		iconSize = iconSize % 2 != 0 ? iconSize + 1 : iconSize;
 		iconSize = MathUtil.clamp(iconSize, 6, (int) (ClientParams.worldmapIconSize * 1.2));
@@ -197,7 +200,6 @@ public class Worldmap extends MapScreen implements IMap {
 		
 		this.drawBorders(paddingTop, paddingBottom);
 		drawCenteredString(matrices, client.textRenderer, cursorCoords, width / 2, paddingTop + 4, Colors.WHITE);
-		RenderSystem.enableDepthTest();
 	}
 	
 	private void drawMap() {		
@@ -205,7 +207,6 @@ public class Worldmap extends MapScreen implements IMap {
 		int cornerZ = centerPos.getZ() - scaledHeight / 2;
 		
 		BlockPos.Mutable currentPos = new BlockPos.Mutable();
-		int cY = centerPos.getY();
 		
 		int picX = 0, imgW = 0;
 		while(picX < scaledWidth) {
@@ -214,7 +215,7 @@ public class Worldmap extends MapScreen implements IMap {
 			while (picY < scaledHeight) {				
 				int cZ = cornerZ + picY;
 				
-				RegionData region = this.worldData.getRegion(this, currentPos.set(cX, cY, cZ));
+				RegionData region = worldData.getRegion(this, currentPos.set(cX, 0, cZ));
 				region.swapLayer(mapLayer, mapLevel);
 				
 				imgW = 512;
@@ -246,6 +247,8 @@ public class Worldmap extends MapScreen implements IMap {
 	public void setCenterByPlayer() {
 		this.playerTracking = true;
 		this.centerPos = DataUtil.currentPos();
+		this.chunkGrid.updateCenter(centerPos.getX(), centerPos.getZ());
+		this.chunkGrid.updateGrid();
 	}
 	
 	private void updateScale() {
@@ -256,8 +259,9 @@ public class Worldmap extends MapScreen implements IMap {
 			this.updateScale();
 			
 			return;
-		}		
-		this.updateInterval = (long) (imageScale > 1 ? 10 * imageScale : 10);
+		}
+		this.chunkGrid.updateRange(x, y, width, height, imageScale);
+		this.chunkGrid.updateGrid();
 	}
 	
 	private void changeScale(float value) {
@@ -265,9 +269,7 @@ public class Worldmap extends MapScreen implements IMap {
 		this.updateScale();
 	}
 	
-	private void moveMap(Direction direction) {
-		long time = System.currentTimeMillis();
-		if (time - updated < updateInterval) return;		
+	private void moveMap(Direction direction) {	
 		switch (direction) {
 			case NORTH:
 				this.centerPos = centerPos.add(0, 0, -16);
@@ -283,8 +285,9 @@ public class Worldmap extends MapScreen implements IMap {
 				break;
 			default: break;
 		}
+		this.chunkGrid.updateCenter(centerPos.getX(), centerPos.getZ());
+		this.chunkGrid.updateGrid();
 		this.playerTracking = false;
-		this.updated = time;
 	}
 	
 	@Override
@@ -326,23 +329,22 @@ public class Worldmap extends MapScreen implements IMap {
 	}
 	
 	@Override
-	public boolean mouseDragged(double d, double e, int i, double f, double g) {
-		if (super.mouseDragged(d, e, i, f, g)) return true;
+	public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
+		if (super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY)) return true;
 		
-		if (i == 0) {
-			long time = System.currentTimeMillis();
-			if (time - updated < updateInterval) return true;
+		if (button == 0) {
 			
 			int x = centerPos.getX();
 			int y = centerPos.getY();
 			int z = centerPos.getZ();
 			
-			x -= Math.round(2 * f * imageScale);
-			z -= Math.round(2 * g * imageScale);
+			x -= Math.ceil(deltaX * imageScale);
+			z -= Math.ceil(deltaY * imageScale);
 			
 			this.centerPos = new BlockPos(x, y, z);
+			this.chunkGrid.updateCenter(x, z);
+			this.chunkGrid.updateGrid();
 			this.playerTracking = false;
-			this.updated = time;
 		
 			return true;
 		}
