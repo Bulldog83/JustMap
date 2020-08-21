@@ -1,7 +1,12 @@
 package ru.bulldog.justmap.client.screen;
 
+import net.minecraft.client.gui.widget.SliderWidget;
+import net.minecraft.util.math.MathHelper;
+
 import ru.bulldog.justmap.JustMap;
+import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.client.widget.TitledButtonWidget;
+import ru.bulldog.justmap.config.ConfigKeeper.IntegerRange;
 import ru.bulldog.justmap.map.waypoint.Waypoint;
 import ru.bulldog.justmap.map.waypoint.WaypointKeeper;
 import ru.bulldog.justmap.map.waypoint.Waypoint.Icon;
@@ -32,6 +37,7 @@ public class WaypointEditor extends MapScreen {
 	
 	private int colorIndex;
 	private int iconIndex;
+	private int showRange;
 	
 	private int spacing = 2;
 	private int padding = 10;
@@ -79,7 +85,7 @@ public class WaypointEditor extends MapScreen {
 		
 		this.children.add(nameField);
 		
-		Predicate<String> validNumber = (s) -> Predicates.or(s, Predicates.isInteger, Predicates.isEmpty);
+		Predicate<String> validNumber = (s) -> Predicates.or(s, Predicates.isInteger, Predicates.isEmpty, "-"::equals);
 		
 		ew = 60;
 		int px = center - (ew * 3) / 2;
@@ -124,12 +130,36 @@ public class WaypointEditor extends MapScreen {
 		
 		ey += row * 1.5;
 		
-		this.isHidden = new CheckboxWidget(ex, ey, ew, rowH, lang("wp_hidden"), waypoint.hidden);
-		this.isTrackable = new CheckboxWidget(ex + 90, ey, ew, rowH, lang("wp_tracking"), waypoint.tracking);
-		this.isRenderable = new CheckboxWidget(ex + 180, ey, ew, rowH, lang("wp_render"), waypoint.render);
+		int sliderW = (int) (screenW * 0.6);
+		int elemX = width / 2 - sliderW / 2;
+		
+		this.isHidden = new CheckboxWidget(elemX, ey, ew, rowH, lang("wp_hidden"), waypoint.hidden);
+		this.isTrackable = new CheckboxWidget(elemX + 100, ey, ew, rowH, lang("wp_tracking"), waypoint.tracking);
+		this.isRenderable = new CheckboxWidget(elemX + 200, ey, ew, rowH, lang("wp_render"), waypoint.render);
 		this.children.add(isHidden);
 		this.children.add(isTrackable);
-		this.children.add(isRenderable);		
+		this.children.add(isRenderable);
+
+		ey += row * 1.25;
+
+		IntegerRange maxRangeConfig = JustMapClient.CONFIG.getEntry("max_render_dist");
+		final int SHOW_RANGE_MAX = maxRangeConfig.maxValue();
+		this.showRange = waypoint.showRange;
+		this.children.add(new SliderWidget(elemX, ey, sliderW, rowH, LiteralText.EMPTY, (double) this.showRange / SHOW_RANGE_MAX) {
+			{
+				this.updateMessage();
+			}
+
+			@Override
+			protected void updateMessage() {
+				this.setMessage(new LiteralText(lang("wp_render_dist").getString() + WaypointEditor.this.showRange));
+			}
+
+			@Override
+			protected void applyValue() {
+				WaypointEditor.this.showRange = MathHelper.floor(MathHelper.clampedLerp(0, SHOW_RANGE_MAX, this.value));
+			}
+		});
 		
 		ew = 60;
 		ey = height - (rowH / 2 + 16);
@@ -179,11 +209,13 @@ public class WaypointEditor extends MapScreen {
 		this.waypoint.tracking = isTrackable.isChecked();
 		this.waypoint.render = isRenderable.isChecked();
 		
-		int xPos = xField.getText().isEmpty() ? 0 : Integer.parseInt(xField.getText());
-		int yPos = yField.getText().isEmpty() ? 0 : Integer.parseInt(yField.getText());
-		int zPos = zField.getText().isEmpty() ? 0 : Integer.parseInt(zField.getText());
+		int xPos = (xField.getText().isEmpty() || xField.getText().equals("-")) ? 0 : Integer.parseInt(xField.getText());
+		int yPos = (yField.getText().isEmpty() || yField.getText().equals("-")) ? 0 : Integer.parseInt(yField.getText());
+		int zPos = (zField.getText().isEmpty() || zField.getText().equals("-")) ? 0 : Integer.parseInt(zField.getText());
 		
 		this.waypoint.pos = new BlockPos(xPos, yPos, zPos);
+
+		this.waypoint.showRange = this.showRange;
 		
 		if (onSaveCallback != null) {
 			this.onSaveCallback.accept(waypoint);

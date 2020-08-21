@@ -19,7 +19,7 @@ public class RuleUtil {
 	}
 	
 	public static boolean detectMultiworlds() {
-		return DataUtil.isOnline() && ClientParams.detectMultiworlds;
+		return ClientParams.detectMultiworlds;
 	}
 
 	public static boolean needRenderCaves(World world, BlockPos pos) {

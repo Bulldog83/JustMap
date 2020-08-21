@@ -26,6 +26,7 @@ import ru.bulldog.justmap.map.data.Layer;
 import ru.bulldog.justmap.map.data.WorldData;
 import ru.bulldog.justmap.map.data.WorldKey;
 import ru.bulldog.justmap.map.data.WorldManager;
+import ru.bulldog.justmap.map.ChunkGrid;
 import ru.bulldog.justmap.map.IMap;
 import ru.bulldog.justmap.map.MapPlayerManager;
 import ru.bulldog.justmap.map.data.ChunkData;
@@ -58,17 +59,9 @@ public class Worldmap extends MapScreen implements IMap {
 	private int scaledWidth;
 	private int scaledHeight;
 	private double centerX;
-	private double centerZ;
-	private double startX;
-	private double startZ;	
-	private double endX;
-	private double endZ;
-	private double shiftW;
-	private double shiftH;
+	private double centerY;
 	private float imageScale = 1.0F;
 	private boolean playerTracking = true;
-	private long updateInterval = 50;
-	private long updated = 0;
 	private int mapLevel = 0;
 	private DropDownListWidget mapMenu;
 	private WorldData worldData;
@@ -76,6 +69,7 @@ public class Worldmap extends MapScreen implements IMap {
 	private BlockPos centerPos;
 	private String cursorCoords;
 	private Layer mapLayer;
+	private ChunkGrid chunkGrid;
 	
 	private List<WaypointIcon> waypoints = new ArrayList<>();
 	private List<PlayerIcon> players = new ArrayList<>();
@@ -90,6 +84,8 @@ public class Worldmap extends MapScreen implements IMap {
 		
 		this.paddingTop = 8;
 		this.paddingBottom = 8;
+		this.centerX = width / 2.0;
+		this.centerY = height / 2.0;
 		
 		this.worldData = WorldManager.getData();
 		WorldKey worldKey = WorldManager.getWorldKey();
@@ -100,6 +96,7 @@ public class Worldmap extends MapScreen implements IMap {
 			this.centerPos = DataUtil.currentPos();
 		}
 		this.cursorCoords = PosUtil.posToString(centerPos);
+		this.chunkGrid = new ChunkGrid(centerPos.getX(), centerPos.getZ(), x, y, width, height, imageScale);
 
 		this.updateScale();
 
@@ -171,21 +168,23 @@ public class Worldmap extends MapScreen implements IMap {
 	
 	@Override
 	public void renderForeground(MatrixStack matrices) {
-		RenderSystem.disableDepthTest();
+		if (ClientParams.showGrid) {
+			this.chunkGrid.draw();
+		}
 		int iconSize = (int) (ClientParams.worldmapIconSize / imageScale);
 		iconSize = iconSize % 2 != 0 ? iconSize + 1 : iconSize;
 		iconSize = MathUtil.clamp(iconSize, 6, (int) (ClientParams.worldmapIconSize * 1.2));
 		for (WaypointIcon icon : waypoints) {
 			icon.setPosition(
-				MathUtil.screenPos(icon.waypoint.pos.getX(), startX, endX, width) - shiftW,
-				MathUtil.screenPos(icon.waypoint.pos.getZ(), startZ, endZ, height) - shiftH
+				MathUtil.screenPos(icon.waypoint.pos.getX(), centerPos.getX(), centerX, imageScale),
+				MathUtil.screenPos(icon.waypoint.pos.getZ(), centerPos.getZ(), centerY, imageScale)
 			);
 			icon.draw(iconSize);
 		}
 		for (PlayerIcon icon : players) {
 			icon.setPosition(
-					MathUtil.screenPos(icon.getX(), startX, endX, width) - shiftW,
-					MathUtil.screenPos(icon.getZ(), startZ, endZ, height) - shiftH
+					MathUtil.screenPos(icon.getX(), centerPos.getX(), centerX, imageScale),
+					MathUtil.screenPos(icon.getZ(), centerPos.getZ(), centerY, imageScale)
 			);
 			icon.draw(matrices, iconSize);
 		}
@@ -194,14 +193,13 @@ public class Worldmap extends MapScreen implements IMap {
 		
 		double playerX = player.getX();
 		double playerZ = player.getZ();
-		double arrowX = MathUtil.screenPos(playerX, startX, endX, width) - shiftW;
-		double arrowY = MathUtil.screenPos(playerZ, startZ, endZ, height) - shiftH;
+		double arrowX = MathUtil.screenPos(playerX, centerPos.getX(), centerX, imageScale);
+		double arrowY = MathUtil.screenPos(playerZ, centerPos.getZ(), centerY, imageScale);
 		
 		MapPlayerManager.getPlayer(player).getIcon().draw(arrowX, arrowY, iconSize, true);
 		
 		this.drawBorders(paddingTop, paddingBottom);
 		drawCenteredString(matrices, client.textRenderer, cursorCoords, width / 2, paddingTop + 4, Colors.WHITE);
-		RenderSystem.enableDepthTest();
 	}
 	
 	private void drawMap() {		
@@ -209,61 +207,48 @@ public class Worldmap extends MapScreen implements IMap {
 		int cornerZ = centerPos.getZ() - scaledHeight / 2;
 		
 		BlockPos.Mutable currentPos = new BlockPos.Mutable();
-		int cY = centerPos.getY();
 		
-		int picX = 0, picW = 0;
+		int picX = 0, imgW = 0;
 		while(picX < scaledWidth) {
 			int cX = cornerX + picX;
-			int picY = 0, picH = 0;
+			int picY = 0, imgH = 0;
 			while (picY < scaledHeight) {				
 				int cZ = cornerZ + picY;
 				
-				RegionData region = this.worldData.getRegion(this, currentPos.set(cX, cY, cZ));
+				RegionData region = worldData.getRegion(this, currentPos.set(cX, 0, cZ));
 				region.swapLayer(mapLayer, mapLevel);
 				
-				picW = 512;
-				picH = 512;
+				imgW = 512;
+				imgH = 512;
 				int imgX = cX - (region.getX() << 9);
 				int imgY = cZ - (region.getZ() << 9);
 				
-				if (picX + picW >= scaledWidth) picW = (int) (scaledWidth - picX);
-				if (picY + picH >= scaledHeight) picH = (int) (scaledHeight - picY);
-				if (imgX + picW >= 512) picW = 512 - imgX;
-				if (imgY + picH >= 512) picH = 512 - imgY;
+				if (picX + imgW >= scaledWidth) imgW = (int) (scaledWidth - picX);
+				if (picY + imgH >= scaledHeight) imgH = (int) (scaledHeight - picY);
+				if (imgX + imgW >= 512) imgW = 512 - imgX;
+				if (imgY + imgH >= 512) imgH = 512 - imgY;
 				
 				double scX = picX / imageScale;
 				double scY = picY / imageScale;
+				double scW = imgW / imageScale;
+				double scH = imgH / imageScale;
 				
 				RenderSystem.enableBlend();
 				RenderSystem.defaultBlendFunc();
-				region.draw(scX, scY, imgX, imgY, picW, picH, imageScale);
+				region.draw(scX, scY, scW, scH, imgX, imgY, imgW, imgH);
 				
-				picY += picH > 0 ? picH : 512;
+				picY += imgH > 0 ? imgH : 512;
 			}
 			
-			picX += picW > 0 ? picW : 512;
+			picX += imgW > 0 ? imgW : 512;
 		}
-	}
-	
-	private void calculateShift() {
-		this.centerX = (centerPos.getX() >> 4) << 4;
-		this.centerZ = (centerPos.getZ() >> 4) << 4;
-		this.startX = centerX - scaledWidth / 2;
-		this.startZ = centerZ - scaledHeight / 2;
-		this.endX = startX + scaledWidth;
-		this.endZ = startZ + scaledHeight;
-		
-		double screenCX = MathUtil.screenPos(centerPos.getX(), startX, endX, width);
-		double screenCY = MathUtil.screenPos(centerPos.getZ(), startZ, endZ, height);
-		
-		this.shiftW = screenCX - width / 2F;
-		this.shiftH = screenCY - height / 2F;
 	}
 	
 	public void setCenterByPlayer() {
 		this.playerTracking = true;
-		this.centerPos = DataUtil.currentPos();  		
-		this.calculateShift();
+		this.centerPos = DataUtil.currentPos();
+		this.chunkGrid.updateCenter(centerPos.getX(), centerPos.getZ());
+		this.chunkGrid.updateGrid();
 	}
 	
 	private void updateScale() {
@@ -275,8 +260,8 @@ public class Worldmap extends MapScreen implements IMap {
 			
 			return;
 		}
-		this.calculateShift();		
-		this.updateInterval = (long) (imageScale > 1 ? 10 * imageScale : 10);
+		this.chunkGrid.updateRange(x, y, width, height, imageScale);
+		this.chunkGrid.updateGrid();
 	}
 	
 	private void changeScale(float value) {
@@ -284,9 +269,7 @@ public class Worldmap extends MapScreen implements IMap {
 		this.updateScale();
 	}
 	
-	private void moveMap(Direction direction) {
-		long time = System.currentTimeMillis();
-		if (time - updated < updateInterval) return;		
+	private void moveMap(Direction direction) {	
 		switch (direction) {
 			case NORTH:
 				this.centerPos = centerPos.add(0, 0, -16);
@@ -301,10 +284,10 @@ public class Worldmap extends MapScreen implements IMap {
 				this.centerPos = centerPos.add(-16, 0, 0);
 				break;
 			default: break;
-		}		
-		this.calculateShift();
+		}
+		this.chunkGrid.updateCenter(centerPos.getX(), centerPos.getZ());
+		this.chunkGrid.updateGrid();
 		this.playerTracking = false;
-		this.updated = time;
 	}
 	
 	@Override
@@ -346,24 +329,22 @@ public class Worldmap extends MapScreen implements IMap {
 	}
 	
 	@Override
-	public boolean mouseDragged(double d, double e, int i, double f, double g) {
-		if (super.mouseDragged(d, e, i, f, g)) return true;
+	public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
+		if (super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY)) return true;
 		
-		if (i == 0) {
-			long time = System.currentTimeMillis();
-			if (time - updated < updateInterval) return true;
+		if (button == 0) {
 			
 			int x = centerPos.getX();
 			int y = centerPos.getY();
 			int z = centerPos.getZ();
 			
-			x -= Math.round(2 * f * imageScale);
-			z -= Math.round(2 * g * imageScale);
+			x -= Math.ceil(deltaX * imageScale);
+			z -= Math.ceil(deltaY * imageScale);
 			
-			this.centerPos = new BlockPos(x, y, z);			
-			this.calculateShift();
+			this.centerPos = new BlockPos(x, y, z);
+			this.chunkGrid.updateCenter(x, z);
+			this.chunkGrid.updateGrid();
 			this.playerTracking = false;
-			this.updated = time;
 		
 			return true;
 		}
@@ -371,17 +352,14 @@ public class Worldmap extends MapScreen implements IMap {
 		return false;
 	}
 	
-	private int pixelToPos(double x, int cx, double range, double scaledRange) {
-		double x1 = cx - scaledRange / 2;
-		double x2 = x1 + scaledRange;
-		
-		return MathUtil.worldPos(x, x1, x2, range);
+	private int pixelToPos(double screenPos, double centerWorld, double centerScreen) {
+		return (int) MathUtil.worldPos(screenPos, centerWorld, centerScreen, imageScale);
 	}
 	
 	private BlockPos cursorBlockPos(double x, double y) {
 		
-		int posX = this.pixelToPos(x, centerPos.getX(), width, scaledWidth);
-		int posZ = this.pixelToPos(y, centerPos.getZ(), height, scaledHeight);
+		int posX = this.pixelToPos(x, centerPos.getX(), centerX);
+		int posZ = this.pixelToPos(y, centerPos.getZ(), centerY);
 		
 		int chunkX = posX >> 4;
 		int chunkZ = posZ >> 4;

@@ -27,21 +27,15 @@ public class WorldKey {
 	
 	public void setWorldName(String name) {
 		this.worldName = name;
-		if (worldPos != null) {
-			this.worldId = String.format("%s_%s", worldName, PosUtil.shortPosString(worldPos));
-		} else {
-			this.worldId = worldName;
-		}
+		// if specified, directly use world name as key
+		this.worldId = name;
 	}
 	
 	public void setWorldPos(BlockPos worldPos) {
 		this.worldPos = worldPos;
-		if (worldName != null) {
-			this.worldId = String.format("%s_%s", worldName, PosUtil.shortPosString(worldPos));
-		} else {
+		if (worldName == null) {
 			this.worldId = String.format("%s_%s", dimension, PosUtil.shortPosString(worldPos));
 		}
-		
 	}
 	
 	public Identifier getDimension() {
@@ -85,7 +79,9 @@ public class WorldKey {
 		JsonObject jsonKey = new JsonObject();
 		jsonKey.addProperty("dimension", this.dimension.toString());
 		if (worldName != null) {
+			// if name is set, don't save the position
 			jsonKey.addProperty("name", worldName);
+			return jsonKey;
 		}
 		if (worldPos != null) {
 			jsonKey.add("position", PosUtil.toJson(worldPos));
@@ -99,6 +95,7 @@ public class WorldKey {
 		WorldKey worldKey = new WorldKey(dimension);
 		if (element.has("name")) {
 			worldKey.setWorldName(JsonHelper.getString(element, "name"));
+			return worldKey;
 		}
 		if (element.has("position")) {
 			BlockPos worldPos = PosUtil.fromJson(JsonHelper.getObject(element, "position"));

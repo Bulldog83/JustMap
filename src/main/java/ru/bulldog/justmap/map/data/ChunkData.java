@@ -6,6 +6,7 @@ import ru.bulldog.justmap.util.ColorUtil;
 import ru.bulldog.justmap.util.Colors;
 import ru.bulldog.justmap.util.DataUtil;
 import ru.bulldog.justmap.util.Dimension;
+import ru.bulldog.justmap.util.math.MathUtil;
 import ru.bulldog.justmap.util.tasks.TaskManager;
 
 import net.minecraft.world.World;
@@ -290,7 +291,7 @@ public class ChunkData {
 			float topoLevel = chunkLevel.topomap[index] / 100F;
 			color = ColorUtil.proccessColor(color, heightDiff, topoLevel);
 			if (ClientParams.showTopography) {
-				return chunkLevel.sampleHeightmap(index) % 2 != 0 ?
+				return MathUtil.isOdd(chunkLevel.sampleHeightmap(index)) ?
 						ColorUtil.colorBrigtness(color, -0.6F) : color;
 			}
 			return color;
