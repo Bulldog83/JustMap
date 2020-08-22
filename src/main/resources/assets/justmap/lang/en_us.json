@@ -118,7 +118,7 @@
   "justmap.gui.worldname_title": "Enter the name for current world:",
   "justmap.gui.worldmap.add_waypoint": "New waypoint",
   "justmap.gui.worldmap.set_map_pos": "Map position",
-  "justmap.gui.worldmap.open_map_config": "Config",
+  "justmap.gui.worldmap.open_map_config": "Settings",
   "justmap.gui.save": "Save",
   "justmap.gui.reset": "Reset",
   "justmap.gui.cancel": "Cancel",
