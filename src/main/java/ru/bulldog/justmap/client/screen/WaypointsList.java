@@ -92,7 +92,7 @@ public class WaypointsList extends MapScreen {
 			int stringY = y + 7;			
 			int nameX = x + iconSize + 2;
 
-			RenderUtil.drawStringWithShadow(matrixStack, font, waypoint.name, nameX, stringY, Colors.WHITE);
+			RenderUtil.DRAWER.drawStringWithShadow(matrixStack, font, waypoint.name, nameX, stringY, Colors.WHITE);
 			
 			int posX = tpButton.x - 5;
 			RenderUtil.drawRightAlignedString(matrixStack, waypoint.pos.toShortString(), posX, stringY, Colors.WHITE);

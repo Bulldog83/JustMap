@@ -314,7 +314,7 @@ public class Minimap implements IMap {
 			int checkHeight = 24;
 			BlockPos start = new BlockPos(startX, posY - checkHeight / 2, startZ);
 			BlockPos end = new BlockPos(endX, posY + checkHeight / 2, endZ);
-			List<Entity> entities = world.getOtherEntities(player, new Box(start, end));
+			List<Entity> entities = world.getEntities(player, new Box(start, end));
 		
 			int amount = 0;				
 			for (Entity entity : entities) {

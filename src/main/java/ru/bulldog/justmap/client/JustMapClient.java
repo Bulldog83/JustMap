@@ -1,5 +1,8 @@
 package ru.bulldog.justmap.client;
 
+import com.mojang.realmsclient.RealmsMainScreen;
+import com.mojang.realmsclient.gui.screens.RealmsGenericErrorScreen;
+
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientChunkEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
@@ -14,8 +17,6 @@ import net.minecraft.client.gui.screen.world.CreateWorldScreen;
 import net.minecraft.client.gui.screen.world.EditGameRulesScreen;
 import net.minecraft.client.gui.screen.world.EditWorldScreen;
 import net.minecraft.client.gui.screen.world.SelectWorldScreen;
-import net.minecraft.client.realms.gui.screen.RealmsGenericErrorScreen;
-import net.minecraft.client.realms.gui.screen.RealmsMainScreen;
 import net.minecraft.text.TranslatableText;
 
 import ru.bulldog.justmap.JustMap;

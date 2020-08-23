@@ -73,7 +73,7 @@ public class RenderUtil extends DrawableHelper {
 			drawX = rightBound - stringWidth;
 		}
 
-		drawStringWithShadow(matrices, textRenderer, string, drawX, y, color);
+		DRAWER.drawStringWithShadow(matrices, textRenderer, string, drawX, y, color);
 	}
 
 	public static void drawRightAlignedString(MatrixStack matrices, String string, int x, int y, int color) {

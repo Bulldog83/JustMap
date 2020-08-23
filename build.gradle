@@ -23,10 +23,9 @@ if (versionPropsFile.canRead()) {
 	major = versionProps['VERSION_MAJOR'].toInteger()
 	minor = versionProps['VERSION_MINOR'].toInteger()
 	build = versionProps['VERSION_BUILD'].toInteger()
-}
 
-build += 1
-	
+	build += 1
+}
 if (versionPropsFile.canWrite()) {
 	versionProps['VERSION_MAJOR'] = major.toString()
 	versionProps['VERSION_MINOR'] = minor.toString()
@@ -54,6 +53,7 @@ dependencies {
 	modCompile "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 	modCompile "io.github.prospector:modmenu:${project.modmenu_version}"
 	modCompile "me.shedaniel.cloth:config-2:${project.cloth_version}"
+	modCompile name: "authme-1.16.1-1.2.1-dev"
 	
 	include "me.shedaniel.cloth:config-2:${project.cloth_version}"
 }
@@ -85,5 +85,5 @@ jar {
 }
 
 assemble {
-	version += "-${project.minecraft_version}-release"
+	version = "${major}.${minor}.${build}-${project.minecraft_version}-release"
 }
