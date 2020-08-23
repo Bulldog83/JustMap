@@ -23,9 +23,10 @@ if (versionPropsFile.canRead()) {
 	major = versionProps['VERSION_MAJOR'].toInteger()
 	minor = versionProps['VERSION_MINOR'].toInteger()
 	build = versionProps['VERSION_BUILD'].toInteger()
-
-	build += 1
 }
+
+build += 1
+
 if (versionPropsFile.canWrite()) {
 	versionProps['VERSION_MAJOR'] = major.toString()
 	versionProps['VERSION_MINOR'] = minor.toString()
@@ -85,5 +86,5 @@ jar {
 }
 
 assemble {
-	version = "${major}.${minor}.${build}-${project.minecraft_version}-release"
+	version += "-${project.minecraft_version}-release"
 }
