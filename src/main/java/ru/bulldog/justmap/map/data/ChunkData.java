@@ -5,6 +5,7 @@ import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.util.ColorUtil;
 import ru.bulldog.justmap.util.Colors;
 import ru.bulldog.justmap.util.DimensionUtil;
+import ru.bulldog.justmap.util.math.MathUtil;
 import ru.bulldog.justmap.util.tasks.TaskManager;
 
 import net.minecraft.world.World;
@@ -15,6 +16,7 @@ import net.minecraft.world.chunk.WorldChunk;
 import net.minecraft.world.gen.ChunkRandom;
 
 import java.lang.ref.SoftReference;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -92,8 +94,15 @@ public class ChunkData {
 					this.levels.get(layer)[level] = chunkLevel;
 				}
 			} catch (ArrayIndexOutOfBoundsException ex) {
-				chunkLevel = EMPTY_LEVEL;
+				if (level < 0) {
+					chunkLevel = EMPTY_LEVEL;
+				} else {
+					ChunkLevel[] levels = this.levels.get(layer);
+					this.levels.replace(layer, Arrays.copyOf(levels, levels.length + 1));
+					chunkLevel = this.getChunkLevel(layer, level);
+				}
 			}
+
 			return chunkLevel;
 		}
 	}
@@ -278,7 +287,7 @@ public class ChunkData {
 			float topoLevel = chunkLevel.topomap[index] / 100F;
 			color = ColorUtil.proccessColor(color, heightDiff, topoLevel);
 			if (ClientParams.showTopography) {
-				return chunkLevel.sampleHeightmap(index) % 2 != 0 ?
+				return MathUtil.isOdd(chunkLevel.sampleHeightmap(index)) ?
 						ColorUtil.colorBrigtness(color, -0.6F) : color;
 			}
 			return color;

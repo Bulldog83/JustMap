@@ -63,4 +63,9 @@ public class Line {
 		return this.first.equals(line.first) &&
 			   this.second.equals(line.second);
 	}
+	
+	@Override
+	public String toString() {
+		return String.format("Line (%s, %s)", first.shortString(), second.shortString());
+	}
 }

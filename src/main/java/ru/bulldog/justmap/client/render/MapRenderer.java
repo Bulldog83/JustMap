@@ -11,11 +11,13 @@ import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.enums.TextAlignment;
 import ru.bulldog.justmap.enums.ArrowType;
+import ru.bulldog.justmap.map.ChunkGrid;
 import ru.bulldog.justmap.map.DirectionArrow;
 import ru.bulldog.justmap.map.MapPlayerManager;
+import ru.bulldog.justmap.map.data.RegionData;
 import ru.bulldog.justmap.map.data.WorldData;
 import ru.bulldog.justmap.map.icon.MapIcon;
-import ru.bulldog.justmap.map.data.RegionData;
+import ru.bulldog.justmap.map.icon.WaypointIcon;
 import ru.bulldog.justmap.map.minimap.Minimap;
 import ru.bulldog.justmap.map.minimap.skin.MapSkin;
 import ru.bulldog.justmap.util.Colors;
@@ -37,28 +39,30 @@ import net.minecraft.util.math.BlockPos;
 @Environment(EnvType.CLIENT)
 public class MapRenderer {
 	
+	private final static MinecraftClient minecraft = DataUtil.getMinecraft();
+	private final static Identifier roundMask = new Identifier(JustMap.MODID, "textures/round_mask.png");
+	
 	private int mapX, mapY;
 	private int winWidth, winHeight;
 	private int mapWidth, mapHeight;
+	private int scaledW, scaledH;
+	private int centerX, centerY;
+	private int lastX, lastZ;
 	private int imgX, imgY;
 	private int imgW, imgH;
 	private float rotation;
-	private int lastX;
-	private int lastZ;
+	private float mapScale;
 	private boolean mapRotation = false;
 
 	private final Minimap minimap;
 	private WorldData worldData;
-	
+	private ChunkGrid chunkGrid;
 	private MapSkin mapSkin;
 	private TextManager textManager;	
 	private InfoText dirN = new MapText(TextAlignment.CENTER, "N");
 	private InfoText dirS = new MapText(TextAlignment.CENTER, "S");
 	private InfoText dirE = new MapText(TextAlignment.CENTER, "E");
 	private InfoText dirW = new MapText(TextAlignment.CENTER, "W");
-	
-	private final MinecraftClient minecraft = DataUtil.getMinecraft();
-	private final Identifier roundMask = new Identifier(JustMap.MODID, "textures/round_mask.png");
 	
 	public MapRenderer(Minimap map) {
 		this.minimap = map;
@@ -86,32 +90,61 @@ public class MapRenderer {
 		int mapH = minimap.getHeight();
 		int mapX = minimap.getMapX();
 		int mapY = minimap.getMapY();
+		int lastX = minimap.getLastX();
+		int lastZ = minimap.getLastZ();
+		float scale = minimap.getScale();
 		boolean rotateMap = minimap.isRotated();
 		if (mapWidth != mapW || mapHeight != mapH ||
 			this.mapX != mapX || this.mapY != mapY ||
-			mapRotation != rotateMap) {
+			mapScale != scale || mapRotation != rotateMap) {
 			
 			this.mapWidth = mapW;
 			this.mapHeight = mapH;
 			this.mapRotation = rotateMap;
+			this.mapScale = scale;
 			this.mapX = minimap.getMapX();
-			this.mapY = minimap.getMapY();			
+			this.mapY = minimap.getMapY();	
+			this.centerX = mapX + mapWidth / 2;
+			this.centerY = mapY + mapHeight / 2;
 			
 			if (mapRotation) {
+				float mult = minimap.isBigMap() ? 1.9F : 1.44F;
+				this.scaledW = (int) Math.ceil(mapWidth * mapScale * mult);
+				this.scaledH = (int) Math.ceil(mapHeight * mapScale * mult);
 				this.imgW = minimap.getScaledWidth();
 				this.imgH = minimap.getScaledHeight();
-				this.imgX = mapX - (imgW - mapWidth) / 2;
-				this.imgY = mapY - (imgH - mapHeight) / 2;
+				this.imgX = (int) Math.ceil(mapX - (imgW - mapWidth) / 2.0);
+				this.imgY = (int) Math.ceil(mapY - (imgH - mapHeight) / 2.0);
 			} else {
-				this.imgW = this.mapWidth;
-				this.imgH = this.mapHeight;
-				this.imgX = this.mapX;
-				this.imgY = this.mapY;
+				this.scaledW = minimap.getScaledWidth();
+				this.scaledH = minimap.getScaledHeight();
+				this.imgX = mapX;
+				this.imgY = mapY;
+				this.imgW = mapW;
+				this.imgH = mapH;
+			}
+			this.scaledW += (16 * mapScale);
+			this.scaledH += (16 * mapScale);
+			this.imgW += 16;
+			this.imgH += 16;
+			this.imgX -= 8;
+			this.imgY -= 8;
+			
+			if (chunkGrid == null) {
+				this.chunkGrid = new ChunkGrid(lastX, lastZ, imgX, imgY, imgW, imgH, mapScale);
+			} else {
+				this.chunkGrid.updateRange(imgX, imgY, imgW, imgH, mapScale);
+				this.chunkGrid.updateGrid();
 			}
 		}
 		
-		int centerX = mapX + mapWidth / 2;
-		int centerY = mapY + mapHeight / 2;
+		if (this.lastX != lastX || this.lastZ != lastZ) {
+			this.lastX = lastX;
+			this.lastZ = lastZ;
+			this.chunkGrid.updateCenter(lastX, lastZ);
+			this.chunkGrid.updateGrid();
+		}
+		
 		int mapR = mapX + mapWidth;
 		int mapB = mapY + mapHeight;
 		
@@ -171,21 +204,10 @@ public class MapRenderer {
 		int scaledW = (int) (mapWidth * scale);
 		int scaledH = (int) (mapHeight * scale);
 		
-		
-		if (minimap.posChanged) {
-			this.lastX = minimap.getLasX();
-			this.lastZ = minimap.getLastZ();
-			this.minimap.posChanged = false;
-		}
-		
-		RenderSystem.disableDepthTest();
-		GL11.glEnable(GL11.GL_SCISSOR_TEST);
-		GL11.glScissor(scaledX, scaledY, scaledW, scaledH);
 		RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
-		
-		float mult = 1 / minimap.getScale();		
-		float offX = (float) (DataUtil.doubleX() - this.lastX) * mult;
-		float offY = (float) (DataUtil.doubleZ() - this.lastZ) * mult;
+		RenderSystem.disableDepthTest();
+		RenderUtil.enableScissor();
+		RenderUtil.applyScissor(scaledX, scaledY, scaledW, scaledH);
 		
 		if (Minimap.isRound()) {
 			RenderSystem.enableBlend();
@@ -193,32 +215,41 @@ public class MapRenderer {
 			RenderSystem.clearColor(0.0F, 0.0F, 0.0F, 0.0F);
 			RenderSystem.clear(GL11.GL_COLOR_BUFFER_BIT, false);
 			RenderSystem.colorMask(true, true, true, true);
-			RenderUtil.bindTexture(this.roundMask);
+			RenderUtil.bindTexture(roundMask);
 			RenderUtil.startDraw();
 			RenderUtil.addQuad(mapX, mapY, mapWidth, mapHeight);
 			RenderUtil.endDraw();
 			RenderSystem.blendFunc(GL11.GL_DST_ALPHA, GL11.GL_ONE_MINUS_DST_ALPHA);
 		}
-		
+
 		RenderSystem.pushMatrix();
 		if (mapRotation) {
-			float moveX = imgX + imgW / 2;
-			float moveY = imgY + imgH / 2;
+			float moveX = mapX + mapWidth / 2.0F;
+			float moveY = mapY + mapHeight / 2.0F;
 			RenderSystem.translatef(moveX, moveY, 0.0F);
-			RenderSystem.rotatef(-rotation + 180, 0, 0, 1.0F);
+			RenderSystem.rotatef(-rotation + 180, 0.0F, 0.0F, 1.0F);
 			RenderSystem.translatef(-moveX, -moveY, 0.0F);
 		}
-		RenderSystem.translatef(-offX, -offY, 0.0F);		
+		float offX = (float) (DataUtil.doubleX() - lastX) / mapScale;
+		float offY = (float) (DataUtil.doubleZ() - lastZ) / mapScale;
+		RenderSystem.translatef(-offX, -offY, 0.0F);
 		this.drawMap();
-		RenderSystem.popMatrix();
-		
+		if (ClientParams.showGrid) {
+			this.chunkGrid.draw();
+		}
 		MatrixStack matrices = new MatrixStack();
 		VertexConsumerProvider.Immediate consumerProvider = minecraft.getBufferBuilders().getEntityVertexConsumers();
 		for (MapIcon<?> icon : minimap.getDrawedIcons()) {
+			icon.draw(matrices, consumerProvider, mapX, mapY, rotation);
+		}
+		consumerProvider.draw();
+		RenderSystem.popMatrix();
+		for (WaypointIcon icon : minimap.getWaypoints()) {
 			icon.draw(matrices, consumerProvider, mapX, mapY, offX, offY, rotation);
 		}
 		consumerProvider.draw();
-		GL11.glDisable(GL11.GL_SCISSOR_TEST);
+		
+		RenderUtil.disableScissor();
 		
 		if (mapSkin != null) {
 			int skinX = minimap.getSkinX();
@@ -228,11 +259,9 @@ public class MapRenderer {
 		}
 		
 		RenderUtil.drawRightAlignedString(
-				Float.toString(minimap.getScale()),
+				Float.toString(mapScale),
 				mapX + mapWidth - 3, mapY + mapHeight - 10, Colors.WHITE);
 		
-		int centerX = mapX + mapWidth / 2;
-		int centerY = mapY + mapHeight / 2;
 		int iconSize = ClientParams.arrowIconSize;
 		if (ClientParams.arrowIconType == ArrowType.DIRECTION_ARROW) {
 			float direction = mapRotation ? 180 : minecraft.player.headYaw;
@@ -247,54 +276,42 @@ public class MapRenderer {
 	}
 	
 	private void drawMap() {
-		int scaledW = minimap.getScaledWidth();
-		int scaledH = minimap.getScaledHeight();
-		int cornerX = DataUtil.coordX() - scaledW / 2;
-		int cornerZ = DataUtil.coordZ() - scaledH / 2;		
-		int right = imgX + scaledW;
+		int cornerX = lastX - scaledW / 2;
+		int cornerZ = lastZ - scaledH / 2;
 		
-		int bottom;
-		if (mapRotation) {
-			bottom = (int) (imgY + scaledH * 1.42);
-		} else {
-			bottom = imgY + scaledH;
-		}
-		
-		float scale = minimap.getScale();
-		
-		BlockPos center = DataUtil.currentPos();
 		BlockPos.Mutable currentPos = new BlockPos.Mutable();
-		int cY = center.getY();
 		
-		int picX = 0, picW = 0;
+		int picX = 0;
 		while(picX < scaledW) {
+			int texW = 512;
+			if (picX + texW > scaledW) texW = (int) (scaledW - picX);
+			
+			int picY = 0;
 			int cX = cornerX + picX;
-			int picY = 0, picH = 0;
-			while (picY < scaledH ) {				
-				int cZ = cornerZ + picY;
+			while (picY < scaledH) {
+				int texH = 512;
+				if (picY + texH > scaledH) texH = (int) (scaledH - picY);
 				
-				RegionData region = worldData.getRegion(minimap, currentPos.set(cX, cY, cZ));
+				int cZ = cornerZ + picY;
+				RegionData region = worldData.getRegion(minimap, currentPos.set(cX, 0, cZ));
 				region.swapLayer(minimap.getLayer(), minimap.getLevel());
 				
-				picW = 512;
-				picH = 512;
-				int imgX = cX - (region.getX() << 9);
-				int imgY = cZ - (region.getZ() << 9);
+				int texX = cX - (region.getX() << 9);
+				int texY = cZ - (region.getZ() << 9);
+				if (texX + texW >= 512) texW = 512 - texX;
+				if (texY + texH >= 512) texH = 512 - texY;
 				
-				if (picX + picW >= right) picW = right - picX;
-				if (picY + picH >= bottom) picH = bottom - picY;
-				if (imgX + picW >= 512) picW = 512 - imgX;
-				if (imgY + picH >= 512) picH = 512 - imgY;
+				double scX = picX / mapScale;
+				double scY = picY / mapScale;
+				double scW = texW / mapScale;
+				double scH = texH / mapScale;
 				
-				double scX = (picX - 4) / scale;
-				double scY = (picY - 4) / scale;
+				region.draw(imgX + scX, imgY + scY, scW, scH, texX, texY, texW, texH);
 				
-				region.draw(this.imgX + scX, this.imgY + scY, imgX, imgY, picW, picH, scale);
-				
-				picY += picH > 0 ? picH : 512;
+				picY += texH > 0 ? texH : 512;
 			}
 			
-			picX += picW > 0 ? picW : 512;
+			picX += texW > 0 ? texW : 512;
 		}
 	}
 }

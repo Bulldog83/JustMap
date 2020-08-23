@@ -137,10 +137,6 @@ public class RegionData {
 			this.alternateRender = ClientParams.alternateColorRender;
 			this.needUpdate = true;
 		}
-		if (ClientParams.showGrid != gridOverlay) {
-			this.gridOverlay = ClientParams.showGrid;
-			this.renewOverlay = true;
-		}
 		if (slimeOverlay != RuleUtil.allowSlimeChunks()) {
 			this.slimeOverlay = RuleUtil.allowSlimeChunks();
 			this.renewOverlay = true;
@@ -231,13 +227,6 @@ public class RegionData {
 		if (slimeOverlay && mapChunk.hasSlime()) {
 			this.overlay.fill(x, y, 16, 16, Colors.SLIME_OVERLAY);
 		}
-		if (gridOverlay) {
-			this.overlay.setColor(x, y, Colors.GRID);
-			for (int i = 1; i < 16; i++) {
-				this.overlay.setColor(x + i, y, Colors.GRID);
-				this.overlay.setColor(x, y + i, Colors.GRID);
-			}
-		}
 	}
 	
 	public Layer getLayer() {
@@ -291,18 +280,15 @@ public class RegionData {
 		return new File(dir, String.format("r%d.%d.png", regPos.x, regPos.z));
 	}
 	
-	public void draw(double x, double y, int imgX, int imgY, int width, int height, float scale) {
+	public void draw(double x, double y, double width, double height, int imgX, int imgY, int imgW, int imgH) {
 		if (width <= 0 || height <= 0) return;
 		
 		float u1 = imgX / 512F;
 		float v1 = imgY / 512F;
-		float u2 = (imgX + width) / 512F;
-		float v2 = (imgY + height) / 512F;
+		float u2 = (imgX + imgW) / 512F;
+		float v2 = (imgY + imgH) / 512F;
 		
-		double scW = (double) width / scale;
-		double scH = (double) height / scale;
-		
-		this.drawTexture(x, y, scW, scH, u1, v1, u2, v2);
+		this.drawTexture(x, y, width, height, u1, v1, u2, v2);
 	}
 	
 	private void drawTexture(double x, double y, double w, double h, float u1, float v1, float u2, float v2) {
