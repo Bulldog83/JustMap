@@ -85,5 +85,5 @@ jar {
 }
 
 assemble {
-	version += "-${project.minecraft_version}-unlimited"
+	version = "${major}.${minor}.${build}-${project.minecraft_version}-unlimited"
 }

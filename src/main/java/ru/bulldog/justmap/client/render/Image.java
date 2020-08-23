@@ -24,7 +24,7 @@ public abstract class Image {
 		this.image = image;
 	}
 	
-	public abstract void draw(MatrixStack matrix, double x, double y, int w, int h);
+	public abstract void draw(MatrixStack matrices, double x, double y, int w, int h);
 	
 	public int getWidth() {
 		return this.width;
@@ -43,20 +43,20 @@ public abstract class Image {
 	}
 	
 	public void draw(double x, double y) {
-		MatrixStack matrix = new MatrixStack();
-		this.draw(matrix, x, y, this.getWidth(), this.getHeight());
+		MatrixStack matrices = new MatrixStack();
+		this.draw(matrices, x, y, this.getWidth(), this.getHeight());
 	}
 	
 	public void draw(double x, double y, int size) {
-		MatrixStack matrix = new MatrixStack();
-		this.draw(matrix, x, y, size, size);
+		MatrixStack matrices = new MatrixStack();
+		this.draw(matrices, x, y, size, size);
 	}
 	
-	public void draw(MatrixStack matrix, double x, double y, int size) {
-		this.draw(matrix, x, y, size, size);
+	public void draw(MatrixStack matrices, double x, double y, int size) {
+		this.draw(matrices, x, y, size, size);
 	}
 	
-	protected void draw(MatrixStack matrix, double x, double y, float w, float h) {
-		RenderUtil.drawImage(matrix, this, x, y, w, h);
+	protected void draw(MatrixStack matrices, double x, double y, float w, float h) {
+		RenderUtil.drawImage(matrices, this, x, y, w, h);
 	}
 }

@@ -18,12 +18,13 @@ import java.util.Map;
 public class WorldData {
 	private World world;
 	private final ChunkDataManager chunkManager;
-	private final Map<RegionPos, RegionData> regions = new HashMap<>();
+	private final Map<RegionPos, RegionData> regions;
 	private long lastPurged = 0;
 	private long purgeDelay = 1000;
 	private int purgeAmount = 500;
 	
 	public WorldData(World world) {
+		this.regions = new HashMap<>();
 		this.chunkManager = new ChunkDataManager(this, world);
 		this.world = world;
 	}

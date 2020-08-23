@@ -33,6 +33,7 @@ public abstract class ClientWorldMixin {
 			int level = DataUtil.getLevel(layer, pos.getY());
 			if (layer.equals(map.getLayer()) && level == map.getLevel()) {
 				WorldData mapData = WorldManager.getData();
+				if (mapData == null) return;
 				ChunkData mapChunk = mapData.getChunk(worldChunk.getPos());
 				ChunkUpdateListener.accept(new ChunkUpdateEvent(worldChunk, mapChunk, layer, level, true));
 			}
