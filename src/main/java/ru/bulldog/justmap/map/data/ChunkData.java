@@ -6,6 +6,7 @@ import ru.bulldog.justmap.util.ColorUtil;
 import ru.bulldog.justmap.util.Colors;
 import ru.bulldog.justmap.util.DataUtil;
 import ru.bulldog.justmap.util.Dimension;
+import ru.bulldog.justmap.util.math.MathUtil;
 import ru.bulldog.justmap.util.tasks.TaskManager;
 
 import net.minecraft.world.World;
@@ -13,12 +14,11 @@ import net.minecraft.block.BlockState;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
-import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.chunk.WorldChunk;
-import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.gen.ChunkRandom;
 
 import java.lang.ref.SoftReference;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -56,13 +56,12 @@ public class ChunkData {
 		this.chunkPos = pos;
 		this.worldChunk = new SoftReference<>(world.getChunk(pos.x, pos.z));
 
-		RegistryKey<DimensionType> dimType = world.getDimensionRegistryKey();
 		ServerWorld serverWorld = DataUtil.getServerWorld();
-		if (serverWorld != null && Dimension.isOverworld(dimType)) {
+		if (serverWorld != null && Dimension.isOverworld(world)) {
 			this.slime = ChunkRandom.getSlimeRandom(chunkPos.x, chunkPos.z,
 					serverWorld.getSeed(), 987234911L).nextInt(10) == 0;
 		}		
-		if (Dimension.isNether(dimType)) {
+		if (Dimension.isNether(world)) {
 			initLayer(Layer.NETHER);
 		} else {
 			initLayer(Layer.SURFACE);
@@ -99,8 +98,15 @@ public class ChunkData {
 					this.levels.get(layer)[level] = chunkLevel;
 				}
 			} catch (ArrayIndexOutOfBoundsException ex) {
-				chunkLevel = EMPTY_LEVEL;
+				if (level < 0) {
+					chunkLevel = EMPTY_LEVEL;
+				} else {
+					ChunkLevel[] levels = this.levels.get(layer);
+					this.levels.replace(layer, Arrays.copyOf(levels, levels.length + 1));
+					chunkLevel = this.getChunkLevel(layer, level);
+				}
 			}
+
 			return chunkLevel;
 		}
 	}
@@ -285,7 +291,7 @@ public class ChunkData {
 			float topoLevel = chunkLevel.topomap[index] / 100F;
 			color = ColorUtil.proccessColor(color, heightDiff, topoLevel);
 			if (ClientParams.showTopography) {
-				return chunkLevel.sampleHeightmap(index) % 2 != 0 ?
+				return MathUtil.isOdd(chunkLevel.sampleHeightmap(index)) ?
 						ColorUtil.colorBrigtness(color, -0.6F) : color;
 			}
 			return color;

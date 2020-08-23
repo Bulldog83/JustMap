@@ -104,6 +104,21 @@ public class RenderUtil extends DrawableHelper {
 		RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
 	}
 	
+	public static void enableScissor() {
+		RenderSystem.assertThread(RenderSystem::isOnRenderThread);
+		GL11.glEnable(GL11.GL_SCISSOR_TEST);
+	}
+	
+	public static void disableScissor() {
+		RenderSystem.assertThread(RenderSystem::isOnRenderThread);
+		GL11.glDisable(GL11.GL_SCISSOR_TEST);
+	}
+	
+	public static void applyScissor(int x, int y, int width, int height) {
+		RenderSystem.assertThread(RenderSystem::isOnRenderThread);
+		GL11.glScissor(x, y, width, height);
+	}
+	
     public static void startDraw() {
     	startDraw(VertexFormats.POSITION_TEXTURE);
     }
@@ -122,6 +137,10 @@ public class RenderUtil extends DrawableHelper {
     
     public static void endDraw() {
     	tessellator.draw();
+    }
+    
+    public static BufferBuilder getBuffer() {
+    	return vertexBuffer;
     }
 	
 	public static void drawTriangle(double x1, double y1, double x2, double y2, double x3, double y3, int color) {
@@ -152,6 +171,7 @@ public class RenderUtil extends DrawableHelper {
 		vertexBuffer.vertex(x1, y1, 0).next();
 		vertexBuffer.vertex(x2, y2, 0).next();
 		endDraw();
+		RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
 		RenderSystem.enableTexture();
 	}	
 	
@@ -217,8 +237,7 @@ public class RenderUtil extends DrawableHelper {
 		RenderSystem.disableBlend();
 	}
 	
-	public static void draw(double x, double y, float w, float h) {
-		MatrixStack matrices = new MatrixStack();		
+	public static void draw(MatrixStack matrices, double x, double y, float w, float h) {
 		startDrawNormal();
 		draw(matrices, vertexBuffer, x, y, w, h, 0.0F, 0.0F, 1.0F, 1.0F);
 		endDraw();

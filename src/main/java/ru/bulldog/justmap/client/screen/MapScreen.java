@@ -7,7 +7,7 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.RegistryKey;
-import net.minecraft.world.dimension.DimensionType;
+import net.minecraft.world.World;
 
 import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.util.LangUtil;
@@ -43,24 +43,26 @@ public class MapScreen extends Screen {
 	public MapScreen(Text title, Screen parent) {
 		super(title);
 		this.parent = parent;
-		this.langUtil = new LangUtil("gui");
+		this.langUtil = new LangUtil(LangUtil.GUI_ELEMENT);
 	}
 	
 	@Override
 	protected void init() {
-		RegistryKey<DimensionType> dimKey = client.world.getDimensionRegistryKey();
+		RegistryKey<World> dimKey = client.world.getRegistryKey();
 		this.info = DIMENSION_INFO.getOrDefault(dimKey.getValue().toString(), null);
 	}
 	
 	@Override
 	public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+		RenderSystem.disableDepthTest();
 		this.renderBackground(matrices);
+		this.renderForeground(matrices);
 		for (Element e : children) {
 			if (e instanceof Drawable) {
 				((Drawable) e).render(matrices, mouseX, mouseY, delta);
 			}
 		}
-		this.renderForeground(matrices);
+		RenderSystem.enableDepthTest();
 	}
 	
 	public void renderBackground(MatrixStack matrixStack) {
