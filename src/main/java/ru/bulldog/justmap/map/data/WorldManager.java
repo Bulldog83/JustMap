@@ -5,10 +5,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
+import com.google.gson.*;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ProgressScreen;
@@ -37,7 +36,8 @@ import ru.bulldog.justmap.util.tasks.MemoryUtil;
 public final class WorldManager {
 
 	private final static Map<WorldKey, WorldData> worldsData = new HashMap<>();
-	private final static Map<BlockPos, String> registeredWorlds = new HashMap<>();
+	// used only in mixed mode to associate world names with worlds
+	private final static Map<MultiworldIdentifier, String> worldAssociations = new HashMap<>();
 	private final static MinecraftClient minecraft = DataUtil.getMinecraft();
 	private final static ClientConfig modConfig = JustMapClient.CONFIG;
 
@@ -47,6 +47,7 @@ public final class WorldManager {
 	private static String currentWorldName;
 	private static boolean cacheClearing = false;
 	private static boolean requestWorldName = false;
+	private static boolean loaded = false;
 	
 	public static List<WorldKey> registeredWorlds() {
 		return new ArrayList<>(worldsData.keySet());
@@ -58,7 +59,7 @@ public final class WorldManager {
 	
 	public static void onConfigUpdate() {
 		if (currentWorld == null) return;
-		if (DataUtil.isOnline()) saveConfig();
+		saveConfig();
 		JustMapClient.stopMapping();
 		if (!RuleUtil.detectMultiworlds()) {
 			if (currentWorldPos != null || currentWorldName != null) {
@@ -86,10 +87,12 @@ public final class WorldManager {
 				currentWorldName = null;
 				clearData();
 			}
+			assert minecraft.world != null;
 			onWorldPosChanged(minecraft.world.getSpawnPos());
 			return;
 		} else if (MultiworldDetection.isMixed()) {
 			if (currentWorldPos == null) {
+				assert minecraft.world != null;
 				onWorldPosChanged(minecraft.world.getSpawnPos());
 			} else if (currentWorldName == null) {
 				requestWorldName = true;
@@ -128,17 +131,12 @@ public final class WorldManager {
 			return;
 		}
 		JustMapClient.stopMapping();
-		if (currentWorldPos == null) {
-			synchronized (worldsData) {
-				worldsData.keySet().forEach(key -> {
-					key.setWorldPos(newPos);
-				});
-			}
-		}
 		currentWorldPos = newPos;
 		if (MultiworldDetection.isMixed()) {
-			if (registeredWorlds.containsKey(newPos)) {
-				currentWorldName = registeredWorlds.get(newPos);
+			MultiworldIdentifier identifier = new MultiworldIdentifier(newPos, currentWorld);
+			String name = worldAssociations.get(identifier);
+			if (name != null) {
+				currentWorldName = name;
 				updateWorldKey();
 				JustMapClient.startMapping();
 			} else {
@@ -154,20 +152,11 @@ public final class WorldManager {
 		if (!RuleUtil.detectMultiworlds()) {
 			return;
 		}
-		if (currentWorldName == null) {
-			synchronized (worldsData) {
-				worldsData.keySet().forEach(key -> {
-					if (name.equals(key.getName())) {
-						key.setWorldName(name);
-					}
-				});
-			}
-		}
 		currentWorldName = name;
 		if (MultiworldDetection.isMixed()) {
-			if (!registeredWorlds.containsKey(currentWorldPos)) {
-				registeredWorlds.put(currentWorldPos, name);
-			}
+			MultiworldIdentifier identifier = new MultiworldIdentifier(currentWorldPos, currentWorld);
+			worldAssociations.put(identifier, name);
+			saveWorlds();
 		}
 		updateWorldKey();
 		JustMapClient.startMapping();
@@ -227,6 +216,7 @@ public final class WorldManager {
 		if (world == null || worldChunk == null || worldChunk.isEmpty()) return;
 		IMap map = DataUtil.getMap();
 		WorldData mapData = getData();
+		if (mapData == null) return;
 		ChunkData mapChunk = mapData.getChunk(worldChunk.getPos());
 		ChunkUpdateEvent updateEvent = new ChunkUpdateEvent(worldChunk, mapChunk, map.getLayer(), map.getLevel(), true);
 		ChunkUpdateListener.accept(updateEvent);
@@ -272,28 +262,41 @@ public final class WorldManager {
 	}
 	
 	public static void load() {
+		loaded = true;
+		loadConfig();
 		File worldsFile = new File(StorageUtil.filesDir(), "worlds.json");
 		if (!worldsFile.exists()) return;
 		JsonObject jsonObject = JsonFactory.loadJson(worldsFile);
-		if (jsonObject.has("worlds")) {
+		if (jsonObject.has("worlds") && jsonObject.get("worlds").isJsonArray()) {
 			JsonArray worldsArray = jsonObject.getAsJsonArray("worlds");
-			synchronized (worldsData) {
-				for(JsonElement elem : worldsArray) {
-					WorldKey world = WorldKey.fromJson((JsonObject) elem);
-					worldsData.put(world, null);
+			for (JsonElement elem : worldsArray) {
+				if (!elem.isJsonObject()) continue;
+				JsonObject object = (JsonObject) elem;
+				MultiworldIdentifier identifier;
+				try {
+					identifier = MultiworldIdentifier.fromJson(object);
+				} catch (JsonSyntaxException ex) {
+					continue;
 				}
+				JsonElement nameElement = object.get("name");
+				if (nameElement == null) continue;
+				String name;
+				try {
+					name = nameElement.getAsString();
+				} catch (ClassCastException ex) {
+					continue;
+				}
+				worldAssociations.put(identifier, name);
 			}
 		}
-		loadConfig();
 	}
 	
 	private static void saveWorlds() {
-		if (worldsData.size() == 0) return;
 		JsonArray worldsArray = new JsonArray();
-		synchronized (worldsData) {
-			worldsData.keySet().forEach(world -> {
-				worldsArray.add(world.toJson());
-			});
+		for (Entry<MultiworldIdentifier, String> entry : worldAssociations.entrySet()) {
+			JsonObject object = entry.getKey().toJson();
+			object.addProperty("name", entry.getValue());
+			worldsArray.add(object);
 		}
 		JsonObject jsonObject = new JsonObject();
 		jsonObject.add("worlds", worldsArray);
@@ -310,15 +313,33 @@ public final class WorldManager {
 		configObject.addProperty("multiworld_detection_type", detectionType.asString());
 		JsonFactory.storeJson(configFile, configObject);
 	}
+
+	// try to load local configuration, return false if not successful
+	private static boolean tryLoadConfig() {
+		File configFile = new File(StorageUtil.filesDir(), "config.json");
+		if (!configFile.exists()) return false;
+		try {
+			JsonObject configObject = JsonFactory.loadJson(configFile);
+			EnumEntry<MultiworldDetection> detectionType = modConfig.getEntry("multiworld_detection");
+			BooleanEntry detectMultiworlds = modConfig.getEntry("detect_multiworlds");
+			detectMultiworlds.fromString(JsonHelper.getString(configObject, "detect_multiworlds"));
+			detectionType.fromString(JsonHelper.getString(configObject, "multiworld_detection_type"));
+		} catch (JsonSyntaxException ex) {
+			return false;
+		}
+		return true;
+	}
 	
 	private static void loadConfig() {
-		File configFile = new File(StorageUtil.filesDir(), "config.json");
-		if (!configFile.exists()) return;
-		JsonObject configObject = JsonFactory.loadJson(configFile);
-		EnumEntry<MultiworldDetection> detectionType = modConfig.getEntry("multiworld_detection");
-		BooleanEntry detectMultiworlds = modConfig.getEntry("detect_multiworlds");
-		detectMultiworlds.fromString(JsonHelper.getString(configObject, "detect_multiworlds"));
-		detectionType.fromString(JsonHelper.getString(configObject, "multiworld_detection_type"));
+		if (!tryLoadConfig()) {
+			// load defaults
+			EnumEntry<MultiworldDetection> detectionType = modConfig.getEntry("multiworld_detection");
+			BooleanEntry detectMultiworlds = modConfig.getEntry("detect_multiworlds");
+			detectionType.setValue(detectionType.getDefault());
+			detectMultiworlds.setValue(detectMultiworlds.getDefault());
+			// then save them
+			saveConfig();
+		}
 	}
 	
 	private static void clearData() {
@@ -335,7 +356,11 @@ public final class WorldManager {
 	public static void close() {
 		modConfig.reloadFromDisk();
 		currentWorld = null;
-		saveWorlds();
-		clearData();
+		if (loaded) {
+			saveWorlds();
+			worldAssociations.clear();
+			clearData();
+			loaded = false;
+		}
 	}
 }

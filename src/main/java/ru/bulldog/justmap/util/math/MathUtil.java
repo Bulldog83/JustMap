@@ -31,6 +31,13 @@ public class MathUtil {
 		return !isEven(num);
 	}
 	
+	public static int floor(double val) {
+		if (val < 0.0) {
+			--val;
+		}
+        return (int) val;
+	}
+	
 	public static double min(double... args) {
 		if (args.length == 0) return 0.0;
 		double min = Double.POSITIVE_INFINITY;
@@ -59,12 +66,12 @@ public class MathUtil {
 		return angle;
 	}
 	
-	public static double screenPos(double val, double x1, double x2, double mapWidth) {
-		return ((val - x1) / (x2 - x1)) * mapWidth;
+	public static double screenPos(double worldPos, double anchorWorld, double anchorScreen, float scale) {
+		return anchorScreen + (worldPos - anchorWorld) / scale;
 	}
 	
-	public static int worldPos(double val, double x1, double x2, double range) {
-		return (int) Math.round((val * (x2 - x1) + range * x1) / range);
+	public static double worldPos(double screenPos, double anchorWorld, double anchorScreen, float scale) {
+		return anchorWorld + (screenPos - anchorScreen) * scale;
 	}
 
 	public static Point circlePos(Point pos, Point center, double angle) {

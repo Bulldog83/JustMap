@@ -59,6 +59,7 @@ public class MapGameRules {
 	 *	§d: entities radar (animal)
 	 *	§e: entities radar (hostile)
 	 *	§s: slime chunks
+	 *	§t: teleportation
 	 *
 	 *  §1: enable
 	 *  §0: disable

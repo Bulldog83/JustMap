@@ -44,9 +44,9 @@ public class PlayerIcon extends MapIcon<PlayerIcon> {
 	}
 
 	@Override
-	public void draw(MatrixStack matrices, VertexConsumerProvider consumerProvider, int mapX, int mapY, double offX, double offY, float rotation) {
+	public void draw(MatrixStack matrices, VertexConsumerProvider consumerProvider, int mapX, int mapY, float rotation) {
 		int size = ClientParams.entityIconSize;
-		this.updatePos(size, mapX, mapY, offX, offY, rotation);
+		this.updatePos(size, mapX, mapY);
 		if (!allowRender) return;
 		if (ClientParams.renderEntityModel) {
 			EntityModelRenderer.renderModel(matrices, consumerProvider, player, iconPos.x, iconPos.y);

@@ -13,6 +13,7 @@ import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen;
 import net.minecraft.client.gui.screen.world.CreateWorldScreen;
 import net.minecraft.client.gui.screen.world.EditWorldScreen;
 import net.minecraft.client.gui.screen.world.SelectWorldScreen;
+import net.minecraft.text.TranslatableText;
 
 import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.advancedinfo.AdvancedInfo;
@@ -81,7 +82,16 @@ public class JustMapClient implements ClientModInitializer {
 	}
 	
 	private boolean isOnTitleScreen(Screen currentScreen) {
-		return currentScreen instanceof TitleScreen ||
+		if (currentScreen == null) return false;
+		
+		boolean isTitleScreen = false;
+		if (currentScreen.getTitle() instanceof TranslatableText) {
+			TranslatableText title = (TranslatableText) currentScreen.getTitle();
+			isTitleScreen = title.getKey().equals("dataPack.title");
+		}
+		
+		return isTitleScreen ||
+			   currentScreen instanceof TitleScreen ||
 			   currentScreen instanceof SelectWorldScreen ||
 		       currentScreen instanceof MultiplayerScreen ||
 		       currentScreen instanceof BackupPromptScreen ||

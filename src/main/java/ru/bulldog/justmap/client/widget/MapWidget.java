@@ -50,7 +50,14 @@ public class MapWidget implements Element, Drawable {
 
 	@Override
 	public void render(int mouseX, int mouseY, float delta) {
-		RenderUtil.fill(x + border, y + border, bgW, bgH, 0xDD00AA00);
+		int color = 0xDD00AA00;
+		if (Minimap.isRound()) {
+			double centerX = x + border + bgW / 2;
+			double centerY = y + border + bgH / 2;
+			RenderUtil.drawCircle(centerX, centerY, bgW / 2, color);
+		} else {
+			RenderUtil.fill(x + border, y + border, bgW, bgH, color);
+		}
 		if (map.getSkin() != null) {
 			map.getSkin().draw(new MatrixStack(), x, y, width, height);
 		}

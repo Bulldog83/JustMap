@@ -54,8 +54,14 @@ public class WorldnameScreen extends Screen {
 			btnY = (y + frameHeight) - 40;
 		}
 		this.nameField = new TextFieldWidget(font, x + 20, y + 50, frameWidth - 40, 20, "Default");
-		this.buttons.add(new ButtonWidget(center - 30, btnY, 80, 20, LangUtil.getString("gui", "save"), this::onPressSave));
-		this.children.add(nameField);
+		this.setFocused(this.nameField);
+		this.nameField.setSelected(true);
+		this.addButton(new ButtonWidget(center - 30, btnY, 80, 20, LangUtil.getString("gui", "save"), this::onPressSave));
+		this.addChild(nameField);
+	}
+	
+	private void addChild(Element element) {
+		this.children.add(element);
 	}
 	
 	private void onPressSave(ButtonWidget button) {
@@ -72,7 +78,7 @@ public class WorldnameScreen extends Screen {
 	@Override
 	public void render(int mouseX, int mouseY, float delta) {
 		this.renderBackground();
-		this.drawCenteredString(font, LangUtil.getString("gui", "worldname_title"), center, y + 25, Colors.WHITE);
+		drawCenteredString(font, LangUtil.getString("gui", "worldname_title"), center, y + 25, Colors.WHITE);
 		for (Element child : children) {
 			if (child instanceof Drawable) {
 				((Drawable) child).render(mouseX, mouseY, delta);
@@ -95,9 +101,10 @@ public class WorldnameScreen extends Screen {
 	
 	@Override
 	public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-		switch(keyCode) {
+		switch (keyCode) {
 			case GLFW.GLFW_KEY_ENTER:
 				this.onPressSave(null);
+				return true;
 		  	default:
 		  		return super.keyPressed(keyCode, scanCode, modifiers);
 		}
