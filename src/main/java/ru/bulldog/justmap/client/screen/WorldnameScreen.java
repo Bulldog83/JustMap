@@ -53,9 +53,12 @@ public class WorldnameScreen extends Screen {
 			this.y = height / 2 - frameHeight / 2;
 			btnY = (y + frameHeight) - 40;
 		}
-		this.nameField = new TextFieldWidget(font, x + 20, y + 50, frameWidth - 40, 20, "Default");
-		this.buttons.add(new ButtonWidget(center - 30, btnY, 80, 20, LangUtil.getString("gui", "save"), this::onPressSave));
-		this.children.add(nameField);
+		Text defaultText = new LiteralText("Default");
+		this.nameField = new TextFieldWidget(textRenderer, x + 20, y + 50, frameWidth - 40, 20, defaultText);
+		this.setFocused(this.nameField);
+		this.nameField.setSelected(true);
+		this.addButton(new ButtonWidget(center - 30, btnY, 80, 20, LangUtil.getText("gui", "save"), this::onPressSave));
+		this.addChild(nameField);
 	}
 	
 	private void onPressSave(ButtonWidget button) {
@@ -70,9 +73,9 @@ public class WorldnameScreen extends Screen {
 	}
 	
 	@Override
-	public void render(int mouseX, int mouseY, float delta) {
-		this.renderBackground();
-		this.drawCenteredString(font, LangUtil.getString("gui", "worldname_title"), center, y + 25, Colors.WHITE);
+	public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+		this.renderBackground(matrices);
+		drawCenteredString(matrices, textRenderer, LangUtil.getString("gui", "worldname_title"), center, y + 25, Colors.WHITE);
 		for (Element child : children) {
 			if (child instanceof Drawable) {
 				((Drawable) child).render(mouseX, mouseY, delta);
@@ -95,9 +98,10 @@ public class WorldnameScreen extends Screen {
 	
 	@Override
 	public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-		switch(keyCode) {
+		switch (keyCode) {
 			case GLFW.GLFW_KEY_ENTER:
 				this.onPressSave(null);
+				return true;
 		  	default:
 		  		return super.keyPressed(keyCode, scanCode, modifiers);
 		}

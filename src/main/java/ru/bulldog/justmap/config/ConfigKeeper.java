@@ -319,6 +319,14 @@ public final class ConfigKeeper {
 		public void setValue(T value) {
 			this.setter.accept(value.compareTo(min) < 0 ? min : value.compareTo(max) > 0 ? max : value);
 		}
+		
+		public T minValue() {
+			return this.min;
+		}
+		
+		public T maxValue() {
+			return this.max;
+		}
 	}
 	
 	public static abstract class Entry<T> {

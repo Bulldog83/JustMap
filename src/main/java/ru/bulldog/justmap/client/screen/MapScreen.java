@@ -41,7 +41,7 @@ public class MapScreen extends Screen {
 	public MapScreen(Text title, Screen parent) {
 		super(title);
 		this.parent = parent;
-		this.langUtil = new LangUtil("gui");
+		this.langUtil = new LangUtil(LangUtil.GUI_ELEMENT);
 	}
 	
 	@Override
@@ -52,13 +52,15 @@ public class MapScreen extends Screen {
 	
 	@Override
 	public void render(int mouseX, int mouseY, float delta) {
+		RenderSystem.disableDepthTest();
 		this.renderBackground();
+		this.renderForeground();
 		for (Element e : children) {
 			if (e instanceof Drawable) {
 				((Drawable) e).render(mouseX, mouseY, delta);
 			}
 		}
-		this.renderForeground();
+		RenderSystem.enableDepthTest();
 	}
 	
 	public void renderBackground() {

@@ -56,17 +56,21 @@ public class Minimap implements IMap {
 	private InfoText txtCoords = new CoordsInfo(TextAlignment.CENTER, "0, 0, 0");
 	private InfoText txtBiome = new BiomeInfo(TextAlignment.CENTER, "");
 	private InfoText txtTime = new TimeInfo(TextAlignment.CENTER, "");
-	private List<MapIcon<?>> drawedIcons = new ArrayList<>();	
+	private List<MapIcon<?>> drawedIcons = new ArrayList<>();
+	private List<WaypointIcon> waypoints = new ArrayList<>();
 	private PlayerEntity locPlayer = null;
 	private Layer mapLayer = Layer.SURFACE;
 	private WorldData worldData;
 	private MapSkin mapSkin;
 	private World world;
 	private ScreenPosition mapPosition;
+	private double winScale;
 	private boolean isMapVisible = true;
 	private boolean rotateMap = false;
 	private boolean bigMap = false;
 	private float mapScale;
+	private int lastPosX;
+	private int lastPosZ;
 	private int skinX, skinY;
 	private int mapX, mapY;
 	private int offset;
@@ -76,10 +80,6 @@ public class Minimap implements IMap {
 	private int mapHeight;
 	private int scaledWidth;
 	private int scaledHeight;
-	private int lastPosX;
-	private int lastPosZ;
-
-	public boolean posChanged = false;
 
 	public Minimap() {
 		this.textManager = AdvancedInfo.getMapTextManager();
@@ -105,6 +105,15 @@ public class Minimap implements IMap {
 		} else {
 			locPlayer = null;
 		}
+		
+		Window window = minecraft.getWindow();
+		if (window != null) {
+			double scale = window.getScaleFactor();
+			if (winScale != scale) {
+				winScale = scale;
+				this.updateMapParams();
+			}
+		}
 	}
 
 	public void updateMapParams() {
@@ -112,46 +121,6 @@ public class Minimap implements IMap {
 		this.isMapVisible = config.getBoolean("map_visible");
 		
 		if (!isMapVisible) return;
-		
-		int configSize = config.getInt("map_size");
-		float configScale = config.getFloat("map_scale");
-		boolean needRotate = config.getBoolean("rotate_map");
-		boolean bigMap = config.getBoolean("show_big_map");
-
-		Window window = minecraft.getWindow();
-		if (window != null) {
-			int winWidth = window.getScaledWidth();
-			int guiScale = minecraft.options.guiScale;
-			double winScale = window.getScaleFactor();
-			if (guiScale == 0 && winScale > 2) {
-				configSize *= configSize / (winWidth / winScale);
-			}
-		}
-
-		if (configSize != mapWidth || configScale != mapScale ||
-			rotateMap != needRotate || this.bigMap != bigMap) {
-			if (bigMap) {
-				this.mapWidth = config.getInt("big_map_size");
-				this.mapHeight = (mapWidth * 10) / 16;
-			} else {
-				this.mapWidth = configSize;
-				this.mapHeight = configSize;
-			}
-			this.mapScale = configScale;
-			this.rotateMap = needRotate;
-			this.bigMap = bigMap;
-
-			if (rotateMap) {
-				double mult = (bigMap) ? 1.8 : 1.42;
-				this.scaledWidth = (int) ((mapWidth * mapScale) * mult + 8);
-				this.scaledHeight = (int) ((mapHeight * mapScale) * mult + 8);
-			} else {
-				this.scaledWidth = (int) ((mapWidth * mapScale) + 8);
-				this.scaledHeight = (int) ((mapHeight * mapScale) + 8);
-			}
-
-			this.textManager.setLineWidth(this.mapWidth);
-		}
 		
 		this.border = 0;
 		if (ClientParams.useSkins) {
@@ -172,6 +141,39 @@ public class Minimap implements IMap {
 		} else {
 			this.mapSkin = null;
 		}
+		
+		int configSize = config.getInt("map_size");
+		float configScale = config.getFloat("map_scale");
+		boolean needRotate = config.getBoolean("rotate_map");
+		boolean bigMap = config.getBoolean("show_big_map");
+		
+		configSize *= winScale;
+
+		if (configSize != mapWidth || configScale != mapScale ||
+			rotateMap != needRotate || this.bigMap != bigMap) {
+			if (bigMap) {
+				this.mapWidth = config.getInt("big_map_size");
+				this.mapHeight = (mapWidth * 10) / 16;
+			} else {
+				this.mapWidth = configSize;
+				this.mapHeight = configSize;
+			}
+			this.mapScale = configScale;
+			this.rotateMap = needRotate;
+			this.bigMap = bigMap;
+
+			if (rotateMap) {
+				float mult = ((bigMap) ? 1.9F : 1.44F) / mapScale;
+				this.scaledWidth = (int) (mapWidth * mapScale * mult);
+				this.scaledHeight = (int) (mapHeight * mapScale * mult);
+			} else {
+				this.scaledWidth = (int) (mapWidth * mapScale);
+				this.scaledHeight = (int) (mapHeight * mapScale);
+			}
+			
+			this.textManager.setLineWidth(this.mapWidth);
+		}
+		
 		this.updateMapPosition();
 	}
 	
@@ -275,12 +277,13 @@ public class Minimap implements IMap {
 		int posX = pos.getX();
 		int posZ = pos.getZ();
 		int posY = pos.getY();
-		int scaledW = scaledWidth;
-		int scaledH = scaledHeight;
-		double startX = posX - scaledW / 2;
-		double startZ = posZ - scaledH / 2;
 
-		if (DimensionUtil.isNether(world.dimension)) {
+		if (lastPosX != posX || lastPosZ != posZ) {
+			this.lastPosX = posX;
+			this.lastPosZ = posZ;
+		}
+
+		if (Dimension.isNether(world)) {
 			this.mapLayer = Layer.NETHER;
 			this.mapLevel = posY / mapLayer.height;
 		} else if (RuleUtil.needRenderCaves(world, pos)) {
@@ -291,36 +294,32 @@ public class Minimap implements IMap {
 			this.mapLevel = 0;
 		}
 
-		if (lastPosX != posX || lastPosZ != posZ) {
-			this.lastPosX = posX;
-			this.lastPosZ = posZ;
-			this.posChanged = true;
-		}
-
+		int scaledW = scaledWidth;
+		int scaledH = scaledHeight;
+		double startX = posX - scaledW / 2.0;
+		double startZ = posZ - scaledH / 2.0;
 		if (ClientParams.rotateMap) {
 			scaledW = (int) (mapWidth * mapScale);
 			scaledH = (int) (mapHeight * mapScale);
-			startX = posX - scaledW / 2;
-			startZ = posZ - scaledH / 2;
+			startX = posX - scaledW / 2.0;
+			startZ = posZ - scaledH / 2.0;
 		}
-
 		double endX = startX + scaledW;
 		double endZ = startZ + scaledH;
+		int centerX = mapX + mapWidth / 2;
+		int centerY = mapY + mapHeight / 2;
 
 		this.drawedIcons.clear();
 		if (RuleUtil.allowEntityRadar()) {
 			int checkHeight = 24;
 			BlockPos start = new BlockPos(startX, posY - checkHeight / 2, startZ);
 			BlockPos end = new BlockPos(endX, posY + checkHeight / 2, endZ);
-			List<Entity> entities = this.world.getEntities(null, new Box(start, end));
-
-			int amount = 0;
+			List<Entity> entities = world.getEntities(player, new Box(start, end));
+		
+			int amount = 0;				
 			for (Entity entity : entities) {
-				float tick = minecraft.getTickDelta();
-				double entX = entity.prevX + (entity.getX() - entity.prevX) * tick;
-				double entZ = entity.prevZ + (entity.getZ() - entity.prevZ) * tick;
-				double iconX = MathUtil.screenPos(entX, startX, endX, mapWidth);
-				double iconY = MathUtil.screenPos(entZ, startZ, endZ, mapHeight);
+				double iconX = MathUtil.screenPos(entity.getX(), pos.getX(), centerX, mapScale);
+				double iconY = MathUtil.screenPos(entity.getZ(), pos.getZ(), centerY, mapScale);
 				if (entity instanceof PlayerEntity && RuleUtil.allowPlayerRadar()) {
 					PlayerEntity pEntity = (PlayerEntity) entity;
 					if (pEntity == player) continue;
@@ -345,6 +344,7 @@ public class Minimap implements IMap {
 				if (amount >= 250) break;
 			}
 		}
+		this.waypoints.clear();
 		if (ClientParams.showWaypoints) {
 			List<Waypoint> wps = WaypointKeeper.getInstance().getWaypoints(WorldManager.getWorldKey(), true);
 			if (wps != null) {
@@ -352,9 +352,9 @@ public class Minimap implements IMap {
 						.filter(wp -> MathUtil.getDistance(pos, wp.pos, false) <= wp.showRange);
 				for (Waypoint wp : stream.toArray(Waypoint[]::new)) {
 					WaypointIcon waypoint = new WaypointIcon(this, wp);
-					waypoint.setPosition(MathUtil.screenPos(wp.pos.getX(), startX, endX, mapWidth),
-										 MathUtil.screenPos(wp.pos.getZ(), startZ, endZ, mapHeight));
-					this.drawedIcons.add(waypoint);
+					waypoint.setPosition(MathUtil.screenPos(wp.pos.getX(), pos.getX(), centerX, mapScale),
+										 MathUtil.screenPos(wp.pos.getZ(), pos.getZ(), centerY, mapScale));
+					this.waypoints.add(waypoint);
 				}
 			}
 		}
@@ -397,6 +397,10 @@ public class Minimap implements IMap {
 	
 	public List<MapIcon<?>> getDrawedIcons() {
 		return this.drawedIcons;
+	}
+	
+	public List<WaypointIcon> getWaypoints() {
+		return this.waypoints;
 	}
 
 	public TextManager getTextManager() {
@@ -444,7 +448,7 @@ public class Minimap implements IMap {
 		return this.skinY;
 	}
 
-	public int getLasX() {
+	public int getLastX() {
 		return this.lastPosX;
 	}
 

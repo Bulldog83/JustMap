@@ -7,6 +7,12 @@ import ru.bulldog.justmap.JustMap;
 public class LangUtil {
 	private final static String MODID = JustMap.MODID;
 	
+	public final static String CONFIG_ELEMENT = "configuration";
+	public final static String DIMENSION_ELEMENT = "dim";
+	public final static String GUI_ELEMENT = "gui";
+	public final static String GUI_SCREEN_ELEMENT = "gui.screen";
+	public final static String GUI_WORLDMAP_ELEMENT = "gui.worldmap";
+	
 	private String element;
 	
 	public LangUtil(String element) {

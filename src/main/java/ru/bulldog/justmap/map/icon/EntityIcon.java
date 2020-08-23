@@ -2,6 +2,7 @@ package ru.bulldog.justmap.map.icon;
 
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.client.util.math.Vector3f;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.passive.TameableEntity;
 
@@ -25,7 +26,7 @@ public class EntityIcon extends MapIcon<EntityIcon> {
 	}
 	
 	@Override
-	public void draw(MatrixStack matrices, VertexConsumerProvider consumerProvider, int mapX, int mapY, double offX, double offY, float rotation) {
+	public void draw(MatrixStack matrices, VertexConsumerProvider consumerProvider, int mapX, int mapY, float rotation) {
 		if (!RuleUtil.allowCreatureRadar() && !hostile) { return; }
 		if (!RuleUtil.allowHostileRadar() && hostile) { return; }
 		
@@ -37,14 +38,23 @@ public class EntityIcon extends MapIcon<EntityIcon> {
 			color = (hostile) ? Colors.DARK_RED : Colors.YELLOW;
 		}
 		int size = ClientParams.entityIconSize;
-		this.updatePos(size, mapX, mapY, offX, offY, rotation);
+		this.updatePos(size, mapX, mapY);
 		if (!allowRender) return;
 		if (ClientParams.renderEntityModel) {
 			EntityModelRenderer.renderModel(matrices, consumerProvider, entity, iconPos.x, iconPos.y);
 		} else if (ClientParams.showEntityHeads) {
 			EntityHeadIcon icon = EntityHeadIcon.getIcon(entity);
 			if (icon != null) {					
+				matrices.push();
+				if (ClientParams.rotateMap) {
+					double moveX = iconPos.x + size / 2;
+					double moveY = iconPos.y + size / 2;
+					matrices.translate(moveX, moveY, 0.0);
+					matrices.multiply(Vector3f.POSITIVE_Z.getDegreesQuaternion(rotation + 180.0F));
+					matrices.translate(-moveX, -moveY, 0.0);
+				}
 				icon.draw(matrices, iconPos.x, iconPos.y, size);
+				matrices.pop();
 			} else {
 				RenderUtil.drawOutlineCircle(iconPos.x, iconPos.y, size / 3, 0.6, color);
 			}
