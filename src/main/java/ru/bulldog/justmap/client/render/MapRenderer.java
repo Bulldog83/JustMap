@@ -237,6 +237,7 @@ public class MapRenderer {
 		if (ClientParams.showGrid) {
 			this.chunkGrid.draw();
 		}
+		MatrixStack matrices = new MatrixStack();
 		VertexConsumerProvider.Immediate consumerProvider = minecraft.getBufferBuilders().getEntityVertexConsumers();
 		for (MapIcon<?> icon : minimap.getDrawedIcons()) {
 			icon.draw(matrices, consumerProvider, mapX, mapY, rotation);
@@ -258,7 +259,7 @@ public class MapRenderer {
 		}
 		
 		RenderUtil.drawRightAlignedString(
-				matrices, Float.toString(mapScale),
+				Float.toString(mapScale),
 				mapX + mapWidth - 3, mapY + mapHeight - 10, Colors.WHITE);
 		
 		int iconSize = ClientParams.arrowIconSize;

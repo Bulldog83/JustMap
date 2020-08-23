@@ -90,7 +90,8 @@ public class JustMapClient implements ClientModInitializer {
 			isTitleScreen = title.getKey().equals("dataPack.title");
 		}
 		
-		return currentScreen instanceof TitleScreen ||
+		return isTitleScreen ||
+			   currentScreen instanceof TitleScreen ||
 			   currentScreen instanceof SelectWorldScreen ||
 		       currentScreen instanceof MultiplayerScreen ||
 		       currentScreen instanceof BackupPromptScreen ||

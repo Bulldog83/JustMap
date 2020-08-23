@@ -6,7 +6,7 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.JsonHelper;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-
+import ru.bulldog.justmap.util.DimensionUtil;
 import ru.bulldog.justmap.util.PosUtil;
 
 public class MultiworldIdentifier {
@@ -19,7 +19,7 @@ public class MultiworldIdentifier {
     }
 
     public MultiworldIdentifier(BlockPos spawnPosition, World world) {
-        this(spawnPosition, world.getRegistryKey().getValue());
+        this(spawnPosition, DimensionUtil.getId(world));
     }
 
     @Override

@@ -53,12 +53,15 @@ public class WorldnameScreen extends Screen {
 			this.y = height / 2 - frameHeight / 2;
 			btnY = (y + frameHeight) - 40;
 		}
-		Text defaultText = new LiteralText("Default");
-		this.nameField = new TextFieldWidget(textRenderer, x + 20, y + 50, frameWidth - 40, 20, defaultText);
+		this.nameField = new TextFieldWidget(font, x + 20, y + 50, frameWidth - 40, 20, "Default");
 		this.setFocused(this.nameField);
 		this.nameField.setSelected(true);
-		this.addButton(new ButtonWidget(center - 30, btnY, 80, 20, LangUtil.getText("gui", "save"), this::onPressSave));
+		this.addButton(new ButtonWidget(center - 30, btnY, 80, 20, LangUtil.getString("gui", "save"), this::onPressSave));
 		this.addChild(nameField);
+	}
+	
+	private void addChild(Element element) {
+		this.children.add(element);
 	}
 	
 	private void onPressSave(ButtonWidget button) {
@@ -73,9 +76,9 @@ public class WorldnameScreen extends Screen {
 	}
 	
 	@Override
-	public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
-		this.renderBackground(matrices);
-		drawCenteredString(matrices, textRenderer, LangUtil.getString("gui", "worldname_title"), center, y + 25, Colors.WHITE);
+	public void render(int mouseX, int mouseY, float delta) {
+		this.renderBackground();
+		drawCenteredString(font, LangUtil.getString("gui", "worldname_title"), center, y + 25, Colors.WHITE);
 		for (Element child : children) {
 			if (child instanceof Drawable) {
 				((Drawable) child).render(mouseX, mouseY, delta);

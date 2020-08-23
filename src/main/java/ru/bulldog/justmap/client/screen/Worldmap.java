@@ -168,7 +168,7 @@ public class Worldmap extends MapScreen implements IMap {
 	}
 	
 	@Override
-	public void renderForeground(MatrixStack matrices) {
+	public void renderForeground() {
 		if (ClientParams.showGrid) {
 			this.chunkGrid.draw();
 		}
@@ -201,7 +201,7 @@ public class Worldmap extends MapScreen implements IMap {
 		MapPlayerManager.getPlayer(player).getIcon().draw(arrowX, arrowY, iconSize, true);
 		
 		this.drawBorders(paddingTop, paddingBottom);
-		drawCenteredString(matrices, client.textRenderer, cursorCoords, width / 2, paddingTop + 4, Colors.WHITE);
+		this.drawCenteredString(minecraft.textRenderer, cursorCoords, width / 2, paddingTop + 4, Colors.WHITE);
 	}
 	
 	private void drawMap() {		

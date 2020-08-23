@@ -143,14 +143,14 @@ public class WaypointEditor extends MapScreen {
 		IntegerRange maxRangeConfig = JustMapClient.CONFIG.getEntry("max_render_dist");
 		final int SHOW_RANGE_MAX = maxRangeConfig.maxValue();
 		this.showRange = waypoint.showRange;
-		this.children.add(new SliderWidget(elemX, ey, sliderW, rowH, LiteralText.EMPTY, (double) this.showRange / SHOW_RANGE_MAX) {
+		this.children.add(new SliderWidget(elemX, ey, sliderW, rowH, (double) this.showRange / SHOW_RANGE_MAX) {
 			{
 				this.updateMessage();
 			}
 
 			@Override
 			protected void updateMessage() {
-				this.setMessage(new LiteralText(lang("wp_render_dist").getString() + WaypointEditor.this.showRange));
+				this.setMessage(lang("wp_render_dist") + WaypointEditor.this.showRange);
 			}
 
 			@Override

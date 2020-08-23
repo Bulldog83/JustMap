@@ -283,7 +283,7 @@ public class Minimap implements IMap {
 			this.lastPosZ = posZ;
 		}
 
-		if (Dimension.isNether(world)) {
+		if (DimensionUtil.isNether(world.getDimension())) {
 			this.mapLayer = Layer.NETHER;
 			this.mapLevel = posY / mapLayer.height;
 		} else if (RuleUtil.needRenderCaves(world, pos)) {
