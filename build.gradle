@@ -25,6 +25,15 @@ if (versionPropsFile.canRead()) {
 	build = versionProps['VERSION_BUILD'].toInteger()
 }
 
+build += 1
+	
+if (versionPropsFile.canWrite()) {
+	versionProps['VERSION_MAJOR'] = major.toString()
+	versionProps['VERSION_MINOR'] = minor.toString()
+	versionProps['VERSION_BUILD'] = build.toString()
+	versionProps.store(versionPropsFile.newWriter(), null)
+}
+
 version = "${major}.${minor}.${build}"
 
 minecraft {}
@@ -45,7 +54,6 @@ dependencies {
 	modCompile "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 	modCompile "io.github.prospector:modmenu:${project.modmenu_version}"
 	modCompile "me.shedaniel.cloth:config-2:${project.cloth_version}"
-	modCompile name: "authme-1.16.1-1.2.1-dev"
 	
 	include "me.shedaniel.cloth:config-2:${project.cloth_version}"
 }
@@ -77,14 +85,5 @@ jar {
 }
 
 assemble {
-	build += 1
-	
-	if (versionPropsFile.canWrite()) {
-		versionProps['VERSION_MAJOR'] = major.toString()
-		versionProps['VERSION_MINOR'] = minor.toString()
-		versionProps['VERSION_BUILD'] = build.toString()
-		versionProps.store(versionPropsFile.newWriter(), null)
-	}
-
-	version = "${major}.${minor}.${build}-${project.minecraft_version}-beta"
+	version += "-${project.minecraft_version}-release"
 }

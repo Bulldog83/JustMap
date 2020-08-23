@@ -38,8 +38,8 @@ public class TitledButtonWidget<W extends AbstractButtonWidget> extends Abstract
 	
 	@Override
 	public void render(MatrixStack matrixStack, int int_1, int int_2, float float_1) {
-		this.drawStringWithShadow(matrixStack, font, title.getString(), x, y, 0xFFFFFFFF);
-		this.widget.render(matrixStack, int_1, int_2, float_1);
+		drawStringWithShadow(matrixStack, font, title.getString(), x, y, 0xFFFFFFFF);
+		widget.render(matrixStack, int_1, int_2, float_1);
 	}
 	
 	@Override

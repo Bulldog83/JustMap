@@ -9,11 +9,10 @@ import net.minecraft.entity.Entity;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.LightType;
 import net.minecraft.world.PersistentStateManager;
 import net.minecraft.world.World;
-import net.minecraft.world.dimension.DimensionType;
+
 import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.client.screen.Worldmap;
 import ru.bulldog.justmap.map.IMap;
@@ -24,7 +23,6 @@ public class DataUtil {
 	private static BlockPos.Mutable currentPos = new BlockPos.Mutable();
 	private static ClientWorld clientWorld = null;
 	private static ServerWorld serverWorld = null;
-	private static RegistryKey<DimensionType> dimension = null;
 	private static Supplier<PersistentStateManager> persistentSupplier = null;
 	private static Layer currentLayer = Layer.SURFACE;
 	private static int currentLevel = 0;
@@ -34,7 +32,6 @@ public class DataUtil {
 	
 	public static void updateWorld(ClientWorld world) {
 		clientWorld = world;
-		dimension = world.getDimensionRegistryKey();
 		if (minecraft.isIntegratedServerRunning()) {
 			MinecraftServer server = minecraft.getServer();
 			serverWorld = minecraft.getServer().getWorld(world.getRegistryKey());
@@ -90,10 +87,6 @@ public class DataUtil {
 		return serverWorld;
 	}
 	
-	public static RegistryKey<DimensionType> getDimension() {
-		return dimension;
-	}
-	
 	public static Supplier<PersistentStateManager> getPersistentSupplier() {
 		return persistentSupplier;
 	}
@@ -118,14 +111,22 @@ public class DataUtil {
 		return currentPos.set(coordX, coordY, coordZ);
 	}
 	
-	public static double doubleX() {
-		Entity posEntity = getPosEntity();
-		return posEntity.prevX + (posEntity.getX() - posEntity.prevX) * (double) minecraft.getTickDelta();
+	public static double doubleX(Entity entity) {
+		if (entity == null) return 0.0;
+		return entity.prevX + (entity.getX() - entity.prevX) * (double) minecraft.getTickDelta();
 	}
 
+	public static double doubleZ(Entity entity) {
+		if (entity == null) return 0.0;
+		return entity.prevZ + (entity.getZ() - entity.prevZ) * (double) minecraft.getTickDelta();
+	}
+	
+	public static double doubleX() {
+		return doubleX(getPosEntity());
+	}
+	
 	public static double doubleZ() {
-		Entity posEntity = getPosEntity();
-		return posEntity.prevZ + (posEntity.getZ() - posEntity.prevZ) * (double) minecraft.getTickDelta();
+		return doubleZ(getPosEntity());
 	}
 
 	static boolean hasSkyLight(World world, BlockPos pos) {
@@ -148,7 +149,7 @@ public class DataUtil {
 	}
 	
 	public static Layer getLayer(World world, BlockPos pos) {
-		if (Dimension.isNether(world.getDimensionRegistryKey())) {
+		if (Dimension.isNether(world)) {
 			return Layer.NETHER;
 		} else if (RuleUtil.needRenderCaves(world, pos)) {
 			return Layer.CAVES;

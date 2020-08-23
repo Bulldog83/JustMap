@@ -103,7 +103,7 @@ public class WaypointRenderer {
 		List<Waypoint> wayPoints = WaypointKeeper.getInstance().getWaypoints(WorldManager.getWorldKey(), true);
 		for (Waypoint wp : wayPoints) {
 			int dist = (int) MathUtil.getDistance(wp.pos, playerPos, false);
-			if (wp.render && dist > ClientParams.minRenderDist && dist < ClientParams.maxRenderDist) {
+			if (wp.render && dist >= ClientParams.minRenderDist && dist <= wp.showRange) {
 				renderer.renderWaypoint(matrixStack, consumerProvider, wp, minecraft, camera, tick, dist);
 			}
 		}

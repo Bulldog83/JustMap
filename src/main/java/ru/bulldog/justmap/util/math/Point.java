@@ -46,8 +46,12 @@ public class Point {
 		return this.x == point.x && this.y == point.y;
 	}
 	
+	public String shortString() {
+		return String.format("[%f, %f]", x, y);
+	}
+	
 	@Override
 	public String toString() {
-		return String.format("Point [%f, %f]", x, y);
+		return String.format("Point %s", this.shortString());
 	}
 }

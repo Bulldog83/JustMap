@@ -92,7 +92,7 @@ public class WaypointsList extends MapScreen {
 			int stringY = y + 7;			
 			int nameX = x + iconSize + 2;
 
-			RenderUtil.DRAWER.drawStringWithShadow(matrixStack, font, waypoint.name, nameX, stringY, Colors.WHITE);
+			RenderUtil.drawStringWithShadow(matrixStack, font, waypoint.name, nameX, stringY, Colors.WHITE);
 			
 			int posX = tpButton.x - 5;
 			RenderUtil.drawRightAlignedString(matrixStack, waypoint.pos.toShortString(), posX, stringY, Colors.WHITE);
@@ -235,7 +235,7 @@ public class WaypointsList extends MapScreen {
 		if (screenTitle == null) {
 			screenTitle = info == null ? lang("unknown").getString() : I18n.translate(info.getFirst());
 		}
-		this.drawCenteredString(matrixStack, textRenderer, screenTitle, center, 15, Colors.WHITE);
+		drawCenteredString(matrixStack, textRenderer, screenTitle, center, 15, Colors.WHITE);
 		this.drawScrollBar();
 	}
 	
@@ -271,7 +271,7 @@ public class WaypointsList extends MapScreen {
 	
 	public void teleport(Waypoint waypoint) {
 		if (!WorldManager.getWorldKey().equals(currentWorld)) return;
-		int y = waypoint.pos.getY() > 0 ? waypoint.pos.getY() : (Dimension.isNether(client.world.getDimensionRegistryKey()) ? 128 : 64);
+		int y = waypoint.pos.getY() > 0 ? waypoint.pos.getY() : (Dimension.isNether(client.world) ? 128 : 64);
 		this.client.player.sendChatMessage("/tp " + this.client.player.getName().asString() + " " + waypoint.pos.getX() + " " + y + " " + waypoint.pos.getZ());
 		this.onClose();
 	}

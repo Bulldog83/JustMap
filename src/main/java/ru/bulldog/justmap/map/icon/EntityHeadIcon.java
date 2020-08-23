@@ -14,6 +14,7 @@ import ru.bulldog.justmap.util.Colors;
 import ru.bulldog.justmap.util.RenderUtil;
 import ru.bulldog.justmap.util.math.Point;
 import ru.bulldog.justmap.util.storage.StorageUtil;
+
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.texture.NativeImageBackedTexture;
 import net.minecraft.client.util.math.MatrixStack;
@@ -64,17 +65,17 @@ public class EntityHeadIcon extends Image {
 	}
 
 	@Override
-	public void draw(MatrixStack matrix, double x, double y, int w, int h) {
+	public void draw(MatrixStack matrices, double x, double y, int w, int h) {
 		if (ClientParams.showIconsOutline) {
 			double thickness = ClientParams.entityOutlineSize;
 			if (solid) {
-				RenderUtil.fill(matrix, x - thickness / 2, y - thickness / 2, w + thickness, h + thickness, this.color);
+				RenderUtil.fill(matrices, x - thickness / 2, y - thickness / 2, w + thickness, h + thickness, this.color);
 			} else {
 				this.bindOutline();
-				RenderUtil.draw(x - thickness / 2, y - thickness / 2, (float) (w + thickness), (float) (h + thickness));
+				RenderUtil.draw(matrices, x - thickness / 2, y - thickness / 2, (float) (w + thickness), (float) (h + thickness));
 			}
 		}
-		this.draw(matrix, x, y, (float) w, (float) h);
+		this.draw(matrices, x, y, (float) w, (float) h);
 	}
 	
 	private void bindOutline() {
