@@ -49,7 +49,7 @@ public class ChunkGrid {
 	}
 	
 	public void updateGrid() {
-		this.close();
+		this.clear();
 		
 		int centerX = rangeX + rangeW / 2;
 		int centerY = rangeY + rangeH / 2;
@@ -60,16 +60,16 @@ public class ChunkGrid {
 		
 		int xp = (int) MathUtil.screenPos(startX, x, centerX, scale);
 		while (xp < right) {
-			if (xp > rangeX && xp < right) {
-				lines.add(new GridLine(xp, rangeY, xp, bottom));
+			if (xp > rangeX) {
+				this.lines.add(new GridLine(xp, rangeY, xp, bottom));
 			}
 			startX += 16;
 			xp = (int) MathUtil.screenPos(startX, x, centerX, scale);
 		}
 		int yp = (int) MathUtil.screenPos(startZ, z, centerY, scale);
 		while(yp < bottom) {
-			if (yp > rangeY && yp < bottom) {
-				lines.add(new GridLine(rangeX, yp, right, yp));
+			if (yp > rangeY) {
+				this.lines.add(new GridLine(rangeX, yp, right, yp));
 			}
 			startZ += 16;
 			yp = (int) MathUtil.screenPos(startZ, z, centerY, scale);
@@ -103,7 +103,7 @@ public class ChunkGrid {
 		}
 	}
 	
-	public void close() {
+	public void clear() {
 		this.lines.clear();
 	}
 }
