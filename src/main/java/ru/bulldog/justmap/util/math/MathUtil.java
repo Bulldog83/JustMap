@@ -33,7 +33,7 @@ public class MathUtil {
 	
 	public static int floor(double val) {
 		if (val < 0.0) {
-			--val;
+			val--;
 		}
         return (int) val;
 	}
@@ -58,25 +58,33 @@ public class MathUtil {
 		return max;
 	}
 	
-	public static float correctAngle(float angle) {
-		int turns = (int) Math.abs(angle / 360);		
-		if(angle >= 360) return angle - 360 * turns;
-		if(angle < 0) return angle + 360 * (turns + 1);
+	public static double correctAngle(double d) {
+		int turns = (int) Math.abs(d / 360);		
+		if(d >= 360) return d - 360 * turns;
+		if(d < 0) return d + 360 * (turns + 1);
 		
-		return angle;
+		return d;
 	}
 	
-	public static double screenPos(double worldPos, double anchorWorld, double anchorScreen, float scale) {
+	public static double screenPos(double worldPos, double anchorWorld, double anchorScreen, double scale) {
 		return anchorScreen + (worldPos - anchorWorld) / scale;
 	}
 	
-	public static double worldPos(double screenPos, double anchorWorld, double anchorScreen, float scale) {
+	public static double worldPos(double screenPos, double anchorWorld, double anchorScreen, double scale) {
 		return anchorWorld + (screenPos - anchorScreen) * scale;
+	}
+	
+	public static int screenPos(int worldPos, int anchorWorld, int anchorScreen, double scale) {
+		return (int) (anchorScreen + (worldPos - anchorWorld) / scale);
+	}
+	
+	public static int worldPos(int screenPos, int anchorWorld, int anchorScreen, double scale) {
+		return (int) (anchorWorld + (screenPos - anchorScreen) * scale);
 	}
 
 	public static Point circlePos(Point pos, Point center, double angle) {
-		int posX = (int) (center.x + (pos.x - center.x) * Math.cos(angle) - (pos.y - center.y) * Math.sin(angle));
-		int posY = (int) (center.y + (pos.y - center.y) * Math.cos(angle) + (pos.x - center.x) * Math.sin(angle));
+		double posX = center.x + (pos.x - center.x) * Math.cos(angle) - (pos.y - center.y) * Math.sin(angle);
+		double posY = center.y + (pos.y - center.y) * Math.cos(angle) + (pos.x - center.x) * Math.sin(angle);
 		
 		return new Point(posX, posY);
 	}

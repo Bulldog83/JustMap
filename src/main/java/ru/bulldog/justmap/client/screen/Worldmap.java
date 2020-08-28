@@ -168,7 +168,7 @@ public class Worldmap extends MapScreen implements IMap {
 	
 	@Override
 	public void renderForeground(MatrixStack matrices) {
-		if (ClientParams.showGrid) {
+		if (ClientParams.showWorldmapGrid) {
 			this.chunkGrid.draw();
 		}
 		int iconSize = (int) (ClientParams.worldmapIconSize / imageScale);
@@ -183,8 +183,8 @@ public class Worldmap extends MapScreen implements IMap {
 		}
 		for (PlayerIcon icon : players) {
 			icon.setPosition(
-					MathUtil.screenPos(icon.getX(), centerPos.getX(), centerX, imageScale),
-					MathUtil.screenPos(icon.getZ(), centerPos.getZ(), centerY, imageScale)
+				MathUtil.screenPos(icon.getX(), centerPos.getX(), centerX, imageScale),
+				MathUtil.screenPos(icon.getZ(), centerPos.getZ(), centerY, imageScale)
 			);
 			icon.draw(matrices, iconSize);
 		}
@@ -265,7 +265,7 @@ public class Worldmap extends MapScreen implements IMap {
 	}
 	
 	private void changeScale(float value) {
-		this.imageScale = MathUtil.clamp(this.imageScale + value, 0.5F, 3F);
+		this.imageScale = MathUtil.clamp(imageScale + value, 0.5F, 3F);
 		this.updateScale();
 	}
 	
@@ -440,7 +440,7 @@ public class Worldmap extends MapScreen implements IMap {
 
 	@Override
 	public float getScale() {
-		return this.getScale();
+		return this.imageScale;
 	}
 
 	@Override

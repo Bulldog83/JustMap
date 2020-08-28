@@ -76,6 +76,7 @@ public class ClientConfig extends Config {
 		KEEPER.registerEntry("show_topography", new BooleanEntry(ClientParams.showTopography, (b) -> ClientParams.showTopography = b, () -> ClientParams.showTopography));
 		KEEPER.registerEntry("terrain_strength", new IntegerRange(ClientParams.terrainStrength, (i) -> ClientParams.terrainStrength = i, () -> ClientParams.terrainStrength, 2, 9));
 		KEEPER.registerEntry("draw_chunk_grid", new BooleanEntry(ClientParams.showGrid, (b) -> ClientParams.showGrid = b, () -> ClientParams.showGrid));
+		KEEPER.registerEntry("draw_worldmap_grid", new BooleanEntry(ClientParams.showWorldmapGrid, (b) -> ClientParams.showWorldmapGrid = b, () -> ClientParams.showWorldmapGrid));
 		KEEPER.registerEntry("show_in_chat", new BooleanEntry(ClientParams.showInChat, (b) -> ClientParams.showInChat = b, () -> ClientParams.showInChat));
 		KEEPER.registerEntry("show_waypoints", new BooleanEntry(ClientParams.showWaypoints, (b) -> ClientParams.showWaypoints = b, () -> ClientParams.showWaypoints));
 		KEEPER.registerEntry("jump_to_waypoints", new BooleanEntry(ClientParams.jumpToWaypoints, (b) -> ClientParams.jumpToWaypoints = b, () -> ClientParams.jumpToWaypoints));
@@ -116,6 +117,15 @@ public class ClientConfig extends Config {
 		} else {
 			ConfigWriter.save(KEEPER.toJson());
 		}
+	}
+	
+	public float getMapScale() {
+		return this.getFloat("map_scale");
+	}
+	
+	public void updateMapScale(float value) {
+		this.setRanged("map_scale", this.getMapScale() * value);
+		this.saveChanges();
 	}
 	
 	public void reloadFromDisk() {

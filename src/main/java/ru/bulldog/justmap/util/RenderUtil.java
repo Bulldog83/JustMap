@@ -182,8 +182,6 @@ public class RenderUtil extends DrawableHelper {
 	}
 	
 	public static void drawCircle(double x, double y, double radius, int color) {
-		double pi2 = Math.PI * 2;
-		
 		float a = (float)(color >> 24 & 255) / 255.0F;
 		float r = (float)(color >> 16 & 255) / 255.0F;
 		float g = (float)(color >> 8 & 255) / 255.0F;
@@ -193,10 +191,16 @@ public class RenderUtil extends DrawableHelper {
 	    RenderSystem.disableTexture();
 	    RenderSystem.defaultBlendFunc();
 		RenderSystem.color4f(r, g, b, a);
-		
-		startDraw(GL11.GL_TRIANGLE_FAN, VertexFormats.POSITION);		
-		vertexBuffer.vertex(x, y, 0).next();		
-		
+		drawCircleVertices(x, y, radius);
+		RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+		RenderSystem.enableTexture();
+		RenderSystem.disableBlend();
+	}
+	
+	public static void drawCircleVertices(double x, double y, double radius) {
+		double pi2 = Math.PI * 2;
+		startDraw(GL11.GL_TRIANGLE_FAN, VertexFormats.POSITION);
+		vertexBuffer.vertex(x, y, 0).next();
 		int sides = 50;
 		for (int i = 0; i <= sides; i++) {
 			double angle = (pi2 * i / sides) + Math.toRadians(180);
@@ -205,9 +209,6 @@ public class RenderUtil extends DrawableHelper {
 			vertexBuffer.vertex(vx, vy, 0).next();
 		}
 		endDraw();
-		
-		RenderSystem.enableTexture();
-		RenderSystem.disableBlend();
 	}
 
 	public static void fill(double x, double y, double w, double h, int color) {

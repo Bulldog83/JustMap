@@ -308,7 +308,7 @@ public class ChunkData {
 	}
 	
 	public boolean isChunkLoaded() {
-		return this.mapData.isChunkLoaded(chunkPos);
+		return this.world.isChunkLoaded(chunkPos.x, chunkPos.z);
 	}
 	
 	public boolean hasSlime() {

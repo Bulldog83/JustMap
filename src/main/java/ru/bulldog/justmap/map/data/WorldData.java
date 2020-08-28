@@ -81,11 +81,6 @@ public class WorldData {
 		return worldChunk;
 	}
 	
-	public boolean isChunkLoaded(ChunkPos chunkPos) {
-		World world = DataUtil.getWorld();
-		return world.isChunkLoaded(chunkPos.x, chunkPos.z);
-	}
-	
 	public WorldChunk getEmptyChunk() {
 		return this.chunkManager.getEmptyChunk();
 	}

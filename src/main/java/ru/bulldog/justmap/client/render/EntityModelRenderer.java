@@ -34,14 +34,14 @@ public class EntityModelRenderer {
 		
 		setPitchAndYaw(livingEntity);
 		
-		float scale = getScale(livingEntity);
+		float scale = (float) getScale(livingEntity);
 		int modelSize = ClientParams.entityModelSize;
 		
 		matrices.push();
 		matrices.translate(x, y, 0);
 		matrices.translate(modelSize / 4, modelSize / 2, 0);
 		if (ClientParams.rotateMap) {
-			float rotation = MathUtil.correctAngle(minecraft.player.headYaw);
+			float rotation = (float) MathUtil.correctAngle(minecraft.player.headYaw);
 			matrices.multiply(Vector3f.POSITIVE_Z.getDegreesQuaternion(rotation));
 		} else {
 			matrices.multiply(Vector3f.POSITIVE_X.getDegreesQuaternion(180.0F));
@@ -62,16 +62,16 @@ public class EntityModelRenderer {
 		livingEntity.prevBodyYaw = prevBodyYaw;
 	}
 	
-	private static float getScale(LivingEntity livingEntity) {
+	private static double getScale(LivingEntity livingEntity) {
 		int modelSize = ClientParams.entityModelSize;
-		float mapScale = JustMapClient.MAP.getScale();
+		double mapScale = JustMapClient.MAP.getScale();
 		
 		modelSize = (int) Math.min(modelSize, modelSize / mapScale);
 		
-		float scaleX = modelSize / Math.max(livingEntity.getWidth(), 1.0F);
-		float scaleY = modelSize / Math.max(livingEntity.getHeight(), 1.0F);
+		double scaleX = modelSize / Math.max(livingEntity.getWidth(), 1.0F);
+		double scaleY = modelSize / Math.max(livingEntity.getHeight(), 1.0F);
 		
-		float scale = Math.max(Math.min(scaleX, scaleY), modelSize);
+		double scale = Math.max(Math.min(scaleX, scaleY), modelSize);
 		
 		if (livingEntity instanceof GhastEntity || livingEntity instanceof EnderDragonEntity) {
 			scale = modelSize / 3.0F;

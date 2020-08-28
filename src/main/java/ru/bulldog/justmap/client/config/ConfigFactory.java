@@ -131,6 +131,10 @@ public final class ConfigFactory {
 				.setSaveConsumer(val -> modConfig.setBoolean("draw_chunk_grid", val))
 				.setDefaultValue((boolean) modConfig.getDefault("draw_chunk_grid"))
 				.build());
+		mapDetails.addEntry(entryBuilder.startBooleanToggle(lang("show_worldmap_grid"), modConfig.getBoolean("draw_worldmap_grid"))
+				.setSaveConsumer(val -> modConfig.setBoolean("draw_worldmap_grid", val))
+				.setDefaultValue((boolean) modConfig.getDefault("draw_worldmap_grid"))
+				.build());
 		mapDetails.addEntry(entryBuilder.startBooleanToggle(lang("show_slime_chunks"), modConfig.getBoolean("show_slime"))
 				.setSaveConsumer(val -> modConfig.setBoolean("show_slime", val))
 				.setDefaultValue((boolean) modConfig.getDefault("show_slime"))

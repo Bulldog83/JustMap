@@ -31,6 +31,7 @@ public class ClientParams {
 	public static boolean hidePlants = false;
 	public static boolean hideWater = false;
 	public static boolean showGrid = false;
+	public static boolean showWorldmapGrid = false;
 	public static boolean showTerrain = true;
 	public static boolean showTopography = true;
 	public static boolean showSlime = false;

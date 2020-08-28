@@ -46,6 +46,7 @@
   "justmap.configuration.show_loaded_chunks": "Отображать загруженные чанки",
   "justmap.configuration.terrain_strength": "Сила перепада рельефа",
   "justmap.configuration.show_grid": "Отображать линии сетки",
+  "justmap.configuration.show_worldmap_grid": "Отображать линии сетки на карте мира",
   "justmap.configuration.info_position": "Расположение расширенной информации на экране",
   "justmap.configuration.equipment_position": "Расположение информации о снаряжении на экране",
   "justmap.configuration.advanced_info": "Отображать расширенную информацию",

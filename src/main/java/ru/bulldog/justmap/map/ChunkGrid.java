@@ -21,12 +21,12 @@ public class ChunkGrid {
 	private final static int color = Colors.GRID;	
 	private final List<GridLine> lines;
 	
-	private int x, z;
 	private float scale;
 	private int rangeX;
 	private int rangeY;
 	private int rangeW;
 	private int rangeH;
+	private int x, z;
 	
 	public ChunkGrid(int x, int z, int rangeX, int rangeY, int rangeW, int rangeH, float scale) {
 		this.lines = new ArrayList<>();
@@ -51,28 +51,28 @@ public class ChunkGrid {
 	public void updateGrid() {
 		this.clear();
 		
-		int centerX = rangeX + rangeW / 2;
-		int centerY = rangeY + rangeH / 2;
+		double centerX = rangeX + rangeW / 2.0;
+		double centerY = rangeY + rangeH / 2.0;
 		int startX = ((int) MathUtil.worldPos(rangeX, x, centerX, scale) >> 4) << 4;
 		int startZ = ((int) MathUtil.worldPos(rangeY, z, centerY, scale) >> 4) << 4;
 		int right = rangeX + rangeW;
 		int bottom = rangeY + rangeH;
 		
-		int xp = (int) MathUtil.screenPos(startX, x, centerX, scale);
+		double xp = MathUtil.screenPos(startX, x, centerX, scale);
 		while (xp < right) {
 			if (xp > rangeX) {
 				this.lines.add(new GridLine(xp, rangeY, xp, bottom));
 			}
 			startX += 16;
-			xp = (int) MathUtil.screenPos(startX, x, centerX, scale);
+			xp = MathUtil.screenPos(startX, x, centerX, scale);
 		}
-		int yp = (int) MathUtil.screenPos(startZ, z, centerY, scale);
+		double yp = MathUtil.screenPos(startZ, z, centerY, scale);
 		while(yp < bottom) {
 			if (yp > rangeY) {
 				this.lines.add(new GridLine(rangeX, yp, right, yp));
 			}
 			startZ += 16;
-			yp = (int) MathUtil.screenPos(startZ, z, centerY, scale);
+			yp = MathUtil.screenPos(startZ, z, centerY, scale);
 		}
 	}
 	

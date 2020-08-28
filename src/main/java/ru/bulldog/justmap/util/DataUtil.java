@@ -17,6 +17,7 @@ import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.client.screen.Worldmap;
 import ru.bulldog.justmap.map.IMap;
 import ru.bulldog.justmap.map.data.Layer;
+import ru.bulldog.justmap.util.math.MathUtil;
 
 public class DataUtil {
 	private static MinecraftClient minecraft = JustMapClient.MINECRAFT;
@@ -54,9 +55,9 @@ public class DataUtil {
 		Entity posEntity = getPosEntity();
 		if (posEntity == null) return;
 		
-		coordX = (int) (posEntity.getX() < 0.0 ? posEntity.getX() - 1.0 : posEntity.getX());
-		coordZ = (int) (posEntity.getZ() < 0.0 ? posEntity.getZ() - 1.0 : posEntity.getZ());
-		coordY = (int) (posEntity.getY());
+		coordX = MathUtil.floor(posEntity.getX());
+		coordZ = MathUtil.floor(posEntity.getZ());
+		coordY = (int) posEntity.getY();
 		
 		if (clientWorld == null) return;
 		currentLayer = getLayer(clientWorld, currentPos());
@@ -113,12 +114,12 @@ public class DataUtil {
 	
 	public static double doubleX(Entity entity) {
 		if (entity == null) return 0.0;
-		return entity.prevX + (entity.getX() - entity.prevX) * (double) minecraft.getTickDelta();
+		return entity.prevX + (entity.getX() - entity.prevX) * minecraft.getTickDelta();
 	}
 
 	public static double doubleZ(Entity entity) {
 		if (entity == null) return 0.0;
-		return entity.prevZ + (entity.getZ() - entity.prevZ) * (double) minecraft.getTickDelta();
+		return entity.prevZ + (entity.getZ() - entity.prevZ) * minecraft.getTickDelta();
 	}
 	
 	public static double doubleX() {
