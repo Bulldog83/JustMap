@@ -218,8 +218,6 @@ public class MapRenderer {
 		
 		if (offY != prevOffY) {
 			System.out.println("=====");
-			System.out.println("d: " + delta);
-			System.out.println("dy: " + (offY - prevOffY));
 			System.out.println("oy: " + offY);
 		}
 		
@@ -340,6 +338,6 @@ public class MapRenderer {
 	}
 	
 	private float calcOffset(double x, double lastX, double scale) {
-		return (float) ((x - lastX) / scale);
+		return (float) (Math.floor(((x - lastX) / scale) * 100D) * 0.01D);
 	}
 }
