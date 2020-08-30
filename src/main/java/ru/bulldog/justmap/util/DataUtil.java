@@ -112,22 +112,22 @@ public class DataUtil {
 		return currentPos.set(coordX, coordY, coordZ);
 	}
 	
-	public static double doubleX(Entity entity) {
+	public static double doubleX(Entity entity, float delta) {
 		if (entity == null) return 0.0;
-		return entity.prevX + (entity.getX() - entity.prevX) * minecraft.getTickDelta();
+		return MathUtil.lerp(delta, entity.prevX, entity.getX());
 	}
 
-	public static double doubleZ(Entity entity) {
+	public static double doubleZ(Entity entity, float delta) {
 		if (entity == null) return 0.0;
-		return entity.prevZ + (entity.getZ() - entity.prevZ) * minecraft.getTickDelta();
+		return MathUtil.lerp(delta, entity.prevZ, entity.getZ());
 	}
 	
-	public static double doubleX() {
-		return doubleX(getPosEntity());
+	public static double doubleX(float delta) {
+		return doubleX(getPosEntity(), delta);
 	}
 	
-	public static double doubleZ() {
-		return doubleZ(getPosEntity());
+	public static double doubleZ(float delta) {
+		return doubleZ(getPosEntity(), delta);
 	}
 
 	static boolean hasSkyLight(World world, BlockPos pos) {

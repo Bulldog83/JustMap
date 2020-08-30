@@ -23,19 +23,24 @@ public class MathUtil {
 		return n * n;
 	}
 	
-	public static boolean isEven(int num) {
+	public static boolean isEven(double num) {
 		return num % 2 == 0;
 	}
 	
-	public static boolean isOdd(int num) {
+	public static boolean isOdd(double num) {
 		return !isEven(num);
 	}
 	
 	public static int floor(double val) {
-		if (val < 0.0) {
-			val--;
-		}
-        return (int) val;
+		return val < 0.0 ? (int) --val : (int) val;
+	}
+	
+	public static float lerp(float delta, float start, float end) {
+		return start + delta * (end - start);
+	}
+	
+	public static double lerp(double delta, double start, double end) {
+		return start + delta * (end - start);
 	}
 	
 	public static double min(double... args) {

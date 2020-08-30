@@ -54,7 +54,9 @@ public class MapRenderer {
 	private int imgW, imgH;
 	private float mapScale;
 	private float rotation;
+	private float prevOffX, prevOffY;
 	private float offX, offY;
+	private float delta;
 	private boolean mapRotation = false;
 	private final Minimap minimap;
 	private BlockPos.Mutable playerPos;
@@ -90,12 +92,14 @@ public class MapRenderer {
 			this.winHeight = winH;
 		}
 		
+		this.delta = minecraft.getTickDelta();
+		
 		int mapW = minimap.getWidth();
 		int mapH = minimap.getHeight();
 		int mapX = minimap.getMapX();
 		int mapY = minimap.getMapY();
-		int lastX = MathUtil.floor(DataUtil.doubleX());
-		int lastZ = MathUtil.floor(DataUtil.doubleZ());
+		int lastX = MathUtil.floor(DataUtil.doubleX(delta));
+		int lastZ = MathUtil.floor(DataUtil.doubleZ(delta));
 		float scale = minimap.getScale();
 		boolean rotateMap = minimap.isRotated();
 		if (mapWidth != mapW || mapHeight != mapH ||
@@ -207,11 +211,20 @@ public class MapRenderer {
 		int scaledW = (int) (mapWidth * scale);
 		int scaledH = (int) (mapHeight * scale);
 
-		this.offX = this.calcOffset(DataUtil.doubleX(), lastX, mapScale);
-		this.offY = this.calcOffset(DataUtil.doubleZ(), lastZ, mapScale);
+		this.prevOffX = offX;
+		this.prevOffY = offY;
+		this.offX = this.calcOffset(DataUtil.doubleX(delta), lastX, mapScale);
+		this.offY = this.calcOffset(DataUtil.doubleZ(delta), lastZ, mapScale);
 		
-		List<MapIcon<?>> drawedEntities = minimap.getDrawedIcons(lastX, lastZ, centerX, centerY);
-		List<WaypointIcon> drawedWaypoints = minimap.getWaypoints(playerPos, centerX, centerY);
+		if (offY != prevOffY) {
+			System.out.println("=====");
+			System.out.println("d: " + delta);
+			System.out.println("dy: " + (offY - prevOffY));
+			System.out.println("oy: " + offY);
+		}
+		
+		List<MapIcon<?>> drawableEntities = minimap.getDrawableIcons(lastX, lastZ, centerX, centerY);
+		List<WaypointIcon> drawableWaypoints = minimap.getWaypoints(playerPos, centerX, centerY);
 		
 		RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
 		RenderSystem.disableDepthTest();
@@ -249,13 +262,13 @@ public class MapRenderer {
 		VertexConsumerProvider.Immediate consumerProvider = minecraft.getBufferBuilders().getEntityVertexConsumers();
 		matrices.push();
 		matrices.translate(-offX, -offY, 0.0);
-		for (MapIcon<?> icon : drawedEntities) {
+		for (MapIcon<?> icon : drawableEntities) {
 			icon.draw(matrices, consumerProvider, mapX, mapY, rotation);
 		}
 		consumerProvider.draw();
 		matrices.pop();
 		RenderSystem.popMatrix();
-		for (WaypointIcon icon : drawedWaypoints) {
+		for (WaypointIcon icon : drawableWaypoints) {
 			icon.draw(matrices, consumerProvider, mapX, mapY, offX, offY, rotation);
 		}
 		consumerProvider.draw();

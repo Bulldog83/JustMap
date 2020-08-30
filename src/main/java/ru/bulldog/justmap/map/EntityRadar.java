@@ -16,12 +16,12 @@ import ru.bulldog.justmap.util.math.MathUtil;
 public class EntityRadar {
 	private final List<PlayerEntity> players;
 	private final List<MobEntity> creatures;
-	private final List<MapIcon<?>> drawedIcons;
+	private final List<MapIcon<?>> drawableIcons;
 	
 	public EntityRadar() {
 		this.players = new LinkedList<>();
 		this.creatures = new LinkedList<>();
-		this.drawedIcons = new ArrayList<>();
+		this.drawableIcons = new ArrayList<>();
 	}
 	
 	public void addPlayer(PlayerEntity player) {
@@ -34,23 +34,23 @@ public class EntityRadar {
 		this.creatures.add(creature);
 	}
 	
-	public List<MapIcon<?>> getDrawedIcons(IMap map, double worldX, double worldZ, double screenX, double screenZ, double scale) {
-		this.drawedIcons.clear();
+	public List<MapIcon<?>> getDrawableIcons(IMap map, double worldX, double worldZ, double screenX, double screenZ, double scale) {
+		this.drawableIcons.clear();
 		this.players.forEach(player -> {
 			double iconX = MathUtil.screenPos(player.getX(), worldX, screenX, scale);
 			double iconY = MathUtil.screenPos(player.getZ(), worldZ, screenZ, scale);
 			PlayerIcon icon = new PlayerIcon(map, player);
 			icon.setPosition(iconX, iconY);
-			this.drawedIcons.add(icon);
+			this.drawableIcons.add(icon);
 		});
 		this.creatures.forEach(mob -> {
 			double iconX = MathUtil.screenPos(mob.getX(), worldX, screenX, scale);
 			double iconY = MathUtil.screenPos(mob.getZ(), worldZ, screenZ, scale);
 			EntityIcon icon = new EntityIcon(map, mob);
 			icon.setPosition(iconX, iconY);
-			this.drawedIcons.add(icon);
+			this.drawableIcons.add(icon);
 		});
-		return this.drawedIcons;
+		return this.drawableIcons;
 	}
 	
 	public void clear(BlockPos center, int radius) {
