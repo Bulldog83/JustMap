@@ -4,10 +4,10 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.BlockPos;
+
 import ru.bulldog.justmap.map.icon.EntityIcon;
 import ru.bulldog.justmap.map.icon.MapIcon;
 import ru.bulldog.justmap.map.icon.PlayerIcon;
@@ -16,10 +16,12 @@ import ru.bulldog.justmap.util.math.MathUtil;
 public class EntityRadar {
 	private final List<PlayerEntity> players;
 	private final List<MobEntity> creatures;
+	private final List<MapIcon<?>> drawedIcons;
 	
 	public EntityRadar() {
 		this.players = new LinkedList<>();
 		this.creatures = new LinkedList<>();
+		this.drawedIcons = new ArrayList<>();
 	}
 	
 	public void addPlayer(PlayerEntity player) {
@@ -33,23 +35,22 @@ public class EntityRadar {
 	}
 	
 	public List<MapIcon<?>> getDrawedIcons(IMap map, double worldX, double worldZ, double screenX, double screenZ, double scale) {
-		List<MapIcon<?>> icons = new ArrayList<>();
+		this.drawedIcons.clear();
 		this.players.forEach(player -> {
 			double iconX = MathUtil.screenPos(player.getX(), worldX, screenX, scale);
 			double iconY = MathUtil.screenPos(player.getZ(), worldZ, screenZ, scale);
 			PlayerIcon icon = new PlayerIcon(map, player);
 			icon.setPosition(iconX, iconY);
-			icons.add(icon);
+			this.drawedIcons.add(icon);
 		});
 		this.creatures.forEach(mob -> {
 			double iconX = MathUtil.screenPos(mob.getX(), worldX, screenX, scale);
 			double iconY = MathUtil.screenPos(mob.getZ(), worldZ, screenZ, scale);
-			boolean hostile = mob instanceof HostileEntity;
-			EntityIcon icon = new EntityIcon(map, mob, hostile);
+			EntityIcon icon = new EntityIcon(map, mob);
 			icon.setPosition(iconX, iconY);
-			icons.add(icon);
+			this.drawedIcons.add(icon);
 		});
-		return icons;
+		return this.drawedIcons;
 	}
 	
 	public void clear(BlockPos center, int radius) {

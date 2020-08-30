@@ -4,6 +4,7 @@ import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.client.util.math.Vector3f;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.entity.passive.TameableEntity;
 
 import ru.bulldog.justmap.client.config.ClientParams;
@@ -18,11 +19,10 @@ public class EntityIcon extends MapIcon<EntityIcon> {
 	private final Entity entity;
 	boolean hostile;
 		
-	public EntityIcon(IMap map, Entity entity, boolean hostile) {
+	public EntityIcon(IMap map, Entity entity) {
 		super(map);
-			
+		this.hostile = entity instanceof HostileEntity;
 		this.entity = entity;
-		this.hostile = hostile;
 	}
 	
 	@Override

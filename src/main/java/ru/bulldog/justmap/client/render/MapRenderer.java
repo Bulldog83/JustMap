@@ -210,11 +210,6 @@ public class MapRenderer {
 		this.offX = this.calcOffset(DataUtil.doubleX(), lastX, mapScale);
 		this.offY = this.calcOffset(DataUtil.doubleZ(), lastZ, mapScale);
 		
-		System.out.println("=====");
-		System.out.println("lx: " + lastX);
-		System.out.println("cx: " + DataUtil.doubleX());
-		System.out.println("ox: " + offX);
-		
 		List<MapIcon<?>> drawedEntities = minimap.getDrawedIcons(lastX, lastZ, centerX, centerY);
 		List<WaypointIcon> drawedWaypoints = minimap.getWaypoints(playerPos, centerX, centerY);
 		

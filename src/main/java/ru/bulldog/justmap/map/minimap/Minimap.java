@@ -147,8 +147,6 @@ public class Minimap implements IMap {
 		float configScale = config.getMapScale();
 		boolean needRotate = config.getBoolean("rotate_map");
 		boolean bigMap = config.getBoolean("show_big_map");
-		
-		configSize *= winScale;
 
 		if (configSize != mapWidth || configScale != mapScale ||
 			rotateMap != needRotate || this.bigMap != bigMap) {
