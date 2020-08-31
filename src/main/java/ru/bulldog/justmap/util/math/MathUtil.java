@@ -32,7 +32,11 @@ public class MathUtil {
 	}
 	
 	public static int floor(double val) {
-		return val < 0.0 ? (int) --val : (int) val;
+		return (int) (val < (int) val ? --val : val);
+	}
+	
+	public static int ceil(double val) {
+		return (int) (val > (int) val ? ++val : val);
 	}
 	
 	public static float lerp(float delta, float start, float end) {

@@ -88,8 +88,8 @@ public class ChunkGrid {
 		BufferBuilder buffer = RenderUtil.getBuffer();
 		lines.forEach(line -> line.draw(buffer));
 		RenderUtil.endDraw();
-		RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
 		RenderSystem.enableTexture();
+		RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
 	}	
 	
 	private class GridLine extends Line {

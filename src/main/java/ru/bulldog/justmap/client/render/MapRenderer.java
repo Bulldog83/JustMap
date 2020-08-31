@@ -52,6 +52,7 @@ public class MapRenderer {
 	private int mapX, mapY;
 	private int imgX, imgY;
 	private int imgW, imgH;
+	private double currX, currZ;
 	private float mapScale;
 	private float rotation;
 	private float prevOffX, prevOffY;
@@ -93,13 +94,15 @@ public class MapRenderer {
 		}
 		
 		this.delta = minecraft.getTickDelta();
+		this.currX = DataUtil.doubleX(delta);
+		this.currZ = DataUtil.doubleZ(delta);
 		
 		int mapW = minimap.getWidth();
 		int mapH = minimap.getHeight();
 		int mapX = minimap.getMapX();
 		int mapY = minimap.getMapY();
-		int lastX = MathUtil.floor(DataUtil.doubleX(delta));
-		int lastZ = MathUtil.floor(DataUtil.doubleZ(delta));
+		int lastX = MathUtil.floor(currX);
+		int lastZ = MathUtil.floor(currZ);
 		float scale = minimap.getScale();
 		boolean rotateMap = minimap.isRotated();
 		if (mapWidth != mapW || mapHeight != mapH ||
@@ -110,24 +113,21 @@ public class MapRenderer {
 			this.mapHeight = mapH;
 			this.mapRotation = rotateMap;
 			this.mapScale = scale;
-			this.mapX = minimap.getMapX();
-			this.mapY = minimap.getMapY();	
+			this.mapX = mapX;
+			this.mapY = mapY;	
 			this.centerX = mapX + mapWidth / 2;
 			this.centerY = mapY + mapHeight / 2;
+			this.scaledW = minimap.getScaledWidth();
+			this.scaledH = minimap.getScaledHeight();
 			
 			if (mapRotation) {
-				double mult = minimap.isBigMap() ? 1.9 : 1.44;
-				this.scaledW = (int) Math.ceil(mapWidth * mapScale * mult);
-				this.scaledH = (int) Math.ceil(mapHeight * mapScale * mult);
-				this.imgW = minimap.getScaledWidth();
-				this.imgH = minimap.getScaledHeight();
-				this.imgX = (int) Math.ceil(mapX - (imgW - mapW) / 2F);
-				this.imgY = (int) Math.ceil(mapY - (imgH - mapH) / 2F);
+				this.imgW = (int) (scaledW / mapScale);
+				this.imgH = (int) (scaledH / mapScale);
+				this.imgX = mapX - (imgW - mapW) / 2;
+				this.imgY = mapY - (imgH - mapH) / 2;
 			} else {
-				this.scaledW = minimap.getScaledWidth();
-				this.scaledH = minimap.getScaledHeight();
-				this.imgW = (int) (mapW * 1.125F);
-				this.imgH = (int) (mapH * 1.125F);
+				this.imgW = (int) (mapW * 1.25);
+				this.imgH = (int) (mapH * 1.25);
 				int deltaX = imgW - mapW;
 				int deltaY = imgH - mapH;
 				this.imgX = mapX - deltaX / 2;
@@ -213,22 +213,16 @@ public class MapRenderer {
 
 		this.prevOffX = offX;
 		this.prevOffY = offY;
-		this.offX = this.calcOffset(DataUtil.doubleX(delta), lastX, mapScale);
-		this.offY = this.calcOffset(DataUtil.doubleZ(delta), lastZ, mapScale);
+		this.offX = this.calcOffset(currX, lastX, mapScale);
+		this.offY = this.calcOffset(currZ, lastZ, mapScale);
 		
-		if (offY != prevOffY) {
-			System.out.println("=====");
-			System.out.println("oy: " + offY);
-		}
-		
-		List<MapIcon<?>> drawableEntities = minimap.getDrawableIcons(lastX, lastZ, centerX, centerY);
+		List<MapIcon<?>> drawableEntities = minimap.getDrawableIcons(lastX, lastZ, centerX, centerY, delta);
 		List<WaypointIcon> drawableWaypoints = minimap.getWaypoints(playerPos, centerX, centerY);
 		
 		RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
 		RenderSystem.disableDepthTest();
 		RenderUtil.enableScissor();
 		RenderUtil.applyScissor(scaledX, scaledY, scaledW, scaledH);
-		
 		RenderSystem.enableBlend();
 		if (Minimap.isRound()) {
 			RenderSystem.colorMask(false, false, false, true);
@@ -306,13 +300,13 @@ public class MapRenderer {
 		int picX = 0;
 		while(picX < scaledW) {
 			int texW = 512;
-			if (picX + texW > scaledW) texW = (int) (scaledW - picX);
+			if (picX + texW > scaledW) texW = scaledW - picX;
 			
 			int picY = 0;
 			int cX = cornerX + picX;
 			while (picY < scaledH) {
 				int texH = 512;
-				if (picY + texH > scaledH) texH = (int) (scaledH - picY);
+				if (picY + texH > scaledH) texH = scaledH - picY;
 				
 				int cZ = cornerZ + picY;
 				RegionData region = worldData.getRegion(minimap, currentPos.set(cX, 0, cZ));
@@ -323,10 +317,10 @@ public class MapRenderer {
 				if (texX + texW >= 512) texW = 512 - texX;
 				if (texY + texH >= 512) texH = 512 - texY;
 				
-				double scX = picX / mapScale;
-				double scY = picY / mapScale;
-				double scW = texW / mapScale;
-				double scH = texH / mapScale;
+				double scX = (double) picX / mapScale;
+				double scY = (double) picY / mapScale;
+				double scW = (double) texW / mapScale;
+				double scH = (double) texH / mapScale;
 				
 				region.draw(imgX + scX, imgY + scY, scW, scH, texX, texY, texW, texH);
 				

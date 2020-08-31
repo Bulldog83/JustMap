@@ -162,7 +162,7 @@ public class Minimap implements IMap {
 			this.bigMap = bigMap;
 
 			if (rotateMap) {
-				double mult = ((bigMap) ? 1.9 : 1.44) / mapScale;
+				double mult = (bigMap) ? 1.88 : 1.42;
 				this.scaledWidth = (int) (mapWidth * mapScale * mult);
 				this.scaledHeight = (int) (mapHeight * mapScale * mult);
 			} else {
@@ -374,8 +374,8 @@ public class Minimap implements IMap {
 		return this.mapScale;
 	}
 
-	public List<MapIcon<?>> getDrawableIcons(double worldX, double worldZ, double screenX, double screenZ) {
-		return this.entityRadar.getDrawableIcons(this, worldX, worldZ, screenX, screenZ, mapScale);
+	public List<MapIcon<?>> getDrawableIcons(double worldX, double worldZ, double screenX, double screenZ, float delta) {
+		return this.entityRadar.getDrawableIcons(this, worldX, worldZ, screenX, screenZ, mapScale, delta);
 	}
 	
 	public List<WaypointIcon> getWaypoints(BlockPos currentPos, int screenX, int screenY) {
@@ -478,12 +478,10 @@ public class Minimap implements IMap {
 		return this.mapHeight;
 	}
 
-	@Override
 	public int getScaledWidth() {
 		return this.scaledWidth;
 	}
 
-	@Override
 	public int getScaledHeight() {
 		return this.scaledHeight;
 	}

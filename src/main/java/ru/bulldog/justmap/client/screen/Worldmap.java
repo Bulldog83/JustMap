@@ -429,16 +429,6 @@ public class Worldmap extends MapScreen implements IMap {
 	}
 
 	@Override
-	public int getScaledWidth() {
-		return this.scaledWidth;
-	}
-
-	@Override
-	public int getScaledHeight() {
-		return this.scaledHeight;
-	}
-
-	@Override
 	public float getScale() {
 		return this.imageScale;
 	}
