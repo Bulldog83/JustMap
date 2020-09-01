@@ -34,7 +34,9 @@ import net.fabricmc.api.Environment;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.util.Window;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.client.util.math.Vector3f;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 
@@ -137,9 +139,9 @@ public class MapRenderer {
 			}
 			
 			if (chunkGrid == null) {
-				this.chunkGrid = new ChunkGrid(lastX, lastZ, imgX, imgY, imgW, imgH, mapScale);
+				this.chunkGrid = new ChunkGrid(lastX, lastZ, 0, 0, imgW, imgH, mapScale);
 			} else {
-				this.chunkGrid.updateRange(imgX, imgY, imgW, imgH, mapScale);
+				this.chunkGrid.updateRange(0, 0, imgW, imgH, mapScale);
 				this.chunkGrid.updateGrid();
 			}
 		}
@@ -203,13 +205,18 @@ public class MapRenderer {
 		
 		if (worldData == null) return;
 		
-		int winH = minecraft.getWindow().getFramebufferHeight();
-		double scale = minecraft.getWindow().getScaleFactor();
-		
-		int scaledX = (int) (mapX * scale);
-		int scaledY = (int) (winH - (mapY + mapHeight) * scale);
-		int scaledW = (int) (mapWidth * scale);
-		int scaledH = (int) (mapHeight * scale);
+		Window window = minecraft.getWindow();
+		int fbuffW = window.getFramebufferWidth();
+		int fbuffH = window.getFramebufferHeight();
+		double scale = window.getScaleFactor();
+		int scissX = (int) (mapX * scale);
+		int scissY = (int) (fbuffH - (mapY + mapHeight) * scale);
+		int scissW = (int) (mapWidth * scale);
+		int scissH = (int) (mapHeight * scale);
+		int viewX = (int) (imgX * scale);
+		int viewY = (int) (fbuffH - (imgY + imgH) * scale);
+		int viewW = (int) (imgW * scale);
+		int viewH = (int) (imgH * scale);
 
 		this.prevOffX = offX;
 		this.prevOffY = offY;
@@ -218,12 +225,21 @@ public class MapRenderer {
 		
 		List<MapIcon<?>> drawableEntities = minimap.getDrawableIcons(lastX, lastZ, centerX, centerY, delta);
 		List<WaypointIcon> drawableWaypoints = minimap.getWaypoints(playerPos, centerX, centerY);
-		
-		RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+
 		RenderSystem.disableDepthTest();
 		RenderUtil.enableScissor();
-		RenderUtil.applyScissor(scaledX, scaledY, scaledW, scaledH);
-		RenderSystem.enableBlend();
+		RenderUtil.applyScissor(scissX, scissY, scissW, scissH);
+		RenderSystem.viewport(viewX, viewY, viewW, viewH);
+		RenderSystem.matrixMode(GL11.GL_PROJECTION);
+		RenderSystem.pushMatrix();
+		RenderSystem.loadIdentity();
+		RenderSystem.ortho(0.0, imgW, imgH, 0.0, 1000.0, 3000.0);
+		RenderSystem.matrixMode(GL11.GL_MODELVIEW);
+		RenderSystem.pushMatrix();
+		RenderSystem.loadIdentity();
+        RenderSystem.translatef(0.0F, 0.0F, -2000.0F);
+        RenderSystem.enableBlend();
+        RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
 		if (Minimap.isRound()) {
 			RenderSystem.colorMask(false, false, false, true);
 			RenderSystem.clearColor(0.0F, 0.0F, 0.0F, 0.0F);
@@ -235,31 +251,43 @@ public class MapRenderer {
 			RenderUtil.endDraw();
 			RenderSystem.blendFunc(GL11.GL_DST_ALPHA, GL11.GL_ONE_MINUS_DST_ALPHA);
 		}
-
 		RenderSystem.pushMatrix();
 		if (mapRotation) {
-			float moveX = mapX + mapWidth / 2.0F;
-			float moveY = mapY + mapHeight / 2.0F;
+			float moveX = imgW / 2.0F;
+			float moveY = imgH / 2.0F;
 			RenderSystem.translatef(moveX, moveY, 0.0F);
 			RenderSystem.rotatef(-rotation + 180, 0.0F, 0.0F, 1.0F);
 			RenderSystem.translatef(-moveX, -moveY, 0.0F);
 		}
-		RenderSystem.pushMatrix();
 		RenderSystem.translatef(-offX, -offY, 0.0F);
+		
 		this.drawMap();
 		if (ClientParams.showGrid) {
 			this.chunkGrid.draw();
 		}
 		RenderSystem.popMatrix();
+		RenderSystem.matrixMode(GL11.GL_PROJECTION);
+		RenderSystem.popMatrix();
+		RenderSystem.matrixMode(GL11.GL_MODELVIEW);
+		RenderSystem.popMatrix();
+		RenderSystem.viewport(0, 0, fbuffW, fbuffH);
+		
 		VertexConsumerProvider.Immediate consumerProvider = minecraft.getBufferBuilders().getEntityVertexConsumers();
 		matrices.push();
+		if (mapRotation) {
+			double moveX = mapX + mapWidth / 2.0;
+			double moveY = mapY + mapHeight / 2.0;
+			matrices.translate(moveX, moveY, 0.0);
+			matrices.multiply(Vector3f.POSITIVE_Z.getDegreesQuaternion(180 - rotation));
+			matrices.translate(-moveX, -moveY, 0.0);
+		}
 		matrices.translate(-offX, -offY, 0.0);
 		for (MapIcon<?> icon : drawableEntities) {
 			icon.draw(matrices, consumerProvider, mapX, mapY, rotation);
 		}
 		consumerProvider.draw();
 		matrices.pop();
-		RenderSystem.popMatrix();
+		
 		for (WaypointIcon icon : drawableWaypoints) {
 			icon.draw(matrices, consumerProvider, mapX, mapY, offX, offY, rotation);
 		}
@@ -285,7 +313,6 @@ public class MapRenderer {
 		} else {
 			MapPlayerManager.getPlayer(minecraft.player).getIcon().draw(centerX, centerY, iconSize, true);
 		}
-		
 		this.textManager.draw(matrices);
 		
 		RenderSystem.enableDepthTest();
@@ -322,7 +349,7 @@ public class MapRenderer {
 				double scW = (double) texW / mapScale;
 				double scH = (double) texH / mapScale;
 				
-				region.draw(imgX + scX, imgY + scY, scW, scH, texX, texY, texW, texH);
+				region.draw(scX, scY, scW, scH, texX, texY, texW, texH);
 				
 				picY += texH > 0 ? texH : 512;
 			}
