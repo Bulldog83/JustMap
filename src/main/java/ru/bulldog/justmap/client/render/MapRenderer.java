@@ -57,7 +57,6 @@ public class MapRenderer {
 	private double currX, currZ;
 	private float mapScale;
 	private float rotation;
-	private float prevOffX, prevOffY;
 	private float offX, offY;
 	private float delta;
 	private boolean mapRotation = false;
@@ -218,8 +217,6 @@ public class MapRenderer {
 		int viewW = (int) (imgW * scale);
 		int viewH = (int) (imgH * scale);
 
-		this.prevOffX = offX;
-		this.prevOffY = offY;
 		this.offX = this.calcOffset(currX, lastX, mapScale);
 		this.offY = this.calcOffset(currZ, lastZ, mapScale);
 		
@@ -247,7 +244,7 @@ public class MapRenderer {
 			RenderSystem.colorMask(true, true, true, true);
 			RenderUtil.bindTexture(roundMask);
 			RenderUtil.startDraw();
-			RenderUtil.addQuad(mapX, mapY, mapWidth, mapHeight);
+			RenderUtil.addQuad(mapX - imgX, mapY - imgY, mapWidth, mapHeight);
 			RenderUtil.endDraw();
 			RenderSystem.blendFunc(GL11.GL_DST_ALPHA, GL11.GL_ONE_MINUS_DST_ALPHA);
 		}
