@@ -68,7 +68,7 @@ public class Minimap implements IMap {
 	private boolean rotateMap = false;
 	private boolean bigMap = false;
 	private double winScale;
-	private float mapScale;
+	private double mapScale;
 	private int lastPosX;
 	private int lastPosZ;
 	private int skinX, skinY;
@@ -78,8 +78,11 @@ public class Minimap implements IMap {
 	private int mapLevel;
 	private int mapWidth;
 	private int mapHeight;
-	private int scaledWidth;
-	private int scaledHeight;
+	private int textureWidth;
+	private int textureHeight;
+	
+	private final int TEXTURE_SIZE_REGULAR = 512;
+	private final int TEXTURE_SIZE_BIG = 1024;
 
 	public Minimap() {
 		this.entityRadar = new EntityRadar();
@@ -144,7 +147,7 @@ public class Minimap implements IMap {
 		}
 		
 		int configSize = config.getInt("map_size");
-		float configScale = config.getMapScale();
+		double configScale = Math.pow(2, config.getMapScale()) / 2.0;
 		boolean needRotate = config.getBoolean("rotate_map");
 		boolean bigMap = config.getBoolean("show_big_map");
 
@@ -162,12 +165,21 @@ public class Minimap implements IMap {
 			this.bigMap = bigMap;
 
 			if (rotateMap) {
-				double mult = (bigMap) ? 1.88 : 1.42;
-				this.scaledWidth = (int) (mapWidth * mapScale * mult);
-				this.scaledHeight = (int) (mapHeight * mapScale * mult);
+				if (bigMap) {
+					this.textureWidth = (int) (TEXTURE_SIZE_BIG * 1.88);
+					this.textureHeight = (textureWidth * 10) / 16;
+				} else {
+					this.textureWidth = (int) (TEXTURE_SIZE_REGULAR * 1.42);
+					this.textureHeight = textureWidth;
+				}
 			} else {
-				this.scaledWidth = (int) (mapWidth * mapScale);
-				this.scaledHeight = (int) (mapHeight * mapScale);
+				if (bigMap) {
+					this.textureWidth = TEXTURE_SIZE_BIG;
+					this.textureHeight = (textureWidth * 10) / 16;
+				} else {
+					this.textureWidth = TEXTURE_SIZE_REGULAR;
+					this.textureHeight = TEXTURE_SIZE_REGULAR;
+				}
 			}
 			
 			this.textManager.setLineWidth(this.mapWidth);
@@ -293,18 +305,10 @@ public class Minimap implements IMap {
 			this.mapLevel = 0;
 		}
 
-		int scaledW = scaledWidth;
-		int scaledH = scaledHeight;
-		double startX = posX - scaledW / 2.0;
-		double startZ = posZ - scaledH / 2.0;
-		if (ClientParams.rotateMap) {
-			scaledW = (int) (mapWidth * mapScale);
-			scaledH = (int) (mapHeight * mapScale);
-			startX = posX - scaledW / 2.0;
-			startZ = posZ - scaledH / 2.0;
-		}
-		double endX = startX + scaledW;
-		double endZ = startZ + scaledH;
+		double startX = posX - textureWidth / 2.0;
+		double startZ = posZ - textureHeight / 2.0;
+		double endX = startX + textureWidth;
+		double endZ = startZ + textureHeight;
 
 		int radius = (int) (posX - startX);
 		this.entityRadar.clear(pos, radius);
@@ -314,7 +318,7 @@ public class Minimap implements IMap {
 			BlockPos end = new BlockPos(endX, posY + checkHeight / 2, endZ);
 			List<Entity> entities = world.getOtherEntities(player, new Box(start, end));
 		
-			int amount = 0;				
+			int amount = 0;
 			for (Entity entity : entities) {
 				if (entity instanceof PlayerEntity && RuleUtil.allowPlayerRadar()) {
 					PlayerEntity pEntity = (PlayerEntity) entity;
@@ -371,11 +375,11 @@ public class Minimap implements IMap {
 
 	@Override
 	public float getScale() {
-		return this.mapScale;
+		return (float) this.mapScale;
 	}
 
 	public List<MapIcon<?>> getDrawableIcons(double worldX, double worldZ, double screenX, double screenZ, float delta) {
-		return this.entityRadar.getDrawableIcons(this, worldX, worldZ, screenX, screenZ, mapScale, delta);
+		return this.entityRadar.getDrawableIcons(this, worldX, worldZ, screenX, screenZ, 1 / mapScale, delta);
 	}
 	
 	public List<WaypointIcon> getWaypoints(BlockPos currentPos, int screenX, int screenY) {
@@ -385,10 +389,11 @@ public class Minimap implements IMap {
 			if (wps != null) {
 				Stream<Waypoint> stream = wps.stream()
 						.filter(wp -> MathUtil.getDistance(currentPos, wp.pos, false) <= wp.showRange);
+				double scale = 1 / mapScale;
 				for (Waypoint wp : stream.toArray(Waypoint[]::new)) {
 					WaypointIcon waypoint = new WaypointIcon(this, wp);
-					waypoint.setPosition(MathUtil.screenPos(wp.pos.getX(), currentPos.getX(), screenX, mapScale),
-										 MathUtil.screenPos(wp.pos.getZ(), currentPos.getZ(), screenY, mapScale));
+					waypoint.setPosition(MathUtil.screenPos(wp.pos.getX(), currentPos.getX(), screenX, scale),
+										 MathUtil.screenPos(wp.pos.getZ(), currentPos.getZ(), screenY, scale));
 					this.waypoints.add(waypoint);
 				}
 			}
@@ -478,12 +483,12 @@ public class Minimap implements IMap {
 		return this.mapHeight;
 	}
 
-	public int getScaledWidth() {
-		return this.scaledWidth;
+	public int getTextureWidth() {
+		return this.textureWidth;
 	}
 
-	public int getScaledHeight() {
-		return this.scaledHeight;
+	public int getTextureHeight() {
+		return this.textureHeight;
 	}
 
 	@Override

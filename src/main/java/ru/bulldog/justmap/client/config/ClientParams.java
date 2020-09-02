@@ -18,7 +18,7 @@ public class ClientParams {
 	public static int mapPositionY = positionOffset;
 	public static int mapSize = 64;
 	public static int bigMapSize = 256;
-	public static float mapScale = 1.0F;
+	public static int mapScale = 2;
 	public static boolean mapVisible = true;
 	public static boolean moveEffects = true;
 	public static boolean showEffectTimers = true;

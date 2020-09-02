@@ -21,14 +21,14 @@ public class ChunkGrid {
 	private final static int color = Colors.GRID;	
 	private final List<GridLine> lines;
 	
-	private float scale;
+	private double scale;
 	private int rangeX;
 	private int rangeY;
 	private int rangeW;
 	private int rangeH;
 	private int x, z;
 	
-	public ChunkGrid(int x, int z, int rangeX, int rangeY, int rangeW, int rangeH, float scale) {
+	public ChunkGrid(int x, int z, int rangeX, int rangeY, int rangeW, int rangeH, double scale) {
 		this.lines = new ArrayList<>();
 		this.updateRange(rangeX, rangeY, rangeW, rangeH, scale);
 		this.updateCenter(x, z);
@@ -40,7 +40,7 @@ public class ChunkGrid {
 		this.z = z;
 	}
 	
-	public void updateRange(int rangeX, int rangeY, int rangeW, int rangeH, float scale) {
+	public void updateRange(int rangeX, int rangeY, int rangeW, int rangeH, double scale) {
 		this.rangeX = rangeX;
 		this.rangeY = rangeY;
 		this.rangeW = rangeW;

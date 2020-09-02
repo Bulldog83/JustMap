@@ -54,8 +54,8 @@ public class MapRenderer {
 	private int mapX, mapY;
 	private int imgX, imgY;
 	private int imgW, imgH;
+	private double mapScale;
 	private double currX, currZ;
-	private float mapScale;
 	private float rotation;
 	private float offX, offY;
 	private float delta;
@@ -104,7 +104,7 @@ public class MapRenderer {
 		int mapY = minimap.getMapY();
 		int lastX = MathUtil.floor(currX);
 		int lastZ = MathUtil.floor(currZ);
-		float scale = minimap.getScale();
+		double scale = minimap.getScale();
 		boolean rotateMap = minimap.isRotated();
 		if (mapWidth != mapW || mapHeight != mapH ||
 			this.mapX != mapX || this.mapY != mapY ||
@@ -118,15 +118,10 @@ public class MapRenderer {
 			this.mapY = mapY;	
 			this.centerX = mapX + mapWidth / 2;
 			this.centerY = mapY + mapHeight / 2;
-			this.scaledW = minimap.getScaledWidth();
-			this.scaledH = minimap.getScaledHeight();
+			this.scaledW = minimap.getTextureWidth();
+			this.scaledH = minimap.getTextureHeight();
 			
-			if (mapRotation) {
-				this.imgW = (int) (scaledW / mapScale);
-				this.imgH = (int) (scaledH / mapScale);
-				this.imgX = mapX - (imgW - mapW) / 2;
-				this.imgY = mapY - (imgH - mapH) / 2;
-			} else {
+			if (!mapRotation) {
 				this.imgW = (int) (mapW * 1.25);
 				this.imgH = (int) (mapH * 1.25);
 				int deltaX = imgW - mapW;
@@ -138,9 +133,9 @@ public class MapRenderer {
 			}
 			
 			if (chunkGrid == null) {
-				this.chunkGrid = new ChunkGrid(lastX, lastZ, 0, 0, imgW, imgH, mapScale);
+				this.chunkGrid = new ChunkGrid(lastX, lastZ, 0, 0, imgW, imgH, 1.0);
 			} else {
-				this.chunkGrid.updateRange(0, 0, imgW, imgH, mapScale);
+				this.chunkGrid.updateRange(0, 0, imgW, imgH, 1.0);
 				this.chunkGrid.updateGrid();
 			}
 		}
@@ -207,6 +202,8 @@ public class MapRenderer {
 		Window window = minecraft.getWindow();
 		int fbuffW = window.getFramebufferWidth();
 		int fbuffH = window.getFramebufferHeight();
+		double deltaX = (scaledW - imgW) / 2.0;
+		double deltaY = (scaledH - imgH) / 2.0;
 		double scale = window.getScaleFactor();
 		int scissX = (int) (mapX * scale);
 		int scissY = (int) (fbuffH - (mapY + mapHeight) * scale);
@@ -248,16 +245,19 @@ public class MapRenderer {
 			RenderSystem.blendFunc(GL11.GL_DST_ALPHA, GL11.GL_ONE_MINUS_DST_ALPHA);
 		}
 		RenderSystem.pushMatrix();
+		double moveX = imgW / 2.0;
+		double moveY = imgH / 2.0;
+		RenderSystem.translated(moveX, moveY, 0.0F);
 		if (mapRotation) {
-			float moveX = imgW / 2.0F;
-			float moveY = imgH / 2.0F;
-			RenderSystem.translatef(moveX, moveY, 0.0F);
 			RenderSystem.rotatef(-rotation + 180, 0.0F, 0.0F, 1.0F);
-			RenderSystem.translatef(-moveX, -moveY, 0.0F);
 		}
+		RenderSystem.scaled(mapScale, mapScale, 1.0);
+		RenderSystem.translated(-moveX, -moveY, 0.0F);
 		RenderSystem.translatef(-offX, -offY, 0.0F);
-		
+		RenderSystem.pushMatrix();
+		RenderSystem.translated(-deltaX, -deltaY, 0.0F);
 		this.drawMap();
+		RenderSystem.popMatrix();
 		if (ClientParams.showGrid) {
 			this.chunkGrid.draw();
 		}
@@ -271,12 +271,14 @@ public class MapRenderer {
 		VertexConsumerProvider.Immediate consumerProvider = minecraft.getBufferBuilders().getEntityVertexConsumers();
 		matrices.push();
 		if (mapRotation) {
-			double moveX = mapX + mapWidth / 2.0;
-			double moveY = mapY + mapHeight / 2.0;
+			moveX = mapX + mapWidth / 2.0;
+			moveY = mapY + mapHeight / 2.0;
 			matrices.translate(moveX, moveY, 0.0);
 			matrices.multiply(Vector3f.POSITIVE_Z.getDegreesQuaternion(180 - rotation));
 			matrices.translate(-moveX, -moveY, 0.0);
 		}
+		float offX = (float) (this.offX * mapScale);
+		float offY = (float) (this.offY * mapScale);
 		matrices.translate(-offX, -offY, 0.0);
 		List<MapIcon<?>> drawableEntities = minimap.getDrawableIcons(lastX, lastZ, centerX, centerY, delta);
 		for (MapIcon<?> icon : drawableEntities) {
@@ -342,10 +344,10 @@ public class MapRenderer {
 				if (texX + texW >= 512) texW = 512 - texX;
 				if (texY + texH >= 512) texH = 512 - texY;
 				
-				double scX = (double) picX / mapScale;
-				double scY = (double) picY / mapScale;
-				double scW = (double) texW / mapScale;
-				double scH = (double) texH / mapScale;
+				double scX = (double) picX;
+				double scY = (double) picY;
+				double scW = (double) texW;
+				double scH = (double) texH;
 				
 				region.draw(scX, scY, scW, scH, texX, texY, texW, texH);
 				
@@ -357,6 +359,6 @@ public class MapRenderer {
 	}
 	
 	private float calcOffset(double x, double lastX, double scale) {
-		return (float) (Math.floor(((x - lastX) / scale) * 100D) * 0.01D);
+		return (float) (x - lastX);
 	}
 }

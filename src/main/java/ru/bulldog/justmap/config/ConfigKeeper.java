@@ -133,7 +133,7 @@ public final class ConfigKeeper {
 
 		@Override
 		public void fromString(String value) {
-			setValue(Float.valueOf(value));
+			setValue(Double.valueOf(value).floatValue());
 		}
 
 	}
@@ -156,7 +156,7 @@ public final class ConfigKeeper {
 
 		@Override
 		public void fromString(String value) {
-			setValue(Float.valueOf(value));
+			setValue(Double.valueOf(value).floatValue());
 		}
 
 		@Override
@@ -194,7 +194,7 @@ public final class ConfigKeeper {
 
 		@Override
 		public void fromString(String value) {
-			setValue(Integer.valueOf(value));
+			setValue(Double.valueOf(value).intValue());
 		}
 
 	}
@@ -217,7 +217,7 @@ public final class ConfigKeeper {
 
 		@Override
 		public void fromString(String value) {
-			setValue(Integer.valueOf(value));
+			setValue(Double.valueOf(value).intValue());
 		}
 
 		@Override

@@ -37,7 +37,7 @@ public class ClientConfig extends Config {
 		KEEPER.registerEntry("map_position_y", new IntegerEntry(ClientParams.mapPositionY, (i) -> ClientParams.mapPositionY = i, () -> ClientParams.mapPositionY));
 		KEEPER.registerEntry("map_size", new IntegerRange(ClientParams.mapSize, (i) -> ClientParams.mapSize = i, () -> ClientParams.mapSize, 16, 256));
 		KEEPER.registerEntry("big_map_size", new IntegerRange(ClientParams.bigMapSize, (i) -> ClientParams.bigMapSize = i, () -> ClientParams.bigMapSize, 256, 400));
-		KEEPER.registerEntry("map_scale", new FloatRange(ClientParams.mapScale, (f) -> ClientParams.mapScale = f, () -> ClientParams.mapScale, 0.25F, 2.0F));
+		KEEPER.registerEntry("map_scale", new IntegerRange(ClientParams.mapScale, (f) -> ClientParams.mapScale = f, () -> ClientParams.mapScale, 1, 4));
 		KEEPER.registerEntry("map_saturation", new IntegerRange(ClientParams.mapSaturation, (i) -> ClientParams.mapSaturation = i, () -> ClientParams.mapSaturation, -50, 50));
 		KEEPER.registerEntry("map_brightness", new IntegerRange(ClientParams.mapBrightness, (i) -> ClientParams.mapBrightness = i, () -> ClientParams.mapBrightness, -50, 50));
 		KEEPER.registerEntry("rotate_map", new BooleanEntry(ClientParams.rotateMap, (b) -> ClientParams.rotateMap = b, () -> ClientParams.rotateMap));
@@ -119,12 +119,12 @@ public class ClientConfig extends Config {
 		}
 	}
 	
-	public float getMapScale() {
-		return this.getFloat("map_scale");
+	public int getMapScale() {
+		return this.getInt("map_scale");
 	}
 	
-	public void updateMapScale(float value) {
-		this.setRanged("map_scale", this.getMapScale() * value);
+	public void updateMapScale(int value) {
+		this.setRanged("map_scale", this.getMapScale() + value);
 		this.saveChanges();
 	}
 	
