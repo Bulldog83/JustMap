@@ -216,13 +216,12 @@ public class MapRenderer {
 		int viewY = (int) (fbuffH - (imgY + imgH) * scale);
 		int viewW = (int) (imgW * scale);
 		int viewH = (int) (imgH * scale);
+		int maskX = mapX - imgX;
+		int maskY = mapY - imgY;
 
 		this.offX = this.calcOffset(currX, lastX, mapScale);
 		this.offY = this.calcOffset(currZ, lastZ, mapScale);
 		
-		List<MapIcon<?>> drawableEntities = minimap.getDrawableIcons(lastX, lastZ, centerX, centerY, delta);
-		List<WaypointIcon> drawableWaypoints = minimap.getWaypoints(playerPos, centerX, centerY);
-
 		RenderSystem.disableDepthTest();
 		RenderUtil.enableScissor();
 		RenderUtil.applyScissor(scissX, scissY, scissW, scissH);
@@ -244,7 +243,7 @@ public class MapRenderer {
 			RenderSystem.colorMask(true, true, true, true);
 			RenderUtil.bindTexture(roundMask);
 			RenderUtil.startDraw();
-			RenderUtil.addQuad(mapX - imgX, mapY - imgY, mapWidth, mapHeight);
+			RenderUtil.addQuad(maskX, maskY, mapWidth, mapHeight);
 			RenderUtil.endDraw();
 			RenderSystem.blendFunc(GL11.GL_DST_ALPHA, GL11.GL_ONE_MINUS_DST_ALPHA);
 		}
@@ -279,12 +278,14 @@ public class MapRenderer {
 			matrices.translate(-moveX, -moveY, 0.0);
 		}
 		matrices.translate(-offX, -offY, 0.0);
+		List<MapIcon<?>> drawableEntities = minimap.getDrawableIcons(lastX, lastZ, centerX, centerY, delta);
 		for (MapIcon<?> icon : drawableEntities) {
 			icon.draw(matrices, consumerProvider, mapX, mapY, rotation);
 		}
 		consumerProvider.draw();
 		matrices.pop();
 		
+		List<WaypointIcon> drawableWaypoints = minimap.getWaypoints(playerPos, centerX, centerY);
 		for (WaypointIcon icon : drawableWaypoints) {
 			icon.draw(matrices, consumerProvider, mapX, mapY, offX, offY, rotation);
 		}

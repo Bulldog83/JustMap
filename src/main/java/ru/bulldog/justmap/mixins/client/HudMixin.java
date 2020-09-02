@@ -4,7 +4,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Ordering;
 import com.mojang.blaze3d.systems.RenderSystem;
 
-import ru.bulldog.justmap.advancedinfo.AdvancedInfo;
 import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.enums.ScreenPosition;
@@ -39,14 +38,6 @@ abstract class HudMixin extends DrawableHelper {
 	
 	@Shadow
 	private int scaledWidth;
-	
-	@Inject(at = @At("RETURN"), method = "render")
-	public void draw(MatrixStack matrices, float delta, CallbackInfo info) {
-		if (!client.options.debugEnabled) {
-			JustMapClient.MAP.getRenderer().draw(matrices);
-			AdvancedInfo.getInstance().draw(matrices);
-		}
-	}
 	
 	@Inject(at = @At("HEAD"), method = "renderStatusEffectOverlay", cancellable = true)
 	protected void renderStatusEffects(MatrixStack matrices, CallbackInfo info) {

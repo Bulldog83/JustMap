@@ -4,7 +4,7 @@ import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientChunkEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-
+import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.BackupPromptScreen;
 import net.minecraft.client.gui.screen.Screen;
@@ -38,7 +38,6 @@ public class JustMapClient implements ClientModInitializer {
 	@Override
 	public void onInitializeClient() {
 		KeyHandler.initKeyBindings();
-
 		ClientChunkEvents.CHUNK_LOAD.register(WorldManager::onChunkLoad);
 		ClientTickEvents.END_CLIENT_TICK.register(minecraft -> {
 			boolean isTitle = this.isOnTitleScreen(minecraft.currentScreen);
@@ -61,6 +60,12 @@ public class JustMapClient implements ClientModInitializer {
 		ClientLifecycleEvents.CLIENT_STOPPING.register(client -> {
 			JustMapClient.stop();
 			TaskManager.shutdown();
+		});
+		HudRenderCallback.EVENT.register((matrices, delta) -> {
+			if (!MINECRAFT.options.debugEnabled) {
+				JustMapClient.MAP.getRenderer().draw(matrices);
+				AdvancedInfo.getInstance().draw(matrices);
+			}
 		});
 	}
 	
