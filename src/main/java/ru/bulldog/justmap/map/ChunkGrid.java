@@ -12,9 +12,9 @@ import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexFormats;
 
 import ru.bulldog.justmap.util.Colors;
-import ru.bulldog.justmap.util.RenderUtil;
 import ru.bulldog.justmap.util.math.Line;
 import ru.bulldog.justmap.util.math.MathUtil;
+import ru.bulldog.justmap.util.render.RenderUtil;
 
 public class ChunkGrid {
 	

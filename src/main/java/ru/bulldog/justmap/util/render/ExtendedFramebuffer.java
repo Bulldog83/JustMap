@@ -1,9 +1,7 @@
-package ru.bulldog.justmap.client.render;
+package ru.bulldog.justmap.util.render;
 
 import org.lwjgl.opengl.EXTFramebufferObject;
 import org.lwjgl.opengl.ARBFramebufferObject;
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL14;
 import org.lwjgl.opengl.GL30;
 import org.lwjgl.opengl.GL;
 
@@ -13,14 +11,21 @@ import net.minecraft.client.texture.TextureUtil;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gl.Framebuffer;
 
-public class AvancedFramebuffer extends Framebuffer {
-	private int type;
+public class ExtendedFramebuffer extends Framebuffer {
 	private int colorAttachment;
 	private int depthAttachment;
+	private Fbo type;
 	
-	public AvancedFramebuffer(int width, int height, boolean useDepthIn) {
+	public ExtendedFramebuffer(int width, int height, boolean useDepthIn) {
 		super(width, height, useDepthIn, MinecraftClient.IS_SYSTEM_MAC);
 	}
+
+	public static boolean canUseFramebuffer() {
+        return GL.getCapabilities().OpenGL14 && (
+        		GL.getCapabilities().GL_ARB_framebuffer_object ||
+        	    GL.getCapabilities().GL_EXT_framebuffer_object ||
+        	    GL.getCapabilities().OpenGL30);
+    }
 	
 	@Override
 	public void resize(int width, int height, boolean isMac) {
@@ -30,7 +35,7 @@ public class AvancedFramebuffer extends Framebuffer {
 		}
 		this.initFbo(width, height, isMac);
 		this.checkFramebufferStatus();
-		bindFramebuffer(type, GL30.GL_FRAMEBUFFER, 0);
+		bindFramebuffer(type, GLC.GL_FRAMEBUFFER, 0);
 	}
 	
 	@Override
@@ -56,15 +61,15 @@ public class AvancedFramebuffer extends Framebuffer {
 				return;
 			}
 		}
-		this.setTexFilter(GL11.GL_NEAREST);
+		this.setTexFilter(GLC.GL_NEAREST);
 		GlStateManager.bindTexture(colorAttachment);
-		GlStateManager.texImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA8, textureWidth, textureHeight, 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, null);
-		bindFramebuffer(type, GL30.GL_FRAMEBUFFER, fbo);
-		framebufferTexture2D(type, GL30.GL_FRAMEBUFFER, GL30.GL_COLOR_ATTACHMENT0, GL11.GL_TEXTURE_2D, colorAttachment, 0);
+		GlStateManager.texImage2D(GLC.GL_TEXTURE_2D, 0, GLC.GL_RGBA8, textureWidth, textureHeight, 0, GLC.GL_RGBA, GLC.GL_UNSIGNED_BYTE, null);
+		bindFramebuffer(type, GLC.GL_FRAMEBUFFER, fbo);
+		framebufferTexture2D(type, GLC.GL_FRAMEBUFFER, GLC.GL_COLOR_ATTACHMENT0, GLC.GL_TEXTURE_2D, colorAttachment, 0);
 		if (useDepthAttachment) {
-			bindRenderbuffer(type, GL30.GL_RENDERBUFFER, depthAttachment);
-			renderbufferStorage(type, GL30.GL_RENDERBUFFER, GL14.GL_DEPTH_COMPONENT24, textureWidth, textureHeight);
-			framebufferRenderbuffer(type, GL30.GL_FRAMEBUFFER, GL30.GL_DEPTH_ATTACHMENT, GL30.GL_RENDERBUFFER, depthAttachment);
+			bindRenderbuffer(type, GLC.GL_RENDERBUFFER, depthAttachment);
+			renderbufferStorage(type, GLC.GL_RENDERBUFFER, GLC.GL_DEPTH_COMPONENT24, textureWidth, textureHeight);
+			framebufferRenderbuffer(type, GLC.GL_FRAMEBUFFER, GLC.GL_DEPTH_ATTACHMENT, GLC.GL_RENDERBUFFER, depthAttachment);
 		}
 		this.clear(isMac);
 		this.endRead();
@@ -72,39 +77,37 @@ public class AvancedFramebuffer extends Framebuffer {
 	
 	private int genFrameBuffers() {
 		int fbo = -1;
-		this.type = -1;
+		this.type = Fbo.NONE;
 		if (GL.getCapabilities().OpenGL30) {
 			fbo = GL30.glGenFramebuffers();
-			this.type = 0;
+			this.type = Fbo.BASE;
 		}
 		else if (GL.getCapabilities().GL_ARB_framebuffer_object) {
 			fbo = ARBFramebufferObject.glGenFramebuffers();
-			this.type = 1;
+			this.type = Fbo.ARB;
 		}
 		else if (GL.getCapabilities().GL_EXT_framebuffer_object) {
 			fbo = EXTFramebufferObject.glGenFramebuffersEXT();
-			this.type = 2;
+			this.type = Fbo.EXT;
 		}
 		return fbo;
 	}
 	
 	public int genRenderbuffers() {
-		int rbo = -1;
 		switch (type) {
-			case 0: {
-				rbo = GL30.glGenRenderbuffers();
-				break;
+			case BASE: {
+				return GL30.glGenRenderbuffers();
 			}
-			case 1: {
-				rbo = ARBFramebufferObject.glGenRenderbuffers();
-				break;
+			case ARB: {
+				return ARBFramebufferObject.glGenRenderbuffers();
 			}
-			case 2: {
-				rbo = EXTFramebufferObject.glGenRenderbuffersEXT();
-				break;
+			case EXT: {
+				return EXTFramebufferObject.glGenRenderbuffersEXT();
+			}
+			default: {
+				return -1;
 			}
 		}
-		return rbo;
 	}
 	
 	public void delete() {
@@ -119,7 +122,7 @@ public class AvancedFramebuffer extends Framebuffer {
 			this.colorAttachment = -1;
 		}
 		if (fbo > -1) {
-			bindFramebuffer(type, GL30.GL_FRAMEBUFFER, 0);
+			bindFramebuffer(type, GLC.GL_FRAMEBUFFER, 0);
 			this.deleteFramebuffers(fbo);
 			this.fbo = -1;
 		}
@@ -127,67 +130,73 @@ public class AvancedFramebuffer extends Framebuffer {
 	
 	private void deleteFramebuffers(int framebufferIn) {
 		switch (type) {
-			case 0: {
+			case BASE: {
 				GL30.glDeleteFramebuffers(framebufferIn);
 				break;
 			}
-			case 1: {
+			case ARB: {
 				ARBFramebufferObject.glDeleteFramebuffers(framebufferIn);
 				break;
 			}
-			case 2: {
+			case EXT: {
 				EXTFramebufferObject.glDeleteFramebuffersEXT(framebufferIn);
 				break;
 			}
+			default: {}
 		}
 	}
 	
 	private void deleteRenderbuffers(int renderbuffer) {
 		switch (type) {
-			case 0: {
+			case BASE: {
 				GL30.glDeleteRenderbuffers(renderbuffer);
 				break;
 			}
-			case 1: {
+			case ARB: {
 				ARBFramebufferObject.glDeleteRenderbuffers(renderbuffer);
 				break;
 			}
-			case 2: {
+			case EXT: {
 				EXTFramebufferObject.glDeleteRenderbuffersEXT(renderbuffer);
 				break;
 			}
+			default: {}
 		}
 	}
 	
 	public void checkFramebufferStatus() {
-		int i = this.checkFramebufferStatus(GL30.GL_FRAMEBUFFER);
-		if (i == GL30.GL_FRAMEBUFFER_COMPLETE) return;
-		
-		if (i == GL30.GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT) {
-			throw new RuntimeException("GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT");
+		int status = this.checkFramebufferStatus(GLC.GL_FRAMEBUFFER);
+		switch (status) {
+			case GLC.GL_FRAMEBUFFER_COMPLETE: {
+				return;
+			}
+			case GLC.GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT: {
+				throw new RuntimeException("GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT");
+			}
+			case GLC.GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT: {
+				throw new RuntimeException("GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT");
+			}
+			case GLC.GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER: {
+				throw new RuntimeException("GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER");
+			}
+			case GLC.GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER: {
+				throw new RuntimeException("GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER");
+			}
+			default: {
+				throw new RuntimeException("glCheckFramebufferStatus returned unknown status: " + status);
+			}
 		}
-		if (i == GL30.GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT) {
-			throw new RuntimeException("GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT");
-		}
-		if (i == GL30.GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER) {
-			throw new RuntimeException("GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER");
-		}
-		if (i == GL30.GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER) {
-			throw new RuntimeException("GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER");
-		}
-		
-		throw new RuntimeException("glCheckFramebufferStatus returned unknown status:" + i);
 	}
 	
 	private int checkFramebufferStatus(int target) {
 		switch (type) {
-			case 0: {
+			case BASE: {
 				return GL30.glCheckFramebufferStatus(target);
 			}
-			case 1: {
+			case ARB: {
 				return ARBFramebufferObject.glCheckFramebufferStatus(target);
 			}
-			case 2: {
+			case EXT: {
 				return EXTFramebufferObject.glCheckFramebufferStatusEXT(target);
 			}
 			default: {
@@ -196,118 +205,144 @@ public class AvancedFramebuffer extends Framebuffer {
 		}
 	}
 	
-	public static void bindFramebuffer(int type, int target, int framebufferIn) {
+	public static void bindFramebuffer(Fbo type, int target, int framebufferIn) {
 		switch (type) {
-			case 0: {
+			case BASE: {
 				GL30.glBindFramebuffer(target, framebufferIn);
 				break;
 			}
-			case 1: {
+			case ARB: {
 				ARBFramebufferObject.glBindFramebuffer(target, framebufferIn);
 				break;
 			}
-			case 2: {
+			case EXT: {
 				EXTFramebufferObject.glBindFramebufferEXT(target, framebufferIn);
 				break;
 			}
+			default: {
+				throw new RuntimeException("bindFramebuffer: Invalid FBO type.");
+			}
 		}
 	}
 	
-	public static void framebufferTexture2D(int type, int target, int attachment, int textarget, int texture, int level) {
+	public static void framebufferTexture2D(Fbo type, int target, int attachment, int textarget, int texture, int level) {
 		switch (type) {
-			case 0: {
+			case BASE: {
 				GL30.glFramebufferTexture2D(target, attachment, textarget, texture, level);
 				break;
 			}
-			case 1: {
+			case ARB: {
 				ARBFramebufferObject.glFramebufferTexture2D(target, attachment, textarget, texture, level);
 				break;
 			}
-			case 2: {
+			case EXT: {
 				EXTFramebufferObject.glFramebufferTexture2DEXT(target, attachment, textarget, texture, level);
 				break;
 			}
+			default: {
+				throw new RuntimeException("framebufferTexture2D: Invalid FBO type.");
+			}
 		}
 	}
 	
-	public static void bindRenderbuffer(int type, int target, int renderbuffer) {
+	public static void bindRenderbuffer(Fbo type, int target, int renderbuffer) {
 		switch (type) {
-			case 0: {
+			case BASE: {
 				GL30.glBindRenderbuffer(target, renderbuffer);
 				break;
 			}
-			case 1: {
+			case ARB: {
 				ARBFramebufferObject.glBindRenderbuffer(target, renderbuffer);
 				break;
 			}
-			case 2: {
+			case EXT: {
 				EXTFramebufferObject.glBindRenderbufferEXT(target, renderbuffer);
 				break;
 			}
+			default: {
+				throw new RuntimeException("bindRenderbuffer: Invalid FBO type.");
+			}
 		}
 	}
 	
-	public static void renderbufferStorage(int type, int target, int internalFormat, int width, int height) {
+	public static void renderbufferStorage(Fbo type, int target, int internalFormat, int width, int height) {
 		switch (type) {
-			case 0: {
+			case BASE: {
 				GL30.glRenderbufferStorage(target, internalFormat, width, height);
 				break;
 			}
-			case 1: {
+			case ARB: {
 				ARBFramebufferObject.glRenderbufferStorage(target, internalFormat, width, height);
 				break;
 			}
-			case 2: {
+			case EXT: {
 				EXTFramebufferObject.glRenderbufferStorageEXT(target, internalFormat, width, height);
 				break;
+			}
+			default: {
+				throw new RuntimeException("renderbufferStorage: Invalid FBO type.");
 			}
 		}
 	}
 	
-	public static void framebufferRenderbuffer(int type, int target, int attachment, int renderBufferTarget, int renderBuffer) {
+	public static void framebufferRenderbuffer(Fbo type, int target, int attachment, int renderBufferTarget, int renderBuffer) {
 		switch (type) {
-			case 0: {
+			case BASE: {
 				GL30.glFramebufferRenderbuffer(target, attachment, renderBufferTarget, renderBuffer);
 				break;
 			}
-			case 1: {
+			case ARB: {
 				ARBFramebufferObject.glFramebufferRenderbuffer(target, attachment, renderBufferTarget, renderBuffer);
 				break;
 			}
-			case 2: {
+			case EXT: {
 				EXTFramebufferObject.glFramebufferRenderbufferEXT(target, attachment, renderBufferTarget, renderBuffer);
 				break;
+			}
+			default: {
+				throw new RuntimeException("framebufferRenderbuffer: Invalid FBO type.");
 			}
 		}
 	}
 	
 	@Override
 	public void beginWrite(boolean setViewport) {
-		bindFramebuffer(type, GL30.GL_FRAMEBUFFER, fbo);
+		bindFramebuffer(type, GLC.GL_FRAMEBUFFER, fbo);
 		if (setViewport) {
 			GlStateManager.viewport(0, 0, viewportWidth, viewportHeight);
 		}
 	}
 	
+	@Override
 	public void endWrite() {
-		bindFramebuffer(type, GL30.GL_FRAMEBUFFER, 0);
+		bindFramebuffer(type, GLC.GL_FRAMEBUFFER, 0);
 	}
 	
+	@Override
 	public void beginRead() {
 		GlStateManager.bindTexture(colorAttachment);
 	}
 	
+	@Override
 	public void endRead() {
 		GlStateManager.bindTexture(0);
 	}
 	
+	@Override
 	public void setTexFilter(int framebufferFilterIn) {
 		this.texFilter = framebufferFilterIn;
 		GlStateManager.bindTexture(colorAttachment);
-		GlStateManager.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, framebufferFilterIn);
-		GlStateManager.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, framebufferFilterIn);
-		GlStateManager.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, GL11.GL_CLAMP);
-		GlStateManager.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, GL11.GL_CLAMP);
+		GlStateManager.texParameter(GLC.GL_TEXTURE_2D, GLC.GL_TEXTURE_MIN_FILTER, framebufferFilterIn);
+		GlStateManager.texParameter(GLC.GL_TEXTURE_2D, GLC.GL_TEXTURE_MAG_FILTER, framebufferFilterIn);
+		GlStateManager.texParameter(GLC.GL_TEXTURE_2D, GLC.GL_TEXTURE_WRAP_S, GLC.GL_CLAMP);
+		GlStateManager.texParameter(GLC.GL_TEXTURE_2D, GLC.GL_TEXTURE_WRAP_T, GLC.GL_CLAMP);
 		GlStateManager.bindTexture(0);
+	}
+	
+	public static enum Fbo {
+		BASE,
+		ARB,
+		EXT,
+		NONE;
 	}
 }

@@ -8,7 +8,7 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 
 import ru.bulldog.justmap.util.Colors;
-import ru.bulldog.justmap.util.RenderUtil;
+import ru.bulldog.justmap.util.render.RenderUtil;
 
 public class ListElementWidget implements Drawable, Element {
 	

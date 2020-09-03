@@ -11,8 +11,8 @@ import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.client.render.EntityModelRenderer;
 import ru.bulldog.justmap.map.IMap;
 import ru.bulldog.justmap.util.Colors;
-import ru.bulldog.justmap.util.RenderUtil;
 import ru.bulldog.justmap.util.RuleUtil;
+import ru.bulldog.justmap.util.render.RenderUtil;
 
 public class EntityIcon extends MapIcon<EntityIcon> {
 	

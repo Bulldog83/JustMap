@@ -1,4 +1,4 @@
-package ru.bulldog.justmap.util;
+package ru.bulldog.justmap.util.render;
 
 import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -17,10 +17,10 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Matrix3f;
 import net.minecraft.util.math.Matrix4f;
 import net.minecraft.text.Text;
-
-import ru.bulldog.justmap.client.render.Image;
 import ru.bulldog.justmap.map.minimap.skin.MapSkin;
 import ru.bulldog.justmap.map.minimap.skin.MapSkin.RenderData;
+import ru.bulldog.justmap.util.ColorUtil;
+import ru.bulldog.justmap.util.DataUtil;
 
 import org.lwjgl.opengl.GL11;
 
@@ -104,14 +104,22 @@ public class RenderUtil extends DrawableHelper {
 		RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
 	}
 	
+	public static void enable(int target) {
+		GL11.glEnable(target);
+	}
+	
+	public static void disable(int target) {
+		GL11.glDisable(target);
+	}
+	
 	public static void enableScissor() {
 		RenderSystem.assertThread(RenderSystem::isOnRenderThread);
-		GL11.glEnable(GL11.GL_SCISSOR_TEST);
+		enable(GL11.GL_SCISSOR_TEST);
 	}
 	
 	public static void disableScissor() {
 		RenderSystem.assertThread(RenderSystem::isOnRenderThread);
-		GL11.glDisable(GL11.GL_SCISSOR_TEST);
+		disable(GL11.GL_SCISSOR_TEST);
 	}
 	
 	public static void applyScissor(int x, int y, int width, int height) {
@@ -137,6 +145,12 @@ public class RenderUtil extends DrawableHelper {
     
     public static void endDraw() {
     	tessellator.draw();
+    }
+    
+    public static void drawQuad(double x, double y, double w, double h) {
+    	startDraw();
+    	addQuad(x, y, w, h);
+    	endDraw();
     }
     
     public static BufferBuilder getBuffer() {

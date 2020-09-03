@@ -8,9 +8,8 @@ import ru.bulldog.justmap.map.waypoint.Waypoint.Icon;
 import ru.bulldog.justmap.util.ColorUtil;
 import ru.bulldog.justmap.util.Colors;
 import ru.bulldog.justmap.util.DataUtil;
-import ru.bulldog.justmap.util.RenderUtil;
 import ru.bulldog.justmap.util.math.MathUtil;
-
+import ru.bulldog.justmap.util.render.RenderUtil;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 

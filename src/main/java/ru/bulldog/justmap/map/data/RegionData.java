@@ -8,14 +8,14 @@ import net.minecraft.util.math.ChunkPos;
 
 import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.client.config.ClientParams;
-import ru.bulldog.justmap.client.render.MapTexture;
 import ru.bulldog.justmap.map.IMap;
 import ru.bulldog.justmap.util.Colors;
 import ru.bulldog.justmap.util.DataUtil;
-import ru.bulldog.justmap.util.RenderUtil;
 import ru.bulldog.justmap.util.RuleUtil;
 import ru.bulldog.justmap.util.math.Plane;
 import ru.bulldog.justmap.util.math.Point;
+import ru.bulldog.justmap.util.render.MapTexture;
+import ru.bulldog.justmap.util.render.RenderUtil;
 import ru.bulldog.justmap.util.storage.StorageUtil;
 import ru.bulldog.justmap.util.tasks.TaskManager;
 

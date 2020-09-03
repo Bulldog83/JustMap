@@ -10,7 +10,7 @@ import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.map.MapPlayer;
 import ru.bulldog.justmap.util.Colors;
 import ru.bulldog.justmap.util.DataUtil;
-import ru.bulldog.justmap.util.RenderUtil;
+import ru.bulldog.justmap.util.render.RenderUtil;
 
 import java.io.IOException;
 

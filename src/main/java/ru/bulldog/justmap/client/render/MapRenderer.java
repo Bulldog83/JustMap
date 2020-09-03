@@ -1,8 +1,5 @@
 package ru.bulldog.justmap.client.render;
 
-import java.util.List;
-
-import org.lwjgl.opengl.GL11;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import ru.bulldog.justmap.JustMap;
@@ -16,59 +13,56 @@ import ru.bulldog.justmap.enums.ArrowType;
 import ru.bulldog.justmap.map.ChunkGrid;
 import ru.bulldog.justmap.map.DirectionArrow;
 import ru.bulldog.justmap.map.MapPlayerManager;
-import ru.bulldog.justmap.map.data.RegionData;
 import ru.bulldog.justmap.map.data.WorldData;
-import ru.bulldog.justmap.map.icon.MapIcon;
-import ru.bulldog.justmap.map.icon.WaypointIcon;
 import ru.bulldog.justmap.map.minimap.Minimap;
 import ru.bulldog.justmap.map.minimap.skin.MapSkin;
 import ru.bulldog.justmap.util.Colors;
-import ru.bulldog.justmap.util.RenderUtil;
 import ru.bulldog.justmap.util.DataUtil;
 import ru.bulldog.justmap.util.math.Line;
 import ru.bulldog.justmap.util.math.MathUtil;
 import ru.bulldog.justmap.util.math.Point;
-
+import ru.bulldog.justmap.util.render.RenderUtil;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.util.Window;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 
 @Environment(EnvType.CLIENT)
-public class MapRenderer {
+public abstract class MapRenderer {
 	
-	private final static MinecraftClient minecraft = DataUtil.getMinecraft();
-	private final static Identifier roundMask = new Identifier(JustMap.MODID, "textures/round_mask.png");
+	protected final static MinecraftClient minecraft = DataUtil.getMinecraft();
+	protected final static Identifier roundMask = new Identifier(JustMap.MODID, "textures/round_mask.png");
 	
-	private int winWidth, winHeight;
-	private int mapWidth, mapHeight;
-	private int scaledW, scaledH;
-	private int centerX, centerY;
-	private int lastX, lastZ;
-	private int mapX, mapY;
-	private int imgX, imgY;
-	private int imgW, imgH;
-	private double currX, currZ;
-	private float mapScale;
-	private float rotation;
-	private float offX, offY;
-	private float delta;
-	private boolean mapRotation = false;
-	private final Minimap minimap;
-	private BlockPos.Mutable playerPos;
-	private WorldData worldData;
-	private ChunkGrid chunkGrid;
-	private MapSkin mapSkin;
-	private TextManager textManager;	
-	private InfoText dirN = new MapText(TextAlignment.CENTER, "N");
-	private InfoText dirS = new MapText(TextAlignment.CENTER, "S");
-	private InfoText dirE = new MapText(TextAlignment.CENTER, "E");
-	private InfoText dirW = new MapText(TextAlignment.CENTER, "W");
+	protected int winWidth, winHeight;
+	protected int mapWidth, mapHeight;
+	protected int scaledW, scaledH;
+	protected int centerX, centerY;
+	protected int lastX, lastZ;
+	protected int mapX, mapY;
+	protected int imgX, imgY;
+	protected int imgW, imgH;
+	protected double currX, currZ;
+	protected float mapScale;
+	protected float rotation;
+	protected float offX, offY;
+	protected float delta;
+	protected boolean mapRotation = false;
+	protected boolean paramsUpdated = false;
+	protected boolean playerMoved = false;
+	protected final Minimap minimap;
+	protected BlockPos.Mutable playerPos;
+	protected WorldData worldData;
+	protected ChunkGrid chunkGrid;
+	protected MapSkin mapSkin;
+	protected TextManager textManager;	
+	protected InfoText dirN = new MapText(TextAlignment.CENTER, "N");
+	protected InfoText dirS = new MapText(TextAlignment.CENTER, "S");
+	protected InfoText dirE = new MapText(TextAlignment.CENTER, "E");
+	protected InfoText dirW = new MapText(TextAlignment.CENTER, "W");
 	
 	public MapRenderer(Minimap map) {
 		this.minimap = map;
@@ -81,7 +75,9 @@ public class MapRenderer {
 		this.textManager.add(dirW);
 	}
 	
-	public void updateParams() {		
+	protected abstract void render(MatrixStack matrices);
+	
+	public void updateParams() {
 		this.worldData = minimap.getWorldData();
 		this.mapSkin = minimap.getSkin();
 		
@@ -136,20 +132,14 @@ public class MapRenderer {
 				this.scaledH += deltaY * mapScale;
 			}
 			
-			if (chunkGrid == null) {
-				this.chunkGrid = new ChunkGrid(lastX, lastZ, imgX, imgY, imgW, imgH, mapScale);
-			} else {
-				this.chunkGrid.updateRange(imgX, imgY, imgW, imgH, mapScale);
-				this.chunkGrid.updateGrid();
-			}
+			this.paramsUpdated = true;
 		}
 		
 		if (this.lastX != lastX || this.lastZ != lastZ) {
 			this.lastX = lastX;
 			this.lastZ = lastZ;
-			this.chunkGrid.updateCenter(lastX, lastZ);
-			this.chunkGrid.updateGrid();
 			this.playerPos.set(lastX, DataUtil.coordY(), lastZ);
+			this.playerMoved = true;
 		}
 		
 		int mapR = mapX + mapWidth;
@@ -161,7 +151,7 @@ public class MapRenderer {
 		Point pointE = new Point(mapR, centerY);
 		Point pointW = new Point(mapX, centerY);
 		
-		this.rotation = 180;
+		this.rotation = 0.0F;
 		if (mapRotation) {
 			this.rotation = minecraft.player.headYaw;
 			double rotate = MathUtil.correctAngle(rotation) + 180;
@@ -188,7 +178,7 @@ public class MapRenderer {
 		this.dirW.setPos((int) pointW.x, (int) pointW.y - 5);
 	}
 	
-	private void calculatePos(Point center, Point dir, int mr, int mb, double angle) {		
+	protected void calculatePos(Point center, Point dir, int mr, int mb, double angle) {		
 		Point pos = MathUtil.circlePos(dir, center, angle);
 		int posX = (int) MathUtil.clamp(pos.x, mapX, mr);
 		int posY = (int) MathUtil.clamp(pos.y, mapY, mb);
@@ -196,7 +186,7 @@ public class MapRenderer {
 		dir.x = posX; dir.y = posY;
 	}
 	
-	public void draw(MatrixStack matrices) {
+	public void renderMap(MatrixStack matrices) {
 		if (!minimap.isMapVisible() || !JustMapClient.canMapping()) return;
 		
 		this.updateParams();
@@ -215,50 +205,10 @@ public class MapRenderer {
 		this.offY = this.calcOffset(currZ, lastZ, mapScale);
 		
 		RenderSystem.disableDepthTest();
-		RenderUtil.enableScissor();
+		//RenderUtil.enableScissor();
 		RenderUtil.applyScissor(scissX, scissY, scissW, scissH);
-        RenderSystem.enableBlend();
-        RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
-		if (Minimap.isRound()) {
-			RenderSystem.colorMask(false, false, false, true);
-			RenderSystem.clearColor(0.0F, 0.0F, 0.0F, 0.0F);
-			RenderSystem.clear(GL11.GL_COLOR_BUFFER_BIT, false);
-			RenderSystem.colorMask(true, true, true, true);
-			RenderUtil.bindTexture(roundMask);
-			RenderUtil.startDraw();
-			RenderUtil.addQuad(mapX, mapY, mapWidth, mapHeight);
-			RenderUtil.endDraw();
-			RenderSystem.blendFunc(GL11.GL_DST_ALPHA, GL11.GL_ONE_MINUS_DST_ALPHA);
-		}
-		RenderSystem.pushMatrix();
-		if (mapRotation) {
-			float moveX = mapX + mapWidth / 2.0F;
-			float moveY = mapY + mapHeight / 2.0F;
-			RenderSystem.translatef(moveX, moveY, 0.0F);
-			RenderSystem.rotatef(-rotation + 180, 0.0F, 0.0F, 1.0F);
-			RenderSystem.translatef(-moveX, -moveY, 0.0F);
-		}
-		//RenderSystem.translatef(-offX, -offY, 0.0F);
-		
-		this.drawMap();
-		if (ClientParams.showGrid) {
-			this.chunkGrid.draw();
-		}
-		
-		VertexConsumerProvider.Immediate consumerProvider = minecraft.getBufferBuilders().getEntityVertexConsumers();
-		List<MapIcon<?>> drawableEntities = minimap.getDrawableIcons(lastX, lastZ, centerX, centerY, delta);
-		for (MapIcon<?> icon : drawableEntities) {
-			icon.draw(matrices, consumerProvider, mapX, mapY, rotation);
-		}
-		consumerProvider.draw();
-		
-		RenderSystem.popMatrix();
-		
-		List<WaypointIcon> drawableWaypoints = minimap.getWaypoints(playerPos, centerX, centerY);
-		for (WaypointIcon icon : drawableWaypoints) {
-			icon.draw(matrices, consumerProvider, mapX, mapY, offX, offY, rotation);
-		}
-		consumerProvider.draw();
+        
+		this.render(matrices);
 		
 		RenderUtil.disableScissor();
 		
@@ -285,47 +235,7 @@ public class MapRenderer {
 		RenderSystem.enableDepthTest();
 	}
 	
-	private void drawMap() {
-		int cornerX = lastX - scaledW / 2;
-		int cornerZ = lastZ - scaledH / 2;
-		
-		BlockPos.Mutable currentPos = new BlockPos.Mutable();
-		
-		int picX = 0;
-		while(picX < scaledW) {
-			int texW = 512;
-			if (picX + texW > scaledW) texW = scaledW - picX;
-			
-			int picY = 0;
-			int cX = cornerX + picX;
-			while (picY < scaledH) {
-				int texH = 512;
-				if (picY + texH > scaledH) texH = scaledH - picY;
-				
-				int cZ = cornerZ + picY;
-				RegionData region = worldData.getRegion(minimap, currentPos.set(cX, 0, cZ));
-				region.swapLayer(minimap.getLayer(), minimap.getLevel());
-				
-				int texX = cX - (region.getX() << 9);
-				int texY = cZ - (region.getZ() << 9);
-				if (texX + texW >= 512) texW = 512 - texX;
-				if (texY + texH >= 512) texH = 512 - texY;
-				
-				double scX = (double) picX / mapScale - offX;
-				double scY = (double) picY / mapScale - offY;
-				double scW = (double) texW / mapScale;
-				double scH = (double) texH / mapScale;
-				
-				region.draw(imgX + scX, imgY + scY, scW, scH, texX, texY, texW, texH);
-				
-				picY += texH > 0 ? texH : 512;
-			}
-			
-			picX += texW > 0 ? texW : 512;
-		}
-	}
-	
-	private float calcOffset(double x, double lastX, double scale) {
+	protected float calcOffset(double x, double lastX, double scale) {
 		return (float) (Math.floor(((x - lastX) / scale) * 1000.0) * 0.001);
 	}
 }

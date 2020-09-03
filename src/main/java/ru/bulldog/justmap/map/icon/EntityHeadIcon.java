@@ -7,12 +7,12 @@ import java.util.List;
 import java.util.Map;
 
 import ru.bulldog.justmap.client.config.ClientParams;
-import ru.bulldog.justmap.client.render.Image;
 import ru.bulldog.justmap.util.ImageUtil;
 import ru.bulldog.justmap.util.ColorUtil;
 import ru.bulldog.justmap.util.Colors;
-import ru.bulldog.justmap.util.RenderUtil;
 import ru.bulldog.justmap.util.math.Point;
+import ru.bulldog.justmap.util.render.Image;
+import ru.bulldog.justmap.util.render.RenderUtil;
 import ru.bulldog.justmap.util.storage.StorageUtil;
 
 import net.minecraft.client.texture.NativeImage;

@@ -1,5 +1,6 @@
 package ru.bulldog.justmap.map.minimap;
 
+import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.advancedinfo.AdvancedInfo;
 import ru.bulldog.justmap.advancedinfo.BiomeInfo;
 import ru.bulldog.justmap.advancedinfo.CoordsInfo;
@@ -9,6 +10,8 @@ import ru.bulldog.justmap.advancedinfo.TimeInfo;
 import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.client.config.ClientConfig;
 import ru.bulldog.justmap.client.config.ClientParams;
+import ru.bulldog.justmap.client.render.BufferedRenderer;
+import ru.bulldog.justmap.client.render.FastRenderer;
 import ru.bulldog.justmap.client.render.MapRenderer;
 import ru.bulldog.justmap.client.screen.WaypointEditor;
 import ru.bulldog.justmap.enums.MapShape;
@@ -31,7 +34,7 @@ import ru.bulldog.justmap.util.Dimension;
 import ru.bulldog.justmap.util.RuleUtil;
 import ru.bulldog.justmap.util.math.MathUtil;
 import ru.bulldog.justmap.util.math.RandomUtil;
-
+import ru.bulldog.justmap.util.render.ExtendedFramebuffer;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ChatScreen;
 import net.minecraft.client.util.Window;
@@ -52,7 +55,8 @@ public class Minimap implements IMap {
 	private static final MinecraftClient minecraft = DataUtil.getMinecraft();
 
 	private final TextManager textManager;
-	private final MapRenderer mapRenderer;
+	private final FastRenderer fastRenderer;
+	private final BufferedRenderer bufferedRenderer;
 	private InfoText txtCoords = new CoordsInfo(TextAlignment.CENTER, "0, 0, 0");
 	private InfoText txtBiome = new BiomeInfo(TextAlignment.CENTER, "");
 	private InfoText txtTime = new TimeInfo(TextAlignment.CENTER, "");
@@ -84,7 +88,8 @@ public class Minimap implements IMap {
 	public Minimap() {
 		this.entityRadar = new EntityRadar();
 		this.textManager = AdvancedInfo.getMapTextManager();
-		this.mapRenderer = new MapRenderer(this);
+		this.fastRenderer = new FastRenderer(this);
+		this.bufferedRenderer = new BufferedRenderer(this);
 		this.textManager.add(txtCoords);
 		this.textManager.add(txtBiome);
 		this.textManager.add(txtTime);
@@ -152,7 +157,7 @@ public class Minimap implements IMap {
 			rotateMap != needRotate || this.bigMap != bigMap) {
 			if (bigMap) {
 				this.mapWidth = config.getInt("big_map_size");
-				this.mapHeight = (mapWidth * 10) / 16;
+				this.mapHeight = (int) (mapWidth * 0.625);
 			} else {
 				this.mapWidth = configSize;
 				this.mapHeight = configSize;
@@ -162,7 +167,7 @@ public class Minimap implements IMap {
 			this.bigMap = bigMap;
 
 			if (rotateMap) {
-				double mult = (bigMap) ? 1.88 : 1.42;
+				double mult = (bigMap) ? MathUtil.BIG_SQRT2 : MathUtil.SQRT2;
 				this.scaledWidth = (int) (mapWidth * mapScale * mult);
 				this.scaledHeight = (int) (mapHeight * mapScale * mult);
 			} else {
@@ -170,7 +175,19 @@ public class Minimap implements IMap {
 				this.scaledHeight = (int) (mapHeight * mapScale);
 			}
 			
-			this.textManager.setLineWidth(this.mapWidth);
+			this.textManager.setLineWidth(mapWidth);
+		}
+		
+		try {
+			if (ExtendedFramebuffer.canUseFramebuffer()) {
+				if (!bufferedRenderer.isFBOTried()) {
+					this.bufferedRenderer.loadFrameBuffer(mapWidth, mapHeight);
+				}
+			} else if (bufferedRenderer.isFBOLoaded()) {
+				this.bufferedRenderer.deleteFramebuffers();
+			}
+		} catch (RuntimeException ex) {
+			JustMap.LOGGER.error("Failed to load framebuffers!", ex);
 		}
 		
 		this.updateMapPosition();
@@ -354,7 +371,10 @@ public class Minimap implements IMap {
 	}
 	
 	public MapRenderer getRenderer() {
-		return this.mapRenderer;
+		if (bufferedRenderer.isFBOLoaded()) {
+			return this.bufferedRenderer;
+		}
+		return this.fastRenderer;
 	}
 
 	public World getWorld() {

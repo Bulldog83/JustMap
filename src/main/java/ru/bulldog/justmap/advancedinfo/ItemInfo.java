@@ -5,7 +5,7 @@ import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.item.ItemStack;
 
 import ru.bulldog.justmap.client.config.ClientParams;
-import ru.bulldog.justmap.util.RenderUtil;
+import ru.bulldog.justmap.util.render.RenderUtil;
 
 public class ItemInfo extends InfoText {
 

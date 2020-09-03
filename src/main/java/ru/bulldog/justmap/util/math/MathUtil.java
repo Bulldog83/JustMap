@@ -3,6 +3,10 @@ package ru.bulldog.justmap.util.math;
 import net.minecraft.util.math.BlockPos;
 
 public class MathUtil {
+	
+	public final static double SQRT2 = Math.sqrt(2.0);
+	public final static double BIG_SQRT2 = SQRT2 * 0.625 + 1.0;
+	
 	public static int clamp(int val, int min, int max) {
 		return val < min ? min : val > max ? max : val;
 	}

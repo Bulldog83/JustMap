@@ -63,7 +63,7 @@ public class JustMapClient implements ClientModInitializer {
 		});
 		HudRenderCallback.EVENT.register((matrices, delta) -> {
 			if (!MINECRAFT.options.debugEnabled) {
-				JustMapClient.MAP.getRenderer().draw(matrices);
+				JustMapClient.MAP.getRenderer().renderMap(matrices);
 				AdvancedInfo.getInstance().draw(matrices);
 			}
 		});

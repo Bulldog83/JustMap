@@ -9,12 +9,11 @@ import com.mojang.blaze3d.systems.RenderSystem;
 
 import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.client.config.ClientParams;
-import ru.bulldog.justmap.client.render.Image;
 import ru.bulldog.justmap.map.minimap.Minimap;
 import ru.bulldog.justmap.util.DataUtil;
 import ru.bulldog.justmap.util.ImageUtil;
-import ru.bulldog.justmap.util.RenderUtil;
-
+import ru.bulldog.justmap.util.render.Image;
+import ru.bulldog.justmap.util.render.RenderUtil;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 

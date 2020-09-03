@@ -1,4 +1,4 @@
-package ru.bulldog.justmap.client.render;
+package ru.bulldog.justmap.util.render;
 
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.texture.TextureManager;
@@ -6,7 +6,6 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
 
 import ru.bulldog.justmap.util.DataUtil;
-import ru.bulldog.justmap.util.RenderUtil;
 
 public abstract class Image {
 
