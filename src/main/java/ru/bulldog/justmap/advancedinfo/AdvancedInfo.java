@@ -10,7 +10,7 @@ import net.minecraft.client.gui.screen.ChatScreen;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.EquipmentSlot;
 
-import ru.bulldog.justmap.client.config.ClientParams;
+import ru.bulldog.justmap.client.config.ClientSettings;
 import ru.bulldog.justmap.enums.ScreenPosition;
 import ru.bulldog.justmap.util.DataUtil;
 
@@ -55,8 +55,8 @@ public class AdvancedInfo {
 	private void initInfo() {
 		this.managers.forEach((position, manager) -> manager.clear());
 		
-		this.infoPos = ClientParams.infoPosition;
-		this.itemsPos = ClientParams.itemsPosition;
+		this.infoPos = ClientSettings.infoPosition;
+		this.itemsPos = ClientSettings.itemsPosition;
 		
 		TextManager textManager = this.getTextManager(infoPos);
 		textManager.setSpacing(12);
@@ -78,11 +78,11 @@ public class AdvancedInfo {
 	}
 	
 	public void updateInfo() {
-		if (!ClientParams.advancedInfo) return;
+		if (!ClientSettings.advancedInfo) return;
 		if (minecraft.currentScreen != null &&
 		  !(minecraft.currentScreen instanceof ChatScreen)) return;
 		
-		if (ClientParams.infoPosition != infoPos || ClientParams.itemsPosition != itemsPos) {
+		if (ClientSettings.infoPosition != infoPos || ClientSettings.itemsPosition != itemsPos) {
 			this.initInfo();
 		}
 		this.managers.forEach((position, manager) -> {
@@ -92,7 +92,7 @@ public class AdvancedInfo {
 	}
 	
 	public void draw(MatrixStack matrixStack) {
-		if (!ClientParams.advancedInfo) return;
+		if (!ClientSettings.advancedInfo) return;
 		if (minecraft.currentScreen != null &&
 		  !(minecraft.currentScreen instanceof ChatScreen)) return;
 		RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);

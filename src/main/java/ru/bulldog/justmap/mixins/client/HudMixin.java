@@ -4,9 +4,8 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Ordering;
 import com.mojang.blaze3d.systems.RenderSystem;
 
-import ru.bulldog.justmap.advancedinfo.AdvancedInfo;
 import ru.bulldog.justmap.client.JustMapClient;
-import ru.bulldog.justmap.client.config.ClientParams;
+import ru.bulldog.justmap.client.config.ClientSettings;
 import ru.bulldog.justmap.enums.ScreenPosition;
 import ru.bulldog.justmap.util.Colors;
 
@@ -40,20 +39,12 @@ abstract class HudMixin extends DrawableHelper {
 	@Shadow
 	private int scaledWidth;
 	
-	@Inject(at = @At("RETURN"), method = "render")
-	public void draw(MatrixStack matrices, float delta, CallbackInfo info) {
-		if (!client.options.debugEnabled) {
-			JustMapClient.MAP.getRenderer().draw(matrices);
-			AdvancedInfo.getInstance().draw(matrices);
-		}
-	}
-	
 	@Inject(at = @At("HEAD"), method = "renderStatusEffectOverlay", cancellable = true)
 	protected void renderStatusEffects(MatrixStack matrices, CallbackInfo info) {
-		if (ClientParams.moveEffects) {
+		if (ClientSettings.moveEffects) {
 			int posX = this.scaledWidth;
-			int posY = ClientParams.positionOffset;
-			if (ClientParams.mapPosition == ScreenPosition.TOP_RIGHT) {
+			int posY = ClientSettings.positionOffset;
+			if (ClientSettings.mapPosition == ScreenPosition.TOP_RIGHT) {
 				posX = JustMapClient.MAP.getSkinX();
 			}
 			
@@ -72,7 +63,7 @@ abstract class HudMixin extends DrawableHelper {
 		int hOffset = 6;
 		int vOffset = 10;
 		
-		if (!ClientParams.showEffectTimers) {
+		if (!ClientSettings.showEffectTimers) {
 			hOffset = 1;
 			vOffset = 2;
 		}
@@ -124,7 +115,7 @@ abstract class HudMixin extends DrawableHelper {
 					RenderSystem.color4f(1.0F, 1.0F, 1.0F, fa);
 					drawSprite(matrixStack, fx + 3, fy + 3, this.getZOffset(), 18, 18, sprite);
 		   		});
-		   		if (ClientParams.showEffectTimers) {
+		   		if (ClientSettings.showEffectTimers) {
 			   		timers.add(() -> {
 			   			drawCenteredString(matrixStack, client.textRenderer, convertDuration(effectDuration), fx + size / 2, fy + (size + 1), Colors.WHITE);
 			   		});

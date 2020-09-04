@@ -27,16 +27,19 @@ public class MapPositionScreen extends Screen {
 	
 	@Override
 	public void init() {
-		this.addButton(new ButtonWidget(width / 2 - 85, height - 60, 80, 20, LangUtil.getText("gui", "save"), this::onPressSave));
-		this.addButton(new ButtonWidget(width / 2 + 5, height - 60, 80, 20, LangUtil.getText("gui", "reset"), this::onPressReset));
+		int posX = width / 2;
+		int posY = height - 60;
+		this.addButton(new ButtonWidget(posX - 125, posY, 80, 20, LangUtil.getText("gui", "save"), button -> this.onSave()));
+		this.addButton(new ButtonWidget(posX - 40, posY, 80, 20, LangUtil.getText("gui", "reset"), button -> this.onReset()));
+		this.addButton(new ButtonWidget(posX + 45, posY, 80, 20, LangUtil.getText("gui", "cancel"), button -> this.onClose()));
 		this.mapHolder = this.addChild(new MapWidget(this, JustMapClient.MAP));
 	}
 	
-	private void onPressReset(ButtonWidget button) {
+	private void onReset() {
 		this.mapHolder.resetPosition();
 	}
 	
-	private void onPressSave(ButtonWidget button) {
+	private void onSave() {
 		EnumEntry<ScreenPosition> drawPosConfig = config.getEntry("map_position");
 		drawPosConfig.setValue(ScreenPosition.USER_DEFINED);
 		config.setInt("map_position_x", mapHolder.getX());

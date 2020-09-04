@@ -1,6 +1,6 @@
 package ru.bulldog.justmap.map.data;
 
-import ru.bulldog.justmap.client.config.ClientParams;
+import ru.bulldog.justmap.client.config.ClientSettings;
 import ru.bulldog.justmap.util.StateUtil;
 
 import net.minecraft.block.BlockState;
@@ -29,7 +29,7 @@ public class MapProcessor {
 		int posX = x + (chunkPos.x << 4);
 		int posZ = z + (chunkPos.z << 4);
 		
-		boolean plants = !ClientParams.hidePlants;
+		boolean plants = !ClientSettings.hidePlants;
 		if ((layer.equals(Layer.NETHER) || layer.equals(Layer.CAVES))) {
 			int floor = level * layer.height;
 			for (int i = floor + (layer.height - 1); i >= floor; i--) {
@@ -108,7 +108,7 @@ public class MapProcessor {
 		int diff = east - south;
 		if (diff == 0) return 0;
 		
-		int maxDiff = ClientParams.terrainStrength;
+		int maxDiff = ClientSettings.terrainStrength;
 		diff = diff < 0 ? Math.max(-maxDiff, diff) : Math.min(maxDiff, diff);
 		
 		return diff;

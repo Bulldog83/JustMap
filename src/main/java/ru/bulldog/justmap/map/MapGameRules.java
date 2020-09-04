@@ -14,6 +14,7 @@ import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.world.GameRules;
 import net.minecraft.world.GameRules.Key;
+import net.minecraft.server.MinecraftServer;
 
 public class MapGameRules {
 
@@ -66,13 +67,14 @@ public class MapGameRules {
 	 */	
 	@Environment(EnvType.CLIENT)
 	public static void parseCommand(String command) {
+		MinecraftServer server = DataUtil.getMinecraft().getServer();
 		GameRules gameRules = DataUtil.getWorld().getGameRules();
 		codes.forEach((key, rule) -> {
 			if (command.contains(key)) {
 				int valPos = command.indexOf(key) + 2;
 				boolean value = command.substring(valPos, valPos + 2).equals("§1");
-				gameRules.get(rule).set(value, null);
-				JustMap.LOGGER.info(String.format("Map rule %s switched to: %s.", rule, value));
+				gameRules.get(rule).set(value, server);
+				JustMap.LOGGER.info("Map rule {} switched to: {}", rule, value);
 			}
 		});
 	}
