@@ -31,7 +31,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.chunk.WorldChunk;
 
 import ru.bulldog.justmap.JustMap;
-import ru.bulldog.justmap.client.config.ClientParams;
+import ru.bulldog.justmap.client.config.ClientSettings;
 import ru.bulldog.justmap.mixins.client.BakedSpriteAccessor;
 import ru.bulldog.justmap.util.math.MathUtil;
 
@@ -243,15 +243,15 @@ public class ColorUtil {
 	
 	public static int proccessColor(int color, int heightDiff, float topoLevel) {
 		RGBtoHSB((color >> 16) & 255, (color >> 8) & 255, color & 255, floatBuffer);
-		floatBuffer[1] += ClientParams.mapSaturation / 100.0F;
+		floatBuffer[1] += ClientSettings.mapSaturation / 100.0F;
 		floatBuffer[1] = MathUtil.clamp(floatBuffer[1], 0.0F, 1.0F);
-		floatBuffer[2] += ClientParams.mapBrightness / 100.0F;
+		floatBuffer[2] += ClientSettings.mapBrightness / 100.0F;
 		floatBuffer[2] = MathUtil.clamp(floatBuffer[2], 0.0F, 1.0F);
-		if (ClientParams.showTerrain && heightDiff != 0) {
+		if (ClientSettings.showTerrain && heightDiff != 0) {
 			floatBuffer[2] += heightDiff / 10.0F;
 			floatBuffer[2] = MathUtil.clamp(floatBuffer[2], 0.0F, 1.0F);
 		}
-		if (ClientParams.showTopography && topoLevel != 0) {
+		if (ClientSettings.showTopography && topoLevel != 0) {
 			floatBuffer[2] += MathUtil.clamp(topoLevel, -0.75F, 0.1F);
 			floatBuffer[2] = MathUtil.clamp(floatBuffer[2], 0.0F, 1.0F);
 		}
@@ -279,17 +279,17 @@ public class ColorUtil {
 		BlockState overState = worldChunk.getBlockState(overPos);
 		BlockState blockState = worldChunk.getBlockState(pos);
 		
-		boolean waterTint = ClientParams.alternateColorRender && ClientParams.waterTint;
-		boolean skipWater = !(ClientParams.hideWater || waterTint);
-		if (!ClientParams.hideWater && ClientParams.hidePlants && StateUtil.isSeaweed(overState)) {
+		boolean waterTint = ClientSettings.alternateColorRender && ClientSettings.waterTint;
+		boolean skipWater = !(ClientSettings.hideWater || waterTint);
+		if (!ClientSettings.hideWater && ClientSettings.hidePlants && StateUtil.isSeaweed(overState)) {
 			if (waterTint) {
 				int color = blockColor(world, blockState, pos);
 				return applyTint(color, BiomeColors.getWaterColor(world, pos));
 			}
 			return blockColor(world, Blocks.WATER.getDefaultState(), pos);			
-		} else if (!StateUtil.isAir(blockState) && StateUtil.checkState(overState, skipWater, !ClientParams.hidePlants)) {			
+		} else if (!StateUtil.isAir(blockState) && StateUtil.checkState(overState, skipWater, !ClientSettings.hidePlants)) {			
 			int color = blockColor(world, blockState, pos);
-			if (ClientParams.hideWater) return color;
+			if (ClientSettings.hideWater) return color;
 			if (waterTint && (StateUtil.isWater(overState) || StateUtil.isWaterlogged(blockState))) {
 				return applyTint(color, BiomeColors.getWaterColor(world, pos));
 			}
@@ -301,7 +301,7 @@ public class ColorUtil {
 	
 	public static int blockColor(World world, BlockState state, BlockPos pos) {
 		int materialColor = state.getTopMaterialColor(world, pos).color;
-		if (ClientParams.alternateColorRender) {
+		if (ClientSettings.alternateColorRender) {
 			int blockColor = minecraft.getBlockColorMap().getColor(state, world, pos, Colors.LIGHT);
 			int textureColor = getStateColor(state);
 			

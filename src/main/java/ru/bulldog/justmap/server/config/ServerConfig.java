@@ -22,14 +22,14 @@ public class ServerConfig extends Config {
 	}
 	
 	private ServerConfig() {
-		KEEPER.registerEntry("use_game_rules", new BooleanEntry(ServerParams.useGameRules, (b) -> ServerParams.useGameRules = b, () -> ServerParams.useGameRules));
-		KEEPER.registerEntry("allow_caves_map", new BooleanEntry(ServerParams.allowCavesMap, (b) -> ServerParams.allowCavesMap = b, () -> ServerParams.allowCavesMap));
-		KEEPER.registerEntry("allow_entities_radar", new BooleanEntry(ServerParams.allowEntities, (b) -> ServerParams.allowEntities = b, () -> ServerParams.allowEntities));
-		KEEPER.registerEntry("allow_hostile_radar", new BooleanEntry(ServerParams.allowHostile, (b) -> ServerParams.allowHostile = b, () -> ServerParams.allowHostile));
-		KEEPER.registerEntry("allow_creatures_radar", new BooleanEntry(ServerParams.allowCreatures, (b) -> ServerParams.allowCreatures = b, () -> ServerParams.allowCreatures));
-		KEEPER.registerEntry("allow_players_radar", new BooleanEntry(ServerParams.allowPlayers, (b) -> ServerParams.allowPlayers = b, () -> ServerParams.allowPlayers));
-		KEEPER.registerEntry("allow_slime_chunks", new BooleanEntry(ServerParams.allowSlime, (b) -> ServerParams.allowSlime = b, () -> ServerParams.allowSlime));
-		KEEPER.registerEntry("allow_waypoints_jumps", new BooleanEntry(ServerParams.allowTeleportation, (b) -> ServerParams.allowTeleportation = b, () -> ServerParams.allowTeleportation));
+		KEEPER.registerEntry("use_game_rules", new BooleanEntry(ServerSettings.useGameRules, (b) -> ServerSettings.useGameRules = b, () -> ServerSettings.useGameRules));
+		KEEPER.registerEntry("allow_caves_map", new BooleanEntry(ServerSettings.allowCavesMap, (b) -> ServerSettings.allowCavesMap = b, () -> ServerSettings.allowCavesMap));
+		KEEPER.registerEntry("allow_entities_radar", new BooleanEntry(ServerSettings.allowEntities, (b) -> ServerSettings.allowEntities = b, () -> ServerSettings.allowEntities));
+		KEEPER.registerEntry("allow_hostile_radar", new BooleanEntry(ServerSettings.allowHostile, (b) -> ServerSettings.allowHostile = b, () -> ServerSettings.allowHostile));
+		KEEPER.registerEntry("allow_creatures_radar", new BooleanEntry(ServerSettings.allowCreatures, (b) -> ServerSettings.allowCreatures = b, () -> ServerSettings.allowCreatures));
+		KEEPER.registerEntry("allow_players_radar", new BooleanEntry(ServerSettings.allowPlayers, (b) -> ServerSettings.allowPlayers = b, () -> ServerSettings.allowPlayers));
+		KEEPER.registerEntry("allow_slime_chunks", new BooleanEntry(ServerSettings.allowSlime, (b) -> ServerSettings.allowSlime = b, () -> ServerSettings.allowSlime));
+		KEEPER.registerEntry("allow_waypoints_jumps", new BooleanEntry(ServerSettings.allowTeleportation, (b) -> ServerSettings.allowTeleportation = b, () -> ServerSettings.allowTeleportation));
 		
 		JsonObject config = ConfigWriter.load();
 		if (config.size() > 0) {

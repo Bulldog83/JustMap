@@ -15,14 +15,14 @@ import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.minecraft.world.GameRules;
 import net.minecraft.world.GameRules.BooleanRule;
-import ru.bulldog.justmap.server.config.ServerParams;
+import ru.bulldog.justmap.server.config.ServerSettings;
 
 @Mixin(GameRuleCommand.class)
 public abstract class GameRuleCommandMixin {
 	
 	@Inject(method = "executeSet", at = @At("RETURN"))
 	private static <T extends GameRules.Rule<T>> void executeSet(CommandContext<ServerCommandSource> commandContext, GameRules.RuleKey<T> ruleKey, CallbackInfoReturnable<Integer> cir) {
-		if (ServerParams.useGameRules) {
+		if (ServerSettings.useGameRules) {
 			ServerCommandSource serverCommandSource = (ServerCommandSource) commandContext.getSource();
 			T rule = serverCommandSource.getMinecraftServer().getGameRules().get(ruleKey);
 			

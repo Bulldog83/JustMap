@@ -18,7 +18,7 @@ import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.minecraft.world.GameRules;
 import ru.bulldog.justmap.map.MapGameRules;
-import ru.bulldog.justmap.server.config.ServerParams;
+import ru.bulldog.justmap.server.config.ServerSettings;
 
 @Mixin(PlayerManager.class)
 public abstract class PlayerManagerMixin {
@@ -30,7 +30,7 @@ public abstract class PlayerManagerMixin {
 	@Inject(method = "onPlayerConnect", at = @At("RETURN"))
 	public void onPlayerConnect(ClientConnection clientConnection, ServerPlayerEntity serverPlayerEntity, CallbackInfo ci) {
 		BaseText command = new LiteralText("§0§0");
-		if (ServerParams.useGameRules) {
+		if (ServerSettings.useGameRules) {
 			GameRules gameRules = server.getGameRules();
 			if (gameRules.getBoolean(MapGameRules.ALLOW_CAVES_MAP)) {
 				command.append("§a§1");
@@ -54,25 +54,25 @@ public abstract class PlayerManagerMixin {
 				command.append("§t§1");
 			}
 		} else {
-			if (ServerParams.allowCavesMap) {
+			if (ServerSettings.allowCavesMap) {
 				command.append("§a§1");
 			}
-			if (ServerParams.allowEntities) {
+			if (ServerSettings.allowEntities) {
 				command.append("§b§1");
 			}
-			if (ServerParams.allowPlayers) {
+			if (ServerSettings.allowPlayers) {
 				command.append("§c§1");
 			}
-			if (ServerParams.allowCreatures) {
+			if (ServerSettings.allowCreatures) {
 				command.append("§d§1");
 			}
-			if (ServerParams.allowHostile) {
+			if (ServerSettings.allowHostile) {
 				command.append("§e§1");
 			}
-			if (ServerParams.allowSlime) {
+			if (ServerSettings.allowSlime) {
 				command.append("§s§1");
 			}
-			if (ServerParams.allowTeleportation) {
+			if (ServerSettings.allowTeleportation) {
 				command.append("§t§1");
 			}
 		}

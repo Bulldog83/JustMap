@@ -3,8 +3,8 @@ package ru.bulldog.justmap.advancedinfo;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.item.ItemStack;
 
-import ru.bulldog.justmap.client.config.ClientParams;
-import ru.bulldog.justmap.util.RenderUtil;
+import ru.bulldog.justmap.client.config.ClientSettings;
+import ru.bulldog.justmap.util.render.RenderUtil;
 
 public class ItemInfo extends InfoText {
 
@@ -59,14 +59,14 @@ public class ItemInfo extends InfoText {
 	}
 	
 	private boolean isVisible() {
-		if (!ClientParams.showItems) return false;
+		if (!ClientSettings.showItems) return false;
 		switch (slot) {
-			case MAINHAND: return ClientParams.showMainhand;
-			case OFFHAND: return ClientParams.showOffhand;
-			case HEAD: return ClientParams.showHead;
-			case CHEST: return ClientParams.showChest;
-			case LEGS: return ClientParams.showLegs;
-			case FEET: return ClientParams.showFeet;
+			case MAINHAND: return ClientSettings.showMainhand;
+			case OFFHAND: return ClientSettings.showOffhand;
+			case HEAD: return ClientSettings.showHead;
+			case CHEST: return ClientSettings.showChest;
+			case LEGS: return ClientSettings.showLegs;
+			case FEET: return ClientSettings.showFeet;
 		}
 		
 		return true;

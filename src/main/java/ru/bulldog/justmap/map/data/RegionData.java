@@ -7,15 +7,15 @@ import java.util.concurrent.ConcurrentHashMap;
 import net.minecraft.util.math.ChunkPos;
 
 import ru.bulldog.justmap.JustMap;
-import ru.bulldog.justmap.client.config.ClientParams;
-import ru.bulldog.justmap.client.render.MapTexture;
+import ru.bulldog.justmap.client.config.ClientSettings;
 import ru.bulldog.justmap.map.IMap;
 import ru.bulldog.justmap.util.Colors;
 import ru.bulldog.justmap.util.DataUtil;
-import ru.bulldog.justmap.util.RenderUtil;
 import ru.bulldog.justmap.util.RuleUtil;
 import ru.bulldog.justmap.util.math.Plane;
 import ru.bulldog.justmap.util.math.Point;
+import ru.bulldog.justmap.util.render.MapTexture;
+import ru.bulldog.justmap.util.render.RenderUtil;
 import ru.bulldog.justmap.util.storage.StorageUtil;
 import ru.bulldog.justmap.util.tasks.TaskManager;
 
@@ -124,25 +124,25 @@ public class RegionData {
 	
 	private void updateMapParams(boolean needUpdate) {
 		this.needUpdate = needUpdate;
-		if (ClientParams.hideWater != hideWater) {
-			this.hideWater = ClientParams.hideWater;
+		if (ClientSettings.hideWater != hideWater) {
+			this.hideWater = ClientSettings.hideWater;
 			this.needUpdate = true;
 		}
-		boolean waterTint = ClientParams.alternateColorRender && ClientParams.waterTint;
+		boolean waterTint = ClientSettings.alternateColorRender && ClientSettings.waterTint;
 		if (this.waterTint != waterTint) {
 			this.waterTint = waterTint;
 			this.needUpdate = true;
 		}
-		if (ClientParams.alternateColorRender != alternateRender) {
-			this.alternateRender = ClientParams.alternateColorRender;
+		if (ClientSettings.alternateColorRender != alternateRender) {
+			this.alternateRender = ClientSettings.alternateColorRender;
 			this.needUpdate = true;
 		}
 		if (slimeOverlay != RuleUtil.allowSlimeChunks()) {
 			this.slimeOverlay = RuleUtil.allowSlimeChunks();
 			this.renewOverlay = true;
 		}
-		if (ClientParams.showLoadedChunks != loadedOverlay) {
-			this.loadedOverlay = ClientParams.showLoadedChunks;
+		if (ClientSettings.showLoadedChunks != loadedOverlay) {
+			this.loadedOverlay = ClientSettings.showLoadedChunks;
 			this.renewOverlay = true;
 		}
 		this.overlayNeeded = gridOverlay || slimeOverlay || loadedOverlay;
@@ -299,10 +299,7 @@ public class RegionData {
 		}
 		int id = texture != null ? texture.getId() : image.getId();
 		RenderUtil.bindTexture(id);
-		if (ClientParams.textureFilter) {
-			RenderUtil.applyFilter();
-		}
-		
+		RenderUtil.applyFilter();
 		RenderUtil.startDraw();
 		RenderUtil.addQuad(x, y, w, h, u1, v1, u2, v2);
 		RenderUtil.endDraw();
