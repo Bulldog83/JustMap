@@ -1,4 +1,4 @@
-package ru.bulldog.justmap.client.render;
+package ru.bulldog.justmap.util.render;
 
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;

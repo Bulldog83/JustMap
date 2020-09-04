@@ -15,6 +15,7 @@ import ru.bulldog.justmap.util.RenderUtil;
 import ru.bulldog.justmap.util.RuleUtil;
 import ru.bulldog.justmap.util.math.MathUtil;
 import ru.bulldog.justmap.util.math.RandomUtil;
+import ru.bulldog.justmap.util.render.RenderUtil;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.Element;
