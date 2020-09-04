@@ -1,6 +1,6 @@
 package ru.bulldog.justmap.map.data;
 
-import ru.bulldog.justmap.client.config.ClientParams;
+import ru.bulldog.justmap.client.config.ClientSettings;
 import ru.bulldog.justmap.event.ChunkUpdateEvent;
 import ru.bulldog.justmap.event.ChunkUpdateListener;
 import ru.bulldog.justmap.map.IMap;
@@ -51,7 +51,7 @@ public class WorldData {
 		}
 		long time = System.currentTimeMillis();
 		if (time - region.updated > 1000) {
-			region.updateImage(ClientParams.forceUpdate);
+			region.updateImage(ClientSettings.forceUpdate);
 		}
 		
 		return region;
@@ -99,10 +99,10 @@ public class WorldData {
 		BlockPos centerPos = map.getCenter();
 		Layer layer = map.getLayer();
 		int level = map.getLevel();
-		boolean update = ClientParams.forceUpdate;
+		boolean update = ClientSettings.forceUpdate;
 		
 		long time = System.currentTimeMillis();
-		long interval = ClientParams.chunkUpdateInterval;
+		long interval = ClientSettings.chunkUpdateInterval;
 		ChunkData mapChunk = this.getChunk(centerPos);
 		WorldChunk worldChunk = this.world.getWorldChunk(centerPos);
 		boolean chunkLoaded = !worldChunk.isEmpty() && mapChunk.isChunkLoaded();
@@ -146,8 +146,8 @@ public class WorldData {
 	}
 	
 	public void clearCache() {
-		this.purgeDelay = ClientParams.purgeDelay * 1000;
-		this.purgeAmount = ClientParams.purgeAmount;
+		this.purgeDelay = ClientSettings.purgeDelay * 1000;
+		this.purgeAmount = ClientSettings.purgeAmount;
 		
 		long currentTime = System.currentTimeMillis();
 		if (currentTime - lastPurged > purgeDelay) {

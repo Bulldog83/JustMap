@@ -1,6 +1,6 @@
 package ru.bulldog.justmap.enums;
 
-import ru.bulldog.justmap.client.config.ClientParams;
+import ru.bulldog.justmap.client.config.ClientSettings;
 
 public enum MultiworldDetection {
 	MANUAL,
@@ -8,14 +8,14 @@ public enum MultiworldDetection {
 	AUTO;
 	
 	public static boolean isManual() {
-		return ClientParams.multiworldDetection.equals(MANUAL);
+		return ClientSettings.multiworldDetection.equals(MANUAL);
 	}
 	
 	public static boolean isAuto() {
-		return ClientParams.multiworldDetection.equals(AUTO);
+		return ClientSettings.multiworldDetection.equals(AUTO);
 	}
 	
 	public static boolean isMixed() {
-		return ClientParams.multiworldDetection.equals(MIXED);
+		return ClientSettings.multiworldDetection.equals(MIXED);
 	}
 }

@@ -1,7 +1,7 @@
 package ru.bulldog.justmap.client.render;
 
 import ru.bulldog.justmap.client.JustMapClient;
-import ru.bulldog.justmap.client.config.ClientParams;
+import ru.bulldog.justmap.client.config.ClientSettings;
 import ru.bulldog.justmap.util.DataUtil;
 import ru.bulldog.justmap.util.math.MathUtil;
 
@@ -35,12 +35,12 @@ public class EntityModelRenderer {
 		setPitchAndYaw(livingEntity);
 		
 		float scale = (float) getScale(livingEntity);
-		int modelSize = ClientParams.entityModelSize;
+		int modelSize = ClientSettings.entityModelSize;
 		
 		matrices.push();
 		matrices.translate(x, y, 0);
 		matrices.translate(modelSize / 4, modelSize / 2, 0);
-		if (ClientParams.rotateMap) {
+		if (ClientSettings.rotateMap) {
 			float rotation = (float) MathUtil.correctAngle(minecraft.player.headYaw);
 			matrices.multiply(Vector3f.POSITIVE_Z.getDegreesQuaternion(rotation));
 		} else {
@@ -63,7 +63,7 @@ public class EntityModelRenderer {
 	}
 	
 	private static double getScale(LivingEntity livingEntity) {
-		int modelSize = ClientParams.entityModelSize;
+		int modelSize = ClientSettings.entityModelSize;
 		double mapScale = JustMapClient.MAP.getScale();
 		
 		modelSize = (int) Math.min(modelSize, modelSize / mapScale);

@@ -6,7 +6,7 @@ import net.minecraft.client.util.Window;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerEntity;
 
-import ru.bulldog.justmap.client.config.ClientParams;
+import ru.bulldog.justmap.client.config.ClientSettings;
 import ru.bulldog.justmap.client.render.EntityModelRenderer;
 import ru.bulldog.justmap.map.MapPlayerManager;
 import ru.bulldog.justmap.util.ColorUtil;
@@ -34,7 +34,7 @@ public class PlayerIcon extends MapIcon<PlayerIcon> {
 	public void draw(MatrixStack matrices, int size) {
 		double x = this.x - size / 2;
 		double y = this.y - size / 2;
-		if (ClientParams.showPlayerHeads) {
+		if (ClientSettings.showPlayerHeads) {
 			MapPlayerManager.getPlayer(player).getIcon().draw(matrices, x, y, size, true);
 		} else {
 			int darken = ColorUtil.colorBrigtness(color, -3);
@@ -46,12 +46,12 @@ public class PlayerIcon extends MapIcon<PlayerIcon> {
 
 	@Override
 	public void draw(MatrixStack matrices, VertexConsumerProvider consumerProvider, int mapX, int mapY, int mapW, int mapH, float rotation) {
-		int size = ClientParams.entityIconSize;
+		int size = ClientSettings.entityIconSize;
 		this.updatePos(mapX, mapY, mapW, mapH, size);
 		if (!allowRender) return;
-		if (ClientParams.renderEntityModel) {
+		if (ClientSettings.renderEntityModel) {
 			EntityModelRenderer.renderModel(matrices, consumerProvider, player, iconPos.x, iconPos.y);
-		} else if (ClientParams.showPlayerHeads) {
+		} else if (ClientSettings.showPlayerHeads) {
 			MapPlayerManager.getPlayer(player).getIcon().draw(matrices, iconPos.x, iconPos.y);
 		} else {
 			int darken = ColorUtil.colorBrigtness(color, -3);
@@ -62,7 +62,7 @@ public class PlayerIcon extends MapIcon<PlayerIcon> {
 	}
 	
 	private void drawPlayerName(MatrixStack matrices, double x, double y) {
-		if (!ClientParams.showPlayerNames) return;
+		if (!ClientSettings.showPlayerNames) return;
 		MinecraftClient minecraft = DataUtil.getMinecraft();
 		Window window = minecraft.getWindow();
 		double sf = window.getScaleFactor();

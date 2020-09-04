@@ -7,10 +7,11 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.entity.passive.TameableEntity;
 
-import ru.bulldog.justmap.client.config.ClientParams;
+import ru.bulldog.justmap.client.config.ClientSettings;
 import ru.bulldog.justmap.client.render.EntityModelRenderer;
 import ru.bulldog.justmap.util.Colors;
 import ru.bulldog.justmap.util.RuleUtil;
+import ru.bulldog.justmap.util.math.MathUtil;
 import ru.bulldog.justmap.util.render.RenderUtil;
 
 public class EntityIcon extends MapIcon<EntityIcon> {
@@ -35,22 +36,24 @@ public class EntityIcon extends MapIcon<EntityIcon> {
 		} else {
 			color = (hostile) ? Colors.DARK_RED : Colors.YELLOW;
 		}
-		int size = ClientParams.entityIconSize;
+		int size = ClientSettings.entityIconSize;
 		this.updatePos(mapX, mapY, mapW, mapH, size);
 		if (!allowRender) return;
-		if (ClientParams.renderEntityModel) {
+		if (ClientSettings.renderEntityModel) {
 			EntityModelRenderer.renderModel(matrices, consumerProvider, entity, iconPos.x, iconPos.y);
-		} else if (ClientParams.showEntityHeads) {
+		} else if (ClientSettings.showEntityHeads) {
 			EntityHeadIcon icon = EntityHeadIcon.getIcon(entity);
-			if (icon != null) {					
+			if (icon != null) {
+				double moveX = iconPos.x + size / 2;
+				double moveY = iconPos.y + size / 2;
+				float scale = MathUtil.clamp(1.0F / ClientSettings.mapScale, 0.5F, 1.5F);
 				matrices.push();
-				if (ClientParams.rotateMap) {
-					double moveX = iconPos.x + size / 2;
-					double moveY = iconPos.y + size / 2;
-					matrices.translate(moveX, moveY, 0.0);
+				matrices.translate(moveX, moveY, 0.0);
+				if (ClientSettings.rotateMap) {
 					matrices.multiply(Vector3f.POSITIVE_Z.getDegreesQuaternion(rotation + 180.0F));
-					matrices.translate(-moveX, -moveY, 0.0);
 				}
+				matrices.scale(scale, scale, 1.0F);
+				matrices.translate(-moveX, -moveY, 0.0);
 				icon.draw(matrices, iconPos.x, iconPos.y, size);
 				matrices.pop();
 			} else {

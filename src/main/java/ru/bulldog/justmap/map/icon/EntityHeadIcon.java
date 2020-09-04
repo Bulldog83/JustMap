@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import ru.bulldog.justmap.client.config.ClientParams;
+import ru.bulldog.justmap.client.config.ClientSettings;
 import ru.bulldog.justmap.util.ImageUtil;
 import ru.bulldog.justmap.util.ColorUtil;
 import ru.bulldog.justmap.util.Colors;
@@ -66,8 +66,8 @@ public class EntityHeadIcon extends Image {
 
 	@Override
 	public void draw(MatrixStack matrices, double x, double y, int w, int h) {
-		if (ClientParams.showIconsOutline) {
-			double thickness = ClientParams.entityOutlineSize;
+		if (ClientSettings.showIconsOutline) {
+			double thickness = ClientSettings.entityOutlineSize;
 			if (solid) {
 				RenderUtil.fill(matrices, x - thickness / 2, y - thickness / 2, w + thickness, h + thickness, this.color);
 			} else {

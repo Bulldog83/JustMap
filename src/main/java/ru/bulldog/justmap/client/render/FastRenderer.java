@@ -9,7 +9,7 @@ import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.BlockPos;
 
-import ru.bulldog.justmap.client.config.ClientParams;
+import ru.bulldog.justmap.client.config.ClientSettings;
 import ru.bulldog.justmap.map.ChunkGrid;
 import ru.bulldog.justmap.map.data.RegionData;
 import ru.bulldog.justmap.map.icon.MapIcon;
@@ -57,7 +57,7 @@ public class FastRenderer extends MapRenderer {
 		RenderSystem.translatef(-offX, -offY, 0.0F);
 		
 		this.drawMap();
-		if (ClientParams.showGrid) {
+		if (ClientSettings.showGrid) {
 			this.drawGrid();
 		}
 		

@@ -7,7 +7,7 @@ import ru.bulldog.justmap.advancedinfo.InfoText;
 import ru.bulldog.justmap.advancedinfo.MapText;
 import ru.bulldog.justmap.advancedinfo.TextManager;
 import ru.bulldog.justmap.client.JustMapClient;
-import ru.bulldog.justmap.client.config.ClientParams;
+import ru.bulldog.justmap.client.config.ClientSettings;
 import ru.bulldog.justmap.enums.TextAlignment;
 import ru.bulldog.justmap.enums.ArrowType;
 import ru.bulldog.justmap.map.ChunkGrid;
@@ -37,7 +37,11 @@ public abstract class MapRenderer {
 	
 	protected static MinecraftClient minecraft = DataUtil.getMinecraft();
 	protected static Identifier roundMask = new Identifier(JustMap.MODID, "textures/round_mask.png");
-	protected static TextManager textManager;	
+	protected static TextManager textManager;
+	protected static InfoText dirN = new MapText(TextAlignment.CENTER, "N");
+	protected static InfoText dirS = new MapText(TextAlignment.CENTER, "S");
+	protected static InfoText dirE = new MapText(TextAlignment.CENTER, "E");
+	protected static InfoText dirW = new MapText(TextAlignment.CENTER, "W");
 	
 	protected int winWidth, winHeight;
 	protected int mapWidth, mapHeight;
@@ -60,19 +64,10 @@ public abstract class MapRenderer {
 	protected WorldData worldData;
 	protected ChunkGrid chunkGrid;
 	protected MapSkin mapSkin;
-	protected InfoText dirN = new MapText(TextAlignment.CENTER, "N");
-	protected InfoText dirS = new MapText(TextAlignment.CENTER, "S");
-	protected InfoText dirE = new MapText(TextAlignment.CENTER, "E");
-	protected InfoText dirW = new MapText(TextAlignment.CENTER, "W");
 	
 	public MapRenderer(Minimap map) {
 		this.playerPos = new BlockPos.Mutable(0, 0, 0);
 		this.minimap = map;
-	}
-	
-	protected abstract void render(MatrixStack matrices, double scale);
-	
-	public void updateParams() {
 		if (textManager == null) {
 			textManager = minimap.getTextManager();
 			textManager.setSpacing(12);
@@ -81,7 +76,11 @@ public abstract class MapRenderer {
 			textManager.add(dirE);
 			textManager.add(dirW);
 		}
-		
+	}
+	
+	protected abstract void render(MatrixStack matrices, double scale);
+	
+	public void updateParams() {
 		this.worldData = minimap.getWorldData();
 		this.mapSkin = minimap.getSkin();
 		
@@ -176,10 +175,10 @@ public abstract class MapRenderer {
 			this.calculatePos(center, pointW, mapR, mapB, angle);
 		}
 		
-		this.dirN.setPos((int) pointN.x, (int) pointN.y - 5);
-		this.dirS.setPos((int) pointS.x, (int) pointS.y - 5);
-		this.dirE.setPos((int) pointE.x, (int) pointE.y - 5);
-		this.dirW.setPos((int) pointW.x, (int) pointW.y - 5);
+		dirN.setPos((int) pointN.x, (int) pointN.y - 5);
+		dirS.setPos((int) pointS.x, (int) pointS.y - 5);
+		dirE.setPos((int) pointE.x, (int) pointE.y - 5);
+		dirW.setPos((int) pointW.x, (int) pointW.y - 5);
 	}
 	
 	protected void calculatePos(Point center, Point dir, int mr, int mb, double angle) {		
@@ -217,8 +216,8 @@ public abstract class MapRenderer {
 				matrices, Double.toString(1 / mapScale),
 				mapX + mapWidth - 3, mapY + mapHeight - 10, Colors.WHITE);
 		
-		int iconSize = ClientParams.arrowIconSize;
-		if (ClientParams.arrowIconType == ArrowType.DIRECTION_ARROW) {
+		int iconSize = ClientSettings.arrowIconSize;
+		if (ClientSettings.arrowIconType == ArrowType.DIRECTION_ARROW) {
 			float direction = mapRotation ? 180 : minecraft.player.headYaw;
 			DirectionArrow.draw(centerX, centerY, iconSize, direction);
 		} else {
@@ -231,5 +230,9 @@ public abstract class MapRenderer {
 	
 	protected float calcOffset(double x, double lastX, double scale) {
 		return (float) (Math.floor(((x - lastX) / scale) * 1000.0) * 0.001);
+	}
+	
+	static {
+		
 	}
 }

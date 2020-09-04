@@ -409,6 +409,10 @@ public final class ConfigFactory {
 				.setSaveConsumer(val -> modConfig.setBoolean("force_map_update", val))
 				.setDefaultValue((boolean) modConfig.getDefault("force_map_update"))
 				.build());
+		optimization.addEntry(entryBuilder.startBooleanToggle(lang("use_fast_render"), modConfig.getBoolean("use_fast_render"))
+				.setSaveConsumer(val -> modConfig.setBoolean("use_fast_render", val))
+				.setDefaultValue((boolean) modConfig.getDefault("use_fast_render"))
+				.build());
 		
 		configBuilder.setDoesConfirmSave(false);
 		configBuilder.transparentBackground();

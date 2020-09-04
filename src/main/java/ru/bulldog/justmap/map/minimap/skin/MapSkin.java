@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import ru.bulldog.justmap.JustMap;
-import ru.bulldog.justmap.client.config.ClientParams;
+import ru.bulldog.justmap.client.config.ClientSettings;
 import ru.bulldog.justmap.map.minimap.Minimap;
 import ru.bulldog.justmap.util.DataUtil;
 import ru.bulldog.justmap.util.ImageUtil;
@@ -200,11 +200,11 @@ public class MapSkin extends Image {
 	}
 	
 	public static MapSkin getCurrentSkin() {
-		return getSkin(ClientParams.currentSkin);
+		return getSkin(ClientSettings.currentSkin);
 	}
 	
 	public static MapSkin getBigMapSkin() {
-		return getSkin(ClientParams.bigMapSkin);
+		return getSkin(ClientSettings.bigMapSkin);
 	}
 	
 	public RenderData getRenderData() {
@@ -240,7 +240,7 @@ public class MapSkin extends Image {
 		}
 		
 		public void updateScale() {
-			this.updateScale(ClientParams.skinScale);
+			this.updateScale(ClientSettings.skinScale);
 		}
 		
 		public void calculate(double x, double y, float w, float h) {

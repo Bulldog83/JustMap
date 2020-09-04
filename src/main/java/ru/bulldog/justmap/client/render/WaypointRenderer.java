@@ -1,6 +1,6 @@
 package ru.bulldog.justmap.client.render;
 
-import ru.bulldog.justmap.client.config.ClientParams;
+import ru.bulldog.justmap.client.config.ClientSettings;
 import ru.bulldog.justmap.map.data.WorldManager;
 import ru.bulldog.justmap.map.waypoint.Waypoint;
 import ru.bulldog.justmap.map.waypoint.WaypointKeeper;
@@ -40,7 +40,7 @@ public class WaypointRenderer {
 	private final static MinecraftClient minecraft = DataUtil.getMinecraft();
 	
 	public static void renderHUD(float delta, float fov) {
-		if (!ClientParams.showWaypoints || !ClientParams.waypointsTracking) return;
+		if (!ClientSettings.showWaypoints || !ClientSettings.waypointsTracking) return;
 		if (minecraft.world == null || minecraft.player == null || minecraft.currentScreen != null) {
 			return;
 		}
@@ -73,7 +73,7 @@ public class WaypointRenderer {
 		double scale = (MathUtil.clamp(ax, a0, a1) - a0) / fov;
 		
 		int x = (int) Math.round(MathUtil.clamp((screenWidth - screenWidth * scale) - size / 2, 0, screenWidth - size));
-		int y = ClientParams.positionOffset;
+		int y = ClientSettings.positionOffset;
 		
 		if (icon != null) {
 			icon.draw(x, y);
@@ -84,7 +84,7 @@ public class WaypointRenderer {
 	}
 	
 	public static void renderWaypoints(MatrixStack matrixStack, Camera camera, float tickDelta) {
-		if (!ClientParams.showWaypoints || !ClientParams.waypointsWorldRender) return;
+		if (!ClientSettings.showWaypoints || !ClientSettings.waypointsWorldRender) return;
 		
 		long time = minecraft.player.world.getTime();
 		float tick = (float) Math.floorMod(time, 125L) + tickDelta;
@@ -102,7 +102,7 @@ public class WaypointRenderer {
 		List<Waypoint> wayPoints = WaypointKeeper.getInstance().getWaypoints(WorldManager.getWorldKey(), true);
 		for (Waypoint wp : wayPoints) {
 			int dist = (int) MathUtil.getDistance(wp.pos, playerPos, false);
-			if (wp.render && dist >= ClientParams.minRenderDist && dist <= wp.showRange) {
+			if (wp.render && dist >= ClientSettings.minRenderDist && dist <= wp.showRange) {
 				renderer.renderWaypoint(matrixStack, consumerProvider, wp, minecraft, camera, tick, dist);
 			}
 		}
@@ -128,14 +128,14 @@ public class WaypointRenderer {
 		matrixStack.push();
 		matrixStack.translate((double) wpX - camX, (double) wpY - camY, (double) wpZ - camZ);
 		matrixStack.translate(0.5, 0.5, 0.5);
-		if (ClientParams.renderLightBeam) {
+		if (ClientSettings.renderLightBeam) {
 			VertexConsumer vertexConsumer = consumerProvider.getBuffer(RenderLayer.getBeaconBeam(BEAM_TEX, true));
 			this.renderLightBeam(matrixStack, vertexConsumer, tick, -wpY, 1024 - wpY, colors, alpha, 0.15F, 0.2F);
 		}
-		if (ClientParams.renderMarkers) {
+		if (ClientSettings.renderMarkers) {
 			matrixStack.push();
 			matrixStack.translate(0.0, 1.0, 0.0);
-			if (ClientParams.renderAnimation) {
+			if (ClientSettings.renderAnimation) {
 				double swing = 0.25 * Math.sin((tick * 2.25 - 45.0) / 15.0);
 				matrixStack.translate(0.0, swing, 0.0);
 			}

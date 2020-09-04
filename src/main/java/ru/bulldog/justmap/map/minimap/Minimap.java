@@ -9,7 +9,7 @@ import ru.bulldog.justmap.advancedinfo.TextManager;
 import ru.bulldog.justmap.advancedinfo.TimeInfo;
 import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.client.config.ClientConfig;
-import ru.bulldog.justmap.client.config.ClientParams;
+import ru.bulldog.justmap.client.config.ClientSettings;
 import ru.bulldog.justmap.client.render.BufferedRenderer;
 import ru.bulldog.justmap.client.render.FastRenderer;
 import ru.bulldog.justmap.client.render.MapRenderer;
@@ -129,7 +129,7 @@ public class Minimap implements IMap {
 		if (!isMapVisible) return;
 		
 		this.border = 0;
-		if (ClientParams.useSkins) {
+		if (ClientSettings.useSkins) {
 			if (isBigMap()) {
 				this.mapSkin = MapSkin.getBigMapSkin();
 			} else {
@@ -178,16 +178,20 @@ public class Minimap implements IMap {
 			this.textManager.setLineWidth(mapWidth);
 		}
 		
-		try {
-			if (ExtendedFramebuffer.canUseFramebuffer()) {
-				if (!bufferedRenderer.isFBOTried()) {
-					this.bufferedRenderer.loadFrameBuffer(mapWidth, mapHeight);
+		if (!ClientSettings.fastRender) {
+			try {
+				if (ExtendedFramebuffer.canUseFramebuffer()) {
+					if (!bufferedRenderer.isFBOTried()) {
+						this.bufferedRenderer.loadFrameBuffers();
+					}
+				} else if (bufferedRenderer.isFBOLoaded()) {
+					this.bufferedRenderer.deleteFramebuffers();
 				}
-			} else if (bufferedRenderer.isFBOLoaded()) {
-				this.bufferedRenderer.deleteFramebuffers();
+			} catch (RuntimeException ex) {
+				JustMap.LOGGER.error("Failed to load framebuffers!", ex);
 			}
-		} catch (RuntimeException ex) {
-			JustMap.LOGGER.error("Failed to load framebuffers!", ex);
+		} else if (bufferedRenderer.isFBOLoaded()) {
+			this.bufferedRenderer.deleteFramebuffers();
 		}
 		
 		this.updateMapPosition();
@@ -197,8 +201,8 @@ public class Minimap implements IMap {
 		Window window = minecraft.getWindow();
 		int winW = window.getScaledWidth();
 		int winH = window.getScaledHeight();
-		this.offset = ClientParams.positionOffset;
-		this.mapPosition = ClientParams.mapPosition;		
+		this.offset = ClientSettings.positionOffset;
+		this.mapPosition = ClientSettings.mapPosition;		
 		
 		TextPosition textPos = TextPosition.UNDER;
 
@@ -206,8 +210,8 @@ public class Minimap implements IMap {
 		int fullHeight = mapHeight + border * 2;
 		switch (mapPosition) {
 			case USER_DEFINED:
-				this.skinX = ClientParams.mapPositionX;
-				this.skinY = ClientParams.mapPositionY;
+				this.skinX = ClientSettings.mapPositionX;
+				this.skinY = ClientSettings.mapPositionY;
 				break;
 			case TOP_CENTER:
 				this.skinX = winW / 2 - fullWidth / 2;
@@ -264,19 +268,19 @@ public class Minimap implements IMap {
 	}
 
 	private void updateInfo(PlayerEntity player) {
-		if (!ClientParams.mapInfo) {
+		if (!ClientSettings.mapInfo) {
 			this.txtCoords.setVisible(false);
 			this.txtBiome.setVisible(false);
 			this.txtTime.setVisible(false);
 
 			return;
 		}
-		this.txtCoords.setVisible(ClientParams.showPosition);
-		if (ClientParams.showPosition) {
+		this.txtCoords.setVisible(ClientSettings.showPosition);
+		if (ClientSettings.showPosition) {
 			this.txtCoords.update();
 		}
-		boolean showBiome = !ClientParams.advancedInfo && ClientParams.showBiome;
-		boolean showTime = !ClientParams.advancedInfo && ClientParams.showTime;
+		boolean showBiome = !ClientSettings.advancedInfo && ClientSettings.showBiome;
+		boolean showTime = !ClientSettings.advancedInfo && ClientSettings.showTime;
 		this.txtBiome.setVisible(showBiome);
 		this.txtTime.setVisible(showTime);
 		if (showBiome)
@@ -314,7 +318,7 @@ public class Minimap implements IMap {
 		int scaledH = scaledHeight;
 		double startX = posX - scaledW / 2.0;
 		double startZ = posZ - scaledH / 2.0;
-		if (ClientParams.rotateMap) {
+		if (ClientSettings.rotateMap) {
 			scaledW = (int) (mapWidth * mapScale);
 			scaledH = (int) (mapHeight * mapScale);
 			startX = posX - scaledW / 2.0;
@@ -400,7 +404,7 @@ public class Minimap implements IMap {
 	
 	public List<WaypointIcon> getWaypoints(BlockPos currentPos, int screenX, int screenY) {
 		this.waypoints.clear();
-		if (ClientParams.showWaypoints) {
+		if (ClientSettings.showWaypoints) {
 			List<Waypoint> wps = WaypointKeeper.getInstance().getWaypoints(WorldManager.getWorldKey(), true);
 			if (wps != null) {
 				Stream<Waypoint> stream = wps.stream()
@@ -425,16 +429,16 @@ public class Minimap implements IMap {
 	}
 
 	public static boolean isBig() {
-		return ClientParams.showBigMap;
+		return ClientSettings.showBigMap;
 	}
 
 	public static boolean isRound() {
-		return !isBig() && (ClientParams.mapShape == MapShape.CIRCLE);
+		return !isBig() && (ClientSettings.mapShape == MapShape.CIRCLE);
 	}
 
 	public boolean isMapVisible() {
 		if (minecraft.currentScreen != null) {
-			return this.isMapVisible && !minecraft.isPaused() && ClientParams.showInChat
+			return this.isMapVisible && !minecraft.isPaused() && ClientSettings.showInChat
 					&& minecraft.currentScreen instanceof ChatScreen;
 		}
 
@@ -475,7 +479,7 @@ public class Minimap implements IMap {
 	
 	@Override
 	public boolean isRotated() {
-		return ClientParams.rotateMap;
+		return ClientSettings.rotateMap;
 	}
 
 	@Override

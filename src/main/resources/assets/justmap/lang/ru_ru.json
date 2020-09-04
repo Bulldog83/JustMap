@@ -105,6 +105,7 @@
   "justmap.configuration.purge_delay": "Задержка очистки кэша (секунд)",
   "justmap.configuration.purge_amount": "Максимальное количество чанков для удаления",
   "justmap.configuration.uninterrupted_map_update": "Непрерывное обновление карты",
+  "justmap.configuration.use_fast_render": "Использовать быстрый рендер",
   
   "justmap.configuration.tooltip_color_config": "Имеет эффект только при альтернативном цветовом рендере.",
 

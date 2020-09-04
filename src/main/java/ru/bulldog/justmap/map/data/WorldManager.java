@@ -19,7 +19,7 @@ import net.minecraft.world.chunk.WorldChunk;
 import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.client.config.ClientConfig;
-import ru.bulldog.justmap.client.config.ClientParams;
+import ru.bulldog.justmap.client.config.ClientSettings;
 import ru.bulldog.justmap.client.screen.WorldnameScreen;
 import ru.bulldog.justmap.config.ConfigKeeper.BooleanEntry;
 import ru.bulldog.justmap.config.ConfigKeeper.EnumEntry;
@@ -245,7 +245,7 @@ public final class WorldManager {
 			cacheClearing = true;
 			JustMap.LOGGER.warning(String.format("Memory usage at %2d%%, forcing garbage collection.", usedPct));
 			JustMap.WORKER.execute("Hard cache clearing...", () -> {
-				int amount = ClientParams.purgeAmount * 10;
+				int amount = ClientSettings.purgeAmount * 10;
 				synchronized (worldsData) {
 					worldsData.forEach((id, world) -> {
 						if (world != null) {
