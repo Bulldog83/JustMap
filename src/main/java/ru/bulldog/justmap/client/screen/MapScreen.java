@@ -9,7 +9,7 @@ import net.minecraft.util.Identifier;
 import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.util.DimensionUtil;
 import ru.bulldog.justmap.util.LangUtil;
-import ru.bulldog.justmap.util.RenderUtil;
+import ru.bulldog.justmap.util.render.RenderUtil;
 
 import java.util.HashMap;
 

@@ -19,6 +19,7 @@ import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.client.screen.Worldmap;
 import ru.bulldog.justmap.map.IMap;
 import ru.bulldog.justmap.map.data.Layer;
+import ru.bulldog.justmap.util.math.MathUtil;
 
 public class DataUtil {
 	private static MinecraftClient minecraft = JustMapClient.MINECRAFT;
@@ -58,9 +59,9 @@ public class DataUtil {
 		Entity posEntity = getPosEntity();
 		if (posEntity == null) return;
 		
-		coordX = (int) (posEntity.getX() < 0.0 ? posEntity.getX() - 1.0 : posEntity.getX());
-		coordZ = (int) (posEntity.getZ() < 0.0 ? posEntity.getZ() - 1.0 : posEntity.getZ());
-		coordY = (int) (posEntity.getY());
+		coordX = MathUtil.floor(posEntity.getX());
+		coordZ = MathUtil.floor(posEntity.getZ());
+		coordY = (int) posEntity.getY();
 		
 		if (clientWorld == null) return;
 		currentLayer = getLayer(clientWorld, currentPos());
@@ -119,22 +120,22 @@ public class DataUtil {
 		return currentPos.set(coordX, coordY, coordZ);
 	}
 	
-	public static double doubleX(Entity entity) {
+	public static double doubleX(Entity entity, float delta) {
 		if (entity == null) return 0.0;
-		return entity.prevX + (entity.getX() - entity.prevX) * (double) minecraft.getTickDelta();
+		return MathUtil.lerp(delta, entity.prevX, entity.getX());
 	}
 
-	public static double doubleZ(Entity entity) {
+	public static double doubleZ(Entity entity, float delta) {
 		if (entity == null) return 0.0;
-		return entity.prevZ + (entity.getZ() - entity.prevZ) * (double) minecraft.getTickDelta();
+		return MathUtil.lerp(delta, entity.prevZ, entity.getZ());
 	}
 	
-	public static double doubleX() {
-		return doubleX(getPosEntity());
+	public static double doubleX(float delta) {
+		return doubleX(getPosEntity(), delta);
 	}
 	
-	public static double doubleZ() {
-		return doubleZ(getPosEntity());
+	public static double doubleZ(float delta) {
+		return doubleZ(getPosEntity(), delta);
 	}
 
 	static boolean hasSkyLight(World world, BlockPos pos) {

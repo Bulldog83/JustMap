@@ -7,7 +7,7 @@ import net.minecraft.client.gui.Element;
 import net.minecraft.text.Text;
 
 import ru.bulldog.justmap.util.Colors;
-import ru.bulldog.justmap.util.RenderUtil;
+import ru.bulldog.justmap.util.render.RenderUtil;
 
 public class ListElementWidget implements Drawable, Element {
 	

@@ -16,7 +16,7 @@ import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.map.data.WorldManager;
 import ru.bulldog.justmap.util.Colors;
 import ru.bulldog.justmap.util.LangUtil;
-import ru.bulldog.justmap.util.RenderUtil;
+import ru.bulldog.justmap.util.render.RenderUtil;
 
 public class WorldnameScreen extends Screen {
 

@@ -5,7 +5,7 @@ import java.util.List;
 
 import net.minecraft.client.MinecraftClient;
 
-import ru.bulldog.justmap.client.config.ClientParams;
+import ru.bulldog.justmap.client.config.ClientSettings;
 import ru.bulldog.justmap.enums.ScreenPosition;
 import ru.bulldog.justmap.enums.TextAlignment;
 import ru.bulldog.justmap.enums.TextPosition;
@@ -42,7 +42,7 @@ public class TextManager {
 	}
 	
 	public TextManager updatePosition(ScreenPosition position) {
-		int offset = ClientParams.positionOffset;
+		int offset = ClientSettings.positionOffset;
 		MinecraftClient minecraft = DataUtil.getMinecraft();
 		int screenW = minecraft.getWindow().getScaledWidth();
 		int screenH = minecraft.getWindow().getScaledHeight();
@@ -98,7 +98,7 @@ public class TextManager {
 		}
 		for (InfoText line : elements) {
 			if (line.fixed) continue;
-			line.offset = ClientParams.positionOffset;
+			line.offset = ClientSettings.positionOffset;
 			if (textPosition == TextPosition.ABOVE || textPosition == TextPosition.UNDER) {
 				line.alignment = TextAlignment.CENTER;
 			} else if (textPosition == TextPosition.LEFT ||

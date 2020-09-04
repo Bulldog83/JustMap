@@ -1,7 +1,7 @@
 package ru.bulldog.justmap.map.data;
 
 import ru.bulldog.justmap.client.JustMapClient;
-import ru.bulldog.justmap.client.config.ClientParams;
+import ru.bulldog.justmap.client.config.ClientSettings;
 import ru.bulldog.justmap.util.ColorUtil;
 import ru.bulldog.justmap.util.Colors;
 import ru.bulldog.justmap.util.DimensionUtil;
@@ -161,7 +161,7 @@ public class ChunkData {
 			this.outdated = forceUpdate;
 		}
 		long currentTime = System.currentTimeMillis();
-		if (!outdated && currentTime - updated < ClientParams.chunkUpdateInterval) return false;
+		if (!outdated && currentTime - updated < ClientSettings.chunkUpdateInterval) return false;
 		
 		WorldChunk worldChunk = this.updateWorldChunk();
 		chunkUpdater.execute(() -> {
@@ -201,10 +201,10 @@ public class ChunkData {
 		ChunkLevel chunkLevel = this.getChunkLevel(layer, level);
 		chunkLevel.updating = true;
 
-		boolean waterTint = ClientParams.alternateColorRender && ClientParams.waterTint;
-		boolean skipWater = !(ClientParams.hideWater || waterTint);
+		boolean waterTint = ClientSettings.alternateColorRender && ClientSettings.waterTint;
+		boolean skipWater = !(ClientSettings.hideWater || waterTint);
 		long currentTime = System.currentTimeMillis();
-		if (currentTime - chunkLevel.updated > ClientParams.chunkLevelUpdateInterval) {
+		if (currentTime - chunkLevel.updated > ClientSettings.chunkLevelUpdateInterval) {
 			this.updateHeighmap(worldChunk, layer, level, skipWater);
 		}
 		
@@ -286,7 +286,7 @@ public class ChunkData {
 			int heightDiff = chunkLevel.levelmap[index];
 			float topoLevel = chunkLevel.topomap[index] / 100F;
 			color = ColorUtil.proccessColor(color, heightDiff, topoLevel);
-			if (ClientParams.showTopography) {
+			if (ClientSettings.showTopography) {
 				return MathUtil.isOdd(chunkLevel.sampleHeightmap(index)) ?
 						ColorUtil.colorBrigtness(color, -0.6F) : color;
 			}
@@ -304,7 +304,7 @@ public class ChunkData {
 	}
 	
 	public boolean isChunkLoaded() {
-		return this.mapData.isChunkLoaded(chunkPos);
+		return this.world.isChunkLoaded(chunkPos.x, chunkPos.z);
 	}
 	
 	public boolean hasSlime() {
