@@ -123,8 +123,7 @@ public final class KeyHandler {
 		registerKey(new KeyParser(createKeyBinding("reduce_scale", GLFW.GLFW_KEY_LEFT_BRACKET)) {
 			@Override
 			public void onKeyUp() {
-				JustMapClient.CONFIG.setRanged("map_scale", JustMapClient.CONFIG.getFloat("map_scale") - 0.25F);
-				JustMapClient.CONFIG.saveChanges();
+				JustMapClient.CONFIG.updateMapScale(0.5F);
 			}
 	
 			@Override
@@ -136,8 +135,7 @@ public final class KeyHandler {
 		registerKey(new KeyParser(createKeyBinding("increase_scale", GLFW.GLFW_KEY_RIGHT_BRACKET)) {
 			@Override
 			public void onKeyUp() {
-				JustMapClient.CONFIG.setRanged("map_scale", JustMapClient.CONFIG.getFloat("map_scale") + 0.25F);
-				JustMapClient.CONFIG.saveChanges();
+				JustMapClient.CONFIG.updateMapScale(2F);
 			}
 	
 			@Override

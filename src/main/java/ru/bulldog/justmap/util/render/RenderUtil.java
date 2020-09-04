@@ -1,4 +1,4 @@
-package ru.bulldog.justmap.util;
+package ru.bulldog.justmap.util.render;
 
 import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -17,10 +17,11 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Matrix3f;
 import net.minecraft.util.math.Matrix4f;
 import net.minecraft.text.Text;
-
-import ru.bulldog.justmap.client.render.Image;
+import ru.bulldog.justmap.client.config.ClientSettings;
 import ru.bulldog.justmap.map.minimap.skin.MapSkin;
 import ru.bulldog.justmap.map.minimap.skin.MapSkin.RenderData;
+import ru.bulldog.justmap.util.ColorUtil;
+import ru.bulldog.justmap.util.DataUtil;
 
 import org.lwjgl.opengl.GL11;
 
@@ -100,18 +101,31 @@ public class RenderUtil extends DrawableHelper {
 	}
 	
 	public static void applyFilter() {
-		RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR_MIPMAP_LINEAR);
-		RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
+		if (ClientSettings.textureFilter) {
+			RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR_MIPMAP_LINEAR);
+			RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
+		} else {
+			RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR_MIPMAP_NEAREST);
+			RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST);
+		}
+	}
+	
+	public static void enable(int target) {
+		GL11.glEnable(target);
+	}
+	
+	public static void disable(int target) {
+		GL11.glDisable(target);
 	}
 	
 	public static void enableScissor() {
 		RenderSystem.assertThread(RenderSystem::isOnRenderThread);
-		GL11.glEnable(GL11.GL_SCISSOR_TEST);
+		enable(GL11.GL_SCISSOR_TEST);
 	}
 	
 	public static void disableScissor() {
 		RenderSystem.assertThread(RenderSystem::isOnRenderThread);
-		GL11.glDisable(GL11.GL_SCISSOR_TEST);
+		disable(GL11.GL_SCISSOR_TEST);
 	}
 	
 	public static void applyScissor(int x, int y, int width, int height) {
@@ -137,6 +151,12 @@ public class RenderUtil extends DrawableHelper {
     
     public static void endDraw() {
     	tessellator.draw();
+    }
+    
+    public static void drawQuad(double x, double y, double w, double h) {
+    	startDraw();
+    	addQuad(x, y, w, h);
+    	endDraw();
     }
     
     public static BufferBuilder getBuffer() {
@@ -182,8 +202,6 @@ public class RenderUtil extends DrawableHelper {
 	}
 	
 	public static void drawCircle(double x, double y, double radius, int color) {
-		double pi2 = Math.PI * 2;
-		
 		float a = (float)(color >> 24 & 255) / 255.0F;
 		float r = (float)(color >> 16 & 255) / 255.0F;
 		float g = (float)(color >> 8 & 255) / 255.0F;
@@ -193,10 +211,16 @@ public class RenderUtil extends DrawableHelper {
 	    RenderSystem.disableTexture();
 	    RenderSystem.defaultBlendFunc();
 		RenderSystem.color4f(r, g, b, a);
-		
-		startDraw(GL11.GL_TRIANGLE_FAN, VertexFormats.POSITION);		
-		vertexBuffer.vertex(x, y, 0).next();		
-		
+		drawCircleVertices(x, y, radius);
+		RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+		RenderSystem.enableTexture();
+		RenderSystem.disableBlend();
+	}
+	
+	public static void drawCircleVertices(double x, double y, double radius) {
+		double pi2 = Math.PI * 2;
+		startDraw(GL11.GL_TRIANGLE_FAN, VertexFormats.POSITION);
+		vertexBuffer.vertex(x, y, 0).next();
 		int sides = 50;
 		for (int i = 0; i <= sides; i++) {
 			double angle = (pi2 * i / sides) + Math.toRadians(180);
@@ -205,9 +229,6 @@ public class RenderUtil extends DrawableHelper {
 			vertexBuffer.vertex(vx, vy, 0).next();
 		}
 		endDraw();
-		
-		RenderSystem.enableTexture();
-		RenderSystem.disableBlend();
 	}
 
 	public static void fill(double x, double y, double w, double h, int color) {
@@ -393,10 +414,10 @@ public class RenderUtil extends DrawableHelper {
 	}
 	
 	public static void addQuad(double x, double y, double w, double h, float minU, float minV, float maxU, float maxV) {
-		vertex(x, y, 0.0, minU, minV);
 		vertex(x, y + h, 0.0, minU, maxV);
 		vertex(x + w, y + h, 0.0, maxU, maxV);
 		vertex(x + w, y, 0.0, maxU, minV);
+		vertex(x, y, 0.0, minU, minV);
 	}
 	
 	private static void vertex(Matrix4f m4f, Matrix3f m3f, VertexConsumer vertexConsumer, float x, float y, float z, float u, float v) {

@@ -6,11 +6,11 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
 
 import ru.bulldog.justmap.JustMap;
-import ru.bulldog.justmap.client.config.ClientParams;
+import ru.bulldog.justmap.client.config.ClientSettings;
 import ru.bulldog.justmap.map.MapPlayer;
 import ru.bulldog.justmap.util.Colors;
 import ru.bulldog.justmap.util.DataUtil;
-import ru.bulldog.justmap.util.RenderUtil;
+import ru.bulldog.justmap.util.render.RenderUtil;
 
 import java.io.IOException;
 
@@ -23,8 +23,8 @@ public class PlayerHeadIcon {
 	private ResourceTexture playerSkin;
 	
 	public void draw(MatrixStack matrices, double x, double y) {
-		int size = ClientParams.entityIconSize;
-		this.draw(matrices, x, y, size, ClientParams.showIconsOutline);
+		int size = ClientSettings.entityIconSize;
+		this.draw(matrices, x, y, size, ClientSettings.showIconsOutline);
 	}
 	
 	public void draw(double x, double y, int size, boolean outline) {
@@ -37,7 +37,7 @@ public class PlayerHeadIcon {
 		double drawY = y - size / 2;
 		y -= size / 2;
 		if (outline) {
-			double thickness = ClientParams.entityOutlineSize;
+			double thickness = ClientSettings.entityOutlineSize;
 			RenderUtil.fill(drawX - thickness / 2, drawY - thickness / 2, size + thickness, size + thickness, Colors.LIGHT_GRAY);
 		}
 		this.playerSkin.bindTexture();	

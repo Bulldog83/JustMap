@@ -11,7 +11,7 @@ import net.minecraft.client.gui.Element;
 import net.minecraft.client.util.math.MatrixStack;
 
 import ru.bulldog.justmap.util.Colors;
-import ru.bulldog.justmap.util.RenderUtil;
+import ru.bulldog.justmap.util.render.RenderUtil;
 
 public class DropDownListWidget extends AbstractParentElement implements Drawable {
 

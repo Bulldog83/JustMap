@@ -5,7 +5,7 @@ import ru.bulldog.justmap.enums.MapShape;
 import ru.bulldog.justmap.enums.MultiworldDetection;
 import ru.bulldog.justmap.enums.ArrowType;
 
-public class ClientParams {
+public class ClientSettings {
 	public static ScreenPosition mapPosition = ScreenPosition.TOP_RIGHT;
 	public static ScreenPosition infoPosition = ScreenPosition.TOP_LEFT;
 	public static ScreenPosition itemsPosition = ScreenPosition.MIDDLE_LEFT;
@@ -31,6 +31,7 @@ public class ClientParams {
 	public static boolean hidePlants = false;
 	public static boolean hideWater = false;
 	public static boolean showGrid = false;
+	public static boolean showWorldmapGrid = false;
 	public static boolean showTerrain = true;
 	public static boolean showTopography = true;
 	public static boolean showSlime = false;
@@ -84,6 +85,7 @@ public class ClientParams {
 	public static int purgeDelay = 60;
 	public static int purgeAmount = 1500;
 	public static boolean forceUpdate = false;
+	public static boolean fastRender = false;
 	
 	public static boolean showWaypoints = true;
 	public static boolean jumpToWaypoints = true;

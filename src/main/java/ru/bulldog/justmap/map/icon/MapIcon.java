@@ -1,6 +1,5 @@
 package ru.bulldog.justmap.map.icon;
 
-import ru.bulldog.justmap.map.IMap;
 import ru.bulldog.justmap.map.minimap.Minimap;
 import ru.bulldog.justmap.util.DataUtil;
 import ru.bulldog.justmap.util.math.Line;
@@ -13,7 +12,6 @@ import net.minecraft.client.util.math.MatrixStack;
 
 public abstract class MapIcon<T extends MapIcon<T>> {
 	
-	protected IMap map;
 	protected Point iconPos;
 	protected boolean allowRender = true;
 	protected int lastMapX, lastMapY;
@@ -22,18 +20,14 @@ public abstract class MapIcon<T extends MapIcon<T>> {
 	
 	protected static final MinecraftClient minecraft = DataUtil.getMinecraft();
 	
-	public MapIcon(IMap map) {
-		this.map = map;
-	}
+	public MapIcon() {}
 	
 	public void setPosition(double x, double y) {
 		this.x = x;
 		this.y = y;
 	}
 	
-	protected void updatePos(int size, int mapX, int mapY) {
-		int mapW = map.getWidth();
-		int mapH = map.getHeight();
+	protected void updatePos(int mapX, int mapY, int mapW, int mapH, int size) {
 		if (iconPos == null || x != lastX || y != lastY || mapX != lastMapX || mapY != lastMapY) {
 			this.iconPos = new Point(x, y);
 			this.iconPos.x -= size / 2;
@@ -67,5 +61,5 @@ public abstract class MapIcon<T extends MapIcon<T>> {
 		}
 	}
 	
-	public abstract void draw(MatrixStack matrixStack, VertexConsumerProvider consumerProvider, int mapX, int mapY, float rotation);
+	public abstract void draw(MatrixStack matrixStack, VertexConsumerProvider consumerProvider, int mapX, int mapY, int mapW, int mapH, float rotation);
 }
