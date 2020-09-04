@@ -301,7 +301,7 @@ public class ColorUtil {
 	
 	public static int blockColor(World world, BlockState state, BlockPos pos) {
 		int materialColor = state.getTopMaterialColor(world, pos).color;
-		if (ServerSettings.alternateColorRender) {
+		if (ClientSettings.alternateColorRender) {
 			int blockColor = minecraft.getBlockColorMap().getColor(state, world, pos, Colors.LIGHT);
 			int textureColor = getStateColor(state);
 			

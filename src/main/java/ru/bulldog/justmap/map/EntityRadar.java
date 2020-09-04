@@ -69,7 +69,7 @@ public class EntityRadar {
 		if (creatures.size() > 0) {
 			List<MobEntity> mobsToClear = new ArrayList<>();
 			this.creatures.forEach(mob -> {
-				if (mob.isDead() || mob.removed) {
+				if (mob.getHealth() <= 0 || mob.removed) {
 					mobsToClear.add(mob);
 				} else if (MathUtil.getDistance(center, mob.getBlockPos()) > radius) {
 					mobsToClear.add(mob);

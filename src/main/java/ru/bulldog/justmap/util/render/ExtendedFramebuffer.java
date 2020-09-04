@@ -49,7 +49,7 @@ public class ExtendedFramebuffer extends Framebuffer {
 			this.clear(isMac);
 			return;
 		}
-		this.colorAttachment = TextureUtil.generateId();
+		this.colorAttachment = TextureUtil.generateTextureId();
 		if (colorAttachment == -1) {
 			this.clear(isMac);
 			return;
@@ -118,7 +118,7 @@ public class ExtendedFramebuffer extends Framebuffer {
 			this.depthAttachment = -1;
 		}
 		if (colorAttachment > -1) {
-			TextureUtil.deleteId(colorAttachment);
+			TextureUtil.releaseTextureId(colorAttachment);
 			this.colorAttachment = -1;
 		}
 		if (fbo > -1) {

@@ -122,7 +122,7 @@ public class Worldmap extends MapScreen implements IMap {
 			List<AbstractClientPlayerEntity> players = this.minecraft.world.getPlayers();
 			for (PlayerEntity player : players) {
 				if (player == minecraft.player) continue;
-				this.players.add(new PlayerIcon(this, player));
+				this.players.add(new PlayerIcon(player));
 			}
 		}
 		

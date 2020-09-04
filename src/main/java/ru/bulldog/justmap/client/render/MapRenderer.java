@@ -202,6 +202,7 @@ public abstract class MapRenderer {
 		this.offX = this.calcOffset(currX, lastX, mapScale);
 		this.offY = this.calcOffset(currZ, lastZ, mapScale);
 		
+		MatrixStack matrices = new MatrixStack();
 		RenderSystem.disableDepthTest();
 		this.render(matrices, scale);
 		
@@ -213,7 +214,7 @@ public abstract class MapRenderer {
 		}
 		
 		RenderUtil.drawRightAlignedString(
-				matrices, Double.toString(1 / mapScale),
+				Double.toString(1 / mapScale),
 				mapX + mapWidth - 3, mapY + mapHeight - 10, Colors.WHITE);
 		
 		int iconSize = ClientSettings.arrowIconSize;
@@ -223,7 +224,7 @@ public abstract class MapRenderer {
 		} else {
 			MapPlayerManager.getPlayer(minecraft.player).getIcon().draw(centerX, centerY, iconSize, true);
 		}
-		textManager.draw(matrices);
+		textManager.draw();
 		
 		RenderSystem.enableDepthTest();
 	}
