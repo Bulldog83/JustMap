@@ -1,6 +1,5 @@
 package ru.bulldog.justmap.client.render;
 
-import org.lwjgl.opengl.GL11;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import ru.bulldog.justmap.JustMap;
@@ -8,73 +7,80 @@ import ru.bulldog.justmap.advancedinfo.InfoText;
 import ru.bulldog.justmap.advancedinfo.MapText;
 import ru.bulldog.justmap.advancedinfo.TextManager;
 import ru.bulldog.justmap.client.JustMapClient;
-import ru.bulldog.justmap.client.config.ClientParams;
+import ru.bulldog.justmap.client.config.ClientSettings;
 import ru.bulldog.justmap.enums.TextAlignment;
 import ru.bulldog.justmap.enums.ArrowType;
 import ru.bulldog.justmap.map.ChunkGrid;
 import ru.bulldog.justmap.map.DirectionArrow;
 import ru.bulldog.justmap.map.MapPlayerManager;
-import ru.bulldog.justmap.map.data.RegionData;
 import ru.bulldog.justmap.map.data.WorldData;
-import ru.bulldog.justmap.map.icon.MapIcon;
-import ru.bulldog.justmap.map.icon.WaypointIcon;
 import ru.bulldog.justmap.map.minimap.Minimap;
 import ru.bulldog.justmap.map.minimap.skin.MapSkin;
 import ru.bulldog.justmap.util.Colors;
-import ru.bulldog.justmap.util.RenderUtil;
 import ru.bulldog.justmap.util.DataUtil;
 import ru.bulldog.justmap.util.math.Line;
 import ru.bulldog.justmap.util.math.MathUtil;
 import ru.bulldog.justmap.util.math.Point;
+import ru.bulldog.justmap.util.render.RenderUtil;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.util.Window;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 
 @Environment(EnvType.CLIENT)
-public class MapRenderer {
+public abstract class MapRenderer {
 	
-	private final static MinecraftClient minecraft = DataUtil.getMinecraft();
-	private final static Identifier roundMask = new Identifier(JustMap.MODID, "textures/round_mask.png");
+	protected static MinecraftClient minecraft = DataUtil.getMinecraft();
+	protected static Identifier roundMask = new Identifier(JustMap.MODID, "textures/round_mask.png");
+	protected static TextManager textManager;
+	protected static InfoText dirN = new MapText(TextAlignment.CENTER, "N");
+	protected static InfoText dirS = new MapText(TextAlignment.CENTER, "S");
+	protected static InfoText dirE = new MapText(TextAlignment.CENTER, "E");
+	protected static InfoText dirW = new MapText(TextAlignment.CENTER, "W");
 	
-	private int mapX, mapY;
-	private int winWidth, winHeight;
-	private int mapWidth, mapHeight;
-	private int scaledW, scaledH;
-	private int centerX, centerY;
-	private int lastX, lastZ;
-	private int imgX, imgY;
-	private int imgW, imgH;
-	private float rotation;
-	private float mapScale;
-	private boolean mapRotation = false;
-
-	private final Minimap minimap;
-	private WorldData worldData;
-	private ChunkGrid chunkGrid;
-	private MapSkin mapSkin;
-	private TextManager textManager;	
-	private InfoText dirN = new MapText(TextAlignment.CENTER, "N");
-	private InfoText dirS = new MapText(TextAlignment.CENTER, "S");
-	private InfoText dirE = new MapText(TextAlignment.CENTER, "E");
-	private InfoText dirW = new MapText(TextAlignment.CENTER, "W");
+	protected int winWidth, winHeight;
+	protected int mapWidth, mapHeight;
+	protected int scaledW, scaledH;
+	protected int centerX, centerY;
+	protected int lastX, lastZ;
+	protected int mapX, mapY;
+	protected int imgX, imgY;
+	protected int imgW, imgH;
+	protected double currX, currZ;
+	protected float mapScale;
+	protected float rotation;
+	protected float offX, offY;
+	protected float delta;
+	protected boolean mapRotation = false;
+	protected boolean paramsUpdated = false;
+	protected boolean playerMoved = false;
+	protected final Minimap minimap;
+	protected BlockPos.Mutable playerPos;
+	protected WorldData worldData;
+	protected ChunkGrid chunkGrid;
+	protected MapSkin mapSkin;
 	
 	public MapRenderer(Minimap map) {
+		this.playerPos = new BlockPos.Mutable(0, 0, 0);
 		this.minimap = map;
-		this.textManager = minimap.getTextManager();
-		this.textManager.setSpacing(12);
-		this.textManager.add(dirN);
-		this.textManager.add(dirS);
-		this.textManager.add(dirE);
-		this.textManager.add(dirW);
+		if (textManager == null) {
+			textManager = minimap.getTextManager();
+			textManager.setSpacing(12);
+			textManager.add(dirN);
+			textManager.add(dirS);
+			textManager.add(dirE);
+			textManager.add(dirW);
+		}
 	}
 	
-	public void updateParams() {		
+	protected abstract void render(MatrixStack matrices, double scale);
+	
+	public void updateParams() {
 		this.worldData = minimap.getWorldData();
 		this.mapSkin = minimap.getSkin();
 		
@@ -86,12 +92,16 @@ public class MapRenderer {
 			this.winHeight = winH;
 		}
 		
+		this.delta = minecraft.getTickDelta();
+		this.currX = DataUtil.doubleX(delta);
+		this.currZ = DataUtil.doubleZ(delta);
+		
 		int mapW = minimap.getWidth();
 		int mapH = minimap.getHeight();
 		int mapX = minimap.getMapX();
 		int mapY = minimap.getMapY();
-		int lastX = minimap.getLastX();
-		int lastZ = minimap.getLastZ();
+		int lastX = MathUtil.floor(currX);
+		int lastZ = MathUtil.floor(currZ);
 		float scale = minimap.getScale();
 		boolean rotateMap = minimap.isRotated();
 		if (mapWidth != mapW || mapHeight != mapH ||
@@ -102,47 +112,37 @@ public class MapRenderer {
 			this.mapHeight = mapH;
 			this.mapRotation = rotateMap;
 			this.mapScale = scale;
-			this.mapX = minimap.getMapX();
-			this.mapY = minimap.getMapY();	
+			this.mapX = mapX;
+			this.mapY = mapY;	
 			this.centerX = mapX + mapWidth / 2;
 			this.centerY = mapY + mapHeight / 2;
+			this.scaledW = minimap.getScaledWidth();
+			this.scaledH = minimap.getScaledHeight();
 			
 			if (mapRotation) {
-				float mult = minimap.isBigMap() ? 1.9F : 1.44F;
-				this.scaledW = (int) Math.ceil(mapWidth * mapScale * mult);
-				this.scaledH = (int) Math.ceil(mapHeight * mapScale * mult);
-				this.imgW = minimap.getScaledWidth();
-				this.imgH = minimap.getScaledHeight();
-				this.imgX = (int) Math.ceil(mapX - (imgW - mapWidth) / 2.0);
-				this.imgY = (int) Math.ceil(mapY - (imgH - mapHeight) / 2.0);
+				this.imgW = (int) (scaledW / mapScale);
+				this.imgH = (int) (scaledH / mapScale);
+				this.imgX = mapX - (imgW - mapW) / 2;
+				this.imgY = mapY - (imgH - mapH) / 2;
 			} else {
-				this.scaledW = minimap.getScaledWidth();
-				this.scaledH = minimap.getScaledHeight();
-				this.imgX = mapX;
-				this.imgY = mapY;
-				this.imgW = mapW;
-				this.imgH = mapH;
+				this.imgW = (int) (mapW * 1.25);
+				this.imgH = (int) (mapH * 1.25);
+				int deltaX = imgW - mapW;
+				int deltaY = imgH - mapH;
+				this.imgX = mapX - deltaX / 2;
+				this.imgY = mapY - deltaY / 2;
+				this.scaledW += deltaX * mapScale;
+				this.scaledH += deltaY * mapScale;
 			}
-			this.scaledW += (16 * mapScale);
-			this.scaledH += (16 * mapScale);
-			this.imgW += 16;
-			this.imgH += 16;
-			this.imgX -= 8;
-			this.imgY -= 8;
 			
-			if (chunkGrid == null) {
-				this.chunkGrid = new ChunkGrid(lastX, lastZ, imgX, imgY, imgW, imgH, mapScale);
-			} else {
-				this.chunkGrid.updateRange(imgX, imgY, imgW, imgH, mapScale);
-				this.chunkGrid.updateGrid();
-			}
+			this.paramsUpdated = true;
 		}
 		
 		if (this.lastX != lastX || this.lastZ != lastZ) {
 			this.lastX = lastX;
 			this.lastZ = lastZ;
-			this.chunkGrid.updateCenter(lastX, lastZ);
-			this.chunkGrid.updateGrid();
+			this.playerPos.set(lastX, DataUtil.coordY(), lastZ);
+			this.playerMoved = true;
 		}
 		
 		int mapR = mapX + mapWidth;
@@ -154,10 +154,10 @@ public class MapRenderer {
 		Point pointE = new Point(mapR, centerY);
 		Point pointW = new Point(mapX, centerY);
 		
-		this.rotation = 180;
+		this.rotation = 180.0F;
 		if (mapRotation) {
 			this.rotation = minecraft.player.headYaw;
-			float rotate = MathUtil.correctAngle(rotation) + 180;
+			double rotate = MathUtil.correctAngle(rotation) + 180;
 			double angle = Math.toRadians(-rotate);
 			
 			Line radius = new Line(center, pointN);
@@ -175,13 +175,13 @@ public class MapRenderer {
 			this.calculatePos(center, pointW, mapR, mapB, angle);
 		}
 		
-		this.dirN.setPos((int) pointN.x, (int) pointN.y - 5);
-		this.dirS.setPos((int) pointS.x, (int) pointS.y - 5);
-		this.dirE.setPos((int) pointE.x, (int) pointE.y - 5);
-		this.dirW.setPos((int) pointW.x, (int) pointW.y - 5);
+		dirN.setPos((int) pointN.x, (int) pointN.y - 5);
+		dirS.setPos((int) pointS.x, (int) pointS.y - 5);
+		dirE.setPos((int) pointE.x, (int) pointE.y - 5);
+		dirW.setPos((int) pointW.x, (int) pointW.y - 5);
 	}
 	
-	private void calculatePos(Point center, Point dir, int mr, int mb, double angle) {		
+	protected void calculatePos(Point center, Point dir, int mr, int mb, double angle) {		
 		Point pos = MathUtil.circlePos(dir, center, angle);
 		int posX = (int) MathUtil.clamp(pos.x, mapX, mr);
 		int posY = (int) MathUtil.clamp(pos.y, mapY, mb);
@@ -189,66 +189,21 @@ public class MapRenderer {
 		dir.x = posX; dir.y = posY;
 	}
 	
-	public void draw(MatrixStack matrices) {
+	public void renderMap(MatrixStack matrices) {
 		if (!minimap.isMapVisible() || !JustMapClient.canMapping()) return;
 		
 		this.updateParams();
 		
 		if (worldData == null) return;
 		
-		int winH = minecraft.getWindow().getFramebufferHeight();
-		double scale = minecraft.getWindow().getScaleFactor();
-		
-		int scaledX = (int) (mapX * scale);
-		int scaledY = (int) (winH - (mapY + mapHeight) * scale);
-		int scaledW = (int) (mapWidth * scale);
-		int scaledH = (int) (mapHeight * scale);
-		
-		RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
-		RenderSystem.disableDepthTest();
-		RenderUtil.enableScissor();
-		RenderUtil.applyScissor(scaledX, scaledY, scaledW, scaledH);
-		
-		if (Minimap.isRound()) {
-			RenderSystem.enableBlend();
-			RenderSystem.colorMask(false, false, false, true);
-			RenderSystem.clearColor(0.0F, 0.0F, 0.0F, 0.0F);
-			RenderSystem.clear(GL11.GL_COLOR_BUFFER_BIT, false);
-			RenderSystem.colorMask(true, true, true, true);
-			RenderUtil.bindTexture(roundMask);
-			RenderUtil.startDraw();
-			RenderUtil.addQuad(mapX, mapY, mapWidth, mapHeight);
-			RenderUtil.endDraw();
-			RenderSystem.blendFunc(GL11.GL_DST_ALPHA, GL11.GL_ONE_MINUS_DST_ALPHA);
-		}
+		Window window = minecraft.getWindow();
+		double scale = window.getScaleFactor();
 
-		RenderSystem.pushMatrix();
-		if (mapRotation) {
-			float moveX = mapX + mapWidth / 2.0F;
-			float moveY = mapY + mapHeight / 2.0F;
-			RenderSystem.translatef(moveX, moveY, 0.0F);
-			RenderSystem.rotatef(-rotation + 180, 0.0F, 0.0F, 1.0F);
-			RenderSystem.translatef(-moveX, -moveY, 0.0F);
-		}
-		float offX = (float) (DataUtil.doubleX() - lastX) / mapScale;
-		float offY = (float) (DataUtil.doubleZ() - lastZ) / mapScale;
-		RenderSystem.translatef(-offX, -offY, 0.0F);
-		this.drawMap();
-		if (ClientParams.showGrid) {
-			this.chunkGrid.draw();
-		}
-		VertexConsumerProvider.Immediate consumerProvider = minecraft.getBufferBuilders().getEntityVertexConsumers();
-		for (MapIcon<?> icon : minimap.getDrawedIcons()) {
-			icon.draw(matrices, consumerProvider, mapX, mapY, rotation);
-		}
-		consumerProvider.draw();
-		RenderSystem.popMatrix();
-		for (WaypointIcon icon : minimap.getWaypoints()) {
-			icon.draw(matrices, consumerProvider, mapX, mapY, offX, offY, rotation);
-		}
-		consumerProvider.draw();
+		this.offX = this.calcOffset(currX, lastX, mapScale);
+		this.offY = this.calcOffset(currZ, lastZ, mapScale);
 		
-		RenderUtil.disableScissor();
+		RenderSystem.disableDepthTest();
+		this.render(matrices, scale);
 		
 		if (mapSkin != null) {
 			int skinX = minimap.getSkinX();
@@ -258,59 +213,26 @@ public class MapRenderer {
 		}
 		
 		RenderUtil.drawRightAlignedString(
-				matrices, Float.toString(mapScale),
+				matrices, Double.toString(1 / mapScale),
 				mapX + mapWidth - 3, mapY + mapHeight - 10, Colors.WHITE);
 		
-		int iconSize = ClientParams.arrowIconSize;
-		if (ClientParams.arrowIconType == ArrowType.DIRECTION_ARROW) {
+		int iconSize = ClientSettings.arrowIconSize;
+		if (ClientSettings.arrowIconType == ArrowType.DIRECTION_ARROW) {
 			float direction = mapRotation ? 180 : minecraft.player.headYaw;
 			DirectionArrow.draw(centerX, centerY, iconSize, direction);
 		} else {
 			MapPlayerManager.getPlayer(minecraft.player).getIcon().draw(centerX, centerY, iconSize, true);
 		}
-		
-		this.textManager.draw(matrices);
+		textManager.draw(matrices);
 		
 		RenderSystem.enableDepthTest();
 	}
 	
-	private void drawMap() {
-		int cornerX = lastX - scaledW / 2;
-		int cornerZ = lastZ - scaledH / 2;
+	protected float calcOffset(double x, double lastX, double scale) {
+		return (float) (Math.floor(((x - lastX) / scale) * 1000.0) * 0.001);
+	}
+	
+	static {
 		
-		BlockPos.Mutable currentPos = new BlockPos.Mutable();
-		
-		int picX = 0;
-		while(picX < scaledW) {
-			int texW = 512;
-			if (picX + texW > scaledW) texW = (int) (scaledW - picX);
-			
-			int picY = 0;
-			int cX = cornerX + picX;
-			while (picY < scaledH) {
-				int texH = 512;
-				if (picY + texH > scaledH) texH = (int) (scaledH - picY);
-				
-				int cZ = cornerZ + picY;
-				RegionData region = worldData.getRegion(minimap, currentPos.set(cX, 0, cZ));
-				region.swapLayer(minimap.getLayer(), minimap.getLevel());
-				
-				int texX = cX - (region.getX() << 9);
-				int texY = cZ - (region.getZ() << 9);
-				if (texX + texW >= 512) texW = 512 - texX;
-				if (texY + texH >= 512) texH = 512 - texY;
-				
-				double scX = picX / mapScale;
-				double scY = picY / mapScale;
-				double scW = texW / mapScale;
-				double scH = texH / mapScale;
-				
-				region.draw(imgX + scX, imgY + scY, scW, scH, texX, texY, texW, texH);
-				
-				picY += texH > 0 ? texH : 512;
-			}
-			
-			picX += texW > 0 ? texW : 512;
-		}
 	}
 }

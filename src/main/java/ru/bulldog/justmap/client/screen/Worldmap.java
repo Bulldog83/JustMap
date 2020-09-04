@@ -18,7 +18,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 
 import ru.bulldog.justmap.client.JustMapClient;
-import ru.bulldog.justmap.client.config.ClientParams;
+import ru.bulldog.justmap.client.config.ClientSettings;
 import ru.bulldog.justmap.client.config.ConfigFactory;
 import ru.bulldog.justmap.client.widget.DropDownListWidget;
 import ru.bulldog.justmap.client.widget.ListElementWidget;
@@ -122,7 +122,7 @@ public class Worldmap extends MapScreen implements IMap {
 			List<AbstractClientPlayerEntity> players = this.client.world.getPlayers();
 			for (PlayerEntity player : players) {
 				if (player == client.player) continue;
-				this.players.add(new PlayerIcon(this, player));
+				this.players.add(new PlayerIcon(player));
 			}
 		}
 		
@@ -168,12 +168,12 @@ public class Worldmap extends MapScreen implements IMap {
 	
 	@Override
 	public void renderForeground(MatrixStack matrices) {
-		if (ClientParams.showGrid) {
+		if (ClientSettings.showWorldmapGrid) {
 			this.chunkGrid.draw();
 		}
-		int iconSize = (int) (ClientParams.worldmapIconSize / imageScale);
+		int iconSize = (int) (ClientSettings.worldmapIconSize / imageScale);
 		iconSize = iconSize % 2 != 0 ? iconSize + 1 : iconSize;
-		iconSize = MathUtil.clamp(iconSize, 6, (int) (ClientParams.worldmapIconSize * 1.2));
+		iconSize = MathUtil.clamp(iconSize, 6, (int) (ClientSettings.worldmapIconSize * 1.2));
 		for (WaypointIcon icon : waypoints) {
 			icon.setPosition(
 				MathUtil.screenPos(icon.waypoint.pos.getX(), centerPos.getX(), centerX, imageScale),
@@ -183,8 +183,8 @@ public class Worldmap extends MapScreen implements IMap {
 		}
 		for (PlayerIcon icon : players) {
 			icon.setPosition(
-					MathUtil.screenPos(icon.getX(), centerPos.getX(), centerX, imageScale),
-					MathUtil.screenPos(icon.getZ(), centerPos.getZ(), centerY, imageScale)
+				MathUtil.screenPos(icon.getX(), centerPos.getX(), centerX, imageScale),
+				MathUtil.screenPos(icon.getZ(), centerPos.getZ(), centerY, imageScale)
 			);
 			icon.draw(matrices, iconSize);
 		}
@@ -265,7 +265,7 @@ public class Worldmap extends MapScreen implements IMap {
 	}
 	
 	private void changeScale(float value) {
-		this.imageScale = MathUtil.clamp(this.imageScale + value, 0.5F, 3F);
+		this.imageScale = MathUtil.clamp(imageScale + value, 0.5F, 3F);
 		this.updateScale();
 	}
 	
@@ -429,18 +429,8 @@ public class Worldmap extends MapScreen implements IMap {
 	}
 
 	@Override
-	public int getScaledWidth() {
-		return this.scaledWidth;
-	}
-
-	@Override
-	public int getScaledHeight() {
-		return this.scaledHeight;
-	}
-
-	@Override
 	public float getScale() {
-		return this.getScale();
+		return this.imageScale;
 	}
 
 	@Override

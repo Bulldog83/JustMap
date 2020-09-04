@@ -6,7 +6,7 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.util.math.MatrixStack;
 
 import ru.bulldog.justmap.map.minimap.Minimap;
-import ru.bulldog.justmap.util.RenderUtil;
+import ru.bulldog.justmap.util.render.RenderUtil;
 
 public class MapWidget implements Element, Drawable {
 
@@ -50,7 +50,14 @@ public class MapWidget implements Element, Drawable {
 
 	@Override
 	public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
-		RenderUtil.fill(matrices, x + border, y + border, bgW, bgH, 0xDD00AA00);
+		int color = 0xDD00AA00;
+		if (Minimap.isRound()) {
+			double centerX = x + border + bgW / 2;
+			double centerY = y + border + bgH / 2;
+			RenderUtil.drawCircle(centerX, centerY, bgW / 2, color);
+		} else {
+			RenderUtil.fill(matrices, x + border, y + border, bgW, bgH, color);
+		}
 		if (map.getSkin() != null) {
 			map.getSkin().draw(matrices, x, y, width, height);
 		}
