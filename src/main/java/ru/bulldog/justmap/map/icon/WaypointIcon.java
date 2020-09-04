@@ -13,6 +13,7 @@ import ru.bulldog.justmap.util.math.Point;
 public class WaypointIcon extends MapIcon<WaypointIcon> {
 	
 	public final Waypoint waypoint;
+	private final IMap map;
 	
 	private int iconSize = 8;
 	private float lastRotation;
@@ -20,8 +21,8 @@ public class WaypointIcon extends MapIcon<WaypointIcon> {
 	private float offY;
 	
 	public WaypointIcon(IMap map, Waypoint waypoint) {
-		super(map);
 		this.waypoint = waypoint;
+		this.map = map;
 	}
 
 	public void draw(int size) {
@@ -34,25 +35,23 @@ public class WaypointIcon extends MapIcon<WaypointIcon> {
 		}
 	}
 	
-	public void draw(MatrixStack matrices, VertexConsumerProvider consumerProvider, int mapX, int mapY, float offX, float offY, float rotation) {
+	public void draw(MatrixStack matrices, VertexConsumerProvider consumerProvider, int mapX, int mapY, int mapW, int mapH, double offX, double offY, double rotation) {
 		rotation = MathUtil.correctAngle(rotation + 180);
+		this.updatePos(mapX, mapY, mapW, mapH, iconSize, rotation);
 		this.applyOffset(offX, offY, rotation);
-		this.updatePos(iconSize, mapX, mapY, rotation);
-		this.draw(matrices, consumerProvider, mapX, mapY, rotation);
+		this.draw(matrices, consumerProvider, mapX, mapY, mapW, mapH, (float) rotation);
 	}
 	
 	@Override
-	public void draw(MatrixStack matrices, VertexConsumerProvider consumerProvider, int mapX, int mapY, float rotation) {
+	public void draw(MatrixStack matrices, VertexConsumerProvider consumerProvider, int mapX, int mapY, int mapW, int mapH, float rotation) {
 		Waypoint.Icon icon = waypoint.getIcon();
 		if (icon != null) {
 			icon.draw(matrices, iconPos.x - offX, iconPos.y - offY, iconSize);
 		}
 	}
 	
-	private void updatePos(int size, int mapX, int mapY, float rotation) {
+	private void updatePos(int mapX, int mapY, int mapW, int mapH, int size, double rotation) {
 		if (iconPos == null || x != lastX || y != lastY || mapX != lastMapX || mapY != lastMapY || rotation != lastRotation) {
-			int mapW = map.getWidth();
-			int mapH = map.getHeight();
 			int centerX = mapX + mapW / 2;
 			int centerY = mapY + mapH / 2;
 			this.iconPos = new Point(x, y);
@@ -81,7 +80,7 @@ public class WaypointIcon extends MapIcon<WaypointIcon> {
 				this.iconPos.x = MathUtil.clamp(iconPos.x, mapX, (mapX + mapW) - size);
 				this.iconPos.y = MathUtil.clamp(iconPos.y, mapY, (mapY + mapH) - size);
 			}
-			this.lastRotation = rotation;
+			this.lastRotation = (float) rotation;
 			this.lastMapX = mapX;
 			this.lastMapY = mapY;
 			this.lastX = x;
@@ -89,7 +88,7 @@ public class WaypointIcon extends MapIcon<WaypointIcon> {
 		}
 	}
 
-	private void correctRotation(int centerX, int centerY, float rotation) {
+	private void correctRotation(int centerX, int centerY, double rotation) {
 		double angle = Math.toRadians(-rotation);
 		double posX = centerX + (iconPos.x - centerX) * Math.cos(angle) - (iconPos.y - centerY) * Math.sin(angle);
 		double posY = centerY + (iconPos.y - centerY) * Math.cos(angle) + (iconPos.x - centerX) * Math.sin(angle);
@@ -98,7 +97,7 @@ public class WaypointIcon extends MapIcon<WaypointIcon> {
 		this.iconPos.y = posY;
 	}
 	
-	private void applyOffset(float offX, float offY, float rotation) {
+	private void applyOffset(double offX, double offY, double rotation) {
 		double angle = Math.toRadians(-rotation);
 		this.offX = (float) (offX * Math.cos(angle) - offY * Math.sin(angle));
 		this.offY = (float) (offY * Math.cos(angle) + offX * Math.sin(angle));

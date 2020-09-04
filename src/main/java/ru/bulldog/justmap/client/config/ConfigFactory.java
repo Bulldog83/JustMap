@@ -131,6 +131,10 @@ public final class ConfigFactory {
 				.setSaveConsumer(val -> modConfig.setBoolean("draw_chunk_grid", val))
 				.setDefaultValue((boolean) modConfig.getDefault("draw_chunk_grid"))
 				.build());
+		mapDetails.addEntry(entryBuilder.startBooleanToggle(lang("show_worldmap_grid"), modConfig.getBoolean("draw_worldmap_grid"))
+				.setSaveConsumer(val -> modConfig.setBoolean("draw_worldmap_grid", val))
+				.setDefaultValue((boolean) modConfig.getDefault("draw_worldmap_grid"))
+				.build());
 		mapDetails.addEntry(entryBuilder.startBooleanToggle(lang("show_slime_chunks"), modConfig.getBoolean("show_slime"))
 				.setSaveConsumer(val -> modConfig.setBoolean("show_slime", val))
 				.setDefaultValue((boolean) modConfig.getDefault("show_slime"))
@@ -404,6 +408,10 @@ public final class ConfigFactory {
 		optimization.addEntry(entryBuilder.startBooleanToggle(lang("uninterrupted_map_update"), modConfig.getBoolean("force_map_update"))
 				.setSaveConsumer(val -> modConfig.setBoolean("force_map_update", val))
 				.setDefaultValue((boolean) modConfig.getDefault("force_map_update"))
+				.build());
+		optimization.addEntry(entryBuilder.startBooleanToggle(lang("use_fast_render"), modConfig.getBoolean("use_fast_render"))
+				.setSaveConsumer(val -> modConfig.setBoolean("use_fast_render", val))
+				.setDefaultValue((boolean) modConfig.getDefault("use_fast_render"))
 				.build());
 		
 		configBuilder.setDoesConfirmSave(false);

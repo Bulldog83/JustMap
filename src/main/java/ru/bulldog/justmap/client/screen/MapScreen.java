@@ -11,7 +11,7 @@ import net.minecraft.world.World;
 
 import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.util.LangUtil;
-import ru.bulldog.justmap.util.RenderUtil;
+import ru.bulldog.justmap.util.render.RenderUtil;
 
 import java.util.HashMap;
 
