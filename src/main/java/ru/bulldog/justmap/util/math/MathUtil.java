@@ -3,6 +3,10 @@ package ru.bulldog.justmap.util.math;
 import net.minecraft.util.math.BlockPos;
 
 public class MathUtil {
+	
+	public final static double SQRT2 = Math.sqrt(2.0);
+	public final static double BIG_SQRT2 = SQRT2 * 0.625 + 1.0;
+	
 	public static int clamp(int val, int min, int max) {
 		return val < min ? min : val > max ? max : val;
 	}
@@ -23,19 +27,28 @@ public class MathUtil {
 		return n * n;
 	}
 	
-	public static boolean isEven(int num) {
+	public static boolean isEven(double num) {
 		return num % 2 == 0;
 	}
 	
-	public static boolean isOdd(int num) {
+	public static boolean isOdd(double num) {
 		return !isEven(num);
 	}
 	
 	public static int floor(double val) {
-		if (val < 0.0) {
-			--val;
-		}
-        return (int) val;
+		return (int) (val < (int) val ? --val : val);
+	}
+	
+	public static int ceil(double val) {
+		return (int) (val > (int) val ? ++val : val);
+	}
+	
+	public static float lerp(float delta, float start, float end) {
+		return start + delta * (end - start);
+	}
+	
+	public static double lerp(double delta, double start, double end) {
+		return start + delta * (end - start);
 	}
 	
 	public static double min(double... args) {
@@ -58,25 +71,33 @@ public class MathUtil {
 		return max;
 	}
 	
-	public static float correctAngle(float angle) {
-		int turns = (int) Math.abs(angle / 360);		
-		if(angle >= 360) return angle - 360 * turns;
-		if(angle < 0) return angle + 360 * (turns + 1);
+	public static double correctAngle(double d) {
+		int turns = (int) Math.abs(d / 360);		
+		if(d >= 360) return d - 360 * turns;
+		if(d < 0) return d + 360 * (turns + 1);
 		
-		return angle;
+		return d;
 	}
 	
-	public static double screenPos(double worldPos, double anchorWorld, double anchorScreen, float scale) {
+	public static double screenPos(double worldPos, double anchorWorld, double anchorScreen, double scale) {
 		return anchorScreen + (worldPos - anchorWorld) / scale;
 	}
 	
-	public static double worldPos(double screenPos, double anchorWorld, double anchorScreen, float scale) {
+	public static double worldPos(double screenPos, double anchorWorld, double anchorScreen, double scale) {
 		return anchorWorld + (screenPos - anchorScreen) * scale;
+	}
+	
+	public static int screenPos(int worldPos, int anchorWorld, int anchorScreen, double scale) {
+		return (int) (anchorScreen + (worldPos - anchorWorld) / scale);
+	}
+	
+	public static int worldPos(int screenPos, int anchorWorld, int anchorScreen, double scale) {
+		return (int) (anchorWorld + (screenPos - anchorScreen) * scale);
 	}
 
 	public static Point circlePos(Point pos, Point center, double angle) {
-		int posX = (int) (center.x + (pos.x - center.x) * Math.cos(angle) - (pos.y - center.y) * Math.sin(angle));
-		int posY = (int) (center.y + (pos.y - center.y) * Math.cos(angle) + (pos.x - center.x) * Math.sin(angle));
+		double posX = center.x + (pos.x - center.x) * Math.cos(angle) - (pos.y - center.y) * Math.sin(angle);
+		double posY = center.y + (pos.y - center.y) * Math.cos(angle) + (pos.x - center.x) * Math.sin(angle);
 		
 		return new Point(posX, posY);
 	}

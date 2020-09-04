@@ -46,6 +46,7 @@
   "justmap.configuration.show_loaded_chunks": "Отображать загруженные чанки",
   "justmap.configuration.terrain_strength": "Сила перепада рельефа",
   "justmap.configuration.show_grid": "Отображать линии сетки",
+  "justmap.configuration.show_worldmap_grid": "Отображать линии сетки на карте мира",
   "justmap.configuration.info_position": "Расположение расширенной информации на экране",
   "justmap.configuration.equipment_position": "Расположение информации о снаряжении на экране",
   "justmap.configuration.advanced_info": "Отображать расширенную информацию",
@@ -104,6 +105,7 @@
   "justmap.configuration.purge_delay": "Задержка очистки кэша (секунд)",
   "justmap.configuration.purge_amount": "Максимальное количество чанков для удаления",
   "justmap.configuration.uninterrupted_map_update": "Непрерывное обновление карты",
+  "justmap.configuration.use_fast_render": "Использовать быстрый рендер",
   
   "justmap.configuration.tooltip_color_config": "Имеет эффект только при альтернативном цветовом рендере.",
 

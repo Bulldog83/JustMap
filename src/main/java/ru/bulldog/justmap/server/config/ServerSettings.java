@@ -1,6 +1,6 @@
 package ru.bulldog.justmap.server.config;
 
-public class ServerParams {
+public class ServerSettings {
 	public static boolean useGameRules = true;
 	public static boolean allowCavesMap = true;
 	public static boolean allowEntities = true;

@@ -17,11 +17,11 @@ import net.minecraft.client.util.math.Vector3f;
 import net.minecraft.util.Identifier;
 
 import ru.bulldog.justmap.JustMap;
-import ru.bulldog.justmap.client.config.ClientParams;
+import ru.bulldog.justmap.client.config.ClientSettings;
 import ru.bulldog.justmap.util.Colors;
-import ru.bulldog.justmap.util.RenderUtil;
 import ru.bulldog.justmap.util.ImageUtil;
 import ru.bulldog.justmap.util.SpriteAtlas;
+import ru.bulldog.justmap.util.render.RenderUtil;
 
 public class DirectionArrow extends Sprite {
 	private final static VertexFormat vertexFormat = new VertexFormat(ImmutableList.of(VertexFormats.POSITION_ELEMENT, VertexFormats.TEXTURE_ELEMENT, VertexFormats.NORMAL_ELEMENT, VertexFormats.PADDING_ELEMENT));
@@ -36,7 +36,7 @@ public class DirectionArrow extends Sprite {
 	}
 	
 	public static void draw(double x, double y, int size, float rotation) {		
-		if (!ClientParams.simpleArrow) {
+		if (!ClientSettings.simpleArrow) {
 			if (ARROW == null) {
 				ARROW = new DirectionArrow(new Identifier(JustMap.MODID, "textures/icon/player_arrow.png"), 20, 20);
 			}
