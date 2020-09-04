@@ -225,9 +225,9 @@ public class Waypoint {
 		}
 		
 		@Override
-		public void draw(MatrixStack matrix, double x, double y, int w, int h) {
+		public void draw(MatrixStack matrices, double x, double y, int w, int h) {
 			this.bindTexture();
-			this.draw(matrix, x, y, (float) w, (float) h);
+			this.draw(matrices, x, y, (float) w, (float) h);
 		}
 		
 		private Identifier getColoredTexture() {
