@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
+import net.minecraft.client.gl.Framebuffer;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.BlockPos;
@@ -23,7 +24,15 @@ public class FastRenderer extends MapRenderer {
 		super(map);
 	}
 	
-	protected void render(MatrixStack matrices) {
+	protected void render(MatrixStack matrices, double scale) {
+		Framebuffer minecraftFramebuffer = minecraft.getFramebuffer();
+		int fbuffH = minecraftFramebuffer.viewportHeight;
+		int scissX = (int) (mapX * scale);
+		int scissY = (int) (fbuffH - (mapY + mapHeight) * scale);
+		int scissW = (int) (mapWidth * scale);
+		int scissH = (int) (mapHeight * scale);
+		RenderUtil.enableScissor();
+		RenderUtil.applyScissor(scissX, scissY, scissW, scissH);
 		RenderSystem.enableBlend();
         RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
 		if (Minimap.isRound()) {
@@ -55,7 +64,7 @@ public class FastRenderer extends MapRenderer {
 		VertexConsumerProvider.Immediate consumerProvider = minecraft.getBufferBuilders().getEntityVertexConsumers();
 		List<MapIcon<?>> drawableEntities = minimap.getDrawableIcons(lastX, lastZ, centerX, centerY, delta);
 		for (MapIcon<?> icon : drawableEntities) {
-			icon.draw(matrices, consumerProvider, mapX, mapY, rotation);
+			icon.draw(matrices, consumerProvider, mapX, mapY, mapWidth, mapHeight, rotation);
 		}
 		consumerProvider.draw();
 		
@@ -63,9 +72,10 @@ public class FastRenderer extends MapRenderer {
 		
 		List<WaypointIcon> drawableWaypoints = minimap.getWaypoints(playerPos, centerX, centerY);
 		for (WaypointIcon icon : drawableWaypoints) {
-			icon.draw(matrices, consumerProvider, mapX, mapY, offX, offY, rotation);
+			icon.draw(matrices, consumerProvider, mapX, mapY, mapWidth, mapHeight, offX, offY, rotation);
 		}
 		consumerProvider.draw();
+		RenderUtil.disableScissor();
 	}
 	
 	private void drawMap() {

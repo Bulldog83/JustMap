@@ -408,10 +408,10 @@ public class RenderUtil extends DrawableHelper {
 	}
 	
 	public static void addQuad(double x, double y, double w, double h, float minU, float minV, float maxU, float maxV) {
-		vertex(x, y, 0.0, minU, minV);
 		vertex(x, y + h, 0.0, minU, maxV);
 		vertex(x + w, y + h, 0.0, maxU, maxV);
 		vertex(x + w, y, 0.0, maxU, minV);
+		vertex(x, y, 0.0, minU, minV);
 	}
 	
 	private static void vertex(Matrix4f m4f, Matrix3f m3f, VertexConsumer vertexConsumer, float x, float y, float z, float u, float v) {

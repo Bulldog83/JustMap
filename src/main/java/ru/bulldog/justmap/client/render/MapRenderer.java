@@ -22,6 +22,7 @@ import ru.bulldog.justmap.util.math.Line;
 import ru.bulldog.justmap.util.math.MathUtil;
 import ru.bulldog.justmap.util.math.Point;
 import ru.bulldog.justmap.util.render.RenderUtil;
+
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 
@@ -34,8 +35,9 @@ import net.minecraft.util.math.BlockPos;
 @Environment(EnvType.CLIENT)
 public abstract class MapRenderer {
 	
-	protected final static MinecraftClient minecraft = DataUtil.getMinecraft();
-	protected final static Identifier roundMask = new Identifier(JustMap.MODID, "textures/round_mask.png");
+	protected static MinecraftClient minecraft = DataUtil.getMinecraft();
+	protected static Identifier roundMask = new Identifier(JustMap.MODID, "textures/round_mask.png");
+	protected static TextManager textManager;	
 	
 	protected int winWidth, winHeight;
 	protected int mapWidth, mapHeight;
@@ -58,26 +60,28 @@ public abstract class MapRenderer {
 	protected WorldData worldData;
 	protected ChunkGrid chunkGrid;
 	protected MapSkin mapSkin;
-	protected TextManager textManager;	
 	protected InfoText dirN = new MapText(TextAlignment.CENTER, "N");
 	protected InfoText dirS = new MapText(TextAlignment.CENTER, "S");
 	protected InfoText dirE = new MapText(TextAlignment.CENTER, "E");
 	protected InfoText dirW = new MapText(TextAlignment.CENTER, "W");
 	
 	public MapRenderer(Minimap map) {
-		this.minimap = map;
 		this.playerPos = new BlockPos.Mutable(0, 0, 0);
-		this.textManager = minimap.getTextManager();
-		this.textManager.setSpacing(12);
-		this.textManager.add(dirN);
-		this.textManager.add(dirS);
-		this.textManager.add(dirE);
-		this.textManager.add(dirW);
+		this.minimap = map;
 	}
 	
-	protected abstract void render(MatrixStack matrices);
+	protected abstract void render(MatrixStack matrices, double scale);
 	
 	public void updateParams() {
+		if (textManager == null) {
+			textManager = minimap.getTextManager();
+			textManager.setSpacing(12);
+			textManager.add(dirN);
+			textManager.add(dirS);
+			textManager.add(dirE);
+			textManager.add(dirW);
+		}
+		
 		this.worldData = minimap.getWorldData();
 		this.mapSkin = minimap.getSkin();
 		
@@ -151,7 +155,7 @@ public abstract class MapRenderer {
 		Point pointE = new Point(mapR, centerY);
 		Point pointW = new Point(mapX, centerY);
 		
-		this.rotation = 0.0F;
+		this.rotation = 180.0F;
 		if (mapRotation) {
 			this.rotation = minecraft.player.headYaw;
 			double rotate = MathUtil.correctAngle(rotation) + 180;
@@ -194,23 +198,13 @@ public abstract class MapRenderer {
 		if (worldData == null) return;
 		
 		Window window = minecraft.getWindow();
-		int fbuffH = window.getFramebufferHeight();
 		double scale = window.getScaleFactor();
-		int scissX = (int) (mapX * scale);
-		int scissY = (int) (fbuffH - (mapY + mapHeight) * scale);
-		int scissW = (int) (mapWidth * scale);
-		int scissH = (int) (mapHeight * scale);
 
 		this.offX = this.calcOffset(currX, lastX, mapScale);
 		this.offY = this.calcOffset(currZ, lastZ, mapScale);
 		
 		RenderSystem.disableDepthTest();
-		//RenderUtil.enableScissor();
-		RenderUtil.applyScissor(scissX, scissY, scissW, scissH);
-        
-		this.render(matrices);
-		
-		RenderUtil.disableScissor();
+		this.render(matrices, scale);
 		
 		if (mapSkin != null) {
 			int skinX = minimap.getSkinX();
@@ -230,7 +224,7 @@ public abstract class MapRenderer {
 		} else {
 			MapPlayerManager.getPlayer(minecraft.player).getIcon().draw(centerX, centerY, iconSize, true);
 		}
-		this.textManager.draw(matrices);
+		textManager.draw(matrices);
 		
 		RenderSystem.enableDepthTest();
 	}

@@ -394,8 +394,8 @@ public class Minimap implements IMap {
 		return this.mapScale;
 	}
 
-	public List<MapIcon<?>> getDrawableIcons(double worldX, double worldZ, double screenX, double screenZ, float delta) {
-		return this.entityRadar.getDrawableIcons(this, worldX, worldZ, screenX, screenZ, mapScale, delta);
+	public List<MapIcon<?>> getDrawableIcons(double worldX, double worldZ, double screenX, double screenY, float delta) {
+		return this.entityRadar.getDrawableIcons(worldX, worldZ, screenX, screenY, mapScale, delta);
 	}
 	
 	public List<WaypointIcon> getWaypoints(BlockPos currentPos, int screenX, int screenY) {

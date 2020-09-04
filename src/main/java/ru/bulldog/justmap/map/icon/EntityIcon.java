@@ -9,7 +9,6 @@ import net.minecraft.entity.passive.TameableEntity;
 
 import ru.bulldog.justmap.client.config.ClientParams;
 import ru.bulldog.justmap.client.render.EntityModelRenderer;
-import ru.bulldog.justmap.map.IMap;
 import ru.bulldog.justmap.util.Colors;
 import ru.bulldog.justmap.util.RuleUtil;
 import ru.bulldog.justmap.util.render.RenderUtil;
@@ -19,14 +18,13 @@ public class EntityIcon extends MapIcon<EntityIcon> {
 	private final Entity entity;
 	boolean hostile;
 		
-	public EntityIcon(IMap map, Entity entity) {
-		super(map);
+	public EntityIcon(Entity entity) {
 		this.hostile = entity instanceof HostileEntity;
 		this.entity = entity;
 	}
 	
 	@Override
-	public void draw(MatrixStack matrices, VertexConsumerProvider consumerProvider, int mapX, int mapY, float rotation) {
+	public void draw(MatrixStack matrices, VertexConsumerProvider consumerProvider, int mapX, int mapY, int mapW, int mapH, float rotation) {
 		if (!RuleUtil.allowCreatureRadar() && !hostile) { return; }
 		if (!RuleUtil.allowHostileRadar() && hostile) { return; }
 		
@@ -38,7 +36,7 @@ public class EntityIcon extends MapIcon<EntityIcon> {
 			color = (hostile) ? Colors.DARK_RED : Colors.YELLOW;
 		}
 		int size = ClientParams.entityIconSize;
-		this.updatePos(size, mapX, mapY);
+		this.updatePos(mapX, mapY, mapW, mapH, size);
 		if (!allowRender) return;
 		if (ClientParams.renderEntityModel) {
 			EntityModelRenderer.renderModel(matrices, consumerProvider, entity, iconPos.x, iconPos.y);

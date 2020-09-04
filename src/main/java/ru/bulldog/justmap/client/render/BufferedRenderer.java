@@ -6,6 +6,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gl.Framebuffer;
+import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.BlockPos;
@@ -17,7 +18,6 @@ import ru.bulldog.justmap.map.data.RegionData;
 import ru.bulldog.justmap.map.icon.MapIcon;
 import ru.bulldog.justmap.map.icon.WaypointIcon;
 import ru.bulldog.justmap.map.minimap.Minimap;
-import ru.bulldog.justmap.util.DataUtil;
 import ru.bulldog.justmap.util.render.ExtendedFramebuffer;
 import ru.bulldog.justmap.util.render.GLC;
 import ru.bulldog.justmap.util.render.RenderUtil;
@@ -45,11 +45,14 @@ public class BufferedRenderer extends MapRenderer {
 	}
 
 	@Override
-	protected void render(MatrixStack matrices) {
+	protected void render(MatrixStack matrices, double scale) {
+		float halfW = imgW / 2.0F;
+		float halfH = imgH / 2.0F;
+		int scaledW = (int) (imgW * scale);
+		int scaledH = (int) (imgH * scale);
+		boolean isMac = MinecraftClient.IS_SYSTEM_MAC;
 		if (paramsUpdated) {
-			if (this.isFBOLoaded()) {
-				this.resize(imgW, imgH);
-			}
+			this.resize(scaledW, scaledH, isMac);
 			if (ClientParams.showGrid) {
 				if (chunkGrid == null) {
 					this.chunkGrid = new ChunkGrid(lastX, lastZ, 0, 0, imgW, imgH, mapScale);
@@ -60,9 +63,7 @@ public class BufferedRenderer extends MapRenderer {
 			}
 			this.paramsUpdated = false;
 		}
-		
-		boolean isMac = MinecraftClient.IS_SYSTEM_MAC;
-		
+
 		RenderSystem.pushMatrix();
 		this.scalingFramebuffer.beginWrite(true);
 		RenderSystem.clear(GLC.GL_COLOR_OR_DEPTH_BUFFER_BIT, isMac);
@@ -70,11 +71,12 @@ public class BufferedRenderer extends MapRenderer {
 		RenderSystem.matrixMode(GLC.GL_PROJECTION);
 		RenderSystem.pushMatrix();
 		RenderSystem.loadIdentity();
-		RenderSystem.ortho(0.0, imgW, imgH, 0.0, 1000.0, 3000.0);
+		RenderSystem.ortho(0.0, scaledW, scaledH, 0.0, 1000.0, 3000.0);
 		RenderSystem.matrixMode(GLC.GL_MODELVIEW);
 		RenderSystem.pushMatrix();
 		RenderSystem.loadIdentity();
 		RenderSystem.translatef(0.0F, 0.0F, -2000.0F);
+		RenderSystem.scaled(scale, scale, 1.0);
 		RenderSystem.enableBlend();
 		RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
 		this.drawMap();
@@ -86,34 +88,39 @@ public class BufferedRenderer extends MapRenderer {
 		RenderSystem.pushMatrix();
 		this.rotationFramebuffer.beginWrite(false);
 		RenderSystem.clear(GLC.GL_COLOR_OR_DEPTH_BUFFER_BIT, isMac);
-		float moveX = imgW / 2.0F;
-		float moveY = imgH / 2.0F;
+		float shiftX = scaledW / 2.0F;
+		float shiftY = scaledH / 2.0F;
+		RenderSystem.pushMatrix();
 		if (mapRotation) {
-			RenderSystem.translatef(moveX, moveY, 0.0F);
-			RenderSystem.rotatef(rotation + 180, 0.0F, 0.0F, 1.0F);
-			RenderSystem.translatef(-moveX, -moveY, 0.0F);
+			RenderSystem.translatef(shiftX, shiftY, 0.0F);
+			RenderSystem.rotatef(180.0F - rotation, 0.0F, 0.0F, 1.0F);
+			RenderSystem.translatef(-shiftX, -shiftY, 0.0F);
 		}
 		RenderSystem.pushMatrix();
-		RenderSystem.translatef(-offX, -offY, 0.0F);
-		
+		RenderSystem.translated(-offX * scale, -offY * scale, 0.0);
 		this.scalingFramebuffer.beginRead();
-		RenderUtil.drawQuad(0.0, 0.0, imgW, imgH);
-		
-		VertexConsumerProvider.Immediate consumerProvider = minecraft.getBufferBuilders().getEntityVertexConsumers();
-		List<MapIcon<?>> drawableEntities = minimap.getDrawableIcons(lastX, lastZ, moveX, moveY, delta);
-		for (MapIcon<?> icon : drawableEntities) {
-			icon.draw(matrices, consumerProvider, 0, 0, rotation);
-		}
-		consumerProvider.draw();
-		
+		RenderUtil.startDraw();
+		BufferBuilder buffer = RenderUtil.getBuffer();
+		buffer.vertex(0.0, scaledH, 0.0).texture(0.0F, 0.0F).next();
+		buffer.vertex(scaledW, scaledH, 0.0).texture(1.0F, 0.0F).next();
+		buffer.vertex(scaledW, 0.0, 0.0).texture(1.0F, 1.0F).next();
+		buffer.vertex(0.0, 0.0, 0.0).texture(0.0F, 1.0F).next();
+		RenderUtil.endDraw();
 		RenderSystem.popMatrix();
-		
-		List<WaypointIcon> drawableWaypoints = minimap.getWaypoints(playerPos, (int) moveX, (int) moveY);
-		for (WaypointIcon icon : drawableWaypoints) {
-			icon.draw(matrices, consumerProvider, 0, 0, offX, offY, rotation);
+		RenderSystem.scaled(scale, scale, 1.0);
+		RenderSystem.translated(-offX, -offY, 0.0);
+		int iconX = (int) (imgW - mapWidth);
+		int iconY = (int) (imgH - mapHeight);
+		VertexConsumerProvider.Immediate consumerProvider = minecraft.getBufferBuilders().getEntityVertexConsumers();
+		List<MapIcon<?>> drawableEntities = minimap.getDrawableIcons(lastX, lastZ, halfW, halfH, delta);
+		for (MapIcon<?> icon : drawableEntities) {
+			icon.draw(matrices, consumerProvider, iconX, iconY, mapWidth, mapHeight, rotation);
 		}
 		consumerProvider.draw();
-		
+		RenderSystem.popMatrix();
+		RenderSystem.pushMatrix();
+		RenderSystem.scaled(scale, scale, 1.0);
+		RenderSystem.popMatrix();
 		this.rotationFramebuffer.endWrite();
 		RenderSystem.popMatrix();
 		RenderSystem.matrixMode(GLC.GL_PROJECTION);
@@ -121,10 +128,17 @@ public class BufferedRenderer extends MapRenderer {
 		RenderSystem.matrixMode(GLC.GL_MODELVIEW);
 		RenderSystem.popMatrix();
 		
-		Framebuffer minecraftFramebuffer = DataUtil.getMinecraft().getFramebuffer();
+		Framebuffer minecraftFramebuffer = minecraft.getFramebuffer();
+		int fbuffW = minecraftFramebuffer.viewportWidth;
+		int fbuffH = minecraftFramebuffer.viewportHeight;
+		int scissX = (int) (mapX * scale);
+		int scissY = (int) (fbuffH - (mapY + mapHeight) * scale);
+		int scissW = (int) (mapWidth * scale);
+		int scissH = (int) (mapHeight * scale);
+		RenderUtil.enableScissor();
+		RenderUtil.applyScissor(scissX, scissY, scissW, scissH);
 		minecraftFramebuffer.beginWrite(false);
-		RenderSystem.viewport(0, 0, minecraftFramebuffer.viewportWidth, minecraftFramebuffer.viewportHeight);
-		RenderSystem.pushMatrix();
+		RenderSystem.viewport(0, 0, fbuffW, fbuffH);
 		if (Minimap.isRound()) {
 			RenderSystem.enableBlend();
 			RenderSystem.colorMask(false, false, false, true);
@@ -136,8 +150,19 @@ public class BufferedRenderer extends MapRenderer {
 			RenderSystem.blendFunc(GLC.GL_DST_ALPHA, GLC.GL_ONE_MINUS_DST_ALPHA);
 		}
 		this.rotationFramebuffer.beginRead();
-		RenderUtil.drawQuad(mapX, mapY, mapWidth, mapHeight);
-		RenderSystem.popMatrix();
+		RenderUtil.startDraw();
+		buffer = RenderUtil.getBuffer();
+		buffer.vertex(imgX, imgY + imgH, 0.0).texture(0.0F, 0.0F).next();
+		buffer.vertex(imgX + imgW, imgY + imgH, 0.0).texture(1.0F, 0.0F).next();
+		buffer.vertex(imgX + imgW, imgY, 0.0).texture(1.0F, 1.0F).next();
+		buffer.vertex(imgX, imgY, 0.0).texture(0.0F, 1.0F).next();
+		RenderUtil.endDraw();
+		List<WaypointIcon> drawableWaypoints = minimap.getWaypoints(playerPos, centerX, centerY);
+		for (WaypointIcon icon : drawableWaypoints) {
+			icon.draw(matrices, consumerProvider, mapX, mapY, mapWidth, mapHeight, offX, offY, rotation);
+		}
+		consumerProvider.draw();
+		RenderUtil.disableScissor();
 	}
 	
 	private void drawMap() {
@@ -189,8 +214,7 @@ public class BufferedRenderer extends MapRenderer {
 		this.chunkGrid.draw();
 	}
 	
-	public void resize(int width, int height) {
-		boolean isMac = MinecraftClient.IS_SYSTEM_MAC;
+	public void resize(int width, int height, boolean isMac) {
 		this.scalingFramebuffer.resize(width, height, isMac);
 		this.rotationFramebuffer.resize(width, height, isMac);
 	}

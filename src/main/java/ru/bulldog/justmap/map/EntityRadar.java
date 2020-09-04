@@ -35,19 +35,19 @@ public class EntityRadar {
 		this.creatures.add(creature);
 	}
 	
-	public List<MapIcon<?>> getDrawableIcons(IMap map, double worldX, double worldZ, double screenX, double screenZ, double scale, float delta) {
+	public List<MapIcon<?>> getDrawableIcons(double worldX, double worldZ, double screenX, double screenY, double scale, float delta) {
 		this.drawableIcons.clear();
 		this.players.forEach(player -> {
 			double iconX = MathUtil.screenPos(DataUtil.doubleX(player, delta), worldX, screenX, scale);
-			double iconY = MathUtil.screenPos(DataUtil.doubleZ(player, delta), worldZ, screenZ, scale);
-			PlayerIcon icon = new PlayerIcon(map, player);
+			double iconY = MathUtil.screenPos(DataUtil.doubleZ(player, delta), worldZ, screenY, scale);
+			PlayerIcon icon = new PlayerIcon(player);
 			icon.setPosition(iconX, iconY);
 			this.drawableIcons.add(icon);
 		});
 		this.creatures.forEach(mob -> {
 			double iconX = MathUtil.screenPos(DataUtil.doubleX(mob, delta), worldX, screenX, scale);
-			double iconY = MathUtil.screenPos(DataUtil.doubleZ(mob, delta), worldZ, screenZ, scale);
-			EntityIcon icon = new EntityIcon(map, mob);
+			double iconY = MathUtil.screenPos(DataUtil.doubleZ(mob, delta), worldZ, screenY, scale);
+			EntityIcon icon = new EntityIcon(mob);
 			icon.setPosition(iconX, iconY);
 			this.drawableIcons.add(icon);
 		});
