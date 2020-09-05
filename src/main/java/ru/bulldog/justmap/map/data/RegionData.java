@@ -299,7 +299,7 @@ public class RegionData {
 		}
 		int id = texture != null ? texture.getId() : image.getId();
 		RenderUtil.bindTexture(id);
-		RenderUtil.applyFilter();
+		RenderUtil.applyFilter(false);
 		RenderUtil.startDraw();
 		RenderUtil.addQuad(x, y, w, h, u1, v1, u2, v2);
 		RenderUtil.endDraw();

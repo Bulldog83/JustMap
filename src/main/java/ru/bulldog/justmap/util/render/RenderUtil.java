@@ -100,8 +100,8 @@ public class RenderUtil extends DrawableHelper {
 		RenderSystem.bindTexture(id);
 	}
 	
-	public static void applyFilter() {
-		if (ClientSettings.textureFilter) {
+	public static void applyFilter(boolean force) {
+		if (force || ClientSettings.textureFilter) {
 			RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR_MIPMAP_LINEAR);
 			RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
 		} else {
@@ -318,7 +318,7 @@ public class RenderUtil extends DrawableHelper {
 		RenderSystem.enableAlphaTest();		
 		RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
 		
-		skin.bindTexture();		
+		skin.bindTexture();
 		startDrawNormal();
 		
 		draw(matrices, vertexBuffer, x, y, scaledBrd, scaledBrd, sMinU, sMinV, leftU, topV);
