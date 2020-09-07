@@ -102,11 +102,11 @@ public class RenderUtil extends DrawableHelper {
 	
 	public static void applyFilter(boolean force) {
 		if (force || ClientSettings.textureFilter) {
-			RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR_MIPMAP_LINEAR);
-			RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
+			RenderSystem.texParameter(GLC.GL_TEXTURE_2D, GLC.GL_TEXTURE_MIN_FILTER, GLC.GL_LINEAR_MIPMAP_LINEAR);
+			RenderSystem.texParameter(GLC.GL_TEXTURE_2D, GLC.GL_TEXTURE_MAG_FILTER, GLC.GL_LINEAR);
 		} else {
-			RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR_MIPMAP_NEAREST);
-			RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST);
+			RenderSystem.texParameter(GLC.GL_TEXTURE_2D, GLC.GL_TEXTURE_MIN_FILTER, GLC.GL_LINEAR_MIPMAP_NEAREST);
+			RenderSystem.texParameter(GLC.GL_TEXTURE_2D, GLC.GL_TEXTURE_MAG_FILTER, GLC.GL_NEAREST);
 		}
 	}
 	
@@ -120,12 +120,12 @@ public class RenderUtil extends DrawableHelper {
 	
 	public static void enableScissor() {
 		RenderSystem.assertThread(RenderSystem::isOnRenderThread);
-		enable(GL11.GL_SCISSOR_TEST);
+		enable(GLC.GL_SCISSOR_TEST);
 	}
 	
 	public static void disableScissor() {
 		RenderSystem.assertThread(RenderSystem::isOnRenderThread);
-		disable(GL11.GL_SCISSOR_TEST);
+		disable(GLC.GL_SCISSOR_TEST);
 	}
 	
 	public static void applyScissor(int x, int y, int width, int height) {
@@ -142,7 +142,7 @@ public class RenderUtil extends DrawableHelper {
     }
     
     public static void startDraw(VertexFormat vertexFormat) {
-    	startDraw(GL11.GL_QUADS, vertexFormat);
+    	startDraw(GLC.GL_QUADS, vertexFormat);
     }
     
     public static void startDraw(int mode, VertexFormat vertexFormat) {
@@ -171,7 +171,7 @@ public class RenderUtil extends DrawableHelper {
 	
 		RenderSystem.disableTexture();
 		RenderSystem.color4f(r, g, b, a);
-		startDraw(GL11.GL_TRIANGLES, VertexFormats.POSITION);
+		startDraw(GLC.GL_TRIANGLES, VertexFormats.POSITION);
 		vertexBuffer.vertex(x1, y1, 0).next();
 		vertexBuffer.vertex(x2, y2, 0).next();
 		vertexBuffer.vertex(x3, y3, 0).next();
@@ -187,7 +187,7 @@ public class RenderUtil extends DrawableHelper {
 	
 		RenderSystem.disableTexture();
 		RenderSystem.color4f(r, g, b, a);
-		startDraw(GL11.GL_LINES, VertexFormats.POSITION);
+		startDraw(GLC.GL_LINES, VertexFormats.POSITION);
 		vertexBuffer.vertex(x1, y1, 0).next();
 		vertexBuffer.vertex(x2, y2, 0).next();
 		endDraw();
@@ -219,7 +219,7 @@ public class RenderUtil extends DrawableHelper {
 	
 	public static void drawCircleVertices(double x, double y, double radius) {
 		double pi2 = Math.PI * 2;
-		startDraw(GL11.GL_TRIANGLE_FAN, VertexFormats.POSITION);
+		startDraw(GLC.GL_TRIANGLE_FAN, VertexFormats.POSITION);
 		vertexBuffer.vertex(x, y, 0).next();
 		int sides = 50;
 		for (int i = 0; i <= sides; i++) {
@@ -248,7 +248,7 @@ public class RenderUtil extends DrawableHelper {
 		RenderSystem.enableBlend();
 		RenderSystem.disableTexture();
 		RenderSystem.defaultBlendFunc();
-		startDraw(GL11.GL_QUADS, VertexFormats.POSITION_COLOR);
+		startDraw(GLC.GL_QUADS, VertexFormats.POSITION_COLOR);
 		vertexBuffer.vertex(matrix4f, (float) x, (float) (y + h), 0.0F).color(r, g, b, a).next();
 		vertexBuffer.vertex(matrix4f, (float) (x + w), (float) (y + h), 0.0F).color(r, g, b, a).next();
 		vertexBuffer.vertex(matrix4f, (float) (x + w), (float) y, 0.0F).color(r, g, b, a).next();

@@ -13,8 +13,6 @@ import java.nio.ByteOrder;
 import javax.imageio.ImageIO;
 
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL12;
-import org.lwjgl.opengl.GL14;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
@@ -67,16 +65,16 @@ public class MapTexture {
 		this.refillBuffer();
 		
 		RenderSystem.bindTexture(this.glId);
-		RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_NEAREST);
-		RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST);
-		RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, GL12.GL_CLAMP_TO_EDGE);
-		RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, GL12.GL_CLAMP_TO_EDGE);
-		RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL14.GL_GENERATE_MIPMAP, GL11.GL_TRUE);
-		RenderSystem.pixelStore(GL11.GL_UNPACK_ROW_LENGTH, 0);
-		RenderSystem.pixelStore(GL11.GL_UNPACK_SKIP_PIXELS, 0);
-		RenderSystem.pixelStore(GL11.GL_UNPACK_SKIP_ROWS, 0);
+		RenderSystem.texParameter(GLC.GL_TEXTURE_2D, GLC.GL_TEXTURE_MIN_FILTER, GLC.GL_NEAREST);
+		RenderSystem.texParameter(GLC.GL_TEXTURE_2D, GLC.GL_TEXTURE_MAG_FILTER, GLC.GL_NEAREST);
+		RenderSystem.texParameter(GLC.GL_TEXTURE_2D, GLC.GL_TEXTURE_WRAP_S, GLC.GL_CLAMP_TO_EDGE);
+		RenderSystem.texParameter(GLC.GL_TEXTURE_2D, GLC.GL_TEXTURE_WRAP_T, GLC.GL_CLAMP_TO_EDGE);
+		RenderSystem.texParameter(GLC.GL_TEXTURE_2D, GLC.GL_GENERATE_MIPMAP, GLC.GL_TRUE);
+		RenderSystem.pixelStore(GLC.GL_UNPACK_ROW_LENGTH, 0);
+		RenderSystem.pixelStore(GLC.GL_UNPACK_SKIP_PIXELS, 0);
+		RenderSystem.pixelStore(GLC.GL_UNPACK_SKIP_ROWS, 0);
 		
-		GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA, this.getWidth(), this.getHeight(), 0, GL11.GL_RGBA, GL12.GL_UNSIGNED_INT_8_8_8_8, this.buffer);
+		GL11.glTexImage2D(GLC.GL_TEXTURE_2D, 0, GLC.GL_RGBA, this.getWidth(), this.getHeight(), 0, GLC.GL_RGBA, GLC.GL_UNSIGNED_INT_8_8_8_8, this.buffer);
 	
 		this.changed = false;
 	}

@@ -1,9 +1,10 @@
-package ru.bulldog.justmap.client;
+package ru.bulldog.justmap.client.control;
 
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.minecraft.client.options.KeyBinding;
 
 import ru.bulldog.justmap.JustMap;
+import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.client.config.ConfigFactory;
 import ru.bulldog.justmap.client.screen.WaypointsList;
 import ru.bulldog.justmap.client.screen.Worldmap;

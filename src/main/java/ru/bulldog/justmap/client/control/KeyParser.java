@@ -1,4 +1,4 @@
-package ru.bulldog.justmap.client;
+package ru.bulldog.justmap.client.control;
 
 
 import net.minecraft.client.MinecraftClient;
