@@ -35,11 +35,11 @@ import ru.bulldog.justmap.util.RuleUtil;
 import ru.bulldog.justmap.util.math.MathUtil;
 import ru.bulldog.justmap.util.math.RandomUtil;
 import ru.bulldog.justmap.util.render.ExtendedFramebuffer;
+
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ChatScreen;
 import net.minecraft.client.util.Window;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -341,7 +341,7 @@ public class Minimap implements IMap {
 					PlayerEntity pEntity = (PlayerEntity) entity;
 					if (pEntity.isMainPlayer()) continue;
 					this.entityRadar.addPlayer(pEntity);
-				} else if (entity instanceof LivingEntity && !(entity instanceof PlayerEntity)) {
+				} else if (entity instanceof MobEntity && !(entity instanceof PlayerEntity)) {
 					MobEntity mobEntity = (MobEntity) entity;
 					boolean hostile = mobEntity instanceof HostileEntity;
 					if (hostile && RuleUtil.allowHostileRadar()) {
