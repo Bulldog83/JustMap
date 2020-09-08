@@ -20,7 +20,6 @@ import ru.bulldog.justmap.map.data.Layer;
 import ru.bulldog.justmap.util.math.MathUtil;
 
 public class DataUtil {
-	private static MinecraftClient minecraft = JustMapClient.MINECRAFT;
 	private static BlockPos.Mutable currentPos = new BlockPos.Mutable();
 	private static ClientWorld clientWorld = null;
 	private static ServerWorld serverWorld = null;
@@ -33,6 +32,7 @@ public class DataUtil {
 	
 	public static void updateWorld(ClientWorld world) {
 		clientWorld = world;
+		MinecraftClient minecraft = MinecraftClient.getInstance();
 		if (minecraft.isIntegratedServerRunning()) {
 			MinecraftServer server = minecraft.getServer();
 			serverWorld = minecraft.getServer().getWorld(world.getRegistryKey());
@@ -65,15 +65,12 @@ public class DataUtil {
 	}
 	
 	public static boolean isOnline() {
-		return !minecraft.isIntegratedServerRunning();
+		return !MinecraftClient.getInstance().isIntegratedServerRunning();
 	}
 	
 	public static IMap getMap() {
-		return minecraft.currentScreen instanceof Worldmap ? (Worldmap) minecraft.currentScreen : JustMapClient.MAP;
-	}
-	
-	public static MinecraftClient getMinecraft() {
-		return minecraft;
+		MinecraftClient minecraft = MinecraftClient.getInstance();
+		return minecraft.currentScreen instanceof Worldmap ? (Worldmap) minecraft.currentScreen : JustMapClient.getMap();
 	}
 	
 	public static World getWorld() {
@@ -93,6 +90,7 @@ public class DataUtil {
 	}
 	
 	public static GameOptions getGameOptions() {
+		MinecraftClient minecraft = MinecraftClient.getInstance();
 		return minecraft.options;
 	}
 	
@@ -155,7 +153,6 @@ public class DataUtil {
 		} else if (RuleUtil.needRenderCaves(world, pos)) {
 			return Layer.CAVES;
 		}
-		
 		return Layer.SURFACE;
 	}
 	
@@ -165,6 +162,7 @@ public class DataUtil {
 	}
 
 	private static Entity getPosEntity() {
+		MinecraftClient minecraft = MinecraftClient.getInstance();
 		return minecraft.getCameraEntity() != null ? minecraft.getCameraEntity() : minecraft.player;
 	}
 }

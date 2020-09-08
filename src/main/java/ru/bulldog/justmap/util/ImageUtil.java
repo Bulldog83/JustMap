@@ -9,7 +9,7 @@ import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.util.math.Line;
 
 import net.fabricmc.fabric.impl.client.indigo.renderer.helper.ColorHelper;
-
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.resource.Resource;
 import net.minecraft.resource.ResourceManager;
@@ -21,7 +21,7 @@ public class ImageUtil {
 	private static ResourceManager resourceManager;
 	
 	private static void checkResourceManager() {
-		if (resourceManager == null) resourceManager = DataUtil.getMinecraft().getResourceManager();
+		if (resourceManager == null) resourceManager = MinecraftClient.getInstance().getResourceManager();
 	}
 	
 	public static boolean imageExists(Identifier image) {

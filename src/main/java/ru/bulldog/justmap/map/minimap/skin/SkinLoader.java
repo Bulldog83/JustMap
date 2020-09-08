@@ -5,6 +5,7 @@ import java.io.File;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.texture.NativeImageBackedTexture;
 import net.minecraft.client.texture.TextureManager;
@@ -13,7 +14,6 @@ import net.minecraft.util.JsonHelper;
 
 import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.map.minimap.skin.MapSkin.SkinType;
-import ru.bulldog.justmap.util.DataUtil;
 import ru.bulldog.justmap.util.ImageUtil;
 import ru.bulldog.justmap.util.JsonFactory;
 import ru.bulldog.justmap.util.storage.StorageUtil;
@@ -21,7 +21,7 @@ import ru.bulldog.justmap.util.storage.StorageUtil;
 public final class SkinLoader extends JsonFactory {
 
 	private final static File SKINS_FOLDER = StorageUtil.skinsDir();
-	private final static TextureManager textureManager = DataUtil.getMinecraft().getTextureManager();
+	private final static TextureManager textureManager = MinecraftClient.getInstance().getTextureManager();
 	
 	private SkinLoader() {}
 	

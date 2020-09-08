@@ -2,6 +2,7 @@ package ru.bulldog.justmap.map.data;
 
 import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.client.config.ClientSettings;
+import ru.bulldog.justmap.network.ClientNetworkHandler;
 import ru.bulldog.justmap.util.ColorUtil;
 import ru.bulldog.justmap.util.Colors;
 import ru.bulldog.justmap.util.DataUtil;
@@ -27,6 +28,7 @@ public class ChunkData {
 	public final static ChunkLevel EMPTY_LEVEL = new ChunkLevel(-1);
 	
 	private final static TaskManager chunkUpdater = TaskManager.getManager("chunk-updater", 2);
+	private static ClientNetworkHandler networkHandler = JustMapClient.getNetworkHandler();
 	
 	private final WorldData mapData;
 	private final Map<Layer, ChunkLevel[]> levels = new ConcurrentHashMap<>();
@@ -56,11 +58,17 @@ public class ChunkData {
 		this.chunkPos = pos;
 		this.worldChunk = new SoftReference<>(world.getChunk(pos.x, pos.z));
 
-		ServerWorld serverWorld = DataUtil.getServerWorld();
-		if (serverWorld != null && Dimension.isOverworld(world)) {
-			this.slime = ChunkRandom.getSlimeRandom(chunkPos.x, chunkPos.z,
-					serverWorld.getSeed(), 987234911L).nextInt(10) == 0;
-		}		
+		if (Dimension.isOverworld(world)) {
+			ServerWorld serverWorld = DataUtil.getServerWorld();
+			if (serverWorld != null) {
+				this.slime = ChunkRandom.getSlimeRandom(chunkPos.x, chunkPos.z,
+						serverWorld.getSeed(), 987234911L).nextInt(10) == 0;
+			} else if (networkHandler.canRequestData()) {
+				networkHandler.requestChunkHasSlime(chunkPos, result -> {
+					this.slime = result;
+				});
+			}
+		}
 		if (Dimension.isNether(world)) {
 			initLayer(Layer.NETHER);
 		} else {

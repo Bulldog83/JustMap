@@ -35,8 +35,8 @@ import net.minecraft.util.math.BlockPos;
 @Environment(EnvType.CLIENT)
 public abstract class MapRenderer {
 	
-	protected static MinecraftClient minecraft = DataUtil.getMinecraft();
 	protected static Identifier roundMask = new Identifier(JustMap.MODID, "textures/round_mask.png");
+	protected static MinecraftClient minecraft = MinecraftClient.getInstance();
 	protected static TextManager textManager;
 	protected static InfoText dirN = new MapText(TextAlignment.CENTER, "N");
 	protected static InfoText dirS = new MapText(TextAlignment.CENTER, "S");

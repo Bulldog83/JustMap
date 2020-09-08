@@ -142,7 +142,7 @@ public class WaypointEditor extends MapScreen {
 
 		ey += row * 1.25;
 
-		IntegerRange maxRangeConfig = JustMapClient.CONFIG.getEntry("max_render_dist");
+		IntegerRange maxRangeConfig = JustMapClient.getConfig().getEntry("max_render_dist");
 		final int SHOW_RANGE_MAX = maxRangeConfig.maxValue();
 		this.showRange = waypoint.showRange;
 		this.children.add(new SliderWidget(elemX, ey, sliderW, rowH, LiteralText.EMPTY, (double) this.showRange / SHOW_RANGE_MAX) {

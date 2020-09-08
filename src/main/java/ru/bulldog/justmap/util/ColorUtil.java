@@ -37,7 +37,7 @@ import ru.bulldog.justmap.util.math.MathUtil;
 
 public class ColorUtil {
 	
-	private static MinecraftClient minecraft = DataUtil.getMinecraft();	
+	private static MinecraftClient minecraft = MinecraftClient.getInstance();	
 	private static BlockModels blockModels = minecraft.getBlockRenderManager().getModels();	
 	private static FluidRenderHandlerRegistryImpl fluidRenderHandlerRegistry = FluidRenderHandlerRegistryImpl.INSTANCE;	
 	private static Map<BlockState, Integer> colorCache = new HashMap<>();	

@@ -38,8 +38,8 @@ public final class WorldManager {
 	private final static Map<WorldKey, WorldData> worldsData = new HashMap<>();
 	// used only in mixed mode to associate world names with worlds
 	private final static Map<MultiworldIdentifier, String> worldAssociations = new HashMap<>();
-	private final static MinecraftClient minecraft = DataUtil.getMinecraft();
-	private final static ClientConfig modConfig = JustMapClient.CONFIG;
+	private final static MinecraftClient minecraft = MinecraftClient.getInstance();
+	private final static ClientConfig modConfig = JustMapClient.getConfig();
 
 	private static World currentWorld;
 	private static WorldKey currentWorldKey;

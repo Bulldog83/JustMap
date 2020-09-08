@@ -45,7 +45,6 @@ public class NetworkHandler {
 	
 	public static enum PacketType {
 		SLIME_CHUNK_PACKET,
-		ACTIVE_CHUNK_PACKET,
 		GET_IMAGE_PACKET;
 		
 		private final static PacketType[] values = values();

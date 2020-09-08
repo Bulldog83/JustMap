@@ -52,8 +52,7 @@ import java.util.List;
 import java.util.stream.Stream;
 
 public class Minimap implements IMap {
-	private static final MinecraftClient minecraft = DataUtil.getMinecraft();
-
+	private final MinecraftClient minecraft;
 	private final TextManager textManager;
 	private final FastRenderer fastRenderer;
 	private final BufferedRenderer bufferedRenderer;
@@ -86,6 +85,7 @@ public class Minimap implements IMap {
 	private int scaledHeight;
 
 	public Minimap() {
+		this.minecraft = MinecraftClient.getInstance();
 		this.entityRadar = new EntityRadar();
 		this.textManager = AdvancedInfo.getMapTextManager();
 		this.fastRenderer = new FastRenderer(this);
@@ -123,7 +123,7 @@ public class Minimap implements IMap {
 	}
 
 	public void updateMapParams() {
-		ClientConfig config = JustMapClient.CONFIG;
+		ClientConfig config = JustMapClient.getConfig();
 		this.isMapVisible = config.getBoolean("map_visible");
 		
 		if (!isMapVisible) return;
@@ -437,6 +437,7 @@ public class Minimap implements IMap {
 	}
 
 	public boolean isMapVisible() {
+		if (minecraft == null) return false;
 		if (minecraft.currentScreen != null) {
 			return this.isMapVisible && !minecraft.isPaused() && ClientSettings.showInChat
 					&& minecraft.currentScreen instanceof ChatScreen;

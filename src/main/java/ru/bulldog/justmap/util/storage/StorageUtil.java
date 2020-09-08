@@ -104,7 +104,7 @@ public final class StorageUtil {
 	
 	@Environment(EnvType.CLIENT)
 	public static File filesDir() {
-		MinecraftClient minecraft = DataUtil.getMinecraft();		
+		MinecraftClient minecraft = MinecraftClient.getInstance();		
 		ServerInfo serverInfo = minecraft.getCurrentServerEntry();
 		File mapDataDir = MAP_DATA_DIR.toFile();
 		if (minecraft.isIntegratedServerRunning()) {

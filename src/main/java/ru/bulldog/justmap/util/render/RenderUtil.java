@@ -3,6 +3,7 @@ package ru.bulldog.justmap.util.render;
 import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.systems.RenderSystem;
 
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.render.BufferBuilder;
@@ -17,11 +18,11 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Matrix3f;
 import net.minecraft.util.math.Matrix4f;
 import net.minecraft.text.Text;
+
 import ru.bulldog.justmap.client.config.ClientSettings;
 import ru.bulldog.justmap.map.minimap.skin.MapSkin;
 import ru.bulldog.justmap.map.minimap.skin.MapSkin.RenderData;
 import ru.bulldog.justmap.util.ColorUtil;
-import ru.bulldog.justmap.util.DataUtil;
 
 import org.lwjgl.opengl.GL11;
 
@@ -34,8 +35,8 @@ public class RenderUtil extends DrawableHelper {
 	private final static VertexFormat VF_POS_TEX_NORMAL = new VertexFormat(ImmutableList.of(VertexFormats.POSITION_ELEMENT, VertexFormats.TEXTURE_ELEMENT, VertexFormats.NORMAL_ELEMENT, VertexFormats.PADDING_ELEMENT));
 	private final static Tessellator tessellator = Tessellator.getInstance();
 	private final static BufferBuilder vertexBuffer = tessellator.getBuffer();
-	private final static TextRenderer textRenderer = DataUtil.getMinecraft().textRenderer;
-	private final static TextureManager textureManager = DataUtil.getMinecraft().getTextureManager();
+	private final static TextRenderer textRenderer = MinecraftClient.getInstance().textRenderer;
+	private final static TextureManager textureManager = MinecraftClient.getInstance().getTextureManager();
 
 	public static int getWidth(Text text) {
 		return textRenderer.getWidth(text);

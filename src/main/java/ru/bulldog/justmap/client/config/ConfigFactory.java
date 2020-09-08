@@ -19,13 +19,11 @@ import ru.bulldog.justmap.enums.MultiworldDetection;
 import ru.bulldog.justmap.enums.ArrowType;
 import ru.bulldog.justmap.map.minimap.Minimap;
 import ru.bulldog.justmap.map.minimap.skin.MapSkin;
-import ru.bulldog.justmap.util.DataUtil;
 import ru.bulldog.justmap.util.LangUtil;
 
 public final class ConfigFactory {
 	
-	private final static ClientConfig modConfig = JustMapClient.CONFIG;
-	private final static MinecraftClient minecraft = DataUtil.getMinecraft();
+	private final static ClientConfig modConfig = JustMapClient.getConfig();
 	
 	private static Text lang(String key) {
 		return LangUtil.getText("configuration", key);
@@ -53,6 +51,7 @@ public final class ConfigFactory {
 		mwDetectEntry.setSaveConsumer(val -> mwDetectConfig.setValue(val))
 					 .setDefaultValue(mwDetectConfig.getDefault());
 		
+		MinecraftClient minecraft = MinecraftClient.getInstance();
 		int offset = modConfig.getInt("map_offset");
 		int maxX = minecraft.getWindow().getScaledWidth();
 		int maxY = minecraft.getWindow().getScaledHeight();

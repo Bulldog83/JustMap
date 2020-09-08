@@ -134,7 +134,7 @@ public class Worldmap extends MapScreen implements IMap {
 		LangUtil langUtil = new LangUtil("gui.worldmap");
 		this.mapMenu = this.addChild(new DropDownListWidget(25, paddingTop + 2, 100, 22));
 		this.mapMenu.addElement(new ListElementWidget(langUtil.getText("add_waypoint"), () -> {
-			JustMapClient.MAP.createWaypoint(world, centerPos);
+			JustMapClient.getMap().createWaypoint(world, centerPos);
 			return true;
 		}));
 		this.mapMenu.addElement(new ListElementWidget(langUtil.getText("set_map_pos"), () -> {
@@ -392,7 +392,7 @@ public class Worldmap extends MapScreen implements IMap {
 			if (time - clicked > 300) clicks = 0;
 			
 			if (++clicks == 2) {			
-				JustMapClient.MAP.createWaypoint(world, cursorBlockPos(d, e));
+				JustMapClient.getMap().createWaypoint(world, cursorBlockPos(d, e));
 				
 				clicked = 0;
 				clicks = 0;
