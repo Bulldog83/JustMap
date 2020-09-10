@@ -18,9 +18,9 @@ import net.minecraft.util.Identifier;
 
 import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.client.config.ClientSettings;
-import ru.bulldog.justmap.util.Colors;
 import ru.bulldog.justmap.util.ImageUtil;
 import ru.bulldog.justmap.util.SpriteAtlas;
+import ru.bulldog.justmap.util.colors.ColorPalette;
 import ru.bulldog.justmap.util.render.RenderUtil;
 
 public class DirectionArrow extends Sprite {
@@ -78,7 +78,7 @@ public class DirectionArrow extends Sprite {
 			double x3 = x + Math.cos(a3) * l;
 			double y3 = y + Math.sin(a3) * l;
 			
-			RenderUtil.drawTriangle(x1, y1, x2, y2, x3, y3, Colors.RED);
+			RenderUtil.drawTriangle(x1, y1, x2, y2, x3, y3, ColorPalette.RED);
 		}
 	}
 	

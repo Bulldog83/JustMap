@@ -1,7 +1,7 @@
 package ru.bulldog.justmap.advancedinfo;
 
 import ru.bulldog.justmap.enums.TextAlignment;
-import ru.bulldog.justmap.util.Colors;
+import ru.bulldog.justmap.util.colors.ColorPalette;
 import ru.bulldog.justmap.util.render.RenderUtil;
 
 import net.minecraft.client.MinecraftClient;
@@ -24,11 +24,11 @@ public abstract class InfoText {
 	public abstract void update();
 	
 	public InfoText(String text) {
-		this(TextAlignment.LEFT, text, Colors.WHITE);
+		this(TextAlignment.LEFT, text, ColorPalette.WHITE);
 	}
   
 	public InfoText(TextAlignment alignment, String text) {
-		this(alignment, text, Colors.WHITE);
+		this(alignment, text, ColorPalette.WHITE);
 	}
   
 	public InfoText(String text, int color) {

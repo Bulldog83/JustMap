@@ -8,9 +8,9 @@ import ru.bulldog.justmap.map.data.WorldManager;
 import ru.bulldog.justmap.map.waypoint.Waypoint;
 import ru.bulldog.justmap.map.waypoint.WaypointKeeper;
 import ru.bulldog.justmap.map.waypoint.Waypoint.Icon;
-import ru.bulldog.justmap.util.Colors;
 import ru.bulldog.justmap.util.Dimension;
 import ru.bulldog.justmap.util.RuleUtil;
+import ru.bulldog.justmap.util.colors.ColorPalette;
 import ru.bulldog.justmap.util.math.MathUtil;
 import ru.bulldog.justmap.util.math.RandomUtil;
 import ru.bulldog.justmap.util.render.RenderUtil;
@@ -89,10 +89,10 @@ public class WaypointsList extends MapScreen {
 			int stringY = y + 7;			
 			int nameX = x + iconSize + 2;
 
-			RenderUtil.drawStringWithShadow(matrixStack, font, waypoint.name, nameX, stringY, Colors.WHITE);
+			RenderUtil.drawStringWithShadow(matrixStack, font, waypoint.name, nameX, stringY, ColorPalette.WHITE);
 			
 			int posX = tpButton.x - 5;
-			RenderUtil.drawRightAlignedString(matrixStack, waypoint.pos.toShortString(), posX, stringY, Colors.WHITE);
+			RenderUtil.drawRightAlignedString(matrixStack, waypoint.pos.toShortString(), posX, stringY, ColorPalette.WHITE);
 			
 			if (RuleUtil.allowTeleportation()) {
 				this.tpButton.render(matrixStack, mouseX, mouseY, delta);
@@ -232,7 +232,7 @@ public class WaypointsList extends MapScreen {
 		if (screenTitle == null) {
 			screenTitle = info == null ? lang("unknown").getString() : I18n.translate(info.getFirst());
 		}
-		drawCenteredString(matrixStack, textRenderer, screenTitle, center, 15, Colors.WHITE);
+		drawCenteredString(matrixStack, textRenderer, screenTitle, center, 15, ColorPalette.WHITE);
 		this.drawScrollBar();
 	}
 	

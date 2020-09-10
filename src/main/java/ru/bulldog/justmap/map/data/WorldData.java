@@ -107,7 +107,7 @@ public class WorldData {
 		WorldChunk worldChunk = this.world.getWorldChunk(centerPos);
 		boolean chunkLoaded = !worldChunk.isEmpty() && mapChunk.isChunkLoaded();
 		if (chunkLoaded && time - mapChunk.updated > interval) {
-			ChunkUpdateListener.accept(new ChunkUpdateEvent(worldChunk, mapChunk, layer, level, update));
+			ChunkUpdateListener.accept(new ChunkUpdateEvent(worldChunk, mapChunk, layer, level, 0, 0, 16, 16, update));
 		}
 		int x = centerPos.getX();
 		int z = centerPos.getZ();
@@ -125,7 +125,7 @@ public class WorldData {
 				worldChunk = this.world.getWorldChunk(currentPos);
 				chunkLoaded = !worldChunk.isEmpty() && mapChunk.isChunkLoaded();
 				if (chunkLoaded && time - mapChunk.updated > interval) {
-					ChunkUpdateListener.accept(new ChunkUpdateEvent(worldChunk, mapChunk, layer, level, update));
+					ChunkUpdateListener.accept(new ChunkUpdateEvent(worldChunk, mapChunk, layer, level, 0, 0, 16, 16, update));
 				}
 			}
 			for (int i = 0; i < step; i++) {
@@ -138,7 +138,7 @@ public class WorldData {
 				worldChunk = this.world.getWorldChunk(currentPos);
 				chunkLoaded = !worldChunk.isEmpty() && mapChunk.isChunkLoaded();
 				if (chunkLoaded && time - mapChunk.updated > interval) {
-					ChunkUpdateListener.accept(new ChunkUpdateEvent(worldChunk, mapChunk, layer, level, update));
+					ChunkUpdateListener.accept(new ChunkUpdateEvent(worldChunk, mapChunk, layer, level, 0, 0, 16, 16, update));
 				}
 			}
 		}

@@ -9,8 +9,7 @@ import net.minecraft.client.gui.AbstractParentElement;
 import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.util.math.MatrixStack;
-
-import ru.bulldog.justmap.util.Colors;
+import ru.bulldog.justmap.util.colors.ColorPalette;
 import ru.bulldog.justmap.util.render.RenderUtil;
 
 public class DropDownListWidget extends AbstractParentElement implements Drawable {
@@ -49,10 +48,10 @@ public class DropDownListWidget extends AbstractParentElement implements Drawabl
 	
 	private void renderBackground(MatrixStack matrices) {
 		RenderUtil.fill(matrices, x, y, x + width, y + height, 0xAA222222);
-		RenderUtil.drawLine(x, y, x + width, y, Colors.LIGHT_GRAY);
-		RenderUtil.drawLine(x, y, x, y + height, Colors.LIGHT_GRAY);
-		RenderUtil.drawLine(x + width, y, x + width, y + height, Colors.LIGHT_GRAY);
-		RenderUtil.drawLine(x, y + height, x + width, y + height, Colors.LIGHT_GRAY);
+		RenderUtil.drawLine(x, y, x + width, y, ColorPalette.LIGHT_GRAY);
+		RenderUtil.drawLine(x, y, x, y + height, ColorPalette.LIGHT_GRAY);
+		RenderUtil.drawLine(x + width, y, x + width, y + height, ColorPalette.LIGHT_GRAY);
+		RenderUtil.drawLine(x, y + height, x + width, y + height, ColorPalette.LIGHT_GRAY);
 	}
 	
 	public void addElement(ListElementWidget element) {

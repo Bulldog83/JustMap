@@ -19,7 +19,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.texture.TextureUtil;
 
 import ru.bulldog.justmap.JustMap;
-import ru.bulldog.justmap.util.ColorUtil;
+import ru.bulldog.justmap.util.colors.ColorUtil;
 
 public class MapTexture {
 
@@ -58,6 +58,8 @@ public class MapTexture {
 	}
 	
 	public void upload() {
+		if (bytes == null) return;
+		
 		if (this.glId == -1) {
 			this.glId = TextureUtil.generateId();
 		}

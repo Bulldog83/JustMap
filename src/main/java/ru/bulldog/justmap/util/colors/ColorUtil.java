@@ -1,8 +1,6 @@
-package ru.bulldog.justmap.util;
+package ru.bulldog.justmap.util.colors;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 
 import net.fabricmc.fabric.impl.client.indigo.renderer.helper.ColorHelper;
@@ -33,15 +31,17 @@ import net.minecraft.world.chunk.WorldChunk;
 import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.client.config.ClientSettings;
 import ru.bulldog.justmap.mixins.client.BakedSpriteAccessor;
+import ru.bulldog.justmap.util.ImageUtil;
+import ru.bulldog.justmap.util.StateUtil;
 import ru.bulldog.justmap.util.math.MathUtil;
 
 public class ColorUtil {
 	
-	private static MinecraftClient minecraft = MinecraftClient.getInstance();	
-	private static BlockModels blockModels = minecraft.getBlockRenderManager().getModels();	
-	private static FluidRenderHandlerRegistryImpl fluidRenderHandlerRegistry = FluidRenderHandlerRegistryImpl.INSTANCE;	
-	private static Map<BlockState, Integer> colorCache = new HashMap<>();	
+	private static MinecraftClient minecraft = MinecraftClient.getInstance();
+	private static BlockModels blockModels = minecraft.getBlockRenderManager().getModels();
+	private static FluidRenderHandlerRegistryImpl fluidRenderHandlerRegistry = FluidRenderHandlerRegistryImpl.INSTANCE;
 	private static float[] floatBuffer = new float[3];
+	private static ColorPalette colorPalette = ColorPalette.getInstance();
 	
 	public static int[] toIntArray(int color) {
 		return new int[] {
@@ -197,10 +197,14 @@ public class ColorUtil {
 	}
 	
 	private static int getStateColor(BlockState state) {
-		if (colorCache.containsKey(state)) {
-			return colorCache.get(state);
-		}		
-		return extractColor(state);
+		int color = colorPalette.getBlockColor(state);		
+		if (color == 0x0) {
+			color = extractColor(state);
+			if (color != -1) {
+				colorPalette.addBlockColor(state, color);
+			}
+		}
+		return color;
 	}
 	
 	private static int extractColor(BlockState state) {
@@ -232,10 +236,7 @@ public class ColorUtil {
 		image.close();
 		
 		if (pixels > 0) {
-			int color = ((int) (r / pixels)) << 16 | ((int) (g / pixels)) << 8 | (int) (b / pixels);
-			colorCache.put(state, color);
-			
-			return color;
+			return ((int) (r / pixels)) << 16 | ((int) (g / pixels)) << 8 | (int) (b / pixels);
 		}
 		
 		return -1;
@@ -267,12 +268,6 @@ public class ColorUtil {
 		return textureColor;
 	}
 	
-	private static int fluidColor(World world, BlockState state, BlockPos pos, int defColor) {
-		FluidState fluidState = state.getBlock().getFluidState(state);
-		int fcolor = fluidRenderHandlerRegistry.get(fluidState.getFluid()).getFluidColor(world, pos, fluidState);
-		return fcolor != -1 ? fcolor : defColor;
-	}
-	
 	public static int blockColor(WorldChunk worldChunk, BlockPos pos) {
 		World world = worldChunk.getWorld();
 		BlockPos overPos = new BlockPos(pos.getX(), pos.getY() + 1, pos.getZ());
@@ -302,7 +297,7 @@ public class ColorUtil {
 	public static int blockColor(World world, BlockState state, BlockPos pos) {
 		int materialColor = state.getTopMaterialColor(world, pos).color;
 		if (ClientSettings.alternateColorRender) {
-			int blockColor = minecraft.getBlockColors().getColor(state, world, pos, Colors.LIGHT);
+			int blockColor = minecraft.getBlockColors().getColor(state, world, pos, ColorPalette.LIGHT);
 			int textureColor = getStateColor(state);
 			
 			Block block = state.getBlock();
@@ -328,5 +323,11 @@ public class ColorUtil {
 		}
 		
 		return materialColor;
+	}
+	
+	private static int fluidColor(World world, BlockState state, BlockPos pos, int defColor) {
+		FluidState fluidState = state.getBlock().getFluidState(state);
+		int fcolor = fluidRenderHandlerRegistry.get(fluidState.getFluid()).getFluidColor(world, pos, fluidState);
+		return fcolor != -1 ? fcolor : defColor;
 	}
 }

@@ -36,4 +36,13 @@ public class Plane {
 		}
 		return false;
 	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) return true;
+		if (!(obj instanceof Plane)) return false;
+		Plane plane = (Plane) obj;
+		return this.first.equals(plane.first) &&
+			   this.second.equals(plane.second);
+	}
 }

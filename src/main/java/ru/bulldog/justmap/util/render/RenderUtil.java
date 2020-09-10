@@ -22,7 +22,7 @@ import net.minecraft.text.Text;
 import ru.bulldog.justmap.client.config.ClientSettings;
 import ru.bulldog.justmap.map.minimap.skin.MapSkin;
 import ru.bulldog.justmap.map.minimap.skin.MapSkin.RenderData;
-import ru.bulldog.justmap.util.ColorUtil;
+import ru.bulldog.justmap.util.colors.ColorUtil;
 
 import org.lwjgl.opengl.GL11;
 

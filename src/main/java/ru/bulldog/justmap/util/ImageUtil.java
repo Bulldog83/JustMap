@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import ru.bulldog.justmap.JustMap;
+import ru.bulldog.justmap.util.colors.ColorUtil;
 import ru.bulldog.justmap.util.math.Line;
 
 import net.fabricmc.fabric.impl.client.indigo.renderer.helper.ColorHelper;

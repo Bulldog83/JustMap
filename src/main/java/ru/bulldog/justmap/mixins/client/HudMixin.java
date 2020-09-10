@@ -7,8 +7,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.client.config.ClientSettings;
 import ru.bulldog.justmap.enums.ScreenPosition;
-import ru.bulldog.justmap.util.Colors;
-
+import ru.bulldog.justmap.util.colors.ColorPalette;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.hud.InGameHud;
@@ -117,7 +116,7 @@ abstract class HudMixin extends DrawableHelper {
 		   		});
 		   		if (ClientSettings.showEffectTimers) {
 			   		timers.add(() -> {
-			   			drawCenteredString(matrixStack, client.textRenderer, convertDuration(effectDuration), fx + size / 2, fy + (size + 1), Colors.WHITE);
+			   			drawCenteredString(matrixStack, client.textRenderer, convertDuration(effectDuration), fx + size / 2, fy + (size + 1), ColorPalette.WHITE);
 			   		});
 		   		}
 			}

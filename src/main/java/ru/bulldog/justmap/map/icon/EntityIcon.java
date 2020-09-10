@@ -9,8 +9,8 @@ import net.minecraft.entity.passive.TameableEntity;
 
 import ru.bulldog.justmap.client.config.ClientSettings;
 import ru.bulldog.justmap.client.render.EntityModelRenderer;
-import ru.bulldog.justmap.util.Colors;
 import ru.bulldog.justmap.util.RuleUtil;
+import ru.bulldog.justmap.util.colors.ColorPalette;
 import ru.bulldog.justmap.util.math.MathUtil;
 import ru.bulldog.justmap.util.render.RenderUtil;
 
@@ -32,9 +32,9 @@ public class EntityIcon extends MapIcon<EntityIcon> {
 		int color;
 		if (entity instanceof TameableEntity) {
 			TameableEntity tameable = (TameableEntity) entity;
-			color = tameable.isTamed() ? Colors.GREEN : Colors.YELLOW;
+			color = tameable.isTamed() ? ColorPalette.GREEN : ColorPalette.YELLOW;
 		} else {
-			color = (hostile) ? Colors.DARK_RED : Colors.YELLOW;
+			color = (hostile) ? ColorPalette.DARK_RED : ColorPalette.YELLOW;
 		}
 		int size = ClientSettings.entityIconSize;
 		this.updatePos(mapX, mapY, mapW, mapH, size);

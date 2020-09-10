@@ -8,11 +8,11 @@ import com.google.gson.JsonObject;
 
 import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.map.data.WorldKey;
-import ru.bulldog.justmap.util.ColorUtil;
-import ru.bulldog.justmap.util.Colors;
 import ru.bulldog.justmap.util.Dimension;
 import ru.bulldog.justmap.util.ImageUtil;
 import ru.bulldog.justmap.util.PosUtil;
+import ru.bulldog.justmap.util.colors.ColorUtil;
+import ru.bulldog.justmap.util.colors.ColorPalette;
 import ru.bulldog.justmap.util.math.RandomUtil;
 import ru.bulldog.justmap.util.render.Image;
 import net.minecraft.client.texture.NativeImage;
@@ -66,10 +66,10 @@ public class Waypoint {
 	};
 	
 	public static final Integer[] WAYPOINT_COLORS = new Integer[] {
-		Colors.RED, Colors.GREEN, Colors.BLUE, Colors.DARK_RED,
-		Colors.GOLD, Colors.YELLOW, Colors.DARK_GREEN, Colors.CYAN,
-		Colors.DARK_AQUA, Colors.DARK_BLUE, Colors.PINK, Colors.MAGENTA,
-		Colors.PURPLE
+		ColorPalette.RED, ColorPalette.GREEN, ColorPalette.BLUE, ColorPalette.DARK_RED,
+		ColorPalette.GOLD, ColorPalette.YELLOW, ColorPalette.DARK_GREEN, ColorPalette.CYAN,
+		ColorPalette.DARK_AQUA, ColorPalette.DARK_BLUE, ColorPalette.PINK, ColorPalette.MAGENTA,
+		ColorPalette.PURPLE
 	};
 	
 	public String name = "";
@@ -89,7 +89,7 @@ public class Waypoint {
 		waypoint.world = world;
 		waypoint.name = "Player Death";
 		waypoint.pos = pos;
-		waypoint.setIcon(Waypoint.getIcon(Icons.CROSS), Colors.RED);
+		waypoint.setIcon(Waypoint.getIcon(Icons.CROSS), ColorPalette.RED);
 		
 		JustMap.LOGGER.info("Created Death waypoint at " + waypoint.pos.toShortString());
 		

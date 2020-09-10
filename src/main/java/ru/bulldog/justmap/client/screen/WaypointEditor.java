@@ -10,9 +10,8 @@ import ru.bulldog.justmap.config.ConfigKeeper.IntegerRange;
 import ru.bulldog.justmap.map.waypoint.Waypoint;
 import ru.bulldog.justmap.map.waypoint.WaypointKeeper;
 import ru.bulldog.justmap.map.waypoint.Waypoint.Icon;
-import ru.bulldog.justmap.util.Colors;
 import ru.bulldog.justmap.util.Predicates;
-
+import ru.bulldog.justmap.util.colors.ColorPalette;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.CheckboxWidget;
@@ -176,7 +175,7 @@ public class WaypointEditor extends MapScreen {
 	public void render(MatrixStack matrixStack, int mouseX, int mouseY, float delta) {
 		super.render(matrixStack, mouseX, mouseY, delta);
 		String dimensionName = info == null ? lang("unknown").asString() : I18n.translate(info.getFirst());
-		drawCenteredString(matrixStack, textRenderer, dimensionName, center, 15, Colors.WHITE);
+		drawCenteredString(matrixStack, textRenderer, dimensionName, center, 15, ColorPalette.WHITE);
 	}
 	
 	private void cycleColor(int i) {
