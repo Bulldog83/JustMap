@@ -72,10 +72,9 @@ public final class StorageUtil {
 		return iconsDir;
 	}
 	
-	@Environment(EnvType.CLIENT)
 	public static File cacheDir() {
 		String dimension = "undefined";
-		World world = DataUtil.getClientWorld();
+		World world = DataUtil.getWorld();
 		if (world != null) {
 			RegistryKey<World> dimKey = world.getRegistryKey();			
 			dimension = dimKey.getValue().getPath();			
@@ -102,7 +101,6 @@ public final class StorageUtil {
 		return cacheDir;
 	}
 	
-	@Environment(EnvType.CLIENT)
 	public static File filesDir() {
 		MinecraftClient minecraft = MinecraftClient.getInstance();		
 		ServerInfo serverInfo = minecraft.getCurrentServerEntry();

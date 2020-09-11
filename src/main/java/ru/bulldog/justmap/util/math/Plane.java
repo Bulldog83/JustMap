@@ -10,9 +10,6 @@ public class Plane {
 	}
 	
 	public Plane(Point first, Point second) {
-		if (first.x == second.x || first.y == second.y) {
-			throw new IllegalArgumentException("Invalid Plane corners!");
-		}
 		this.first = first;
 		this.second = second;
 	}

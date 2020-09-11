@@ -9,13 +9,15 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.RedstoneWireBlock;
 import net.minecraft.block.StemBlock;
-import net.minecraft.client.color.world.BiomeColors;
 import net.minecraft.client.color.world.FoliageColors;
+import net.minecraft.client.color.world.GrassColors;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.ChunkStatus;
+
+import ru.bulldog.justmap.util.BiomeMap;
 
 public class ColorProviders implements ColorProvider {
 	
@@ -34,16 +36,16 @@ public class ColorProviders implements ColorProvider {
 			return FoliageColors.getBirchColor();
 		}, Blocks.BIRCH_LEAVES);
 		blockColors.registerColorProvider((state, world, pos) -> {
-			return world != null && pos != null ? BiomeColors.getFoliageColor(world, pos) : FoliageColors.getDefaultColor();
+			return blockColors.getFoliageColor(world, pos);
 		}, Blocks.OAK_LEAVES, Blocks.JUNGLE_LEAVES, Blocks.ACACIA_LEAVES, Blocks.DARK_OAK_LEAVES, Blocks.VINE);
 		blockColors.registerColorProvider((state, world, pos) -> {
-			return world != null && pos != null ? BiomeColors.getWaterColor(world, pos) : -1;
+			return blockColors.getWaterColor(world, pos);
 		}, Blocks.WATER, Blocks.BUBBLE_COLUMN, Blocks.CAULDRON);
 		blockColors.registerColorProvider((state, world, pos) -> {
-			return RedstoneWireBlock.getWireColor((Integer)state.get(RedstoneWireBlock.POWER));
+			return RedstoneWireBlock.getWireColor(state.get(RedstoneWireBlock.POWER));
 		}, Blocks.REDSTONE_WIRE);
 		blockColors.registerColorProvider((state, world, pos) -> {
-			return world != null && pos != null ? BiomeColors.getGrassColor(world, pos) : -1;
+			return blockColors.getGrassColor(world, pos);
 		}, Blocks.SUGAR_CANE);
 		blockColors.registerColorProvider((state, world, pos) -> {
 			return 14731036;
@@ -69,18 +71,46 @@ public class ColorProviders implements ColorProvider {
 		}
 	}
 	
-	private int getGrassColor(World world, BlockPos pos) {
+	public int getGrassColor(World world, BlockPos pos) {
 		if (world != null && pos != null) {
 			Chunk chunk = world.getChunk(pos.getX() >> 4, pos.getZ() >> 4, ChunkStatus.BIOMES, false);
 			if (chunk != null && chunk.getBiomeArray() != null) {
-				int bx = pos.getX() >> 2;
-				int by = pos.getY() >> 2;
-				int bz = pos.getZ() >> 2;
-				Biome biome = chunk.getBiomeArray().getBiomeForNoiseGen(bx, by, bz);
+				Biome biome = BiomeMap.getBiome(world, pos);
 				return this.colorPalette.getGrassColor(biome, pos.getX(), pos.getZ());
 			}
 		}
-		
+		return GrassColors.getColor(0.5, 1.0);
+	}
+	
+	public int getFoliageColor(World world, BlockPos pos) {
+		if (world != null && pos != null) {
+			Chunk chunk = world.getChunk(pos.getX() >> 4, pos.getZ() >> 4, ChunkStatus.BIOMES, false);
+			if (chunk != null && chunk.getBiomeArray() != null) {
+				Biome biome = BiomeMap.getBiome(world, pos);
+				int color = this.colorPalette.getFoliageColor(biome);
+				if (color == 0x0) {
+					color = biome.getFoliageColor();
+					this.colorPalette.addFoliageColor(biome, color);
+				}
+				return color;
+			}
+		}
+		return FoliageColors.getDefaultColor();
+	}
+	
+	public int getWaterColor(World world, BlockPos pos) {
+		if (world != null && pos != null) {
+			Chunk chunk = world.getChunk(pos.getX() >> 4, pos.getZ() >> 4, ChunkStatus.BIOMES, false);
+			if (chunk != null && chunk.getBiomeArray() != null) {
+				Biome biome = BiomeMap.getBiome(world, pos);
+				int color = this.colorPalette.getWaterColor(biome);
+				if (color == 0x0) {
+					color = biome.getWaterColor();
+					this.colorPalette.addWaterColor(biome, color);
+				}
+				return color;
+			}
+		}
 		return -1;
 	}
 
@@ -90,6 +120,6 @@ public class ColorProviders implements ColorProvider {
 		if (provider != null) {
 			return provider.getColor(state, world, pos);
 		}
-		return 0;
+		return -1;
 	}
 }

@@ -42,6 +42,7 @@ public class ColorUtil {
 	private static FluidRenderHandlerRegistryImpl fluidRenderHandlerRegistry = FluidRenderHandlerRegistryImpl.INSTANCE;
 	private static float[] floatBuffer = new float[3];
 	private static ColorPalette colorPalette = ColorPalette.getInstance();
+	private static ColorProviders colorProvider = ColorProviders.registerProviders();
 	
 	public static int[] toIntArray(int color) {
 		return new int[] {
@@ -297,19 +298,22 @@ public class ColorUtil {
 	public static int blockColor(World world, BlockState state, BlockPos pos) {
 		int materialColor = state.getTopMaterialColor(world, pos).color;
 		if (ClientSettings.alternateColorRender) {
-			int blockColor = minecraft.getBlockColors().getColor(state, world, pos, ColorPalette.LIGHT);
+			int blockColor = colorProvider.getColor(state, world, pos);
+			if (blockColor == -1) {
+				blockColor = minecraft.getBlockColors().getColor(state, world, pos, ColorPalette.LIGHT);
+			}
 			int textureColor = getStateColor(state);
 			
 			Block block = state.getBlock();
 			if (block instanceof VineBlock) {
-				blockColor = proccessColor(blockColor, textureColor, BiomeColors.getFoliageColor(world, pos));
+				blockColor = proccessColor(blockColor, textureColor, colorProvider.getFoliageColor(world, pos));
 			} else if (block instanceof FernBlock || block instanceof TallPlantBlock) {				
-				blockColor = proccessColor(blockColor, textureColor, BiomeColors.getGrassColor(world, pos));
+				blockColor = proccessColor(blockColor, textureColor, colorProvider.getGrassColor(world, pos));
 			} else if (block instanceof LilyPadBlock || block instanceof StemBlock || block instanceof AttachedStemBlock) {
 				blockColor = proccessColor(blockColor, textureColor, materialColor);
 			} else if (block instanceof FluidBlock) {
 				if (StateUtil.isWater(state)) {
-					blockColor = proccessColor(blockColor, textureColor, BiomeColors.getWaterColor(world, pos));
+					blockColor = proccessColor(blockColor, textureColor, colorProvider.getWaterColor(world, pos));
 				} else {
 					blockColor = fluidColor(world, state, pos, textureColor);
 				}

@@ -40,6 +40,7 @@ public final class ColorPalette {
 	}
 	
 	private final Map<String, Integer> blockColors = Maps.newHashMap();
+	private final Map<String, Integer> fluidColors = Maps.newHashMap();
 	private final Map<String, BiomeColors> biomeColors = Maps.newHashMap();
 	
 	private ColorPalette() {}
@@ -54,6 +55,18 @@ public final class ColorPalette {
 	
 	public void addBlockColor(BlockState block, int color) {
 		this.blockColors.put(block.toString(), color);
+	}
+	
+	public int getFluidColor(BlockState block) {
+		String state = block.toString();
+		if (fluidColors.containsKey(state)) {
+			return this.fluidColors.get(state);
+		}
+		return 0x0;
+	}
+	
+	public void addFluidColor(BlockState block, int color) {
+		this.fluidColors.put(block.toString(), color);
 	}
 	
 	public BiomeColors getBiomeColors(Biome biome) {
