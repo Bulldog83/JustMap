@@ -22,41 +22,41 @@ import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.util.storage.StorageUtil;
 
 public class BiomeMap {
-	private final static String SEPARATOR = ";";
+	private final static String ENTRY_DELIM = "#";
+	private final static String CHUNK_DELIM = ";";
+	private final static String BIOME_DELIM = ",";
 	private static final int HORIZONTAL_COUNT;
 	private static final int VERTICAL_COUNT;
 	private static final int DEFAULT_LENGTH;
 	private static final int HORIZONTAL_BIT;
 	private static final int VERTICAL_BIT;
-	private static Map<String, String[]> biomeMap = Maps.newHashMap();
+	private static Map<String, Identifier[][]> biomeMap = Maps.newHashMap();
 	private static Identifier plainsId = BiomeKeys.PLAINS.getValue();
 	private static File cacheDir;
 	
 	public static void addBiome(World world, BlockPos pos, Biome biome) {
-		int index = makeIndex(pos);
 		String posStr = makeKey(pos);
 		Identifier biomeId = world.getRegistryManager().get(Registry.BIOME_KEY).getId(biome);
 		if (biomeMap.containsKey(posStr)) {
-			Identifier hasId = new Identifier(biomeMap.get(posStr)[index]);
+			Identifier hasId = getValue(pos);
 			if (!hasId.equals(biomeId) && !biomeId.equals(plainsId)) {
-				addValue(posStr, index, biome);
+				addValue(pos, biomeId);
 			}
 		}
-		addValue(posStr, index, biome);
+		addValue(pos, biomeId);
 	}
 	
 	public static Biome getBiome(World world, BlockPos pos) {
 		String posStr = makeKey(pos);
 		if (biomeMap.containsKey(posStr)) {
-			String value = getValue(pos);
-			if (value != null) {
-				Identifier biomeId = new Identifier(value);
+			Identifier biomeId = getValue(pos);
+			if (biomeId != null) {
 				return world.getRegistryManager().get(Registry.BIOME_KEY).get(biomeId);
 			}
 		}
 		Biome biome = world.getBiome(pos);
-		int index = makeIndex(pos);
-		addValue(posStr, index, biome);
+		Identifier biomeId = world.getRegistryManager().get(Registry.BIOME_KEY).getId(biome);
+		addValue(pos, biomeId);
 		
 		return biome;
 	}
@@ -94,9 +94,15 @@ public class BiomeMap {
 	private static String serialize() {
 		if (biomeMap.size() == 0) return "";
 		StringBuilder builder = new StringBuilder();
-		biomeMap.entrySet().forEach(entry -> {
-			builder.append(entry)
-				   .append(SEPARATOR);
+		biomeMap.forEach((key, region) -> {
+			for (Identifier[] chunks : region) {
+				for (Identifier biome : chunks) {
+					builder.append(biome)
+						   .append(BIOME_DELIM);
+				}
+				builder.append(CHUNK_DELIM);
+			}
+			builder.append(ENTRY_DELIM);
 		});
 		String data = new String(builder);
 		return CompressionUtil.compress(data.getBytes());
@@ -104,8 +110,8 @@ public class BiomeMap {
 	
 	private static void deserialize(String data) {
 		String dataStr = CompressionUtil.decompress(data);
-		if (dataStr == null || !dataStr.contains(SEPARATOR)) return;
-		String[] dataArray = dataStr.split(SEPARATOR);
+		if (dataStr == null || !dataStr.contains(ENTRY_DELIM)) return;
+		String[] dataArray = dataStr.split(ENTRY_DELIM);
 		for (String entry : dataArray) {
 			String[] entryData = entry.split("=");
 			if (entryData.length < 2 || entryData.length > 2) return;
@@ -113,26 +119,42 @@ public class BiomeMap {
 		}
 	}
 	
-	private static String getValue(BlockPos pos) {
+	private static Identifier getValue(BlockPos pos) {
 		String key = makeKey(pos);
 		if (biomeMap.containsKey(key)) {
-			int index = makeIndex(pos);
-			return biomeMap.get(key)[index];
+			int ri = regionIndex(pos);
+			int chi = chunkIndex(pos);
+			return biomeMap.get(key)[ri][chi];
 		}
 		return null;
 	}
 	
-	private static void addValue(String key, int index, Biome biome) {
-		
+	private static void addValue(BlockPos pos, Identifier biome) {
+		int ri = regionIndex(pos);
+		int chi = chunkIndex(pos);
+		String key = makeKey(pos);
+		if (biomeMap.containsKey(key)) {
+			biomeMap.get(key)[ri][chi] = biome;
+		} else {
+			Identifier[][] map = new Identifier[1024][DEFAULT_LENGTH];
+			map[ri][chi] = biome;
+			biomeMap.put(key, map);
+		}
 	}
 	
 	private static String makeKey(BlockPos pos) {
-		int x = pos.getX() >> 4;
-		int z = pos.getZ() >> 4;
+		int x = pos.getX() >> 9;
+		int z = pos.getZ() >> 9;
 		return String.format("%s.%s", x, z);
 	}
 	
-	private static int makeIndex(BlockPos pos) {
+	private static int regionIndex(BlockPos pos) {
+		int x = pos.getX() >> 4;
+		int z = pos.getZ() >> 4;
+		return x + (z << 5);
+	}
+	
+	private static int chunkIndex(BlockPos pos) {
 		int x = (pos.getX() >> 2) & HORIZONTAL_BIT;
 		int y = MathHelper.clamp(pos.getY() >> 2, 0, VERTICAL_BIT);
 		int z = (pos.getZ() >> 2) & HORIZONTAL_BIT;
