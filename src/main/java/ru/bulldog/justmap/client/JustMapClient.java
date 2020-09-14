@@ -28,7 +28,6 @@ import ru.bulldog.justmap.event.ChunkUpdateListener;
 import ru.bulldog.justmap.map.data.WorldManager;
 import ru.bulldog.justmap.map.minimap.Minimap;
 import ru.bulldog.justmap.network.ClientNetworkHandler;
-import ru.bulldog.justmap.util.BiomeMap;
 import ru.bulldog.justmap.util.DataUtil;
 import ru.bulldog.justmap.util.tasks.TaskManager;
 
@@ -87,7 +86,6 @@ public class JustMapClient implements ClientModInitializer {
 	private static void stop() {
 		stopMapping();
 		ChunkUpdateListener.stop();
-		BiomeMap.saveData();
 		JustMap.WORKER.execute("Clearing map cache...", WorldManager::close);
 	}
 	

@@ -119,4 +119,14 @@ public class MathUtil {
 		
 		return Math.sqrt(dist);
 	}
+
+	public static int packRgb(float r, float g, float b) {
+		return packRgb(floor(r * 255.0F), floor(g * 255.0F), floor(b * 255.0F));
+	}
+
+	public static int packRgb(int r, int g, int b) {
+		int i = (r << 8) + g;
+		i = (i << 8) + b;
+		return i;
+	}
 }

@@ -85,6 +85,10 @@ public class RegionData {
 		return this.regPos.z;
 	}
 	
+	public void setIsWorldmap(boolean isWorldmap) {
+		this.worldmap = isWorldmap;
+	}
+	
 	private MapTexture getImage(Layer layer, int level) {
 		File regionFile = this.imageFile(layer, level);
 		if (images.containsKey(layer)) {
@@ -169,8 +173,10 @@ public class RegionData {
 				ChunkData mapChunk = this.mapData.getChunk(chunkX, chunkZ);
 				if (updateArea.contains(Point.fromPos(mapChunk.getPos()))) {
 					boolean updated = mapChunk.saveNeeded();
-					if (!worldmap && !updated) {
-						mapChunk.updateFullChunk(layer, level, needUpdate);
+					if (!worldmap) {
+						if (!updated) {
+							mapChunk.updateFullChunk(layer, level, needUpdate);
+						}
 					}
 					synchronized (imageLock) {
 						if (updated) {

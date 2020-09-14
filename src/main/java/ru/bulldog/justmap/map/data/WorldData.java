@@ -49,6 +49,7 @@ public class WorldData {
 				regions.put(regPos, region);
 			}
 		}
+		region.setIsWorldmap(map.isWorldmap());
 		long time = System.currentTimeMillis();
 		if (time - region.updated > 1000) {
 			region.updateImage(ClientSettings.forceUpdate);

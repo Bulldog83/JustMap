@@ -65,7 +65,7 @@ public class ExtendedFramebuffer extends Framebuffer {
 		GlStateManager.bindTexture(colorAttachment);
 		GlStateManager.texImage2D(GLC.GL_TEXTURE_2D, 0, GLC.GL_RGBA8, textureWidth, textureHeight, 0, GLC.GL_RGBA, GLC.GL_UNSIGNED_BYTE, null);
 		bindFramebuffer(type, GLC.GL_FRAMEBUFFER, fbo);
-		framebufferTexture2D(type, GLC.GL_FRAMEBUFFER, GLC.GL_COLOR_ATTACHMENT0, GLC.GL_TEXTURE_2D, colorAttachment, 0);
+		framebufferTexture2D(type, GLC.GL_FRAMEBUFFER, GLC.GL_COLOR_ATTACHMENT, GLC.GL_TEXTURE_2D, colorAttachment, 0);
 		if (useDepthAttachment) {
 			bindRenderbuffer(type, GLC.GL_RENDERBUFFER, depthAttachment);
 			renderbufferStorage(type, GLC.GL_RENDERBUFFER, GLC.GL_DEPTH_COMPONENT24, textureWidth, textureHeight);
@@ -164,6 +164,7 @@ public class ExtendedFramebuffer extends Framebuffer {
 		}
 	}
 	
+	@Override
 	public void checkFramebufferStatus() {
 		int status = this.checkFramebufferStatus(GLC.GL_FRAMEBUFFER);
 		switch (status) {

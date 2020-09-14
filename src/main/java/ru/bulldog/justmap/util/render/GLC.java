@@ -45,7 +45,7 @@ public final class GLC {
 	public final static int GL_CLAMP_TO_EDGE = GL12.GL_CLAMP_TO_EDGE; //33071
 	public final static int GL_GENERATE_MIPMAP = GL14.GL_GENERATE_MIPMAP; //33169
 	public final static int GL_DEPTH_COMPONENT24 = GL14.GL_DEPTH_COMPONENT24; //33190
-	public final static int GL_COLOR_ATTACHMENT0 = GL30.GL_COLOR_ATTACHMENT0; //36064
+	public final static int GL_COLOR_ATTACHMENT = GL30.GL_COLOR_ATTACHMENT0; //36064
 	public final static int GL_DEPTH_ATTACHMENT = GL30.GL_DEPTH_ATTACHMENT; //36096
 	public final static int GL_FRAMEBUFFER = GL30.GL_FRAMEBUFFER; //36160
 	public final static int GL_RENDERBUFFER = GL30.GL_RENDERBUFFER; //36161

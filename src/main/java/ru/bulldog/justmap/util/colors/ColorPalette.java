@@ -31,6 +31,10 @@ public final class ColorPalette {
 	public static final int LOADED_OVERLAY = 0xFFA264E2;
 	public static final int SLIME_OVERLAY = 0xFF00FF00;
 	public static final int LIGHT = 0xFFF000F0;
+	public static final int SPRUCE_LEAVES = 0xFF619961;
+	public static final int BIRCH_LEAVES = 0xFF80A755;
+	public static final int LILY_PAD = 0xFF208030;
+	public static final int ATTACHED_STEM = 0xFFE0C71C;
 	public static final int TRANSPARENT = 0x0;
 	
 	private final static ColorPalette INSTANCE = new ColorPalette();
@@ -104,9 +108,5 @@ public final class ColorPalette {
 	public static class BiomeColors {
 		public int foliageColor = 0x0;
 		public int waterColor = 0x0;
-		
-		public boolean isEmpty() {
-			return (foliageColor | waterColor) == 0x0;
-		}
 	}
 }

@@ -184,7 +184,7 @@ public class ChunkData {
 			if (worldChunk.isEmpty() || !this.isChunkLoaded()) return;
 			this.updateArea(worldChunk, layer, level, x, z, width, height);
 			if (saveNeeded()) {
-				BlockPos.Mutable chunkBlockPos = this.chunkPos.getCenterBlockPos().mutableCopy();
+				BlockPos.Mutable chunkBlockPos = this.chunkPos.getStartPos().mutableCopy();
 				chunkBlockPos.setY(level * layer.height);
 				RegionData region = this.mapData.getRegion(chunkBlockPos);
 				if (region.getLayer().equals(layer) && region.getLevel() == level) {
