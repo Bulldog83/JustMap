@@ -165,6 +165,17 @@ public class MapTexture {
 		}
 	}
 	
+	public int[] getPixels() {
+		int[] pixels = new int[width * height];
+		for (int x = 0; x < width; x++) {
+			for (int y = 0; y < height; y++) {
+				int index = y + x * width;
+				pixels[index] = this.getColor(x, y);
+			}
+		}
+		return pixels;
+	}
+	
 	public void applyTint(int x, int y, int tint) {
 		if (this.bytes == null) return;		
 		if (x < 0 || x >= this.getWidth()) return;

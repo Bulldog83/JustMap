@@ -21,7 +21,7 @@ import ru.bulldog.justmap.util.math.MathUtil;
 
 public class ColorProviders implements ColorProvider {
 	
-	private final ColorPalette colorPalette = ColorPalette.getInstance();
+	private final Colors colorPalette = Colors.getInstance();
 	private final Map<Block, ColorProvider> providers = Maps.newHashMap();
 
 	public static ColorProviders registerProviders() {
@@ -30,10 +30,10 @@ public class ColorProviders implements ColorProvider {
 			return blockColors.getGrassColor(world, pos);
 		}, Blocks.LARGE_FERN, Blocks.TALL_GRASS, Blocks.GRASS_BLOCK, Blocks.FERN, Blocks.GRASS, Blocks.POTTED_FERN);
 		blockColors.registerColorProvider((state, world, pos) -> {
-			return ColorPalette.SPRUCE_LEAVES;
+			return Colors.SPRUCE_LEAVES;
 		}, Blocks.SPRUCE_LEAVES);
 		blockColors.registerColorProvider((state, world, pos) -> {
-			return ColorPalette.BIRCH_LEAVES;
+			return Colors.BIRCH_LEAVES;
 		}, Blocks.BIRCH_LEAVES);
 		blockColors.registerColorProvider((state, world, pos) -> {
 			return blockColors.getFoliageColor(world, pos);
@@ -50,7 +50,7 @@ public class ColorProviders implements ColorProvider {
 			return blockColors.getGrassColor(world, pos);
 		}, Blocks.SUGAR_CANE);
 		blockColors.registerColorProvider((state, world, pos) -> {
-			return ColorPalette.ATTACHED_STEM;
+			return Colors.ATTACHED_STEM;
 		}, Blocks.ATTACHED_MELON_STEM, Blocks.ATTACHED_PUMPKIN_STEM);
 		blockColors.registerColorProvider((state, world, pos) -> {
 			int age = state.get(StemBlock.AGE);
@@ -60,7 +60,7 @@ public class ColorProviders implements ColorProvider {
 			return i << 16 | j << 8 | k;
 		}, Blocks.MELON_STEM, Blocks.PUMPKIN_STEM);
 		blockColors.registerColorProvider((state, world, pos) -> {
-			return ColorPalette.LILY_PAD;
+			return Colors.LILY_PAD;
 		}, Blocks.LILY_PAD);
 		
 		return blockColors;
@@ -81,7 +81,7 @@ public class ColorProviders implements ColorProvider {
 				int by = pos.getY() >> 2;
 				int bz = pos.getZ() >> 2;
 				Biome biome = chunk.getBiomeArray().getBiomeForNoiseGen(bx, by, bz);
-				return this.colorPalette.getGrassColor(biome, pos.getX(), pos.getZ());
+				return this.colorPalette.getGrassColor(world, biome, pos.getX(), pos.getZ());
 			}
 		}
 		return -1;
@@ -95,12 +95,7 @@ public class ColorProviders implements ColorProvider {
 				int by = pos.getY() >> 2;
 				int bz = pos.getZ() >> 2;
 				Biome biome = chunk.getBiomeArray().getBiomeForNoiseGen(bx, by, bz);
-				int color = this.colorPalette.getFoliageColor(biome);
-				if (color == 0x0) {
-					color = biome.getFoliageColor();
-					this.colorPalette.addFoliageColor(biome, color);
-				}
-				return color;
+				return this.colorPalette.getFoliageColor(world, biome);
 			}
 		}
 		return -1;
@@ -114,12 +109,7 @@ public class ColorProviders implements ColorProvider {
 				int by = pos.getY() >> 2;
 				int bz = pos.getZ() >> 2;
 				Biome biome = chunk.getBiomeArray().getBiomeForNoiseGen(bx, by, bz);
-				int color = this.colorPalette.getWaterColor(biome);
-				if (color == 0x0) {
-					color = biome.getWaterColor();
-					this.colorPalette.addWaterColor(biome, color);
-				}
-				return color;
+				return this.colorPalette.getWaterColor(world, biome);
 			}
 		}
 		return -1;

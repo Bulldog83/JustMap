@@ -10,13 +10,13 @@ import ru.bulldog.justmap.client.config.ClientSettings;
 import ru.bulldog.justmap.client.render.EntityModelRenderer;
 import ru.bulldog.justmap.map.MapPlayerManager;
 import ru.bulldog.justmap.util.colors.ColorUtil;
-import ru.bulldog.justmap.util.colors.ColorPalette;
+import ru.bulldog.justmap.util.colors.Colors;
 import ru.bulldog.justmap.util.render.RenderUtil;
 
 public class PlayerIcon extends MapIcon<PlayerIcon> {
 	
 	private PlayerEntity player;
-	private int color = ColorPalette.GREEN;
+	private int color = Colors.GREEN;
 	
 	public PlayerIcon(PlayerEntity player) {
 		this.player = player;
@@ -71,7 +71,7 @@ public class PlayerIcon extends MapIcon<PlayerIcon> {
 			matrices.scale(scale, scale, 1.0F);
 			matrices.translate(x * (sf - 1), y * (sf - 1), 0.0);
 		}
-		RenderUtil.drawCenteredText(matrices, player.getName(), x, y + 12, ColorPalette.WHITE);
+		RenderUtil.drawCenteredText(matrices, player.getName(), x, y + 12, Colors.WHITE);
 		matrices.pop();
 	}
 }

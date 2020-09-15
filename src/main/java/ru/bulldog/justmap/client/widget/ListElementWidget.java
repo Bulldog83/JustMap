@@ -6,7 +6,7 @@ import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
-import ru.bulldog.justmap.util.colors.ColorPalette;
+import ru.bulldog.justmap.util.colors.Colors;
 import ru.bulldog.justmap.util.render.RenderUtil;
 
 public class ListElementWidget implements Drawable, Element {
@@ -28,7 +28,7 @@ public class ListElementWidget implements Drawable, Element {
 		if (isMouseOver(mouseX, mouseY)) {
 			RenderUtil.fill(matrices, x, y, x + width, y + height, 0x33FFFFFF);
 		}
-		RenderUtil.drawCenteredText(matrices, text, x + width / 2, y + height / 2 - 5, ColorPalette.WHITE);
+		RenderUtil.drawCenteredText(matrices, text, x + width / 2, y + height / 2 - 5, Colors.WHITE);
 	}
 	
 	@Override

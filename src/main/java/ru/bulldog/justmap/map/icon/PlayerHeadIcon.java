@@ -9,7 +9,7 @@ import net.minecraft.util.Identifier;
 import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.client.config.ClientSettings;
 import ru.bulldog.justmap.map.MapPlayer;
-import ru.bulldog.justmap.util.colors.ColorPalette;
+import ru.bulldog.justmap.util.colors.Colors;
 import ru.bulldog.justmap.util.render.RenderUtil;
 
 import java.io.IOException;
@@ -38,7 +38,7 @@ public class PlayerHeadIcon {
 		y -= size / 2;
 		if (outline) {
 			double thickness = ClientSettings.entityOutlineSize;
-			RenderUtil.fill(drawX - thickness / 2, drawY - thickness / 2, size + thickness, size + thickness, ColorPalette.LIGHT_GRAY);
+			RenderUtil.fill(drawX - thickness / 2, drawY - thickness / 2, size + thickness, size + thickness, Colors.LIGHT_GRAY);
 		}
 		this.playerSkin.bindTexture();	
 		RenderUtil.drawPlayerHead(matrices, drawX, drawY, size, size);

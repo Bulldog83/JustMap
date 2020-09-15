@@ -6,7 +6,7 @@ import ru.bulldog.justmap.map.waypoint.Waypoint;
 import ru.bulldog.justmap.map.waypoint.WaypointKeeper;
 import ru.bulldog.justmap.map.waypoint.Waypoint.Icon;
 import ru.bulldog.justmap.util.colors.ColorUtil;
-import ru.bulldog.justmap.util.colors.ColorPalette;
+import ru.bulldog.justmap.util.colors.Colors;
 import ru.bulldog.justmap.util.math.MathUtil;
 import ru.bulldog.justmap.util.render.RenderUtil;
 
@@ -79,7 +79,7 @@ public class WaypointRenderer {
 		} else {
 			RenderUtil.drawDiamond(x, y, size, size, waypoint.color);
 		}
-		RenderUtil.drawBoundedString((int) dist + "m", x + size / 2, y + size + 2, 0, screenWidth, ColorPalette.WHITE);
+		RenderUtil.drawBoundedString((int) dist + "m", x + size / 2, y + size + 2, 0, screenWidth, Colors.WHITE);
 	}
 	
 	public static void renderWaypoints(MatrixStack matrixStack, Camera camera, float tickDelta) {
@@ -212,7 +212,7 @@ public class WaypointRenderer {
 	}
 
 	private void addVertex(Matrix4f matrix4f, Matrix3f matrix3f, VertexConsumer vertexConsumer, float red, float green, float blue, float alpha, float y, float x, float l, float m, float n) {
-		vertexConsumer.vertex(matrix4f, x, y, l).color(red, green, blue, alpha).texture(m, n).overlay(OverlayTexture.DEFAULT_UV).light(ColorPalette.LIGHT).normal(matrix3f, 0.0F, 1.0F, 0.0F).next();
+		vertexConsumer.vertex(matrix4f, x, y, l).color(red, green, blue, alpha).texture(m, n).overlay(OverlayTexture.DEFAULT_UV).light(Colors.LIGHT).normal(matrix3f, 0.0F, 1.0F, 0.0F).next();
 	}
 	 
 	private double correctAngle(float angle) {

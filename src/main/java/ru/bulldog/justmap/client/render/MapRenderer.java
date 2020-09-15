@@ -17,7 +17,7 @@ import ru.bulldog.justmap.map.data.WorldData;
 import ru.bulldog.justmap.map.minimap.Minimap;
 import ru.bulldog.justmap.map.minimap.skin.MapSkin;
 import ru.bulldog.justmap.util.DataUtil;
-import ru.bulldog.justmap.util.colors.ColorPalette;
+import ru.bulldog.justmap.util.colors.Colors;
 import ru.bulldog.justmap.util.math.Line;
 import ru.bulldog.justmap.util.math.MathUtil;
 import ru.bulldog.justmap.util.math.Point;
@@ -214,7 +214,7 @@ public abstract class MapRenderer {
 		
 		RenderUtil.drawRightAlignedString(
 				matrices, Double.toString(1 / mapScale),
-				mapX + mapWidth - 3, mapY + mapHeight - 10, ColorPalette.WHITE);
+				mapX + mapWidth - 3, mapY + mapHeight - 10, Colors.WHITE);
 		
 		int iconSize = ClientSettings.arrowIconSize;
 		if (ClientSettings.arrowIconType == ArrowType.DIRECTION_ARROW) {

@@ -3,6 +3,8 @@ package ru.bulldog.justmap.util.colors;
 import java.util.List;
 import java.util.Random;
 
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.impl.client.indigo.renderer.helper.ColorHelper;
 import net.fabricmc.fabric.impl.client.rendering.fluid.FluidRenderHandlerRegistryImpl;
 
@@ -35,13 +37,14 @@ import ru.bulldog.justmap.util.ImageUtil;
 import ru.bulldog.justmap.util.StateUtil;
 import ru.bulldog.justmap.util.math.MathUtil;
 
+@Environment(EnvType.CLIENT)
 public class ColorUtil {
 	
 	private static MinecraftClient minecraft = MinecraftClient.getInstance();
 	private static BlockModels blockModels = minecraft.getBlockRenderManager().getModels();
 	private static FluidRenderHandlerRegistryImpl fluidRenderHandlerRegistry = FluidRenderHandlerRegistryImpl.INSTANCE;
 	private static float[] floatBuffer = new float[3];
-	private static ColorPalette colorPalette = ColorPalette.getInstance();
+	private static Colors colorPalette = Colors.getInstance();
 	private static ColorProviders colorProvider = ColorProviders.registerProviders();
 	
 	public static int[] toIntArray(int color) {
@@ -226,7 +229,7 @@ public class ColorUtil {
 		for (int i = 0; i < image.getWidth(); i++) {
 			for (int j = 0; j < image.getHeight(); j++) {
 				int col = image.getPixelColor(i, j);
-				if ((int) (col >> 24 & 255) > 0) {
+				if ((col >> 24 & 255) > 0) {
 					b += (col >> 16) & 255;
 					g += (col >> 8) & 255;
 					r += col & 255;
@@ -300,7 +303,7 @@ public class ColorUtil {
 		if (ClientSettings.alternateColorRender) {
 			int blockColor = colorProvider.getColor(state, world, pos);
 			if (blockColor == -1) {
-				blockColor = minecraft.getBlockColors().getColor(state, world, pos, ColorPalette.LIGHT);
+				blockColor = minecraft.getBlockColors().getColor(state, world, pos, Colors.LIGHT);
 			}
 			int textureColor = getStateColor(state);
 			
@@ -330,8 +333,15 @@ public class ColorUtil {
 	}
 	
 	private static int fluidColor(World world, BlockState state, BlockPos pos, int defColor) {
-		FluidState fluidState = state.getBlock().getFluidState(state);
-		int fcolor = fluidRenderHandlerRegistry.get(fluidState.getFluid()).getFluidColor(world, pos, fluidState);
-		return fcolor != -1 ? fcolor : defColor;
+		int color = colorPalette.getFluidColor(state);
+		if (color == 0x0) {
+			FluidState fluidState = state.getBlock().getFluidState(state);
+			color = fluidRenderHandlerRegistry.get(fluidState.getFluid()).getFluidColor(world, pos, fluidState);
+			if (color != -1) {
+				colorPalette.addFluidColor(state, color);
+				return color;
+			}
+		}
+		return color == -1 ? defColor : color;
 	}
 }

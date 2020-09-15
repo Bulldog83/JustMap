@@ -6,7 +6,7 @@ import ru.bulldog.justmap.network.ClientNetworkHandler;
 import ru.bulldog.justmap.util.DataUtil;
 import ru.bulldog.justmap.util.Dimension;
 import ru.bulldog.justmap.util.colors.ColorUtil;
-import ru.bulldog.justmap.util.colors.ColorPalette;
+import ru.bulldog.justmap.util.colors.Colors;
 import ru.bulldog.justmap.util.math.MathUtil;
 import ru.bulldog.justmap.util.tasks.TaskManager;
 
@@ -312,7 +312,7 @@ public class ChunkData {
 			}
 			return color;
 		}
-		return ColorPalette.BLACK;
+		return Colors.BLACK;
 	}
 	
 	public boolean saveNeeded() {

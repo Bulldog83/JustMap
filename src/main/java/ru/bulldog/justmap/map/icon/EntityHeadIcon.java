@@ -9,7 +9,7 @@ import java.util.Map;
 import ru.bulldog.justmap.client.config.ClientSettings;
 import ru.bulldog.justmap.util.ImageUtil;
 import ru.bulldog.justmap.util.colors.ColorUtil;
-import ru.bulldog.justmap.util.colors.ColorPalette;
+import ru.bulldog.justmap.util.colors.Colors;
 import ru.bulldog.justmap.util.math.Point;
 import ru.bulldog.justmap.util.render.Image;
 import ru.bulldog.justmap.util.render.RenderUtil;
@@ -50,7 +50,7 @@ public class EntityHeadIcon extends Image {
 	
 	private final Identifier id;
 	private Identifier outlineId;
-	private int color = ColorPalette.LIGHT_GRAY;
+	private int color = Colors.LIGHT_GRAY;
 	private boolean solid;
 	
 	private EntityHeadIcon(Identifier id, Identifier texture, int w, int h) {
@@ -106,7 +106,7 @@ public class EntityHeadIcon extends Image {
 	
 	private NativeImage generateOutline() {
 		NativeImage outline = new NativeImage(width + 4, height + 4, false);
-		ImageUtil.fillImage(outline, ColorPalette.TRANSPARENT);
+		ImageUtil.fillImage(outline, Colors.TRANSPARENT);
 		
 		int outWidth = outline.getWidth();
 		int outHeight = outline.getHeight();
@@ -266,12 +266,12 @@ public class EntityHeadIcon extends Image {
 	
 	private static EntityHeadIcon registerIcon(Entity entity, Identifier entityId, EntityHeadIcon icon) {
 		if (entity instanceof HostileEntity) {
-			icon.color = ColorPalette.DARK_RED;
+			icon.color = Colors.DARK_RED;
 		} else if (entity instanceof TameableEntity) {
 			TameableEntity tameable = (TameableEntity) entity;
-			icon.color = tameable.isTamed() ? ColorPalette.GREEN : ColorPalette.YELLOW;
+			icon.color = tameable.isTamed() ? Colors.GREEN : Colors.YELLOW;
 		} else {
-			icon.color = ColorPalette.YELLOW;
+			icon.color = Colors.YELLOW;
 		}
 		
 		ICONS.put(entityId, icon);

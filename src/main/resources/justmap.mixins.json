@@ -4,6 +4,7 @@
     "compatibilityLevel": "JAVA_8",
     "mixins": [
 		"SessionAccessor",
+		"BiomeColorsAccessor",
 		"RedstoneLevelAccessor",
 		"BooleanRuleAccessor",
 		"GameRulesAccessor",

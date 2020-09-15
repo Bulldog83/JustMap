@@ -11,7 +11,7 @@ import ru.bulldog.justmap.client.config.ClientSettings;
 import ru.bulldog.justmap.map.IMap;
 import ru.bulldog.justmap.util.DataUtil;
 import ru.bulldog.justmap.util.RuleUtil;
-import ru.bulldog.justmap.util.colors.ColorPalette;
+import ru.bulldog.justmap.util.colors.Colors;
 import ru.bulldog.justmap.util.math.Plane;
 import ru.bulldog.justmap.util.math.Point;
 import ru.bulldog.justmap.util.render.MapTexture;
@@ -94,12 +94,12 @@ public class RegionData {
 		if (images.containsKey(layer)) {
 			MapTexture image = this.images.get(layer);
 			if (!image.loadImage(regionFile)) {
-				this.image.fill(ColorPalette.BLACK);
+				this.image.fill(Colors.BLACK);
 			}
 			return image;
 		}
 		
-		MapTexture image = new MapTexture(regionFile, 512, 512, ColorPalette.BLACK);
+		MapTexture image = new MapTexture(regionFile, 512, 512, Colors.BLACK);
 		image.loadImage(regionFile);
 		this.images.put(layer, image);
 		
@@ -153,7 +153,7 @@ public class RegionData {
 		synchronized (imageLock) {
 			if (overlayNeeded && texture == null) {
 				this.texture = new MapTexture(null, image);
-				this.overlay = new MapTexture(null, 512, 512, ColorPalette.TRANSPARENT);
+				this.overlay = new MapTexture(null, 512, 512, Colors.TRANSPARENT);
 			} else if (!overlayNeeded && texture != null) {
 				this.overlay.close();
 				this.overlay = null;
@@ -223,15 +223,15 @@ public class RegionData {
 	
 	private void updateOverlay(int x, int y, ChunkData mapChunk) {
 		if (renewOverlay) {
-			this.overlay.fill(x, y, 16, 16, ColorPalette.TRANSPARENT);
+			this.overlay.fill(x, y, 16, 16, Colors.TRANSPARENT);
 		}
 		if (loadedOverlay && mapChunk.isChunkLoaded()) {
-			this.overlay.fill(x, y, 16, 16, ColorPalette.LOADED_OVERLAY);
+			this.overlay.fill(x, y, 16, 16, Colors.LOADED_OVERLAY);
 		} else if (loadedOverlay && !renewOverlay) {
-			this.overlay.fill(x, y, 16, 16, ColorPalette.TRANSPARENT);
+			this.overlay.fill(x, y, 16, 16, Colors.TRANSPARENT);
 		}
 		if (slimeOverlay && mapChunk.hasSlime()) {
-			this.overlay.fill(x, y, 16, 16, ColorPalette.SLIME_OVERLAY);
+			this.overlay.fill(x, y, 16, 16, Colors.SLIME_OVERLAY);
 		}
 	}
 	
