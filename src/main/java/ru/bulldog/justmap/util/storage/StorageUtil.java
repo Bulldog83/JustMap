@@ -36,6 +36,10 @@ public final class StorageUtil {
 	
 	private static File filesDir = new File(MAP_DATA_DIR.toFile(), "undefined");
 	
+	public static File mapDir() {
+		return MAP_DATA_DIR.toFile();
+	}
+	
 	public static VersionedChunkStorage getChunkStorage(ServerWorld world) {
 		File regionDir = new File(savesDir(world), "region");
 		return new VersionedChunkStorage(regionDir, world.getServer().getDataFixer(), true);
@@ -104,11 +108,19 @@ public final class StorageUtil {
 	public static File filesDir() {
 		MinecraftClient minecraft = MinecraftClient.getInstance();		
 		ServerInfo serverInfo = minecraft.getCurrentServerEntry();
-		File mapDataDir = MAP_DATA_DIR.toFile();
+		File dataDir = MAP_DATA_DIR.toFile();
+		File mapsDir = new File(MAP_DATA_DIR.toFile(), "maps");
 		if (minecraft.isIntegratedServerRunning()) {
 			MinecraftServer server = minecraft.getServer();
 			String name = scrubFileName(server.getSaveProperties().getLevelName());
-			filesDir = new File(mapDataDir, String.format("local/%s", name));
+			filesDir = new File(mapsDir, "local/" + name);
+			File oldDir = new File(dataDir, "local/" + name);
+			if (oldDir.exists()) {
+				System.out.println("Folder " + oldDir + " found!");
+				System.out.println("Rename to " + filesDir);
+				boolean renamed = oldDir.renameTo(filesDir);
+				System.out.println("Result: " + renamed);
+			}
 		} else if (serverInfo != null) {
 			String name = scrubFileName(serverInfo.name);
 			String address = serverInfo.address;
@@ -116,8 +128,8 @@ public final class StorageUtil {
 				int end = address.indexOf(":") - 1;
 				address = address.substring(0, end);
 			}
-			filesDir = new File(mapDataDir, String.format("servers/%s_(%s)", name, address));
-			File oldDir = new File(mapDataDir, String.format("servers/%s", name));
+			filesDir = new File(mapsDir, String.format("servers/%s_(%s)", name, address));
+			File oldDir = new File(dataDir, String.format("servers/%s_(%s)", name, address));
 			if (oldDir.exists()) {
 				oldDir.renameTo(filesDir);
 			}

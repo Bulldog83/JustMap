@@ -29,6 +29,7 @@ import ru.bulldog.justmap.map.data.WorldManager;
 import ru.bulldog.justmap.map.minimap.Minimap;
 import ru.bulldog.justmap.network.ClientNetworkHandler;
 import ru.bulldog.justmap.util.DataUtil;
+import ru.bulldog.justmap.util.colors.Colors;
 import ru.bulldog.justmap.util.tasks.TaskManager;
 
 public class JustMapClient implements ClientModInitializer {
@@ -87,6 +88,7 @@ public class JustMapClient implements ClientModInitializer {
 		stopMapping();
 		ChunkUpdateListener.stop();
 		JustMap.WORKER.execute("Clearing map cache...", WorldManager::close);
+		Colors.INSTANCE.saveData();
 	}
 	
 	public static void startMapping() {

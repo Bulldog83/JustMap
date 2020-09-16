@@ -14,8 +14,11 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.FernBlock;
 import net.minecraft.block.FluidBlock;
+import net.minecraft.block.GrassBlock;
+import net.minecraft.block.LeavesBlock;
 import net.minecraft.block.LilyPadBlock;
 import net.minecraft.block.StemBlock;
+import net.minecraft.block.SugarCaneBlock;
 import net.minecraft.block.TallPlantBlock;
 import net.minecraft.block.VineBlock;
 import net.minecraft.client.MinecraftClient;
@@ -44,8 +47,8 @@ public class ColorUtil {
 	private static BlockModels blockModels = minecraft.getBlockRenderManager().getModels();
 	private static FluidRenderHandlerRegistryImpl fluidRenderHandlerRegistry = FluidRenderHandlerRegistryImpl.INSTANCE;
 	private static float[] floatBuffer = new float[3];
-	private static Colors colorPalette = Colors.getInstance();
-	private static ColorProviders colorProvider = ColorProviders.registerProviders();
+	private static ColorProviders colorProvider = ColorProviders.INSTANCE;
+	private static Colors colorPalette = Colors.INSTANCE;
 	
 	public static int[] toIntArray(int color) {
 		return new int[] {
@@ -200,17 +203,6 @@ public class ColorUtil {
 		return colorBrigtness(ColorHelper.multiplyColor(color, tint), 1.5F);
 	}
 	
-	private static int getStateColor(BlockState state) {
-		int color = colorPalette.getBlockColor(state);		
-		if (color == 0x0) {
-			color = extractColor(state);
-			if (color != -1) {
-				colorPalette.addBlockColor(state, color);
-			}
-		}
-		return color;
-	}
-	
 	private static int extractColor(BlockState state) {
 		List<BakedQuad> quads = blockModels.getModel(state).getQuads(state, Direction.UP, new Random());
 		
@@ -220,6 +212,10 @@ public class ColorUtil {
 		} else {
 			blockSprite = blockModels.getSprite(state).getId();
 		}
+		
+		int color = colorPalette.getTextureColor(state, blockSprite);
+		if (color != 0x0) return color;
+		
 		Identifier texture = new Identifier(blockSprite.getNamespace(), String.format("textures/%s.png", blockSprite.getPath()));
 		NativeImage image = ImageUtil.loadImage(texture, 16, 16);
 		
@@ -240,7 +236,10 @@ public class ColorUtil {
 		image.close();
 		
 		if (pixels > 0) {
-			return ((int) (r / pixels)) << 16 | ((int) (g / pixels)) << 8 | (int) (b / pixels);
+			color = ((int) (r / pixels)) << 16 | ((int) (g / pixels)) << 8 | (int) (b / pixels);
+			colorPalette.addTextureColor(state, blockSprite, color);
+			
+			return color;
 		}
 		
 		return -1;
@@ -301,29 +300,42 @@ public class ColorUtil {
 	public static int blockColor(World world, BlockState state, BlockPos pos) {
 		int materialColor = state.getTopMaterialColor(world, pos).color;
 		if (ClientSettings.alternateColorRender) {
-			int blockColor = colorProvider.getColor(state, world, pos);
+			int blockColor = colorPalette.getBlockColor(state);
+			if (blockColor != 0x0) {
+				return blockColor;
+			}
+			
+			blockColor = colorProvider.getColor(state, world, pos);
 			if (blockColor == -1) {
 				blockColor = minecraft.getBlockColors().getColor(state, world, pos, Colors.LIGHT);
 			}
-			int textureColor = getStateColor(state);
+			int textureColor = extractColor(state);
 			
 			Block block = state.getBlock();
 			if (block instanceof VineBlock) {
 				blockColor = proccessColor(blockColor, textureColor, colorProvider.getFoliageColor(world, pos));
-			} else if (block instanceof FernBlock || block instanceof TallPlantBlock) {				
+			} else if (block instanceof FernBlock || block instanceof TallPlantBlock || block instanceof SugarCaneBlock) {				
 				blockColor = proccessColor(blockColor, textureColor, colorProvider.getGrassColor(world, pos));
 			} else if (block instanceof LilyPadBlock || block instanceof StemBlock || block instanceof AttachedStemBlock) {
 				blockColor = proccessColor(blockColor, textureColor, materialColor);
+				colorPalette.addBlockColor(state, blockColor);
 			} else if (block instanceof FluidBlock) {
 				if (StateUtil.isWater(state)) {
 					blockColor = proccessColor(blockColor, textureColor, colorProvider.getWaterColor(world, pos));
 				} else {
 					blockColor = fluidColor(world, state, pos, textureColor);
+					colorPalette.addFluidColor(state, blockColor);
 				}
 			} else if (blockColor != -1){
 				blockColor = ColorHelper.multiplyColor(textureColor, blockColor);
+				if (block.equals(Blocks.BIRCH_LEAVES) || block.equals(Blocks.SPRUCE_LEAVES)) {
+					colorPalette.addBlockColor(state, blockColor);
+				} else if (!(block instanceof LeavesBlock) && !(block instanceof GrassBlock)) {
+					colorPalette.addBlockColor(state, blockColor);
+				}
 			} else {
 				blockColor = textureColor != -1 ? textureColor : materialColor;
+				colorPalette.addBlockColor(state, blockColor);
 			}
 			
 			return blockColor;
@@ -337,10 +349,6 @@ public class ColorUtil {
 		if (color == 0x0) {
 			FluidState fluidState = state.getBlock().getFluidState(state);
 			color = fluidRenderHandlerRegistry.get(fluidState.getFluid()).getFluidColor(world, pos, fluidState);
-			if (color != -1) {
-				colorPalette.addFluidColor(state, color);
-				return color;
-			}
 		}
 		return color == -1 ? defColor : color;
 	}

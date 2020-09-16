@@ -1,5 +1,6 @@
 package ru.bulldog.justmap.util.colors;
 
+import java.io.File;
 import java.util.Map;
 
 import com.google.common.collect.Maps;
@@ -11,44 +12,41 @@ import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 
 import ru.bulldog.justmap.util.DataUtil;
+import ru.bulldog.justmap.util.storage.StorageUtil;
 
 public final class Colors {
-	public static final int TRANSPARENT = 0x0;
-	public static final int WHITE = 0xFFFFFFFF;
-	public static final int BLACK = 0xFF000000;
-	public static final int RED = 0xFFFF0000;
-	public static final int GREEN = 0xFF00FF00;
-	public static final int BLUE = 0xFF0000FF;
-	public static final int DARK_RED = 0xFFAA0000;
-	public static final int GOLD = 0xFFFFAA00;
-	public static final int YELLOW = 0xFFFFFF00;
-	public static final int ORANGE = 0xFFFFA500;
-	public static final int DARK_GREEN = 0xFF00AA00;
-	public static final int CYAN = 0xFF00FFFF;
-	public static final int DARK_AQUA = 0xFF00AAAA;
-	public static final int DARK_BLUE = 0xFF000099;
-	public static final int PINK = 0xFFFFC0CB;
-	public static final int MAGENTA = 0xFFFF00FF;
-	public static final int PURPLE = 0xFF6A0DAD;
-	public static final int LIGHT_GRAY = 0xFFBBBBBB;
-	public static final int GRAY = 0xFF676676;
+	public final static int TRANSPARENT = 0x0;
+	public final static int WHITE = 0xFFFFFFFF;
+	public final static int BLACK = 0xFF000000;
+	public final static int RED = 0xFFFF0000;
+	public final static int GREEN = 0xFF00FF00;
+	public final static int BLUE = 0xFF0000FF;
+	public final static int DARK_RED = 0xFFAA0000;
+	public final static int GOLD = 0xFFFFAA00;
+	public final static int YELLOW = 0xFFFFFF00;
+	public final static int ORANGE = 0xFFFFA500;
+	public final static int DARK_GREEN = 0xFF00AA00;
+	public final static int CYAN = 0xFF00FFFF;
+	public final static int DARK_AQUA = 0xFF00AAAA;
+	public final static int DARK_BLUE = 0xFF000099;
+	public final static int PINK = 0xFFFFC0CB;
+	public final static int MAGENTA = 0xFFFF00FF;
+	public final static int PURPLE = 0xFF6A0DAD;
+	public final static int LIGHT_GRAY = 0xFFBBBBBB;
+	public final static int GRAY = 0xFF676676;
 
-	public static final int GRID = 0xFF858585;
-	public static final int LOADED_OVERLAY = 0xFFA264E2;
-	public static final int SLIME_OVERLAY = 0xFF00FF00;
-	public static final int LIGHT = 0xFFF000F0;
-	public static final int SPRUCE_LEAVES = 0xFF619961;
-	public static final int BIRCH_LEAVES = 0xFF80A755;
-	public static final int LILY_PAD = 0xFF208030;
-	public static final int GRASS = BiomeColors.defaultGrassColor();
-	public static final int FOLIAGE = BiomeColors.defaultFoliageColor();
-	public static final int ATTACHED_STEM = 0xFFE0C71C;
+	public final static int GRID = 0xFF858585;
+	public final static int LOADED_OVERLAY = 0xFFA264E2;
+	public final static int SLIME_OVERLAY = 0xFF00FF00;
+	public final static int LIGHT = 0xFFF000F0;
+	public final static int SPRUCE_LEAVES = 0xFF619961;
+	public final static int BIRCH_LEAVES = 0xFF80A755;
+	public final static int LILY_PAD = 0xFF208030;
+	public final static int ATTACHED_STEM = 0xFFE0C71C;
+	public final static int GRASS = BiomeColors.defaultGrassColor();
+	public final static int FOLIAGE = BiomeColors.defaultFoliageColor();
 	
-	private final static Colors INSTANCE = new Colors();
-	
-	public static Colors getInstance() {
-		return INSTANCE;
-	}
+	public final static Colors INSTANCE = new Colors();
 	
 	private final Map<String, ColorPalette> palettes = Maps.newHashMap();
 	
@@ -84,6 +82,16 @@ public final class Colors {
 		this.getPalette(stateId.getNamespace()).addFluidColor(block, color);
 	}
 	
+	public int getTextureColor(BlockState block, Identifier texture) {
+		Identifier stateId = Registry.BLOCK.getId(block.getBlock());
+		return this.getPalette(stateId.getNamespace()).getTextureColor(texture);
+	}
+	
+	public void addTextureColor(BlockState block, Identifier texture, int color) {
+		Identifier stateId = Registry.BLOCK.getId(block.getBlock());
+		this.getPalette(stateId.getNamespace()).addTextureColor(texture, color);
+	}
+	
 	public int getFoliageColor(World world, Biome biome) {
 		Identifier biomeId = DataUtil.getBiomeRegistry(world).getId(biome);
 		return this.getPalette(biomeId.getNamespace()).getFoliageColor(biomeId, biome);
@@ -97,5 +105,14 @@ public final class Colors {
 	public int getWaterColor(World world, Biome biome) {
 		Identifier biomeId = DataUtil.getBiomeRegistry(world).getId(biome);
 		return this.getPalette(biomeId.getNamespace()).getWaterColor(biomeId, biome);
+	}
+	
+	public void saveData() {
+		File dir = new File(StorageUtil.mapDir(), "palettes");
+		this.palettes.forEach((mod, palette) -> {
+			File saveDir = new File(dir, mod);
+			if (!saveDir.exists()) saveDir.mkdirs();
+			palette.saveData(saveDir);
+		});
 	}
 }

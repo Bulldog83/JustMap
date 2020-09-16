@@ -7,6 +7,9 @@ import java.util.Optional;
 
 import javax.imageio.ImageIO;
 
+import com.google.gson.JsonObject;
+
+import net.minecraft.util.JsonHelper;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.BiomeEffects;
 
@@ -18,11 +21,12 @@ public class BiomeColors {
 	private static int[] foliageMap;
 	private static int[] grassMap;
 	
-	private final Biome biome;
-	
+	private Biome biome;
 	private Optional<Integer> foliageColor;
 	private Optional<Integer> grassColor;
 	private int waterColor;
+	
+	private BiomeColors() {}
 	
 	public BiomeColors(Biome biome) {
 		this.biome = biome;
@@ -83,6 +87,55 @@ public class BiomeColors {
 	
 	public static int defaultFoliageColor() {
 		return getFoliageColor(0.5, 1.0);
+	}
+	
+	public JsonObject toJson() {
+		JsonObject json = new JsonObject();
+		if (foliageColor.isPresent()) {
+			json.addProperty("foliage", foliageColor.get());
+		}
+		if (grassColor.isPresent()) {
+			json.addProperty("grass", grassColor.get());
+		}
+		json.addProperty("water", waterColor);
+		
+		return json;
+	}
+	
+	public static BiomeColors fromJson(Biome biome, JsonObject json) {
+		BiomeColors biomeColors = new BiomeColors();
+		BiomeColorsAccessor accessor = (BiomeColorsAccessor) biome.getEffects();
+		biomeColors.biome = biome;
+		if (json.has("foliage")) {
+			biomeColors.foliageColor = Optional.of(JsonHelper.getInt(json, "foliage"));
+		} else {
+			biomeColors.foliageColor = accessor.getFoliageColor();
+		}
+		if (json.has("grass")) {
+			biomeColors.grassColor = Optional.of(JsonHelper.getInt(json, "grass"));
+		} else {
+			biomeColors.grassColor = accessor.getGrassColor();
+		}
+		if (json.has("water")) {
+			biomeColors.waterColor = JsonHelper.getInt(json, "water");
+		} else {
+			biomeColors.waterColor = accessor.getWaterColor();
+		}
+		
+		return biomeColors;
+	}
+	
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("[")
+			   .append("foliage=" + foliageColor)
+			   .append(",")
+			   .append("grass=" + grassColor)
+			   .append(",")
+			   .append("water=" + waterColor)
+			   .append("]");
+		
+		return builder.toString();
 	}
 	
 	static {
