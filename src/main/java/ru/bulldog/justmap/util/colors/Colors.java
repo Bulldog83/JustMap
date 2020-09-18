@@ -10,7 +10,7 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
-
+import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.util.DataUtil;
 import ru.bulldog.justmap.util.storage.StorageUtil;
 
@@ -114,5 +114,25 @@ public final class Colors {
 			if (!saveDir.exists()) saveDir.mkdirs();
 			palette.saveData(saveDir);
 		});
+	}
+	
+	public void loadData() {
+		File dir = new File(StorageUtil.mapDir(), "palettes");
+		if (!dir.exists()) return;
+		for (File paletteDir : dir.listFiles()) {
+			if (paletteDir.isFile()) continue;
+			String name = paletteDir.getName();
+			try {
+				if (palettes.containsKey(name)) {
+					this.palettes.get(name).loadData(paletteDir);
+				} else {
+					ColorPalette palette = new ColorPalette();
+					palette.loadData(paletteDir);
+					this.palettes.put(name, palette);
+				}
+			} catch (Exception ex) {
+				JustMap.LOGGER.warning("Error while loading palette!", name, ex);
+			}
+		}
 	}
 }

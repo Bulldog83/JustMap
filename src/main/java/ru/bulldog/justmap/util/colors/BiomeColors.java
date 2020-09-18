@@ -92,12 +92,12 @@ public class BiomeColors {
 	public JsonObject toJson() {
 		JsonObject json = new JsonObject();
 		if (foliageColor.isPresent()) {
-			json.addProperty("foliage", foliageColor.get());
+			json.addProperty("foliage", Integer.toHexString(foliageColor.get()));
 		}
 		if (grassColor.isPresent()) {
-			json.addProperty("grass", grassColor.get());
+			json.addProperty("grass", Integer.toHexString(grassColor.get()));
 		}
-		json.addProperty("water", waterColor);
+		json.addProperty("water", Integer.toHexString(waterColor));
 		
 		return json;
 	}
@@ -107,17 +107,20 @@ public class BiomeColors {
 		BiomeColorsAccessor accessor = (BiomeColorsAccessor) biome.getEffects();
 		biomeColors.biome = biome;
 		if (json.has("foliage")) {
-			biomeColors.foliageColor = Optional.of(JsonHelper.getInt(json, "foliage"));
+			String hexColor = JsonHelper.getString(json, "foliage");
+			biomeColors.foliageColor = Optional.of(ColorUtil.parseHex(hexColor));
 		} else {
 			biomeColors.foliageColor = accessor.getFoliageColor();
 		}
 		if (json.has("grass")) {
-			biomeColors.grassColor = Optional.of(JsonHelper.getInt(json, "grass"));
+			String hexColor = JsonHelper.getString(json, "grass");
+			biomeColors.grassColor = Optional.of(ColorUtil.parseHex(hexColor));
 		} else {
 			biomeColors.grassColor = accessor.getGrassColor();
 		}
 		if (json.has("water")) {
-			biomeColors.waterColor = JsonHelper.getInt(json, "water");
+			String hexColor = JsonHelper.getString(json, "water");
+			biomeColors.waterColor = ColorUtil.parseHex(hexColor);
 		} else {
 			biomeColors.waterColor = accessor.getWaterColor();
 		}

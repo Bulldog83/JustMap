@@ -1,6 +1,10 @@
 package ru.bulldog.justmap.util.colors;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Random;
 
 import net.fabricmc.api.EnvType;
@@ -203,6 +207,54 @@ public class ColorUtil {
 		return colorBrigtness(ColorHelper.multiplyColor(color, tint), 1.5F);
 	}
 	
+	private static void test(List<Integer> colors, int width, int height) {
+		Map<Integer, List<Integer>> centers = new HashMap<>();
+		
+		Random rnd = new Random();
+		for (int i = 0; i < 4; i++) {
+			int color = colors.get(rnd.nextInt(colors.size()));
+			centers.put(color, new ArrayList<>());
+		}
+		boolean move = true;
+		while(move) {
+			groupping(centers, colors);
+			for (Entry<Integer, List<Integer>> entry : centers.entrySet()) {
+				int color = entry.getKey();
+				int or = (color >> 16) & 255;
+				int og = (color >> 8) & 255;
+				int ob = color & 255;
+				double r = 0, g = 0, b = 0;
+				int size = entry.getValue().size();
+				for (int col : entry.getValue()) {
+					r += (col >> 16) & 255;
+					g += (col >> 8) & 255;
+					b += col & 255;
+				}
+				r /= size;
+				g /= size;
+				b /= size;
+				
+				move = Math.abs(r - or) > 0.1 || Math.abs(g - og) > 0.1 || Math.abs(b - ob) > 0.1;
+			}
+		}
+	}
+	
+	private static void groupping(Map<Integer, List<Integer>> centers, List<Integer> colors) {
+		centers.entrySet().forEach(entry -> entry.getValue().clear());
+		colors.forEach(color -> {
+			int base = centers.keySet().iterator().next();
+			int dst = MathUtil.colorDistance(color, base);
+			for (Entry<Integer, List<Integer>> entry : centers.entrySet()) {
+				int dst1 = MathUtil.colorDistance(color, entry.getKey());
+				if (dst1 < dst) {
+					dst = dst1;
+					base = entry.getKey();
+				}
+			}
+			centers.get(base).add(color);
+		});		
+	}
+	
 	private static int extractColor(BlockState state) {
 		List<BakedQuad> quads = blockModels.getModel(state).getQuads(state, Direction.UP, new Random());
 		
@@ -219,30 +271,57 @@ public class ColorUtil {
 		Identifier texture = new Identifier(blockSprite.getNamespace(), String.format("textures/%s.png", blockSprite.getPath()));
 		NativeImage image = ImageUtil.loadImage(texture, 16, 16);
 		
-		long r = 0, g = 0, b = 0;
-					
-		int pixels = 0;
+		List<Integer> alpha = new ArrayList<>();
+		List<Integer> red = new ArrayList<>();
+		List<Integer> green = new ArrayList<>();
+		List<Integer> blue = new ArrayList<>();
+		
+		List<Integer> colors = new ArrayList<>();
+		int count = 0;
 		for (int i = 0; i < image.getWidth(); i++) {
 			for (int j = 0; j < image.getHeight(); j++) {
 				int col = image.getPixelColor(i, j);
-				if ((col >> 24 & 255) > 0) {
-					b += (col >> 16) & 255;
-					g += (col >> 8) & 255;
-					r += col & 255;
-					pixels++;
+				if (((col >> 24) & 255) > 0) {
+					colors.add(ABGRtoARGB(col));
+					alpha.add((col >> 24) & 255);
+					blue.add((col >> 16) & 255);
+					green.add((col >> 8) & 255);
+					red.add(col & 255);
+					count++;
 				}
 			}
 		}
 		image.close();
 		
-		if (pixels > 0) {
-			color = ((int) (r / pixels)) << 16 | ((int) (g / pixels)) << 8 | (int) (b / pixels);
-			colorPalette.addTextureColor(state, blockSprite, color);
-			
-			return color;
+		test(colors, image.getWidth(), image.getHeight());
+		
+		if (count == 0) return -1;
+		
+		alpha.sort(MathUtil.INT_COMPARATOR);
+		red.sort(MathUtil.INT_COMPARATOR);
+		green.sort(MathUtil.INT_COMPARATOR);
+		blue.sort(MathUtil.INT_COMPARATOR);
+		
+		int cut = red.size() / 4;
+		
+		alpha = alpha.subList(cut, alpha.size() - cut);
+		red = red.subList(cut, red.size() - cut);
+		green = green.subList(cut, green.size() - cut);
+		blue = blue.subList(cut, blue.size() - cut);
+		
+		long a = 0, r = 0, g = 0, b = 0;
+		int pixels = red.size();
+		for (int i = 0; i < pixels; i++) {
+			a += alpha.get(i);
+			r += red.get(i);
+			g += green.get(i);
+			b += blue.get(i);
 		}
 		
-		return -1;
+		color = ((int) (a / pixels) << 24) | ((int) (r / pixels) << 16) | ((int) (g / pixels) << 8) | (int) (b / pixels);
+		colorPalette.addTextureColor(state, blockSprite, color);
+		
+		return color;
 	}
 	
 	public static int proccessColor(int color, int heightDiff, float topoLevel) {

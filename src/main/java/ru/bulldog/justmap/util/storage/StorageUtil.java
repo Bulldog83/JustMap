@@ -1,7 +1,10 @@
 package ru.bulldog.justmap.util.storage;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Path;
+
+import org.apache.commons.io.FileUtils;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -116,10 +119,11 @@ public final class StorageUtil {
 			filesDir = new File(mapsDir, "local/" + name);
 			File oldDir = new File(dataDir, "local/" + name);
 			if (oldDir.exists()) {
-				System.out.println("Folder " + oldDir + " found!");
-				System.out.println("Rename to " + filesDir);
-				boolean renamed = oldDir.renameTo(filesDir);
-				System.out.println("Result: " + renamed);
+				try {
+					FileUtils.moveDirectory(oldDir, filesDir);
+				} catch (IOException ex) {
+					JustMap.LOGGER.warning("Can't move directory!", oldDir, ex);
+				}
 			}
 		} else if (serverInfo != null) {
 			String name = scrubFileName(serverInfo.name);
@@ -131,7 +135,11 @@ public final class StorageUtil {
 			filesDir = new File(mapsDir, String.format("servers/%s_(%s)", name, address));
 			File oldDir = new File(dataDir, String.format("servers/%s_(%s)", name, address));
 			if (oldDir.exists()) {
-				oldDir.renameTo(filesDir);
+				try {
+					FileUtils.moveDirectory(oldDir, filesDir);
+				} catch (IOException ex) {
+					JustMap.LOGGER.warning("Can't move directory!", oldDir, ex);
+				}
 			}
 		}
 		

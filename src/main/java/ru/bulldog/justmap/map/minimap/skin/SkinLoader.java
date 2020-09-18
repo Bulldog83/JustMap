@@ -41,7 +41,7 @@ public final class SkinLoader extends JsonFactory {
 	}
 	
 	private static void loadSkin(File folder, File skinFile) throws Exception {
-		JsonObject skinData = loadJson(skinFile);
+		JsonObject skinData = getJsonObject(skinFile);
 		String name = JsonHelper.getString(skinData, "name");
 		int width = JsonHelper.getInt(skinData, "width");
 		int height = JsonHelper.getInt(skinData, "height");

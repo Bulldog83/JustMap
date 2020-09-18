@@ -21,6 +21,8 @@ import net.minecraft.state.property.Property;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.biome.Biome;
+
+import ru.bulldog.justmap.util.DataUtil;
 import ru.bulldog.justmap.util.JsonFactory;
 
 public class ColorPalette {
@@ -110,7 +112,7 @@ public class ColorPalette {
 			JsonArray keysArray = new JsonArray();
 			keys.forEach(key -> keysArray.add(key));
 			block.add("blocks", keysArray);
-			block.addProperty("color", value);
+			block.addProperty("color", Integer.toHexString(value));
 			blocks.add(block);
 		});
 		JsonFactory.storeJson(new File(folder, "blockcolors.json"), blocks);
@@ -121,14 +123,14 @@ public class ColorPalette {
 			JsonArray keysArray = new JsonArray();
 			keys.forEach(key -> keysArray.add(key));
 			fluid.add("fluids", keysArray);
-			fluid.addProperty("color", value);
+			fluid.addProperty("color", Integer.toHexString(value));
 			fluids.add(fluid);
 		});
 		JsonFactory.storeJson(new File(folder, "fluidcolors.json"), fluids);
 		
 		JsonObject textures = new JsonObject();
 		this.textureColors.forEach((id, color) -> {
-			textures.addProperty(id.toString(), color);
+			textures.addProperty(id.toString(), Integer.toHexString(color));
 		});
 		JsonFactory.storeJson(new File(folder, "texturecolors.json"), textures);
 		
@@ -140,7 +142,69 @@ public class ColorPalette {
 	}
 	
 	public void loadData(File folder) {
-		
+		if (!folder.exists()) return;
+		for (File dataFile : folder.listFiles()) {
+			if (dataFile.isDirectory()) continue;
+			switch(dataFile.getName()) {
+				case "blockcolors.json": {
+					JsonArray blocks = JsonFactory.loadJson(dataFile).getAsJsonArray();
+					if (blocks.size() == 0) continue;
+					blocks.forEach(obj -> {
+						JsonObject entry = obj.getAsJsonObject();
+						if (!entry.has("blocks") || !entry.has("color")) return;
+						JsonArray keysArray = entry.get("blocks").getAsJsonArray();
+						if (keysArray.size() == 0) return;
+						Set<String> keySet = new HashSet<>();
+						keysArray.forEach(key -> {
+							keySet.add(key.getAsString());
+						});
+						String hexColor = entry.get("color").getAsString();
+						int color = ColorUtil.parseHex(hexColor);
+						this.blockColors.put(keySet, color);
+					});
+					continue;
+				}
+				case "fluidcolors.json": {
+					JsonArray fluids = JsonFactory.loadJson(dataFile).getAsJsonArray();
+					if (fluids.size() == 0) continue;
+					fluids.forEach(obj -> {
+						JsonObject entry = obj.getAsJsonObject();
+						if (!entry.has("fluids") || !entry.has("color")) return;
+						JsonArray keysArray = entry.get("fluids").getAsJsonArray();
+						if (keysArray.size() == 0) return;
+						Set<String> keySet = new HashSet<>();
+						keysArray.forEach(key -> {
+							keySet.add(key.getAsString());
+						});
+						String hexColor = entry.get("color").getAsString();
+						int color = ColorUtil.parseHex(hexColor);
+						this.fluidColors.put(keySet, color);
+					});
+					continue;
+				}
+				case "texturecolors.json": {
+					JsonObject textures = JsonFactory.getJsonObject(dataFile);
+					textures.entrySet().forEach(entry -> {
+						String key = entry.getKey();
+						String hexColor = entry.getValue().getAsString();
+						int color = ColorUtil.parseHex(hexColor);
+						this.textureColors.put(new Identifier(key), color);
+					});
+					continue;
+				}
+				case "biomecolors.json": {
+					JsonObject biomes = JsonFactory.getJsonObject(dataFile);
+					biomes.entrySet().forEach(entry -> {
+						String key = entry.getKey();
+						JsonObject biomeJson = entry.getValue().getAsJsonObject();
+						Identifier biomeId = new Identifier(key);
+						Biome biome = DataUtil.getBiomeRegistry().get(biomeId);
+						this.biomeColors.put(biomeId, BiomeColors.fromJson(biome, biomeJson));
+					});
+					continue;
+				}
+			}
+		}
 	}
 	
 	private static int getColor(BiMap<Set<String>, Integer> map, BlockState block) {

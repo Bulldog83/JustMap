@@ -266,7 +266,7 @@ public final class WorldManager {
 		loadConfig();
 		File worldsFile = new File(StorageUtil.filesDir(), "worlds.json");
 		if (!worldsFile.exists()) return;
-		JsonObject jsonObject = JsonFactory.loadJson(worldsFile);
+		JsonObject jsonObject = JsonFactory.getJsonObject(worldsFile);
 		if (jsonObject.has("worlds") && jsonObject.get("worlds").isJsonArray()) {
 			JsonArray worldsArray = jsonObject.getAsJsonArray("worlds");
 			for (JsonElement elem : worldsArray) {
@@ -319,7 +319,7 @@ public final class WorldManager {
 		File configFile = new File(StorageUtil.filesDir(), "config.json");
 		if (!configFile.exists()) return false;
 		try {
-			JsonObject configObject = JsonFactory.loadJson(configFile);
+			JsonObject configObject = JsonFactory.getJsonObject(configFile);
 			EnumEntry<MultiworldDetection> detectionType = modConfig.getEntry("multiworld_detection");
 			BooleanEntry detectMultiworlds = modConfig.getEntry("detect_multiworlds");
 			detectMultiworlds.fromString(JsonHelper.getString(configObject, "detect_multiworlds"));

@@ -76,6 +76,7 @@ public class JustMapClient implements ClientModInitializer {
 			networkHandler.registerPacketsListeners();
 			config = ClientConfig.get();
 			map = new Minimap();
+			Colors.INSTANCE.loadData();
 		});
 		ClientLifecycleEvents.CLIENT_STOPPING.register(client -> {
 			JustMapClient.stop();

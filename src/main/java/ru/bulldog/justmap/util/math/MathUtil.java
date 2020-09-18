@@ -1,11 +1,21 @@
 package ru.bulldog.justmap.util.math;
 
+import java.util.Comparator;
+
 import net.minecraft.util.math.BlockPos;
 
 public class MathUtil {
 	
 	public final static double SQRT2 = Math.sqrt(2.0);
 	public final static double BIG_SQRT2 = SQRT2 * 0.625 + 1.0;
+	public final static Comparator<Integer> INT_COMPARATOR = new Comparator<Integer>() {
+		@Override
+		public int compare(Integer int1, Integer int2) {
+			if (int1 == null) return -1;
+			if (int2 == null) return 1;
+			return int1 - int2;
+		}
+	};
 	
 	public static int clamp(int val, int min, int max) {
 		return val < min ? min : val > max ? max : val;
@@ -128,5 +138,15 @@ public class MathUtil {
 		int i = (r << 8) + g;
 		i = (i << 8) + b;
 		return i;
+	}
+	
+	public static int colorDistance(int color1, int color2) {
+		int r1 = (color1 >> 16) & 255;
+		int g1 = (color1 >> 8) & 255;
+		int b1 = color1 & 255;
+		int r2 = (color2 >> 16) & 255;
+		int g2 = (color2 >> 8) & 255;
+		int b2 = color2 & 255;
+		return (int) (pow2(r1 - r2) + pow2(g1 - g2) + pow2(b1 - b2));
 	}
 }

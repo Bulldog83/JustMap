@@ -41,7 +41,7 @@ public abstract class ServerWorldMixin extends World {
 				String id = blockId.getPath();
 				String stateFile = String.format("/assets/%s/blockstates/%s.json", modId, id);
 				try {
-					JsonObject stateJson = JsonFactory.loadJson(stateFile);
+					JsonObject stateJson = JsonFactory.getJsonObject(stateFile);
 					if (stateJson.has("variants")) {
 						JsonObject variants = stateJson.getAsJsonObject("variants");
 						variants.entrySet().forEach((entry) -> {
