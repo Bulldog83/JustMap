@@ -13,7 +13,7 @@ public class MathUtil {
 		public int compare(Integer int1, Integer int2) {
 			if (int1 == null) return -1;
 			if (int2 == null) return 1;
-			return int1 - int2;
+			return Integer.compare(int1, int2);
 		}
 	};
 	
