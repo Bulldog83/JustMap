@@ -1,16 +1,12 @@
 package ru.bulldog.justmap.map.icon;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import ru.bulldog.justmap.client.config.ClientSettings;
 import ru.bulldog.justmap.util.ImageUtil;
-import ru.bulldog.justmap.util.colors.ColorUtil;
 import ru.bulldog.justmap.util.colors.Colors;
-import ru.bulldog.justmap.util.math.Point;
 import ru.bulldog.justmap.util.render.Image;
 import ru.bulldog.justmap.util.render.RenderUtil;
 import ru.bulldog.justmap.util.storage.StorageUtil;
@@ -80,7 +76,8 @@ public class EntityHeadIcon extends Image {
 	
 	private void bindOutline() {
 		if (outlineId == null) {
-			NativeImageBackedTexture outTexture = new NativeImageBackedTexture(this.generateOutline());
+			NativeImage outline = ImageUtil.generateOutline(image, width, height, color);
+			NativeImageBackedTexture outTexture = new NativeImageBackedTexture(outline);
 			this.outlineId = textureManager.registerDynamicTexture(String.format("%s_%s_outline", this.id.getNamespace(), this.id.getPath()), outTexture);
 		}
 		textureManager.bindTexture(outlineId);
@@ -102,148 +99,6 @@ public class EntityHeadIcon extends Image {
 		}
 		
 		return solid;
-	}
-	
-	private NativeImage generateOutline() {
-		NativeImage outline = new NativeImage(width + 4, height + 4, false);
-		ImageUtil.fillImage(outline, Colors.TRANSPARENT);
-		
-		int outWidth = outline.getWidth();
-		int outHeight = outline.getHeight();
-		
-		int outlineColor = ColorUtil.toABGR(this.color);
-		
-		List<Point> outlinePixels = new ArrayList<>();
-		for (int x = 0; x < width; x++) {
-			int left = x - 1;
-			int right = x + 1;
-			for (int y = 0; y < height; y++) {
-				int alpha = (image.getPixelColor(x, y) >> 24) & 255;
-				if (alpha == 0) continue;
-				
-				outlinePixels.add(new Point(x + 2, y + 2));
-				
-				int top = y - 1;
-				int bottom = y + 1;					
-				if (top >= 0) {
-					alpha = (image.getPixelColor(x, top) >> 24) & 255;
-					if (alpha == 0) {
-						Point pixel = new Point(x + 2, y);
-						if (!outlinePixels.contains(pixel)) {
-							outlinePixels.add(pixel);
-							outlinePixels.add(new Point(x + 2, y + 1));
-						}
-					}
-					if (left >= 0) {
-						alpha = (image.getPixelColor(left, top) >> 24) & 255;
-						if (alpha == 0) {
-							Point pixel = new Point(x, y);
-							if (!outlinePixels.contains(pixel)) {
-								outlinePixels.add(pixel);
-								outlinePixels.add(new Point(x, y + 1));
-								outlinePixels.add(new Point(x + 1, y));
-								outlinePixels.add(new Point(x + 1, y + 1));
-							}
-						}
-					}
-					if (right < width) {
-						alpha = (image.getPixelColor(right, top) >> 24) & 255;
-						if (alpha == 0) {
-							Point pixel = new Point(right + 2, y);
-							if (!outlinePixels.contains(pixel)) {
-								outlinePixels.add(pixel);
-								outlinePixels.add(new Point(right + 2, y + 1));
-								outlinePixels.add(new Point(right + 3, y));
-								outlinePixels.add(new Point(right + 3, y + 1));
-							}
-						}
-					}
-				} else if (y == 0){
-					Point pixel = new Point(x + 2, 0);
-					if (!outlinePixels.contains(pixel)) {
-						outlinePixels.add(pixel);
-						outlinePixels.add(new Point(x + 2, 1));
-					}
-				}
-				if (bottom < height) {
-					alpha = (image.getPixelColor(x, bottom) >> 24) & 255;
-					if (alpha == 0) {
-						Point pixel = new Point(x + 2, bottom + 1);
-						if (!outlinePixels.contains(pixel)) {
-							outlinePixels.add(pixel);
-							outlinePixels.add(new Point(x + 2, bottom + 2));
-						}
-					}
-					if (left >= 0) {
-						alpha = (image.getPixelColor(left, bottom) >> 24) & 255;
-						if (alpha == 0) {
-							Point pixel = new Point(x, bottom + 2);
-							if (!outlinePixels.contains(pixel)) {
-								outlinePixels.add(pixel);
-								outlinePixels.add(new Point(x, bottom + 3));
-								outlinePixels.add(new Point(x + 1, bottom + 2));
-								outlinePixels.add(new Point(x + 1, bottom + 3));
-							}
-						}
-					}
-					if (right < width) {
-						alpha = (image.getPixelColor(right, bottom) >> 24) & 255;
-						if (alpha == 0) {
-							Point pixel = new Point(right + 2, bottom + 2);
-							if (!outlinePixels.contains(pixel)) {
-								outlinePixels.add(pixel);
-								outlinePixels.add(new Point(right + 2, bottom + 3));
-								outlinePixels.add(new Point(right + 3, bottom + 2));
-								outlinePixels.add(new Point(right + 3, bottom + 3));
-							}
-						}
-					}
-				} else if (y == height - 1) {
-					Point pixel = new Point(x + 2, outHeight - 1);
-					if (!outlinePixels.contains(pixel)) {
-						outlinePixels.add(pixel);
-						outlinePixels.add(new Point(x + 2, outHeight - 2));
-					}
-				}
-				if (left >= 0) {
-					alpha = (image.getPixelColor(left, y) >> 24) & 255;
-					if (alpha == 0) {
-						Point pixel = new Point(x, y + 2);
-						if (!outlinePixels.contains(pixel)) {
-							outlinePixels.add(pixel);
-							outlinePixels.add(new Point(x + 1, y + 2));
-						}
-					}
-				} else if (x == 0) {
-					Point pixel = new Point(0, y + 2);
-					if (!outlinePixels.contains(pixel)) {
-						outlinePixels.add(pixel);
-						outlinePixels.add(new Point(1, y + 2));
-					}
-				}
-				if (right < width) {
-					alpha = (image.getPixelColor(right, y) >> 24) & 255;
-					if (alpha == 0) {
-						Point pixel = new Point(right + 1, y + 2);
-						if (!outlinePixels.contains(pixel)) {
-							outlinePixels.add(pixel);
-							outlinePixels.add(new Point(right + 2, y + 2));
-						}
-					}
-				} else if (x == width - 1) {
-					Point pixel = new Point(outWidth - 1, y + 2);
-					if (!outlinePixels.contains(pixel)) {
-						outlinePixels.add(pixel);
-						outlinePixels.add(new Point(outWidth - 2, y + 2));
-					}
-				}
-			}
-		}
-		outlinePixels.forEach(pixel -> {
-			outline.setPixelColor((int) pixel.x, (int) pixel.y, outlineColor);
-		});
-		
-		return outline;
 	}
 	
 	private static Identifier iconId(Identifier id) {

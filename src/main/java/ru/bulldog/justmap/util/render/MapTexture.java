@@ -53,6 +53,10 @@ public class MapTexture {
 		this.copyData(source);
 	}
 	
+	public MapTexture(MapTexture source) {
+		this(source.imageFile, source);
+	}
+
 	public int getId() {
 		return this.glId;
 	}

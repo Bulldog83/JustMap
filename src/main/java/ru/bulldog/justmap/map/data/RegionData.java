@@ -10,6 +10,7 @@ import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.client.config.ClientSettings;
 import ru.bulldog.justmap.map.IMap;
 import ru.bulldog.justmap.util.DataUtil;
+import ru.bulldog.justmap.util.Logger;
 import ru.bulldog.justmap.util.RuleUtil;
 import ru.bulldog.justmap.util.colors.Colors;
 import ru.bulldog.justmap.util.math.Plane;
@@ -21,7 +22,9 @@ import ru.bulldog.justmap.util.tasks.TaskManager;
 
 public class RegionData {
 	
-	private static TaskManager worker = TaskManager.getManager("region-updater");
+	private static TaskManager updater = TaskManager.getManager("region-updater");
+	private static TaskManager worker = JustMap.WORKER;
+	private static Logger logger = JustMap.LOGGER;
 	
 	private final WorldData mapData;
 	private final RegionPos regPos;
@@ -109,7 +112,7 @@ public class RegionData {
 	public void updateImage(boolean needUpdate) {
 		if (updating) return;
 		this.updating = true;
-		worker.execute(() -> {
+		updater.execute(() -> {
 			this.updateMapParams(needUpdate);
 			this.update();
 		});
@@ -201,7 +204,7 @@ public class RegionData {
 	}
 	
 	public void writeChunkData(ChunkData mapChunk) {
-		worker.execute(() -> {
+		updater.execute(() -> {
 			int x = (mapChunk.getX() << 4) - (this.getX() << 9);
 			int y = (mapChunk.getZ() << 4) - (this.getZ() << 9);
 			synchronized (imageLock) {
@@ -249,24 +252,34 @@ public class RegionData {
 			
 			return;
 		}
-		JustMap.LOGGER.debug("Swap region {} ({}, {}) to: {}, level: {}",
-				regPos, this.layer, this.level, layer, level);
-		synchronized (imageLock) {
-			this.image.saveImage();
-			this.layer = layer;
-			this.level = level;
-			this.image = this.getImage(layer, level);
-			this.updateImage(true);
-			if (texture != null) {
-				this.updateTexture();
+		worker.execute(() -> {
+			logger.debug("Swap region {} ({}, {}) to: {}, level: {}",
+					regPos, this.layer, this.level, layer, level);
+			synchronized (imageLock) {
+				MapTexture toSave = new MapTexture(image);
+				this.saveImage(toSave, true);
+				this.layer = layer;
+				this.level = level;
+				this.image = this.getImage(layer, level);
+				this.updateImage(true);
+				if (texture != null) {
+					this.updateTexture();
+				}
 			}
-		}
+		});
 	}
 	
 	private void saveImage() {
-		JustMap.WORKER.execute("Saving image for region: " + regPos, () -> {
-			this.image.saveImage();
-			this.imageChanged = false;
+		this.saveImage(image, false);
+		this.imageChanged = false;
+	}
+	
+	private void saveImage(MapTexture image, boolean close) {
+		worker.execute("Saving image for region: " + regPos, () -> {
+			image.saveImage();
+			if (close) {
+				image.close();
+			}
 		});
 	}
 	
@@ -312,7 +325,7 @@ public class RegionData {
 	}
 	
 	public void close() {
-		JustMap.LOGGER.debug("Closing region: {}", regPos);
+		logger.debug("Closing region: {}", regPos);
 		synchronized (imageLock) {
 			this.images.forEach((layer, image) -> {
 				image.saveImage();

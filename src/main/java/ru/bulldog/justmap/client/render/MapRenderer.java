@@ -231,8 +231,4 @@ public abstract class MapRenderer {
 	protected float calcOffset(double x, double lastX, double scale) {
 		return (float) (Math.floor(((x - lastX) / scale) * 1000.0) * 0.001);
 	}
-	
-	static {
-		
-	}
 }
