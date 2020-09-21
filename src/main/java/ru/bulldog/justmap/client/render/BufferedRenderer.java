@@ -24,8 +24,8 @@ import ru.bulldog.justmap.util.render.RenderUtil;
 
 public class BufferedRenderer extends MapRenderer {
 	
-	private ExtendedFramebuffer primaryFramebuffer;
-	private ExtendedFramebuffer secondaryFramebuffer;
+	private Framebuffer primaryFramebuffer;
+	private Framebuffer secondaryFramebuffer;
 	private boolean triedFBO = false;
 	private boolean loadedFBO = false;
 	

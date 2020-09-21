@@ -175,6 +175,8 @@ public class Minimap implements IMap {
 			textManager.setLineWidth(mapWidth);
 		}
 		
+		this.updateMapPosition();
+		
 		if (!ClientSettings.fastRender) {
 			try {
 				if (ExtendedFramebuffer.canUseFramebuffer()) {
@@ -190,8 +192,6 @@ public class Minimap implements IMap {
 		} else if (bufferedRenderer.isFBOLoaded()) {
 			this.bufferedRenderer.deleteFramebuffers();
 		}
-		
-		this.updateMapPosition();
 	}
 	
 	private void updateMapPosition() {
