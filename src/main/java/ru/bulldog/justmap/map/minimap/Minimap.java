@@ -409,7 +409,8 @@ public class Minimap implements IMap {
 				for (Waypoint wp : stream.toArray(Waypoint[]::new)) {
 					WaypointIcon waypoint = new WaypointIcon(this, wp);
 					waypoint.setPosition(MathUtil.screenPos(wp.pos.getX(), currentPos.getX(), screenX, mapScale),
-										 MathUtil.screenPos(wp.pos.getZ(), currentPos.getZ(), screenY, mapScale));
+										 MathUtil.screenPos(wp.pos.getZ(), currentPos.getZ(), screenY, mapScale),
+										 wp.pos.getY());
 					this.waypoints.add(waypoint);
 				}
 			}

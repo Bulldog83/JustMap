@@ -24,8 +24,8 @@ import ru.bulldog.justmap.util.render.RenderUtil;
 
 public class BufferedRenderer extends MapRenderer {
 	
-	private ExtendedFramebuffer scalingFramebuffer;
-	private ExtendedFramebuffer rotationFramebuffer;
+	private ExtendedFramebuffer primaryFramebuffer;
+	private ExtendedFramebuffer secondaryFramebuffer;
 	private boolean triedFBO = false;
 	private boolean loadedFBO = false;
 	
@@ -40,9 +40,9 @@ public class BufferedRenderer extends MapRenderer {
 			double scale = minecraft.getWindow().getScaleFactor();
 			int scaledW = (int) (imgW * scale);
 			int scaledH = (int) (imgH * scale);
-			this.scalingFramebuffer = new ExtendedFramebuffer(scaledW, scaledH, false);
-			this.rotationFramebuffer = new ExtendedFramebuffer(scaledW, scaledH, false);
-			this.loadedFBO = (this.scalingFramebuffer.fbo != -1 && this.rotationFramebuffer.fbo != -1);
+			this.primaryFramebuffer = new ExtendedFramebuffer(scaledW, scaledH, false);
+			this.secondaryFramebuffer = new ExtendedFramebuffer(scaledW, scaledH, false);
+			this.loadedFBO = (this.primaryFramebuffer.fbo != -1 && this.secondaryFramebuffer.fbo != -1);
 		}
 		this.triedFBO = true;
 	}
@@ -68,7 +68,7 @@ public class BufferedRenderer extends MapRenderer {
 		}
 
 		RenderSystem.pushMatrix();
-		this.scalingFramebuffer.beginWrite(true);
+		this.primaryFramebuffer.beginWrite(true);
 		RenderSystem.clear(GLC.GL_COLOR_OR_DEPTH_BUFFER_BIT, isMac);
 		RenderSystem.enableTexture();
 		RenderSystem.matrixMode(GLC.GL_PROJECTION);
@@ -88,12 +88,11 @@ public class BufferedRenderer extends MapRenderer {
 		}
 		if (!mapRotation) {
 			this.drawEntities(matrices, consumerProvider);
-			consumerProvider.draw();
 		}
-		this.scalingFramebuffer.endWrite();
+		this.primaryFramebuffer.endWrite();
 		RenderSystem.popMatrix();
 		
-		this.rotationFramebuffer.beginWrite(false);
+		this.secondaryFramebuffer.beginWrite(false);
 		RenderSystem.clear(GLC.GL_COLOR_OR_DEPTH_BUFFER_BIT, isMac);
 		RenderSystem.pushMatrix();
 		if (mapRotation) {
@@ -104,7 +103,7 @@ public class BufferedRenderer extends MapRenderer {
 			RenderSystem.translatef(-shiftX, -shiftY, 0.0F);
 		}
 		RenderSystem.translated(-offX * scale, -offY * scale, 0.0);
-		this.scalingFramebuffer.beginRead();
+		this.primaryFramebuffer.beginRead();
 		RenderUtil.startDraw();
 		BufferBuilder buffer = RenderUtil.getBuffer();
 		buffer.vertex(0.0, scaledH, 0.0).texture(0.0F, 0.0F).next();
@@ -116,11 +115,10 @@ public class BufferedRenderer extends MapRenderer {
 			RenderSystem.pushMatrix();
 			RenderSystem.scaled(scale, scale, 1.0);
 			this.drawEntities(matrices, consumerProvider);
-			consumerProvider.draw();
 			RenderSystem.popMatrix();
 		}
 		RenderSystem.popMatrix();
-		this.rotationFramebuffer.endWrite();
+		this.secondaryFramebuffer.endWrite();
 		RenderSystem.matrixMode(GLC.GL_PROJECTION);
 		RenderSystem.popMatrix();
 		RenderSystem.matrixMode(GLC.GL_MODELVIEW);
@@ -147,7 +145,7 @@ public class BufferedRenderer extends MapRenderer {
 			RenderUtil.drawQuad(mapX, mapY, mapWidth, mapHeight);
 			RenderSystem.blendFunc(GLC.GL_DST_ALPHA, GLC.GL_ONE_MINUS_DST_ALPHA);
 		}
-		this.rotationFramebuffer.beginRead();
+		this.secondaryFramebuffer.beginRead();
 		RenderUtil.startDraw();
 		buffer = RenderUtil.getBuffer();
 		buffer.vertex(imgX, imgY + imgH, 0.0).texture(0.0F, 0.0F).next();
@@ -212,7 +210,7 @@ public class BufferedRenderer extends MapRenderer {
 		this.chunkGrid.draw();
 	}
 	
-	private void drawEntities(MatrixStack matrices, VertexConsumerProvider consumerProvider) {
+	private void drawEntities(MatrixStack matrices, VertexConsumerProvider.Immediate consumerProvider) {
 		float halfW = imgW / 2.0F;
 		float halfH = imgH / 2.0F;
 		int iconX = (int) (imgW - mapWidth);
@@ -220,17 +218,18 @@ public class BufferedRenderer extends MapRenderer {
 		List<MapIcon<?>> drawableEntities = minimap.getDrawableIcons(lastX, lastZ, halfW, halfH, delta);
 		for (MapIcon<?> icon : drawableEntities) {
 			icon.draw(matrices, consumerProvider, iconX, iconY, mapWidth, mapHeight, rotation);
+			consumerProvider.draw();
 		}
 	}
 	
 	public void resize(int width, int height, boolean isMac) {
-		this.scalingFramebuffer.resize(width, height, isMac);
-		this.rotationFramebuffer.resize(width, height, isMac);
+		this.primaryFramebuffer.resize(width, height, isMac);
+		this.secondaryFramebuffer.resize(width, height, isMac);
 	}
 	
 	public void deleteFramebuffers() {
-		this.scalingFramebuffer.delete();
-		this.rotationFramebuffer.delete();
+		this.primaryFramebuffer.delete();
+		this.secondaryFramebuffer.delete();
 		this.setLoadedFBO(false);
 		this.triedFBO = false;
 	}

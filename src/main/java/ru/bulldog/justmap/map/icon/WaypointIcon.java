@@ -1,14 +1,19 @@
 package ru.bulldog.justmap.map.icon;
 
+import com.mojang.blaze3d.systems.RenderSystem;
+
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.util.math.MatrixStack;
-
+import ru.bulldog.justmap.client.config.ClientSettings;
 import ru.bulldog.justmap.map.IMap;
 import ru.bulldog.justmap.map.minimap.Minimap;
 import ru.bulldog.justmap.map.waypoint.Waypoint;
+import ru.bulldog.justmap.util.DataUtil;
 import ru.bulldog.justmap.util.math.Line;
 import ru.bulldog.justmap.util.math.MathUtil;
 import ru.bulldog.justmap.util.math.Point;
+import ru.bulldog.justmap.util.render.GLC;
+import ru.bulldog.justmap.util.render.RenderUtil;
 
 public class WaypointIcon extends MapIcon<WaypointIcon> {
 	
@@ -46,7 +51,22 @@ public class WaypointIcon extends MapIcon<WaypointIcon> {
 	public void draw(MatrixStack matrices, VertexConsumerProvider consumerProvider, int mapX, int mapY, int mapW, int mapH, float rotation) {
 		Waypoint.Icon icon = waypoint.getIcon();
 		if (icon != null) {
+			if (ClientSettings.entityIconsShading) {
+				int posY = DataUtil.coordY();
+				int hdiff = posY - height;
+				float hmod;
+				if (hdiff < 0) {
+					hmod = MathUtil.clamp(Math.abs(hdiff) / 24F, 0.0F, 0.5F);
+					RenderUtil.texEnvMode(GLC.GL_ADD);
+				} else {
+					hmod = MathUtil.clamp((24 - Math.abs(hdiff)) / 24F, 0.25F, 1.0F);
+					RenderUtil.texEnvMode(GLC.GL_MODULATE);
+				}
+				RenderSystem.color3f(hmod, hmod, hmod);
+			}
 			icon.draw(matrices, iconPos.x - offX, iconPos.y - offY, iconSize);
+			RenderUtil.texEnvMode(GLC.GL_MODULATE);
+			RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
 		}
 	}
 	

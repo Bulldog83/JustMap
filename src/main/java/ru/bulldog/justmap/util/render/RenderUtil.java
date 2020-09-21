@@ -134,6 +134,10 @@ public class RenderUtil extends DrawableHelper {
 		GL11.glScissor(x, y, width, height);
 	}
 	
+	public static void texEnvMode(int mode) {
+		GL11.glTexEnvi(GLC.GL_TEXTURE_ENV, GLC.GL_TEXTURE_ENV_MODE, mode);
+	}
+	
     public static void startDraw() {
     	startDraw(VertexFormats.POSITION_TEXTURE);
     }
@@ -373,10 +377,6 @@ public class RenderUtil extends DrawableHelper {
 	}
 	
 	public static void drawImage(MatrixStack matrices, Image image, double x, double y, float w, float h) {
-		RenderSystem.enableBlend();
-		RenderSystem.enableAlphaTest();		
-		RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
-		
 		image.bindTexture();
 		startDrawNormal();
 		draw(matrices, vertexBuffer, x, y, w, h, 0.0F, 0.0F, 1.0F, 1.0F);
@@ -386,16 +386,15 @@ public class RenderUtil extends DrawableHelper {
 	private static void draw(MatrixStack matrixStack, VertexConsumer vertexConsumer, double x, double y, float w, float h, float minU, float minV, float maxU, float maxV) {
 		RenderSystem.enableBlend();
 		RenderSystem.enableAlphaTest();
-		RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
-		
+
 		matrixStack.push();
 		matrixStack.translate(x, y, 0);
-		
+
 		Matrix4f m4f = matrixStack.peek().getModel();
 		Matrix3f m3f = matrixStack.peek().getNormal();
-		
+
 		addVertices(m4f, m3f, vertexConsumer, w, h, minU, minV, maxU, maxV);
-		
+
 		matrixStack.pop();
 	}
 	

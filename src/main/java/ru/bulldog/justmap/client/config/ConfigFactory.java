@@ -267,6 +267,10 @@ public final class ConfigFactory {
 				.setSaveConsumer(val -> modConfig.setBoolean("show_entity_heads", val))
 				.setDefaultValue((boolean) modConfig.getDefault("show_entity_heads"))
 				.build());
+		entityRadar.addEntry(entryBuilder.startBooleanToggle(lang("icons_shading"), modConfig.getBoolean("map_icons_shading"))
+				.setSaveConsumer(val -> modConfig.setBoolean("map_icons_shading", val))
+				.setDefaultValue((boolean) modConfig.getDefault("map_icons_shading"))
+				.build());
 		entityRadar.addEntry(entryBuilder.startIntSlider(lang("entity_icon_size"), modConfig.getInt("entity_icon_size"), 2, 16)
 				.setSaveConsumer(val -> modConfig.setRanged("entity_icon_size", val))
 				.setDefaultValue((int) modConfig.getDefault("entity_icon_size"))

@@ -177,14 +177,16 @@ public class Worldmap extends MapScreen implements IMap {
 		for (WaypointIcon icon : waypoints) {
 			icon.setPosition(
 				MathUtil.screenPos(icon.waypoint.pos.getX(), centerPos.getX(), centerX, imageScale),
-				MathUtil.screenPos(icon.waypoint.pos.getZ(), centerPos.getZ(), centerY, imageScale)
+				MathUtil.screenPos(icon.waypoint.pos.getZ(), centerPos.getZ(), centerY, imageScale),
+				icon.waypoint.pos.getY()
 			);
 			icon.draw(iconSize);
 		}
 		for (PlayerIcon icon : players) {
 			icon.setPosition(
 				MathUtil.screenPos(icon.getX(), centerPos.getX(), centerX, imageScale),
-				MathUtil.screenPos(icon.getZ(), centerPos.getZ(), centerY, imageScale)
+				MathUtil.screenPos(icon.getZ(), centerPos.getZ(), centerY, imageScale),
+				(int) icon.getY()
 			);
 			icon.draw(matrices, iconSize);
 		}

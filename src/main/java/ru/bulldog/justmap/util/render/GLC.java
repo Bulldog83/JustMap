@@ -14,6 +14,7 @@ public final class GLC {
 	public final static int GL_TRIANGLE_FAN = GL11.GL_TRIANGLE_FAN; //6
 	public final static int GL_QUADS = GL11.GL_QUADS; //7
 	public final static int GL_DEPTH_BUFFER_BIT = GL11.GL_DEPTH_BUFFER_BIT; //256
+	public final static int GL_ADD = GL11.GL_ADD; //260
 	public final static int GL_SRC_COLOR = GL11.GL_SRC_COLOR; //768
 	public final static int GL_ONE_MINUS_SRC_COLOR = GL11.GL_ONE_MINUS_SRC_COLOR; //769
 	public final static int GL_SRC_ALPHA = GL11.GL_SRC_ALPHA; //770
@@ -41,6 +42,9 @@ public final class GLC {
 	public final static int GL_UNPACK_ROW_LENGTH = GL11.GL_UNPACK_ROW_LENGTH; //3314
 	public final static int GL_UNPACK_SKIP_ROWS = GL11.GL_UNPACK_SKIP_ROWS; //3315
 	public final static int GL_UNPACK_SKIP_PIXELS = GL11.GL_UNPACK_SKIP_PIXELS; //3316
+	public final static int GL_TEXTURE_ENV = GL11.GL_TEXTURE_ENV; //8960
+	public final static int GL_TEXTURE_ENV_MODE = GL11.GL_TEXTURE_ENV_MODE; //8704
+	public final static int GL_MODULATE = GL11.GL_MODULATE; //8448
 	public final static int GL_UNSIGNED_INT_8_8_8_8 = GL12.GL_UNSIGNED_INT_8_8_8_8; //32821
 	public final static int GL_CLAMP_TO_EDGE = GL12.GL_CLAMP_TO_EDGE; //33071
 	public final static int GL_GENERATE_MIPMAP = GL14.GL_GENERATE_MIPMAP; //33169
