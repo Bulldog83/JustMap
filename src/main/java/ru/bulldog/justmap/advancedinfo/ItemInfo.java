@@ -1,5 +1,6 @@
 package ru.bulldog.justmap.advancedinfo;
 
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.item.ItemStack;
@@ -33,11 +34,13 @@ public class ItemInfo extends InfoText {
 			default:
 				posX = x - offsetX;	
 		}
+		MinecraftClient minecraft = MinecraftClient.getInstance();
 		minecraft.getItemRenderer().renderInGuiWithOverrides(itemStack, posX, y - 5);
 	}
 
 	@Override
 	public void update() {
+		MinecraftClient minecraft = MinecraftClient.getInstance();
 		if (minecraft.player == null) {
 			this.setVisible(false);
 			return;

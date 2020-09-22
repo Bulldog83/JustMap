@@ -8,11 +8,11 @@ import com.google.gson.JsonObject;
 
 import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.map.data.WorldKey;
-import ru.bulldog.justmap.util.ColorUtil;
-import ru.bulldog.justmap.util.Colors;
 import ru.bulldog.justmap.util.Dimension;
 import ru.bulldog.justmap.util.ImageUtil;
 import ru.bulldog.justmap.util.PosUtil;
+import ru.bulldog.justmap.util.colors.ColorUtil;
+import ru.bulldog.justmap.util.colors.Colors;
 import ru.bulldog.justmap.util.math.RandomUtil;
 import ru.bulldog.justmap.util.render.Image;
 import net.minecraft.client.texture.NativeImage;

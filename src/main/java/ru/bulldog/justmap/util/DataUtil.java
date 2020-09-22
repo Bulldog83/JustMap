@@ -2,26 +2,37 @@ package ru.bulldog.justmap.util;
 
 import java.util.function.Supplier;
 
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.options.GameOptions;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.registry.DynamicRegistryManager;
+import net.minecraft.util.registry.MutableRegistry;
+import net.minecraft.util.registry.Registry;
+import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.LightType;
 import net.minecraft.world.PersistentStateManager;
 import net.minecraft.world.World;
+import net.minecraft.world.biome.Biome;
 
+import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.client.screen.Worldmap;
 import ru.bulldog.justmap.map.IMap;
 import ru.bulldog.justmap.map.data.Layer;
+import ru.bulldog.justmap.server.JustMapServer;
 import ru.bulldog.justmap.util.math.MathUtil;
 
 public class DataUtil {
-	private static MinecraftClient minecraft = JustMapClient.MINECRAFT;
 	private static BlockPos.Mutable currentPos = new BlockPos.Mutable();
+	private static DynamicRegistryManager registryManager = DynamicRegistryManager.create();
 	private static ClientWorld clientWorld = null;
 	private static ServerWorld serverWorld = null;
 	private static Supplier<PersistentStateManager> persistentSupplier = null;
@@ -31,8 +42,10 @@ public class DataUtil {
 	private static int coordY = 0;
 	private static int coordZ = 0;
 	
+	@Environment(EnvType.CLIENT)
 	public static void updateWorld(ClientWorld world) {
 		clientWorld = world;
+		MinecraftClient minecraft = MinecraftClient.getInstance();
 		if (minecraft.isIntegratedServerRunning()) {
 			MinecraftServer server = minecraft.getServer();
 			serverWorld = minecraft.getServer().getWorld(world.getRegistryKey());
@@ -60,24 +73,46 @@ public class DataUtil {
 		coordY = (int) posEntity.getY();
 		
 		if (clientWorld == null) return;
-		currentLayer = getLayer(clientWorld, currentPos());
+		currentLayer = getLayer(getWorld(), currentPos());
 		currentLevel = getLevel(currentLayer, coordY);
 	}
 	
 	public static boolean isOnline() {
-		return !minecraft.isIntegratedServerRunning();
+		return !MinecraftClient.getInstance().isIntegratedServerRunning();
 	}
 	
 	public static IMap getMap() {
-		return minecraft.currentScreen instanceof Worldmap ? (Worldmap) minecraft.currentScreen : JustMapClient.MAP;
+		MinecraftClient minecraft = MinecraftClient.getInstance();
+		return minecraft.currentScreen instanceof Worldmap ? (Worldmap) minecraft.currentScreen : JustMapClient.getMap();
 	}
 	
-	public static MinecraftClient getMinecraft() {
-		return minecraft;
+	@Environment(EnvType.SERVER)
+	public static World getServerWorld(RegistryKey<World> worldKey) {
+		return JustMapServer.getServer().getWorld(worldKey);
 	}
 	
 	public static World getWorld() {
 		return serverWorld != null ? serverWorld : clientWorld;
+	}
+	
+	public static MutableRegistry<Biome> getBiomeRegistry(World world) {
+		return world.getRegistryManager().get(Registry.BIOME_KEY);
+	}
+	
+	public static MutableRegistry<Biome> getBiomeRegistry() {
+		if (JustMap.getSide().equals(EnvType.CLIENT)) {
+			MinecraftClient minecraft = MinecraftClient.getInstance();
+			ClientPlayNetworkHandler networkHandler = minecraft.getNetworkHandler();
+			if (networkHandler != null) {
+				return minecraft.getNetworkHandler().getRegistryManager().get(Registry.BIOME_KEY);
+			}
+			return registryManager.get(Registry.BIOME_KEY);
+		}
+		MinecraftServer server = JustMapServer.getServer();
+		if (server != null) {
+			return server.getRegistryManager().get(Registry.BIOME_KEY);
+		}
+		return registryManager.get(Registry.BIOME_KEY);
 	}
 	
 	public static ClientWorld getClientWorld() {
@@ -93,6 +128,7 @@ public class DataUtil {
 	}
 	
 	public static GameOptions getGameOptions() {
+		MinecraftClient minecraft = MinecraftClient.getInstance();
 		return minecraft.options;
 	}
 	
@@ -155,7 +191,6 @@ public class DataUtil {
 		} else if (RuleUtil.needRenderCaves(world, pos)) {
 			return Layer.CAVES;
 		}
-		
 		return Layer.SURFACE;
 	}
 	
@@ -165,6 +200,7 @@ public class DataUtil {
 	}
 
 	private static Entity getPosEntity() {
+		MinecraftClient minecraft = MinecraftClient.getInstance();
 		return minecraft.getCameraEntity() != null ? minecraft.getCameraEntity() : minecraft.player;
 	}
 }

@@ -10,9 +10,8 @@ import ru.bulldog.justmap.config.ConfigKeeper.IntegerRange;
 import ru.bulldog.justmap.map.waypoint.Waypoint;
 import ru.bulldog.justmap.map.waypoint.WaypointKeeper;
 import ru.bulldog.justmap.map.waypoint.Waypoint.Icon;
-import ru.bulldog.justmap.util.Colors;
 import ru.bulldog.justmap.util.Predicates;
-
+import ru.bulldog.justmap.util.colors.Colors;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.CheckboxWidget;
@@ -142,7 +141,7 @@ public class WaypointEditor extends MapScreen {
 
 		ey += row * 1.25;
 
-		IntegerRange maxRangeConfig = JustMapClient.CONFIG.getEntry("max_render_dist");
+		IntegerRange maxRangeConfig = JustMapClient.getConfig().getEntry("max_render_dist");
 		final int SHOW_RANGE_MAX = maxRangeConfig.maxValue();
 		this.showRange = waypoint.showRange;
 		this.children.add(new SliderWidget(elemX, ey, sliderW, rowH, LiteralText.EMPTY, (double) this.showRange / SHOW_RANGE_MAX) {

@@ -2,7 +2,6 @@ package ru.bulldog.justmap.client.render;
 
 import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.client.config.ClientSettings;
-import ru.bulldog.justmap.util.DataUtil;
 import ru.bulldog.justmap.util.math.MathUtil;
 
 import net.minecraft.client.MinecraftClient;
@@ -64,7 +63,7 @@ public class EntityModelRenderer {
 	
 	private static double getScale(LivingEntity livingEntity) {
 		int modelSize = ClientSettings.entityModelSize;
-		double mapScale = JustMapClient.MAP.getScale();
+		double mapScale = JustMapClient.getMap().getScale();
 		
 		modelSize = (int) Math.min(modelSize, modelSize / mapScale);
 		

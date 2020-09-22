@@ -7,8 +7,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.client.config.ClientSettings;
 import ru.bulldog.justmap.enums.ScreenPosition;
-import ru.bulldog.justmap.util.Colors;
-
+import ru.bulldog.justmap.util.colors.Colors;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.hud.InGameHud;
@@ -45,7 +44,7 @@ abstract class HudMixin extends DrawableHelper {
 			int posX = this.scaledWidth;
 			int posY = ClientSettings.positionOffset;
 			if (ClientSettings.mapPosition == ScreenPosition.TOP_RIGHT) {
-				posX = JustMapClient.MAP.getSkinX();
+				posX = JustMapClient.getMap().getSkinX();
 			}
 			
 			this.drawMovedEffects(matrices, posX, posY);			

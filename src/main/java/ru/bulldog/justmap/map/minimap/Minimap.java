@@ -52,14 +52,14 @@ import java.util.List;
 import java.util.stream.Stream;
 
 public class Minimap implements IMap {
-	private static final MinecraftClient minecraft = DataUtil.getMinecraft();
-
-	private final TextManager textManager;
+	private static TextManager textManager;
+	private static InfoText txtCoords = new CoordsInfo(TextAlignment.CENTER, "0, 0, 0");
+	private static InfoText txtBiome = new BiomeInfo(TextAlignment.CENTER, "");
+	private static InfoText txtTime = new TimeInfo(TextAlignment.CENTER, "");
+	
+	private final MinecraftClient minecraft;
 	private final FastRenderer fastRenderer;
 	private final BufferedRenderer bufferedRenderer;
-	private InfoText txtCoords = new CoordsInfo(TextAlignment.CENTER, "0, 0, 0");
-	private InfoText txtBiome = new BiomeInfo(TextAlignment.CENTER, "");
-	private InfoText txtTime = new TimeInfo(TextAlignment.CENTER, "");
 	private List<WaypointIcon> waypoints = new ArrayList<>();
 	private PlayerEntity locPlayer = null;
 	private Layer mapLayer = Layer.SURFACE;
@@ -86,13 +86,10 @@ public class Minimap implements IMap {
 	private int scaledHeight;
 
 	public Minimap() {
+		this.minecraft = MinecraftClient.getInstance();
 		this.entityRadar = new EntityRadar();
-		this.textManager = AdvancedInfo.getMapTextManager();
 		this.fastRenderer = new FastRenderer(this);
 		this.bufferedRenderer = new BufferedRenderer(this);
-		this.textManager.add(txtCoords);
-		this.textManager.add(txtBiome);
-		this.textManager.add(txtTime);
 	}
 
 	public void update() {
@@ -123,7 +120,7 @@ public class Minimap implements IMap {
 	}
 
 	public void updateMapParams() {
-		ClientConfig config = JustMapClient.CONFIG;
+		ClientConfig config = JustMapClient.getConfig();
 		this.isMapVisible = config.getBoolean("map_visible");
 		
 		if (!isMapVisible) return;
@@ -175,8 +172,10 @@ public class Minimap implements IMap {
 				this.scaledHeight = (int) (mapHeight * mapScale);
 			}
 			
-			this.textManager.setLineWidth(mapWidth);
+			textManager.setLineWidth(mapWidth);
 		}
+		
+		this.updateMapPosition();
 		
 		if (!ClientSettings.fastRender) {
 			try {
@@ -193,8 +192,6 @@ public class Minimap implements IMap {
 		} else if (bufferedRenderer.isFBOLoaded()) {
 			this.bufferedRenderer.deleteFramebuffers();
 		}
-		
-		this.updateMapPosition();
 	}
 	
 	private void updateMapPosition() {
@@ -260,7 +257,7 @@ public class Minimap implements IMap {
 		this.mapX = skinX + border;
 		this.mapY = skinY + border;	
 		
-		this.textManager.updatePosition(textPos,
+		textManager.updatePosition(textPos,
 				mapX, (textPos == TextPosition.UNDER ?
 						skinY + fullHeight + 3 :
 							skinY - 12)
@@ -269,24 +266,24 @@ public class Minimap implements IMap {
 
 	private void updateInfo(PlayerEntity player) {
 		if (!ClientSettings.mapInfo) {
-			this.txtCoords.setVisible(false);
-			this.txtBiome.setVisible(false);
-			this.txtTime.setVisible(false);
+			txtCoords.setVisible(false);
+			txtBiome.setVisible(false);
+			txtTime.setVisible(false);
 
 			return;
 		}
-		this.txtCoords.setVisible(ClientSettings.showPosition);
+		txtCoords.setVisible(ClientSettings.showPosition);
 		if (ClientSettings.showPosition) {
-			this.txtCoords.update();
+			txtCoords.update();
 		}
 		boolean showBiome = !ClientSettings.advancedInfo && ClientSettings.showBiome;
 		boolean showTime = !ClientSettings.advancedInfo && ClientSettings.showTime;
-		this.txtBiome.setVisible(showBiome);
-		this.txtTime.setVisible(showTime);
+		txtBiome.setVisible(showBiome);
+		txtTime.setVisible(showTime);
 		if (showBiome)
-			this.txtBiome.update();
+			txtBiome.update();
 		if (showTime)
-			this.txtTime.update();
+			txtTime.update();
 	}
 
 	public void prepareMap(PlayerEntity player) {
@@ -341,7 +338,7 @@ public class Minimap implements IMap {
 					PlayerEntity pEntity = (PlayerEntity) entity;
 					if (pEntity.isMainPlayer()) continue;
 					this.entityRadar.addPlayer(pEntity);
-				} else if (entity instanceof MobEntity && !(entity instanceof PlayerEntity)) {
+				} else if (entity instanceof MobEntity) {
 					MobEntity mobEntity = (MobEntity) entity;
 					boolean hostile = mobEntity instanceof HostileEntity;
 					if (hostile && RuleUtil.allowHostileRadar()) {
@@ -412,7 +409,8 @@ public class Minimap implements IMap {
 				for (Waypoint wp : stream.toArray(Waypoint[]::new)) {
 					WaypointIcon waypoint = new WaypointIcon(this, wp);
 					waypoint.setPosition(MathUtil.screenPos(wp.pos.getX(), currentPos.getX(), screenX, mapScale),
-										 MathUtil.screenPos(wp.pos.getZ(), currentPos.getZ(), screenY, mapScale));
+										 MathUtil.screenPos(wp.pos.getZ(), currentPos.getZ(), screenY, mapScale),
+										 wp.pos.getY());
 					this.waypoints.add(waypoint);
 				}
 			}
@@ -421,7 +419,7 @@ public class Minimap implements IMap {
 	}
 
 	public TextManager getTextManager() {
-		return this.textManager;
+		return textManager;
 	}
 
 	public boolean isBigMap() {
@@ -437,6 +435,7 @@ public class Minimap implements IMap {
 	}
 
 	public boolean isMapVisible() {
+		if (minecraft == null) return false;
 		if (minecraft.currentScreen != null) {
 			return this.isMapVisible && !minecraft.isPaused() && ClientSettings.showInChat
 					&& minecraft.currentScreen instanceof ChatScreen;
@@ -513,5 +512,12 @@ public class Minimap implements IMap {
 	@Override
 	public BlockPos getCenter() {
 		return DataUtil.currentPos();
+	}
+	
+	static {
+		textManager = AdvancedInfo.getMapTextManager();
+		textManager.add(txtCoords);
+		textManager.add(txtBiome);
+		textManager.add(txtTime);
 	}
 }
