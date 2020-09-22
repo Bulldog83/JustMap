@@ -8,10 +8,9 @@ import ru.bulldog.justmap.map.data.WorldManager;
 import ru.bulldog.justmap.map.waypoint.Waypoint;
 import ru.bulldog.justmap.map.waypoint.WaypointKeeper;
 import ru.bulldog.justmap.map.waypoint.Waypoint.Icon;
-import ru.bulldog.justmap.util.Colors;
-import ru.bulldog.justmap.util.DataUtil;
 import ru.bulldog.justmap.util.DimensionUtil;
 import ru.bulldog.justmap.util.RuleUtil;
+import ru.bulldog.justmap.util.colors.Colors;
 import ru.bulldog.justmap.util.math.MathUtil;
 import ru.bulldog.justmap.util.math.RandomUtil;
 import ru.bulldog.justmap.util.render.RenderUtil;
@@ -45,9 +44,7 @@ public class WaypointsList extends MapScreen {
 			this.width = width;
 			this.height = height + 2;
 			this.waypoint = waypoint;
-			
-			this.minecraft = DataUtil.getMinecraft();
-			
+			this.minecraft = MinecraftClient.getInstance();
 			this.editButton = new ButtonWidget(0, 0, 40, height, wayPointListEditor.lang("edit"), (b) -> wayPointListEditor.edit(waypoint));
 			this.deleteButton = new ButtonWidget(0, 0, 40, height, wayPointListEditor.lang("delete"), (b) -> wayPointListEditor.delete(waypoint));
 			this.tpButton = new ButtonWidget(0, 0, 40, height, wayPointListEditor.lang("teleport"), (b) -> wayPointListEditor.teleport(waypoint));

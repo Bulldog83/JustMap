@@ -1,9 +1,10 @@
-package ru.bulldog.justmap.client;
+package ru.bulldog.justmap.client.control;
 
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.minecraft.client.options.KeyBinding;
 
 import ru.bulldog.justmap.JustMap;
+import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.client.config.ConfigFactory;
 import ru.bulldog.justmap.client.screen.WaypointsList;
 import ru.bulldog.justmap.client.screen.Worldmap;
@@ -25,7 +26,7 @@ public final class KeyHandler {
 		registerKey(new KeyParser(createKeyBinding("create_waypoint", GLFW.GLFW_KEY_B)) {
 			@Override
 			public void onKeyUp() {
-				JustMapClient.MAP.createWaypoint();
+				JustMapClient.getMap().createWaypoint();
 			}
 
 			@Override
@@ -37,50 +38,50 @@ public final class KeyHandler {
 		registerKey(new KeyParser(createKeyBinding("toggle_map_visible", GLFW.GLFW_KEY_H)) {
 			@Override
 			public void onKeyUp() {
-				JustMapClient.CONFIG.setBoolean("map_visible", !JustMapClient.CONFIG.getBoolean("map_visible"));
-				JustMapClient.CONFIG.saveChanges();
+				JustMapClient.getConfig().setBoolean("map_visible", !JustMapClient.getConfig().getBoolean("map_visible"));
+				JustMapClient.getConfig().saveChanges();
 			}
 		});
 		
 		registerKey(new KeyParser(createKeyBinding("toggle_big_map", GLFW.GLFW_KEY_N)) {
 			@Override
 			public void onKeyUp() {
-				JustMapClient.CONFIG.setBoolean("show_big_map", !JustMapClient.CONFIG.getBoolean("show_big_map"));
-				JustMapClient.CONFIG.saveChanges();
+				JustMapClient.getConfig().setBoolean("show_big_map", !JustMapClient.getConfig().getBoolean("show_big_map"));
+				JustMapClient.getConfig().saveChanges();
 			}
 		});
 		
 		registerKey(new KeyParser(createKeyBinding("toggle_show_caves", GLFW.GLFW_KEY_K)) {
 			@Override
 			public void onKeyUp() {
-				JustMapClient.CONFIG.setBoolean("show_caves", !JustMapClient.CONFIG.getBoolean("show_caves"));
-				JustMapClient.CONFIG.saveChanges();
+				JustMapClient.getConfig().setBoolean("show_caves", !JustMapClient.getConfig().getBoolean("show_caves"));
+				JustMapClient.getConfig().saveChanges();
 			}
 	
 			@Override
 			public boolean isListening() {
-				return JustMapClient.MAP.isMapVisible();
+				return JustMapClient.getMap().isMapVisible();
 			}
 		});
 		
 		registerKey(new KeyParser(createKeyBinding("toggle_show_entities", GLFW.GLFW_KEY_Y)) {
 			@Override
 			public void onKeyUp() {
-				JustMapClient.CONFIG.setBoolean("show_entities", !JustMapClient.CONFIG.getBoolean("show_entities"));
-				JustMapClient.CONFIG.saveChanges();
+				JustMapClient.getConfig().setBoolean("show_entities", !JustMapClient.getConfig().getBoolean("show_entities"));
+				JustMapClient.getConfig().saveChanges();
 			}
 	
 			@Override
 			public boolean isListening() {
-				return JustMapClient.MAP.isMapVisible();
+				return JustMapClient.getMap().isMapVisible();
 			}
 		});
 		
 		registerKey(new KeyParser(createKeyBinding("toggle_show_waypoints", GLFW.GLFW_KEY_P)) {
 			@Override
 			public void onKeyUp() {
-				JustMapClient.CONFIG.setBoolean("show_waypoints", !JustMapClient.CONFIG.getBoolean("show_waypoints"));
-				JustMapClient.CONFIG.saveChanges();
+				JustMapClient.getConfig().setBoolean("show_waypoints", !JustMapClient.getConfig().getBoolean("show_waypoints"));
+				JustMapClient.getConfig().saveChanges();
 			}
 		});
 		
@@ -123,24 +124,24 @@ public final class KeyHandler {
 		registerKey(new KeyParser(createKeyBinding("reduce_scale", GLFW.GLFW_KEY_LEFT_BRACKET)) {
 			@Override
 			public void onKeyUp() {
-				JustMapClient.CONFIG.updateMapScale(0.5F);
+				JustMapClient.getConfig().updateMapScale(0.5F);
 			}
 	
 			@Override
 			public boolean isListening() {
-				return JustMapClient.MAP.isMapVisible();
+				return JustMapClient.getMap().isMapVisible();
 			}
 		});
 		
 		registerKey(new KeyParser(createKeyBinding("increase_scale", GLFW.GLFW_KEY_RIGHT_BRACKET)) {
 			@Override
 			public void onKeyUp() {
-				JustMapClient.CONFIG.updateMapScale(2F);
+				JustMapClient.getConfig().updateMapScale(2F);
 			}
 	
 			@Override
 			public boolean isListening() {
-				return JustMapClient.MAP.isMapVisible();
+				return JustMapClient.getMap().isMapVisible();
 			}
 		});
 	}

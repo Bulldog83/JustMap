@@ -9,7 +9,7 @@ import net.minecraft.client.gui.AbstractParentElement;
 import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.Element;
 
-import ru.bulldog.justmap.util.Colors;
+import ru.bulldog.justmap.util.colors.Colors;
 import ru.bulldog.justmap.util.render.RenderUtil;
 
 public class DropDownListWidget extends AbstractParentElement implements Drawable {

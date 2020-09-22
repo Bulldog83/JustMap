@@ -86,6 +86,7 @@
   "justmap.configuration.max_render_dist": "Max render distance",
   "justmap.configuration.show_entities": "Show entities on the map",
   "justmap.configuration.show_entity_heads": "Show entities heads",
+  "justmap.configuration.icons_shading": "Icons shading (include waypoints)",
   "justmap.configuration.show_hostile": "Show Hostile",
   "justmap.configuration.show_creatures": "Show Creatures",
   "justmap.configuration.show_players": "Show Players",

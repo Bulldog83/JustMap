@@ -7,6 +7,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.world.ClientWorld;
+
 import ru.bulldog.justmap.map.data.WorldManager;
 import ru.bulldog.justmap.util.DataUtil;
 

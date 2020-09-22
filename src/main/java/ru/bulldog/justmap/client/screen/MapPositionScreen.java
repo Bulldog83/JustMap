@@ -15,7 +15,7 @@ import ru.bulldog.justmap.util.LangUtil;
 public class MapPositionScreen extends Screen {
 
 	private final static Text TITLE = LangUtil.getText("gui", "screen.map_position");
-	private final static ClientConfig config = JustMapClient.CONFIG;
+	private final static ClientConfig config = JustMapClient.getConfig();
 	
 	private final Screen parent;
 	private MapWidget mapHolder;

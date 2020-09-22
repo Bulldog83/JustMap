@@ -9,7 +9,6 @@ import ru.bulldog.justmap.client.config.ClientSettings;
 import ru.bulldog.justmap.enums.ScreenPosition;
 import ru.bulldog.justmap.enums.TextAlignment;
 import ru.bulldog.justmap.enums.TextPosition;
-import ru.bulldog.justmap.util.DataUtil;
 
 public class TextManager {
 	private TextPosition textPosition = TextPosition.RIGHT;
@@ -43,7 +42,7 @@ public class TextManager {
 	
 	public TextManager updatePosition(ScreenPosition position) {
 		int offset = ClientSettings.positionOffset;
-		MinecraftClient minecraft = DataUtil.getMinecraft();
+		MinecraftClient minecraft = MinecraftClient.getInstance();
 		int screenW = minecraft.getWindow().getScaledWidth();
 		int screenH = minecraft.getWindow().getScaledHeight();
 		switch(position) {
