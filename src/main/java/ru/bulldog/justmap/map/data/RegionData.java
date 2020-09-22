@@ -61,13 +61,10 @@ public class RegionData {
 		this.level = map.getLevel();
 		this.center = new ChunkPos(map.getCenter());
 		this.worldmap = map.isWorldmap();
-		this.image = this.getImage(layer, level);
-		
 		int radius = DataUtil.getGameOptions().viewDistance - 1;
 		this.updateArea = new Plane(center.x - radius, center.z - radius,
 									center.x + radius, center.z + radius);
-		
-		this.updateImage(true);
+		this.loadImage(layer, level);
 	}
 	
 	private RegionData(WorldData data, RegionPos regPos) {
@@ -92,21 +89,22 @@ public class RegionData {
 		this.worldmap = isWorldmap;
 	}
 	
-	private MapTexture getImage(Layer layer, int level) {
+	private void loadImage(Layer layer, int level) {
 		File regionFile = this.imageFile(layer, level);
 		if (images.containsKey(layer)) {
-			MapTexture image = this.images.get(layer);
-			if (!image.loadImage(regionFile)) {
-				this.image.fill(Colors.BLACK);
-			}
-			return image;
+			this.image = this.images.get(layer);
+		} else {
+			this.image = new MapTexture(regionFile, 512, 512, Colors.BLACK);
+			this.images.put(layer, image);
 		}
-		
-		MapTexture image = new MapTexture(regionFile, 512, 512, Colors.BLACK);
-		image.loadImage(regionFile);
-		this.images.put(layer, image);
-		
-		return image;
+		worker.execute(() -> {
+			synchronized (imageLock) {
+				if (!image.loadImage(regionFile)) {
+					this.image.fill(Colors.BLACK);
+				}
+			}
+			this.updateImage(true);
+		});
 	}
 	
 	public void updateImage(boolean needUpdate) {
@@ -252,21 +250,15 @@ public class RegionData {
 			
 			return;
 		}
-		worker.execute(() -> {
-			logger.debug("Swap region {} ({}, {}) to: {}, level: {}",
-					regPos, this.layer, this.level, layer, level);
-			synchronized (imageLock) {
-				MapTexture toSave = new MapTexture(image);
-				this.saveImage(toSave, true);
-				this.layer = layer;
-				this.level = level;
-				this.image = this.getImage(layer, level);
-				this.updateImage(true);
-				if (texture != null) {
-					this.updateTexture();
-				}
-			}
-		});
+		logger.debug("Swap region {} ({}, {}) to: {}, level: {}",
+				regPos, this.layer, this.level, layer, level);
+		this.layer = layer;
+		this.level = level;
+		synchronized (imageLock) {
+			MapTexture toSave = new MapTexture(image);
+			this.loadImage(layer, level);
+			this.saveImage(toSave, true);
+		}
 	}
 	
 	private void saveImage() {
