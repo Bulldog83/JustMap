@@ -7,6 +7,7 @@ import org.lwjgl.opengl.GL30;
 import org.lwjgl.opengl.GL;
 
 import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.texture.TextureUtil;
 import net.minecraft.client.MinecraftClient;
@@ -30,17 +31,18 @@ public class ExtendedFramebuffer extends Framebuffer {
 	
 	@Override
 	public void resize(int width, int height, boolean isMac) {
+		RenderSystem.assertThread(RenderSystem::isOnRenderThreadOrInit);
 		GlStateManager.enableDepthTest();
 		if (fbo >= 0) {
 			this.delete();
 		}
 		this.initFbo(width, height, isMac);
-		this.checkFramebufferStatus();
 		this.bindFramebuffer(GLC.GL_FRAMEBUFFER, 0);
 	}
 	
 	@Override
 	public void initFbo(int width, int height, boolean isMac) {
+		RenderSystem.assertThread(RenderSystem::isOnRenderThreadOrInit);
 		this.viewportWidth = width;
 		this.viewportHeight = height;
 		this.textureWidth = width;
@@ -49,6 +51,13 @@ public class ExtendedFramebuffer extends Framebuffer {
 		this.colorAttachment = TextureUtil.generateId();
 		if (useDepthAttachment) {
 			this.depthAttachment = this.genRenderbuffers();
+			GlStateManager.bindTexture(depthAttachment);
+			GlStateManager.texParameter(GLC.GL_TEXTURE_2D, GLC.GL_TEXTURE_MIN_FILTER, GLC.GL_NEAREST);
+			GlStateManager.texParameter(GLC.GL_TEXTURE_2D, GLC.GL_TEXTURE_MAG_FILTER, GLC.GL_NEAREST);
+			GlStateManager.texParameter(GLC.GL_TEXTURE_2D, GLC.GL_TEXTURE_WRAP_S, GLC.GL_CLAMP);
+			GlStateManager.texParameter(GLC.GL_TEXTURE_2D, GLC.GL_TEXTURE_WRAP_T, GLC.GL_CLAMP);
+			GlStateManager.texParameter(GLC.GL_TEXTURE_2D, 34892, 0);
+			GlStateManager.texImage2D(GLC.GL_TEXTURE_2D, 0, 6402, textureWidth, textureHeight, 0, 6402, 5126, null);
 		}
 		this.setTexFilter(GLC.GL_NEAREST);
 		GlStateManager.bindTexture(colorAttachment);
@@ -60,8 +69,10 @@ public class ExtendedFramebuffer extends Framebuffer {
 			this.renderbufferStorage(GLC.GL_RENDERBUFFER, GLC.GL_DEPTH_COMPONENT24, textureWidth, textureHeight);
 			this.framebufferRenderbuffer(GLC.GL_FRAMEBUFFER, GLC.GL_DEPTH_ATTACHMENT, GLC.GL_RENDERBUFFER, depthAttachment);
 		}
-		//this.checkFramebufferStatus();
-		this.clear(isMac);
+		try {
+			this.checkFramebufferStatus();
+			this.clear(isMac);
+		} catch (Exception ex) {}
 		this.endRead();
 	}
 	
@@ -321,6 +332,7 @@ public class ExtendedFramebuffer extends Framebuffer {
 	
 	@Override
 	public void setTexFilter(int filter) {
+		RenderSystem.assertThread(RenderSystem::isOnRenderThreadOrInit);
 		this.texFilter = filter;
 		GlStateManager.bindTexture(colorAttachment);
 		GlStateManager.texParameter(GLC.GL_TEXTURE_2D, GLC.GL_TEXTURE_MIN_FILTER, filter);

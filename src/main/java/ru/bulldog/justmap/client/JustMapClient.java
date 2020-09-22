@@ -44,7 +44,21 @@ public class JustMapClient implements ClientModInitializer {
 	public void onInitializeClient() {
 		JustMap.setSide(EnvType.CLIENT);
 		KeyHandler.initKeyBindings();
+		ClientLifecycleEvents.CLIENT_STARTED.register((client) -> {
+			minecraft = client;
+			networkHandler = new ClientNetworkHandler();
+			networkHandler.registerPacketsListeners();
+			config = ClientConfig.get();
+			map = new Minimap();
+			Colors.INSTANCE.loadData();
+		});
 		ClientChunkEvents.CHUNK_LOAD.register(WorldManager::onChunkLoad);
+		HudRenderCallback.EVENT.register((matrices, delta) -> {
+			if (!minecraft.options.debugEnabled) {
+				JustMapClient.map.getRenderer().renderMap(matrices);
+				AdvancedInfo.getInstance().draw(matrices);
+			}
+		});
 		ClientTickEvents.END_CLIENT_TICK.register(client -> {
 			if (minecraft == null) return;
 			boolean isTitle = this.isOnTitleScreen(client.currentScreen);
@@ -63,20 +77,6 @@ public class JustMapClient implements ClientModInitializer {
 			JustMapClient.map.update();
 			WorldManager.memoryControl();
 			ChunkUpdateListener.proceed();
-		});
-		HudRenderCallback.EVENT.register((matrices, delta) -> {
-			if (!minecraft.options.debugEnabled) {
-				JustMapClient.map.getRenderer().renderMap(matrices);
-				AdvancedInfo.getInstance().draw(matrices);
-			}
-		});
-		ClientLifecycleEvents.CLIENT_STARTED.register((client) -> {
-			minecraft = client;
-			networkHandler = new ClientNetworkHandler();
-			networkHandler.registerPacketsListeners();
-			config = ClientConfig.get();
-			map = new Minimap();
-			Colors.INSTANCE.loadData();
 		});
 		ClientLifecycleEvents.CLIENT_STOPPING.register(client -> {
 			JustMapClient.stop();
