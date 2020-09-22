@@ -1,5 +1,7 @@
 package ru.bulldog.justmap.advancedinfo;
 
+import net.minecraft.client.MinecraftClient;
+
 import ru.bulldog.justmap.client.config.ClientSettings;
 import ru.bulldog.justmap.enums.TextAlignment;
 
@@ -20,6 +22,7 @@ public class TimeInfo extends InfoText {
 	@Override
 	public void update() {
 		this.setVisible(ClientSettings.showTime);
+		MinecraftClient minecraft = MinecraftClient.getInstance();
 		if (visible && minecraft.world != null) {
 			this.setText(title + this.timeString(minecraft.world.getTimeOfDay()));
 		}
