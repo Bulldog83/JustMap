@@ -4,7 +4,8 @@
     "compatibilityLevel": "JAVA_8",
     "server": [
 		"GameRuleCommandMixin",
-		"PlayerManagerMixin"
+		"PlayerManagerMixin",
+		"ServerWorldMixin"
 	],
     "injectors": {
         "defaultRequire": 1

@@ -5,11 +5,11 @@ import ru.bulldog.justmap.map.data.WorldManager;
 import ru.bulldog.justmap.map.waypoint.Waypoint;
 import ru.bulldog.justmap.map.waypoint.WaypointKeeper;
 import ru.bulldog.justmap.map.waypoint.Waypoint.Icon;
-import ru.bulldog.justmap.util.ColorUtil;
-import ru.bulldog.justmap.util.Colors;
-import ru.bulldog.justmap.util.DataUtil;
+import ru.bulldog.justmap.util.colors.ColorUtil;
+import ru.bulldog.justmap.util.colors.Colors;
 import ru.bulldog.justmap.util.math.MathUtil;
 import ru.bulldog.justmap.util.render.RenderUtil;
+
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 
@@ -35,9 +35,8 @@ import com.mojang.blaze3d.systems.RenderSystem;
 @Environment(EnvType.CLIENT)
 public class WaypointRenderer {
 	private static WaypointRenderer renderer = new WaypointRenderer();
-	
 	private final static Identifier BEAM_TEX = new Identifier("textures/entity/beacon_beam.png");
-	private final static MinecraftClient minecraft = DataUtil.getMinecraft();
+	private final static MinecraftClient minecraft = MinecraftClient.getInstance();
 	
 	public static void renderHUD(float delta, float fov) {
 		if (!ClientSettings.showWaypoints || !ClientSettings.waypointsTracking) return;
@@ -84,6 +83,7 @@ public class WaypointRenderer {
 	}
 	
 	public static void renderWaypoints(MatrixStack matrices, Camera camera, float tickDelta) {
+		if (minecraft == null) return;
 		if (!ClientSettings.showWaypoints || !ClientSettings.waypointsWorldRender) return;
 		
 		long time = minecraft.player.world.getTime();

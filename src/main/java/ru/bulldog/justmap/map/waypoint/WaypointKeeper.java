@@ -42,7 +42,7 @@ public class WaypointKeeper {
 	private void loadWaypoints() {
 		waypoints = new HashMap<>();		
 		if (currentStorage.exists()) {
-			JsonObject jsonObject = JsonFactory.loadJson(currentStorage);
+			JsonObject jsonObject = JsonFactory.getJsonObject(currentStorage);
 			if (jsonObject.has("waypoints")) {
 				JsonArray waypointObject = jsonObject.getAsJsonArray("waypoints");
 				for(JsonElement elem : waypointObject) {

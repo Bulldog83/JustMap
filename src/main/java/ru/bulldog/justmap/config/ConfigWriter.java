@@ -19,7 +19,7 @@ public class ConfigWriter {
 	
 	public static JsonObject load() {
 		if (configObject == null) {
-			configObject = JsonFactory.loadJson(CONFIG_FILE);
+			configObject = JsonFactory.getJsonObject(CONFIG_FILE);
 		}
 		
 		return configObject;

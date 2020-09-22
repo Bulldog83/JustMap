@@ -15,7 +15,7 @@ import ru.bulldog.justmap.util.LangUtil;
 public class MapPositionScreen extends Screen {
 
 	private final static Text TITLE = LangUtil.getText("gui", "screen.map_position");
-	private final static ClientConfig config = JustMapClient.CONFIG;
+	private final static ClientConfig config = JustMapClient.getConfig();
 	
 	private final Screen parent;
 	private MapWidget mapHolder;
@@ -32,7 +32,7 @@ public class MapPositionScreen extends Screen {
 		this.addButton(new ButtonWidget(posX - 125, posY, 80, 20, LangUtil.getString("gui", "save"), button -> this.onSave()));
 		this.addButton(new ButtonWidget(posX - 40, posY, 80, 20, LangUtil.getString("gui", "reset"), button -> this.onReset()));
 		this.addButton(new ButtonWidget(posX + 45, posY, 80, 20, LangUtil.getString("gui", "cancel"), button -> this.onClose()));
-		this.mapHolder = this.addChild(new MapWidget(this, JustMapClient.MAP));
+		this.mapHolder = this.addChild(new MapWidget(this, JustMapClient.getMap()));
 	}
 	
 	private <T extends Element> T addChild(T elem) {

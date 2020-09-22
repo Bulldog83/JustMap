@@ -86,6 +86,7 @@
   "justmap.configuration.max_render_dist": "Максимальное расстояние видимости",
   "justmap.configuration.show_entities": "Отображать сущности на карте",
   "justmap.configuration.show_entity_heads": "Отображать головы существ",
+  "justmap.configuration.icons_shading": "Затенение иконок (включая маркеры)",
   "justmap.configuration.show_hostile": "Отображать враждебных существ",
   "justmap.configuration.show_creatures": "Отображать пассивных существ",
   "justmap.configuration.show_players": "Отображать игроков",

@@ -1,8 +1,7 @@
 package ru.bulldog.justmap.advancedinfo;
 
 import ru.bulldog.justmap.enums.TextAlignment;
-import ru.bulldog.justmap.util.Colors;
-import ru.bulldog.justmap.util.DataUtil;
+import ru.bulldog.justmap.util.colors.Colors;
 import ru.bulldog.justmap.util.render.RenderUtil;
 
 import net.minecraft.client.MinecraftClient;
@@ -21,8 +20,6 @@ public abstract class InfoText {
 	int offsetY;
 	int x, y;
   
-	protected static final MinecraftClient minecraft = DataUtil.getMinecraft();
-	
 	public abstract void update();
 	
 	public InfoText(String text) {
@@ -48,7 +45,8 @@ public abstract class InfoText {
 	  }
 	  
 	  public void draw(int x, int y) {
-		  TextRenderer textRenderer = minecraft.textRenderer;
+		MinecraftClient minecraft = MinecraftClient.getInstance();  
+		TextRenderer textRenderer = minecraft.textRenderer;
 		
 		  int width = minecraft.getWindow().getScaledWidth();
 		

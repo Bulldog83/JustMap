@@ -95,6 +95,7 @@ public class ClientConfig extends Config {
 		KEEPER.registerEntry("show_player_heads", new BooleanEntry(ClientSettings.showPlayerHeads, (b) -> ClientSettings.showPlayerHeads = b, () -> ClientSettings.showPlayerHeads));
 		KEEPER.registerEntry("show_player_names", new BooleanEntry(ClientSettings.showPlayerNames, (b) -> ClientSettings.showPlayerNames = b, () -> ClientSettings.showPlayerNames));
 		KEEPER.registerEntry("render_entity_model", new BooleanEntry(ClientSettings.renderEntityModel, (b) -> ClientSettings.renderEntityModel = b, () -> ClientSettings.renderEntityModel));
+		KEEPER.registerEntry("map_icons_shading", new BooleanEntry(ClientSettings.entityIconsShading, (b) -> ClientSettings.entityIconsShading = b, () -> ClientSettings.entityIconsShading));
 		KEEPER.registerEntry("show_icons_outline", new BooleanEntry(ClientSettings.showIconsOutline, (b) -> ClientSettings.showIconsOutline = b, () -> ClientSettings.showIconsOutline));
 		KEEPER.registerEntry("show_big_map", new BooleanEntry(ClientSettings.showBigMap, (b) -> ClientSettings.showBigMap = b, () -> ClientSettings.showBigMap));
 		KEEPER.registerEntry("force_map_update", new BooleanEntry(ClientSettings.forceUpdate, (b) -> ClientSettings.forceUpdate = b, () -> ClientSettings.forceUpdate));
@@ -139,7 +140,7 @@ public class ClientConfig extends Config {
 	@Override
 	public void saveChanges() {
 		ConfigWriter.save(KEEPER.toJson());
-		JustMapClient.MAP.updateMapParams();
+		JustMapClient.getMap().updateMapParams();
 		WorldManager.onConfigUpdate();
 	}
 }

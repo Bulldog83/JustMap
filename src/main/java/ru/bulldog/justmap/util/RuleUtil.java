@@ -1,17 +1,27 @@
 package ru.bulldog.justmap.util;
 
+import net.fabricmc.api.EnvType;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.GameRules;
 import net.minecraft.world.World;
 
+import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.client.config.ClientSettings;
 import ru.bulldog.justmap.map.MapGameRules;
+import ru.bulldog.justmap.server.config.ServerSettings;
 
 public class RuleUtil {
 
-	public static boolean isAllowed(boolean param, GameRules.RuleKey<GameRules.BooleanRule> rule) {
-		if (param) {
-			return DataUtil.getMinecraft().isInSingleplayer() || MapGameRules.isAllowed(rule);
+	public static boolean isAllowed(boolean param, GameRules.RuleKey<GameRules.BooleanRule> rule, boolean isServer) {
+		if (isServer) {
+			if (ServerSettings.useGameRules) {
+				return MapGameRules.isAllowed(rule);
+			} else {
+				return param;
+			}
+		} else if (param) {
+			return MinecraftClient.getInstance().isInSingleplayer() || MapGameRules.isAllowed(rule);
 		}
 		
 		return false;
@@ -22,7 +32,12 @@ public class RuleUtil {
 	}
 
 	public static boolean needRenderCaves(World world, BlockPos pos) {
-		boolean allowCaves = isAllowed(ClientSettings.drawCaves, MapGameRules.ALLOW_CAVES_MAP);
+		boolean allowCaves = false;
+		if (JustMap.getSide() == EnvType.SERVER) {
+			allowCaves = isAllowed(ServerSettings.allowCavesMap, MapGameRules.ALLOW_CAVES_MAP, true);
+		} else {
+			allowCaves = isAllowed(ClientSettings.drawCaves, MapGameRules.ALLOW_CAVES_MAP, false);
+		}
 		
 		if (DimensionUtil.isEnd(world.dimension)) {
 			return false;
@@ -36,26 +51,44 @@ public class RuleUtil {
 	}
 	
 	public static boolean allowEntityRadar() {
-		return isAllowed(ClientSettings.showEntities, MapGameRules.ALLOW_ENTITY_RADAR);
+		if (JustMap.getSide() == EnvType.SERVER) {
+			return isAllowed(ServerSettings.allowEntities, MapGameRules.ALLOW_ENTITY_RADAR, true);
+		}
+		return isAllowed(ClientSettings.showEntities, MapGameRules.ALLOW_ENTITY_RADAR, false);
 	}
 
 	public static boolean allowHostileRadar() {
-		return isAllowed(ClientSettings.showHostile, MapGameRules.ALLOW_HOSTILE_RADAR);
+		if (JustMap.getSide() == EnvType.SERVER) {
+			return isAllowed(ServerSettings.allowHostile, MapGameRules.ALLOW_HOSTILE_RADAR, true);
+		}
+		return isAllowed(ClientSettings.showHostile, MapGameRules.ALLOW_HOSTILE_RADAR, false);
 	}
 
 	public static boolean allowCreatureRadar() {
-		return isAllowed(ClientSettings.showCreatures, MapGameRules.ALLOW_CREATURE_RADAR);
+		if (JustMap.getSide() == EnvType.SERVER) {
+			return isAllowed(ServerSettings.allowCreatures, MapGameRules.ALLOW_CREATURE_RADAR, true);
+		}
+		return isAllowed(ClientSettings.showCreatures, MapGameRules.ALLOW_CREATURE_RADAR, false);
 	}
 
 	public static boolean allowPlayerRadar() {
-		return isAllowed(ClientSettings.showPlayers, MapGameRules.ALLOW_PLAYER_RADAR);
+		if (JustMap.getSide() == EnvType.SERVER) {
+			return isAllowed(ServerSettings.allowPlayers, MapGameRules.ALLOW_PLAYER_RADAR, true);
+		}
+		return isAllowed(ClientSettings.showPlayers, MapGameRules.ALLOW_PLAYER_RADAR, false);
 	}
 
 	public static boolean allowSlimeChunks() {
-		return isAllowed(ClientSettings.showSlime, MapGameRules.ALLOW_SLIME_CHUNKS);
+		if (JustMap.getSide() == EnvType.SERVER) {
+			return isAllowed(ServerSettings.allowSlime, MapGameRules.ALLOW_SLIME_CHUNKS, true);
+		}
+		return isAllowed(ClientSettings.showSlime, MapGameRules.ALLOW_SLIME_CHUNKS, false);
 	}
 
 	public static boolean allowTeleportation() {
-		return isAllowed(ClientSettings.jumpToWaypoints, MapGameRules.ALLOW_TELEPORTATION);
+		if (JustMap.getSide() == EnvType.SERVER) {
+			return isAllowed(ServerSettings.allowTeleportation, MapGameRules.ALLOW_TELEPORTATION, true);
+		}
+		return isAllowed(ClientSettings.jumpToWaypoints, MapGameRules.ALLOW_TELEPORTATION, false);
 	}
 }

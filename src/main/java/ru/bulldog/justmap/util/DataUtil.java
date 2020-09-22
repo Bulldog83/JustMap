@@ -2,6 +2,9 @@ package ru.bulldog.justmap.util;
 
 import java.util.function.Supplier;
 
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.options.GameOptions;
 import net.minecraft.client.world.ClientWorld;
@@ -19,10 +22,10 @@ import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.client.screen.Worldmap;
 import ru.bulldog.justmap.map.IMap;
 import ru.bulldog.justmap.map.data.Layer;
+import ru.bulldog.justmap.server.JustMapServer;
 import ru.bulldog.justmap.util.math.MathUtil;
 
 public class DataUtil {
-	private static MinecraftClient minecraft = JustMapClient.MINECRAFT;
 	private static BlockPos.Mutable currentPos = new BlockPos.Mutable();
 	private static ClientWorld clientWorld = null;
 	private static ServerWorld serverWorld = null;
@@ -34,9 +37,11 @@ public class DataUtil {
 	private static int coordY = 0;
 	private static int coordZ = 0;
 	
+	@Environment(EnvType.CLIENT)
 	public static void updateWorld(ClientWorld world) {
 		clientWorld = world;
 		dimension = world.dimension;
+		MinecraftClient minecraft = MinecraftClient.getInstance();
 		if (minecraft.isIntegratedServerRunning()) {
 			MinecraftServer server = minecraft.getServer();
 			serverWorld = minecraft.getServer().getWorld(dimension.getType());
@@ -64,20 +69,22 @@ public class DataUtil {
 		coordY = (int) posEntity.getY();
 		
 		if (clientWorld == null) return;
-		currentLayer = getLayer(clientWorld, currentPos());
+		currentLayer = getLayer(getWorld(), currentPos());
 		currentLevel = getLevel(currentLayer, coordY);
 	}
 	
 	public static boolean isOnline() {
-		return !minecraft.isIntegratedServerRunning();
+		return !MinecraftClient.getInstance().isIntegratedServerRunning();
 	}
 	
 	public static IMap getMap() {
-		return minecraft.currentScreen instanceof Worldmap ? (Worldmap) minecraft.currentScreen : JustMapClient.MAP;
+		MinecraftClient minecraft = MinecraftClient.getInstance();
+		return minecraft.currentScreen instanceof Worldmap ? (Worldmap) minecraft.currentScreen : JustMapClient.getMap();
 	}
 	
-	public static MinecraftClient getMinecraft() {
-		return minecraft;
+	@Environment(EnvType.SERVER)
+	public static World getServerWorld(DimensionType dimType) {
+		return JustMapServer.getServer().getWorld(dimType);
 	}
 	
 	public static World getWorld() {
@@ -101,6 +108,7 @@ public class DataUtil {
 	}
 	
 	public static GameOptions getGameOptions() {
+		MinecraftClient minecraft = MinecraftClient.getInstance();
 		return minecraft.options;
 	}
 	
@@ -163,7 +171,6 @@ public class DataUtil {
 		} else if (RuleUtil.needRenderCaves(world, pos)) {
 			return Layer.CAVES;
 		}
-		
 		return Layer.SURFACE;
 	}
 	
@@ -173,6 +180,7 @@ public class DataUtil {
 	}
 
 	private static Entity getPosEntity() {
+		MinecraftClient minecraft = MinecraftClient.getInstance();
 		return minecraft.getCameraEntity() != null ? minecraft.getCameraEntity() : minecraft.player;
 	}
 }
