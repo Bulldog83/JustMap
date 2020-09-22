@@ -1,5 +1,5 @@
 plugins {
-	id 'fabric-loom' version '0.4-SNAPSHOT'
+	id 'fabric-loom' version '0.5-SNAPSHOT'
 	id "com.wynprice.cursemaven" version "2.1.5"
 	id 'maven-publish'
 	id 'eclipse'

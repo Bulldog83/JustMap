@@ -35,12 +35,12 @@ import ru.bulldog.justmap.map.icon.PlayerIcon;
 import ru.bulldog.justmap.map.icon.WaypointIcon;
 import ru.bulldog.justmap.map.waypoint.Waypoint;
 import ru.bulldog.justmap.map.waypoint.WaypointKeeper;
-import ru.bulldog.justmap.util.Colors;
 import ru.bulldog.justmap.util.DataUtil;
 import ru.bulldog.justmap.util.Dimension;
 import ru.bulldog.justmap.util.LangUtil;
 import ru.bulldog.justmap.util.PosUtil;
 import ru.bulldog.justmap.util.RuleUtil;
+import ru.bulldog.justmap.util.colors.Colors;
 import ru.bulldog.justmap.util.math.MathUtil;
 
 public class Worldmap extends MapScreen implements IMap {
@@ -134,7 +134,7 @@ public class Worldmap extends MapScreen implements IMap {
 		LangUtil langUtil = new LangUtil("gui.worldmap");
 		this.mapMenu = this.addChild(new DropDownListWidget(25, paddingTop + 2, 100, 22));
 		this.mapMenu.addElement(new ListElementWidget(langUtil.getText("add_waypoint"), () -> {
-			JustMapClient.MAP.createWaypoint(world, centerPos);
+			JustMapClient.getMap().createWaypoint(world, centerPos);
 			return true;
 		}));
 		this.mapMenu.addElement(new ListElementWidget(langUtil.getText("set_map_pos"), () -> {
@@ -177,14 +177,16 @@ public class Worldmap extends MapScreen implements IMap {
 		for (WaypointIcon icon : waypoints) {
 			icon.setPosition(
 				MathUtil.screenPos(icon.waypoint.pos.getX(), centerPos.getX(), centerX, imageScale),
-				MathUtil.screenPos(icon.waypoint.pos.getZ(), centerPos.getZ(), centerY, imageScale)
+				MathUtil.screenPos(icon.waypoint.pos.getZ(), centerPos.getZ(), centerY, imageScale),
+				icon.waypoint.pos.getY()
 			);
 			icon.draw(iconSize);
 		}
 		for (PlayerIcon icon : players) {
 			icon.setPosition(
 				MathUtil.screenPos(icon.getX(), centerPos.getX(), centerX, imageScale),
-				MathUtil.screenPos(icon.getZ(), centerPos.getZ(), centerY, imageScale)
+				MathUtil.screenPos(icon.getZ(), centerPos.getZ(), centerY, imageScale),
+				(int) icon.getY()
 			);
 			icon.draw(matrices, iconSize);
 		}
@@ -392,7 +394,7 @@ public class Worldmap extends MapScreen implements IMap {
 			if (time - clicked > 300) clicks = 0;
 			
 			if (++clicks == 2) {			
-				JustMapClient.MAP.createWaypoint(world, cursorBlockPos(d, e));
+				JustMapClient.getMap().createWaypoint(world, cursorBlockPos(d, e));
 				
 				clicked = 0;
 				clicks = 0;

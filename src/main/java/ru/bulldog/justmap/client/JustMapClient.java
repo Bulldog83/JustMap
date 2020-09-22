@@ -1,10 +1,12 @@
 package ru.bulldog.justmap.client;
 
 import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.api.EnvType;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientChunkEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
+
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.BackupPromptScreen;
 import net.minecraft.client.gui.screen.Screen;
@@ -21,26 +23,45 @@ import net.minecraft.text.TranslatableText;
 import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.advancedinfo.AdvancedInfo;
 import ru.bulldog.justmap.client.config.ClientConfig;
+import ru.bulldog.justmap.client.control.KeyHandler;
 import ru.bulldog.justmap.event.ChunkUpdateListener;
 import ru.bulldog.justmap.map.data.WorldManager;
 import ru.bulldog.justmap.map.minimap.Minimap;
+import ru.bulldog.justmap.network.ClientNetworkHandler;
 import ru.bulldog.justmap.util.DataUtil;
+import ru.bulldog.justmap.util.colors.Colors;
 import ru.bulldog.justmap.util.tasks.TaskManager;
 
 public class JustMapClient implements ClientModInitializer {
-	public final static MinecraftClient MINECRAFT = MinecraftClient.getInstance();
-	public final static ClientConfig CONFIG = ClientConfig.get();
-	public final static Minimap MAP = new Minimap();
-
+	private static ClientConfig config = ClientConfig.get();
+	private static Minimap map = new Minimap();
+	private static MinecraftClient minecraft;
+	private static ClientNetworkHandler networkHandler;
 	private static boolean canMapping = false;	
 	private static boolean isOnTitleScreen = true;
 
 	@Override
 	public void onInitializeClient() {
+		JustMap.setSide(EnvType.CLIENT);
 		KeyHandler.initKeyBindings();
+		ClientLifecycleEvents.CLIENT_STARTED.register((client) -> {
+			minecraft = client;
+			networkHandler = new ClientNetworkHandler();
+			networkHandler.registerPacketsListeners();
+			config = ClientConfig.get();
+			map = new Minimap();
+			Colors.INSTANCE.loadData();
+		});
 		ClientChunkEvents.CHUNK_LOAD.register(WorldManager::onChunkLoad);
-		ClientTickEvents.END_CLIENT_TICK.register(minecraft -> {
-			boolean isTitle = this.isOnTitleScreen(minecraft.currentScreen);
+		HudRenderCallback.EVENT.register((matrices, delta) -> {
+			if (!minecraft.options.debugEnabled) {
+				JustMapClient.map.getRenderer().renderMap(matrices);
+				AdvancedInfo.getInstance().draw(matrices);
+			}
+		});
+		ClientTickEvents.END_CLIENT_TICK.register(client -> {
+			if (minecraft == null) return;
+			boolean isTitle = this.isOnTitleScreen(client.currentScreen);
 			if (isTitle && !isOnTitleScreen) {
 				JustMapClient.stop();
 			}
@@ -53,19 +74,14 @@ public class JustMapClient implements ClientModInitializer {
 			if (!canMapping()) return;
 
 			DataUtil.update();
-			JustMapClient.MAP.update();
+			JustMapClient.map.update();
 			WorldManager.memoryControl();
 			ChunkUpdateListener.proceed();
 		});
 		ClientLifecycleEvents.CLIENT_STOPPING.register(client -> {
 			JustMapClient.stop();
 			TaskManager.shutdown();
-		});
-		HudRenderCallback.EVENT.register((matrices, delta) -> {
-			if (!MINECRAFT.options.debugEnabled) {
-				JustMapClient.MAP.getRenderer().renderMap(matrices);
-				AdvancedInfo.getInstance().draw(matrices);
-			}
+			minecraft = null;
 		});
 	}
 	
@@ -73,6 +89,7 @@ public class JustMapClient implements ClientModInitializer {
 		stopMapping();
 		ChunkUpdateListener.stop();
 		JustMap.WORKER.execute("Clearing map cache...", WorldManager::close);
+		Colors.INSTANCE.saveData();
 	}
 	
 	public static void startMapping() {
@@ -84,9 +101,20 @@ public class JustMapClient implements ClientModInitializer {
 	}
 	
 	public static boolean canMapping() {
-		MinecraftClient minecraft = DataUtil.getMinecraft();
 		return !isOnTitleScreen && canMapping && minecraft.world != null &&
 				(minecraft.getCameraEntity() != null || minecraft.player != null);
+	}
+	
+	public static Minimap getMap() {
+		return map;
+	}
+	
+	public static ClientConfig getConfig() {
+		return config;
+	}
+	
+	public static ClientNetworkHandler getNetworkHandler() {
+		return networkHandler;
 	}
 	
 	private boolean isOnTitleScreen(Screen currentScreen) {

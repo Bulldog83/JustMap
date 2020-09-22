@@ -16,8 +16,8 @@ import net.minecraft.util.Identifier;
 
 import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.map.data.WorldManager;
-import ru.bulldog.justmap.util.Colors;
 import ru.bulldog.justmap.util.LangUtil;
+import ru.bulldog.justmap.util.colors.Colors;
 import ru.bulldog.justmap.util.render.RenderUtil;
 
 public class WorldnameScreen extends Screen {

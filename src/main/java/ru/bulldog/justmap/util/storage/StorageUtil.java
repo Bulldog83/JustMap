@@ -1,7 +1,10 @@
 package ru.bulldog.justmap.util.storage;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Path;
+
+import org.apache.commons.io.FileUtils;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -35,6 +38,10 @@ public final class StorageUtil {
 	private final static Path MAP_ICONS_DIR = MAP_CONFIG_DIR.resolve("icons");
 	
 	private static File filesDir = new File(MAP_DATA_DIR.toFile(), "undefined");
+	
+	public static File mapDir() {
+		return MAP_DATA_DIR.toFile();
+	}
 	
 	public static VersionedChunkStorage getChunkStorage(ServerWorld world) {
 		File regionDir = new File(savesDir(world), "region");
@@ -72,10 +79,9 @@ public final class StorageUtil {
 		return iconsDir;
 	}
 	
-	@Environment(EnvType.CLIENT)
 	public static File cacheDir() {
 		String dimension = "undefined";
-		World world = DataUtil.getClientWorld();
+		World world = DataUtil.getWorld();
 		if (world != null) {
 			RegistryKey<World> dimKey = world.getRegistryKey();			
 			dimension = dimKey.getValue().getPath();			
@@ -102,15 +108,23 @@ public final class StorageUtil {
 		return cacheDir;
 	}
 	
-	@Environment(EnvType.CLIENT)
 	public static File filesDir() {
-		MinecraftClient minecraft = DataUtil.getMinecraft();		
+		MinecraftClient minecraft = MinecraftClient.getInstance();		
 		ServerInfo serverInfo = minecraft.getCurrentServerEntry();
-		File mapDataDir = MAP_DATA_DIR.toFile();
+		File dataDir = MAP_DATA_DIR.toFile();
+		File mapsDir = new File(MAP_DATA_DIR.toFile(), "maps");
 		if (minecraft.isIntegratedServerRunning()) {
 			MinecraftServer server = minecraft.getServer();
 			String name = scrubFileName(server.getSaveProperties().getLevelName());
-			filesDir = new File(mapDataDir, String.format("local/%s", name));
+			filesDir = new File(mapsDir, "local/" + name);
+			File oldDir = new File(dataDir, "local/" + name);
+			if (oldDir.exists()) {
+				try {
+					FileUtils.moveDirectory(oldDir, filesDir);
+				} catch (IOException ex) {
+					JustMap.LOGGER.warning("Can't move directory!", oldDir, ex);
+				}
+			}
 		} else if (serverInfo != null) {
 			String name = scrubFileName(serverInfo.name);
 			String address = serverInfo.address;
@@ -118,10 +132,14 @@ public final class StorageUtil {
 				int end = address.indexOf(":") - 1;
 				address = address.substring(0, end);
 			}
-			filesDir = new File(mapDataDir, String.format("servers/%s_(%s)", name, address));
-			File oldDir = new File(mapDataDir, String.format("servers/%s", name));
+			filesDir = new File(mapsDir, String.format("servers/%s_(%s)", name, address));
+			File oldDir = new File(dataDir, String.format("servers/%s_(%s)", name, address));
 			if (oldDir.exists()) {
-				oldDir.renameTo(filesDir);
+				try {
+					FileUtils.moveDirectory(oldDir, filesDir);
+				} catch (IOException ex) {
+					JustMap.LOGGER.warning("Can't move directory!", oldDir, ex);
+				}
 			}
 		}
 		

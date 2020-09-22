@@ -36,14 +36,14 @@ public class Dimension {
 	}
 	
 	public static boolean isEnd(Identifier dimId) {
-		return dimId.equals(DimensionType.THE_END_REGISTRY_KEY.getValue());
+		return dimId.equals(World.END.getValue());
 	}
 	
 	public static boolean isNether(Identifier dimId) {
-		return dimId.equals(DimensionType.THE_NETHER_REGISTRY_KEY.getValue());
+		return dimId.equals(World.NETHER.getValue());
 	}
 	
 	public static boolean isOverworld(Identifier dimId) {
-		return dimId.equals(DimensionType.OVERWORLD_REGISTRY_KEY.getValue());
+		return dimId.equals(World.OVERWORLD.getValue());
 	}
 }
