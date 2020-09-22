@@ -3,7 +3,6 @@ package ru.bulldog.justmap.util.colors;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Optional;
 
 import javax.imageio.ImageIO;
 
@@ -11,10 +10,8 @@ import com.google.gson.JsonObject;
 
 import net.minecraft.util.JsonHelper;
 import net.minecraft.world.biome.Biome;
-import net.minecraft.world.biome.BiomeEffects;
 
 import ru.bulldog.justmap.JustMap;
-import ru.bulldog.justmap.mixins.BiomeColorsAccessor;
 import ru.bulldog.justmap.util.storage.ResourceLoader;
 
 public class BiomeColors {
@@ -22,18 +19,15 @@ public class BiomeColors {
 	private static int[] grassMap;
 	
 	private Biome biome;
-	private Optional<Integer> foliageColor;
-	private Optional<Integer> grassColor;
+	private int foliageColor;
 	private int waterColor;
 	
 	private BiomeColors() {}
 	
 	public BiomeColors(Biome biome) {
 		this.biome = biome;
-		BiomeColorsAccessor accessor = (BiomeColorsAccessor) biome.getEffects();
-		this.foliageColor = accessor.getFoliageColor();
-		this.grassColor = accessor.getGrassColor();
-		this.waterColor = accessor.getWaterColor();
+		this.foliageColor = biome.getFoliageColor();
+		this.waterColor = biome.getWaterColor();
 	}
 	
 	public int getWaterColor() {
@@ -41,29 +35,11 @@ public class BiomeColors {
 	}
 	
 	public int getFoliageColor() {
-		float temperature = this.biome.getTemperature();
-		float humidity = this.biome.getDownfall();
-		return this.foliageColor.orElse(getFoliageColor(temperature, humidity));
+		return this.foliageColor;
 	}
 	
 	public int getGrassColor(int x, int z) {
-		float temperature = this.biome.getTemperature();
-		float humidity = this.biome.getDownfall();
-		int color = this.grassColor.orElse(getGrassColor(temperature, humidity));
-		BiomeColorsAccessor accessor = (BiomeColorsAccessor) biome.getEffects();
-		BiomeEffects.GrassColorModifier modifier = accessor.getGrassColorModifier();
-		switch (modifier) {
-			case DARK_FOREST: {
-				return (color & 16711422) + 2634762 >> 1;
-			}
-			case SWAMP: {
-				double noise = Biome.FOLIAGE_NOISE.sample(x * 0.0225D, z * 0.0225D, false);
-	            return noise < -0.1D ? 5011004 : 6975545;
-			}
-			default: {
-				return color;
-			}
-		}
+		return biome.getGrassColorAt(x, z);
 	}
 	
 	public static int getGrassColor(double temperature, double humidity) {
@@ -91,12 +67,7 @@ public class BiomeColors {
 	
 	public JsonObject toJson() {
 		JsonObject json = new JsonObject();
-		if (foliageColor.isPresent()) {
-			json.addProperty("foliage", Integer.toHexString(foliageColor.get()));
-		}
-		if (grassColor.isPresent()) {
-			json.addProperty("grass", Integer.toHexString(grassColor.get()));
-		}
+		json.addProperty("foliage", Integer.toHexString(foliageColor));
 		json.addProperty("water", Integer.toHexString(waterColor));
 		
 		return json;
@@ -104,25 +75,18 @@ public class BiomeColors {
 	
 	public static BiomeColors fromJson(Biome biome, JsonObject json) {
 		BiomeColors biomeColors = new BiomeColors();
-		BiomeColorsAccessor accessor = (BiomeColorsAccessor) biome.getEffects();
 		biomeColors.biome = biome;
 		if (json.has("foliage")) {
 			String hexColor = JsonHelper.getString(json, "foliage");
-			biomeColors.foliageColor = Optional.of(ColorUtil.parseHex(hexColor));
+			biomeColors.foliageColor = ColorUtil.parseHex(hexColor);
 		} else {
-			biomeColors.foliageColor = accessor.getFoliageColor();
-		}
-		if (json.has("grass")) {
-			String hexColor = JsonHelper.getString(json, "grass");
-			biomeColors.grassColor = Optional.of(ColorUtil.parseHex(hexColor));
-		} else {
-			biomeColors.grassColor = accessor.getGrassColor();
+			biomeColors.foliageColor = biome.getFoliageColor();
 		}
 		if (json.has("water")) {
 			String hexColor = JsonHelper.getString(json, "water");
 			biomeColors.waterColor = ColorUtil.parseHex(hexColor);
 		} else {
-			biomeColors.waterColor = accessor.getWaterColor();
+			biomeColors.waterColor = biome.getWaterColor();
 		}
 		
 		return biomeColors;
@@ -132,8 +96,6 @@ public class BiomeColors {
 		StringBuilder builder = new StringBuilder();
 		builder.append("[")
 			   .append("foliage=" + foliageColor)
-			   .append(",")
-			   .append("grass=" + grassColor)
 			   .append(",")
 			   .append("water=" + waterColor)
 			   .append("]");

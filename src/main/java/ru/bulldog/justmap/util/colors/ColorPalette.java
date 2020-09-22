@@ -8,8 +8,6 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import org.jetbrains.annotations.Nullable;
-
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.Maps;
@@ -22,13 +20,12 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.biome.Biome;
 
-import ru.bulldog.justmap.util.DataUtil;
 import ru.bulldog.justmap.util.JsonFactory;
 
 public class ColorPalette {
 	
 	private static final Function<Entry<Property<?>, Comparable<?>>, String> PROPERTY_PRINTER = new Function<Entry<Property<?>, Comparable<?>>, String>() {
-		public String apply(@Nullable Entry<Property<?>, Comparable<?>> entry) {
+		public String apply(Entry<Property<?>, Comparable<?>> entry) {
 			if (entry == null) {
 				return "";
 			} else {
@@ -198,7 +195,7 @@ public class ColorPalette {
 						String key = entry.getKey();
 						JsonObject biomeJson = entry.getValue().getAsJsonObject();
 						Identifier biomeId = new Identifier(key);
-						Biome biome = DataUtil.getBiomeRegistry().get(biomeId);
+						Biome biome = Registry.BIOME.get(biomeId);
 						this.biomeColors.put(biomeId, BiomeColors.fromJson(biome, biomeJson));
 					});
 					continue;

@@ -6,23 +6,17 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.options.GameOptions;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.registry.DynamicRegistryManager;
-import net.minecraft.util.registry.MutableRegistry;
-import net.minecraft.util.registry.Registry;
 import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.LightType;
 import net.minecraft.world.PersistentStateManager;
 import net.minecraft.world.World;
-import net.minecraft.world.biome.Biome;
 
-import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.client.screen.Worldmap;
 import ru.bulldog.justmap.map.IMap;
@@ -32,7 +26,6 @@ import ru.bulldog.justmap.util.math.MathUtil;
 
 public class DataUtil {
 	private static BlockPos.Mutable currentPos = new BlockPos.Mutable();
-	private static DynamicRegistryManager registryManager = DynamicRegistryManager.create();
 	private static ClientWorld clientWorld = null;
 	private static ServerWorld serverWorld = null;
 	private static Supplier<PersistentStateManager> persistentSupplier = null;
@@ -93,26 +86,6 @@ public class DataUtil {
 	
 	public static World getWorld() {
 		return serverWorld != null ? serverWorld : clientWorld;
-	}
-	
-	public static MutableRegistry<Biome> getBiomeRegistry(World world) {
-		return world.getRegistryManager().get(Registry.BIOME_KEY);
-	}
-	
-	public static MutableRegistry<Biome> getBiomeRegistry() {
-		if (JustMap.getSide().equals(EnvType.CLIENT)) {
-			MinecraftClient minecraft = MinecraftClient.getInstance();
-			ClientPlayNetworkHandler networkHandler = minecraft.getNetworkHandler();
-			if (networkHandler != null) {
-				return minecraft.getNetworkHandler().getRegistryManager().get(Registry.BIOME_KEY);
-			}
-			return registryManager.get(Registry.BIOME_KEY);
-		}
-		MinecraftServer server = JustMapServer.getServer();
-		if (server != null) {
-			return server.getRegistryManager().get(Registry.BIOME_KEY);
-		}
-		return registryManager.get(Registry.BIOME_KEY);
 	}
 	
 	public static ClientWorld getClientWorld() {

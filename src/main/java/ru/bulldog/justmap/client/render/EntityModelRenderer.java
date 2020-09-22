@@ -17,7 +17,7 @@ import net.minecraft.entity.LivingEntity;
 
 public class EntityModelRenderer {	
 
-	private static MinecraftClient minecraft = DataUtil.getMinecraft();
+	private static MinecraftClient minecraft = MinecraftClient.getInstance();
 	private static EntityRenderDispatcher renderDispatcher = minecraft.getEntityRenderManager();
 	
 	public static void renderModel(MatrixStack matrices, VertexConsumerProvider consumerProvider, Entity entity, double x, double y) {
