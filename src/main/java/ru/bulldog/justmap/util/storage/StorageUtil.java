@@ -114,7 +114,7 @@ public final class StorageUtil {
 		File mapsDir = new File(MAP_DATA_DIR.toFile(), "maps");
 		if (minecraft.isIntegratedServerRunning()) {
 			MinecraftServer server = minecraft.getServer();
-			String name = scrubFileName(server.getSaveProperties().getLevelName());
+			String name = scrubFileName(server.getLevelName());
 			filesDir = new File(mapsDir, "local/" + name);
 			File oldDir = new File(dataDir, "local/" + name);
 			if (oldDir.exists()) {

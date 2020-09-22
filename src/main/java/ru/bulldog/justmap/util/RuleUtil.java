@@ -13,7 +13,7 @@ import ru.bulldog.justmap.server.config.ServerSettings;
 
 public class RuleUtil {
 
-	public static boolean isAllowed(boolean param, GameRules.Key<GameRules.BooleanRule> rule, boolean isServer) {
+	public static boolean isAllowed(boolean param, GameRules.RuleKey<GameRules.BooleanRule> rule, boolean isServer) {
 		if (isServer) {
 			if (ServerSettings.useGameRules) {
 				return MapGameRules.isAllowed(rule);

@@ -50,7 +50,7 @@ public class MapGameRules {
 		codes.put("§t", ALLOW_TELEPORTATION);
 	}
 	
-	public static boolean isAllowed(GameRules.Key<GameRules.BooleanRule> rule) {
+	public static boolean isAllowed(GameRules.RuleKey<GameRules.BooleanRule> rule) {
 		boolean allow = true;
 		if (JustMap.getSide() == EnvType.SERVER) {
 			allow = JustMapServer.getServer().getGameRules().getBoolean(rule);

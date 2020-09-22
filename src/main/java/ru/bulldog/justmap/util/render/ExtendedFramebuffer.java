@@ -48,7 +48,7 @@ public class ExtendedFramebuffer extends Framebuffer {
 		this.textureWidth = width;
 		this.textureHeight = height;
 		this.fbo = this.genFrameBuffers();
-		this.colorAttachment = TextureUtil.generateId();
+		this.colorAttachment = TextureUtil.generateTextureId();
 		if (useDepthAttachment) {
 			this.depthAttachment = this.genRenderbuffers();
 			GlStateManager.bindTexture(depthAttachment);

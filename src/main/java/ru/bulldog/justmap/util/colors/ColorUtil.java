@@ -226,7 +226,7 @@ public class ColorUtil {
 		List<Integer> colors = new ArrayList<>();
 		for (int i = 0; i < image.getWidth(); i++) {
 			for (int j = 0; j < height; j++) {
-				int col = image.getPixelColor(i, j);
+				int col = image.getPixelRgba(i, j);
 				if (((col >> 24) & 255) > 0) {
 					colors.add(ABGRtoARGB(col));
 				}
@@ -305,7 +305,7 @@ public class ColorUtil {
 			
 			blockColor = colorProvider.getColor(state, world, pos);
 			if (blockColor == -1) {
-				blockColor = minecraft.getBlockColors().getColor(state, world, pos, Colors.LIGHT);
+				blockColor = minecraft.getBlockColorMap().getColor(state, world, pos, Colors.LIGHT);
 			}
 			int textureColor = extractColor(state);
 			

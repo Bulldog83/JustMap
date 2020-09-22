@@ -189,7 +189,7 @@ public abstract class MapRenderer {
 		dir.x = posX; dir.y = posY;
 	}
 	
-	public void draw() {
+	public void renderMap() {
 		if (!minimap.isMapVisible() || !JustMapClient.canMapping()) return;
 		
 		this.updateParams();

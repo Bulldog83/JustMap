@@ -5,7 +5,6 @@
     "server": [
 		"GameRuleCommandMixin",
 		"PlayerManagerMixin",
-		"ServerResourcesAccessor",
 		"ServerWorldMixin"
 	],
     "injectors": {

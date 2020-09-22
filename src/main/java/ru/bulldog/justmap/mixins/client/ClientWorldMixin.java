@@ -1,6 +1,6 @@
 package ru.bulldog.justmap.mixins.client;
 
-import java.util.function.Supplier;
+import java.util.function.BiFunction;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -12,11 +12,12 @@ import net.minecraft.client.world.ClientWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.profiler.Profiler;
-import net.minecraft.util.registry.RegistryKey;
-import net.minecraft.world.MutableWorldProperties;
 import net.minecraft.world.World;
+import net.minecraft.world.chunk.ChunkManager;
 import net.minecraft.world.chunk.WorldChunk;
+import net.minecraft.world.dimension.Dimension;
 import net.minecraft.world.dimension.DimensionType;
+import net.minecraft.world.level.LevelProperties;
 
 import ru.bulldog.justmap.event.ChunkUpdateEvent;
 import ru.bulldog.justmap.event.ChunkUpdateListener;
@@ -30,10 +31,9 @@ import ru.bulldog.justmap.util.DataUtil;
 @Mixin(ClientWorld.class)
 public abstract class ClientWorldMixin extends World {
 
-	protected ClientWorldMixin(MutableWorldProperties mutableWorldProperties, RegistryKey<World> registryKey,
-			RegistryKey<DimensionType> registryKey2, DimensionType dimensionType, Supplier<Profiler> profiler,
-			boolean bl, boolean bl2, long l) {
-		super(mutableWorldProperties, registryKey, registryKey2, dimensionType, profiler, bl, bl2, l);
+	protected ClientWorldMixin(LevelProperties levelProperties, DimensionType dimensionType,
+			BiFunction<World, Dimension, ChunkManager> chunkManagerProvider, Profiler profiler, boolean isClient) {
+		super(levelProperties, dimensionType, chunkManagerProvider, profiler, isClient);
 	}
 
 	@Inject(method = "setBlockStateWithoutNeighborUpdates", at = @At("TAIL"))

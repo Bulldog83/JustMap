@@ -12,7 +12,6 @@ import net.minecraft.entity.Entity;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.LightType;
 import net.minecraft.world.PersistentStateManager;
 import net.minecraft.world.World;
@@ -84,8 +83,8 @@ public class DataUtil {
 	}
 	
 	@Environment(EnvType.SERVER)
-	public static World getServerWorld(RegistryKey<World> worldKey) {
-		return JustMapServer.getServer().getWorld(worldKey);
+	public static World getServerWorld(DimensionType dimType) {
+		return JustMapServer.getServer().getWorld(dimType);
 	}
 	
 	public static World getWorld() {
