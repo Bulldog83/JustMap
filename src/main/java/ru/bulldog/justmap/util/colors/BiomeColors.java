@@ -71,7 +71,8 @@ public class BiomeColors {
 		int t = (int) ((1.0D - temperature) * 255.0D);
 		int h = (int) ((1.0D - humidity) * 255.0D);
 		int k = h << 8 | t;
-		return k > grassMap.length ? -65281 : grassMap[k];
+		if (k < 0 || k > grassMap.length) return -65281;
+		return grassMap[k];
 	}
 	
 	public static int defaultGrassColor() {
