@@ -108,6 +108,7 @@ public final class StorageUtil {
 		return cacheDir;
 	}
 	
+	@Environment(EnvType.CLIENT)
 	public static File filesDir() {
 		MinecraftClient minecraft = MinecraftClient.getInstance();		
 		ServerInfo serverInfo = minecraft.getCurrentServerEntry();
