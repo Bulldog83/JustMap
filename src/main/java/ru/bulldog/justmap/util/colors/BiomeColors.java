@@ -47,7 +47,8 @@ public class BiomeColors {
 		int t = (int) ((1.0D - temperature) * 255.0D);
 		int h = (int) ((1.0D - humidity) * 255.0D);
 		int k = h << 8 | t;
-		return k > grassMap.length ? -65281 : grassMap[k];
+		if (k < 0 || k > grassMap.length) return Colors.GRASS;
+		return grassMap[k];
 	}
 	
 	public static int defaultGrassColor() {
@@ -58,7 +59,9 @@ public class BiomeColors {
 		humidity *= temperature;
 		int t = (int) ((1.0D - temperature) * 255.0D);
 		int h = (int) ((1.0D - humidity) * 255.0D);
-		return foliageMap[h << 8 | t];
+		int k = h << 8 | t;
+		if (k < 0 || k > foliageMap.length) return Colors.FOLIAGE;
+		return foliageMap[k];
 	}
 	
 	public static int defaultFoliageColor() {
