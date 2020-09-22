@@ -2,7 +2,6 @@ package ru.bulldog.justmap.client.render;
 
 import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.client.config.ClientSettings;
-import ru.bulldog.justmap.util.DataUtil;
 import ru.bulldog.justmap.util.math.MathUtil;
 
 import net.minecraft.client.MinecraftClient;
@@ -18,7 +17,7 @@ import net.minecraft.entity.LivingEntity;
 
 public class EntityModelRenderer {	
 
-	private static MinecraftClient minecraft = DataUtil.getMinecraft();
+	private static MinecraftClient minecraft = MinecraftClient.getInstance();
 	private static EntityRenderDispatcher renderDispatcher = minecraft.getEntityRenderManager();
 	
 	public static void renderModel(MatrixStack matrices, VertexConsumerProvider consumerProvider, Entity entity, double x, double y) {
@@ -64,7 +63,7 @@ public class EntityModelRenderer {
 	
 	private static double getScale(LivingEntity livingEntity) {
 		int modelSize = ClientSettings.entityModelSize;
-		double mapScale = JustMapClient.MAP.getScale();
+		double mapScale = JustMapClient.getMap().getScale();
 		
 		modelSize = (int) Math.min(modelSize, modelSize / mapScale);
 		

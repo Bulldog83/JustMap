@@ -12,7 +12,6 @@ import net.minecraft.entity.EquipmentSlot;
 
 import ru.bulldog.justmap.client.config.ClientSettings;
 import ru.bulldog.justmap.enums.ScreenPosition;
-import ru.bulldog.justmap.util.DataUtil;
 
 public class AdvancedInfo {
 
@@ -31,7 +30,7 @@ public class AdvancedInfo {
 		return mapTextManager;
 	}
 	
-	private MinecraftClient minecraft = DataUtil.getMinecraft();
+	private MinecraftClient minecraft = MinecraftClient.getInstance();
 	private Map<ScreenPosition, TextManager> managers;
 	private ScreenPosition infoPos;
 	private ScreenPosition itemsPos;
@@ -78,7 +77,7 @@ public class AdvancedInfo {
 	}
 	
 	public void updateInfo() {
-		if (!ClientSettings.advancedInfo) return;
+		if (minecraft == null || !ClientSettings.advancedInfo) return;
 		if (minecraft.currentScreen != null &&
 		  !(minecraft.currentScreen instanceof ChatScreen)) return;
 		

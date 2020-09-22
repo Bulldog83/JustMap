@@ -1,15 +1,14 @@
 package ru.bulldog.justmap.util.render;
 
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.texture.TextureManager;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
 
-import ru.bulldog.justmap.util.DataUtil;
-
 public abstract class Image {
 
-	protected static TextureManager textureManager = DataUtil.getMinecraft().getTextureManager();
+	protected static TextureManager textureManager = MinecraftClient.getInstance().getTextureManager();
 	
 	protected final NativeImage image;
 	protected Identifier textureId;

@@ -18,6 +18,8 @@ import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.minecraft.world.GameRules;
 import ru.bulldog.justmap.map.MapGameRules;
+import ru.bulldog.justmap.network.ServerNetworkHandler;
+import ru.bulldog.justmap.server.JustMapServer;
 import ru.bulldog.justmap.server.config.ServerSettings;
 
 @Mixin(PlayerManager.class)
@@ -27,8 +29,16 @@ public abstract class PlayerManagerMixin {
 	@Shadow
 	private MinecraftServer server;
 	
-	@Inject(method = "onPlayerConnect", at = @At("RETURN"))
-	public void onPlayerConnect(ClientConnection clientConnection, ServerPlayerEntity serverPlayerEntity, CallbackInfo ci) {
+	@Inject(method = "onPlayerConnect", at = @At(value = "INVOKE", target = "Lnet/minecraft/network/packet/s2c/play/DifficultyS2CPacket;<init>(Lnet/minecraft/world/Difficulty;Z)V"))
+	public void onPlayerConnectPre(ClientConnection connection, ServerPlayerEntity player, CallbackInfo info) {
+		ServerNetworkHandler networkHandler = JustMapServer.getNetworkHandler();
+		if (networkHandler != null) {
+			networkHandler.onPlayerConnect(player);
+		}
+	}
+	
+	@Inject(method = "onPlayerConnect", at = @At("TAIL"))
+	public void onPlayerConnectPost(ClientConnection clientConnection, ServerPlayerEntity serverPlayerEntity, CallbackInfo info) {
 		BaseText command = new LiteralText("§0§0");
 		if (ServerSettings.useGameRules) {
 			GameRules gameRules = server.getGameRules();

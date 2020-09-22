@@ -3,6 +3,7 @@ package ru.bulldog.justmap.util.render;
 import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.systems.RenderSystem;
 
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.render.BufferBuilder;
@@ -17,11 +18,11 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Matrix3f;
 import net.minecraft.util.math.Matrix4f;
 import net.minecraft.text.Text;
+
 import ru.bulldog.justmap.client.config.ClientSettings;
 import ru.bulldog.justmap.map.minimap.skin.MapSkin;
 import ru.bulldog.justmap.map.minimap.skin.MapSkin.RenderData;
-import ru.bulldog.justmap.util.ColorUtil;
-import ru.bulldog.justmap.util.DataUtil;
+import ru.bulldog.justmap.util.colors.ColorUtil;
 
 import org.lwjgl.opengl.GL11;
 
@@ -34,8 +35,8 @@ public class RenderUtil extends DrawableHelper {
 	private final static VertexFormat VF_POS_TEX_NORMAL = new VertexFormat(ImmutableList.of(VertexFormats.POSITION_ELEMENT, VertexFormats.TEXTURE_ELEMENT, VertexFormats.NORMAL_ELEMENT, VertexFormats.PADDING_ELEMENT));
 	private final static Tessellator tessellator = Tessellator.getInstance();
 	private final static BufferBuilder vertexBuffer = tessellator.getBuffer();
-	private final static TextRenderer textRenderer = DataUtil.getMinecraft().textRenderer;
-	private final static TextureManager textureManager = DataUtil.getMinecraft().getTextureManager();
+	private final static TextRenderer textRenderer = MinecraftClient.getInstance().textRenderer;
+	private final static TextureManager textureManager = MinecraftClient.getInstance().getTextureManager();
 
 	public static int getWidth(Text text) {
 		return textRenderer.getWidth(text);
@@ -100,13 +101,13 @@ public class RenderUtil extends DrawableHelper {
 		RenderSystem.bindTexture(id);
 	}
 	
-	public static void applyFilter() {
-		if (ClientSettings.textureFilter) {
-			RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR_MIPMAP_LINEAR);
-			RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
+	public static void applyFilter(boolean force) {
+		if (force || ClientSettings.textureFilter) {
+			RenderSystem.texParameter(GLC.GL_TEXTURE_2D, GLC.GL_TEXTURE_MIN_FILTER, GLC.GL_LINEAR_MIPMAP_LINEAR);
+			RenderSystem.texParameter(GLC.GL_TEXTURE_2D, GLC.GL_TEXTURE_MAG_FILTER, GLC.GL_LINEAR);
 		} else {
-			RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR_MIPMAP_NEAREST);
-			RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST);
+			RenderSystem.texParameter(GLC.GL_TEXTURE_2D, GLC.GL_TEXTURE_MIN_FILTER, GLC.GL_LINEAR_MIPMAP_NEAREST);
+			RenderSystem.texParameter(GLC.GL_TEXTURE_2D, GLC.GL_TEXTURE_MAG_FILTER, GLC.GL_NEAREST);
 		}
 	}
 	
@@ -120,17 +121,21 @@ public class RenderUtil extends DrawableHelper {
 	
 	public static void enableScissor() {
 		RenderSystem.assertThread(RenderSystem::isOnRenderThread);
-		enable(GL11.GL_SCISSOR_TEST);
+		enable(GLC.GL_SCISSOR_TEST);
 	}
 	
 	public static void disableScissor() {
 		RenderSystem.assertThread(RenderSystem::isOnRenderThread);
-		disable(GL11.GL_SCISSOR_TEST);
+		disable(GLC.GL_SCISSOR_TEST);
 	}
 	
 	public static void applyScissor(int x, int y, int width, int height) {
 		RenderSystem.assertThread(RenderSystem::isOnRenderThread);
 		GL11.glScissor(x, y, width, height);
+	}
+	
+	public static void texEnvMode(int mode) {
+		GL11.glTexEnvi(GLC.GL_TEXTURE_ENV, GLC.GL_TEXTURE_ENV_MODE, mode);
 	}
 	
     public static void startDraw() {
@@ -142,7 +147,7 @@ public class RenderUtil extends DrawableHelper {
     }
     
     public static void startDraw(VertexFormat vertexFormat) {
-    	startDraw(GL11.GL_QUADS, vertexFormat);
+    	startDraw(GLC.GL_QUADS, vertexFormat);
     }
     
     public static void startDraw(int mode, VertexFormat vertexFormat) {
@@ -171,7 +176,7 @@ public class RenderUtil extends DrawableHelper {
 	
 		RenderSystem.disableTexture();
 		RenderSystem.color4f(r, g, b, a);
-		startDraw(GL11.GL_TRIANGLES, VertexFormats.POSITION);
+		startDraw(GLC.GL_TRIANGLES, VertexFormats.POSITION);
 		vertexBuffer.vertex(x1, y1, 0).next();
 		vertexBuffer.vertex(x2, y2, 0).next();
 		vertexBuffer.vertex(x3, y3, 0).next();
@@ -187,7 +192,7 @@ public class RenderUtil extends DrawableHelper {
 	
 		RenderSystem.disableTexture();
 		RenderSystem.color4f(r, g, b, a);
-		startDraw(GL11.GL_LINES, VertexFormats.POSITION);
+		startDraw(GLC.GL_LINES, VertexFormats.POSITION);
 		vertexBuffer.vertex(x1, y1, 0).next();
 		vertexBuffer.vertex(x2, y2, 0).next();
 		endDraw();
@@ -219,7 +224,7 @@ public class RenderUtil extends DrawableHelper {
 	
 	public static void drawCircleVertices(double x, double y, double radius) {
 		double pi2 = Math.PI * 2;
-		startDraw(GL11.GL_TRIANGLE_FAN, VertexFormats.POSITION);
+		startDraw(GLC.GL_TRIANGLE_FAN, VertexFormats.POSITION);
 		vertexBuffer.vertex(x, y, 0).next();
 		int sides = 50;
 		for (int i = 0; i <= sides; i++) {
@@ -248,7 +253,7 @@ public class RenderUtil extends DrawableHelper {
 		RenderSystem.enableBlend();
 		RenderSystem.disableTexture();
 		RenderSystem.defaultBlendFunc();
-		startDraw(GL11.GL_QUADS, VertexFormats.POSITION_COLOR);
+		startDraw(GLC.GL_QUADS, VertexFormats.POSITION_COLOR);
 		vertexBuffer.vertex(matrix4f, (float) x, (float) (y + h), 0.0F).color(r, g, b, a).next();
 		vertexBuffer.vertex(matrix4f, (float) (x + w), (float) (y + h), 0.0F).color(r, g, b, a).next();
 		vertexBuffer.vertex(matrix4f, (float) (x + w), (float) y, 0.0F).color(r, g, b, a).next();
@@ -318,7 +323,7 @@ public class RenderUtil extends DrawableHelper {
 		RenderSystem.enableAlphaTest();		
 		RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
 		
-		skin.bindTexture();		
+		skin.bindTexture();
 		startDrawNormal();
 		
 		draw(matrices, vertexBuffer, x, y, scaledBrd, scaledBrd, sMinU, sMinV, leftU, topV);
@@ -372,10 +377,6 @@ public class RenderUtil extends DrawableHelper {
 	}
 	
 	public static void drawImage(MatrixStack matrices, Image image, double x, double y, float w, float h) {
-		RenderSystem.enableBlend();
-		RenderSystem.enableAlphaTest();		
-		RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
-		
 		image.bindTexture();
 		startDrawNormal();
 		draw(matrices, vertexBuffer, x, y, w, h, 0.0F, 0.0F, 1.0F, 1.0F);
@@ -385,16 +386,15 @@ public class RenderUtil extends DrawableHelper {
 	private static void draw(MatrixStack matrixStack, VertexConsumer vertexConsumer, double x, double y, float w, float h, float minU, float minV, float maxU, float maxV) {
 		RenderSystem.enableBlend();
 		RenderSystem.enableAlphaTest();
-		RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
-		
+
 		matrixStack.push();
 		matrixStack.translate(x, y, 0);
-		
+
 		Matrix4f m4f = matrixStack.peek().getModel();
 		Matrix3f m3f = matrixStack.peek().getNormal();
-		
+
 		addVertices(m4f, m3f, vertexConsumer, w, h, minU, minV, maxU, maxV);
-		
+
 		matrixStack.pop();
 	}
 	

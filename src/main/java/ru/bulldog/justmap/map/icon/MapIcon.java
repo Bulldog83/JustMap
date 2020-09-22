@@ -1,7 +1,6 @@
 package ru.bulldog.justmap.map.icon;
 
 import ru.bulldog.justmap.map.minimap.Minimap;
-import ru.bulldog.justmap.util.DataUtil;
 import ru.bulldog.justmap.util.math.Line;
 import ru.bulldog.justmap.util.math.MathUtil;
 import ru.bulldog.justmap.util.math.Point;
@@ -17,14 +16,20 @@ public abstract class MapIcon<T extends MapIcon<T>> {
 	protected int lastMapX, lastMapY;
 	protected double lastX, lastY;
 	protected double x, y;
+	protected int height;
 	
-	protected static final MinecraftClient minecraft = DataUtil.getMinecraft();
+	protected static final MinecraftClient minecraft = MinecraftClient.getInstance();
 	
 	public MapIcon() {}
 	
-	public void setPosition(double x, double y) {
+	public void setPosition(double x, double y, int height) {
+		this.height = height;
 		this.x = x;
 		this.y = y;
+	}
+	
+	public int getHeight() {
+		return this.height;
 	}
 	
 	protected void updatePos(int mapX, int mapY, int mapW, int mapH, int size) {

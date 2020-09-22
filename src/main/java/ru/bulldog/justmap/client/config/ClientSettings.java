@@ -76,6 +76,7 @@ public class ClientSettings {
 	public static boolean showPlayerNames = true;
 	public static boolean showIconsOutline = false;
 	public static boolean renderEntityModel = false;
+	public static boolean entityIconsShading = true;
 	public static int entityIconSize = 8;
 	public static int entityModelSize = 5;
 	public static int entityOutlineSize = 1;
