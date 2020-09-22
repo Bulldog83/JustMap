@@ -9,15 +9,11 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.RedstoneWireBlock;
 import net.minecraft.block.StemBlock;
-import net.minecraft.client.util.math.Vector3f;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.ChunkStatus;
-
-import ru.bulldog.justmap.mixins.RedstoneLevelAccessor;
-import ru.bulldog.justmap.util.math.MathUtil;
 
 public class ColorProviders implements ColorProvider {
 	
@@ -50,8 +46,7 @@ public class ColorProviders implements ColorProvider {
 		}, Blocks.WATER, Blocks.BUBBLE_COLUMN, Blocks.CAULDRON);
 		blockColors.registerColorProvider((state, world, pos) -> {
 			int power = state.get(RedstoneWireBlock.POWER);
-			Vector3f powerVector = RedstoneLevelAccessor.getPowerVectors()[power];
-			return MathUtil.packRgb(powerVector.getX(), powerVector.getY(), powerVector.getZ());
+			return RedstoneWireBlock.getWireColor(power);
 		}, Blocks.REDSTONE_WIRE);
 		blockColors.registerColorProvider((state, world, pos) -> {
 			return Colors.ATTACHED_STEM;

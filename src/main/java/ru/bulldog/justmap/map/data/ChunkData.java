@@ -57,7 +57,13 @@ public class ChunkData {
 		this.worldChunk = new SoftReference<>(world.getChunk(pos.x, pos.z));
 
 		if (DimensionUtil.isOverworld(world.dimension)) {
-			this.slime = ChunkRandom.create(chunkPos.x, chunkPos.z, world.getSeed(), 987234911L).nextInt(10) == 0;
+			if (networkHandler.canRequestData()) {
+				networkHandler.requestChunkHasSlime(chunkPos, result -> {
+					this.slime = result;
+				});
+			} else {
+				this.slime = ChunkRandom.create(chunkPos.x, chunkPos.z, world.getSeed(), 987234911L).nextInt(10) == 0;
+			}
 		}		
 		if (DimensionUtil.isNether(world.dimension)) {
 			initLayer(Layer.NETHER);
