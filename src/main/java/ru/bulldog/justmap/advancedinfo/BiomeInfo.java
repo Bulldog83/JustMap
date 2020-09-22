@@ -1,5 +1,6 @@
 package ru.bulldog.justmap.advancedinfo;
 
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.world.biome.Biome;
 
 import ru.bulldog.justmap.client.config.ClientSettings;
@@ -23,6 +24,7 @@ public class BiomeInfo extends InfoText {
 	@Override
 	public void update() {
 		this.setVisible(ClientSettings.showBiome);
+		MinecraftClient minecraft = MinecraftClient.getInstance();
 		if (visible && minecraft.world != null) {
 			Biome currentBiome = minecraft.world.getBiome(DataUtil.currentPos());
 			this.setText(title + currentBiome.getName().getString());

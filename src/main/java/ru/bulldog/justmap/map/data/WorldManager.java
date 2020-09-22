@@ -38,8 +38,8 @@ public final class WorldManager {
 	private final static Map<WorldKey, WorldData> worldsData = new HashMap<>();
 	// used only in mixed mode to associate world names with worlds
 	private final static Map<MultiworldIdentifier, String> worldAssociations = new HashMap<>();
-	private final static MinecraftClient minecraft = DataUtil.getMinecraft();
-	private final static ClientConfig modConfig = JustMapClient.CONFIG;
+	private final static MinecraftClient minecraft = MinecraftClient.getInstance();
+	private final static ClientConfig modConfig = JustMapClient.getConfig();
 
 	private static World currentWorld;
 	private static WorldKey currentWorldKey;
@@ -218,7 +218,7 @@ public final class WorldManager {
 		WorldData mapData = getData();
 		if (mapData == null) return;
 		ChunkData mapChunk = mapData.getChunk(worldChunk.getPos());
-		ChunkUpdateEvent updateEvent = new ChunkUpdateEvent(worldChunk, mapChunk, map.getLayer(), map.getLevel(), true);
+		ChunkUpdateEvent updateEvent = new ChunkUpdateEvent(worldChunk, mapChunk, map.getLayer(), map.getLevel(), 0, 0, 16, 16, true);
 		ChunkUpdateListener.accept(updateEvent);
 	}
 	
@@ -266,7 +266,7 @@ public final class WorldManager {
 		loadConfig();
 		File worldsFile = new File(StorageUtil.filesDir(), "worlds.json");
 		if (!worldsFile.exists()) return;
-		JsonObject jsonObject = JsonFactory.loadJson(worldsFile);
+		JsonObject jsonObject = JsonFactory.getJsonObject(worldsFile);
 		if (jsonObject.has("worlds") && jsonObject.get("worlds").isJsonArray()) {
 			JsonArray worldsArray = jsonObject.getAsJsonArray("worlds");
 			for (JsonElement elem : worldsArray) {
@@ -319,7 +319,7 @@ public final class WorldManager {
 		File configFile = new File(StorageUtil.filesDir(), "config.json");
 		if (!configFile.exists()) return false;
 		try {
-			JsonObject configObject = JsonFactory.loadJson(configFile);
+			JsonObject configObject = JsonFactory.getJsonObject(configFile);
 			EnumEntry<MultiworldDetection> detectionType = modConfig.getEntry("multiworld_detection");
 			BooleanEntry detectMultiworlds = modConfig.getEntry("detect_multiworlds");
 			detectMultiworlds.fromString(JsonHelper.getString(configObject, "detect_multiworlds"));

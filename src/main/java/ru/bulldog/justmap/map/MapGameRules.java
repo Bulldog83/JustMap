@@ -6,7 +6,7 @@ import java.util.Map;
 import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.mixins.BooleanRuleAccessor;
 import ru.bulldog.justmap.mixins.GameRulesAccessor;
-import ru.bulldog.justmap.util.DataUtil;
+import ru.bulldog.justmap.server.JustMapServer;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -50,6 +50,22 @@ public class MapGameRules {
 		codes.put("§t", ALLOW_TELEPORTATION);
 	}
 	
+	public static boolean isAllowed(GameRules.Key<GameRules.BooleanRule> rule) {
+		boolean allow = true;
+		if (JustMap.getSide() == EnvType.SERVER) {
+			allow = JustMapServer.getServer().getGameRules().getBoolean(rule);
+		} else {
+			MinecraftClient minecraft = MinecraftClient.getInstance();
+			if (minecraft.isIntegratedServerRunning()) {
+				allow = minecraft.getServer().getGameRules().getBoolean(rule);
+			} else if (!minecraft.isInSingleplayer()) {
+				if (minecraft.world == null) return false;
+				allow = minecraft.world.getGameRules().getBoolean(rule);
+			}
+		}
+		return allow;
+	}
+	
 	/*
 	 *	§0§0: prefix
 	 *  §f§f: suffix
@@ -66,8 +82,9 @@ public class MapGameRules {
 	 */	
 	@Environment(EnvType.CLIENT)
 	public static void parseCommand(String command) {
-		MinecraftServer server = DataUtil.getMinecraft().getServer();
-		GameRules gameRules = DataUtil.getWorld().getGameRules();
+		MinecraftClient minecraft = MinecraftClient.getInstance();
+		MinecraftServer server = minecraft.getServer();
+		GameRules gameRules = minecraft.world.getGameRules();
 		codes.forEach((key, rule) -> {
 			if (command.contains(key)) {
 				int valPos = command.indexOf(key) + 2;
@@ -76,19 +93,5 @@ public class MapGameRules {
 				JustMap.LOGGER.info("Map rule {} switched to: {}", rule, value);
 			}
 		});
-	}
-	
-	@Environment(EnvType.CLIENT)
-	public static boolean isAllowed(GameRules.Key<GameRules.BooleanRule> rule) {
-		MinecraftClient minecraft = DataUtil.getMinecraft();		
-		boolean allow = true;
-		if (minecraft.isIntegratedServerRunning()) {
-			allow = minecraft.getServer().getGameRules().getBoolean(rule);
-		} else if (!minecraft.isInSingleplayer()) {
-			if (minecraft.world == null) return false;
-			allow = minecraft.world.getGameRules().getBoolean(rule);
-		}
-		
-		return allow;
 	}
 }

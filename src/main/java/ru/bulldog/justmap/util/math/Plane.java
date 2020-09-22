@@ -10,9 +10,6 @@ public class Plane {
 	}
 	
 	public Plane(Point first, Point second) {
-		if (first.x == second.x || first.y == second.y) {
-			throw new IllegalArgumentException("Invalid Plane corners!");
-		}
 		this.first = first;
 		this.second = second;
 	}
@@ -35,5 +32,14 @@ public class Plane {
 				   second.x <= point.x && second.y <= point.y;
 		}
 		return false;
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) return true;
+		if (!(obj instanceof Plane)) return false;
+		Plane plane = (Plane) obj;
+		return this.first.equals(plane.first) &&
+			   this.second.equals(plane.second);
 	}
 }

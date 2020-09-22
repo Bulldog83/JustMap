@@ -1,5 +1,7 @@
 package ru.bulldog.justmap.map.icon;
 
+import com.mojang.blaze3d.systems.RenderSystem;
+
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.util.Window;
@@ -9,9 +11,11 @@ import net.minecraft.entity.player.PlayerEntity;
 import ru.bulldog.justmap.client.config.ClientSettings;
 import ru.bulldog.justmap.client.render.EntityModelRenderer;
 import ru.bulldog.justmap.map.MapPlayerManager;
-import ru.bulldog.justmap.util.ColorUtil;
-import ru.bulldog.justmap.util.Colors;
 import ru.bulldog.justmap.util.DataUtil;
+import ru.bulldog.justmap.util.colors.ColorUtil;
+import ru.bulldog.justmap.util.colors.Colors;
+import ru.bulldog.justmap.util.math.MathUtil;
+import ru.bulldog.justmap.util.render.GLC;
 import ru.bulldog.justmap.util.render.RenderUtil;
 
 public class PlayerIcon extends MapIcon<PlayerIcon> {
@@ -25,6 +29,10 @@ public class PlayerIcon extends MapIcon<PlayerIcon> {
 	
 	public double getX() {
 		return this.player.getX();
+	}
+	
+	public double getY() {
+		return this.player.getY();
 	}
 	
 	public double getZ() {
@@ -52,7 +60,22 @@ public class PlayerIcon extends MapIcon<PlayerIcon> {
 		if (ClientSettings.renderEntityModel) {
 			EntityModelRenderer.renderModel(matrices, consumerProvider, player, iconPos.x, iconPos.y);
 		} else if (ClientSettings.showPlayerHeads) {
+			if (ClientSettings.entityIconsShading) {
+				int posY = DataUtil.coordY();
+				int hdiff = posY - height;
+				float hmod;
+				if (hdiff < 0) {
+					hmod = MathUtil.clamp(Math.abs(hdiff) / 24F, 0.0F, 0.5F);
+					RenderUtil.texEnvMode(GLC.GL_ADD);
+				} else {
+					hmod = MathUtil.clamp((24 - Math.abs(hdiff)) / 24F, 0.25F, 1.0F);
+					RenderUtil.texEnvMode(GLC.GL_MODULATE);
+				}
+				RenderSystem.color3f(hmod, hmod, hmod);
+			}
 			MapPlayerManager.getPlayer(player).getIcon().draw(matrices, iconPos.x, iconPos.y);
+			RenderUtil.texEnvMode(GLC.GL_MODULATE);
+			RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
 		} else {
 			int darken = ColorUtil.colorBrigtness(color, -3);
 			RenderUtil.fill(iconPos.x - 0.5, iconPos.y - 0.5, size + 1, size + 1, darken);
@@ -63,7 +86,7 @@ public class PlayerIcon extends MapIcon<PlayerIcon> {
 	
 	private void drawPlayerName(MatrixStack matrices, double x, double y) {
 		if (!ClientSettings.showPlayerNames) return;
-		MinecraftClient minecraft = DataUtil.getMinecraft();
+		MinecraftClient minecraft = MinecraftClient.getInstance();
 		Window window = minecraft.getWindow();
 		double sf = window.getScaleFactor();
 		float scale = (float) (1.0 / sf);
