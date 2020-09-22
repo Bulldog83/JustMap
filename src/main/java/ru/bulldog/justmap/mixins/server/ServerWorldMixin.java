@@ -47,7 +47,7 @@ public abstract class ServerWorldMixin extends World {
 //					if (stateJson.has("variants")) {
 //						JsonObject variants = stateJson.getAsJsonObject("variants");
 //						variants.entrySet().forEach((entry) -> {
-//							//System.out.println(entry.getKey());
+//							System.out.println(entry.getKey());
 //							if (entry.getValue().isJsonArray()) {
 //								JsonArray entryArray = entry.getValue().getAsJsonArray();
 //								entryArray.forEach(elem -> {
