@@ -12,7 +12,9 @@ import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.registry.BuiltinRegistries;
 import net.minecraft.util.registry.DynamicRegistryManager;
 import net.minecraft.util.registry.MutableRegistry;
 import net.minecraft.util.registry.Registry;
@@ -99,8 +101,13 @@ public class DataUtil {
 		return world.getRegistryManager().get(Registry.BIOME_KEY);
 	}
 	
+	public static Identifier getBiomeId(World world, Biome biome) {
+		Identifier biomeId = getBiomeRegistry(world).getId(biome);
+		return biomeId != null ? biomeId : BuiltinRegistries.BIOME.getId(biome);
+	}
+	
 	public static MutableRegistry<Biome> getBiomeRegistry() {
-		if (JustMap.getSide().equals(EnvType.CLIENT)) {
+		if (JustMap.getSide() == EnvType.CLIENT) {
 			MinecraftClient minecraft = MinecraftClient.getInstance();
 			ClientPlayNetworkHandler networkHandler = minecraft.getNetworkHandler();
 			if (networkHandler != null) {
