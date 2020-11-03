@@ -103,7 +103,7 @@
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path=".gradle/caches/modules-2/files-2.1/com.mojang/authlib/1.6.25/5bd0ce00c1e1f483641f85bccb02d1956dd77ec0/authlib-1.6.25.jar" sourcepath=".gradle/caches/modules-2/files-2.1/com.mojang/authlib/1.6.25/de9a1ba1e01d2f3e03a0b5812f4f4e51624a671e/authlib-1.6.25-sources.jar">
+	<classpathentry kind="lib" path=".gradle/caches/modules-2/files-2.1/com.mojang/authlib/2.0.27/cc36c2be8b0de3e200efbb23f0eb2d28055cd98f/authlib-2.0.27.jar" sourcepath=".gradle/caches/modules-2/files-2.1/com.mojang/authlib/2.0.27/352ddcc8122ef9043e386724387733041b5ff8d/authlib-2.0.27-sources.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
@@ -188,12 +188,17 @@
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path=".gradle/caches/modules-2/files-2.1/net.fabricmc/sponge-mixin/0.8.1+build.21/94da90bdbee9f95bf6d6c41ca87943419a0b5624/sponge-mixin-0.8.1+build.21.jar" sourcepath=".gradle/caches/modules-2/files-2.1/net.fabricmc/sponge-mixin/0.8.1+build.21/649e305ebae8a603c9ff34bd682c8bb3d88ae7f6/sponge-mixin-0.8.1+build.21-sources.jar">
+	<classpathentry kind="lib" path=".gradle/caches/modules-2/files-2.1/net.fabricmc/sponge-mixin/0.8.2+build.24/e5a741445d0f425bf3cce946c6cf8c7fb8376b2/sponge-mixin-0.8.2+build.24.jar" sourcepath=".gradle/caches/modules-2/files-2.1/net.fabricmc/sponge-mixin/0.8.2+build.24/2feb7fc5dce9ad4f37d0b4f2c84cdda9742ba52f/sponge-mixin-0.8.2+build.24-sources.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path=".gradle/caches/modules-2/files-2.1/net.fabricmc/tiny-remapper/0.2.2.64/34702a4109c7a9bfe1cb599f9fc46b2c06a3e8f0/tiny-remapper-0.2.2.64.jar" sourcepath=".gradle/caches/modules-2/files-2.1/net.fabricmc/tiny-remapper/0.2.2.64/3ca1e83142735ded50e299f4ef093558aab6678e/tiny-remapper-0.2.2.64-sources.jar">
+	<classpathentry kind="lib" path=".gradle/caches/modules-2/files-2.1/net.fabricmc/tiny-remapper/0.3.0.70/8a79e9b88fbc6b49dc4312bb1efcf6c4a8c818df/tiny-remapper-0.3.0.70.jar" sourcepath=".gradle/caches/modules-2/files-2.1/net.fabricmc/tiny-remapper/0.3.0.70/a597892ae45ba464f80a5d1c22ee70262bd5610c/tiny-remapper-0.3.0.70-sources.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path=".gradle/caches/modules-2/files-2.1/net.fabricmc/access-widener/1.0.0/22264da061b12132ecfe15f68e0a90a11b14e6f9/access-widener-1.0.0.jar" sourcepath=".gradle/caches/modules-2/files-2.1/net.fabricmc/access-widener/1.0.0/67214f6fae7f8c54af0d7bb40b9977a1a5a5580e/access-widener-1.0.0-sources.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
@@ -208,247 +213,247 @@
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path=".gradle/caches/modules-2/files-2.1/org.ow2.asm/asm/8.0/d1a17d07c60e9e82c8b31b1d8f9ca98726418db4/asm-8.0.jar" sourcepath=".gradle/caches/modules-2/files-2.1/org.ow2.asm/asm/8.0/d6984ada3c4fca98afbe71196cb3a0dc715b98de/asm-8.0-sources.jar">
+	<classpathentry kind="lib" path=".gradle/caches/modules-2/files-2.1/org.ow2.asm/asm/9.0/af582ff60bc567c42d931500c3fdc20e0141ddf9/asm-9.0.jar" sourcepath=".gradle/caches/modules-2/files-2.1/org.ow2.asm/asm/9.0/4ebd60354f49eaac2afe314ae2c7f21191807473/asm-9.0-sources.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path=".gradle/caches/modules-2/files-2.1/org.ow2.asm/asm-analysis/8.0/57b12c6a9e14788f63ee3c6c0132fadcce1727d0/asm-analysis-8.0.jar" sourcepath=".gradle/caches/modules-2/files-2.1/org.ow2.asm/asm-analysis/8.0/4d2e2a74691b78de99d2b401bc1057cfd95d7cd/asm-analysis-8.0-sources.jar">
+	<classpathentry kind="lib" path=".gradle/caches/modules-2/files-2.1/org.ow2.asm/asm-analysis/9.0/4630afefbb43939c739445dde0af1a5729a0fb4e/asm-analysis-9.0.jar" sourcepath=".gradle/caches/modules-2/files-2.1/org.ow2.asm/asm-analysis/9.0/69c8779db3098fab77bf462930e4edc16ef7f5f3/asm-analysis-9.0-sources.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path=".gradle/caches/modules-2/files-2.1/org.ow2.asm/asm-commons/8.0/ea2231bdb3394bcca5989db7f7586f743829a9cb/asm-commons-8.0.jar" sourcepath=".gradle/caches/modules-2/files-2.1/org.ow2.asm/asm-commons/8.0/ba5ccc27aa05831a74c01c17cb8058b9c2bfdb26/asm-commons-8.0-sources.jar">
+	<classpathentry kind="lib" path=".gradle/caches/modules-2/files-2.1/org.ow2.asm/asm-commons/9.0/5a34a3a9ac44f362f35d1b27932380b0031a3334/asm-commons-9.0.jar" sourcepath=".gradle/caches/modules-2/files-2.1/org.ow2.asm/asm-commons/9.0/e05dba04ed16700761c397b6d665de383478c929/asm-commons-9.0-sources.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path=".gradle/caches/modules-2/files-2.1/org.ow2.asm/asm-tree/8.0/7b31ca94da9f57334a5aed79b40f2b88c5ee9f4f/asm-tree-8.0.jar" sourcepath=".gradle/caches/modules-2/files-2.1/org.ow2.asm/asm-tree/8.0/689a76af2ee494d7c534a4a2c7c8c3e24d2b97a1/asm-tree-8.0-sources.jar">
+	<classpathentry kind="lib" path=".gradle/caches/modules-2/files-2.1/org.ow2.asm/asm-tree/9.0/9df939f25c556b0c7efe00701d47e77a49837f24/asm-tree-9.0.jar" sourcepath=".gradle/caches/modules-2/files-2.1/org.ow2.asm/asm-tree/9.0/ef07227f641685b6473fd0fbb4931afd6539df1a/asm-tree-9.0-sources.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path=".gradle/caches/modules-2/files-2.1/org.ow2.asm/asm-util/8.0/b21996293fd49851ed9017cfde3191e49f77fbd0/asm-util-8.0.jar" sourcepath=".gradle/caches/modules-2/files-2.1/org.ow2.asm/asm-util/8.0/30e8a068562c4866a6ce8e73d0d3730590ad492c/asm-util-8.0-sources.jar">
+	<classpathentry kind="lib" path=".gradle/caches/modules-2/files-2.1/org.ow2.asm/asm-util/9.0/7c059a94ab5eed3347bf954e27fab58e52968848/asm-util-9.0.jar" sourcepath=".gradle/caches/modules-2/files-2.1/org.ow2.asm/asm-util/9.0/26ec51a908081b110c9fc86be0f4bbf4d30e408b/asm-util-9.0-sources.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path=".gradle/caches/fabric-loom/1.16.3-mapped-net.fabricmc.yarn-1.16.3+build.11-v2/minecraft-1.16.3-mapped-net.fabricmc.yarn-1.16.3+build.11-v2.jar" sourcepath=".gradle/caches/fabric-loom/1.16.3-mapped-net.fabricmc.yarn-1.16.3+build.11-v2/minecraft-1.16.3-mapped-net.fabricmc.yarn-1.16.3+build.11-v2-sources.jar">
+	<classpathentry kind="lib" path=".gradle/caches/fabric-loom/1.16.4-mapped-net.fabricmc.yarn-1.16.4+build.1-v2/minecraft-1.16.4-mapped-net.fabricmc.yarn-1.16.4+build.1-v2.jar" sourcepath=".gradle/caches/fabric-loom/1.16.4-mapped-net.fabricmc.yarn-1.16.4+build.1-v2/minecraft-1.16.4-mapped-net.fabricmc.yarn-1.16.4+build.1-v2-sources.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path=".gradle/loom-cache/remapped_mods/modmenu-1.14.6+build.31@net.fabricmc.yarn.1_16_3.1.16.3+build.11-v2.jar" sourcepath=".gradle/loom-cache/remapped_mods/modmenu-1.14.6+build.31@net.fabricmc.yarn.1_16_3.1.16.3+build.11-v2-sources.jar">
+	<classpathentry kind="lib" path=".gradle/loom-cache/remapped_mods/modmenu-1.14.6+build.31@net.fabricmc.yarn.1_16_4.1.16.4+build.1-v2.jar" sourcepath=".gradle/loom-cache/remapped_mods/modmenu-1.14.6+build.31@net.fabricmc.yarn.1_16_4.1.16.4+build.1-v2-sources.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path=".gradle/loom-cache/remapped_mods/config-2-4.8.1@net.fabricmc.yarn.1_16_3.1.16.3+build.11-v2.jar" sourcepath=".gradle/loom-cache/remapped_mods/config-2-4.8.1@net.fabricmc.yarn.1_16_3.1.16.3+build.11-v2-sources.jar">
+	<classpathentry kind="lib" path=".gradle/loom-cache/remapped_mods/config-2-4.8.1@net.fabricmc.yarn.1_16_4.1.16.4+build.1-v2.jar" sourcepath=".gradle/loom-cache/remapped_mods/config-2-4.8.1@net.fabricmc.yarn.1_16_4.1.16.4+build.1-v2-sources.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path=".gradle/loom-cache/remapped_mods/fabric-api-0.21.0+build.407-1.16@net.fabricmc.yarn.1_16_3.1.16.3+build.11-v2.jar" sourcepath=".gradle/loom-cache/remapped_mods/fabric-api-0.21.0+build.407-1.16@net.fabricmc.yarn.1_16_3.1.16.3+build.11-v2-sources.jar">
+	<classpathentry kind="lib" path=".gradle/loom-cache/remapped_mods/fabric-api-0.25.1+build.416-1.16@net.fabricmc.yarn.1_16_4.1.16.4+build.1-v2.jar" sourcepath=".gradle/loom-cache/remapped_mods/fabric-api-0.25.1+build.416-1.16@net.fabricmc.yarn.1_16_4.1.16.4+build.1-v2-sources.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path=".gradle/loom-cache/remapped_mods/fabric-api-base-0.1.3+12a8474c95@net.fabricmc.yarn.1_16_3.1.16.3+build.11-v2.jar" sourcepath=".gradle/loom-cache/remapped_mods/fabric-api-base-0.1.3+12a8474c95@net.fabricmc.yarn.1_16_3.1.16.3+build.11-v2-sources.jar">
+	<classpathentry kind="lib" path=".gradle/loom-cache/remapped_mods/fabric-api-base-0.2.0+9f0fb4b83a@net.fabricmc.yarn.1_16_4.1.16.4+build.1-v2.jar" sourcepath=".gradle/loom-cache/remapped_mods/fabric-api-base-0.2.0+9f0fb4b83a@net.fabricmc.yarn.1_16_4.1.16.4+build.1-v2-sources.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path=".gradle/loom-cache/remapped_mods/fabric-biome-api-v1-2.0.0+c29459ab95@net.fabricmc.yarn.1_16_3.1.16.3+build.11-v2.jar" sourcepath=".gradle/loom-cache/remapped_mods/fabric-biome-api-v1-2.0.0+c29459ab95@net.fabricmc.yarn.1_16_3.1.16.3+build.11-v2-sources.jar">
+	<classpathentry kind="lib" path=".gradle/loom-cache/remapped_mods/fabric-biome-api-v1-3.0.0+8367596d3a@net.fabricmc.yarn.1_16_4.1.16.4+build.1-v2.jar" sourcepath=".gradle/loom-cache/remapped_mods/fabric-biome-api-v1-3.0.0+8367596d3a@net.fabricmc.yarn.1_16_4.1.16.4+build.1-v2-sources.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path=".gradle/loom-cache/remapped_mods/fabric-blockrenderlayer-v1-1.1.4+c6a8ea8995@net.fabricmc.yarn.1_16_3.1.16.3+build.11-v2.jar" sourcepath=".gradle/loom-cache/remapped_mods/fabric-blockrenderlayer-v1-1.1.4+c6a8ea8995@net.fabricmc.yarn.1_16_3.1.16.3+build.11-v2-sources.jar">
+	<classpathentry kind="lib" path=".gradle/loom-cache/remapped_mods/fabric-blockrenderlayer-v1-1.1.4+c6a8ea893a@net.fabricmc.yarn.1_16_4.1.16.4+build.1-v2.jar" sourcepath=".gradle/loom-cache/remapped_mods/fabric-blockrenderlayer-v1-1.1.4+c6a8ea893a@net.fabricmc.yarn.1_16_4.1.16.4+build.1-v2-sources.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path=".gradle/loom-cache/remapped_mods/fabric-command-api-v1-1.0.8+5ce5339895@net.fabricmc.yarn.1_16_3.1.16.3+build.11-v2.jar" sourcepath=".gradle/loom-cache/remapped_mods/fabric-command-api-v1-1.0.8+5ce5339895@net.fabricmc.yarn.1_16_3.1.16.3+build.11-v2-sources.jar">
+	<classpathentry kind="lib" path=".gradle/loom-cache/remapped_mods/fabric-command-api-v1-1.0.9+a4467d2a3a@net.fabricmc.yarn.1_16_4.1.16.4+build.1-v2.jar" sourcepath=".gradle/loom-cache/remapped_mods/fabric-command-api-v1-1.0.9+a4467d2a3a@net.fabricmc.yarn.1_16_4.1.16.4+build.1-v2-sources.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path=".gradle/loom-cache/remapped_mods/fabric-commands-v0-0.2.0+52d3083695@net.fabricmc.yarn.1_16_3.1.16.3+build.11-v2.jar" sourcepath=".gradle/loom-cache/remapped_mods/fabric-commands-v0-0.2.0+52d3083695@net.fabricmc.yarn.1_16_3.1.16.3+build.11-v2-sources.jar">
+	<classpathentry kind="lib" path=".gradle/loom-cache/remapped_mods/fabric-commands-v0-0.2.0+52d308363a@net.fabricmc.yarn.1_16_4.1.16.4+build.1-v2.jar" sourcepath=".gradle/loom-cache/remapped_mods/fabric-commands-v0-0.2.0+52d308363a@net.fabricmc.yarn.1_16_4.1.16.4+build.1-v2-sources.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path=".gradle/loom-cache/remapped_mods/fabric-containers-v0-0.1.8+045df74f95@net.fabricmc.yarn.1_16_3.1.16.3+build.11-v2.jar" sourcepath=".gradle/loom-cache/remapped_mods/fabric-containers-v0-0.1.8+045df74f95@net.fabricmc.yarn.1_16_3.1.16.3+build.11-v2-sources.jar">
+	<classpathentry kind="lib" path=".gradle/loom-cache/remapped_mods/fabric-containers-v0-0.1.8+045df74f3a@net.fabricmc.yarn.1_16_4.1.16.4+build.1-v2.jar" sourcepath=".gradle/loom-cache/remapped_mods/fabric-containers-v0-0.1.8+045df74f3a@net.fabricmc.yarn.1_16_4.1.16.4+build.1-v2-sources.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path=".gradle/loom-cache/remapped_mods/fabric-content-registries-v0-0.1.9+059ea86695@net.fabricmc.yarn.1_16_3.1.16.3+build.11-v2.jar" sourcepath=".gradle/loom-cache/remapped_mods/fabric-content-registries-v0-0.1.9+059ea86695@net.fabricmc.yarn.1_16_3.1.16.3+build.11-v2-sources.jar">
+	<classpathentry kind="lib" path=".gradle/loom-cache/remapped_mods/fabric-content-registries-v0-0.1.9+059ea8663a@net.fabricmc.yarn.1_16_4.1.16.4+build.1-v2.jar" sourcepath=".gradle/loom-cache/remapped_mods/fabric-content-registries-v0-0.1.9+059ea8663a@net.fabricmc.yarn.1_16_4.1.16.4+build.1-v2-sources.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path=".gradle/loom-cache/remapped_mods/fabric-crash-report-info-v1-0.1.2+b7f9825d95@net.fabricmc.yarn.1_16_3.1.16.3+build.11-v2.jar" sourcepath=".gradle/loom-cache/remapped_mods/fabric-crash-report-info-v1-0.1.2+b7f9825d95@net.fabricmc.yarn.1_16_3.1.16.3+build.11-v2-sources.jar">
+	<classpathentry kind="lib" path=".gradle/loom-cache/remapped_mods/fabric-crash-report-info-v1-0.1.2+b7f9825d3a@net.fabricmc.yarn.1_16_4.1.16.4+build.1-v2.jar" sourcepath=".gradle/loom-cache/remapped_mods/fabric-crash-report-info-v1-0.1.2+b7f9825d3a@net.fabricmc.yarn.1_16_4.1.16.4+build.1-v2-sources.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path=".gradle/loom-cache/remapped_mods/fabric-events-interaction-v0-0.4.0+e2e6cdad95@net.fabricmc.yarn.1_16_3.1.16.3+build.11-v2.jar" sourcepath=".gradle/loom-cache/remapped_mods/fabric-events-interaction-v0-0.4.0+e2e6cdad95@net.fabricmc.yarn.1_16_3.1.16.3+build.11-v2-sources.jar">
+	<classpathentry kind="lib" path=".gradle/loom-cache/remapped_mods/fabric-events-interaction-v0-0.4.1+f8ac1db23a@net.fabricmc.yarn.1_16_4.1.16.4+build.1-v2.jar" sourcepath=".gradle/loom-cache/remapped_mods/fabric-events-interaction-v0-0.4.1+f8ac1db23a@net.fabricmc.yarn.1_16_4.1.16.4+build.1-v2-sources.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path=".gradle/loom-cache/remapped_mods/fabric-events-lifecycle-v0-0.2.0+16acbe5b95@net.fabricmc.yarn.1_16_3.1.16.3+build.11-v2.jar" sourcepath=".gradle/loom-cache/remapped_mods/fabric-events-lifecycle-v0-0.2.0+16acbe5b95@net.fabricmc.yarn.1_16_3.1.16.3+build.11-v2-sources.jar">
+	<classpathentry kind="lib" path=".gradle/loom-cache/remapped_mods/fabric-events-lifecycle-v0-0.2.0+16acbe5b3a@net.fabricmc.yarn.1_16_4.1.16.4+build.1-v2.jar" sourcepath=".gradle/loom-cache/remapped_mods/fabric-events-lifecycle-v0-0.2.0+16acbe5b3a@net.fabricmc.yarn.1_16_4.1.16.4+build.1-v2-sources.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path=".gradle/loom-cache/remapped_mods/fabric-game-rule-api-v1-1.0.1+74685c1495@net.fabricmc.yarn.1_16_3.1.16.3+build.11-v2.jar" sourcepath=".gradle/loom-cache/remapped_mods/fabric-game-rule-api-v1-1.0.1+74685c1495@net.fabricmc.yarn.1_16_3.1.16.3+build.11-v2-sources.jar">
+	<classpathentry kind="lib" path=".gradle/loom-cache/remapped_mods/fabric-game-rule-api-v1-1.0.3+a4467d2a3a@net.fabricmc.yarn.1_16_4.1.16.4+build.1-v2.jar" sourcepath=".gradle/loom-cache/remapped_mods/fabric-game-rule-api-v1-1.0.3+a4467d2a3a@net.fabricmc.yarn.1_16_4.1.16.4+build.1-v2-sources.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path=".gradle/loom-cache/remapped_mods/fabric-item-api-v1-1.1.0+29679fd695@net.fabricmc.yarn.1_16_3.1.16.3+build.11-v2.jar" sourcepath=".gradle/loom-cache/remapped_mods/fabric-item-api-v1-1.1.0+29679fd695@net.fabricmc.yarn.1_16_3.1.16.3+build.11-v2-sources.jar">
+	<classpathentry kind="lib" path=".gradle/loom-cache/remapped_mods/fabric-item-api-v1-1.2.0+f8ac1db23a@net.fabricmc.yarn.1_16_4.1.16.4+build.1-v2.jar" sourcepath=".gradle/loom-cache/remapped_mods/fabric-item-api-v1-1.2.0+f8ac1db23a@net.fabricmc.yarn.1_16_4.1.16.4+build.1-v2-sources.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path=".gradle/loom-cache/remapped_mods/fabric-item-groups-v0-0.2.0+438f963695@net.fabricmc.yarn.1_16_3.1.16.3+build.11-v2.jar" sourcepath=".gradle/loom-cache/remapped_mods/fabric-item-groups-v0-0.2.0+438f963695@net.fabricmc.yarn.1_16_3.1.16.3+build.11-v2-sources.jar">
+	<classpathentry kind="lib" path=".gradle/loom-cache/remapped_mods/fabric-item-groups-v0-0.2.1+a4467d2a3a@net.fabricmc.yarn.1_16_4.1.16.4+build.1-v2.jar" sourcepath=".gradle/loom-cache/remapped_mods/fabric-item-groups-v0-0.2.1+a4467d2a3a@net.fabricmc.yarn.1_16_4.1.16.4+build.1-v2-sources.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path=".gradle/loom-cache/remapped_mods/fabric-key-binding-api-v1-1.0.1+730711c695@net.fabricmc.yarn.1_16_3.1.16.3+build.11-v2.jar" sourcepath=".gradle/loom-cache/remapped_mods/fabric-key-binding-api-v1-1.0.1+730711c695@net.fabricmc.yarn.1_16_3.1.16.3+build.11-v2-sources.jar">
+	<classpathentry kind="lib" path=".gradle/loom-cache/remapped_mods/fabric-key-binding-api-v1-1.0.1+730711c63a@net.fabricmc.yarn.1_16_4.1.16.4+build.1-v2.jar" sourcepath=".gradle/loom-cache/remapped_mods/fabric-key-binding-api-v1-1.0.1+730711c63a@net.fabricmc.yarn.1_16_4.1.16.4+build.1-v2-sources.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path=".gradle/loom-cache/remapped_mods/fabric-keybindings-v0-0.2.0+3fa9f7c595@net.fabricmc.yarn.1_16_3.1.16.3+build.11-v2.jar" sourcepath=".gradle/loom-cache/remapped_mods/fabric-keybindings-v0-0.2.0+3fa9f7c595@net.fabricmc.yarn.1_16_3.1.16.3+build.11-v2-sources.jar">
+	<classpathentry kind="lib" path=".gradle/loom-cache/remapped_mods/fabric-keybindings-v0-0.2.0+3fa9f7c53a@net.fabricmc.yarn.1_16_4.1.16.4+build.1-v2.jar" sourcepath=".gradle/loom-cache/remapped_mods/fabric-keybindings-v0-0.2.0+3fa9f7c53a@net.fabricmc.yarn.1_16_4.1.16.4+build.1-v2-sources.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path=".gradle/loom-cache/remapped_mods/fabric-lifecycle-events-v1-1.2.0+74cc3b2095@net.fabricmc.yarn.1_16_3.1.16.3+build.11-v2.jar" sourcepath=".gradle/loom-cache/remapped_mods/fabric-lifecycle-events-v1-1.2.0+74cc3b2095@net.fabricmc.yarn.1_16_3.1.16.3+build.11-v2-sources.jar">
+	<classpathentry kind="lib" path=".gradle/loom-cache/remapped_mods/fabric-lifecycle-events-v1-1.2.0+74cc3b203a@net.fabricmc.yarn.1_16_4.1.16.4+build.1-v2.jar" sourcepath=".gradle/loom-cache/remapped_mods/fabric-lifecycle-events-v1-1.2.0+74cc3b203a@net.fabricmc.yarn.1_16_4.1.16.4+build.1-v2-sources.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path=".gradle/loom-cache/remapped_mods/fabric-loot-tables-v1-1.0.1+432ea18895@net.fabricmc.yarn.1_16_3.1.16.3+build.11-v2.jar" sourcepath=".gradle/loom-cache/remapped_mods/fabric-loot-tables-v1-1.0.1+432ea18895@net.fabricmc.yarn.1_16_3.1.16.3+build.11-v2-sources.jar">
+	<classpathentry kind="lib" path=".gradle/loom-cache/remapped_mods/fabric-loot-tables-v1-1.0.1+432ea1883a@net.fabricmc.yarn.1_16_4.1.16.4+build.1-v2.jar" sourcepath=".gradle/loom-cache/remapped_mods/fabric-loot-tables-v1-1.0.1+432ea1883a@net.fabricmc.yarn.1_16_4.1.16.4+build.1-v2-sources.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path=".gradle/loom-cache/remapped_mods/fabric-mining-levels-v0-0.1.2+b764ce9995@net.fabricmc.yarn.1_16_3.1.16.3+build.11-v2.jar" sourcepath=".gradle/loom-cache/remapped_mods/fabric-mining-levels-v0-0.1.2+b764ce9995@net.fabricmc.yarn.1_16_3.1.16.3+build.11-v2-sources.jar">
+	<classpathentry kind="lib" path=".gradle/loom-cache/remapped_mods/fabric-mining-levels-v0-0.1.2+b764ce993a@net.fabricmc.yarn.1_16_4.1.16.4+build.1-v2.jar" sourcepath=".gradle/loom-cache/remapped_mods/fabric-mining-levels-v0-0.1.2+b764ce993a@net.fabricmc.yarn.1_16_4.1.16.4+build.1-v2-sources.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path=".gradle/loom-cache/remapped_mods/fabric-models-v0-0.1.0+dfdb52d695@net.fabricmc.yarn.1_16_3.1.16.3+build.11-v2.jar" sourcepath=".gradle/loom-cache/remapped_mods/fabric-models-v0-0.1.0+dfdb52d695@net.fabricmc.yarn.1_16_3.1.16.3+build.11-v2-sources.jar">
+	<classpathentry kind="lib" path=".gradle/loom-cache/remapped_mods/fabric-models-v0-0.1.1+f8ac1db23a@net.fabricmc.yarn.1_16_4.1.16.4+build.1-v2.jar" sourcepath=".gradle/loom-cache/remapped_mods/fabric-models-v0-0.1.1+f8ac1db23a@net.fabricmc.yarn.1_16_4.1.16.4+build.1-v2-sources.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path=".gradle/loom-cache/remapped_mods/fabric-networking-blockentity-v0-0.2.5+b50ffc7b95@net.fabricmc.yarn.1_16_3.1.16.3+build.11-v2.jar" sourcepath=".gradle/loom-cache/remapped_mods/fabric-networking-blockentity-v0-0.2.5+b50ffc7b95@net.fabricmc.yarn.1_16_3.1.16.3+build.11-v2-sources.jar">
+	<classpathentry kind="lib" path=".gradle/loom-cache/remapped_mods/fabric-networking-blockentity-v0-0.2.5+b50ffc7b3a@net.fabricmc.yarn.1_16_4.1.16.4+build.1-v2.jar" sourcepath=".gradle/loom-cache/remapped_mods/fabric-networking-blockentity-v0-0.2.5+b50ffc7b3a@net.fabricmc.yarn.1_16_4.1.16.4+build.1-v2-sources.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path=".gradle/loom-cache/remapped_mods/fabric-networking-v0-0.1.10+e00ecb5f95@net.fabricmc.yarn.1_16_3.1.16.3+build.11-v2.jar" sourcepath=".gradle/loom-cache/remapped_mods/fabric-networking-v0-0.1.10+e00ecb5f95@net.fabricmc.yarn.1_16_3.1.16.3+build.11-v2-sources.jar">
+	<classpathentry kind="lib" path=".gradle/loom-cache/remapped_mods/fabric-networking-v0-0.1.10+e00ecb5f3a@net.fabricmc.yarn.1_16_4.1.16.4+build.1-v2.jar" sourcepath=".gradle/loom-cache/remapped_mods/fabric-networking-v0-0.1.10+e00ecb5f3a@net.fabricmc.yarn.1_16_4.1.16.4+build.1-v2-sources.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path=".gradle/loom-cache/remapped_mods/fabric-object-builder-api-v1-1.8.0+c1aa8ed895@net.fabricmc.yarn.1_16_3.1.16.3+build.11-v2.jar" sourcepath=".gradle/loom-cache/remapped_mods/fabric-object-builder-api-v1-1.8.0+c1aa8ed895@net.fabricmc.yarn.1_16_3.1.16.3+build.11-v2-sources.jar">
+	<classpathentry kind="lib" path=".gradle/loom-cache/remapped_mods/fabric-object-builder-api-v1-1.9.2+a89534ab3a@net.fabricmc.yarn.1_16_4.1.16.4+build.1-v2.jar" sourcepath=".gradle/loom-cache/remapped_mods/fabric-object-builder-api-v1-1.9.2+a89534ab3a@net.fabricmc.yarn.1_16_4.1.16.4+build.1-v2-sources.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path=".gradle/loom-cache/remapped_mods/fabric-object-builders-v0-0.7.0+432ea18895@net.fabricmc.yarn.1_16_3.1.16.3+build.11-v2.jar" sourcepath=".gradle/loom-cache/remapped_mods/fabric-object-builders-v0-0.7.0+432ea18895@net.fabricmc.yarn.1_16_3.1.16.3+build.11-v2-sources.jar">
+	<classpathentry kind="lib" path=".gradle/loom-cache/remapped_mods/fabric-object-builders-v0-0.7.1+a4467d2a3a@net.fabricmc.yarn.1_16_4.1.16.4+build.1-v2.jar" sourcepath=".gradle/loom-cache/remapped_mods/fabric-object-builders-v0-0.7.1+a4467d2a3a@net.fabricmc.yarn.1_16_4.1.16.4+build.1-v2-sources.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path=".gradle/loom-cache/remapped_mods/fabric-particles-v1-0.2.2+fb0d9b0e95@net.fabricmc.yarn.1_16_3.1.16.3+build.11-v2.jar" sourcepath=".gradle/loom-cache/remapped_mods/fabric-particles-v1-0.2.2+fb0d9b0e95@net.fabricmc.yarn.1_16_3.1.16.3+build.11-v2-sources.jar">
+	<classpathentry kind="lib" path=".gradle/loom-cache/remapped_mods/fabric-particles-v1-0.2.2+fb0d9b0e3a@net.fabricmc.yarn.1_16_4.1.16.4+build.1-v2.jar" sourcepath=".gradle/loom-cache/remapped_mods/fabric-particles-v1-0.2.2+fb0d9b0e3a@net.fabricmc.yarn.1_16_4.1.16.4+build.1-v2-sources.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path=".gradle/loom-cache/remapped_mods/fabric-registry-sync-v0-0.5.0+c1aa8ed895@net.fabricmc.yarn.1_16_3.1.16.3+build.11-v2.jar" sourcepath=".gradle/loom-cache/remapped_mods/fabric-registry-sync-v0-0.5.0+c1aa8ed895@net.fabricmc.yarn.1_16_3.1.16.3+build.11-v2-sources.jar">
+	<classpathentry kind="lib" path=".gradle/loom-cache/remapped_mods/fabric-registry-sync-v0-0.6.1+a4467d2a3a@net.fabricmc.yarn.1_16_4.1.16.4+build.1-v2.jar" sourcepath=".gradle/loom-cache/remapped_mods/fabric-registry-sync-v0-0.6.1+a4467d2a3a@net.fabricmc.yarn.1_16_4.1.16.4+build.1-v2-sources.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path=".gradle/loom-cache/remapped_mods/fabric-renderer-api-v1-0.3.0+8bcfced895@net.fabricmc.yarn.1_16_3.1.16.3+build.11-v2.jar" sourcepath=".gradle/loom-cache/remapped_mods/fabric-renderer-api-v1-0.3.0+8bcfced895@net.fabricmc.yarn.1_16_3.1.16.3+build.11-v2-sources.jar">
+	<classpathentry kind="lib" path=".gradle/loom-cache/remapped_mods/fabric-renderer-api-v1-0.3.3+a4467d2a3a@net.fabricmc.yarn.1_16_4.1.16.4+build.1-v2.jar" sourcepath=".gradle/loom-cache/remapped_mods/fabric-renderer-api-v1-0.3.3+a4467d2a3a@net.fabricmc.yarn.1_16_4.1.16.4+build.1-v2-sources.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path=".gradle/loom-cache/remapped_mods/fabric-renderer-indigo-0.4.0+8bcfced895@net.fabricmc.yarn.1_16_3.1.16.3+build.11-v2.jar" sourcepath=".gradle/loom-cache/remapped_mods/fabric-renderer-indigo-0.4.0+8bcfced895@net.fabricmc.yarn.1_16_3.1.16.3+build.11-v2-sources.jar">
+	<classpathentry kind="lib" path=".gradle/loom-cache/remapped_mods/fabric-renderer-indigo-0.4.3+a4467d2a3a@net.fabricmc.yarn.1_16_4.1.16.4+build.1-v2.jar" sourcepath=".gradle/loom-cache/remapped_mods/fabric-renderer-indigo-0.4.3+a4467d2a3a@net.fabricmc.yarn.1_16_4.1.16.4+build.1-v2-sources.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path=".gradle/loom-cache/remapped_mods/fabric-renderer-registries-v1-2.1.0+e2862de695@net.fabricmc.yarn.1_16_3.1.16.3+build.11-v2.jar" sourcepath=".gradle/loom-cache/remapped_mods/fabric-renderer-registries-v1-2.1.0+e2862de695@net.fabricmc.yarn.1_16_3.1.16.3+build.11-v2-sources.jar">
+	<classpathentry kind="lib" path=".gradle/loom-cache/remapped_mods/fabric-renderer-registries-v1-2.2.0+f8ac1db23a@net.fabricmc.yarn.1_16_4.1.16.4+build.1-v2.jar" sourcepath=".gradle/loom-cache/remapped_mods/fabric-renderer-registries-v1-2.2.0+f8ac1db23a@net.fabricmc.yarn.1_16_4.1.16.4+build.1-v2-sources.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path=".gradle/loom-cache/remapped_mods/fabric-rendering-data-attachment-v1-0.1.3+b7f9825d95@net.fabricmc.yarn.1_16_3.1.16.3+build.11-v2.jar" sourcepath=".gradle/loom-cache/remapped_mods/fabric-rendering-data-attachment-v1-0.1.3+b7f9825d95@net.fabricmc.yarn.1_16_3.1.16.3+build.11-v2-sources.jar">
+	<classpathentry kind="lib" path=".gradle/loom-cache/remapped_mods/fabric-rendering-data-attachment-v1-0.1.4+f8ac1db23a@net.fabricmc.yarn.1_16_4.1.16.4+build.1-v2.jar" sourcepath=".gradle/loom-cache/remapped_mods/fabric-rendering-data-attachment-v1-0.1.4+f8ac1db23a@net.fabricmc.yarn.1_16_4.1.16.4+build.1-v2-sources.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path=".gradle/loom-cache/remapped_mods/fabric-rendering-fluids-v1-0.1.11+fb0d9b0e95@net.fabricmc.yarn.1_16_3.1.16.3+build.11-v2.jar" sourcepath=".gradle/loom-cache/remapped_mods/fabric-rendering-fluids-v1-0.1.11+fb0d9b0e95@net.fabricmc.yarn.1_16_3.1.16.3+build.11-v2-sources.jar">
+	<classpathentry kind="lib" path=".gradle/loom-cache/remapped_mods/fabric-rendering-fluids-v1-0.1.12+f8ac1db23a@net.fabricmc.yarn.1_16_4.1.16.4+build.1-v2.jar" sourcepath=".gradle/loom-cache/remapped_mods/fabric-rendering-fluids-v1-0.1.12+f8ac1db23a@net.fabricmc.yarn.1_16_4.1.16.4+build.1-v2-sources.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path=".gradle/loom-cache/remapped_mods/fabric-rendering-v0-1.1.0+5341049095@net.fabricmc.yarn.1_16_3.1.16.3+build.11-v2.jar" sourcepath=".gradle/loom-cache/remapped_mods/fabric-rendering-v0-1.1.0+5341049095@net.fabricmc.yarn.1_16_3.1.16.3+build.11-v2-sources.jar">
+	<classpathentry kind="lib" path=".gradle/loom-cache/remapped_mods/fabric-rendering-v0-1.1.1+f8ac1db23a@net.fabricmc.yarn.1_16_4.1.16.4+build.1-v2.jar" sourcepath=".gradle/loom-cache/remapped_mods/fabric-rendering-v0-1.1.1+f8ac1db23a@net.fabricmc.yarn.1_16_4.1.16.4+build.1-v2-sources.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path=".gradle/loom-cache/remapped_mods/fabric-rendering-v1-1.3.0+432ea18895@net.fabricmc.yarn.1_16_3.1.16.3+build.11-v2.jar" sourcepath=".gradle/loom-cache/remapped_mods/fabric-rendering-v1-1.3.0+432ea18895@net.fabricmc.yarn.1_16_3.1.16.3+build.11-v2-sources.jar">
+	<classpathentry kind="lib" path=".gradle/loom-cache/remapped_mods/fabric-rendering-v1-1.3.1+f8ac1db23a@net.fabricmc.yarn.1_16_4.1.16.4+build.1-v2.jar" sourcepath=".gradle/loom-cache/remapped_mods/fabric-rendering-v1-1.3.1+f8ac1db23a@net.fabricmc.yarn.1_16_4.1.16.4+build.1-v2-sources.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path=".gradle/loom-cache/remapped_mods/fabric-resource-loader-v0-0.3.1+facf3bbf95@net.fabricmc.yarn.1_16_3.1.16.3+build.11-v2.jar" sourcepath=".gradle/loom-cache/remapped_mods/fabric-resource-loader-v0-0.3.1+facf3bbf95@net.fabricmc.yarn.1_16_3.1.16.3+build.11-v2-sources.jar">
+	<classpathentry kind="lib" path=".gradle/loom-cache/remapped_mods/fabric-resource-loader-v0-0.3.1+facf3bbf3a@net.fabricmc.yarn.1_16_4.1.16.4+build.1-v2.jar" sourcepath=".gradle/loom-cache/remapped_mods/fabric-resource-loader-v0-0.3.1+facf3bbf3a@net.fabricmc.yarn.1_16_4.1.16.4+build.1-v2-sources.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path=".gradle/loom-cache/remapped_mods/fabric-screen-handler-api-v1-1.1.0+8724984195@net.fabricmc.yarn.1_16_3.1.16.3+build.11-v2.jar" sourcepath=".gradle/loom-cache/remapped_mods/fabric-screen-handler-api-v1-1.1.0+8724984195@net.fabricmc.yarn.1_16_3.1.16.3+build.11-v2-sources.jar">
+	<classpathentry kind="lib" path=".gradle/loom-cache/remapped_mods/fabric-screen-handler-api-v1-1.1.0+872498413a@net.fabricmc.yarn.1_16_4.1.16.4+build.1-v2.jar" sourcepath=".gradle/loom-cache/remapped_mods/fabric-screen-handler-api-v1-1.1.0+872498413a@net.fabricmc.yarn.1_16_4.1.16.4+build.1-v2-sources.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path=".gradle/loom-cache/remapped_mods/fabric-structure-api-v1-1.0.1+fb0d9b0e95@net.fabricmc.yarn.1_16_3.1.16.3+build.11-v2.jar" sourcepath=".gradle/loom-cache/remapped_mods/fabric-structure-api-v1-1.0.1+fb0d9b0e95@net.fabricmc.yarn.1_16_3.1.16.3+build.11-v2-sources.jar">
+	<classpathentry kind="lib" path=".gradle/loom-cache/remapped_mods/fabric-structure-api-v1-1.1.0+f8ac1db23a@net.fabricmc.yarn.1_16_4.1.16.4+build.1-v2.jar" sourcepath=".gradle/loom-cache/remapped_mods/fabric-structure-api-v1-1.1.0+f8ac1db23a@net.fabricmc.yarn.1_16_4.1.16.4+build.1-v2-sources.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path=".gradle/loom-cache/remapped_mods/fabric-tag-extensions-v0-1.0.3+ac8e8c5995@net.fabricmc.yarn.1_16_3.1.16.3+build.11-v2.jar" sourcepath=".gradle/loom-cache/remapped_mods/fabric-tag-extensions-v0-1.0.3+ac8e8c5995@net.fabricmc.yarn.1_16_3.1.16.3+build.11-v2-sources.jar">
+	<classpathentry kind="lib" path=".gradle/loom-cache/remapped_mods/fabric-tag-extensions-v0-1.0.3+ac8e8c593a@net.fabricmc.yarn.1_16_4.1.16.4+build.1-v2.jar" sourcepath=".gradle/loom-cache/remapped_mods/fabric-tag-extensions-v0-1.0.3+ac8e8c593a@net.fabricmc.yarn.1_16_4.1.16.4+build.1-v2-sources.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path=".gradle/loom-cache/remapped_mods/fabric-textures-v0-1.0.4+eae12eb895@net.fabricmc.yarn.1_16_3.1.16.3+build.11-v2.jar" sourcepath=".gradle/loom-cache/remapped_mods/fabric-textures-v0-1.0.4+eae12eb895@net.fabricmc.yarn.1_16_3.1.16.3+build.11-v2-sources.jar">
+	<classpathentry kind="lib" path=".gradle/loom-cache/remapped_mods/fabric-textures-v0-1.0.5+a4467d2a3a@net.fabricmc.yarn.1_16_4.1.16.4+build.1-v2.jar" sourcepath=".gradle/loom-cache/remapped_mods/fabric-textures-v0-1.0.5+a4467d2a3a@net.fabricmc.yarn.1_16_4.1.16.4+build.1-v2-sources.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path=".gradle/loom-cache/remapped_mods/fabric-tool-attribute-api-v1-1.2.2+ccce563e95@net.fabricmc.yarn.1_16_3.1.16.3+build.11-v2.jar" sourcepath=".gradle/loom-cache/remapped_mods/fabric-tool-attribute-api-v1-1.2.2+ccce563e95@net.fabricmc.yarn.1_16_3.1.16.3+build.11-v2-sources.jar">
+	<classpathentry kind="lib" path=".gradle/loom-cache/remapped_mods/fabric-tool-attribute-api-v1-1.2.4+2b4623793a@net.fabricmc.yarn.1_16_4.1.16.4+build.1-v2.jar" sourcepath=".gradle/loom-cache/remapped_mods/fabric-tool-attribute-api-v1-1.2.4+2b4623793a@net.fabricmc.yarn.1_16_4.1.16.4+build.1-v2-sources.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path=".gradle/loom-cache/remapped_mods/fabric-loader-0.9.3+build.207@net.fabricmc.yarn.1_16_3.1.16.3+build.11-v2.jar" sourcepath=".gradle/loom-cache/remapped_mods/fabric-loader-0.9.3+build.207@net.fabricmc.yarn.1_16_3.1.16.3+build.11-v2-sources.jar">
+	<classpathentry kind="lib" path=".gradle/loom-cache/remapped_mods/fabric-loader-0.10.6+build.214@net.fabricmc.yarn.1_16_4.1.16.4+build.1-v2.jar" sourcepath=".gradle/loom-cache/remapped_mods/fabric-loader-0.10.6+build.214@net.fabricmc.yarn.1_16_4.1.16.4+build.1-v2-sources.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path=".gradle/loom-cache/remapped_mods/basic-math-0.5.1@net.fabricmc.yarn.1_16_3.1.16.3+build.11-v2.jar" sourcepath=".gradle/loom-cache/remapped_mods/basic-math-0.5.1@net.fabricmc.yarn.1_16_3.1.16.3+build.11-v2-sources.jar">
+	<classpathentry kind="lib" path=".gradle/loom-cache/remapped_mods/basic-math-0.5.1@net.fabricmc.yarn.1_16_4.1.16.4+build.1-v2.jar" sourcepath=".gradle/loom-cache/remapped_mods/basic-math-0.5.1@net.fabricmc.yarn.1_16_4.1.16.4+build.1-v2-sources.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
@@ -473,12 +478,12 @@
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path=".gradle/caches/modules-2/files-2.1/net.fabricmc/fabric-loom/0.5-SNAPSHOT/abb93986135cf52193f33b5cf3c3c2a013e080d1/fabric-loom-0.5-SNAPSHOT.jar">
+	<classpathentry kind="lib" path=".gradle/caches/modules-2/files-2.1/net.fabricmc/fabric-loom/0.5-SNAPSHOT/a077ae5dc7f87d55119e25628efaffaa6914cc82/fabric-loom-0.5-SNAPSHOT.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value=""/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path=".gradle/caches/fabric-loom/yarn-1.16.3+build.11-v2-final.jar">
+	<classpathentry kind="lib" path=".gradle/caches/fabric-loom/yarn-1.16.4+build.1-v2-final.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
