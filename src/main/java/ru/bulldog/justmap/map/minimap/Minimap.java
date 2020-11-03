@@ -125,26 +125,6 @@ public class Minimap implements IMap {
 		
 		if (!isMapVisible) return;
 		
-		this.border = 0;
-		if (ClientSettings.useSkins) {
-			if (isBigMap()) {
-				this.mapSkin = MapSkin.getBigMapSkin();
-			} else {
-				this.mapSkin = MapSkin.getCurrentSkin();
-			}
-			if (isRound()) {
-				double scale = (double) mapWidth / mapSkin.getWidth();
-				this.mapSkin.getRenderData().updateScale(scale);
-				this.border = (int) (mapSkin.border * scale);
-			} else {
-				this.mapSkin.getRenderData().updateScale();
-				double scale = mapSkin.getRenderData().scaleFactor;
-				this.border = (int) (mapSkin.border * scale);
-			}
-		} else {
-			this.mapSkin = null;
-		}
-		
 		int configSize = config.getInt("map_size");
 		float configScale = config.getMapScale();
 		boolean needRotate = config.getBoolean("rotate_map");
@@ -173,6 +153,26 @@ public class Minimap implements IMap {
 			}
 			
 			textManager.setLineWidth(mapWidth);
+		}
+		
+		this.border = 0;
+		if (ClientSettings.useSkins) {
+			if (isBigMap()) {
+				this.mapSkin = MapSkin.getBigMapSkin();
+			} else {
+				this.mapSkin = MapSkin.getCurrentSkin();
+			}
+			if (isRound()) {
+				double scale = (double) mapWidth / mapSkin.getWidth();
+				this.mapSkin.getRenderData().updateScale(scale);
+				this.border = (int) (mapSkin.border * scale);
+			} else {
+				this.mapSkin.getRenderData().updateScale();
+				double scale = mapSkin.getRenderData().scaleFactor;
+				this.border = (int) (mapSkin.border * scale);
+			}
+		} else {
+			this.mapSkin = null;
 		}
 		
 		this.updateMapPosition();
