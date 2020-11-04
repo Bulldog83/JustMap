@@ -29,6 +29,7 @@ public class ImageUtil {
 	}
 	
 	public static boolean imageExists(Identifier image) {
+		checkResourceManager();		
 		if (image == null) return false;		
 		try {
 			return resourceManager.containsResource(image);
@@ -51,7 +52,6 @@ public class ImageUtil {
 	}
 	
 	public static NativeImage loadImage(Identifier image, int w, int h) {
-		checkResourceManager();		
 		if (imageExists(image)) {
 			try (Resource resource = resourceManager.getResource(image)) {
 				return NativeImage.read(resource.getInputStream());			
