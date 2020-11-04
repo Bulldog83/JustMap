@@ -33,7 +33,7 @@ public class BiomeInfo extends InfoText {
 		if (visible && minecraft.world != null) {
 			World world = minecraft.world;
 			Biome biome = world.getBiome(DataUtil.currentPos());
-			Identifier biomeId = DataUtil.getBiomeRegistry(world).getId(biome);
+			Identifier biomeId = DataUtil.getBiomeId(world, biome);
 			if (biomeId != null && !biomeId.equals(currentBiome)) {
 				this.currentBiome = biomeId;
 				this.setText(title + this.getTranslation());
