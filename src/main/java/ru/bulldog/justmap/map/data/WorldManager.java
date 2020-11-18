@@ -262,7 +262,6 @@ public final class WorldManager {
 	}
 	
 	public static void load() {
-		loaded = true;
 		loadConfig();
 		File worldsFile = new File(StorageUtil.filesDir(), "worlds.json");
 		if (!worldsFile.exists()) return;
@@ -289,6 +288,7 @@ public final class WorldManager {
 				worldAssociations.put(identifier, name);
 			}
 		}
+		loaded = true;
 	}
 	
 	private static void saveWorlds() {
