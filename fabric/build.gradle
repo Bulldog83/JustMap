@@ -1,0 +1,71 @@
+plugins {
+    id "com.github.johnrengelman.shadow" version "5.0.0"
+}
+
+configurations {
+    shadow
+}
+
+architectury {
+    platformSetupLoomIde()
+}
+
+repositories {
+    jcenter()
+}
+
+dependencies {
+    modCompile "net.fabricmc:fabric-loader:${rootProject.loader_version}"
+    modCompile "net.fabricmc.fabric-api:fabric-api:${rootProject.fabric_version}"
+    modCompile "me.shedaniel:architectury:${rootProject.architectury_version}:fabric"
+
+    optionalApi "io.github.prospector:modmenu:${rootProject.modmenu_version}"
+	includeApi "me.shedaniel.cloth:config-2:${rootProject.cloth_version_fabric}"
+
+    compileOnly(project(path: ":common")) {
+        transitive = false
+    }
+    runtimeOnly(project(path: ":common", configuration: "transformDevelopmentFabric")) {
+        transitive = false
+    }
+    shadow(project(path: ":common", configuration: "transformProductionFabric")) {
+        transitive = false
+    }
+}
+
+def optionalApi (String dep) {
+    dependencies.modApi (dep) {
+        exclude group: "net.fabricmc.fabric-api"
+        exclude group: "net.fabricmc"
+    }
+}
+
+def includeApi(String dep) {
+    dependencies.modApi (dep) {
+        exclude group: "net.fabricmc.fabric-api"
+        exclude group: "net.fabricmc"
+    }
+    dependencies.include (dep) {
+        exclude group: "net.fabricmc.fabric-api"
+        exclude group: "net.fabricmc"
+    }
+}
+
+processResources {
+    inputs.property "version", project.version
+
+    filesMatching("fabric.mod.json") {
+        expand "version": project.version
+    }
+}
+
+shadowJar {
+    configurations = [project.configurations.shadow]
+    classifier "shadow"
+}
+
+remapJar {
+    dependsOn(shadowJar)
+    input.set(shadowJar.archivePath)
+    classifier "fabric"
+}

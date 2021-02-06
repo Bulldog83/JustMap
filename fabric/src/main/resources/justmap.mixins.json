@@ -1,0 +1,16 @@
+{
+    "required": true,
+    "package": "ru.bulldog.justmap.mixins",
+    "compatibilityLevel": "JAVA_8",
+    "mixins": [
+		"SessionAccessor",
+		"BiomeColorsAccessor",
+		"RedstoneLevelAccessor",
+		"BooleanRuleAccessor",
+		"GameRulesAccessor",
+		"GameRulesMixin"
+    ],
+    "injectors": {
+        "defaultRequire": 1
+    }
+}

@@ -1,89 +1,81 @@
 plugins {
-	id 'fabric-loom' version '0.5-SNAPSHOT'
-	id "com.wynprice.cursemaven" version "2.1.5"
+	id "architectury-plugin" version "2.0.68"
+    id "forgified-fabric-loom" version "0.6.64" apply false
 	id 'maven-publish'
 	id 'eclipse'
 }
 
-sourceCompatibility = JavaVersion.VERSION_1_8
-targetCompatibility = JavaVersion.VERSION_1_8
-
-archivesBaseName = project.archives_base_name
-version = project.mod_version
-
-def versionPropsFile = file('version.properties')
-def Properties versionProps = new Properties()
-def major = 1
-def minor = 0
-def build = 0
-
-if (versionPropsFile.canRead()) {
-	versionProps.load(new FileInputStream(versionPropsFile))
-
-	major = versionProps['VERSION_MAJOR'].toInteger()
-	minor = versionProps['VERSION_MINOR'].toInteger()
-	build = versionProps['VERSION_BUILD'].toInteger()
+architectury {
+    minecraft = rootProject.minecraft_version
 }
 
-build += 1
+subprojects {
+    apply plugin: "forgified-fabric-loom"
+
+    loom {
+        silentMojangMappingsLicense()
+    }
+    
+    dependencies {
+        minecraft "com.mojang:minecraft:${rootProject.minecraft_version}"
+        mappings loom.officialMojangMappings()
+    }
+}
+
+allprojects {
+    apply plugin: "java"
+    apply plugin: "architectury-plugin"
+
+	sourceCompatibility = JavaVersion.VERSION_1_8
+	targetCompatibility = JavaVersion.VERSION_1_8
+
+    archivesBaseName = rootProject.archives_base_name
+    version = rootProject.mod_version
+    group = rootProject.maven_group
+
+    def versionPropsFile = file('version.properties')
+	def Properties versionProps = new Properties()
+	def major = 1
+	def minor = 0
+	def build = 0
+
+	if (versionPropsFile.canRead()) {
+		versionProps.load(new FileInputStream(versionPropsFile))
+
+		major = versionProps['VERSION_MAJOR'].toInteger()
+		minor = versionProps['VERSION_MINOR'].toInteger()
+		build = versionProps['VERSION_BUILD'].toInteger()
+	}
+
+	build += 1
+		
+	if (versionPropsFile.canWrite()) {
+		versionProps['VERSION_MAJOR'] = major.toString()
+		versionProps['VERSION_MINOR'] = minor.toString()
+		versionProps['VERSION_BUILD'] = build.toString()
+		versionProps.store(versionPropsFile.newWriter(), null)
+	}
+
+	version = "${major}.${minor}.${build}"
 	
-if (versionPropsFile.canWrite()) {
-	versionProps['VERSION_MAJOR'] = major.toString()
-	versionProps['VERSION_MINOR'] = minor.toString()
-	versionProps['VERSION_BUILD'] = build.toString()
-	versionProps.store(versionPropsFile.newWriter(), null)
-}
+	tasks.withType(JavaCompile) {
+        options.encoding = "UTF-8"
+    }
 
-version = "${major}.${minor}.${build}"
-
-minecraft {}
-
-repositories {
-	maven { url "https://maven.fabricmc.net/" }
-	jcenter()
-	flatDir {
-		dirs 'libs'
-	}
-}
-
-dependencies {
-	minecraft "com.mojang:minecraft:${project.minecraft_version}"
-	mappings "net.fabricmc:yarn:${project.minecraft_version}+build.${project.yarn_mappings}:v2"
-
-	modCompile "net.fabricmc:fabric-loader:${project.loader_version}"	
-	modCompile "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
-	modCompile "io.github.prospector:modmenu:${project.modmenu_version}"
-	modCompile "me.shedaniel.cloth:config-2:${project.cloth_version}"
-	
-	include "me.shedaniel.cloth:config-2:${project.cloth_version}"
-}
-
-processResources {
-	inputs.property "version", project.version
-
-	from(sourceSets.main.resources.srcDirs) {
-		include "fabric.mod.json"
-		expand "version": project.version
+	task sourcesJar(type: Jar, dependsOn: classes) {
+		classifier = "sources"
+		from sourceSets.main.allSource
 	}
 
-	from(sourceSets.main.resources.srcDirs) {
-		exclude "fabric.mod.json"
+	jar {
+		from "LICENSE"
 	}
-}
 
-tasks.withType(JavaCompile) {
-	options.encoding = "UTF-8"
-}
+	assemble {
+		version += "-${project.minecraft_version}-release"
+	}
 
-task sourcesJar(type: Jar, dependsOn: classes) {
-	classifier = "sources"
-	from sourceSets.main.allSource
-}
-
-jar {
-	from "LICENSE"
-}
-
-assemble {
-	version += "-${project.minecraft_version}-release"
+    java {
+        withSourcesJar()
+    }
 }
