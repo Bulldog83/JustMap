@@ -1,10 +1,9 @@
-package ru.bulldog.justmap.map.data;
+package ru.bulldog.justmap.client.map.data;
 
 import java.util.Arrays;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
 import ru.bulldog.justmap.util.StateUtil;
 
 public class ChunkLevel {
@@ -30,7 +29,7 @@ public class ChunkLevel {
 		this.topomap = new int[256];		
 		this.level = level;
 		
-		int airId = Block.getRawIdFromState(StateUtil.AIR);		
+		int airId = Block.getId(StateUtil.AIR);
 		Arrays.fill(statemap, airId);
 		Arrays.fill(colormap, -1);
 		Arrays.fill(heightmap, -1);
@@ -39,12 +38,12 @@ public class ChunkLevel {
 	}
 	
 	public BlockState getBlockState(int x, int z) {
-		return Block.getStateFromRawId(statemap[index(x, z)]);
+		return Block.stateById(statemap[index(x, z)]);
 	}
 	
 	public void setBlockState(int x, int z, BlockState blockState) {
 		synchronized (arrayLock) {
-			this.statemap[index(x, z)] = Block.getRawIdFromState(blockState);
+			this.statemap[index(x, z)] = Block.getId(blockState);
 		}
 	}
 	

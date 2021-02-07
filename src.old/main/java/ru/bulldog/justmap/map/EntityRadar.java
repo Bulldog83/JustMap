@@ -5,7 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import net.minecraft.entity.mob.MobEntity;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.Player;
 import net.minecraft.util.math.BlockPos;
 
 import ru.bulldog.justmap.map.icon.EntityIcon;
@@ -15,7 +15,7 @@ import ru.bulldog.justmap.util.DataUtil;
 import ru.bulldog.justmap.util.math.MathUtil;
 
 public class EntityRadar {
-	private final List<PlayerEntity> players;
+	private final List<Player> players;
 	private final List<MobEntity> creatures;
 	private final List<MapIcon<?>> drawableIcons;
 	
@@ -25,7 +25,7 @@ public class EntityRadar {
 		this.drawableIcons = new ArrayList<>();
 	}
 	
-	public void addPlayer(PlayerEntity player) {
+	public void addPlayer(Player player) {
 		if (players.contains(player)) return;
 		this.players.add(player);
 	}
@@ -56,7 +56,7 @@ public class EntityRadar {
 	
 	public void clear(BlockPos center, int radius) {
 		if (players.size() > 0) {
-			List<PlayerEntity> playersToClear = new ArrayList<>();
+			List<Player> playersToClear = new ArrayList<>();
 			this.players.forEach(player -> {
 				if (player.removed) {
 					playersToClear.add(player);

@@ -1,4 +1,4 @@
-package ru.bulldog.justmap.map.data;
+package ru.bulldog.justmap.client.map.data;
 
 import java.util.Arrays;
 

@@ -12,7 +12,7 @@ import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.util.math.PoseStack;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.Player;
 import net.minecraft.text.TextComponent;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -120,7 +120,7 @@ public class Worldmap extends MapScreen implements IMap {
 		this.players.clear();
 		if (RuleUtil.allowPlayerRadar()) {
 			List<AbstractClientPlayerEntity> players = this.client.world.getPlayers();
-			for (PlayerEntity player : players) {
+			for (Player player : players) {
 				if (player == client.player) continue;
 				this.players.add(new PlayerIcon(player));
 			}

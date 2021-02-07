@@ -42,7 +42,7 @@ import net.minecraft.client.util.Window;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.entity.mob.MobEntity;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.Player;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.world.Level;
@@ -61,7 +61,7 @@ public class Minimap implements IMap {
 	private final FastRenderer fastRenderer;
 	private final BufferedRenderer bufferedRenderer;
 	private List<WaypointIcon> waypoints = new ArrayList<>();
-	private PlayerEntity locPlayer = null;
+	private Player locPlayer = null;
 	private Layer mapLayer = Layer.SURFACE;
 	private EntityRadar entityRadar;
 	private WorldData worldData;
@@ -97,7 +97,7 @@ public class Minimap implements IMap {
 			return;
 		}
 
-		PlayerEntity player = minecraft.player;
+		Player player = minecraft.player;
 		if (player != null) {
 			if (locPlayer == null) {
 				locPlayer = player;
@@ -264,7 +264,7 @@ public class Minimap implements IMap {
 		);
 	}
 
-	private void updateInfo(PlayerEntity player) {
+	private void updateInfo(Player player) {
 		if (!ClientSettings.mapInfo) {
 			txtCoords.setVisible(false);
 			txtBiome.setVisible(false);
@@ -286,7 +286,7 @@ public class Minimap implements IMap {
 			txtTime.update();
 	}
 
-	public void prepareMap(PlayerEntity player) {
+	public void prepareMap(Player player) {
 		this.world = player.world;
 		this.worldData = WorldManager.getData();
 		BlockPos pos = DataUtil.currentPos();
@@ -334,8 +334,8 @@ public class Minimap implements IMap {
 		
 			int amount = 0;				
 			for (Entity entity : entities) {
-				if (entity instanceof PlayerEntity && RuleUtil.allowPlayerRadar()) {
-					PlayerEntity pEntity = (PlayerEntity) entity;
+				if (entity instanceof Player && RuleUtil.allowPlayerRadar()) {
+					Player pEntity = (Player) entity;
 					if (pEntity.isMainPlayer()) continue;
 					this.entityRadar.addPlayer(pEntity);
 				} else if (entity instanceof MobEntity) {

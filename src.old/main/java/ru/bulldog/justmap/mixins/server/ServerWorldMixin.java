@@ -12,12 +12,12 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
 import net.minecraft.block.BlockState;
-import net.minecraft.server.world.ServerWorld;
+import net.minecraft.server.world.ServerLevel;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.profiler.Profiler;
 import net.minecraft.util.registry.Registry;
-import net.minecraft.util.registry.RegistryKey;
+import net.minecraft.util.registry.ResourceKey;
 import net.minecraft.world.MutableWorldProperties;
 import net.minecraft.world.Level;
 import net.minecraft.world.dimension.DimensionType;
@@ -25,9 +25,9 @@ import net.minecraft.world.dimension.DimensionType;
 import ru.bulldog.justmap.util.JsonFactory;
 import ru.bulldog.justmap.util.StateUtil;
 
-@Mixin(ServerWorld.class)
+@Mixin(ServerLevel.class)
 public abstract class ServerWorldMixin extends Level {
-	protected ServerWorldMixin(MutableWorldProperties properties, RegistryKey<Level> registryKey,
+	protected ServerWorldMixin(MutableWorldProperties properties, ResourceKey<Level> registryKey,
 			DimensionType dimensionType, Supplier<Profiler> supplier, boolean bl, boolean debugWorld, long l) {
 		super(properties, registryKey, dimensionType, supplier, bl, debugWorld, l);
 	}

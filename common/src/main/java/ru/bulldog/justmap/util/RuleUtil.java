@@ -46,7 +46,7 @@ public class RuleUtil {
 		DimensionType dimType = world.dimensionType();
 		if (!dimType.hasCeiling() && dimType.hasSkyLight()) {
 			return allowCaves && (!world.isSkyVisibleAllowingSea(pos) && !DataUtil.isSkyVisible(world, pos) ||
-				   world.getRegistryKey().getValue().equals(DimensionType.OVERWORLD_CAVES_REGISTRY_KEY.getValue()));
+				   world.dimension().getValue().equals(DimensionType.OVERWORLD_CAVES_REGISTRY_KEY.getValue()));
 		}
 		
 		return allowCaves;

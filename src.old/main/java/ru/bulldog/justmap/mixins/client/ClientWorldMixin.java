@@ -12,10 +12,10 @@ import net.minecraft.client.world.ClientWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.profiler.Profiler;
-import net.minecraft.util.registry.RegistryKey;
+import net.minecraft.util.registry.ResourceKey;
 import net.minecraft.world.MutableWorldProperties;
 import net.minecraft.world.Level;
-import net.minecraft.world.chunk.WorldChunk;
+import net.minecraft.world.chunk.LevelChunk;
 import net.minecraft.world.dimension.DimensionType;
 
 import ru.bulldog.justmap.event.ChunkUpdateEvent;
@@ -30,14 +30,14 @@ import ru.bulldog.justmap.util.DataUtil;
 @Mixin(ClientWorld.class)
 public abstract class ClientWorldMixin extends Level {
 	
-	protected ClientWorldMixin(MutableWorldProperties properties, RegistryKey<Level> registryKey,
+	protected ClientWorldMixin(MutableWorldProperties properties, ResourceKey<Level> registryKey,
 			DimensionType dimensionType, Supplier<Profiler> supplier, boolean bl, boolean debugWorld, long l) {
 		super(properties, registryKey, dimensionType, supplier, bl, debugWorld, l);
 	}
 
 	@Inject(method = "setBlockStateWithoutNeighborUpdates", at = @At("TAIL"))
 	public void onSetBlockState(BlockPos pos, BlockState state, CallbackInfo info) {
-		WorldChunk worldChunk = this.getWorldChunk(pos);
+		LevelChunk worldChunk = this.getWorldChunk(pos);
 		if (!worldChunk.isEmpty()) {
 			IMap map = DataUtil.getMap();
 			Layer layer = DataUtil.getLayer(this, pos);
@@ -90,7 +90,7 @@ public abstract class ClientWorldMixin extends Level {
 	}
 	
 	private void updateChunk(WorldData mapData, Layer layer, int level, int chx, int chz, int x, int z, int w, int h) {
-		WorldChunk worldChunk = this.getChunk(chx, chz);
+		LevelChunk worldChunk = this.getChunk(chx, chz);
 		if (worldChunk.isEmpty()) return;
 		ChunkData mapChunk = mapData.getChunk(worldChunk.getPos());
 		ChunkUpdateListener.accept(new ChunkUpdateEvent(worldChunk, mapChunk, layer, level, x, z, w, h, true));

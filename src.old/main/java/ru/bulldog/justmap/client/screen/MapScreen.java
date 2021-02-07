@@ -6,7 +6,7 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.util.math.PoseStack;
 import net.minecraft.text.Component;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.registry.RegistryKey;
+import net.minecraft.util.registry.ResourceKey;
 import net.minecraft.world.Level;
 
 import ru.bulldog.justmap.JustMap;
@@ -48,7 +48,7 @@ public class MapScreen extends Screen {
 	
 	@Override
 	protected void init() {
-		RegistryKey<Level> dimKey = client.world.getRegistryKey();
+		ResourceKey<Level> dimKey = client.world.dimension();
 		this.info = DIMENSION_INFO.getOrDefault(dimKey.getValue().toString(), null);
 	}
 	

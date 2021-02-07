@@ -1,5 +1,12 @@
-package ru.bulldog.justmap.map.data;
+package ru.bulldog.justmap.client.map.data;
 
+import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.chunk.LevelChunk;
+import net.minecraft.world.level.levelgen.WorldgenRandom;
 import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.client.config.ClientSettings;
 import ru.bulldog.justmap.network.ClientNetworkHandler;
@@ -9,14 +16,6 @@ import ru.bulldog.justmap.util.colors.ColorUtil;
 import ru.bulldog.justmap.util.colors.Colors;
 import ru.bulldog.justmap.util.math.MathUtil;
 import ru.bulldog.justmap.util.tasks.TaskManager;
-
-import net.minecraft.world.Level;
-import net.minecraft.block.BlockState;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.world.chunk.WorldChunk;
-import net.minecraft.world.gen.ChunkRandom;
 
 import java.lang.ref.SoftReference;
 import java.util.Arrays;
@@ -28,13 +27,13 @@ public class ChunkData {
 	public final static ChunkLevel EMPTY_LEVEL = new ChunkLevel(-1);
 	
 	private final static TaskManager chunkUpdater = TaskManager.getManager("chunk-updater", 2);
-	private static ClientNetworkHandler networkHandler = JustMapClient.getNetworkHandler();
-	
+	//private static ClientNetworkHandler networkHandler = JustMapClient.getNetworkHandler();
+
 	private final WorldData mapData;
 	private final Map<Layer, ChunkLevel[]> levels = new ConcurrentHashMap<>();
 	private final ChunkPos chunkPos;
-	private Level world;
-	private SoftReference<WorldChunk> worldChunk;
+	private final Level world;
+	private SoftReference<LevelChunk> worldChunk;
 	private boolean outdated = false;
 	private boolean purged = false;
 	private boolean slime = false;
@@ -47,7 +46,7 @@ public class ChunkData {
 	
 	private Object levelLock = new Object();
 	
-	public ChunkData(WorldData data, WorldChunk lifeChunk) {
+	public ChunkData(WorldData data, LevelChunk lifeChunk) {
 		this(data, lifeChunk.getPos());
 		this.updateWorldChunk(lifeChunk);
 	}
@@ -59,15 +58,16 @@ public class ChunkData {
 		this.worldChunk = new SoftReference<>(world.getChunk(pos.x, pos.z));
 
 		if (Dimension.isOverworld(world)) {
-			ServerWorld serverWorld = DataUtil.getServerWorld();
+			ServerLevel serverWorld = DataUtil.getServerWorld();
 			if (serverWorld != null) {
-				this.slime = ChunkRandom.getSlimeRandom(chunkPos.x, chunkPos.z,
+				this.slime = WorldgenRandom.seedSlimeChunk(chunkPos.x, chunkPos.z,
 						serverWorld.getSeed(), 987234911L).nextInt(10) == 0;
-			} else if (networkHandler.canRequestData()) {
-				networkHandler.requestChunkHasSlime(chunkPos, result -> {
-					this.slime = result;
-				});
 			}
+//			else if (networkHandler.canRequestData()) {
+//				networkHandler.requestChunkHasSlime(chunkPos, result -> {
+//					this.slime = result;
+//				});
+//			}
 		}
 		if (Dimension.isNether(world)) {
 			initLayer(Layer.NETHER);
@@ -88,7 +88,7 @@ public class ChunkData {
 	}
 	
 	private void initLayer(Layer layer) {
-		int levels = this.world.getDimensionHeight() / layer.height;		
+		int levels = this.world.getMaxBuildHeight() / layer.height;
 		this.levels.put(layer, new ChunkLevel[levels]);
 	}
 	
@@ -131,7 +131,7 @@ public class ChunkData {
 		return this.chunkPos.z;
 	}
 	
-	public WorldChunk getWorldChunk() {
+	public LevelChunk getWorldChunk() {
 		return this.worldChunk.get();
 	}
 	
@@ -147,16 +147,16 @@ public class ChunkData {
 		return this.getChunkLevel(layer, level).updating;
 	}
 	
-	public void updateWorldChunk(WorldChunk lifeChunk) {
+	public void updateWorldChunk(LevelChunk lifeChunk) {
 		if (lifeChunk != null && !lifeChunk.isEmpty()) {
 			this.worldChunk = new SoftReference<>(lifeChunk);
 		}
 	}
 	
-	public WorldChunk updateWorldChunk() {
-		WorldChunk currentChunk = this.worldChunk.get();
+	public LevelChunk updateWorldChunk() {
+		LevelChunk currentChunk = this.worldChunk.get();
 		if(currentChunk == null || currentChunk.isEmpty()) {
-			WorldChunk lifeChunk = this.world.getChunk(getX(), getZ());
+			LevelChunk lifeChunk = this.world.getChunk(getX(), getZ());
 			if (lifeChunk == null || lifeChunk.isEmpty()) {
 				return this.mapData.getEmptyChunk();
 			}
@@ -179,7 +179,7 @@ public class ChunkData {
 		long currentTime = System.currentTimeMillis();
 		if (!outdated && currentTime - updated < ClientSettings.chunkUpdateInterval) return false;
 		
-		WorldChunk worldChunk = this.updateWorldChunk();
+		LevelChunk worldChunk = this.updateWorldChunk();
 		chunkUpdater.execute(() -> {
 			if (worldChunk.isEmpty() || !this.isChunkLoaded()) return;
 			this.updateArea(worldChunk, layer, level, x, z, width, height);
@@ -196,7 +196,7 @@ public class ChunkData {
 		return true;
 	}
 	
-	private void updateHeighmap(WorldChunk worldChunk, Layer layer, int level, boolean skipWater, int x, int z, int width, int height) {
+	private void updateHeighmap(LevelChunk worldChunk, Layer layer, int level, boolean skipWater, int x, int z, int width, int height) {
 		if (worldChunk.isEmpty()) return;
 		for (int sx = x; sx < width; sx++) {
 			for (int sz = z; sz < height; sz++) {
@@ -212,7 +212,7 @@ public class ChunkData {
 		}
 	}
 	
-	private void updateArea(WorldChunk worldChunk, Layer layer, int level, int x, int z, int width, int height) {
+	private void updateArea(LevelChunk worldChunk, Layer layer, int level, int x, int z, int width, int height) {
 		ChunkLevel chunkLevel = this.getChunkLevel(layer, level);
 		chunkLevel.updating = true;
 
@@ -236,7 +236,7 @@ public class ChunkData {
 		chunkLevel.updating = false;
 	}
 	
-	private void updateBlock(WorldChunk worldChunk, ChunkLevel chunkLevel, Layer layer, int level, int x, int z, boolean skipWater) {
+	private void updateBlock(LevelChunk worldChunk, ChunkLevel chunkLevel, Layer layer, int level, int x, int z, boolean skipWater) {
 		int index = x + (z << 4);
 		int posX = x + (chunkPos.x << 4);
 		int posZ = z + (chunkPos.z << 4);

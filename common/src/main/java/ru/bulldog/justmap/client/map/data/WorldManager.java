@@ -1,4 +1,4 @@
-package ru.bulldog.justmap.map.data;
+package ru.bulldog.justmap.client.map.data;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -14,7 +14,7 @@ import net.minecraft.client.gui.screen.ProgressScreen;
 import net.minecraft.util.JsonHelper;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.Level;
-import net.minecraft.world.chunk.WorldChunk;
+import net.minecraft.world.chunk.LevelChunk;
 
 import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.client.JustMapClient;
@@ -167,7 +167,7 @@ public final class WorldManager {
 	}
 	
 	public static WorldKey createWorldKey(Level world, BlockPos blockPos, String worldName) {
-		WorldKey newKey = new WorldKey(world.getRegistryKey());
+		WorldKey newKey = new WorldKey(world.dimension());
 		if (RuleUtil.detectMultiworlds()) {
 			if (blockPos != null) {
 				newKey.setWorldPos(blockPos);
@@ -212,7 +212,7 @@ public final class WorldManager {
 		return data;
 	}
 	
-	public static void onChunkLoad(Level world, WorldChunk worldChunk) {
+	public static void onChunkLoad(Level world, LevelChunk worldChunk) {
 		if (world == null || worldChunk == null || worldChunk.isEmpty()) return;
 		IMap map = DataUtil.getMap();
 		WorldData mapData = getData();

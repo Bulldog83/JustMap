@@ -1,13 +1,13 @@
 package ru.bulldog.justmap.event;
 
-import net.minecraft.world.chunk.WorldChunk;
+import net.minecraft.world.chunk.LevelChunk;
 
 import ru.bulldog.justmap.map.data.ChunkData;
 import ru.bulldog.justmap.map.data.Layer;
 import ru.bulldog.justmap.util.math.Plane;
 
 public class ChunkUpdateEvent {
-	public final WorldChunk worldChunk;
+	public final LevelChunk worldChunk;
 	public final ChunkData mapChunk;
 	public final Layer layer;
 	public final Plane updateArea;
@@ -15,7 +15,7 @@ public class ChunkUpdateEvent {
 	public final boolean full;
 	public final int level;
 	
-	public ChunkUpdateEvent(WorldChunk worldChunk, ChunkData mapChunk, Layer layer, int level, int x, int z, int w, int h, boolean update) {
+	public ChunkUpdateEvent(LevelChunk worldChunk, ChunkData mapChunk, Layer layer, int level, int x, int z, int w, int h, boolean update) {
 		this.full = (x == 0 && z == 0 && w == 16 && h == 16);
 		this.worldChunk = worldChunk;
 		this.mapChunk = mapChunk;
@@ -37,7 +37,7 @@ public class ChunkUpdateEvent {
 			   this.updateArea.equals(event.updateArea);
 	}
 	
-	private boolean chunkEquals(WorldChunk chunk) {
+	private boolean chunkEquals(LevelChunk chunk) {
 		return this.worldChunk.getPos().equals(chunk.getPos());
 	}
 }

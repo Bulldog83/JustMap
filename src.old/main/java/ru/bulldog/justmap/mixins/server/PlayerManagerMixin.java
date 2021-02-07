@@ -12,7 +12,7 @@ import net.minecraft.network.MessageType;
 import net.minecraft.network.packet.s2c.play.GameMessageS2CPacket;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.PlayerManager;
-import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.network.ServerPlayer;
 import net.minecraft.text.BaseText;
 import net.minecraft.text.TextComponent;
 import net.minecraft.text.Component;
@@ -30,7 +30,7 @@ public abstract class PlayerManagerMixin {
 	private MinecraftServer server;
 	
 	@Inject(method = "onPlayerConnect", at = @At(value = "INVOKE", target = "Lnet/minecraft/network/packet/s2c/play/DifficultyS2CPacket;<init>(Lnet/minecraft/world/Difficulty;Z)V"))
-	public void onPlayerConnectPre(ClientConnection connection, ServerPlayerEntity player, CallbackInfo info) {
+	public void onPlayerConnectPre(ClientConnection connection, ServerPlayer player, CallbackInfo info) {
 		ServerNetworkHandler networkHandler = JustMapServer.getNetworkHandler();
 		if (networkHandler != null) {
 			networkHandler.onPlayerConnect(player);
@@ -38,7 +38,7 @@ public abstract class PlayerManagerMixin {
 	}
 	
 	@Inject(method = "onPlayerConnect", at = @At("TAIL"))
-	public void onPlayerConnectPost(ClientConnection clientConnection, ServerPlayerEntity serverPlayerEntity, CallbackInfo info) {
+	public void onPlayerConnectPost(ClientConnection clientConnection, ServerPlayer serverPlayerEntity, CallbackInfo info) {
 		BaseText command = new TextComponent("§0§0");
 		if (ServerSettings.useGameRules) {
 			GameRules gameRules = server.getGameRules();
@@ -93,7 +93,7 @@ public abstract class PlayerManagerMixin {
 		}
 	}
 	
-	private void sendCommand(ServerPlayerEntity serverPlayerEntity, Component command) {
+	private void sendCommand(ServerPlayer serverPlayerEntity, Component command) {
 		serverPlayerEntity.networkHandler.sendPacket(new GameMessageS2CPacket(command, MessageType.SYSTEM, serverPlayerEntity.getUuid()));
 	}
 }

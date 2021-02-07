@@ -1,4 +1,4 @@
-package ru.bulldog.justmap.map.data;
+package ru.bulldog.justmap.client.map.data;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -9,16 +9,12 @@ import java.util.Map;
 import java.util.Set;
 
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.world.ChunkSerializer;
-import net.minecraft.world.Level;
-import net.minecraft.world.chunk.Chunk;
-import net.minecraft.world.chunk.EmptyChunk;
-import net.minecraft.world.chunk.ReadOnlyChunk;
-import net.minecraft.world.chunk.WorldChunk;
-import net.minecraft.world.storage.VersionedChunkStorage;
 
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.chunk.LevelChunk;
+import net.minecraft.world.level.chunk.storage.ChunkSerializer;
 import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.util.DataUtil;
 import ru.bulldog.justmap.util.storage.StorageUtil;
@@ -30,7 +26,7 @@ class ChunkDataManager {
 	private final Map<ChunkPos, ChunkData> mapChunks = new HashMap<>();
 	private final Set<ChunkPos> requestedChunks = new HashSet<>();
 	private final WorldData mapData;
-	private final WorldChunk emptyChunk;
+	private final LevelChunk emptyChunk;
 	
 	ChunkDataManager(WorldData data, Level world) {
 		this.emptyChunk = new EmptyChunk(world, new ChunkPos(0, 0));
@@ -58,7 +54,7 @@ class ChunkDataManager {
 		return mapChunk;
 	}
 	
-	WorldChunk getEmptyChunk() {
+	LevelChunk getEmptyChunk() {
 		return this.emptyChunk;
 	}
 	
@@ -94,10 +90,10 @@ class ChunkDataManager {
 		}
 	}
 	
-	WorldChunk callSavedChunk(Level world, ChunkPos chunkPos) {
-		if (!(world instanceof ServerWorld)) return this.emptyChunk;
+	LevelChunk callSavedChunk(Level world, ChunkPos chunkPos) {
+		if (!(world instanceof ServerLevel)) return this.emptyChunk;
 		if (requestedChunks.add(chunkPos)) {
-			return (WorldChunk) chunkProcessor.run("Call saves for chunk " + chunkPos, (future) -> {
+			return (LevelChunk) chunkProcessor.run("Call saves for chunk " + chunkPos, (future) -> {
 				return () -> {
 					future.complete(this.callSaves(world, chunkPos));
 					this.requestedChunks.remove(chunkPos);
@@ -107,19 +103,19 @@ class ChunkDataManager {
 		return this.emptyChunk;
 	}
 	
-	private WorldChunk callSaves(Level world, ChunkPos chunkPos) {
+	private LevelChunk callSaves(Level world, ChunkPos chunkPos) {
 		long usedPct = MemoryUtil.getMemoryUsage();
 		if (usedPct > 85L) {
 			JustMap.LOGGER.warning("Not enough memory, can't load more chunks.");
 			return this.emptyChunk;
         }
 		
-		ServerWorld serverWorld = (ServerWorld) world;
+		ServerLevel serverWorld = (ServerLevel) world;
 		try (VersionedChunkStorage storage = StorageUtil.getChunkStorage(serverWorld);) {		
-			CompoundTag chunkTag = storage.updateChunkTag(serverWorld.getRegistryKey(),
+			CompoundTag chunkTag = storage.updateChunkTag(serverWorld.dimension(),
 					DataUtil.getPersistentSupplier(), storage.getNbt(chunkPos));
 			if (chunkTag == null) return this.emptyChunk;
-			Chunk chunk = ChunkSerializer.deserialize(
+			Chunk chunk = ChunkSerializer.read(
 					serverWorld, serverWorld.getStructureManager(), serverWorld.getPointOfInterestStorage(), chunkPos, chunkTag);
 			if (chunk instanceof ReadOnlyChunk) {
 				return ((ReadOnlyChunk) chunk).getWrappedChunk();

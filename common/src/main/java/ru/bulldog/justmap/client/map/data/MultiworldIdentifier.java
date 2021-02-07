@@ -1,4 +1,4 @@
-package ru.bulldog.justmap.map.data;
+package ru.bulldog.justmap.client.map.data;
 
 import com.google.gson.JsonObject;
 
@@ -19,7 +19,7 @@ public class MultiworldIdentifier {
     }
 
     public MultiworldIdentifier(BlockPos spawnPosition, Level world) {
-        this(spawnPosition, world.getRegistryKey().getValue());
+        this(spawnPosition, world.dimension().getValue());
     }
 
     @Override

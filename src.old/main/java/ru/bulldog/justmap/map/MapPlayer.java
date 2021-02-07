@@ -8,7 +8,7 @@ import net.minecraft.client.texture.ResourceTexture;
 import net.minecraft.client.texture.TextureManager;
 import net.minecraft.client.util.DefaultSkinHelper;
 import net.minecraft.client.world.ClientWorld;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.Player;
 import net.minecraft.util.ChatUtil;
 import net.minecraft.util.ResourceLocation;
 
@@ -18,7 +18,7 @@ public class MapPlayer extends AbstractClientPlayerEntity {
 
 	private final PlayerHeadIcon icon;
 	
-	public MapPlayer(ClientWorld world, PlayerEntity player) {
+	public MapPlayer(ClientWorld world, Player player) {
 		super(world, player.getGameProfile());
 		
 		this.icon = new PlayerHeadIcon();

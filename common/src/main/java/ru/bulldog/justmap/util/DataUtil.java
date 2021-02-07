@@ -46,7 +46,7 @@ public class DataUtil {
 		Minecraft minecraft = Minecraft.getInstance();
 		if (isSingleplayer()) {
 			MinecraftServer server = minecraft.getServer();
-			serverWorld = minecraft.getServer().getWorld(world.getRegistryKey());
+			serverWorld = minecraft.getServer().getWorld(world.dimension());
 			persistentSupplier = () -> {
 				return server.getOverworld().getPersistentStateManager();
 			};
@@ -125,7 +125,7 @@ public class DataUtil {
 		return clientWorld;
 	}
 	
-	public static ServerWorld getServerWorld() {
+	public static ServerLevel getServerWorld() {
 		return serverWorld;
 	}
 	

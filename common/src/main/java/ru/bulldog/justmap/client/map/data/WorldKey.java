@@ -1,4 +1,4 @@
-package ru.bulldog.justmap.map.data;
+package ru.bulldog.justmap.client.map.data;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -6,7 +6,7 @@ import com.google.gson.JsonObject;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.JsonHelper;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.registry.RegistryKey;
+import net.minecraft.util.registry.ResourceKey;
 import net.minecraft.world.Level;
 import ru.bulldog.justmap.util.PosUtil;
 
@@ -21,7 +21,7 @@ public class WorldKey {
 		this.worldId = this.dimension.toString();
 	}
 	
-	public WorldKey(RegistryKey<Level> worldKey) {
+	public WorldKey(ResourceKey<Level> worldKey) {
 		this(worldKey.getValue());
 	}
 	
