@@ -1,8 +1,7 @@
 plugins {
-	id "architectury-plugin" version "2.0.68"
-    id "forgified-fabric-loom" version "0.6.64" apply false
+	id "architectury-plugin" version "3.0-SNAPSHOT"
+	id "forgified-fabric-loom" version "0.6-SNAPSHOT" apply false
 	id 'maven-publish'
-	id 'eclipse'
 }
 
 architectury {
@@ -34,7 +33,7 @@ allprojects {
     group = rootProject.maven_group
 
     def versionPropsFile = file('version.properties')
-	def Properties versionProps = new Properties()
+	Properties versionProps = new Properties()
 	def major = 1
 	def minor = 0
 	def build = 0

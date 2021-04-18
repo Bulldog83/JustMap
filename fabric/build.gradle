@@ -11,16 +11,16 @@ architectury {
 }
 
 repositories {
-    jcenter()
+    maven { url "https://maven.terraformersmc.com/" }
 }
 
 dependencies {
-    modCompile "net.fabricmc:fabric-loader:${rootProject.loader_version}"
-    modCompile "net.fabricmc.fabric-api:fabric-api:${rootProject.fabric_version}"
-    modCompile "me.shedaniel:architectury:${rootProject.architectury_version}:fabric"
+    modImplementation "net.fabricmc:fabric-loader:${rootProject.loader_version}"
+    modApi "net.fabricmc.fabric-api:fabric-api:${rootProject.fabric_version}"
+    modApi "me.shedaniel:architectury-fabric:${rootProject.architectury_version}"
 
-    optionalApi "io.github.prospector:modmenu:${rootProject.modmenu_version}"
-	includeApi "me.shedaniel.cloth:config-2:${rootProject.cloth_version_fabric}"
+    optionalApi "com.terraformersmc:modmenu:${rootProject.modmenu_version}"
+	includedApi "me.shedaniel.cloth:cloth-config-fabric:${rootProject.cloth_version}"
 
     compileOnly(project(path: ":common")) {
         transitive = false
@@ -33,14 +33,14 @@ dependencies {
     }
 }
 
-def optionalApi (String dep) {
+def optionalApi(String dep) {
     dependencies.modApi (dep) {
         exclude group: "net.fabricmc.fabric-api"
         exclude group: "net.fabricmc"
     }
 }
 
-def includeApi(String dep) {
+def includedApi(String dep) {
     dependencies.modApi (dep) {
         exclude group: "net.fabricmc.fabric-api"
         exclude group: "net.fabricmc"
