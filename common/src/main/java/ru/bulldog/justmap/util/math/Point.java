@@ -1,9 +1,9 @@
 package ru.bulldog.justmap.util.math;
 
-import java.util.Arrays;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.ChunkPos;
+
+import java.util.Objects;
 
 public class Point {
 	
@@ -33,16 +33,15 @@ public class Point {
 	
 	@Override
 	public int hashCode() {
-		return Arrays.hashCode(new double[]{x, y});
+		return Objects.hash(x, y);
 	}
 	
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) return true;
 		if(!(obj instanceof Point)) return false;
-		
 		Point point = (Point) obj;
-		return this.x == point.x && this.y == point.y;
+		return x == point.x && y == point.y;
 	}
 	
 	public String shortString() {

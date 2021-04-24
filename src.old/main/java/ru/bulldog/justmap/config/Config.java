@@ -1,7 +1,6 @@
 package ru.bulldog.justmap.config;
 
 import ru.bulldog.justmap.JustMap;
-import ru.bulldog.justmap.config.ConfigKeeper.*;
 
 public abstract class Config {
 	

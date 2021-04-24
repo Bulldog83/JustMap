@@ -1,8 +1,8 @@
 package ru.bulldog.justmap.config;
 
+import old_files.justmap.JustMap;
 import org.jetbrains.annotations.Nullable;
 
-import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.config.ConfigKeeper.BooleanEntry;
 import ru.bulldog.justmap.config.ConfigKeeper.Entry;
 import ru.bulldog.justmap.config.ConfigKeeper.EnumEntry;

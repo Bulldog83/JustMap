@@ -5,8 +5,8 @@ import com.google.common.reflect.TypeToken;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.minecraft.util.GsonHelper;
+import old_files.justmap.util.JsonFactory;
 import org.jetbrains.annotations.Nullable;
-import ru.bulldog.justmap.util.JsonFactory;
 
 import java.lang.reflect.Type;
 import java.util.Map;

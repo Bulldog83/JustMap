@@ -2,7 +2,7 @@ package ru.bulldog.justmap.util;
 
 import com.sun.org.apache.xml.internal.security.utils.I18n;
 import net.minecraft.network.chat.TranslatableComponent;
-import ru.bulldog.justmap.JustMap;
+import old_files.justmap.JustMap;
 
 public class LangUtil {
 	private final static String MOD_ID = JustMap.MOD_ID;

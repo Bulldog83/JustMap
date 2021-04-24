@@ -1,0 +1,16 @@
+package old_files.justmap.enums;
+
+public enum ScreenPosition {
+	TOP_LEFT,
+	TOP_CENTER,
+	TOP_RIGHT,
+	MIDDLE_LEFT,
+	MIDDLE_RIGHT,
+	BOTTOM_LEFT,
+	BOTTOM_RIGHT,
+	USER_DEFINED;
+  
+	public static ScreenPosition get(int i) {
+		return values()[i];
+	}
+}

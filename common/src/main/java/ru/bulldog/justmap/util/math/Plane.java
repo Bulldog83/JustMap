@@ -39,7 +39,7 @@ public class Plane {
 		if (this == obj) return true;
 		if (!(obj instanceof Plane)) return false;
 		Plane plane = (Plane) obj;
-		return this.first.equals(plane.first) &&
-			   this.second.equals(plane.second);
+		return first.equals(plane.first) &&
+			   second.equals(plane.second);
 	}
 }

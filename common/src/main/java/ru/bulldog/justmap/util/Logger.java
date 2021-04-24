@@ -9,7 +9,7 @@ public final class Logger {
 	
 	private static final org.apache.logging.log4j.Logger LOGGER = LogManager.getLogger();
 	
-	private String modPref = "[" + JustMap.MOD_ID + "] ";
+	private final String modPref = "[" + JustMap.MOD_ID + "] ";
 	
 	private Logger() {}
 	
@@ -26,11 +26,11 @@ public final class Logger {
 	}
 	
 	public void debug(Object message) {
-		this.log(Level.DEBUG, message.toString());
+		log(Level.DEBUG, message.toString());
 	}
 	
 	public void debug(Object message, Object... params) {
-		this.log(Level.DEBUG, message.toString(), params);
+		log(Level.DEBUG, message.toString(), params);
 	}
 	
 	public void catching(Throwable ex) {
@@ -39,7 +39,7 @@ public final class Logger {
 	}
 	
 	public void info(String message) {
-		this.log(Level.INFO, message);
+		log(Level.INFO, message);
 	}
 	
 	public void info(String message, Object... params) {
@@ -47,7 +47,7 @@ public final class Logger {
 	}
 	
 	public void warning(String message) {
-		this.log(Level.WARN, message);
+		log(Level.WARN, message);
 	}
 	
 	public void warning(String message, Object obj, Exception ex) {
@@ -55,7 +55,7 @@ public final class Logger {
 	}
 	
 	public void error(String message) {
-		this.log(Level.ERROR, message);
+		log(Level.ERROR, message);
 	}
 	
 	public void error(String message, Object obj, Exception ex) {

@@ -7,8 +7,8 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import net.fabricmc.loader.api.FabricLoader;
-import ru.bulldog.justmap.JustMap;
-import ru.bulldog.justmap.util.JsonFactory;
+import old_files.justmap.JustMap;
+import old_files.justmap.util.JsonFactory;
 
 public class ConfigWriter {
 	

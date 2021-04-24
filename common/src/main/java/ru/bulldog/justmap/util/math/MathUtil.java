@@ -1,35 +1,32 @@
 package ru.bulldog.justmap.util.math;
 
-import java.util.Comparator;
+import net.minecraft.core.BlockPos;
 
-import net.minecraft.util.math.BlockPos;
+import java.util.Comparator;
 
 public class MathUtil {
 	
 	public final static double SQRT2 = Math.sqrt(2.0);
 	public final static double BIG_SQRT2 = SQRT2 * 0.625 + 1.0;
-	public final static Comparator<Integer> INT_COMPARATOR = new Comparator<Integer>() {
-		@Override
-		public int compare(Integer int1, Integer int2) {
-			if (int1 == null) return -1;
-			if (int2 == null) return 1;
-			return Integer.compare(int1, int2);
-		}
+	public final static Comparator<Integer> INT_COMPARATOR = (int1, int2) -> {
+		if (int1 == null) return -1;
+		if (int2 == null) return 1;
+		return Integer.compare(int1, int2);
 	};
 	
 	public static int clamp(int val, int min, int max) {
-		return val < min ? min : val > max ? max : val;
+		return val < min ? min : Math.min(val, max);
 	}
 	
 	public static double clamp(double val, double min, double max) {
-		return val < min ? min : val > max ? max : val;
+		return val < min ? min : Math.min(val, max);
 	}
 	
 	public static float clamp(float val, float min, float max) {
-		return val < min ? min : val > max ? max : val;
+		return val < min ? min : Math.min(val, max);
 	}
 	
-	public static double logn(double n, double a) {
+	public static double logN(double n, double a) {
 		return Math.log(a) / Math.log(n); 
 	}
 	
@@ -67,7 +64,6 @@ public class MathUtil {
 		for(double arg : args) {
 			min = Math.min(min, arg);
 		}
-		
 		return min;
 	}
 	
@@ -77,7 +73,6 @@ public class MathUtil {
 		for(double arg : args) {
 			max = Math.max(max, arg);
 		}
-		
 		return max;
 	}
 	
@@ -85,7 +80,6 @@ public class MathUtil {
 		int turns = (int) Math.abs(d / 360);		
 		if(d >= 360) return d - 360 * turns;
 		if(d < 0) return d + 360 * (turns + 1);
-		
 		return d;
 	}
 	
@@ -108,7 +102,6 @@ public class MathUtil {
 	public static Point circlePos(Point pos, Point center, double angle) {
 		double posX = center.x + (pos.x - center.x) * Math.cos(angle) - (pos.y - center.y) * Math.sin(angle);
 		double posY = center.y + (pos.y - center.y) * Math.cos(angle) + (pos.x - center.x) * Math.sin(angle);
-		
 		return new Point(posX, posY);
 	}
 	
@@ -120,13 +113,11 @@ public class MathUtil {
 		int dist;
 		int distX = (a.getX() - b.getX());
 		int distZ = (a.getZ() - b.getZ());
-		
 		dist = distX * distX + distZ * distZ;
 		if (!horizontalOnly) {
 			int distY = (a.getY() - b.getY());
 			dist += distY * distY;
 		}
-		
 		return Math.sqrt(dist);
 	}
 
