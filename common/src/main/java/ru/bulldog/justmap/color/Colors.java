@@ -48,7 +48,14 @@ public final class Colors {
 	public final static int GRASS = GrassColor.get(0.5, 1.0);
 	public final static int FOLIAGE = FoliageColor.getDefaultColor();
 	
-	public final static Colors INSTANCE = new Colors();
+	private static Colors instance;
+
+	public static Colors getInstance() {
+		if (instance == null) {
+			instance = new Colors();
+		}
+		return instance;
+	}
 	
 	private final Map<String, ColorPalette> palettes = Maps.newHashMap();
 	

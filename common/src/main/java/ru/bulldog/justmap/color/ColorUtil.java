@@ -12,6 +12,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BiomeColors;
 import net.minecraft.client.renderer.block.BlockModelShaper;
 import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
@@ -26,13 +27,14 @@ import old_files.justmap.util.colors.ColorProviders;
 import ru.bulldog.justmap.util.math.MathUtil;
 
 @Environment(EnvType.CLIENT)
-public class ColorUtil {
-	
+public abstract class ColorUtil {
+
 	private static final Minecraft minecraft = Minecraft.getInstance();
 	private static final BlockModelShaper blockModels = minecraft.getBlockRenderer().getBlockModelShaper();
-	private static final float[] floatBuffer = new float[3];
 	private static final ColorProviders colorProvider = ColorProviders.INSTANCE;
-	private static final Colors colorPalette = Colors.INSTANCE;
+	private static final float[] floatBuffer = new float[3];
+
+	protected static final Colors colorPalette = Colors.getInstance();
 	
 	public static int[] toIntArray(int color) {
 		return new int[] {
@@ -204,10 +206,10 @@ public class ColorUtil {
 	
 	private static int extractColor(BlockState state) {
 		List<BakedQuad> quads = blockModels.getBlockModel(state).getQuads(state, Direction.UP, new Random());
-		
 		ResourceLocation blockSprite;
-		if (quads.size() > 0) {
-			blockSprite = ((BakedSpriteAccessor) quads.get(0)).getSprite().getId();
+		TextureAtlasSprite sprite = BakedSpriteAccessor.getSprite(quads.get(0));
+		if (sprite != null) {
+			blockSprite = sprite.getName();
 		} else {
 			blockSprite = blockModels.getParticleIcon(state).getName();
 		}
@@ -240,7 +242,7 @@ public class ColorUtil {
 		return color;
 	}
 	
-	public static int proccessColor(int color, int heightDiff, float topoLevel) {
+	public static int processColor(int color, int heightDiff, float topoLevel) {
 		RGBtoHSB((color >> 16) & 255, (color >> 8) & 255, color & 255, floatBuffer);
 		floatBuffer[1] += ClientSettings.mapSaturation / 100.0F;
 		floatBuffer[1] = MathUtil.clamp(floatBuffer[1], 0.0F, 1.0F);
@@ -257,7 +259,7 @@ public class ColorUtil {
 		return HSBtoRGB(floatBuffer[0], floatBuffer[1], floatBuffer[2]);
 	}
 	
-	private static int proccessColor(int blockColor, int textureColor, int defaultColor) {
+	private static int processColor(int blockColor, int textureColor, int defaultColor) {
 		blockColor = blockColor == -1 ? defaultColor : blockColor;		
 		if (blockColor != -1) {
 			return multiplyColor(textureColor, blockColor);
@@ -292,7 +294,7 @@ public class ColorUtil {
 		return -1;
 	}
 	
-	public static int blockColor(Level world, BlockState state, BlockPos pos) {
+	public int blockColor(Level world, BlockState state, BlockPos pos) {
 		int materialColor = state.getMapColor(world, pos).col;
 		if (ClientSettings.alternateColorRender) {
 			int blockColor = colorPalette.getBlockColor(state);
@@ -308,20 +310,20 @@ public class ColorUtil {
 			
 			Block block = state.getBlock();
 			if (block instanceof VineBlock) {
-				blockColor = proccessColor(blockColor, textureColor, colorProvider.getFoliageColor(world, pos));
+				blockColor = processColor(blockColor, textureColor, colorProvider.getFoliageColor(world, pos));
 			} else if (block instanceof TallGrassBlock || block instanceof DoublePlantBlock || block instanceof SugarCaneBlock) {
-				blockColor = proccessColor(blockColor, textureColor, colorProvider.getGrassColor(world, pos));
+				blockColor = processColor(blockColor, textureColor, colorProvider.getGrassColor(world, pos));
 			} else if (block instanceof WaterlilyBlock || block instanceof StemBlock || block instanceof AttachedStemBlock) {
-				blockColor = proccessColor(blockColor, textureColor, materialColor);
+				blockColor = processColor(blockColor, textureColor, materialColor);
 				colorPalette.addBlockColor(state, blockColor);
 			} else if (block instanceof LiquidBlock) {
 				if (StateUtil.isWater(state)) {
-					blockColor = proccessColor(blockColor, textureColor, colorProvider.getWaterColor(world, pos));
+					blockColor = processColor(blockColor, textureColor, colorProvider.getWaterColor(world, pos));
 				} else {
 					blockColor = fluidColor(world, state, pos, textureColor);
 					colorPalette.addFluidColor(state, blockColor);
 				}
-			} else if (blockColor != -1){
+			} else if (blockColor != -1) {
 				blockColor = multiplyColor(textureColor, blockColor);
 				if (block.equals(Blocks.BIRCH_LEAVES) || block.equals(Blocks.SPRUCE_LEAVES)) {
 					colorPalette.addBlockColor(state, blockColor);
@@ -338,4 +340,6 @@ public class ColorUtil {
 		
 		return materialColor;
 	}
+
+	protected abstract int fluidColor(Level world, BlockState state, BlockPos pos, int defColor);
 }
