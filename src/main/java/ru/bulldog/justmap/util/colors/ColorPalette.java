@@ -7,7 +7,11 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-
+import net.minecraft.core.Registry;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.Property;
 import org.jetbrains.annotations.Nullable;
 
 import com.google.common.collect.BiMap;
@@ -15,13 +19,6 @@ import com.google.common.collect.HashBiMap;
 import com.google.common.collect.Maps;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-
-import net.minecraft.block.BlockState;
-import net.minecraft.state.property.Property;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.registry.Registry;
-import net.minecraft.world.biome.Biome;
-
 import ru.bulldog.justmap.util.DataUtil;
 import ru.bulldog.justmap.util.JsonFactory;
 
@@ -39,14 +36,14 @@ public class ColorPalette {
 
 		@SuppressWarnings("unchecked")
 		private <T extends Comparable<T>> String nameValue(Property<T> property, Comparable<?> value) {
-			return property.name((T) value);
+			return property.getName((T) value);
 		}
 	};
 	
 	private final BiMap<Set<String>, Integer> blockColors = HashBiMap.create();
 	private final BiMap<Set<String>, Integer> fluidColors = HashBiMap.create();
-	private final Map<Identifier, Integer> textureColors = Maps.newHashMap();
-	private final Map<Identifier, BiomeColors> biomeColors = Maps.newHashMap();
+	private final Map<ResourceLocation, Integer> textureColors = Maps.newHashMap();
+	private final Map<ResourceLocation, BiomeColors> biomeColors = Maps.newHashMap();
 	
 	public int getBlockColor(BlockState block) {
 		return getColor(blockColors, block);
@@ -64,14 +61,14 @@ public class ColorPalette {
 		addColor(fluidColors, block, color);
 	}
 	
-	public int getTextureColor(Identifier texture) {
+	public int getTextureColor(ResourceLocation texture) {
 		if (this.textureColors.containsKey(texture)) {
 			return this.textureColors.get(texture);
 		}
 		return 0x0;
 	}
 	
-	public void addTextureColor(Identifier texture, int color) {
+	public void addTextureColor(ResourceLocation texture, int color) {
 		synchronized (textureColors) {
 			if (this.textureColors.containsKey(texture)) {
 				this.textureColors.replace(texture, color);
@@ -81,7 +78,7 @@ public class ColorPalette {
 		}
 	}
 	
-	public BiomeColors getBiomeColors(Identifier id, Biome biome) {
+	public BiomeColors getBiomeColors(ResourceLocation id, Biome biome) {
 		if (biomeColors.containsKey(id)) {
 			return this.biomeColors.get(id);
 		}
@@ -93,15 +90,15 @@ public class ColorPalette {
 		}
 	}
 	
-	public int getFoliageColor(Identifier id, Biome biome) {
+	public int getFoliageColor(ResourceLocation id, Biome biome) {
 		return this.getBiomeColors(id, biome).getFoliageColor();
 	}
 	
-	public int getGrassColor(Identifier id, Biome biome, int x, int z) {
+	public int getGrassColor(ResourceLocation id, Biome biome, int x, int z) {
 		return this.getBiomeColors(id, biome).getGrassColor(x, z);
 	}
 	
-	public int getWaterColor(Identifier id, Biome biome) {
+	public int getWaterColor(ResourceLocation id, Biome biome) {
 		return this.getBiomeColors(id, biome).getWaterColor();
 	}
 	
@@ -188,7 +185,7 @@ public class ColorPalette {
 						String key = entry.getKey();
 						String hexColor = entry.getValue().getAsString();
 						int color = ColorUtil.parseHex(hexColor);
-						this.textureColors.put(new Identifier(key), color);
+						this.textureColors.put(new ResourceLocation(key), color);
 					});
 					continue;
 				}
@@ -197,7 +194,7 @@ public class ColorPalette {
 					biomes.entrySet().forEach(entry -> {
 						String key = entry.getKey();
 						JsonObject biomeJson = entry.getValue().getAsJsonObject();
-						Identifier biomeId = new Identifier(key);
+						ResourceLocation biomeId = new ResourceLocation(key);
 						Biome biome = DataUtil.getBiomeRegistry().get(biomeId);
 						this.biomeColors.put(biomeId, BiomeColors.fromJson(biome, biomeJson));
 					});
@@ -251,10 +248,10 @@ public class ColorPalette {
 	
 	private static String makeKey(BlockState block) {
 		StringBuilder stringBuilder = new StringBuilder();
-		Identifier stateId = Registry.BLOCK.getId(block.getBlock());
+		ResourceLocation stateId = Registry.BLOCK.getKey(block.getBlock());
 		stringBuilder.append(stateId);
 		
-		Map<Property<?>, Comparable<?>> properties = block.getEntries();
+		Map<Property<?>, Comparable<?>> properties = block.getValues();
 		if (!properties.isEmpty()) {
 			stringBuilder.append('[')
 						 .append(properties.entrySet().stream().map(PROPERTY_PRINTER)

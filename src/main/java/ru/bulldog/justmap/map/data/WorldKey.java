@@ -2,27 +2,26 @@ package ru.bulldog.justmap.map.data;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-
-import net.minecraft.util.Identifier;
-import net.minecraft.util.JsonHelper;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.registry.RegistryKey;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.GsonHelper;
+import net.minecraft.world.level.Level;
 import ru.bulldog.justmap.util.PosUtil;
 
 public class WorldKey {
-	private final Identifier dimension;
+	private final ResourceLocation dimension;
 	private String worldId;
 	private String worldName;
 	private BlockPos worldPos;
 	
-	public WorldKey(Identifier dimension) {
+	public WorldKey(ResourceLocation dimension) {
 		this.dimension = dimension;
 		this.worldId = this.dimension.toString();
 	}
 	
-	public WorldKey(RegistryKey<World> worldKey) {
-		this(worldKey.getValue());
+	public WorldKey(ResourceKey<Level> worldKey) {
+		this(worldKey.location());
 	}
 	
 	public void setWorldName(String name) {
@@ -38,7 +37,7 @@ public class WorldKey {
 		}
 	}
 	
-	public Identifier getDimension() {
+	public ResourceLocation getDimension() {
 		return this.dimension;
 	}
 	
@@ -91,14 +90,14 @@ public class WorldKey {
 	
 	public static WorldKey fromJson(JsonObject element) {
 		if (!element.has("dimension")) return null;
-		Identifier dimension = new Identifier(JsonHelper.getString(element, "dimension"));
+		ResourceLocation dimension = new ResourceLocation(GsonHelper.getAsString(element, "dimension"));
 		WorldKey worldKey = new WorldKey(dimension);
 		if (element.has("name")) {
-			worldKey.setWorldName(JsonHelper.getString(element, "name"));
+			worldKey.setWorldName(GsonHelper.getAsString(element, "name"));
 			return worldKey;
 		}
 		if (element.has("position")) {
-			BlockPos worldPos = PosUtil.fromJson(JsonHelper.getObject(element, "position"));
+			BlockPos worldPos = PosUtil.fromJson(GsonHelper.getAsJsonObject(element, "position"));
 			worldKey.setWorldPos(worldPos);
 		}
 		

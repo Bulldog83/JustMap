@@ -1,23 +1,20 @@
 package ru.bulldog.justmap.mixins.client;
 
 import java.util.function.Supplier;
-
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.core.BlockPos;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.util.profiling.ProfilerFiller;
+import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.chunk.LevelChunk;
+import net.minecraft.world.level.dimension.DimensionType;
+import net.minecraft.world.level.storage.WritableLevelData;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-
-import net.minecraft.block.BlockState;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.util.profiler.Profiler;
-import net.minecraft.util.registry.RegistryKey;
-import net.minecraft.world.MutableWorldProperties;
-import net.minecraft.world.World;
-import net.minecraft.world.chunk.WorldChunk;
-import net.minecraft.world.dimension.DimensionType;
-
 import ru.bulldog.justmap.event.ChunkUpdateEvent;
 import ru.bulldog.justmap.event.ChunkUpdateListener;
 import ru.bulldog.justmap.map.IMap;
@@ -27,17 +24,17 @@ import ru.bulldog.justmap.map.data.WorldManager;
 import ru.bulldog.justmap.map.data.Layer;
 import ru.bulldog.justmap.util.DataUtil;
 
-@Mixin(ClientWorld.class)
-public abstract class ClientWorldMixin extends World {
+@Mixin(ClientLevel.class)
+public abstract class ClientWorldMixin extends Level {
 	
-	protected ClientWorldMixin(MutableWorldProperties properties, RegistryKey<World> registryKey,
-			DimensionType dimensionType, Supplier<Profiler> supplier, boolean bl, boolean debugWorld, long l) {
+	protected ClientWorldMixin(WritableLevelData properties, ResourceKey<Level> registryKey,
+			DimensionType dimensionType, Supplier<ProfilerFiller> supplier, boolean bl, boolean debugWorld, long l) {
 		super(properties, registryKey, dimensionType, supplier, bl, debugWorld, l);
 	}
 
-	@Inject(method = "setBlockStateWithoutNeighborUpdates", at = @At("TAIL"))
+	@Inject(method = "setKnownState", at = @At("TAIL"))
 	public void onSetBlockState(BlockPos pos, BlockState state, CallbackInfo info) {
-		WorldChunk worldChunk = this.getWorldChunk(pos);
+		LevelChunk worldChunk = this.getChunkAt(pos);
 		if (!worldChunk.isEmpty()) {
 			IMap map = DataUtil.getMap();
 			Layer layer = DataUtil.getLayer(this, pos);
@@ -90,7 +87,7 @@ public abstract class ClientWorldMixin extends World {
 	}
 	
 	private void updateChunk(WorldData mapData, Layer layer, int level, int chx, int chz, int x, int z, int w, int h) {
-		WorldChunk worldChunk = this.getChunk(chx, chz);
+		LevelChunk worldChunk = this.getChunk(chx, chz);
 		if (worldChunk.isEmpty()) return;
 		ChunkData mapChunk = mapData.getChunk(worldChunk.getPos());
 		ChunkUpdateListener.accept(new ChunkUpdateEvent(worldChunk, mapChunk, layer, level, x, z, w, h, true));

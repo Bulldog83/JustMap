@@ -1,14 +1,15 @@
 package ru.bulldog.justmap.client.widget;
 
-import net.minecraft.client.gui.Drawable;
-import net.minecraft.client.gui.Element;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.util.math.MatrixStack;
-
+import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.gui.components.Widget;
+import net.minecraft.client.gui.components.events.GuiEventListener;
+import net.minecraft.client.gui.narration.NarratableEntry;
+import net.minecraft.client.gui.narration.NarrationElementOutput;
+import net.minecraft.client.gui.screens.Screen;
 import ru.bulldog.justmap.map.minimap.Minimap;
 import ru.bulldog.justmap.util.render.RenderUtil;
 
-public class MapWidget implements Element, Drawable {
+public class MapWidget implements GuiEventListener, Widget, NarratableEntry {
 
 	final Minimap map;
 	int left, right;
@@ -18,6 +19,7 @@ public class MapWidget implements Element, Drawable {
 	int border;
 	double initX, initY;
 	double x, y;
+	boolean isHovered;
 	
 	public MapWidget(Screen parent, Minimap map) {
 		this.map = map;
@@ -49,7 +51,7 @@ public class MapWidget implements Element, Drawable {
 	}
 
 	@Override
-	public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+	public void render(PoseStack matrices, int mouseX, int mouseY, float delta) {
 		int color = 0xDD00AA00;
 		if (Minimap.isRound()) {
 			double centerX = x + border + bgW / 2;
@@ -65,7 +67,8 @@ public class MapWidget implements Element, Drawable {
 	
 	@Override
 	public boolean isMouseOver(double mouseX, double mouseY) {
-		return (mouseX > x && mouseY > y && mouseX < x + width && mouseY < y + height);
+		this.isHovered = mouseX > x && mouseY > y && mouseX < x + width && mouseY < y + height;
+		return isHovered;
 	}
 	
 	@Override
@@ -85,4 +88,12 @@ public class MapWidget implements Element, Drawable {
 		
 		return true;
 	}
+
+	@Override
+	public NarrationPriority narrationPriority() {
+		return isHovered ? NarrationPriority.HOVERED : NarrationPriority.NONE;
+	}
+
+	@Override
+	public void updateNarration(NarrationElementOutput narrationElementOutput) {}
 }

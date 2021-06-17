@@ -1,18 +1,16 @@
 package ru.bulldog.justmap.map.icon;
 
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.texture.ResourceTexture;
-import net.minecraft.client.util.DefaultSkinHelper;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.Identifier;
-
 import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.client.config.ClientSettings;
 import ru.bulldog.justmap.map.MapPlayer;
 import ru.bulldog.justmap.util.colors.Colors;
 import ru.bulldog.justmap.util.render.RenderUtil;
-
+import com.mojang.blaze3d.vertex.PoseStack;
 import java.io.IOException;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.texture.SimpleTexture;
+import net.minecraft.client.resources.DefaultPlayerSkin;
+import net.minecraft.resources.ResourceLocation;
 
 public class PlayerHeadIcon {
 	
@@ -20,19 +18,19 @@ public class PlayerHeadIcon {
 	public int delay = 5000;
 	public boolean success = false;
 	
-	private ResourceTexture playerSkin;
+	private SimpleTexture playerSkin;
 	
-	public void draw(MatrixStack matrices, double x, double y) {
+	public void draw(PoseStack matrices, double x, double y) {
 		int size = ClientSettings.entityIconSize;
 		this.draw(matrices, x, y, size, ClientSettings.showIconsOutline);
 	}
 	
 	public void draw(double x, double y, int size, boolean outline) {
-		MatrixStack matrix = new MatrixStack();
+		PoseStack matrix = new PoseStack();
 		this.draw(matrix, x, y, size, outline);
 	}
 
-	public void draw(MatrixStack matrices, double x, double y, int size, boolean outline) {		
+	public void draw(PoseStack matrices, double x, double y, int size, boolean outline) {		
 		double drawX = x - size / 2;
 		double drawY = y - size / 2;
 		y -= size / 2;
@@ -40,7 +38,7 @@ public class PlayerHeadIcon {
 			double thickness = ClientSettings.entityOutlineSize;
 			RenderUtil.fill(drawX - thickness / 2, drawY - thickness / 2, size + thickness, size + thickness, Colors.LIGHT_GRAY);
 		}
-		this.playerSkin.bindTexture();	
+		this.playerSkin.bind();	
 		RenderUtil.drawPlayerHead(matrices, drawX, drawY, size, size);
 	}
 	
@@ -52,28 +50,28 @@ public class PlayerHeadIcon {
 	public void getPlayerSkin(MapPlayer player) {
 		this.lastCheck = System.currentTimeMillis();
 		
-		Identifier defaultSkin = DefaultSkinHelper.getTexture(player.getUuid());
-		if (!player.getSkinTexture().equals(defaultSkin)) {
-			ResourceTexture skinTexture = MapPlayer.loadSkinTexture(player.getSkinTexture(), player.getName().getString());
+		ResourceLocation defaultSkin = DefaultPlayerSkin.getDefaultSkin(player.getUUID());
+		if (!player.getSkinTextureLocation().equals(defaultSkin)) {
+			SimpleTexture skinTexture = MapPlayer.loadSkinTexture(player.getSkinTextureLocation(), player.getName().getString());
 			if (skinTexture != this.playerSkin) {
 				if (this.playerSkin != null) {
-					this.playerSkin.clearGlId();
+					this.playerSkin.releaseId();
 				}
 				this.playerSkin = skinTexture;
 
 				try {
-					this.playerSkin.load(MinecraftClient.getInstance().getResourceManager());
+					this.playerSkin.load(Minecraft.getInstance().getResourceManager());
 				} catch (IOException ex) {
 					JustMap.LOGGER.warning(ex.getLocalizedMessage());
 				}
 				this.success = true;
 			}
 		} else if (this.playerSkin == null) {
-			this.playerSkin = new ResourceTexture(defaultSkin);
+			this.playerSkin = new SimpleTexture(defaultSkin);
 			this.success = false;
 			
 			try {
-				this.playerSkin.load(MinecraftClient.getInstance().getResourceManager());
+				this.playerSkin.load(Minecraft.getInstance().getResourceManager());
 			} catch (IOException ex) {
 				JustMap.LOGGER.warning(ex.getLocalizedMessage());
 			}

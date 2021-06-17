@@ -3,9 +3,7 @@ package ru.bulldog.justmap.map.data;
 import java.io.File;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-
-import net.minecraft.util.math.ChunkPos;
-
+import net.minecraft.world.level.ChunkPos;
 import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.client.config.ClientSettings;
 import ru.bulldog.justmap.map.IMap;
@@ -22,14 +20,14 @@ import ru.bulldog.justmap.util.tasks.TaskManager;
 
 public class RegionData {
 	
-	private static TaskManager updater = TaskManager.getManager("region-updater");
-	private static TaskManager worker = JustMap.WORKER;
-	private static Logger logger = JustMap.LOGGER;
+	private static final TaskManager updater = TaskManager.getManager("region-updater");
+	private static final TaskManager worker = JustMap.WORKER;
+	private static final Logger logger = JustMap.LOGGER;
 	
 	private final WorldData mapData;
 	private final RegionPos regPos;
 	private final Map<Layer, MapTexture> images = new ConcurrentHashMap<>();
-	private File cacheDir;
+	private final File cacheDir;
 	private MapTexture image;
 	private MapTexture texture;
 	private MapTexture overlay;
@@ -46,13 +44,12 @@ public class RegionData {
 	private boolean alternateRender = true;
 	private boolean slimeOverlay = false;
 	private boolean loadedOverlay = false;
-	private boolean gridOverlay = false;
-	private boolean imageChanged = false;	
+	private boolean imageChanged = false;
 	private boolean worldmap = false;
 	
 	public long updated = 0;
 	
-	private Object imageLock = new Object();
+	private final Object imageLock = new Object();
 	
 	public RegionData(IMap map, WorldData data, RegionPos regPos) {
 		this(data, regPos);
@@ -61,7 +58,7 @@ public class RegionData {
 		this.level = map.getLevel();
 		this.center = new ChunkPos(map.getCenter());
 		this.worldmap = map.isWorldmap();
-		int radius = DataUtil.getGameOptions().viewDistance - 1;
+		int radius = DataUtil.getGameOptions().renderDistance - 1;
 		this.updateArea = new Plane(center.x - radius, center.z - radius,
 									center.x + radius, center.z + radius);
 		this.loadImage(layer, level);
@@ -117,7 +114,7 @@ public class RegionData {
 	}
 	
 	public void setCenter(ChunkPos centerPos) {
-		int radius = DataUtil.getGameOptions().viewDistance - 1;
+		int radius = DataUtil.getGameOptions().renderDistance - 1;
 		this.center = centerPos;
 		this.updateArea = new Plane(center.x - radius, center.z - radius,
 									center.x + radius, center.z + radius);
@@ -150,7 +147,7 @@ public class RegionData {
 			this.loadedOverlay = ClientSettings.showLoadedChunks;
 			this.renewOverlay = true;
 		}
-		this.overlayNeeded = gridOverlay || slimeOverlay || loadedOverlay;
+		this.overlayNeeded = slimeOverlay || loadedOverlay;
 		synchronized (imageLock) {
 			if (overlayNeeded && texture == null) {
 				this.texture = new MapTexture(null, image);
@@ -299,12 +296,12 @@ public class RegionData {
 		float u2 = (imgX + imgW) / 512F;
 		float v2 = (imgY + imgH) / 512F;
 		
-		this.drawTexture(x, y, width, height, u1, v1, u2, v2);
+		drawTexture(x, y, width, height, u1, v1, u2, v2);
 	}
 	
 	private void drawTexture(double x, double y, double w, double h, float u1, float v1, float u2, float v2) {
 		if (texture != null && texture.changed) {
-			this.texture.upload();
+			texture.upload();
 		} else if (texture == null && image.changed) {
 			this.image.upload();
 		}

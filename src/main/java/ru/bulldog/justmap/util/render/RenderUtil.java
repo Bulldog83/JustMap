@@ -1,73 +1,65 @@
 package ru.bulldog.justmap.util.render;
 
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.mojang.blaze3d.systems.RenderSystem;
-
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.DrawableHelper;
-import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.Tessellator;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.render.VertexFormat;
-import net.minecraft.client.render.VertexFormats;
-import net.minecraft.client.texture.TextureManager;
-import net.minecraft.client.util.math.AffineTransformation;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.Matrix3f;
-import net.minecraft.util.math.Matrix4f;
-import net.minecraft.text.Text;
-
+import com.mojang.blaze3d.vertex.*;
+import com.mojang.math.Matrix3f;
+import com.mojang.math.Matrix4f;
+import com.mojang.math.Transformation;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiComponent;
+import net.minecraft.client.renderer.texture.TextureManager;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import org.lwjgl.opengl.GL11;
 import ru.bulldog.justmap.client.config.ClientSettings;
 import ru.bulldog.justmap.map.minimap.skin.MapSkin;
 import ru.bulldog.justmap.map.minimap.skin.MapSkin.RenderData;
 import ru.bulldog.justmap.util.colors.ColorUtil;
 
-import org.lwjgl.opengl.GL11;
-
-public class RenderUtil extends DrawableHelper {	
+public class RenderUtil extends GuiComponent {	
 	
 	private RenderUtil() {}
 	
 	public final static RenderUtil DRAWER = new RenderUtil();
-	
-	private final static VertexFormat VF_POS_TEX_NORMAL = new VertexFormat(ImmutableList.of(VertexFormats.POSITION_ELEMENT, VertexFormats.TEXTURE_ELEMENT, VertexFormats.NORMAL_ELEMENT, VertexFormats.PADDING_ELEMENT));
-	private final static Tessellator tessellator = Tessellator.getInstance();
-	private final static BufferBuilder vertexBuffer = tessellator.getBuffer();
-	private final static TextRenderer textRenderer = MinecraftClient.getInstance().textRenderer;
-	private final static TextureManager textureManager = MinecraftClient.getInstance().getTextureManager();
 
-	public static int getWidth(Text text) {
-		return textRenderer.getWidth(text);
+	public final static VertexFormat VF_POS_TEX_NORMAL;
+	private final static Tesselator tessellator = Tesselator.getInstance();
+	private final static BufferBuilder vertexBuffer = tessellator.getBuilder();
+	private final static Font textRenderer = Minecraft.getInstance().font;
+	private final static TextureManager textureManager = Minecraft.getInstance().getTextureManager();
+
+	public static int getWidth(Component text) {
+		return textRenderer.width(text);
 	}
 
 	public static int getWidth(String string) {
-		return textRenderer.getWidth(string);
+		return textRenderer.width(string);
 	}
 	
 	public static void drawCenteredString(String string, double x, double y, int color) {
-		MatrixStack matrices = new MatrixStack();
+		PoseStack matrices = new PoseStack();
 		drawCenteredString(matrices, string, x, y, color);
 	}
 	
-	public static void drawCenteredString(MatrixStack matrices, String string, double x, double y, int color) {
-		textRenderer.drawWithShadow(matrices, string, (float) (x - textRenderer.getWidth(string) / 2), (float) y, color);
+	public static void drawCenteredString(PoseStack matrices, String string, double x, double y, int color) {
+		textRenderer.drawShadow(matrices, string, (float) (x - textRenderer.width(string) / 2), (float) y, color);
 	}
 	
-	public static void drawCenteredText(MatrixStack matrices, Text text, double x, double y, int color) {
-		textRenderer.drawWithShadow(matrices, text, (float) (x - textRenderer.getWidth(text) / 2), (float) y, color);
+	public static void drawCenteredText(PoseStack matrices, Component text, double x, double y, int color) {
+		textRenderer.drawShadow(matrices, text, (float) (x - textRenderer.width(text) / 2), (float) y, color);
 	}
 	
 	public static void drawBoundedString(String string, int x, int y, int leftBound, int rightBound, int color) {
-		MatrixStack matrices = new MatrixStack();
+		PoseStack matrices = new PoseStack();
 		drawBoundedString(matrices, string, x, y, leftBound, rightBound, color);
 	}
 	
-	public static void drawBoundedString(MatrixStack matrices, String string, int x, int y, int leftBound, int rightBound, int color) {
+	public static void drawBoundedString(PoseStack matrices, String string, int x, int y, int leftBound, int rightBound, int color) {
 		if (string == null) return;
 		
-		int stringWidth = textRenderer.getWidth(string);
+		int stringWidth = textRenderer.width(string);
 		int drawX = x - stringWidth / 2;
 		if (drawX < leftBound) {
 			drawX = leftBound;
@@ -75,11 +67,11 @@ public class RenderUtil extends DrawableHelper {
 			drawX = rightBound - stringWidth;
 		}
 
-		drawStringWithShadow(matrices, textRenderer, string, drawX, y, color);
+		drawString(matrices, textRenderer, string, drawX, y, color);
 	}
 
-	public static void drawRightAlignedString(MatrixStack matrices, String string, int x, int y, int color) {
-		textRenderer.drawWithShadow(matrices, string, x - textRenderer.getWidth(string), y, color);
+	public static void drawRightAlignedString(PoseStack matrices, String string, int x, int y, int color) {
+		textRenderer.drawShadow(matrices, string, x - textRenderer.width(string), y, color);
 	}
 	
 	public static void drawDiamond(double x, double y, int width, int height, int color) {
@@ -93,12 +85,12 @@ public class RenderUtil extends DrawableHelper {
 				 color);
 	}
 	
-	public static void bindTexture(Identifier id) {
-    	textureManager.bindTexture(id);
+	public static void bindTexture(ResourceLocation id) {
+		RenderSystem.setShaderTexture(0, id);
     }
     
 	public static void bindTexture(int id) {
-		RenderSystem.bindTexture(id);
+		RenderSystem.setShaderTexture(0, id);
 	}
 	
 	public static void applyFilter(boolean force) {
@@ -139,7 +131,7 @@ public class RenderUtil extends DrawableHelper {
 	}
 	
     public static void startDraw() {
-    	startDraw(VertexFormats.POSITION_TEXTURE);
+    	startDraw(DefaultVertexFormat.POSITION_TEX);
     }
     
     public static void startDrawNormal() {
@@ -147,15 +139,15 @@ public class RenderUtil extends DrawableHelper {
     }
     
     public static void startDraw(VertexFormat vertexFormat) {
-    	startDraw(GLC.GL_QUADS, vertexFormat);
+    	startDraw(VertexFormat.Mode.QUADS, vertexFormat);
     }
     
-    public static void startDraw(int mode, VertexFormat vertexFormat) {
+    public static void startDraw(VertexFormat.Mode mode, VertexFormat vertexFormat) {
     	vertexBuffer.begin(mode, vertexFormat);
     }
     
     public static void endDraw() {
-    	tessellator.draw();
+    	tessellator.end();
     }
     
     public static void drawQuad(double x, double y, double w, double h) {
@@ -175,11 +167,11 @@ public class RenderUtil extends DrawableHelper {
 		float b = (float)(color & 255) / 255.0F;
 	
 		RenderSystem.disableTexture();
-		RenderSystem.color4f(r, g, b, a);
-		startDraw(GLC.GL_TRIANGLES, VertexFormats.POSITION);
-		vertexBuffer.vertex(x1, y1, 0).next();
-		vertexBuffer.vertex(x2, y2, 0).next();
-		vertexBuffer.vertex(x3, y3, 0).next();
+		RenderSystem.setShaderColor(r, g, b, a);
+		startDraw(VertexFormat.Mode.TRIANGLES, DefaultVertexFormat.POSITION);
+		vertexBuffer.vertex(x1, y1, 0).endVertex();
+		vertexBuffer.vertex(x2, y2, 0).endVertex();
+		vertexBuffer.vertex(x3, y3, 0).endVertex();
 		endDraw();
 		RenderSystem.enableTexture();
 	}
@@ -191,12 +183,12 @@ public class RenderUtil extends DrawableHelper {
 		float b = (float)(color & 255) / 255.0F;
 	
 		RenderSystem.disableTexture();
-		RenderSystem.color4f(r, g, b, a);
-		startDraw(GLC.GL_LINES, VertexFormats.POSITION);
-		vertexBuffer.vertex(x1, y1, 0).next();
-		vertexBuffer.vertex(x2, y2, 0).next();
+		RenderSystem.setShaderColor(r, g, b, a);
+		startDraw(VertexFormat.Mode.LINES, DefaultVertexFormat.POSITION);
+		vertexBuffer.vertex(x1, y1, 0).endVertex();
+		vertexBuffer.vertex(x2, y2, 0).endVertex();
 		endDraw();
-		RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+		RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 		RenderSystem.enableTexture();
 	}	
 	
@@ -215,33 +207,33 @@ public class RenderUtil extends DrawableHelper {
 		RenderSystem.enableBlend();
 	    RenderSystem.disableTexture();
 	    RenderSystem.defaultBlendFunc();
-		RenderSystem.color4f(r, g, b, a);
+		RenderSystem.setShaderColor(r, g, b, a);
 		drawCircleVertices(x, y, radius);
-		RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+		RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 		RenderSystem.enableTexture();
 		RenderSystem.disableBlend();
 	}
 	
 	public static void drawCircleVertices(double x, double y, double radius) {
 		double pi2 = Math.PI * 2;
-		startDraw(GLC.GL_TRIANGLE_FAN, VertexFormats.POSITION);
-		vertexBuffer.vertex(x, y, 0).next();
+		startDraw(VertexFormat.Mode.TRIANGLE_FAN, DefaultVertexFormat.POSITION);
+		vertexBuffer.vertex(x, y, 0).endVertex();
 		int sides = 50;
 		for (int i = 0; i <= sides; i++) {
 			double angle = (pi2 * i / sides) + Math.toRadians(180);
 			double vx = x + Math.sin(angle) * radius;
 			double vy = y + Math.cos(angle) * radius;
-			vertexBuffer.vertex(vx, vy, 0).next();
+			vertexBuffer.vertex(vx, vy, 0).endVertex();
 		}
 		endDraw();
 	}
 
 	public static void fill(double x, double y, double w, double h, int color) {
-		fill(AffineTransformation.identity().getMatrix(), x, y, w, h, color);
+		fill(Transformation.identity().getMatrix(), x, y, w, h, color);
 	}
 	
-	public static void fill(MatrixStack matrices, double x, double y, double w, double h, int color) {
-		fill(matrices.peek().getModel(), x, y, w, h, color);
+	public static void fill(PoseStack matrices, double x, double y, double w, double h, int color) {
+		fill(matrices.last().pose(), x, y, w, h, color);
 	}
 
 	public static void fill(Matrix4f matrix4f, double x, double y, double w, double h, int color) {
@@ -253,48 +245,48 @@ public class RenderUtil extends DrawableHelper {
 		RenderSystem.enableBlend();
 		RenderSystem.disableTexture();
 		RenderSystem.defaultBlendFunc();
-		startDraw(GLC.GL_QUADS, VertexFormats.POSITION_COLOR);
-		vertexBuffer.vertex(matrix4f, (float) x, (float) (y + h), 0.0F).color(r, g, b, a).next();
-		vertexBuffer.vertex(matrix4f, (float) (x + w), (float) (y + h), 0.0F).color(r, g, b, a).next();
-		vertexBuffer.vertex(matrix4f, (float) (x + w), (float) y, 0.0F).color(r, g, b, a).next();
-		vertexBuffer.vertex(matrix4f, (float) x, (float) y, 0.0F).color(r, g, b, a).next();
+		startDraw(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
+		vertexBuffer.vertex(matrix4f, (float) x, (float) (y + h), 0.0F).color(r, g, b, a).endVertex();
+		vertexBuffer.vertex(matrix4f, (float) (x + w), (float) (y + h), 0.0F).color(r, g, b, a).endVertex();
+		vertexBuffer.vertex(matrix4f, (float) (x + w), (float) y, 0.0F).color(r, g, b, a).endVertex();
+		vertexBuffer.vertex(matrix4f, (float) x, (float) y, 0.0F).color(r, g, b, a).endVertex();
 		endDraw();
 		RenderSystem.enableTexture();
 		RenderSystem.disableBlend();
 	}
 	
-	public static void draw(MatrixStack matrices, double x, double y, float w, float h) {
+	public static void draw(PoseStack matrices, double x, double y, float w, float h) {
 		startDrawNormal();
-		draw(matrices, vertexBuffer, x, y, w, h, 0.0F, 0.0F, 1.0F, 1.0F);
+		draw(matrices, x, y, w, h, 0.0F, 0.0F, 1.0F, 1.0F);
 		endDraw();
 	}
 	
-	public static void drawPlayerHead(MatrixStack matrices, double x, double y, int w, int h) {
+	public static void drawPlayerHead(PoseStack matrices, double x, double y, int w, int h) {
 		RenderSystem.enableBlend();
 		RenderSystem.defaultBlendFunc();
-		RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+		RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 		startDrawNormal();
-		draw(matrices, vertexBuffer, x, y, w, h, 0.125F, 0.125F, 0.25F, 0.25F);
-		draw(matrices, vertexBuffer, x, y, w, h, 0.625F, 0.125F, 0.75F, 0.25F);
+		draw(matrices, x, y, w, h, 0.125F, 0.125F, 0.25F, 0.25F);
+		draw(matrices, x, y, w, h, 0.625F, 0.125F, 0.75F, 0.25F);
 		endDraw();
 	}
 	
-	public static void draw(MatrixStack matrices, double x, double y, int size, int isize, int ix, int iy, int tw, int th) {
+	public static void draw(PoseStack matrices, double x, double y, int size, int isize, int ix, int iy, int tw, int th) {
 		draw(matrices, x, y, size, size, ix, iy, isize, isize, tw, th);
 	}
 	
-	public static void draw(MatrixStack matrices, double x, double y, int w, int h, int ix, int iy, int iw, int ih, int tw, int th) {
+	public static void draw(PoseStack matrices, double x, double y, int w, int h, int ix, int iy, int iw, int ih, int tw, int th) {
 		float minU = (float) ix / tw;
 		float minV = (float) iy / th;
 		float maxU = (float) (ix + iw) / tw;
 		float maxV = (float) (iy + ih) / th;
 		
 		startDrawNormal();
-		draw(matrices, vertexBuffer, x, y, w, h, minU, minV, maxU, maxV);
+		draw(matrices, x, y, w, h, minU, minV, maxU, maxV);
 		endDraw();
 	}
 	
-	public static void drawSkin(MatrixStack matrices, MapSkin skin, double x, double y, float w, float h) {
+	public static void drawSkin(PoseStack matrices, MapSkin skin, double x, double y, float w, float h) {
 		RenderData renderData = skin.getRenderData();
 		
 		if (renderData.scaleChanged || renderData.x != x || renderData.y != y ||
@@ -320,45 +312,45 @@ public class RenderUtil extends DrawableHelper {
 		float bottomV = renderData.bottomV;
 		
 		RenderSystem.enableBlend();
-		RenderSystem.enableAlphaTest();		
-		RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+		RenderSystem.enableCull();		
+		RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 		
 		skin.bindTexture();
 		startDrawNormal();
 		
-		draw(matrices, vertexBuffer, x, y, scaledBrd, scaledBrd, sMinU, sMinV, leftU, topV);
-		draw(matrices, vertexBuffer, rightC, y, scaledBrd, scaledBrd, rightU, sMinV, sMaxU, topV);
-		draw(matrices, vertexBuffer, x, bottomC, scaledBrd, scaledBrd, sMinU, bottomV, leftU, sMaxV);
-		draw(matrices, vertexBuffer, rightC, bottomC, scaledBrd, scaledBrd, rightU, bottomV, sMaxU, sMaxV);
+		draw(matrices, x, y, scaledBrd, scaledBrd, sMinU, sMinV, leftU, topV);
+		draw(matrices, rightC, y, scaledBrd, scaledBrd, rightU, sMinV, sMaxU, topV);
+		draw(matrices, x, bottomC, scaledBrd, scaledBrd, sMinU, bottomV, leftU, sMaxV);
+		draw(matrices, rightC, bottomC, scaledBrd, scaledBrd, rightU, bottomV, sMaxU, sMaxV);
 		
 		if (skin.resizable) {
-			draw(matrices, vertexBuffer, rightC, topC, scaledBrd, vSide, rightU, topV, sMaxU, bottomV);
-			draw(matrices, vertexBuffer, x, topC, scaledBrd, vSide, sMinU, topV, leftU, bottomV);
-			draw(matrices, vertexBuffer, leftC, topC, hSide, vSide, leftU, topV, rightU, bottomV);
+			draw(matrices, rightC, topC, scaledBrd, vSide, rightU, topV, sMaxU, bottomV);
+			draw(matrices, x, topC, scaledBrd, vSide, sMinU, topV, leftU, bottomV);
+			draw(matrices, leftC, topC, hSide, vSide, leftU, topV, rightU, bottomV);
 			if (skin.repeating) {
 				float tail = renderData.tail;
 				float tailU = renderData.tailU;
 				hSide = vSide;
 				
-				draw(matrices, vertexBuffer, leftC + hSide, y, tail, scaledBrd, leftU, sMinV, tailU, topV);
-				draw(matrices, vertexBuffer, leftC + hSide, bottomC, tail, scaledBrd, leftU, bottomV, tailU, sMaxV);
+				draw(matrices, leftC + hSide, y, tail, scaledBrd, leftU, sMinV, tailU, topV);
+				draw(matrices, leftC + hSide, bottomC, tail, scaledBrd, leftU, bottomV, tailU, sMaxV);
 			}
 		
-			draw(matrices, vertexBuffer, leftC, y, hSide, scaledBrd, leftU, sMinV, rightU, topV);
-			draw(matrices, vertexBuffer, leftC, bottomC, hSide, scaledBrd, leftU, bottomV, rightU, sMaxV);
+			draw(matrices, leftC, y, hSide, scaledBrd, leftU, sMinV, rightU, topV);
+			draw(matrices, leftC, bottomC, hSide, scaledBrd, leftU, bottomV, rightU, sMaxV);
 		} else {
 			double left = leftC;
 			int segments = renderData.hSegments;
 			for (int i = 0; i < segments; i++) {
-				draw(matrices, vertexBuffer, left, y, hSide, scaledBrd, leftU, sMinV, rightU, topV);
-				draw(matrices, vertexBuffer, left, bottomC, hSide, scaledBrd, leftU, bottomV, rightU, sMaxV);
+				draw(matrices, left, y, hSide, scaledBrd, leftU, sMinV, rightU, topV);
+				draw(matrices, left, bottomC, hSide, scaledBrd, leftU, bottomV, rightU, sMaxV);
 				left += hSide;
 			}
 			double top = topC;
 			segments = renderData.vSegments;
 			for (int i = 0; i < segments; i++) {
-				draw(matrices, vertexBuffer, x, top, scaledBrd, vSide, sMinU, topV, leftU, bottomV);
-				draw(matrices, vertexBuffer, rightC, top, scaledBrd, vSide, rightU, topV, sMaxU, bottomV);
+				draw(matrices, x, top, scaledBrd, vSide, sMinU, topV, leftU, bottomV);
+				draw(matrices, rightC, top, scaledBrd, vSide, rightU, topV, sMaxU, bottomV);
 				top += vSide;
 			}
 			
@@ -367,46 +359,42 @@ public class RenderUtil extends DrawableHelper {
 			float hTailU = renderData.hTailU;
 			float vTailV = renderData.vTailV;
 			
-			draw(matrices, vertexBuffer, left, y, hTail, scaledBrd, leftU, sMinV, hTailU, topV);
-			draw(matrices, vertexBuffer, left, bottomC, hTail, scaledBrd, leftU, bottomV, hTailU, sMaxV);
-			draw(matrices, vertexBuffer, x, top, scaledBrd, vTail, sMinU, topV, leftU, vTailV);
-			draw(matrices, vertexBuffer, rightC, top, scaledBrd, vTail, rightU, topV, sMaxU, vTailV);
+			draw(matrices, left, y, hTail, scaledBrd, leftU, sMinV, hTailU, topV);
+			draw(matrices, left, bottomC, hTail, scaledBrd, leftU, bottomV, hTailU, sMaxV);
+			draw(matrices, x, top, scaledBrd, vTail, sMinU, topV, leftU, vTailV);
+			draw(matrices, rightC, top, scaledBrd, vTail, rightU, topV, sMaxU, vTailV);
 		}
 		
 		endDraw();
 	}
 	
-	public static void drawImage(MatrixStack matrices, Image image, double x, double y, float w, float h) {
+	public static void drawImage(PoseStack matrices, Image image, double x, double y, float w, float h) {
 		image.bindTexture();
 		startDrawNormal();
-		draw(matrices, vertexBuffer, x, y, w, h, 0.0F, 0.0F, 1.0F, 1.0F);
+		draw(matrices, x, y, w, h, 0.0F, 0.0F, 1.0F, 1.0F);
 		endDraw();
 	}
 	
-	private static void draw(MatrixStack matrixStack, VertexConsumer vertexConsumer, double x, double y, float w, float h, float minU, float minV, float maxU, float maxV) {
+	private static void draw(PoseStack matrixStack, double x, double y, float w, float h, float minU, float minV, float maxU, float maxV) {
 		RenderSystem.enableBlend();
-		RenderSystem.enableAlphaTest();
+		RenderSystem.enableCull();
 
-		matrixStack.push();
+		matrixStack.pushPose();
 		matrixStack.translate(x, y, 0);
 
-		Matrix4f m4f = matrixStack.peek().getModel();
-		Matrix3f m3f = matrixStack.peek().getNormal();
+		Matrix4f m4f = matrixStack.last().pose();
+		Matrix3f m3f = matrixStack.last().normal();
 
-		addVertices(m4f, m3f, vertexConsumer, w, h, minU, minV, maxU, maxV);
+		addVertices(m4f, m3f, w, h, minU, minV, maxU, maxV);
 
-		matrixStack.pop();
+		matrixStack.popPose();
 	}
 	
-	private static void addVertices(Matrix4f m4f, Matrix3f m3f, VertexConsumer vertexConsumer, float w, float h, float minU, float minV, float maxU, float maxV) {
-		addVertices(m4f, m3f, vertexConsumer, 0, w, 0, h, minU, minV, maxU, maxV);
-	}
-	
-	private static void addVertices(Matrix4f m4f, Matrix3f m3f, VertexConsumer vertexConsumer, float minX, float maxX, float minY, float maxY, float minU, float minV, float maxU, float maxV) {
-		vertex(m4f, m3f, vertexConsumer, minX, minY, 1.0F, minU, minV);
-		vertex(m4f, m3f, vertexConsumer, minX, maxY, 1.0F, minU, maxV);
-		vertex(m4f, m3f, vertexConsumer, maxX, maxY, 1.0F, maxU, maxV);
-		vertex(m4f, m3f, vertexConsumer, maxX, minY, 1.0F, maxU, minV);
+	private static void addVertices(Matrix4f m4f, Matrix3f m3f, float maxX, float maxY, float minU, float minV, float maxU, float maxV) {
+		vertex(m4f, m3f, 0.0F, 0.0F, minU, minV);
+		vertex(m4f, m3f, 0.0F, maxY, minU, maxV);
+		vertex(m4f, m3f, maxX, maxY, maxU, maxV);
+		vertex(m4f, m3f, maxX, 0.0F, maxU, minV);
 	}
 	
 	public static void addQuad(double x, double y, double w, double h) {
@@ -414,17 +402,24 @@ public class RenderUtil extends DrawableHelper {
 	}
 	
 	public static void addQuad(double x, double y, double w, double h, float minU, float minV, float maxU, float maxV) {
-		vertex(x, y + h, 0.0, minU, maxV);
-		vertex(x + w, y + h, 0.0, maxU, maxV);
-		vertex(x + w, y, 0.0, maxU, minV);
-		vertex(x, y, 0.0, minU, minV);
+		vertex(x, y + h, minU, maxV);
+		vertex(x + w, y + h, maxU, maxV);
+		vertex(x + w, y, maxU, minV);
+		vertex(x, y, minU, minV);
 	}
 	
-	private static void vertex(Matrix4f m4f, Matrix3f m3f, VertexConsumer vertexConsumer, float x, float y, float z, float u, float v) {
-		vertexConsumer.vertex(m4f, x, y, z).texture(u, v).normal(m3f, 0.0F, 1.0F, 0.0F).next();
+	private static void vertex(Matrix4f m4f, Matrix3f m3f, float x, float y, float u, float v) {
+		RenderUtil.vertexBuffer.vertex(m4f, x, y, (float) 1.0).uv(u, v).normal(m3f, 0.0F, 1.0F, 0.0F).endVertex();
 	}
 	
-	private static void vertex(double x, double y, double z, float u, float v) {
-    	vertexBuffer.vertex(x, y, z).texture(u, v).next();
+	private static void vertex(double x, double y, float u, float v) {
+    	vertexBuffer.vertex(x, y, 0.0).uv(u, v).endVertex();
+    }
+
+    static {
+	    ImmutableMap.Builder<String, VertexFormatElement> immutableMapBuilder = ImmutableMap.builder();
+	    immutableMapBuilder.put("Position", DefaultVertexFormat.ELEMENT_POSITION).put("UV0", DefaultVertexFormat.ELEMENT_UV0).put("Normal", DefaultVertexFormat.ELEMENT_NORMAL);
+
+	    VF_POS_TEX_NORMAL = new VertexFormat(immutableMapBuilder.build());
     }
 }

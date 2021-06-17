@@ -1,10 +1,9 @@
 package ru.bulldog.justmap.advancedinfo;
 
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.EquipmentSlot;
-import net.minecraft.item.ItemStack;
-
+import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.Minecraft;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.item.ItemStack;
 import ru.bulldog.justmap.client.config.ClientSettings;
 import ru.bulldog.justmap.util.render.RenderUtil;
 
@@ -20,7 +19,7 @@ public class ItemInfo extends InfoText {
 	}
 
 	@Override
-	public void draw(MatrixStack matrix) {
+	public void draw(PoseStack matrix) {
 		super.draw(matrix);
 		int posX;
 		switch (alignment) {
@@ -34,24 +33,24 @@ public class ItemInfo extends InfoText {
 			default:
 				posX = x - offsetX;	
 		}
-		MinecraftClient minecraft = MinecraftClient.getInstance();
-		minecraft.getItemRenderer().renderInGuiWithOverrides(itemStack, posX, y - 5);
+		Minecraft minecraft = Minecraft.getInstance();
+		minecraft.getItemRenderer().renderAndDecorateItem(itemStack, posX, y - 5);
 	}
 
 	@Override
 	public void update() {
-		MinecraftClient minecraft = MinecraftClient.getInstance();
+		Minecraft minecraft = Minecraft.getInstance();
 		if (minecraft.player == null) {
 			this.setVisible(false);
 			return;
 		}		
-		this.itemStack = minecraft.player.getEquippedStack(slot);		
+		this.itemStack = minecraft.player.getItemBySlot(slot);		
 		this.setVisible(this.isVisible() && !this.itemStack.isEmpty());
 		if (visible) {
 			String itemString;
-			if (this.itemStack.isDamageable()) {
+			if (this.itemStack.isDamageableItem()) {
 				int maxDamage = this.itemStack.getMaxDamage();
-				int damage = maxDamage - this.itemStack.getDamage();
+				int damage = maxDamage - this.itemStack.getDamageValue();
 				itemString = String.format("%d/%d", damage, maxDamage);
 			} else if (this.itemStack.isStackable()) {
 				itemString = String.format("%d", this.itemStack.getCount());

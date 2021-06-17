@@ -1,51 +1,40 @@
 package ru.bulldog.justmap.client.screen;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Stream;
-
-import org.lwjgl.glfw.GLFW;
-
+import com.google.common.collect.Lists;
 import com.mojang.blaze3d.systems.RenderSystem;
-
-import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.network.AbstractClientPlayerEntity;
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.text.LiteralText;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-
+import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.player.AbstractClientPlayer;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.world.entity.player.Player;
+import org.lwjgl.glfw.GLFW;
 import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.client.config.ClientSettings;
 import ru.bulldog.justmap.client.config.ConfigFactory;
 import ru.bulldog.justmap.client.widget.DropDownListWidget;
 import ru.bulldog.justmap.client.widget.ListElementWidget;
-import ru.bulldog.justmap.map.data.Layer;
-import ru.bulldog.justmap.map.data.WorldData;
-import ru.bulldog.justmap.map.data.WorldKey;
-import ru.bulldog.justmap.map.data.WorldManager;
 import ru.bulldog.justmap.map.ChunkGrid;
 import ru.bulldog.justmap.map.IMap;
 import ru.bulldog.justmap.map.MapPlayerManager;
-import ru.bulldog.justmap.map.data.ChunkData;
-import ru.bulldog.justmap.map.data.RegionData;
+import ru.bulldog.justmap.map.data.*;
 import ru.bulldog.justmap.map.icon.PlayerIcon;
 import ru.bulldog.justmap.map.icon.WaypointIcon;
 import ru.bulldog.justmap.map.waypoint.Waypoint;
 import ru.bulldog.justmap.map.waypoint.WaypointKeeper;
-import ru.bulldog.justmap.util.DataUtil;
-import ru.bulldog.justmap.util.Dimension;
-import ru.bulldog.justmap.util.LangUtil;
-import ru.bulldog.justmap.util.PosUtil;
-import ru.bulldog.justmap.util.RuleUtil;
+import ru.bulldog.justmap.util.*;
 import ru.bulldog.justmap.util.colors.Colors;
 import ru.bulldog.justmap.util.math.MathUtil;
 
+import java.util.List;
+import java.util.stream.Stream;
+
+@SuppressWarnings("ConstantConditions")
 public class Worldmap extends MapScreen implements IMap {
 
-	private final static LiteralText TITLE = new LiteralText("Worldmap");
+	private final static TextComponent TITLE = new TextComponent("Worldmap");
 	
 	private static Worldmap worldmap;
 	
@@ -71,8 +60,8 @@ public class Worldmap extends MapScreen implements IMap {
 	private Layer mapLayer;
 	private ChunkGrid chunkGrid;
 	
-	private List<WaypointIcon> waypoints = new ArrayList<>();
-	private List<PlayerIcon> players = new ArrayList<>();
+	private final List<WaypointIcon> waypoints = Lists.newArrayList();
+	private final List<PlayerIcon> players = Lists.newArrayList();
 	
 	private Worldmap() {
 		super(TITLE);
@@ -119,9 +108,9 @@ public class Worldmap extends MapScreen implements IMap {
 		}
 		this.players.clear();
 		if (RuleUtil.allowPlayerRadar()) {
-			List<AbstractClientPlayerEntity> players = this.client.world.getPlayers();
-			for (PlayerEntity player : players) {
-				if (player == client.player) continue;
+			List<AbstractClientPlayer> players = minecraft.level.players();
+			for (Player player : players) {
+				if (player == minecraft.player) continue;
 				this.players.add(new PlayerIcon(player));
 			}
 		}
@@ -132,42 +121,42 @@ public class Worldmap extends MapScreen implements IMap {
 	
 	private void addMapMenu() {
 		LangUtil langUtil = new LangUtil("gui.worldmap");
-		this.mapMenu = this.addChild(new DropDownListWidget(25, paddingTop + 2, 100, 22));
+		this.mapMenu = addWidget(new DropDownListWidget(25, paddingTop + 2, 100, 22));
 		this.mapMenu.addElement(new ListElementWidget(langUtil.getText("add_waypoint"), () -> {
 			JustMapClient.getMap().createWaypoint(world, centerPos);
 			return true;
 		}));
 		this.mapMenu.addElement(new ListElementWidget(langUtil.getText("set_map_pos"), () -> {
-			client.openScreen(new MapPositionScreen(this));
+			minecraft.setScreen(new MapPositionScreen(this));
 			return true;
 		}));
 		this.mapMenu.addElement(new ListElementWidget(langUtil.getText("open_map_config"), () -> {
-			client.openScreen(ConfigFactory.getConfigScreen(this));
+			minecraft.setScreen(ConfigFactory.getConfigScreen(this));
 			return true;
 		}));
 	}
 	
 	private void addMapButtons() {
-		this.addButton(new ButtonWidget(width - 24, 10, 20, 20, new LiteralText("x"), (b) -> onClose()));		
-		this.addButton(new ButtonWidget(width / 2 - 10, height - paddingBottom - 44, 20, 20, new LiteralText("\u2191"), (b) -> moveMap(Direction.NORTH)));
-		this.addButton(new ButtonWidget(width / 2 - 10, height - paddingBottom - 22, 20, 20, new LiteralText("\u2193"), (b) -> moveMap(Direction.SOUTH)));
-		this.addButton(new ButtonWidget(width / 2 - 32, height - paddingBottom - 32, 20, 20, new LiteralText("\u2190"), (b) -> moveMap(Direction.WEST)));
-		this.addButton(new ButtonWidget(width / 2 + 12, height - paddingBottom - 32, 20, 20, new LiteralText("\u2192"), (b) -> moveMap(Direction.EAST)));		
-		this.addButton(new ButtonWidget(width - 24, height / 2 - 21, 20, 20, new LiteralText("+"), (b) -> changeScale(-0.25F)));
-		this.addButton(new ButtonWidget(width - 24, height / 2 + 1, 20, 20, new LiteralText("-"), (b) -> changeScale(+0.25F)));		
-		this.addButton(new ButtonWidget(width - 24, height - paddingBottom - 22, 20, 20, new LiteralText("\u271C"), (b) -> setCenterByPlayer()));
-		this.addButton(new ButtonWidget(4, paddingTop + 2, 20, 20, new LiteralText("\u2630"), (b) -> mapMenu.toggleVisible()));
-		this.addButton(new ButtonWidget(4, height - paddingBottom - 22, 20, 20, new LiteralText("\u2726"), (b) -> client.openScreen(new WaypointsList(this))));
+		this.addWidget(new Button(width - 24, 10, 20, 20, new TextComponent("x"), (b) -> onClose()));
+		this.addWidget(new Button(width / 2 - 10, height - paddingBottom - 44, 20, 20, new TextComponent("\u2191"), (b) -> moveMap(Direction.NORTH)));
+		this.addWidget(new Button(width / 2 - 10, height - paddingBottom - 22, 20, 20, new TextComponent("\u2193"), (b) -> moveMap(Direction.SOUTH)));
+		this.addWidget(new Button(width / 2 - 32, height - paddingBottom - 32, 20, 20, new TextComponent("\u2190"), (b) -> moveMap(Direction.WEST)));
+		this.addWidget(new Button(width / 2 + 12, height - paddingBottom - 32, 20, 20, new TextComponent("\u2192"), (b) -> moveMap(Direction.EAST)));
+		this.addWidget(new Button(width - 24, height / 2 - 21, 20, 20, new TextComponent("+"), (b) -> changeScale(-0.25F)));
+		this.addWidget(new Button(width - 24, height / 2 + 1, 20, 20, new TextComponent("-"), (b) -> changeScale(+0.25F)));
+		this.addWidget(new Button(width - 24, height - paddingBottom - 22, 20, 20, new TextComponent("\u271C"), (b) -> setCenterByPlayer()));
+		this.addWidget(new Button(4, paddingTop + 2, 20, 20, new TextComponent("\u2630"), (b) -> mapMenu.toggleVisible()));
+		this.addWidget(new Button(4, height - paddingBottom - 22, 20, 20, new TextComponent("\u2726"), (b) -> minecraft.setScreen(new WaypointsList(this))));
 	}
 	
 	@Override
-	public void renderBackground(MatrixStack matrixStack) {
+	public void renderBackground(PoseStack matrixStack) {
 		fill(matrixStack, x, 0, x + width, height, 0xFF444444);
 		this.drawMap();
 	}
 	
 	@Override
-	public void renderForeground(MatrixStack matrices) {
+	public void renderForeground(PoseStack matrices) {
 		if (ClientSettings.showWorldmapGrid) {
 			this.chunkGrid.draw();
 		}
@@ -191,7 +180,7 @@ public class Worldmap extends MapScreen implements IMap {
 			icon.draw(matrices, iconSize);
 		}
 		
-		ClientPlayerEntity player = client.player;
+		LocalPlayer player = minecraft.player;
 		
 		double playerX = player.getX();
 		double playerZ = player.getZ();
@@ -201,19 +190,19 @@ public class Worldmap extends MapScreen implements IMap {
 		MapPlayerManager.getPlayer(player).getIcon().draw(arrowX, arrowY, iconSize, true);
 		
 		this.drawBorders(paddingTop, paddingBottom);
-		drawCenteredString(matrices, client.textRenderer, cursorCoords, width / 2, paddingTop + 4, Colors.WHITE);
+		drawCenteredString(matrices, minecraft.font, cursorCoords, width / 2, paddingTop + 4, Colors.WHITE);
 	}
 	
 	private void drawMap() {		
 		int cornerX = centerPos.getX() - scaledWidth / 2;
 		int cornerZ = centerPos.getZ() - scaledHeight / 2;
 		
-		BlockPos.Mutable currentPos = new BlockPos.Mutable();
+		BlockPos.MutableBlockPos currentPos = new BlockPos.MutableBlockPos();
 		
 		int picX = 0, imgW = 0;
 		while(picX < scaledWidth) {
 			int cX = cornerX + picX;
-			int picY = 0, imgH = 0;
+			int picY = 0, imgH;
 			while (picY < scaledHeight) {				
 				int cZ = cornerZ + picY;
 				
@@ -225,8 +214,8 @@ public class Worldmap extends MapScreen implements IMap {
 				int imgX = cX - (region.getX() << 9);
 				int imgY = cZ - (region.getZ() << 9);
 				
-				if (picX + imgW >= scaledWidth) imgW = (int) (scaledWidth - picX);
-				if (picY + imgH >= scaledHeight) imgH = (int) (scaledHeight - picY);
+				if (picX + imgW >= scaledWidth) imgW = scaledWidth - picX;
+				if (picY + imgH >= scaledHeight) imgH = scaledHeight - picY;
 				if (imgX + imgW >= 512) imgW = 512 - imgX;
 				if (imgY + imgH >= 512) imgH = 512 - imgY;
 				
@@ -274,16 +263,16 @@ public class Worldmap extends MapScreen implements IMap {
 	private void moveMap(Direction direction) {	
 		switch (direction) {
 			case NORTH:
-				this.centerPos = centerPos.add(0, 0, -16);
+				this.centerPos = centerPos.offset(0, 0, -16);
 				break;
 			case SOUTH:
-				this.centerPos = centerPos.add(0, 0, 16);
+				this.centerPos = centerPos.offset(0, 0, 16);
 				break;
 			case EAST:
-				this.centerPos = centerPos.add(16, 0, 0);
+				this.centerPos = centerPos.offset(16, 0, 0);
 				break;
 			case WEST:
-				this.centerPos = centerPos.add(-16, 0, 0);
+				this.centerPos = centerPos.offset(-16, 0, 0);
 				break;
 			default: break;
 		}

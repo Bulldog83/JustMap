@@ -3,39 +3,43 @@ package ru.bulldog.justmap.client.widget;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.client.gui.components.Widget;
+import net.minecraft.client.gui.components.events.AbstractContainerEventHandler;
+import net.minecraft.client.gui.components.events.ContainerEventHandler;
+import net.minecraft.client.gui.components.events.GuiEventListener;
 import com.mojang.blaze3d.systems.RenderSystem;
-
-import net.minecraft.client.gui.AbstractParentElement;
-import net.minecraft.client.gui.Drawable;
-import net.minecraft.client.gui.Element;
-import net.minecraft.client.util.math.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.gui.narration.NarratableEntry;
+import net.minecraft.client.gui.narration.NarratedElementType;
+import net.minecraft.client.gui.narration.NarrationElementOutput;
+import net.minecraft.network.chat.Component;
+import org.jetbrains.annotations.Nullable;
 import ru.bulldog.justmap.util.colors.Colors;
 import ru.bulldog.justmap.util.render.RenderUtil;
 
-public class DropDownListWidget extends AbstractParentElement implements Drawable {
+public class DropDownListWidget extends AbstractWidget implements ContainerEventHandler {
 
-	private List<ListElementWidget> children = new ArrayList<>();
+	private final List<ListElementWidget> children = new ArrayList<>();
+	private final int padding = 3;
+	private final int spacing = 1;
+	private final int elemHeight;
+	@Nullable
+	private GuiEventListener focused;
 	private boolean visible = false;
-	private int x, y;
-	private int width, height;
-	private int elemHeight;
-	private int padding = 3;
-	private int spacing = 1;
-	
+	private boolean isDragging;
+
 	public DropDownListWidget(int x, int y, int width, int height) {
+		super(x, y, width, height, null);
 		this.elemHeight = height;
-		this.width = width;
-		this.height = height + padding * 2;
-		this.x = x;
-		this.y = y;
 	}
 
 	@Override
-	public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+	public void render(PoseStack matrices, int mouseX, int mouseY, float delta) {
 		if (!visible) return;
 		RenderSystem.enableBlend();
 		RenderSystem.defaultBlendFunc();
-		this.renderBackground(matrices);
+		renderBackground(matrices);
 		int x = this.x + padding;
 		int y = this.y + padding;
 		for (ListElementWidget element : children) {
@@ -46,7 +50,7 @@ public class DropDownListWidget extends AbstractParentElement implements Drawabl
 		}
 	}
 	
-	private void renderBackground(MatrixStack matrices) {
+	private void renderBackground(PoseStack matrices) {
 		RenderUtil.fill(matrices, x, y, x + width, y + height, 0xAA222222);
 		RenderUtil.drawLine(x, y, x + width, y, Colors.LIGHT_GRAY);
 		RenderUtil.drawLine(x, y, x, y + height, Colors.LIGHT_GRAY);
@@ -68,14 +72,44 @@ public class DropDownListWidget extends AbstractParentElement implements Drawabl
 	
 	@Override
 	public boolean isMouseOver(double mouseX, double mouseY) {
-		for (Element elem : children) {
-			if (elem.isMouseOver(mouseX, mouseY)) return true;
+		for (GuiEventListener elem : children) {
+			if (elem.isMouseOver(mouseX, mouseY)) {
+				isHovered = true;
+				return true;
+			}
 		}
+		isHovered = false;
 		return false;
 	}
 
 	@Override
-	public List<? extends Element> children() {
-		return this.children;
+	public List<? extends GuiEventListener> children() {
+		return children;
+	}
+
+	@Override
+	public boolean isDragging() {
+		return isDragging;
+	}
+
+	@Override
+	public void setDragging(boolean value) {
+		this.isDragging = value;
+	}
+
+	@Nullable
+	@Override
+	public GuiEventListener getFocused() {
+		return focused;
+	}
+
+	@Override
+	public void setFocused(@Nullable GuiEventListener guiEventListener) {
+		this.focused = guiEventListener;
+	}
+
+	@Override
+	public void updateNarration(NarrationElementOutput narrationElementOutput) {
+		defaultButtonNarrationText(narrationElementOutput);
 	}
 }

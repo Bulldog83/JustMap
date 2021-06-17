@@ -1,5 +1,6 @@
 package ru.bulldog.justmap.util.colors;
 
+import com.mojang.blaze3d.platform.NativeImage;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -8,33 +9,30 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.impl.client.indigo.renderer.helper.ColorHelper;
 import net.fabricmc.fabric.impl.client.rendering.fluid.FluidRenderHandlerRegistryImpl;
-
-import net.minecraft.block.AttachedStemBlock;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.FernBlock;
-import net.minecraft.block.FlowerBlock;
-import net.minecraft.block.FluidBlock;
-import net.minecraft.block.GrassBlock;
-import net.minecraft.block.LeavesBlock;
-import net.minecraft.block.LilyPadBlock;
-import net.minecraft.block.StemBlock;
-import net.minecraft.block.SugarCaneBlock;
-import net.minecraft.block.TallPlantBlock;
-import net.minecraft.block.VineBlock;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.color.world.BiomeColors;
-import net.minecraft.client.render.block.BlockModels;
-import net.minecraft.client.render.model.BakedQuad;
-import net.minecraft.client.texture.NativeImage;
-import net.minecraft.fluid.FluidState;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.World;
-import net.minecraft.world.chunk.WorldChunk;
-
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.BiomeColors;
+import net.minecraft.client.renderer.block.BlockModelShaper;
+import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.AttachedStemBlock;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.DoublePlantBlock;
+import net.minecraft.world.level.block.FlowerBlock;
+import net.minecraft.world.level.block.GrassBlock;
+import net.minecraft.world.level.block.LeavesBlock;
+import net.minecraft.world.level.block.LiquidBlock;
+import net.minecraft.world.level.block.StemBlock;
+import net.minecraft.world.level.block.SugarCaneBlock;
+import net.minecraft.world.level.block.TallGrassBlock;
+import net.minecraft.world.level.block.VineBlock;
+import net.minecraft.world.level.block.WaterlilyBlock;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.chunk.LevelChunk;
+import net.minecraft.world.level.material.FluidState;
 import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.client.config.ClientSettings;
 import ru.bulldog.justmap.mixins.client.BakedSpriteAccessor;
@@ -45,12 +43,12 @@ import ru.bulldog.justmap.util.math.MathUtil;
 @Environment(EnvType.CLIENT)
 public class ColorUtil {
 	
-	private static MinecraftClient minecraft = MinecraftClient.getInstance();
-	private static BlockModels blockModels = minecraft.getBlockRenderManager().getModels();
-	private static FluidRenderHandlerRegistryImpl fluidRenderHandlerRegistry = FluidRenderHandlerRegistryImpl.INSTANCE;
-	private static float[] floatBuffer = new float[3];
-	private static ColorProviders colorProvider = ColorProviders.INSTANCE;
-	private static Colors colorPalette = Colors.INSTANCE;
+	private static final Minecraft minecraft = Minecraft.getInstance();
+	private static final BlockModelShaper blockModels = minecraft.getBlockRenderer().getBlockModelShaper();
+	private static final FluidRenderHandlerRegistryImpl fluidRenderHandlerRegistry = FluidRenderHandlerRegistryImpl.INSTANCE;
+	private static final float[] floatBuffer = new float[3];
+	private static final ColorProviders colorProvider = ColorProviders.INSTANCE;
+	private static final Colors colorPalette = Colors.INSTANCE;
 	
 	public static int[] toIntArray(int color) {
 		return new int[] {
@@ -74,9 +72,9 @@ public class ColorUtil {
 		if (hsbvals == null) {
 			hsbvals = floatBuffer;
 		}
-		int cmax = (r > g) ? r : g;
+		int cmax = Math.max(r, g);
 		if (b > cmax) cmax = b;
-		int cmin = (r < g) ? r : g;
+		int cmin = Math.min(r, g);
 		if (b < cmin) cmin = b;
 
 		brightness = ((float) cmax) / 255.0F;
@@ -117,39 +115,39 @@ public class ColorUtil {
 			float q = brightness * (1.0F - saturation * f);
 			float t = brightness * (1.0F - (saturation * (1.0F - f)));
 			switch ((int) h) {
-			case 0:
-				r = (int) (brightness * 255.0F + 0.5F);
-				g = (int) (t * 255.0F + 0.5F);
-				b = (int) (p * 255.0F + 0.5F);
-				break;
-			case 1:
-				r = (int) (q * 255.0F + 0.5F);
-				g = (int) (brightness * 255.0F + 0.5F);
-				b = (int) (p * 255.0F + 0.5F);
-				break;
-			case 2:
-				r = (int) (p * 255.0F + 0.5F);
-				g = (int) (brightness * 255.0F + 0.5F);
-				b = (int) (t * 255.0F + 0.5F);
-				break;
-			case 3:
-				r = (int) (p * 255.0F + 0.5F);
-				g = (int) (q * 255.0F + 0.5F);
-				b = (int) (brightness * 255.0F + 0.5F);
-				break;
-			case 4:
-				r = (int) (t * 255.0F + 0.5F);
-				g = (int) (p * 255.0F + 0.5F);
-				b = (int) (brightness * 255.0F + 0.5F);
-				break;
-			case 5:
-				r = (int) (brightness * 255.0F + 0.5F);
-				g = (int) (p * 255.0F + 0.5F);
-				b = (int) (q * 255.0F + 0.5F);
-				break;
+				case 0 -> {
+					r = (int) (brightness * 255.0F + 0.5F);
+					g = (int) (t * 255.0F + 0.5F);
+					b = (int) (p * 255.0F + 0.5F);
+				}
+				case 1 -> {
+					r = (int) (q * 255.0F + 0.5F);
+					g = (int) (brightness * 255.0F + 0.5F);
+					b = (int) (p * 255.0F + 0.5F);
+				}
+				case 2 -> {
+					r = (int) (p * 255.0F + 0.5F);
+					g = (int) (brightness * 255.0F + 0.5F);
+					b = (int) (t * 255.0F + 0.5F);
+				}
+				case 3 -> {
+					r = (int) (p * 255.0F + 0.5F);
+					g = (int) (q * 255.0F + 0.5F);
+					b = (int) (brightness * 255.0F + 0.5F);
+				}
+				case 4 -> {
+					r = (int) (t * 255.0F + 0.5F);
+					g = (int) (p * 255.0F + 0.5F);
+					b = (int) (brightness * 255.0F + 0.5F);
+				}
+				case 5 -> {
+					r = (int) (brightness * 255.0F + 0.5F);
+					g = (int) (p * 255.0F + 0.5F);
+					b = (int) (q * 255.0F + 0.5F);
+				}
 			}
 		}
-		return 0xFF000000 | (r << 16) | (g << 8) | (b << 0);
+		return 0xFF000000 | (r << 16) | (g << 8) | b;
 	}
 	
 	public static int parseHex(String hexColor) {
@@ -206,19 +204,19 @@ public class ColorUtil {
 	}
 	
 	private static int extractColor(BlockState state) {
-		List<BakedQuad> quads = blockModels.getModel(state).getQuads(state, Direction.UP, new Random());
+		List<BakedQuad> quads = blockModels.getBlockModel(state).getQuads(state, Direction.UP, new Random());
 		
-		Identifier blockSprite;
+		ResourceLocation blockSprite;
 		if (quads.size() > 0) {
-			blockSprite = ((BakedSpriteAccessor) quads.get(0)).getSprite().getId();
+			blockSprite = ((BakedSpriteAccessor) quads.get(0)).getSprite().getName();
 		} else {
-			blockSprite = blockModels.getSprite(state).getId();
+			blockSprite = blockModels.getParticleIcon(state).getName();
 		}
 		
 		int color = colorPalette.getTextureColor(state, blockSprite);
 		if (color != 0x0) return color;
 		
-		Identifier texture = new Identifier(blockSprite.getNamespace(), String.format("textures/%s.png", blockSprite.getPath()));
+		ResourceLocation texture = new ResourceLocation(blockSprite.getNamespace(), String.format("textures/%s.png", blockSprite.getPath()));
 		NativeImage image = ImageUtil.loadImage(texture, 16, 16);
 		
 		int height = state.getBlock() instanceof FlowerBlock ? image.getHeight() / 2 : image.getHeight();
@@ -226,7 +224,7 @@ public class ColorUtil {
 		List<Integer> colors = new ArrayList<>();
 		for (int i = 0; i < image.getWidth(); i++) {
 			for (int j = 0; j < height; j++) {
-				int col = image.getPixelColor(i, j);
+				int col = image.getPixelRGBA(i, j);
 				if (((col >> 24) & 255) > 0) {
 					colors.add(ABGRtoARGB(col));
 				}
@@ -269,8 +267,8 @@ public class ColorUtil {
 		return textureColor;
 	}
 	
-	public static int blockColor(WorldChunk worldChunk, BlockPos pos) {
-		World world = worldChunk.getWorld();
+	public static int blockColor(LevelChunk worldChunk, BlockPos pos) {
+		Level world = worldChunk.getLevel();
 		BlockPos overPos = new BlockPos(pos.getX(), pos.getY() + 1, pos.getZ());
 		BlockState overState = worldChunk.getBlockState(overPos);
 		BlockState blockState = worldChunk.getBlockState(pos);
@@ -280,14 +278,14 @@ public class ColorUtil {
 		if (!ClientSettings.hideWater && ClientSettings.hidePlants && StateUtil.isSeaweed(overState)) {
 			if (waterTint) {
 				int color = blockColor(world, blockState, pos);
-				return applyTint(color, BiomeColors.getWaterColor(world, pos));
+				return applyTint(color, BiomeColors.getAverageWaterColor(world, pos));
 			}
-			return blockColor(world, Blocks.WATER.getDefaultState(), pos);			
+			return blockColor(world, Blocks.WATER.defaultBlockState(), pos);			
 		} else if (!StateUtil.isAir(blockState) && StateUtil.checkState(overState, skipWater, !ClientSettings.hidePlants)) {			
 			int color = blockColor(world, blockState, pos);
 			if (ClientSettings.hideWater) return color;
 			if (waterTint && (StateUtil.isWater(overState) || StateUtil.isWaterlogged(blockState))) {
-				return applyTint(color, BiomeColors.getWaterColor(world, pos));
+				return applyTint(color, BiomeColors.getAverageWaterColor(world, pos));
 			}
 			return color;
 		}
@@ -295,8 +293,8 @@ public class ColorUtil {
 		return -1;
 	}
 	
-	public static int blockColor(World world, BlockState state, BlockPos pos) {
-		int materialColor = state.getTopMaterialColor(world, pos).color;
+	public static int blockColor(Level world, BlockState state, BlockPos pos) {
+		int materialColor = state.getMapColor(world, pos).col;
 		if (ClientSettings.alternateColorRender) {
 			int blockColor = colorPalette.getBlockColor(state);
 			if (blockColor != 0x0) {
@@ -312,12 +310,12 @@ public class ColorUtil {
 			Block block = state.getBlock();
 			if (block instanceof VineBlock) {
 				blockColor = proccessColor(blockColor, textureColor, colorProvider.getFoliageColor(world, pos));
-			} else if (block instanceof FernBlock || block instanceof TallPlantBlock || block instanceof SugarCaneBlock) {				
+			} else if (block instanceof TallGrassBlock || block instanceof DoublePlantBlock || block instanceof SugarCaneBlock) {				
 				blockColor = proccessColor(blockColor, textureColor, colorProvider.getGrassColor(world, pos));
-			} else if (block instanceof LilyPadBlock || block instanceof StemBlock || block instanceof AttachedStemBlock) {
+			} else if (block instanceof WaterlilyBlock || block instanceof StemBlock || block instanceof AttachedStemBlock) {
 				blockColor = proccessColor(blockColor, textureColor, materialColor);
 				colorPalette.addBlockColor(state, blockColor);
-			} else if (block instanceof FluidBlock) {
+			} else if (block instanceof LiquidBlock) {
 				if (StateUtil.isWater(state)) {
 					blockColor = proccessColor(blockColor, textureColor, colorProvider.getWaterColor(world, pos));
 				} else {
@@ -342,11 +340,11 @@ public class ColorUtil {
 		return materialColor;
 	}
 	
-	private static int fluidColor(World world, BlockState state, BlockPos pos, int defColor) {
+	private static int fluidColor(Level world, BlockState state, BlockPos pos, int defColor) {
 		int color = colorPalette.getFluidColor(state);
 		if (color == 0x0) {
 			FluidState fluidState = state.getBlock().getFluidState(state);
-			color = fluidRenderHandlerRegistry.get(fluidState.getFluid()).getFluidColor(world, pos, fluidState);
+			color = fluidRenderHandlerRegistry.get(fluidState.getType()).getFluidColor(world, pos, fluidState);
 		}
 		return color == -1 ? defColor : color;
 	}

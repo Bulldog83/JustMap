@@ -1,64 +1,64 @@
 package ru.bulldog.justmap.client.render;
 
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Vector3f;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.animal.WaterAnimal;
+import net.minecraft.world.entity.boss.enderdragon.EnderDragon;
+import net.minecraft.world.entity.monster.Ghast;
 import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.client.config.ClientSettings;
 import ru.bulldog.justmap.util.math.MathUtil;
 
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.entity.EntityRenderDispatcher;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.client.util.math.Vector3f;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.boss.dragon.EnderDragonEntity;
-import net.minecraft.entity.mob.GhastEntity;
-import net.minecraft.entity.mob.WaterCreatureEntity;
-import net.minecraft.entity.LivingEntity;
+@SuppressWarnings("ConstantConditions")
+public class EntityModelRenderer {
 
-public class EntityModelRenderer {	
-
-	private static MinecraftClient minecraft = MinecraftClient.getInstance();
-	private static EntityRenderDispatcher renderDispatcher = minecraft.getEntityRenderDispatcher();
+	private static final Minecraft minecraft = Minecraft.getInstance();
+	private static final EntityRenderDispatcher renderDispatcher = minecraft.getEntityRenderDispatcher();
 	
-	public static void renderModel(MatrixStack matrices, VertexConsumerProvider consumerProvider, Entity entity, double x, double y) {
+	public static void renderModel(PoseStack matrices, MultiBufferSource consumerProvider, Entity entity, double x, double y) {
 		
 		LivingEntity livingEntity = (LivingEntity) entity;
 		
-		float headYaw = livingEntity.headYaw;
-		float bodyYaw = livingEntity.bodyYaw;
-		float prevHeadYaw = livingEntity.prevHeadYaw;
-		float prevBodyYaw = livingEntity.prevBodyYaw;
-		float pitch = livingEntity.pitch;
-		float prevPitch = livingEntity.prevPitch;
+		float headYaw = livingEntity.yHeadRot;
+		float bodyYaw = livingEntity.yBodyRot;
+		float prevHeadYaw = livingEntity.yHeadRotO;
+		float prevBodyYaw = livingEntity.yBodyRotO;
+		float pitch = livingEntity.getXRot();
+		float prevPitch = livingEntity.xRotO;
 		
 		setPitchAndYaw(livingEntity);
 		
 		float scale = (float) getScale(livingEntity);
 		int modelSize = ClientSettings.entityModelSize;
 		
-		matrices.push();
+		matrices.pushPose();
 		matrices.translate(x, y, 0);
 		matrices.translate(modelSize / 4, modelSize / 2, 0);
 		if (ClientSettings.rotateMap) {
-			float rotation = (float) MathUtil.correctAngle(minecraft.player.headYaw);
-			matrices.multiply(Vector3f.POSITIVE_Z.getDegreesQuaternion(rotation));
+			float rotation = (float) MathUtil.correctAngle(minecraft.player.yHeadRot);
+			matrices.mulPose(Vector3f.ZP.rotationDegrees(rotation));
 		} else {
-			matrices.multiply(Vector3f.POSITIVE_X.getDegreesQuaternion(180.0F));
+			matrices.mulPose(Vector3f.XP.rotationDegrees(180.0F));
 		}
-		matrices.push();
+		matrices.pushPose();
 		matrices.scale(scale, scale, scale);
-		renderDispatcher.setRenderShadows(false);
+		renderDispatcher.setRenderShadow(false);
 		renderDispatcher.render(livingEntity, 0.0, 0.0, 0.0, 0.0F, 1.0F, matrices, consumerProvider, 240);
-		renderDispatcher.setRenderShadows(true);
-		matrices.pop();
-		matrices.pop();
+		renderDispatcher.setRenderShadow(true);
+		matrices.popPose();
+		matrices.popPose();
 		
-		livingEntity.pitch = pitch;
-		livingEntity.headYaw = headYaw;
-		livingEntity.bodyYaw = bodyYaw;
-		livingEntity.prevPitch = prevPitch;
-		livingEntity.prevHeadYaw = prevHeadYaw;
-		livingEntity.prevBodyYaw = prevBodyYaw;
+		livingEntity.setXRot(pitch);
+		livingEntity.yHeadRot = headYaw;
+		livingEntity.yBodyRot = bodyYaw;
+		livingEntity.xRotO = prevPitch;
+		livingEntity.yHeadRotO = prevHeadYaw;
+		livingEntity.yBodyRotO = prevBodyYaw;
 	}
 	
 	private static double getScale(LivingEntity livingEntity) {
@@ -67,15 +67,15 @@ public class EntityModelRenderer {
 		
 		modelSize = (int) Math.min(modelSize, modelSize / mapScale);
 		
-		double scaleX = modelSize / Math.max(livingEntity.getWidth(), 1.0F);
-		double scaleY = modelSize / Math.max(livingEntity.getHeight(), 1.0F);
+		double scaleX = modelSize / Math.max(livingEntity.getBbWidth(), 1.0F);
+		double scaleY = modelSize / Math.max(livingEntity.getBbHeight(), 1.0F);
 		
 		double scale = Math.max(Math.min(scaleX, scaleY), modelSize);
 		
-		if (livingEntity instanceof GhastEntity || livingEntity instanceof EnderDragonEntity) {
+		if (livingEntity instanceof Ghast || livingEntity instanceof EnderDragon) {
 			scale = modelSize / 3.0F;
 		}
-		if (livingEntity instanceof WaterCreatureEntity) {
+		if (livingEntity instanceof WaterAnimal) {
 			scale = modelSize / 1.35F;
 		}	
 		if (livingEntity.isSleeping()) {
@@ -86,34 +86,34 @@ public class EntityModelRenderer {
 	}
 	
 	private static void setPitchAndYaw(LivingEntity livingEntity) {
-		livingEntity.pitch = 0.0F;
-		livingEntity.prevPitch = 0.0F;
-		
-		switch(livingEntity.getMovementDirection()) {
-			case NORTH:
-				livingEntity.headYaw = 0.0F;
-				livingEntity.bodyYaw = 0.0F;
-				livingEntity.prevHeadYaw = 0.0F;
-				livingEntity.prevBodyYaw = 0.0F;
-				break;
-			case WEST:
-				livingEntity.headYaw = 135.0F;
-				livingEntity.bodyYaw = 135.0F;
-				livingEntity.prevHeadYaw = 135.0F;
-				livingEntity.prevBodyYaw = 135.0F;
-				break;
-			case EAST:
-				livingEntity.headYaw = 225.0F;
-				livingEntity.bodyYaw = 225.0F;
-				livingEntity.prevHeadYaw = 225.0F;
-				livingEntity.prevBodyYaw = 225.0F;
-				break;
-			default:
-				livingEntity.headYaw = 180.0F;
-				livingEntity.bodyYaw = 180.0F;
-				livingEntity.prevHeadYaw = 180.0F;
-				livingEntity.prevBodyYaw = 180.0F;
-			break;
+		livingEntity.setXRot(0.0F);
+		livingEntity.xRotO = 0.0F;
+
+		switch (livingEntity.getMotionDirection()) {
+			case NORTH -> {
+				livingEntity.yHeadRot = 0.0F;
+				livingEntity.yBodyRot = 0.0F;
+				livingEntity.yHeadRotO = 0.0F;
+				livingEntity.yBodyRotO = 0.0F;
+			}
+			case WEST -> {
+				livingEntity.yHeadRot = 135.0F;
+				livingEntity.yBodyRot = 135.0F;
+				livingEntity.yHeadRotO = 135.0F;
+				livingEntity.yBodyRotO = 135.0F;
+			}
+			case EAST -> {
+				livingEntity.yHeadRot = 225.0F;
+				livingEntity.yBodyRot = 225.0F;
+				livingEntity.yHeadRotO = 225.0F;
+				livingEntity.yBodyRotO = 225.0F;
+			}
+			default -> {
+				livingEntity.yHeadRot = 180.0F;
+				livingEntity.yBodyRot = 180.0F;
+				livingEntity.yHeadRotO = 180.0F;
+				livingEntity.yBodyRotO = 180.0F;
+			}
 		}
 	}
 }

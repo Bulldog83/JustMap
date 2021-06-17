@@ -6,16 +6,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.ProgressScreen;
+import net.minecraft.core.BlockPos;
+import net.minecraft.util.GsonHelper;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.chunk.LevelChunk;
 import com.google.gson.*;
-
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.screen.ProgressScreen;
-import net.minecraft.util.JsonHelper;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-import net.minecraft.world.chunk.WorldChunk;
-
 import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.client.config.ClientConfig;
@@ -38,10 +35,10 @@ public final class WorldManager {
 	private final static Map<WorldKey, WorldData> worldsData = new HashMap<>();
 	// used only in mixed mode to associate world names with worlds
 	private final static Map<MultiworldIdentifier, String> worldAssociations = new HashMap<>();
-	private final static MinecraftClient minecraft = MinecraftClient.getInstance();
+	private final static Minecraft minecraft = Minecraft.getInstance();
 	private final static ClientConfig modConfig = JustMapClient.getConfig();
 
-	private static World currentWorld;
+	private static Level currentWorld;
 	private static WorldKey currentWorldKey;
 	private static BlockPos currentWorldPos;
 	private static String currentWorldName;
@@ -87,13 +84,13 @@ public final class WorldManager {
 				currentWorldName = null;
 				clearData();
 			}
-			assert minecraft.world != null;
-			onWorldPosChanged(minecraft.world.getSpawnPos());
+			assert minecraft.level != null;
+			onWorldPosChanged(minecraft.level.getSharedSpawnPos());
 			return;
 		} else if (MultiworldDetection.isMixed()) {
 			if (currentWorldPos == null) {
-				assert minecraft.world != null;
-				onWorldPosChanged(minecraft.world.getSpawnPos());
+				assert minecraft.level != null;
+				onWorldPosChanged(minecraft.level.getSharedSpawnPos());
 			} else if (currentWorldName == null) {
 				requestWorldName = true;
 			} else {
@@ -105,7 +102,7 @@ public final class WorldManager {
 		JustMapClient.startMapping();
 	}
 	
-	public static void onWorldChanged(World world) {
+	public static void onWorldChanged(Level world) {
 		currentWorld = world;
 		if (RuleUtil.detectMultiworlds()) {
 			JustMap.LOGGER.debug("World changed, stop mapping!");
@@ -166,8 +163,8 @@ public final class WorldManager {
 		return currentWorldKey;
 	}
 	
-	public static WorldKey createWorldKey(World world, BlockPos blockPos, String worldName) {
-		WorldKey newKey = new WorldKey(world.getRegistryKey());
+	public static WorldKey createWorldKey(Level world, BlockPos blockPos, String worldName) {
+		WorldKey newKey = new WorldKey(world.dimension());
 		if (RuleUtil.detectMultiworlds()) {
 			if (blockPos != null) {
 				newKey.setWorldPos(blockPos);
@@ -191,7 +188,7 @@ public final class WorldManager {
 		return getData(currentWorld, currentWorldKey);
 	}
 
-	public static WorldData getData(World world, WorldKey worldKey) {
+	public static WorldData getData(Level world, WorldKey worldKey) {
 		if (world == null || worldKey == null) return null;
 		
 		WorldData data;
@@ -212,7 +209,7 @@ public final class WorldManager {
 		return data;
 	}
 	
-	public static void onChunkLoad(World world, WorldChunk worldChunk) {
+	public static void onChunkLoad(Level world, LevelChunk worldChunk) {
 		if (world == null || worldChunk == null || worldChunk.isEmpty()) return;
 		IMap map = DataUtil.getMap();
 		WorldData mapData = getData();
@@ -223,8 +220,8 @@ public final class WorldManager {
 	}
 	
 	public static void update() {
-		if (requestWorldName && !(minecraft.currentScreen instanceof ProgressScreen)) {
-			minecraft.openScreen(new WorldnameScreen(minecraft.currentScreen));
+		if (requestWorldName && !(minecraft.screen instanceof ProgressScreen)) {
+			minecraft.setScreen(new WorldnameScreen(minecraft.screen));
 			requestWorldName = false;
 		}
 		if (!JustMapClient.canMapping()) return;
@@ -322,8 +319,8 @@ public final class WorldManager {
 			JsonObject configObject = JsonFactory.getJsonObject(configFile);
 			EnumEntry<MultiworldDetection> detectionType = modConfig.getEntry("multiworld_detection");
 			BooleanEntry detectMultiworlds = modConfig.getEntry("detect_multiworlds");
-			detectMultiworlds.fromString(JsonHelper.getString(configObject, "detect_multiworlds"));
-			detectionType.fromString(JsonHelper.getString(configObject, "multiworld_detection_type"));
+			detectMultiworlds.fromString(GsonHelper.getAsString(configObject, "detect_multiworlds"));
+			detectionType.fromString(GsonHelper.getAsString(configObject, "multiworld_detection_type"));
 		} catch (JsonSyntaxException ex) {
 			return false;
 		}

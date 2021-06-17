@@ -1,8 +1,6 @@
 package ru.bulldog.justmap.client.screen;
 
-import net.minecraft.client.gui.widget.SliderWidget;
-import net.minecraft.util.math.MathHelper;
-
+import net.minecraft.client.gui.components.events.GuiEventListener;
 import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.client.widget.TitledButtonWidget;
@@ -12,45 +10,44 @@ import ru.bulldog.justmap.map.waypoint.WaypointKeeper;
 import ru.bulldog.justmap.map.waypoint.Waypoint.Icon;
 import ru.bulldog.justmap.util.Predicates;
 import ru.bulldog.justmap.util.colors.Colors;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.gui.widget.CheckboxWidget;
-import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.client.resource.language.I18n;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.LiteralText;
-import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
-import net.minecraft.util.math.BlockPos;
-
 import org.lwjgl.glfw.GLFW;
+import com.mojang.blaze3d.vertex.PoseStack;
 
+import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
+import net.minecraft.client.gui.components.AbstractSliderButton;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.Checkbox;
+import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.resources.language.I18n;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.util.Mth;
 
+@SuppressWarnings("ConstantConditions")
 public class WaypointEditor extends MapScreen {
 	
-	private static final Text TITLE = new TranslatableText(JustMap.MODID + ".gui.screen.waypoints_editor");
+	private static final Component TITLE = new TranslatableComponent(JustMap.MODID + ".gui.screen.waypoints_editor");
 
 	private final Waypoint waypoint;
 	
 	private int colorIndex;
 	private int iconIndex;
 	private int showRange;
-	
-	private int spacing = 2;
-	private int padding = 10;
-	private int rowH = 20;
-	
-	private TitledButtonWidget<TextFieldWidget> nameField;
-	private CheckboxWidget isHidden;
-	private CheckboxWidget isTrackable;
-	private CheckboxWidget isRenderable;
-	private ButtonWidget prevColorButton, nextColorButton;
-	private ButtonWidget prevIconButton, nextIconButton;
-	private TextFieldWidget xField, yField, zField;
-	private ButtonWidget saveButton, cancelButton;
-	private Consumer<Waypoint> onSaveCallback;
+
+	private final int rowH = 20;
+
+	private final Consumer<Waypoint> onSaveCallback;
+	private TitledButtonWidget<EditBox> nameField;
+	private Checkbox isHidden;
+	private Checkbox isTrackable;
+	private Checkbox isRenderable;
+	private Button prevColorButton, nextColorButton;
+	private EditBox xField, yField, zField;
 	
 	public WaypointEditor(Waypoint waypoint, Screen parent, Consumer<Waypoint> onSaveCallback) {
 		super(TITLE, parent);
@@ -67,22 +64,26 @@ public class WaypointEditor extends MapScreen {
 		
 		this.center = width / 2;
 		
-		int screenW = center > 480 ? center : width > 480 ? 480 : width;
+		int screenW = center > 480 ? center : Math.min(width, 480);
 	
 		this.x = center - screenW / 2;
 		this.y = 60;
-		
+
+		int spacing = 2;
 		int row = rowH + spacing;
-		
+
+		int padding = 10;
 		int ex = x + padding;
 		int ey = y;
 		int ew = screenW - padding * 2;
-		this.nameField = new TitledButtonWidget<>(textRenderer, new TextFieldWidget(textRenderer, 0, 0, ew - 30, 12, new LiteralText("Name")), ex, ey, ew, rowH, "", lang("name").asString());
+		this.nameField = new TitledButtonWidget<>(font, new EditBox(font, 0, 0, ew - 30, 12, new TextComponent("Name")), ex, ey, ew, rowH, "", lang("name").getContents());
 		this.nameField.changeFocus(true);
 		this.nameField.widget.setMaxLength(48);
-		this.nameField.widget.setText(waypoint.name);
-		
-		this.children.add(nameField);
+		this.nameField.widget.setValue(waypoint.name);
+
+		@SuppressWarnings("unchecked")
+		List<GuiEventListener> children = (List<GuiEventListener>) children();
+		children.add(nameField);
 		
 		Predicate<String> validNumber = (s) -> Predicates.or(s, Predicates.isInteger, Predicates.isEmpty, "-"::equals);
 		
@@ -91,91 +92,94 @@ public class WaypointEditor extends MapScreen {
 		
 		ey += row;
 		
-		this.xField = new TextFieldWidget(textRenderer, px, ey, ew, rowH, new LiteralText(""));
-		this.xField.setTextPredicate(validNumber);
+		this.xField = new EditBox(font, px, ey, ew, rowH, new TextComponent(""));
+		this.xField.setFilter(validNumber);
 		this.xField.setMaxLength(7);
-		this.xField.setText(waypoint.pos.getX() + "");
+		this.xField.setValue(waypoint.pos.getX() + "");
 		
-		this.yField = new TextFieldWidget(textRenderer, px + ew, ey, ew, rowH, new LiteralText(""));
-		this.yField.setTextPredicate(validNumber);
+		this.yField = new EditBox(font, px + ew, ey, ew, rowH, new TextComponent(""));
+		this.yField.setFilter(validNumber);
 		this.yField.setMaxLength(7);
-		this.yField.setText(waypoint.pos.getY() + "");
+		this.yField.setValue(waypoint.pos.getY() + "");
 		
-		this.zField = new TextFieldWidget(textRenderer, px + 2 * ew, ey, ew, rowH, new LiteralText(""));
-		this.zField.setTextPredicate(validNumber);
+		this.zField = new EditBox(font, px + 2 * ew, ey, ew, rowH, new TextComponent(""));
+		this.zField.setFilter(validNumber);
 		this.zField.setMaxLength(7);
-		this.zField.setText(waypoint.pos.getZ() + "");
+		this.zField.setValue(waypoint.pos.getZ() + "");
 		
-		this.children.add(xField);
-		this.children.add(yField);
-		this.children.add(zField);
+		children.add(xField);
+		children.add(yField);
+		children.add(zField);
 		
 		ey += row;
 		
 		ew = 20;
-		this.prevColorButton = new ButtonWidget(ex, ey, ew, rowH, new LiteralText("<"), (b) -> cycleColor(-1));
-		this.children.add(prevColorButton);
+		this.prevColorButton = new Button(ex, ey, ew, rowH, new TextComponent("<"), (b) -> cycleColor(-1));
+		children.add(prevColorButton);
 		
-		this.nextColorButton = new ButtonWidget(x + screenW - ew - padding, ey, ew, rowH, new LiteralText(">"), (b) -> cycleColor(1));
-		this.children.add(nextColorButton);
+		this.nextColorButton = new Button(x + screenW - ew - padding, ey, ew, rowH, new TextComponent(">"), (b) -> cycleColor(1));
+		children.add(nextColorButton);
 		
 		ey += row;
-		
-		this.prevIconButton = new ButtonWidget(ex, ey, ew, rowH, new LiteralText("<"), (b) -> cycleIcon(-1));
-		this.children.add(prevIconButton);
-		
-		this.nextIconButton = new ButtonWidget(x + screenW - ew - padding, ey, ew, rowH, new LiteralText(">"), (b) -> cycleIcon(1));
-		this.children.add(nextIconButton);
+
+		Button prevIconButton = new Button(ex, ey, ew, rowH, new TextComponent("<"), (b) -> cycleIcon(-1));
+		children.add(prevIconButton);
+
+		Button nextIconButton = new Button(x + screenW - ew - padding, ey, ew, rowH, new TextComponent(">"), (b) -> cycleIcon(1));
+		children.add(nextIconButton);
 		
 		ey += row * 1.5;
 		
 		int sliderW = (int) (screenW * 0.6);
 		int elemX = width / 2 - sliderW / 2;
 		
-		this.isHidden = new CheckboxWidget(elemX, ey, ew, rowH, lang("wp_hidden"), waypoint.hidden);
-		this.isTrackable = new CheckboxWidget(elemX + 100, ey, ew, rowH, lang("wp_tracking"), waypoint.tracking);
-		this.isRenderable = new CheckboxWidget(elemX + 200, ey, ew, rowH, lang("wp_render"), waypoint.render);
-		this.children.add(isHidden);
-		this.children.add(isTrackable);
-		this.children.add(isRenderable);
+		this.isHidden = new Checkbox(elemX, ey, ew, rowH, lang("wp_hidden"), waypoint.hidden);
+		this.isTrackable = new Checkbox(elemX + 100, ey, ew, rowH, lang("wp_tracking"), waypoint.tracking);
+		this.isRenderable = new Checkbox(elemX + 200, ey, ew, rowH, lang("wp_render"), waypoint.render);
+		children.add(isHidden);
+		children.add(isTrackable);
+		children.add(isRenderable);
 
 		ey += row * 1.25;
 
 		IntegerRange maxRangeConfig = JustMapClient.getConfig().getEntry("max_render_dist");
 		final int SHOW_RANGE_MAX = maxRangeConfig.maxValue();
 		this.showRange = waypoint.showRange;
-		this.children.add(new SliderWidget(elemX, ey, sliderW, rowH, LiteralText.EMPTY, (double) this.showRange / SHOW_RANGE_MAX) {
+		children.add(new AbstractSliderButton(elemX, ey, sliderW, rowH, TextComponent.EMPTY, (double) this.showRange / SHOW_RANGE_MAX) {
 			{
 				this.updateMessage();
 			}
 
 			@Override
 			protected void updateMessage() {
-				this.setMessage(new LiteralText(lang("wp_render_dist").getString() + WaypointEditor.this.showRange));
+				this.setMessage(new TextComponent(lang("wp_render_dist").getString() + WaypointEditor.this.showRange));
 			}
 
 			@Override
 			protected void applyValue() {
-				WaypointEditor.this.showRange = MathHelper.floor(MathHelper.clampedLerp(0, SHOW_RANGE_MAX, this.value));
+				WaypointEditor.this.showRange = Mth.floor(Mth.clampedLerp(0, SHOW_RANGE_MAX, this.value));
 			}
 		});
 		
 		ew = 60;
 		ey = height - (rowH / 2 + 16);
-		this.saveButton = new ButtonWidget(center - ew - 2, ey, ew, rowH, lang("save"), (b) -> { save(); onClose(); });
-		this.children.add(saveButton);
+		Button saveButton = new Button(center - ew - 2, ey, ew, rowH, lang("save"), (b) -> {
+			save();
+			onClose();
+		});
+		children.add(saveButton);
+
+		Button cancelButton = new Button(center + 2, ey, ew, rowH, lang("cancel"), (b) -> onClose());
+		children.add(cancelButton);
 		
-		this.cancelButton = new ButtonWidget(center + 2, ey, ew, rowH, lang("cancel"), (b) -> onClose());
-		this.children.add(cancelButton);
-		
-		this.setInitialFocus(nameField);
+		setInitialFocus(nameField);
 	}
 	
 	@Override
-	public void render(MatrixStack matrixStack, int mouseX, int mouseY, float delta) {
+	public void render(PoseStack matrixStack, int mouseX, int mouseY, float delta) {
 		super.render(matrixStack, mouseX, mouseY, delta);
-		String dimensionName = info == null ? lang("unknown").asString() : I18n.translate(info.getFirst());
-		drawCenteredString(matrixStack, textRenderer, dimensionName, center, 15, Colors.WHITE);
+		String dimensionName = info == null ? lang("unknown").getContents() : I18n.get(info.getFirst());
+		drawCenteredString(matrixStack, font, dimensionName, center, 15, Colors.WHITE);
 	}
 	
 	private void cycleColor(int i) {
@@ -197,20 +201,20 @@ public class WaypointEditor extends MapScreen {
 	}
 	
 	private void save() {
-		this.waypoint.name = nameField.widget.getText();		
+		this.waypoint.name = nameField.widget.getValue();		
 		int color = Waypoint.WAYPOINT_COLORS[colorIndex];
 		if(Waypoint.getIcon(iconIndex) != null) {
 			this.waypoint.setIcon(Waypoint.getIcon(iconIndex), color);
 		} else {
 			this.waypoint.color = color;
 		}
-		this.waypoint.hidden = isHidden.isChecked();
-		this.waypoint.tracking = isTrackable.isChecked();
-		this.waypoint.render = isRenderable.isChecked();
+		this.waypoint.hidden = isHidden.selected();
+		this.waypoint.tracking = isTrackable.selected();
+		this.waypoint.render = isRenderable.selected();
 		
-		int xPos = (xField.getText().isEmpty() || xField.getText().equals("-")) ? 0 : Integer.parseInt(xField.getText());
-		int yPos = (yField.getText().isEmpty() || yField.getText().equals("-")) ? 0 : Integer.parseInt(yField.getText());
-		int zPos = (zField.getText().isEmpty() || zField.getText().equals("-")) ? 0 : Integer.parseInt(zField.getText());
+		int xPos = (xField.getValue().isEmpty() || xField.getValue().equals("-")) ? 0 : Integer.parseInt(xField.getValue());
+		int yPos = (yField.getValue().isEmpty() || yField.getValue().equals("-")) ? 0 : Integer.parseInt(yField.getValue());
+		int zPos = (zField.getValue().isEmpty() || zField.getValue().equals("-")) ? 0 : Integer.parseInt(zField.getValue());
 		
 		this.waypoint.pos = new BlockPos(xPos, yPos, zPos);
 
@@ -225,11 +229,11 @@ public class WaypointEditor extends MapScreen {
 	
 	@Override
 	public void onClose() {
-		this.client.openScreen(parent);
+		this.minecraft.setScreen(parent);
 	}
 	
 	@Override
-	public void renderForeground(MatrixStack matrixStack) {
+	public void renderForeground(PoseStack matrixStack) {
 		int x = prevColorButton.x + prevColorButton.getWidth() + 2;
 		int y = prevColorButton.y + 3;
 		int w = nextColorButton.x - x - 2;
@@ -246,21 +250,21 @@ public class WaypointEditor extends MapScreen {
 		int ix = center - icon.getWidth() / 2;
 		int iy = y + rowH + (rowH / 2 - icon.getHeight() / 2);
 		int color = iconIndex > 0 ? icon.color : col;
-		this.borderedRect(matrixStack, x, y, w, h, color, 2, 0xFFCCCCCC);
+		this.borderedRect(matrixStack, x, y, w, h, color);
 		icon.draw(ix, iy);
 	}
 	
 	@Override
 	public void tick() {}
 	
-	private void rect(MatrixStack matrixStack, int x, int y, int w, int h, int color) {
+	private void rect(PoseStack matrixStack, int x, int y, int w, int h, int color) {
 		fill(matrixStack, x, y, x + w, y + h, color);
 	}
 	
-	private void borderedRect(MatrixStack matrixStack, int x, int y, int w, int h, int color, int border, int borderColor) {
-		int hb = border >> 1;
-		this.rect(matrixStack, x, y, w, h, borderColor);
-		this.rect(matrixStack, x + hb, y + hb, w - border, h - border, color);
+	private void borderedRect(PoseStack matrixStack, int x, int y, int w, int h, int color) {
+		int hb = 2 >> 1;
+		this.rect(matrixStack, x, y, w, h, -3355444);
+		this.rect(matrixStack, x + hb, y + hb, w - 2, h - 2, color);
 	}
 	
 	private int getColorIndex(int color) {

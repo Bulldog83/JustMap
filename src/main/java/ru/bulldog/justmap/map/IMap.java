@@ -1,6 +1,6 @@
 package ru.bulldog.justmap.map;
 
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
 import ru.bulldog.justmap.client.screen.Worldmap;
 import ru.bulldog.justmap.map.data.Layer;
 

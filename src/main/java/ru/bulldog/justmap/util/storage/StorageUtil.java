@@ -9,15 +9,13 @@ import org.apache.commons.io.FileUtils;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.loader.api.FabricLoader;
-
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.ServerInfo;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ServerData;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.registry.RegistryKey;
-import net.minecraft.world.World;
-import net.minecraft.world.storage.VersionedChunkStorage;
-
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.chunk.storage.ChunkStorage;
 import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.map.data.WorldManager;
 import ru.bulldog.justmap.map.data.WorldKey;
@@ -43,14 +41,14 @@ public final class StorageUtil {
 		return MAP_DATA_DIR.toFile();
 	}
 	
-	public static VersionedChunkStorage getChunkStorage(ServerWorld world) {
+	public static ChunkStorage getChunkStorage(ServerLevel world) {
 		File regionDir = new File(savesDir(world), "region");
-		return new VersionedChunkStorage(regionDir, world.getServer().getDataFixer(), true);
+		return new ChunkStorage(regionDir, world.getServer().getFixerUpper(), true);
 	}
 	
-	public static File savesDir(ServerWorld world) {
-		if (world == null || !(world instanceof ServerWorld)) return null;
-		return ((SessionAccessor) world.getServer()).getServerSession().getWorldDirectory(world.getRegistryKey());
+	public static File savesDir(ServerLevel world) {
+		if (world == null || !(world instanceof ServerLevel)) return null;
+		return ((SessionAccessor) world.getServer()).getStorageSource().getDimensionPath(world.dimension());
 	}
 	
 	public static File configDir() {
@@ -81,10 +79,10 @@ public final class StorageUtil {
 	
 	public static File cacheDir() {
 		String dimension = "undefined";
-		World world = DataUtil.getWorld();
+		Level world = DataUtil.getWorld();
 		if (world != null) {
-			RegistryKey<World> dimKey = world.getRegistryKey();			
-			dimension = dimKey.getValue().getPath();			
+			ResourceKey<Level> dimKey = world.dimension();			
+			dimension = dimKey.location().getPath();			
 		}
 
 		WorldKey worldKey = WorldManager.getWorldKey();
@@ -110,13 +108,13 @@ public final class StorageUtil {
 	
 	@Environment(EnvType.CLIENT)
 	public static File filesDir() {
-		MinecraftClient minecraft = MinecraftClient.getInstance();		
-		ServerInfo serverInfo = minecraft.getCurrentServerEntry();
+		Minecraft minecraft = Minecraft.getInstance();		
+		ServerData serverInfo = minecraft.getCurrentServer();
 		File dataDir = MAP_DATA_DIR.toFile();
 		File mapsDir = new File(MAP_DATA_DIR.toFile(), "maps");
-		if (minecraft.isIntegratedServerRunning()) {
-			MinecraftServer server = minecraft.getServer();
-			String name = scrubFileName(server.getSaveProperties().getLevelName());
+		if (minecraft.hasSingleplayerServer()) {
+			MinecraftServer server = minecraft.getSingleplayerServer();
+			String name = scrubFileName(server.getWorldData().getLevelName());
 			filesDir = new File(mapsDir, "local/" + name);
 			File oldDir = new File(dataDir, "local/" + name);
 			if (oldDir.exists()) {
@@ -128,7 +126,7 @@ public final class StorageUtil {
 			}
 		} else if (serverInfo != null) {
 			String name = scrubFileName(serverInfo.name);
-			String address = serverInfo.address;
+			String address = serverInfo.ip;
 			if (address.contains(":")) {
 				int end = address.indexOf(":") - 1;
 				address = address.substring(0, end);

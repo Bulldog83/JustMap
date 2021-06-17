@@ -1,9 +1,17 @@
 package ru.bulldog.justmap.map.icon;
 
+import com.mojang.blaze3d.platform.NativeImage;
+import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
-
+import net.minecraft.client.renderer.texture.DynamicTexture;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.TamableAnimal;
+import net.minecraft.world.entity.monster.Monster;
 import ru.bulldog.justmap.client.config.ClientSettings;
 import ru.bulldog.justmap.util.ImageUtil;
 import ru.bulldog.justmap.util.colors.Colors;
@@ -11,21 +19,12 @@ import ru.bulldog.justmap.util.render.Image;
 import ru.bulldog.justmap.util.render.RenderUtil;
 import ru.bulldog.justmap.util.storage.StorageUtil;
 
-import net.minecraft.client.texture.NativeImage;
-import net.minecraft.client.texture.NativeImageBackedTexture;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.mob.HostileEntity;
-import net.minecraft.entity.passive.TameableEntity;
-import net.minecraft.util.Identifier;
-
 public class EntityHeadIcon extends Image {
 	
-	private final static Map<Identifier, EntityHeadIcon> ICONS = new HashMap<>();
+	private final static Map<ResourceLocation, EntityHeadIcon> ICONS = new HashMap<>();
 	
 	public static EntityHeadIcon getIcon(Entity entity) {
-		Identifier id = EntityType.getId(entity.getType());
+		ResourceLocation id = EntityType.getKey(entity.getType());
 		if (ICONS.containsKey(id)) {
 			return ICONS.get(id);
 		} else {
@@ -34,7 +33,7 @@ public class EntityHeadIcon extends Image {
 			if (iconPng.exists()) {
 				return registerIcon(entity, id, iconPng);
 			} else {
-				Identifier iconId = iconId(id);
+				ResourceLocation iconId = iconId(id);
 				if (ImageUtil.imageExists(iconId)) {
 					return registerIcon(entity, id, iconId);
 				}
@@ -44,24 +43,23 @@ public class EntityHeadIcon extends Image {
 		return null;
 	}
 	
-	private final Identifier id;
-	private Identifier outlineId;
+	private final ResourceLocation id;
+	private ResourceLocation outlineId;
 	private int color = Colors.LIGHT_GRAY;
-	private boolean solid;
+	private final boolean solid;
 	
-	private EntityHeadIcon(Identifier id, Identifier texture, int w, int h) {
+	private EntityHeadIcon(ResourceLocation id, ResourceLocation texture, int w, int h) {
 		this(id, texture, ImageUtil.loadImage(texture, w, h));
 	}
 	
-	private EntityHeadIcon(Identifier id, Identifier texture, NativeImage image) {
+	private EntityHeadIcon(ResourceLocation id, ResourceLocation texture, NativeImage image) {
 		super(texture, image);
-		
-		this.solid = this.isSolid();
+		this.solid = isSolid();
 		this.id = id;
 	}
 
 	@Override
-	public void draw(MatrixStack matrices, double x, double y, int w, int h) {
+	public void draw(PoseStack matrices, double x, double y, int w, int h) {
 		if (ClientSettings.showIconsOutline) {
 			double thickness = ClientSettings.entityOutlineSize;
 			if (solid) {
@@ -77,10 +75,10 @@ public class EntityHeadIcon extends Image {
 	private void bindOutline() {
 		if (outlineId == null) {
 			NativeImage outline = ImageUtil.generateOutline(image, width, height, color);
-			NativeImageBackedTexture outTexture = new NativeImageBackedTexture(outline);
-			this.outlineId = textureManager.registerDynamicTexture(String.format("%s_%s_outline", this.id.getNamespace(), this.id.getPath()), outTexture);
+			DynamicTexture outTexture = new DynamicTexture(outline);
+			outlineId = textureManager.register(String.format("%s_%s_outline", id.getNamespace(), id.getPath()), outTexture);
 		}
-		textureManager.bindTexture(outlineId);
+		RenderSystem.setShaderTexture(0, outlineId);
 	}
 	
 	private boolean isSolid() {
@@ -92,7 +90,7 @@ public class EntityHeadIcon extends Image {
 		boolean solid = true;
 		for (int i = 0; i < width; i++) {
 			for (int j = 0; j < height; j++) {
-				int alpha = (icon.getPixelColor(i, j) >> 24) & 255;
+				int alpha = (icon.getPixelRGBA(i, j) >> 24) & 255;
 				solid = alpha > 0;
 				if (!solid) break;
 			}
@@ -101,30 +99,29 @@ public class EntityHeadIcon extends Image {
 		return solid;
 	}
 	
-	private static Identifier iconId(Identifier id) {
+	private static ResourceLocation iconId(ResourceLocation id) {
 		String path = String.format("textures/minimap/entities/%s.png", id.getPath());
-		return new Identifier(id.getNamespace(), path);
+		return new ResourceLocation(id.getNamespace(), path);
 	}
 	
-	private static EntityHeadIcon registerIcon(Entity entity, Identifier entityId, Identifier texture) {
+	private static EntityHeadIcon registerIcon(Entity entity, ResourceLocation entityId, ResourceLocation texture) {
 		EntityHeadIcon icon = new EntityHeadIcon(entityId, texture, 32, 32);
 		return registerIcon(entity, entityId, icon);
 	}
 	
-	private static EntityHeadIcon registerIcon(Entity entity, Identifier entityId, File image) {
+	private static EntityHeadIcon registerIcon(Entity entity, ResourceLocation entityId, File image) {
 		NativeImage iconImage = ImageUtil.loadImage(image, 32, 32);
 		String prefix = String.format("icon_%s_%s", entityId.getNamespace(), entityId.getPath());
-		Identifier textureId = textureManager.registerDynamicTexture(prefix, new NativeImageBackedTexture(iconImage));
+		ResourceLocation textureId = textureManager.register(prefix, new DynamicTexture(iconImage));
 		EntityHeadIcon icon = new EntityHeadIcon(entityId, textureId, iconImage);
 		return registerIcon(entity, entityId, icon);
 	}
 	
-	private static EntityHeadIcon registerIcon(Entity entity, Identifier entityId, EntityHeadIcon icon) {
-		if (entity instanceof HostileEntity) {
+	private static EntityHeadIcon registerIcon(Entity entity, ResourceLocation entityId, EntityHeadIcon icon) {
+		if (entity instanceof Monster) {
 			icon.color = Colors.DARK_RED;
-		} else if (entity instanceof TameableEntity) {
-			TameableEntity tameable = (TameableEntity) entity;
-			icon.color = tameable.isTamed() ? Colors.GREEN : Colors.YELLOW;
+		} else if (entity instanceof TamableAnimal tameable) {
+			icon.color = tameable.isTame() ? Colors.GREEN : Colors.YELLOW;
 		} else {
 			icon.color = Colors.YELLOW;
 		}

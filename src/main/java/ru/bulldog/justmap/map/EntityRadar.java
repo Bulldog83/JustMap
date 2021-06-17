@@ -3,11 +3,9 @@ package ru.bulldog.justmap.map;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-
-import net.minecraft.entity.mob.MobEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.math.BlockPos;
-
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.player.Player;
 import ru.bulldog.justmap.map.icon.EntityIcon;
 import ru.bulldog.justmap.map.icon.MapIcon;
 import ru.bulldog.justmap.map.icon.PlayerIcon;
@@ -15,8 +13,8 @@ import ru.bulldog.justmap.util.DataUtil;
 import ru.bulldog.justmap.util.math.MathUtil;
 
 public class EntityRadar {
-	private final List<PlayerEntity> players;
-	private final List<MobEntity> creatures;
+	private final List<Player> players;
+	private final List<Mob> creatures;
 	private final List<MapIcon<?>> drawableIcons;
 	
 	public EntityRadar() {
@@ -25,12 +23,12 @@ public class EntityRadar {
 		this.drawableIcons = new ArrayList<>();
 	}
 	
-	public void addPlayer(PlayerEntity player) {
+	public void addPlayer(Player player) {
 		if (players.contains(player)) return;
 		this.players.add(player);
 	}
 	
-	public void addCreature(MobEntity creature) {
+	public void addCreature(Mob creature) {
 		if (creatures.contains(creature)) return;
 		this.creatures.add(creature);
 	}
@@ -56,28 +54,28 @@ public class EntityRadar {
 	
 	public void clear(BlockPos center, int radius) {
 		if (players.size() > 0) {
-			List<PlayerEntity> playersToClear = new ArrayList<>();
+			List<Player> playersToClear = new ArrayList<>();
 			this.players.forEach(player -> {
-				if (player.removed) {
+				if (player.isRemoved()) {
 					playersToClear.add(player);
-				} else if (MathUtil.getDistance(center, player.getBlockPos()) > radius) {
+				} else if (MathUtil.getDistance(center, player.blockPosition()) > radius) {
 					playersToClear.add(player);
 				}
 			});
-			playersToClear.forEach(player -> this.players.remove(player));
+			playersToClear.forEach(players::remove);
 		}
 		if (creatures.size() > 0) {
-			List<MobEntity> mobsToClear = new ArrayList<>();
+			List<Mob> mobsToClear = new ArrayList<>();
 			this.creatures.forEach(mob -> {
-				boolean tooFar = MathUtil.getDistance(center, mob.getBlockPos()) > radius ||
+				boolean tooFar = MathUtil.getDistance(center, mob.blockPosition()) > radius ||
 						         Math.abs(mob.getY() - center.getY()) > 24;
-				if (mob.isDead() || mob.removed) {
+				if (mob.isDeadOrDying() || mob.isRemoved()) {
 					mobsToClear.add(mob);
 				} else if (tooFar) {
 					mobsToClear.add(mob);
 				}
 			});
-			mobsToClear.forEach(mob -> this.creatures.remove(mob));
+			mobsToClear.forEach(creatures::remove);
 		}
 	}
 	

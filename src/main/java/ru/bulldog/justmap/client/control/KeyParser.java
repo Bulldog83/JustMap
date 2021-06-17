@@ -1,14 +1,14 @@
 package ru.bulldog.justmap.client.control;
 
 
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.options.KeyBinding;
+import net.minecraft.client.KeyMapping;
+import net.minecraft.client.Minecraft;
 
 public abstract class KeyParser {
-	public final KeyBinding keyBinding;
-	public static final MinecraftClient MC = MinecraftClient.getInstance();
+	public final KeyMapping keyBinding;
+	public static final Minecraft MC = Minecraft.getInstance();
 	
-	protected KeyParser(KeyBinding keyBinding) {
+	protected KeyParser(KeyMapping keyBinding) {
 		this.keyBinding = keyBinding;
 	}
 	

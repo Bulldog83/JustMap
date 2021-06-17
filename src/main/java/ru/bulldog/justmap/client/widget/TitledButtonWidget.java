@@ -1,30 +1,31 @@
 package ru.bulldog.justmap.client.widget;
 
-import net.minecraft.client.sound.SoundManager;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.LiteralText;
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.widget.AbstractButtonWidget;
+import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.client.gui.narration.NarrationElementOutput;
+import net.minecraft.client.sounds.SoundManager;
+import net.minecraft.network.chat.TextComponent;
 
 
-public class TitledButtonWidget<W extends AbstractButtonWidget> extends AbstractButtonWidget {
+public class TitledButtonWidget<W extends AbstractWidget> extends AbstractWidget {
 	public final W widget;
-	public final LiteralText title;
-	private final TextRenderer font;
+	public final TextComponent title;
+	private final Font font;
 	
 	private int spacing = 3;
 	
-	public TitledButtonWidget(TextRenderer font, W widget, int x, int y, int width, int height, String message, String title) {
-		super(x, y, width, height, new LiteralText(message));
+	public TitledButtonWidget(Font font, W widget, int x, int y, int width, int height, String message, String title) {
+		super(x, y, width, height, new TextComponent(message));
 		this.widget = widget;
-		this.title = new LiteralText(title);
+		this.title = new TextComponent(title);
 		this.font = font;
 		
 		update();
 	}
 	
 	private void update() {
-		int titleWidth = font.getWidth(title);
+		int titleWidth = font.width(title);
 		int widgetWidth = widget.getWidth();
 		int wx = x + width - widgetWidth;
 		if (x + titleWidth + spacing > wx) {
@@ -37,8 +38,8 @@ public class TitledButtonWidget<W extends AbstractButtonWidget> extends Abstract
 	}
 	
 	@Override
-	public void render(MatrixStack matrixStack, int int_1, int int_2, float float_1) {
-		drawStringWithShadow(matrixStack, font, title.getString(), x, y, 0xFFFFFFFF);
+	public void render(PoseStack matrixStack, int int_1, int int_2, float float_1) {
+		drawString(matrixStack, font, title.getString(), x, y, 0xFFFFFFFF);
 		widget.render(matrixStack, int_1, int_2, float_1);
 	}
 	
@@ -73,7 +74,7 @@ public class TitledButtonWidget<W extends AbstractButtonWidget> extends Abstract
 	}
 	
 	@Override
-	public void renderButton(MatrixStack matrixStack, int int_1, int int_2, float float_1) {
+	public void renderButton(PoseStack matrixStack, int int_1, int int_2, float float_1) {
 		this.widget.renderButton(matrixStack, int_1, int_2, float_1);
 	}
 	
@@ -113,12 +114,17 @@ public class TitledButtonWidget<W extends AbstractButtonWidget> extends Abstract
 	}
 	
 	@Override
-	public void renderToolTip(MatrixStack matrixStack, int int_1, int int_2) {
+	public void renderToolTip(PoseStack matrixStack, int int_1, int int_2) {
 		this.widget.renderToolTip(matrixStack, int_1, int_2);
 	}
 	
 	@Override
 	public void playDownSound(SoundManager soundManager_1) {
 		this.widget.playDownSound(soundManager_1);
+	}
+
+	@Override
+	public void updateNarration(NarrationElementOutput narrationElementOutput) {
+
 	}
 }

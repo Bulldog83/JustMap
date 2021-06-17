@@ -3,9 +3,7 @@ package ru.bulldog.justmap.map;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
-
-import net.minecraft.entity.player.PlayerEntity;
-
+import net.minecraft.world.entity.player.Player;
 import ru.bulldog.justmap.util.DataUtil;
 
 public class MapPlayerManager {
@@ -14,8 +12,8 @@ public class MapPlayerManager {
 	
 	private static Map<UUID, MapPlayer> players = new HashMap<>();
 	
-	public static MapPlayer getPlayer(PlayerEntity player) {
-		UUID id = player.getUuid();
+	public static MapPlayer getPlayer(Player player) {
+		UUID id = player.getUUID();
 		if (players.containsKey(id)) {
 			return players.get(id);
 		}

@@ -35,21 +35,19 @@ import ru.bulldog.justmap.util.RuleUtil;
 import ru.bulldog.justmap.util.math.MathUtil;
 import ru.bulldog.justmap.util.math.RandomUtil;
 import ru.bulldog.justmap.util.render.ExtendedFramebuffer;
-
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.screen.ChatScreen;
-import net.minecraft.client.util.Window;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.mob.HostileEntity;
-import net.minecraft.entity.mob.MobEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.world.World;
-
+import com.mojang.blaze3d.platform.Window;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.ChatScreen;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.monster.Monster;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.AABB;
 
 public class Minimap implements IMap {
 	private static TextManager textManager;
@@ -57,16 +55,16 @@ public class Minimap implements IMap {
 	private static InfoText txtBiome = new BiomeInfo(TextAlignment.CENTER, "");
 	private static InfoText txtTime = new TimeInfo(TextAlignment.CENTER, "");
 	
-	private final MinecraftClient minecraft;
+	private final Minecraft minecraft;
 	private final FastRenderer fastRenderer;
 	private final BufferedRenderer bufferedRenderer;
 	private List<WaypointIcon> waypoints = new ArrayList<>();
-	private PlayerEntity locPlayer = null;
+	private Player locPlayer = null;
 	private Layer mapLayer = Layer.SURFACE;
 	private EntityRadar entityRadar;
 	private WorldData worldData;
 	private MapSkin mapSkin;
-	private World world;
+	private Level world;
 	private ScreenPosition mapPosition;
 	private boolean isMapVisible = true;
 	private boolean rotateMap = false;
@@ -86,7 +84,7 @@ public class Minimap implements IMap {
 	private int scaledHeight;
 
 	public Minimap() {
-		this.minecraft = MinecraftClient.getInstance();
+		this.minecraft = Minecraft.getInstance();
 		this.entityRadar = new EntityRadar();
 		this.fastRenderer = new FastRenderer(this);
 		this.bufferedRenderer = new BufferedRenderer(this);
@@ -97,7 +95,7 @@ public class Minimap implements IMap {
 			return;
 		}
 
-		PlayerEntity player = minecraft.player;
+		Player player = minecraft.player;
 		if (player != null) {
 			if (locPlayer == null) {
 				locPlayer = player;
@@ -111,7 +109,7 @@ public class Minimap implements IMap {
 		
 		Window window = minecraft.getWindow();
 		if (window != null) {
-			double scale = window.getScaleFactor();
+			double scale = window.getGuiScale();
 			if (winScale != scale) {
 				winScale = scale;
 				this.updateMapParams();
@@ -196,8 +194,8 @@ public class Minimap implements IMap {
 	
 	private void updateMapPosition() {
 		Window window = minecraft.getWindow();
-		int winW = window.getScaledWidth();
-		int winH = window.getScaledHeight();
+		int winW = window.getGuiScaledWidth();
+		int winH = window.getGuiScaledHeight();
 		this.offset = ClientSettings.positionOffset;
 		this.mapPosition = ClientSettings.mapPosition;		
 		
@@ -264,7 +262,7 @@ public class Minimap implements IMap {
 		);
 	}
 
-	private void updateInfo(PlayerEntity player) {
+	private void updateInfo(Player player) {
 		if (!ClientSettings.mapInfo) {
 			txtCoords.setVisible(false);
 			txtBiome.setVisible(false);
@@ -286,8 +284,8 @@ public class Minimap implements IMap {
 			txtTime.update();
 	}
 
-	public void prepareMap(PlayerEntity player) {
-		this.world = player.world;
+	public void prepareMap(Player player) {
+		this.world = player.level;
 		this.worldData = WorldManager.getData();
 		BlockPos pos = DataUtil.currentPos();
 
@@ -330,17 +328,17 @@ public class Minimap implements IMap {
 			int checkHeight = 24;
 			BlockPos start = new BlockPos(startX, posY - checkHeight / 2, startZ);
 			BlockPos end = new BlockPos(endX, posY + checkHeight / 2, endZ);
-			List<Entity> entities = world.getOtherEntities(player, new Box(start, end));
+			List<Entity> entities = world.getEntities(player, new AABB(start, end));
 		
 			int amount = 0;				
 			for (Entity entity : entities) {
-				if (entity instanceof PlayerEntity && RuleUtil.allowPlayerRadar()) {
-					PlayerEntity pEntity = (PlayerEntity) entity;
-					if (pEntity.isMainPlayer()) continue;
+				if (entity instanceof Player && RuleUtil.allowPlayerRadar()) {
+					Player pEntity = (Player) entity;
+					if (pEntity.isLocalPlayer()) continue;
 					this.entityRadar.addPlayer(pEntity);
-				} else if (entity instanceof MobEntity) {
-					MobEntity mobEntity = (MobEntity) entity;
-					boolean hostile = mobEntity instanceof HostileEntity;
+				} else if (entity instanceof Mob) {
+					Mob mobEntity = (Mob) entity;
+					boolean hostile = mobEntity instanceof Monster;
 					if (hostile && RuleUtil.allowHostileRadar()) {
 						this.entityRadar.addCreature(mobEntity);
 						amount++;
@@ -363,8 +361,8 @@ public class Minimap implements IMap {
 		waypoint.color = RandomUtil.getElement(Waypoint.WAYPOINT_COLORS);
 		waypoint.pos = pos;
 
-		minecraft.openScreen(
-				new WaypointEditor(waypoint, minecraft.currentScreen, WaypointKeeper.getInstance()::addNew));
+		minecraft.setScreen(
+				new WaypointEditor(waypoint, minecraft.screen, WaypointKeeper.getInstance()::addNew));
 	}
 
 	public void createWaypoint() {
@@ -378,7 +376,7 @@ public class Minimap implements IMap {
 		return this.fastRenderer;
 	}
 
-	public World getWorld() {
+	public Level getWorld() {
 		return this.world;
 	}
 
@@ -436,9 +434,9 @@ public class Minimap implements IMap {
 
 	public boolean isMapVisible() {
 		if (minecraft == null) return false;
-		if (minecraft.currentScreen != null) {
+		if (minecraft.screen != null) {
 			return this.isMapVisible && !minecraft.isPaused() && ClientSettings.showInChat
-					&& minecraft.currentScreen instanceof ChatScreen;
+					&& minecraft.screen instanceof ChatScreen;
 		}
 
 		return this.isMapVisible;

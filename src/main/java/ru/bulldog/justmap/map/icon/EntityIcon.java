@@ -1,14 +1,12 @@
 package ru.bulldog.justmap.map.icon;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.client.util.math.Vector3f;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.mob.HostileEntity;
-import net.minecraft.entity.passive.TameableEntity;
-
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Vector3f;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.TamableAnimal;
+import net.minecraft.world.entity.monster.Monster;
 import ru.bulldog.justmap.client.config.ClientSettings;
 import ru.bulldog.justmap.client.render.EntityModelRenderer;
 import ru.bulldog.justmap.util.DataUtil;
@@ -24,19 +22,18 @@ public class EntityIcon extends MapIcon<EntityIcon> {
 	boolean hostile;
 		
 	public EntityIcon(Entity entity) {
-		this.hostile = entity instanceof HostileEntity;
+		this.hostile = entity instanceof Monster;
 		this.entity = entity;
 	}
 	
 	@Override
-	public void draw(MatrixStack matrices, VertexConsumerProvider consumerProvider, int mapX, int mapY, int mapW, int mapH, float rotation) {
+	public void draw(PoseStack matrices, MultiBufferSource consumerProvider, int mapX, int mapY, int mapW, int mapH, float rotation) {
 		if (!RuleUtil.allowCreatureRadar() && !hostile) { return; }
 		if (!RuleUtil.allowHostileRadar() && hostile) { return; }
 		
 		int color;
-		if (entity instanceof TameableEntity) {
-			TameableEntity tameable = (TameableEntity) entity;
-			color = tameable.isTamed() ? Colors.GREEN : Colors.YELLOW;
+		if (entity instanceof TamableAnimal tameable) {
+			color = tameable.isTame() ? Colors.GREEN : Colors.YELLOW;
 		} else {
 			color = (hostile) ? Colors.DARK_RED : Colors.YELLOW;
 		}
@@ -54,27 +51,27 @@ public class EntityIcon extends MapIcon<EntityIcon> {
 					float hmod;
 					if (hdiff < 0) {
 						hmod = MathUtil.clamp(Math.abs(hdiff) / 24F, 0.0F, 0.5F);
-						RenderUtil.texEnvMode(GLC.GL_ADD);
+						//RenderUtil.texEnvMode(GLC.GL_ADD);
 					} else {
 						hmod = MathUtil.clamp((24 - Math.abs(hdiff)) / 24F, 0.25F, 1.0F);
-						RenderUtil.texEnvMode(GLC.GL_MODULATE);
+						//RenderUtil.texEnvMode(GLC.GL_MODULATE);
 					}
-					RenderSystem.color3f(hmod, hmod, hmod);
+					RenderSystem.setShaderColor(hmod, hmod, hmod, 1.0F);
 				}
 				double moveX = iconPos.x + size / 2;
 				double moveY = iconPos.y + size / 2;
 				float scale = MathUtil.clamp(1.0F / ClientSettings.mapScale, 0.5F, 1.5F);
-				matrices.push();
+				matrices.pushPose();
 				matrices.translate(moveX, moveY, 0.0);
 				if (ClientSettings.rotateMap) {
-					matrices.multiply(Vector3f.POSITIVE_Z.getDegreesQuaternion(rotation + 180.0F));
+					matrices.mulPose(Vector3f.ZP.rotationDegrees(rotation + 180.0F));
 				}
 				matrices.scale(scale, scale, 1.0F);
 				matrices.translate(-moveX, -moveY, 0.0);
 				icon.draw(matrices, iconPos.x, iconPos.y, size);
-				matrices.pop();
-				RenderUtil.texEnvMode(GLC.GL_MODULATE);
-				RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+				matrices.popPose();
+				//RenderUtil.texEnvMode(GLC.GL_MODULATE);
+				RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 			} else {
 				RenderUtil.drawOutlineCircle(iconPos.x, iconPos.y, size / 3, 0.6, color);
 			}

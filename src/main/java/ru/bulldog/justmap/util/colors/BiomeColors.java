@@ -6,13 +6,10 @@ import java.io.InputStream;
 import java.util.Optional;
 
 import javax.imageio.ImageIO;
-
+import net.minecraft.util.GsonHelper;
+import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.biome.BiomeSpecialEffects;
 import com.google.gson.JsonObject;
-
-import net.minecraft.util.JsonHelper;
-import net.minecraft.world.biome.Biome;
-import net.minecraft.world.biome.BiomeEffects;
-
 import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.mixins.BiomeColorsAccessor;
 import ru.bulldog.justmap.util.storage.ResourceLoader;
@@ -30,9 +27,9 @@ public class BiomeColors {
 	
 	public BiomeColors(Biome biome) {
 		this.biome = biome;
-		BiomeColorsAccessor accessor = (BiomeColorsAccessor) biome.getEffects();
-		this.foliageColor = accessor.getFoliageColor();
-		this.grassColor = accessor.getGrassColor();
+		BiomeColorsAccessor accessor = (BiomeColorsAccessor) biome.getSpecialEffects();
+		this.foliageColor = accessor.getFoliageColorOverride();
+		this.grassColor = accessor.getGrassColorOverride();
 		this.waterColor = accessor.getWaterColor();
 	}
 	
@@ -41,23 +38,23 @@ public class BiomeColors {
 	}
 	
 	public int getFoliageColor() {
-		float temperature = this.biome.getTemperature();
+		float temperature = this.biome.getBaseTemperature();
 		float humidity = this.biome.getDownfall();
 		return this.foliageColor.orElse(getFoliageColor(temperature, humidity));
 	}
 	
 	public int getGrassColor(int x, int z) {
-		float temperature = this.biome.getTemperature();
+		float temperature = this.biome.getBaseTemperature();
 		float humidity = this.biome.getDownfall();
 		int color = this.grassColor.orElse(getGrassColor(temperature, humidity));
-		BiomeColorsAccessor accessor = (BiomeColorsAccessor) biome.getEffects();
-		BiomeEffects.GrassColorModifier modifier = accessor.getGrassColorModifier();
+		BiomeColorsAccessor accessor = (BiomeColorsAccessor) biome.getSpecialEffects();
+		BiomeSpecialEffects.GrassColorModifier modifier = accessor.getGrassColorModifier();
 		switch (modifier) {
 			case DARK_FOREST: {
 				return (color & 16711422) + 2634762 >> 1;
 			}
 			case SWAMP: {
-				double noise = Biome.FOLIAGE_NOISE.sample(x * 0.0225D, z * 0.0225D, false);
+				double noise = Biome.BIOME_INFO_NOISE.getValue(x * 0.0225D, z * 0.0225D, false);
 	            return noise < -0.1D ? 5011004 : 6975545;
 			}
 			default: {
@@ -107,22 +104,22 @@ public class BiomeColors {
 	
 	public static BiomeColors fromJson(Biome biome, JsonObject json) {
 		BiomeColors biomeColors = new BiomeColors();
-		BiomeColorsAccessor accessor = (BiomeColorsAccessor) biome.getEffects();
+		BiomeColorsAccessor accessor = (BiomeColorsAccessor) biome.getSpecialEffects();
 		biomeColors.biome = biome;
 		if (json.has("foliage")) {
-			String hexColor = JsonHelper.getString(json, "foliage");
+			String hexColor = GsonHelper.getAsString(json, "foliage");
 			biomeColors.foliageColor = Optional.of(ColorUtil.parseHex(hexColor));
 		} else {
-			biomeColors.foliageColor = accessor.getFoliageColor();
+			biomeColors.foliageColor = accessor.getFoliageColorOverride();
 		}
 		if (json.has("grass")) {
-			String hexColor = JsonHelper.getString(json, "grass");
+			String hexColor = GsonHelper.getAsString(json, "grass");
 			biomeColors.grassColor = Optional.of(ColorUtil.parseHex(hexColor));
 		} else {
-			biomeColors.grassColor = accessor.getGrassColor();
+			biomeColors.grassColor = accessor.getGrassColorOverride();
 		}
 		if (json.has("water")) {
-			String hexColor = JsonHelper.getString(json, "water");
+			String hexColor = GsonHelper.getAsString(json, "water");
 			biomeColors.waterColor = ColorUtil.parseHex(hexColor);
 		} else {
 			biomeColors.waterColor = accessor.getWaterColor();

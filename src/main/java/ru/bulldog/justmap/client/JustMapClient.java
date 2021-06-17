@@ -1,25 +1,23 @@
 package ru.bulldog.justmap.client;
 
+import com.mojang.realmsclient.RealmsMainScreen;
+import com.mojang.realmsclient.gui.screens.RealmsGenericErrorScreen;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientChunkEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
-
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.screen.BackupPromptScreen;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.screen.TitleScreen;
-import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen;
-import net.minecraft.client.gui.screen.world.CreateWorldScreen;
-import net.minecraft.client.gui.screen.world.EditGameRulesScreen;
-import net.minecraft.client.gui.screen.world.EditWorldScreen;
-import net.minecraft.client.gui.screen.world.SelectWorldScreen;
-import net.minecraft.client.realms.gui.screen.RealmsGenericErrorScreen;
-import net.minecraft.client.realms.gui.screen.RealmsMainScreen;
-import net.minecraft.text.TranslatableText;
-
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.BackupConfirmScreen;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.TitleScreen;
+import net.minecraft.client.gui.screens.multiplayer.JoinMultiplayerScreen;
+import net.minecraft.client.gui.screens.worldselection.CreateWorldScreen;
+import net.minecraft.client.gui.screens.worldselection.EditGameRulesScreen;
+import net.minecraft.client.gui.screens.worldselection.EditWorldScreen;
+import net.minecraft.client.gui.screens.worldselection.SelectWorldScreen;
+import net.minecraft.network.chat.TranslatableComponent;
 import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.advancedinfo.AdvancedInfo;
 import ru.bulldog.justmap.client.config.ClientConfig;
@@ -35,7 +33,7 @@ import ru.bulldog.justmap.util.tasks.TaskManager;
 public class JustMapClient implements ClientModInitializer {
 	private static ClientConfig config = ClientConfig.get();
 	private static Minimap map = new Minimap();
-	private static MinecraftClient minecraft;
+	private static Minecraft minecraft;
 	private static ClientNetworkHandler networkHandler;
 	private static boolean canMapping = false;	
 	private static boolean isOnTitleScreen = true;
@@ -54,14 +52,14 @@ public class JustMapClient implements ClientModInitializer {
 		});
 		ClientChunkEvents.CHUNK_LOAD.register(WorldManager::onChunkLoad);
 		HudRenderCallback.EVENT.register((matrices, delta) -> {
-			if (!minecraft.options.debugEnabled) {
+			if (!minecraft.options.renderDebug) {
 				JustMapClient.map.getRenderer().renderMap(matrices);
 				AdvancedInfo.getInstance().draw(matrices);
 			}
 		});
 		ClientTickEvents.END_CLIENT_TICK.register(client -> {
 			if (minecraft == null) return;
-			boolean isTitle = this.isOnTitleScreen(client.currentScreen);
+			boolean isTitle = this.isOnTitleScreen(client.screen);
 			if (isTitle && !isOnTitleScreen) {
 				JustMapClient.stop();
 			}
@@ -101,7 +99,7 @@ public class JustMapClient implements ClientModInitializer {
 	}
 	
 	public static boolean canMapping() {
-		return !isOnTitleScreen && canMapping && minecraft.world != null &&
+		return !isOnTitleScreen && canMapping && minecraft.level != null &&
 				(minecraft.getCameraEntity() != null || minecraft.player != null);
 	}
 	
@@ -121,15 +119,15 @@ public class JustMapClient implements ClientModInitializer {
 		if (currentScreen == null) return false;
 		
 		boolean isTitleScreen = false;
-		if (currentScreen.getTitle() instanceof TranslatableText) {
-			TranslatableText title = (TranslatableText) currentScreen.getTitle();
+		if (currentScreen.getTitle() instanceof TranslatableComponent) {
+			TranslatableComponent title = (TranslatableComponent) currentScreen.getTitle();
 			isTitleScreen = title.getKey().equals("dataPack.title");
 		}
 		
 		return currentScreen instanceof TitleScreen ||
 			   currentScreen instanceof SelectWorldScreen ||
-		       currentScreen instanceof MultiplayerScreen ||
-		       currentScreen instanceof BackupPromptScreen ||
+		       currentScreen instanceof JoinMultiplayerScreen ||
+		       currentScreen instanceof BackupConfirmScreen ||
 		       currentScreen instanceof CreateWorldScreen ||
 		       currentScreen instanceof EditGameRulesScreen ||
 		       currentScreen instanceof EditWorldScreen ||

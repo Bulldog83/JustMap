@@ -1,19 +1,17 @@
 package ru.bulldog.justmap.map;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.lwjgl.opengl.GL11;
-
 import com.mojang.blaze3d.systems.RenderSystem;
-
-import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.render.VertexFormats;
+import com.mojang.blaze3d.vertex.BufferBuilder;
+import com.mojang.blaze3d.vertex.DefaultVertexFormat;
+import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.blaze3d.vertex.VertexFormat;
 import ru.bulldog.justmap.util.colors.Colors;
 import ru.bulldog.justmap.util.math.Line;
 import ru.bulldog.justmap.util.math.MathUtil;
 import ru.bulldog.justmap.util.render.RenderUtil;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class ChunkGrid {
 	
@@ -82,23 +80,23 @@ public class ChunkGrid {
 		float b = (float) (color & 255) / 255.0F;
 		
 		RenderSystem.disableTexture();
-		RenderSystem.color4f(r, g, b, a);
-		RenderUtil.startDraw(GL11.GL_LINES, VertexFormats.POSITION);
+		RenderSystem.setShaderColor(r, g, b, a);
+		RenderUtil.startDraw(VertexFormat.Mode.LINES, DefaultVertexFormat.POSITION);
 		BufferBuilder buffer = RenderUtil.getBuffer();
 		lines.forEach(line -> line.draw(buffer));
 		RenderUtil.endDraw();
 		RenderSystem.enableTexture();
-		RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+		RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 	}	
 	
-	private class GridLine extends Line {
+	private static class GridLine extends Line {
 		private GridLine(double sx, double sy, double ex, double ey) {
 			super(sx, sy, ex, ey);
 		}
 		
 		private void draw(VertexConsumer builder) {
-			builder.vertex(first.x, first.y, 0).next();
-			builder.vertex(second.x, second.y, 0).next();
+			builder.vertex(first.x, first.y, 0).endVertex();
+			builder.vertex(second.x, second.y, 0).endVertex();
 		}
 	}
 	

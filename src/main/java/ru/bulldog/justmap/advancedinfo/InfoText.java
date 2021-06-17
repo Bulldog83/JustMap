@@ -1,18 +1,17 @@
 package ru.bulldog.justmap.advancedinfo;
 
+import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
 import ru.bulldog.justmap.enums.TextAlignment;
 import ru.bulldog.justmap.util.colors.Colors;
 import ru.bulldog.justmap.util.render.RenderUtil;
 
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.LiteralText;
-import net.minecraft.text.Text;
-
 public abstract class InfoText {
 	TextAlignment alignment;
-	Text text;
+	Component text;
 	boolean fixed = false;
 	boolean visible = true;
 	int color;
@@ -37,21 +36,21 @@ public abstract class InfoText {
 	
 	public InfoText(TextAlignment alignment, String text, int color) {
 		this.alignment = alignment;
-		this.text = new LiteralText(text);
+		this.text = new TextComponent(text);
 		this.color = color;
 	}
 	
-	public void draw(MatrixStack matrixStack) {
+	public void draw(PoseStack matrixStack) {
 		this.draw(matrixStack, x, y);
 	}
 	
-	public void draw(MatrixStack matrixStack, int x, int y) {
-		MinecraftClient minecraft = MinecraftClient.getInstance();
-		TextRenderer textRenderer = minecraft.textRenderer;
-		int width = minecraft.getWindow().getScaledWidth();
+	public void draw(PoseStack matrixStack, int x, int y) {
+		Minecraft minecraft = Minecraft.getInstance();
+		Font textRenderer = minecraft.font;
+		int width = minecraft.getWindow().getGuiScaledWidth();
 		switch (alignment) {
 			 case LEFT:
-				RenderUtil.drawStringWithShadow(matrixStack, textRenderer, text.getString(), x, y, color);
+				RenderUtil.drawString(matrixStack, textRenderer, text.getString(), x, y, color);
 			 break;
 			 case CENTER:
 				RenderUtil.drawBoundedString(matrixStack, text.getString(), x, y, 0, width - 2, color);
@@ -75,7 +74,7 @@ public abstract class InfoText {
 	}
 	
 	public InfoText setText(String text) {
-		this.text = new LiteralText(text);
+		this.text = new TextComponent(text);
 		return this;
 	}
 	

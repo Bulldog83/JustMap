@@ -4,12 +4,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
-
+import net.minecraft.util.GsonHelper;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-
-import net.minecraft.util.JsonHelper;
-
 import ru.bulldog.justmap.JustMap;
 
 public final class ConfigKeeper {
@@ -67,7 +64,7 @@ public final class ConfigKeeper {
 		for (String param : configEntries.keySet()) {
 			if (jsonObject.has(param)) {
 				Entry<?> entry = configEntries.get(param);
-				entry.fromString(JsonHelper.getString(jsonObject, param));
+				entry.fromString(GsonHelper.getAsString(jsonObject, param));
 			}
 		}
 	}

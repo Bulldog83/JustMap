@@ -1,20 +1,18 @@
 package ru.bulldog.justmap.mixins;
 
 import java.util.Optional;
-
+import net.minecraft.world.level.biome.BiomeSpecialEffects;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
-import net.minecraft.world.biome.BiomeEffects;
-
-@Mixin(BiomeEffects.class)
+@Mixin(BiomeSpecialEffects.class)
 public interface BiomeColorsAccessor {
 	@Accessor
 	int getWaterColor();
 	@Accessor
-	Optional<Integer> getFoliageColor();
+	Optional<Integer> getFoliageColorOverride();
 	@Accessor
-	Optional<Integer> getGrassColor();
+	Optional<Integer> getGrassColorOverride();
 	@Accessor
-	BiomeEffects.GrassColorModifier getGrassColorModifier();
+	BiomeSpecialEffects.GrassColorModifier getGrassColorModifier();
 }

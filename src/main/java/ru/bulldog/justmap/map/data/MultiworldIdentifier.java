@@ -1,25 +1,23 @@
 package ru.bulldog.justmap.map.data;
 
 import com.google.gson.JsonObject;
-
-import net.minecraft.util.Identifier;
-import net.minecraft.util.JsonHelper;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-
+import net.minecraft.core.BlockPos;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.GsonHelper;
+import net.minecraft.world.level.Level;
 import ru.bulldog.justmap.util.PosUtil;
 
 public class MultiworldIdentifier {
     public final BlockPos spawnPosition;
-    public final Identifier dimensionType;
+    public final ResourceLocation dimensionType;
 
-    public MultiworldIdentifier(BlockPos spawnPosition, Identifier dimensionType) {
+    public MultiworldIdentifier(BlockPos spawnPosition, ResourceLocation dimensionType) {
         this.spawnPosition = spawnPosition;
         this.dimensionType = dimensionType;
     }
 
-    public MultiworldIdentifier(BlockPos spawnPosition, World world) {
-        this(spawnPosition, world.getRegistryKey().getValue());
+    public MultiworldIdentifier(BlockPos spawnPosition, Level world) {
+        this(spawnPosition, world.dimension().location());
     }
 
     @Override
@@ -48,8 +46,8 @@ public class MultiworldIdentifier {
     }
 
     public static MultiworldIdentifier fromJson(JsonObject object) {
-        Identifier dimensionType = new Identifier(JsonHelper.getString(object, "dimension"));
-        BlockPos spawnPosition = PosUtil.fromJson(JsonHelper.getObject(object, "position"));
+        ResourceLocation dimensionType = new ResourceLocation(GsonHelper.getAsString(object, "dimension"));
+        BlockPos spawnPosition = PosUtil.fromJson(GsonHelper.getAsJsonObject(object, "position"));
         return new MultiworldIdentifier(spawnPosition, dimensionType);
     }
 }

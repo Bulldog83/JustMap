@@ -1,9 +1,8 @@
 package ru.bulldog.justmap.util.math;
 
 import java.util.Arrays;
-
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.ChunkPos;
 import ru.bulldog.justmap.map.data.RegionPos;
 
 public class Point {

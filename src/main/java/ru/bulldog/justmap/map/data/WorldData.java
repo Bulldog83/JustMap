@@ -6,24 +6,22 @@ import ru.bulldog.justmap.event.ChunkUpdateListener;
 import ru.bulldog.justmap.map.IMap;
 import ru.bulldog.justmap.util.DataUtil;
 import ru.bulldog.justmap.util.math.MathUtil;
-
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.world.World;
-import net.minecraft.world.chunk.WorldChunk;
-
 import java.util.HashMap;
 import java.util.Map;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.chunk.LevelChunk;
 
 public class WorldData {
-	private World world;
+	private Level world;
 	private final ChunkDataManager chunkManager;
 	private final Map<RegionPos, RegionData> regions;
 	private long lastPurged = 0;
 	private long purgeDelay = 1000;
 	private int purgeAmount = 500;
 	
-	public WorldData(World world) {
+	public WorldData(Level world) {
 		this.regions = new HashMap<>();
 		this.chunkManager = new ChunkDataManager(this, world);
 		this.world = world;
@@ -70,28 +68,28 @@ public class WorldData {
 		return this.chunkManager.getChunk(x, z);
 	}
 	
-	public WorldChunk getWorldChunk(BlockPos blockPos) {
+	public LevelChunk getWorldChunk(BlockPos blockPos) {
 		return this.getWorldChunk(blockPos.getX() >> 4, blockPos.getZ() >> 4);
 	}
 	
-	public WorldChunk getWorldChunk(int x, int z) {
-		WorldChunk worldChunk = this.world.getChunk(x, z);
+	public LevelChunk getWorldChunk(int x, int z) {
+		LevelChunk worldChunk = this.world.getChunk(x, z);
 		if (worldChunk.isEmpty()) {
 			worldChunk = this.callSavedChunk(worldChunk.getPos());
 		}
 		return worldChunk;
 	}
 	
-	public WorldChunk getEmptyChunk() {
+	public LevelChunk getEmptyChunk() {
 		return this.chunkManager.getEmptyChunk();
 	}
 
-	public WorldChunk callSavedChunk(ChunkPos chunkPos) {
-		World world = DataUtil.getWorld();
+	public LevelChunk callSavedChunk(ChunkPos chunkPos) {
+		Level world = DataUtil.getWorld();
 		return this.chunkManager.callSavedChunk(world, chunkPos);
 	}
 
-	public World getWorld() {
+	public Level getWorld() {
 		return this.world;
 	}
 	
@@ -105,15 +103,15 @@ public class WorldData {
 		long time = System.currentTimeMillis();
 		long interval = ClientSettings.chunkUpdateInterval;
 		ChunkData mapChunk = this.getChunk(centerPos);
-		WorldChunk worldChunk = this.world.getWorldChunk(centerPos);
+		LevelChunk worldChunk = this.world.getChunkAt(centerPos);
 		boolean chunkLoaded = !worldChunk.isEmpty() && mapChunk.isChunkLoaded();
 		if (chunkLoaded && time - mapChunk.updated > interval) {
 			ChunkUpdateListener.accept(new ChunkUpdateEvent(worldChunk, mapChunk, layer, level, 0, 0, 16, 16, update));
 		}
 		int x = centerPos.getX();
 		int z = centerPos.getZ();
-		int distance = DataUtil.getGameOptions().viewDistance - 1;
-		BlockPos.Mutable currentPos = centerPos.mutableCopy();
+		int distance = DataUtil.getGameOptions().renderDistance - 1;
+		BlockPos.MutableBlockPos currentPos = centerPos.mutable();
 		for (int step = 1; step < distance * 2; step++) {
 			boolean even = MathUtil.isEven(step);
 			for (int i = 0; i < step; i++) {
@@ -123,7 +121,7 @@ public class WorldData {
 					currentPos.setX(x += 16);
 				}
 				mapChunk = this.getChunk(currentPos);
-				worldChunk = this.world.getWorldChunk(currentPos);
+				worldChunk = this.world.getChunkAt(currentPos);
 				chunkLoaded = !worldChunk.isEmpty() && mapChunk.isChunkLoaded();
 				if (chunkLoaded && time - mapChunk.updated > interval) {
 					ChunkUpdateListener.accept(new ChunkUpdateEvent(worldChunk, mapChunk, layer, level, 0, 0, 16, 16, update));
@@ -136,7 +134,7 @@ public class WorldData {
 					currentPos.setZ(z += 16);
 				}
 				mapChunk = this.getChunk(currentPos);
-				worldChunk = this.world.getWorldChunk(currentPos);
+				worldChunk = this.world.getChunkAt(currentPos);
 				chunkLoaded = !worldChunk.isEmpty() && mapChunk.isChunkLoaded();
 				if (chunkLoaded && time - mapChunk.updated > interval) {
 					ChunkUpdateListener.accept(new ChunkUpdateEvent(worldChunk, mapChunk, layer, level, 0, 0, 16, 16, update));

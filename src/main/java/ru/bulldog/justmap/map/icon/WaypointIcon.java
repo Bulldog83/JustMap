@@ -1,9 +1,8 @@
 package ru.bulldog.justmap.map.icon;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.util.math.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.renderer.MultiBufferSource;
 import ru.bulldog.justmap.client.config.ClientSettings;
 import ru.bulldog.justmap.map.IMap;
 import ru.bulldog.justmap.map.minimap.Minimap;
@@ -20,7 +19,7 @@ public class WaypointIcon extends MapIcon<WaypointIcon> {
 	public final Waypoint waypoint;
 	private final IMap map;
 	
-	private int iconSize = 8;
+	private final int iconSize = 8;
 	private float lastRotation;
 	private float offX;
 	private float offY;
@@ -40,15 +39,15 @@ public class WaypointIcon extends MapIcon<WaypointIcon> {
 		}
 	}
 	
-	public void draw(MatrixStack matrices, VertexConsumerProvider consumerProvider, int mapX, int mapY, int mapW, int mapH, double offX, double offY, double rotation) {
+	public void draw(PoseStack matrices, MultiBufferSource consumerProvider, int mapX, int mapY, int mapW, int mapH, double offX, double offY, double rotation) {
 		rotation = MathUtil.correctAngle(rotation + 180);
-		this.updatePos(mapX, mapY, mapW, mapH, iconSize, rotation);
+		this.updatePos(mapX, mapY, mapW, mapH, rotation);
 		this.applyOffset(offX, offY, rotation);
 		this.draw(matrices, consumerProvider, mapX, mapY, mapW, mapH, (float) rotation);
 	}
 	
 	@Override
-	public void draw(MatrixStack matrices, VertexConsumerProvider consumerProvider, int mapX, int mapY, int mapW, int mapH, float rotation) {
+	public void draw(PoseStack matrices, MultiBufferSource consumerProvider, int mapX, int mapY, int mapW, int mapH, float rotation) {
 		Waypoint.Icon icon = waypoint.getIcon();
 		if (icon != null) {
 			if (ClientSettings.entityIconsShading) {
@@ -57,20 +56,20 @@ public class WaypointIcon extends MapIcon<WaypointIcon> {
 				float hmod;
 				if (hdiff < 0) {
 					hmod = MathUtil.clamp(Math.abs(hdiff) / 24F, 0.0F, 0.5F);
-					RenderUtil.texEnvMode(GLC.GL_ADD);
+					//RenderUtil.texEnvMode(GLC.GL_ADD);
 				} else {
 					hmod = MathUtil.clamp((24 - Math.abs(hdiff)) / 24F, 0.25F, 1.0F);
-					RenderUtil.texEnvMode(GLC.GL_MODULATE);
+					//RenderUtil.texEnvMode(GLC.GL_MODULATE);
 				}
-				RenderSystem.color3f(hmod, hmod, hmod);
+				RenderSystem.setShaderColor(hmod, hmod, hmod, 1.0F);
 			}
 			icon.draw(matrices, iconPos.x - offX, iconPos.y - offY, iconSize);
-			RenderUtil.texEnvMode(GLC.GL_MODULATE);
-			RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+			//RenderUtil.texEnvMode(GLC.GL_MODULATE);
+			RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 		}
 	}
 	
-	private void updatePos(int mapX, int mapY, int mapW, int mapH, int size, double rotation) {
+	private void updatePos(int mapX, int mapY, int mapW, int mapH, double rotation) {
 		if (iconPos == null || x != lastX || y != lastY || mapX != lastMapX || mapY != lastMapY || rotation != lastRotation) {
 			int centerX = mapX + mapW / 2;
 			int centerY = mapY + mapH / 2;
@@ -78,7 +77,7 @@ public class WaypointIcon extends MapIcon<WaypointIcon> {
 			if (map.isRotated()) {
 				this.correctRotation(centerX, centerY, rotation);
 			}
-			int halfSize = size / 2;
+			int halfSize = iconSize / 2;
 			this.iconPos.x -= halfSize;
 			this.iconPos.y -= halfSize;
 			if (Minimap.isRound()) {
@@ -86,7 +85,7 @@ public class WaypointIcon extends MapIcon<WaypointIcon> {
 				Line rayTL = new Line(centerX, centerY, iconPos.x, iconPos.y);
 				Line rayTR = new Line(centerX, centerY, iconPos.x + halfSize, iconPos.y);
 				Line rayBL = new Line(centerX, centerY, iconPos.x, iconPos.y + halfSize);
-				Line rayBR = new Line(centerX, centerY, iconPos.x + size, iconPos.y + halfSize);
+				Line rayBR = new Line(centerX, centerY, iconPos.x + 8, iconPos.y + halfSize);
 				double diff = MathUtil.max(rayTL.difference(radius),
 										   rayTR.difference(radius),
 										   rayBL.difference(radius),
@@ -97,8 +96,8 @@ public class WaypointIcon extends MapIcon<WaypointIcon> {
 				this.iconPos.x = rayTL.second.x;
 				this.iconPos.y = rayTL.second.y;
 			} else {
-				this.iconPos.x = MathUtil.clamp(iconPos.x, mapX, (mapX + mapW) - size);
-				this.iconPos.y = MathUtil.clamp(iconPos.y, mapY, (mapY + mapH) - size);
+				this.iconPos.x = MathUtil.clamp(iconPos.x, mapX, (mapX + mapW) - 8);
+				this.iconPos.y = MathUtil.clamp(iconPos.y, mapY, (mapY + mapH) - 8);
 			}
 			this.lastRotation = (float) rotation;
 			this.lastMapX = mapX;
@@ -121,9 +120,5 @@ public class WaypointIcon extends MapIcon<WaypointIcon> {
 		double angle = Math.toRadians(-rotation);
 		this.offX = (float) (offX * Math.cos(angle) - offY * Math.sin(angle));
 		this.offY = (float) (offY * Math.cos(angle) + offX * Math.sin(angle));
-	}
-
-	public boolean isHidden() {
-		return this.waypoint.hidden;
 	}
 }

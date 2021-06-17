@@ -6,23 +6,22 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-
-import net.minecraft.network.ClientConnection;
-import net.minecraft.network.MessageType;
-import net.minecraft.network.packet.s2c.play.GameMessageS2CPacket;
+import net.minecraft.network.Connection;
+import net.minecraft.network.chat.BaseComponent;
+import net.minecraft.network.chat.ChatType;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.protocol.game.ClientboundChatPacket;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.PlayerManager;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.BaseText;
-import net.minecraft.text.LiteralText;
-import net.minecraft.text.Text;
-import net.minecraft.world.GameRules;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.players.PlayerList;
+import net.minecraft.world.level.GameRules;
 import ru.bulldog.justmap.map.MapGameRules;
 import ru.bulldog.justmap.network.ServerNetworkHandler;
 import ru.bulldog.justmap.server.JustMapServer;
 import ru.bulldog.justmap.server.config.ServerSettings;
 
-@Mixin(PlayerManager.class)
+@Mixin(PlayerList.class)
 public abstract class PlayerManagerMixin {
 	
 	@Final
@@ -30,7 +29,7 @@ public abstract class PlayerManagerMixin {
 	private MinecraftServer server;
 	
 	@Inject(method = "onPlayerConnect", at = @At(value = "INVOKE", target = "Lnet/minecraft/network/packet/s2c/play/DifficultyS2CPacket;<init>(Lnet/minecraft/world/Difficulty;Z)V"))
-	public void onPlayerConnectPre(ClientConnection connection, ServerPlayerEntity player, CallbackInfo info) {
+	public void onPlayerConnectPre(Connection connection, ServerPlayer player, CallbackInfo info) {
 		ServerNetworkHandler networkHandler = JustMapServer.getNetworkHandler();
 		if (networkHandler != null) {
 			networkHandler.onPlayerConnect(player);
@@ -38,8 +37,8 @@ public abstract class PlayerManagerMixin {
 	}
 	
 	@Inject(method = "onPlayerConnect", at = @At("TAIL"))
-	public void onPlayerConnectPost(ClientConnection clientConnection, ServerPlayerEntity serverPlayerEntity, CallbackInfo info) {
-		BaseText command = new LiteralText("§0§0");
+	public void onPlayerConnectPost(Connection clientConnection, ServerPlayer serverPlayerEntity, CallbackInfo info) {
+		BaseComponent command = new TextComponent("§0§0");
 		if (ServerSettings.useGameRules) {
 			GameRules gameRules = server.getGameRules();
 			if (gameRules.getBoolean(MapGameRules.ALLOW_CAVES_MAP)) {
@@ -93,7 +92,7 @@ public abstract class PlayerManagerMixin {
 		}
 	}
 	
-	private void sendCommand(ServerPlayerEntity serverPlayerEntity, Text command) {
-		serverPlayerEntity.networkHandler.sendPacket(new GameMessageS2CPacket(command, MessageType.SYSTEM, serverPlayerEntity.getUuid()));
+	private void sendCommand(ServerPlayer serverPlayerEntity, Component command) {
+		serverPlayerEntity.connection.send(new ClientboundChatPacket(command, ChatType.SYSTEM, serverPlayerEntity.getUUID()));
 	}
 }

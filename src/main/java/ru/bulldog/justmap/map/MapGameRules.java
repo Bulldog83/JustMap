@@ -10,21 +10,20 @@ import ru.bulldog.justmap.server.JustMapServer;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.world.GameRules;
-import net.minecraft.world.GameRules.Key;
+import net.minecraft.client.Minecraft;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.world.level.GameRules;
+import net.minecraft.world.level.GameRules.Key;
 
 public class MapGameRules {
 
-	public final static GameRules.Key<GameRules.BooleanRule> ALLOW_CAVES_MAP = register("allowCavesMap", false);
-	public final static GameRules.Key<GameRules.BooleanRule> ALLOW_ENTITY_RADAR = register("allowEntityRadar", false);
-	public final static GameRules.Key<GameRules.BooleanRule> ALLOW_PLAYER_RADAR = register("allowPlayerRadar", false);
-	public final static GameRules.Key<GameRules.BooleanRule> ALLOW_CREATURE_RADAR = register("allowCreatureRadar", false);
-	public final static GameRules.Key<GameRules.BooleanRule> ALLOW_HOSTILE_RADAR = register("allowHostileRadar", false);
-	public final static GameRules.Key<GameRules.BooleanRule> ALLOW_SLIME_CHUNKS = register("allowSlimeChunks", false);
-	public final static GameRules.Key<GameRules.BooleanRule> ALLOW_TELEPORTATION = register("allowWaypointsJump", false);
+	public final static GameRules.Key<GameRules.BooleanValue> ALLOW_CAVES_MAP = register("allowCavesMap", false);
+	public final static GameRules.Key<GameRules.BooleanValue> ALLOW_ENTITY_RADAR = register("allowEntityRadar", false);
+	public final static GameRules.Key<GameRules.BooleanValue> ALLOW_PLAYER_RADAR = register("allowPlayerRadar", false);
+	public final static GameRules.Key<GameRules.BooleanValue> ALLOW_CREATURE_RADAR = register("allowCreatureRadar", false);
+	public final static GameRules.Key<GameRules.BooleanValue> ALLOW_HOSTILE_RADAR = register("allowHostileRadar", false);
+	public final static GameRules.Key<GameRules.BooleanValue> ALLOW_SLIME_CHUNKS = register("allowSlimeChunks", false);
+	public final static GameRules.Key<GameRules.BooleanValue> ALLOW_TELEPORTATION = register("allowWaypointsJump", false);
 	
 	private MapGameRules() {}
 	
@@ -32,11 +31,11 @@ public class MapGameRules {
 		JustMap.LOGGER.info("Map gamerules loaded.");
 	}
 
-	private static GameRules.Key<GameRules.BooleanRule> register(String name, boolean defaultValue) {
+	private static GameRules.Key<GameRules.BooleanValue> register(String name, boolean defaultValue) {
 		return GameRulesAccessor.callRegister(name, GameRules.Category.MISC, BooleanRuleAccessor.callCreate(defaultValue));
 	}
 	
-	private static Map<String, Key<GameRules.BooleanRule>> codes;
+	private static Map<String, Key<GameRules.BooleanValue>> codes;
 	
 	static {
 		codes = new HashMap<>();
@@ -50,17 +49,17 @@ public class MapGameRules {
 		codes.put("§t", ALLOW_TELEPORTATION);
 	}
 	
-	public static boolean isAllowed(GameRules.Key<GameRules.BooleanRule> rule) {
+	public static boolean isAllowed(GameRules.Key<GameRules.BooleanValue> rule) {
 		boolean allow = true;
 		if (JustMap.getSide() == EnvType.SERVER) {
 			allow = JustMapServer.getServer().getGameRules().getBoolean(rule);
 		} else {
-			MinecraftClient minecraft = MinecraftClient.getInstance();
-			if (minecraft.isIntegratedServerRunning()) {
-				allow = minecraft.getServer().getGameRules().getBoolean(rule);
-			} else if (!minecraft.isInSingleplayer()) {
-				if (minecraft.world == null) return false;
-				allow = minecraft.world.getGameRules().getBoolean(rule);
+			Minecraft minecraft = Minecraft.getInstance();
+			if (minecraft.hasSingleplayerServer()) {
+				allow = minecraft.getSingleplayerServer().getGameRules().getBoolean(rule);
+			} else if (!minecraft.isLocalServer()) {
+				if (minecraft.level == null) return false;
+				allow = minecraft.level.getGameRules().getBoolean(rule);
 			}
 		}
 		return allow;
@@ -83,14 +82,14 @@ public class MapGameRules {
 	 */	
 	@Environment(EnvType.CLIENT)
 	public static void parseCommand(String command) {
-		MinecraftClient minecraft = MinecraftClient.getInstance();
-		MinecraftServer server = minecraft.getServer();
-		GameRules gameRules = minecraft.world.getGameRules();
+		Minecraft minecraft = Minecraft.getInstance();
+		MinecraftServer server = minecraft.getSingleplayerServer();
+		GameRules gameRules = minecraft.level.getGameRules();
 		codes.forEach((key, rule) -> {
 			if (command.contains(key)) {
 				int valPos = command.indexOf(key) + 2;
 				boolean value = command.substring(valPos, valPos + 2).equals("§1");
-				gameRules.get(rule).set(value, server);
+				gameRules.getRule(rule).set(value, server);
 				JustMap.LOGGER.info("Map rule {} switched to: {}", rule, value);
 			}
 		});

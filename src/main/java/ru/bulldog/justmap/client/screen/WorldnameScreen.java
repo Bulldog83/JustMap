@@ -3,17 +3,15 @@ package ru.bulldog.justmap.client.screen;
 import org.lwjgl.glfw.GLFW;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-
-import net.minecraft.client.gui.Drawable;
-import net.minecraft.client.gui.Element;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.LiteralText;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
-
+import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.gui.components.Widget;
+import net.minecraft.client.gui.components.events.GuiEventListener;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.resources.ResourceLocation;
 import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.map.data.WorldManager;
 import ru.bulldog.justmap.util.LangUtil;
@@ -22,11 +20,11 @@ import ru.bulldog.justmap.util.render.RenderUtil;
 
 public class WorldnameScreen extends Screen {
 
-	private final static Text TITLE = LangUtil.getText("gui", "screen.worldname");
-	private final static Identifier FRAME_TEXTURE = new Identifier(JustMap.MODID, "textures/screen_background.png");
+	private final static Component TITLE = LangUtil.getText("gui", "screen.worldname");
+	private final static ResourceLocation FRAME_TEXTURE = new ResourceLocation(JustMap.MODID, "textures/screen_background.png");
 	
 	private final Screen parent;
-	private TextFieldWidget nameField;
+	private EditBox nameField;
 	private boolean success = false;
 	private int center;
 	private int frameWidth;
@@ -42,8 +40,8 @@ public class WorldnameScreen extends Screen {
 	public void init() {
 		this.center = width / 2;
 		this.frameWidth = width / 3;
-		this.frameWidth = frameWidth > 320 ? frameWidth : width > 320 ? 320 : width;
-		int btnY = 0;
+		this.frameWidth = frameWidth > 320 ? frameWidth : Math.min(width, 320);
+		int btnY;
 		if (frameWidth == width) {
 			this.frameHeight = height;
 			btnY = height - 40;
@@ -55,39 +53,39 @@ public class WorldnameScreen extends Screen {
 			this.y = height / 2 - frameHeight / 2;
 			btnY = (y + frameHeight) - 40;
 		}
-		Text defaultText = new LiteralText("Default");
-		this.nameField = new TextFieldWidget(textRenderer, x + 20, y + 50, frameWidth - 40, 20, defaultText);
+		Component defaultText = new TextComponent("Default");
+		this.nameField = new EditBox(font, x + 20, y + 50, frameWidth - 40, 20, defaultText);
 		this.setFocused(this.nameField);
-		this.nameField.setSelected(true);
-		this.addButton(new ButtonWidget(center - 30, btnY, 80, 20, LangUtil.getText("gui", "save"), this::onPressSave));
-		this.addChild(nameField);
+		this.nameField.setFocus(true);
+		this.addWidget(new Button(center - 30, btnY, 80, 20, LangUtil.getText("gui", "save"), this::onPressSave));
+		this.addWidget(nameField);
 	}
 	
-	private void onPressSave(ButtonWidget button) {
-		String worldName = nameField.getText();
+	private void onPressSave(Button button) {
+		String worldName = nameField.getValue();
 		worldName = worldName.trim().replaceAll(" +", " ");
-		if (worldName == "") {
+		if (worldName.equals("")) {
 			worldName = "Default";
 		}
 		WorldManager.setCurrentWorldName(worldName);
 		this.success = true;
-		this.onClose();
+		onClose();
 	}
 	
 	@Override
-	public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
-		this.renderBackground(matrices);
-		drawCenteredString(matrices, textRenderer, LangUtil.getString("gui", "worldname_title"), center, y + 25, Colors.WHITE);
-		for (Element child : children) {
-			if (child instanceof Drawable) {
-				((Drawable) child).render(matrices, mouseX, mouseY, delta);
+	public void render(PoseStack matrices, int mouseX, int mouseY, float delta) {
+		renderBackground(matrices);
+		drawCenteredString(matrices, font, LangUtil.getString("gui", "worldname_title"), center, y + 25, Colors.WHITE);
+		for (GuiEventListener child : children()) {
+			if (child instanceof Widget) {
+				((Widget) child).render(matrices, mouseX, mouseY, delta);
 			}
 		}
 		super.render(matrices, mouseX, mouseY, delta);
 	}
 	
 	@Override
-	public void renderBackground(MatrixStack matrices) {
+	public void renderBackground(PoseStack matrices) {
 		super.renderBackground(matrices);
 		RenderSystem.enableBlend();
 		RenderSystem.defaultBlendFunc();
@@ -100,13 +98,11 @@ public class WorldnameScreen extends Screen {
 	
 	@Override
 	public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-		switch (keyCode) {
-			case GLFW.GLFW_KEY_ENTER:
-				this.onPressSave(null);
-				return true;
-		  	default:
-		  		return super.keyPressed(keyCode, scanCode, modifiers);
+		if (keyCode == GLFW.GLFW_KEY_ENTER) {
+			this.onPressSave(null);
+			return true;
 		}
+		return super.keyPressed(keyCode, scanCode, modifiers);
 	}
 
 	@Override
@@ -114,6 +110,6 @@ public class WorldnameScreen extends Screen {
 		if (!success) {
 			WorldManager.setCurrentWorldName("Default");
 		}
-		this.client.openScreen(parent);
+		minecraft.setScreen(parent);
 	}
 }

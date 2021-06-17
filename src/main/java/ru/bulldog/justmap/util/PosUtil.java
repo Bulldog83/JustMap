@@ -2,9 +2,8 @@ package ru.bulldog.justmap.util;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-
-import net.minecraft.util.JsonHelper;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
+import net.minecraft.util.GsonHelper;
 
 public class PosUtil {
 	public static String shortPosString(BlockPos pos) {
@@ -29,9 +28,9 @@ public class PosUtil {
 	}
 
 	public static BlockPos fromJson(JsonObject element) {
-		int x = JsonHelper.getInt(element, "x", 0);
-		int y = JsonHelper.getInt(element, "y", 0);
-		int z = JsonHelper.getInt(element, "z", 0);
+		int x = GsonHelper.getAsInt(element, "x", 0);
+		int y = GsonHelper.getAsInt(element, "y", 0);
+		int z = GsonHelper.getAsInt(element, "z", 0);
 		
 		return new BlockPos(x, y, z);
 	}

@@ -1,11 +1,9 @@
 package ru.bulldog.justmap.advancedinfo;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import java.util.ArrayList;
 import java.util.List;
-
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.util.math.MatrixStack;
-
+import net.minecraft.client.Minecraft;
 import ru.bulldog.justmap.client.config.ClientSettings;
 import ru.bulldog.justmap.enums.ScreenPosition;
 import ru.bulldog.justmap.enums.TextAlignment;
@@ -22,7 +20,7 @@ public class TextManager {
 		this.elements = new ArrayList<>();
 	}
   
-	public void draw(MatrixStack matrixStack) {
+	public void draw(PoseStack matrixStack) {
 		int yp = this.y;
 		for (InfoText line : elements) {
 			if (!line.visible) continue;
@@ -43,9 +41,9 @@ public class TextManager {
 	
 	public TextManager updatePosition(ScreenPosition position) {
 		int offset = ClientSettings.positionOffset;
-		MinecraftClient minecraft = MinecraftClient.getInstance();
-		int screenW = minecraft.getWindow().getScaledWidth();
-		int screenH = minecraft.getWindow().getScaledHeight();
+		Minecraft minecraft = Minecraft.getInstance();
+		int screenW = minecraft.getWindow().getGuiScaledWidth();
+		int screenH = minecraft.getWindow().getGuiScaledHeight();
 		switch(position) {
 			case USER_DEFINED:
 			case TOP_LEFT:

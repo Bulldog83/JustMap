@@ -4,14 +4,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 import java.util.function.Consumer;
-
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.protocol.game.ServerboundCustomPayloadPacket;
+import net.minecraft.world.level.ChunkPos;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-
-import net.minecraft.network.PacketByteBuf;
-import net.minecraft.network.packet.c2s.play.CustomPayloadC2SPacket;
-import net.minecraft.util.math.ChunkPos;
-
 import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.map.data.RegionPos;
 
@@ -50,12 +47,12 @@ public class ClientNetworkHandler extends NetworkHandler {
 	public void requestChunkHasSlime(ChunkPos chunkPos, Consumer<Boolean> responseConsumer) {
 		if (!canServerReceive()) return;
 		int packet_id = this.registerResponseConsumer(responseConsumer);
-		PacketByteBuf data = new PacketByteBuf(Unpooled.buffer());
+		FriendlyByteBuf data = new FriendlyByteBuf(Unpooled.buffer());
 		data.writeByte(PacketType.SLIME_CHUNK_PACKET.ordinal());
 		data.writeInt(packet_id);
 		data.writeInt(chunkPos.x);
 		data.writeInt(chunkPos.z);
-		CustomPayloadC2SPacket packet = new CustomPayloadC2SPacket(CHANNEL_ID, data);
+		ServerboundCustomPayloadPacket packet = new ServerboundCustomPayloadPacket(CHANNEL_ID, data);
 		this.sendToServer(packet, result -> {
 			if (!result.isSuccess()) {
 				this.responseListeners.remove(packet_id);

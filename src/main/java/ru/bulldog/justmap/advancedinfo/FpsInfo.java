@@ -1,7 +1,6 @@
 package ru.bulldog.justmap.advancedinfo;
 
-import net.minecraft.client.MinecraftClient;
-
+import net.minecraft.client.Minecraft;
 import ru.bulldog.justmap.client.config.ClientSettings;
 
 public class FpsInfo extends InfoText {
@@ -13,9 +12,9 @@ public class FpsInfo extends InfoText {
 	@Override
 	public void update() {
 		this.setVisible(ClientSettings.showFPS);
-		MinecraftClient minecraft = MinecraftClient.getInstance();
-		if (visible && minecraft.fpsDebugString.indexOf("fps") > 0) {
-			this.setText("FPS: " + minecraft.fpsDebugString.substring(0, minecraft.fpsDebugString.indexOf("fps") + 3));
+		Minecraft minecraft = Minecraft.getInstance();
+		if (visible && minecraft.fpsString.indexOf("fps") > 0) {
+			this.setText("FPS: " + minecraft.fpsString.substring(0, minecraft.fpsString.indexOf("fps") + 3));
 		}
 	}
 }

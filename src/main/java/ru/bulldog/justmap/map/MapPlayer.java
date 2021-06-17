@@ -1,24 +1,23 @@
 package ru.bulldog.justmap.map;
 
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.AbstractClientPlayerEntity;
-import net.minecraft.client.texture.AbstractTexture;
-import net.minecraft.client.texture.PlayerSkinTexture;
-import net.minecraft.client.texture.ResourceTexture;
-import net.minecraft.client.texture.TextureManager;
-import net.minecraft.client.util.DefaultSkinHelper;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.ChatUtil;
-import net.minecraft.util.Identifier;
-
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.player.AbstractClientPlayer;
+import net.minecraft.client.renderer.texture.AbstractTexture;
+import net.minecraft.client.renderer.texture.HttpTexture;
+import net.minecraft.client.renderer.texture.SimpleTexture;
+import net.minecraft.client.renderer.texture.TextureManager;
+import net.minecraft.client.resources.DefaultPlayerSkin;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.StringUtil;
+import net.minecraft.world.entity.player.Player;
 import ru.bulldog.justmap.map.icon.PlayerHeadIcon;
 
-public class MapPlayer extends AbstractClientPlayerEntity {
+public class MapPlayer extends AbstractClientPlayer {
 
 	private final PlayerHeadIcon icon;
 	
-	public MapPlayer(ClientWorld world, PlayerEntity player) {
+	public MapPlayer(ClientLevel world, Player player) {
 		super(world, player.getGameProfile());
 		
 		this.icon = new PlayerHeadIcon();
@@ -38,13 +37,13 @@ public class MapPlayer extends AbstractClientPlayerEntity {
 		return this.icon;
 	}
 	
-	public static ResourceTexture loadSkinTexture(Identifier id, String playerName) {
-		TextureManager textureManager = MinecraftClient.getInstance().getTextureManager();
+	public static SimpleTexture loadSkinTexture(ResourceLocation id, String playerName) {
+		TextureManager textureManager = Minecraft.getInstance().getTextureManager();
 		AbstractTexture abstractTexture = textureManager.getTexture(id);
 		if (abstractTexture == null) {
-			abstractTexture = new PlayerSkinTexture(null, String.format("http://skins.minecraft.net/MinecraftSkins/%s.png", ChatUtil.stripTextFormat(playerName)), DefaultSkinHelper.getTexture(getOfflinePlayerUuid(playerName)), true, null);
-			textureManager.registerTexture(id, (AbstractTexture) abstractTexture);
+			abstractTexture = new HttpTexture(null, String.format("http://skins.minecraft.net/MinecraftSkins/%s.png", StringUtil.stripColor(playerName)), DefaultPlayerSkin.getDefaultSkin(createPlayerUUID(playerName)), true, null);
+			textureManager.register(id, (AbstractTexture) abstractTexture);
 		}
-		return (ResourceTexture) abstractTexture;
+		return (SimpleTexture) abstractTexture;
 	}
 }

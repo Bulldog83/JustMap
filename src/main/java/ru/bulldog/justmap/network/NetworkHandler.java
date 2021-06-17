@@ -5,16 +5,14 @@ import io.netty.util.concurrent.GenericFutureListener;
 
 import net.fabricmc.fabric.api.network.ClientSidePacketRegistry;
 import net.fabricmc.fabric.api.network.ServerSidePacketRegistry;
-
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.network.Packet;
-import net.minecraft.util.Identifier;
-
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.player.Player;
 import ru.bulldog.justmap.JustMap;
 
 public class NetworkHandler {
-	public final static Identifier CHANNEL_ID = new Identifier(JustMap.MODID, "networking");
-	public final static Identifier INIT_PACKET_ID = new Identifier(JustMap.MODID, "networking_init");
+	public final static ResourceLocation CHANNEL_ID = new ResourceLocation(JustMap.MODID, "networking");
+	public final static ResourceLocation INIT_PACKET_ID = new ResourceLocation(JustMap.MODID, "networking_init");
 
 	protected final static ClientSidePacketRegistry clientPacketRegistry = ClientSidePacketRegistry.INSTANCE;
 	protected final static ServerSidePacketRegistry serverPacketRegistry = ServerSidePacketRegistry.INSTANCE;
@@ -23,15 +21,15 @@ public class NetworkHandler {
 		return clientPacketRegistry.canServerReceive(CHANNEL_ID);
 	}
 
-	public boolean canPlayerReceive(PlayerEntity player) {
+	public boolean canPlayerReceive(Player player) {
 		return serverPacketRegistry.canPlayerReceive(player, CHANNEL_ID);
 	}
 	
-	public void sendToPlayer(PlayerEntity player, Packet<?> packet, GenericFutureListener<? extends Future<? super Void>> completionListener) {
+	public void sendToPlayer(Player player, Packet<?> packet, GenericFutureListener<? extends Future<? super Void>> completionListener) {
 		serverPacketRegistry.sendToPlayer(player, packet, completionListener);
 	}
 	
-	public void sendToPlayer(PlayerEntity player, Packet<?> packet) {
+	public void sendToPlayer(Player player, Packet<?> packet) {
 		sendToPlayer(player, packet, null);
 	}
 	

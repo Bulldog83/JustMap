@@ -4,26 +4,24 @@ import java.util.function.Supplier;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.ClientPlayNetworkHandler;
-import net.minecraft.client.options.GameOptions;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.entity.Entity;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.Options;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.multiplayer.ClientPacketListener;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Registry;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.WritableRegistry;
+import net.minecraft.data.BuiltinRegistries;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.registry.BuiltinRegistries;
-import net.minecraft.util.registry.DynamicRegistryManager;
-import net.minecraft.util.registry.MutableRegistry;
-import net.minecraft.util.registry.Registry;
-import net.minecraft.util.registry.RegistryKey;
-import net.minecraft.world.LightType;
-import net.minecraft.world.PersistentStateManager;
-import net.minecraft.world.World;
-import net.minecraft.world.biome.Biome;
-
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LightLayer;
+import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.storage.DimensionDataStorage;
 import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.client.screen.Worldmap;
@@ -32,12 +30,13 @@ import ru.bulldog.justmap.map.data.Layer;
 import ru.bulldog.justmap.server.JustMapServer;
 import ru.bulldog.justmap.util.math.MathUtil;
 
+@SuppressWarnings("ConstantConditions")
 public class DataUtil {
-	private static BlockPos.Mutable currentPos = new BlockPos.Mutable();
-	private static DynamicRegistryManager registryManager = DynamicRegistryManager.create();
-	private static ClientWorld clientWorld = null;
-	private static ServerWorld serverWorld = null;
-	private static Supplier<PersistentStateManager> persistentSupplier = null;
+	private static final BlockPos.MutableBlockPos currentPos = new BlockPos.MutableBlockPos();
+	private static final RegistryAccess registryManager = RegistryAccess.builtin();
+	private static ClientLevel clientWorld = null;
+	private static ServerLevel serverWorld = null;
+	private static Supplier<DimensionDataStorage> persistentSupplier = null;
 	private static Layer currentLayer = Layer.SURFACE;
 	private static int currentLevel = 0;
 	private static int coordX = 0;
@@ -45,15 +44,13 @@ public class DataUtil {
 	private static int coordZ = 0;
 	
 	@Environment(EnvType.CLIENT)
-	public static void updateWorld(ClientWorld world) {
+	public static void updateWorld(ClientLevel world) {
 		clientWorld = world;
-		MinecraftClient minecraft = MinecraftClient.getInstance();
-		if (minecraft.isIntegratedServerRunning()) {
-			MinecraftServer server = minecraft.getServer();
-			serverWorld = minecraft.getServer().getWorld(world.getRegistryKey());
-			persistentSupplier = () -> {
-				return server.getOverworld().getPersistentStateManager();
-			};
+		Minecraft minecraft = Minecraft.getInstance();
+		if (minecraft.hasSingleplayerServer()) {
+			MinecraftServer server = minecraft.getSingleplayerServer();
+			serverWorld = minecraft.getSingleplayerServer().getLevel(world.dimension());
+			persistentSupplier = () -> server.overworld().getDataStorage();
 		} else {
 			serverWorld = null;
 			persistentSupplier = null;
@@ -80,62 +77,62 @@ public class DataUtil {
 	}
 	
 	public static boolean isOnline() {
-		return !MinecraftClient.getInstance().isIntegratedServerRunning();
+		return !Minecraft.getInstance().hasSingleplayerServer();
 	}
 	
 	public static IMap getMap() {
-		MinecraftClient minecraft = MinecraftClient.getInstance();
-		return minecraft.currentScreen instanceof Worldmap ? (Worldmap) minecraft.currentScreen : JustMapClient.getMap();
+		Minecraft minecraft = Minecraft.getInstance();
+		return minecraft.screen instanceof Worldmap ? (Worldmap) minecraft.screen : JustMapClient.getMap();
 	}
 	
 	@Environment(EnvType.SERVER)
-	public static World getServerWorld(RegistryKey<World> worldKey) {
-		return JustMapServer.getServer().getWorld(worldKey);
+	public static Level getServerWorld(ResourceKey<Level> worldKey) {
+		return JustMapServer.getServer().getLevel(worldKey);
 	}
 	
-	public static World getWorld() {
+	public static Level getWorld() {
 		return serverWorld != null ? serverWorld : clientWorld;
 	}
 	
-	public static MutableRegistry<Biome> getBiomeRegistry(World world) {
-		return world.getRegistryManager().get(Registry.BIOME_KEY);
+	public static WritableRegistry<Biome> getBiomeRegistry(Level world) {
+		return (WritableRegistry<Biome>) world.registryAccess().registryOrThrow(Registry.BIOME_REGISTRY);
 	}
 	
-	public static Identifier getBiomeId(World world, Biome biome) {
-		Identifier biomeId = getBiomeRegistry(world).getId(biome);
-		return biomeId != null ? biomeId : BuiltinRegistries.BIOME.getId(biome);
+	public static ResourceLocation getBiomeId(Level world, Biome biome) {
+		ResourceLocation biomeId = getBiomeRegistry(world).getKey(biome);
+		return biomeId != null ? biomeId : BuiltinRegistries.BIOME.getKey(biome);
 	}
 	
-	public static MutableRegistry<Biome> getBiomeRegistry() {
+	public static WritableRegistry<Biome> getBiomeRegistry() {
 		if (JustMap.getSide() == EnvType.CLIENT) {
-			MinecraftClient minecraft = MinecraftClient.getInstance();
-			ClientPlayNetworkHandler networkHandler = minecraft.getNetworkHandler();
+			Minecraft minecraft = Minecraft.getInstance();
+			ClientPacketListener networkHandler = minecraft.getConnection();
 			if (networkHandler != null) {
-				return minecraft.getNetworkHandler().getRegistryManager().get(Registry.BIOME_KEY);
+				return (WritableRegistry<Biome>) minecraft.getConnection().registryAccess().registryOrThrow(Registry.BIOME_REGISTRY);
 			}
-			return registryManager.get(Registry.BIOME_KEY);
+			return (WritableRegistry<Biome>) registryManager.registryOrThrow(Registry.BIOME_REGISTRY);
 		}
 		MinecraftServer server = JustMapServer.getServer();
 		if (server != null) {
-			return server.getRegistryManager().get(Registry.BIOME_KEY);
+			return (WritableRegistry<Biome>) server.registryAccess().registryOrThrow(Registry.BIOME_REGISTRY);
 		}
-		return registryManager.get(Registry.BIOME_KEY);
+		return (WritableRegistry<Biome>) registryManager.registryOrThrow(Registry.BIOME_REGISTRY);
 	}
 	
-	public static ClientWorld getClientWorld() {
+	public static ClientLevel getClientWorld() {
 		return clientWorld;
 	}
 	
-	public static ServerWorld getServerWorld() {
+	public static ServerLevel getServerWorld() {
 		return serverWorld;
 	}
 	
-	public static Supplier<PersistentStateManager> getPersistentSupplier() {
+	public static Supplier<DimensionDataStorage> getPersistentSupplier() {
 		return persistentSupplier;
 	}
 	
-	public static GameOptions getGameOptions() {
-		MinecraftClient minecraft = MinecraftClient.getInstance();
+	public static Options getGameOptions() {
+		Minecraft minecraft = Minecraft.getInstance();
 		return minecraft.options;
 	}
 	
@@ -157,12 +154,12 @@ public class DataUtil {
 	
 	public static double doubleX(Entity entity, float delta) {
 		if (entity == null) return 0.0;
-		return MathUtil.lerp(delta, entity.prevX, entity.getX());
+		return MathUtil.lerp(delta, entity.xo, entity.getX());
 	}
 
 	public static double doubleZ(Entity entity, float delta) {
 		if (entity == null) return 0.0;
-		return MathUtil.lerp(delta, entity.prevZ, entity.getZ());
+		return MathUtil.lerp(delta, entity.zo, entity.getZ());
 	}
 	
 	public static double doubleX(float delta) {
@@ -173,13 +170,13 @@ public class DataUtil {
 		return doubleZ(getPosEntity(), delta);
 	}
 
-	static boolean hasSkyLight(World world, BlockPos pos) {
-		if (world.getLightLevel(LightType.SKY, pos) > 0) return true;
-		if (world.getLightLevel(LightType.SKY, pos.up()) > 0) return true;
-		if (world.getLightLevel(LightType.SKY, pos.north()) > 0) return true;
-		if (world.getLightLevel(LightType.SKY, pos.east()) > 0) return true;
-		if (world.getLightLevel(LightType.SKY, pos.south()) > 0) return true;
-		if (world.getLightLevel(LightType.SKY, pos.west()) > 0) return true;
+	static boolean hasSkyLight(Level world, BlockPos pos) {
+		if (world.getBrightness(LightLayer.SKY, pos) > 0) return true;
+		if (world.getBrightness(LightLayer.SKY, pos.above()) > 0) return true;
+		if (world.getBrightness(LightLayer.SKY, pos.north()) > 0) return true;
+		if (world.getBrightness(LightLayer.SKY, pos.east()) > 0) return true;
+		if (world.getBrightness(LightLayer.SKY, pos.south()) > 0) return true;
+		if (world.getBrightness(LightLayer.SKY, pos.west()) > 0) return true;
 		
 		return false;
 	}
@@ -192,7 +189,7 @@ public class DataUtil {
 		return currentLevel;
 	}
 	
-	public static Layer getLayer(World world, BlockPos pos) {
+	public static Layer getLayer(Level world, BlockPos pos) {
 		if (Dimension.isNether(world)) {
 			return Layer.NETHER;
 		} else if (RuleUtil.needRenderCaves(world, pos)) {
@@ -207,7 +204,7 @@ public class DataUtil {
 	}
 
 	private static Entity getPosEntity() {
-		MinecraftClient minecraft = MinecraftClient.getInstance();
+		Minecraft minecraft = Minecraft.getInstance();
 		return minecraft.getCameraEntity() != null ? minecraft.getCameraEntity() : minecraft.player;
 	}
 }

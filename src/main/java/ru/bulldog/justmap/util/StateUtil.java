@@ -1,15 +1,15 @@
 package ru.bulldog.justmap.util;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.Material;
-import net.minecraft.state.property.Properties;
-import net.minecraft.tag.FluidTags;
+import net.minecraft.tags.FluidTags;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.material.Material;
 
 public class StateUtil {
-	public static final BlockState AIR = Blocks.AIR.getDefaultState();
-	public static final BlockState CAVE_AIR = Blocks.CAVE_AIR.getDefaultState();
-	public static final BlockState VOID_AIR = Blocks.VOID_AIR.getDefaultState();
+	public static final BlockState AIR = Blocks.AIR.defaultBlockState();
+	public static final BlockState CAVE_AIR = Blocks.CAVE_AIR.defaultBlockState();
+	public static final BlockState VOID_AIR = Blocks.VOID_AIR.defaultBlockState();
 	
 	public static boolean checkState(BlockState state, boolean liquids, boolean plants) {
 		return StateUtil.isAir(state) || (!liquids && isLiquid(state, false)) || (!plants && isPlant(state));
@@ -25,23 +25,23 @@ public class StateUtil {
 	}
 	
 	public static boolean isWater(BlockState state) {
-		return !isSeaweed(state) && state.getFluidState().isIn(FluidTags.WATER);
+		return !isSeaweed(state) && state.getFluidState().is(FluidTags.WATER);
 	}
 	
 	public static boolean isPlant(BlockState state) {
 		Material material = state.getMaterial();
 		return material == Material.PLANT || material == Material.REPLACEABLE_PLANT ||
-			   material == Material.UNUSED_PLANT || isSeaweed(state);
+			   material == Material.WATER_PLANT || isSeaweed(state);
 	}
 	
 	public static boolean isSeaweed(BlockState state) {
 		Material material = state.getMaterial();
-		return material == Material.UNDERWATER_PLANT || material == Material.REPLACEABLE_UNDERWATER_PLANT;
+		return material == Material.WATER_PLANT || material == Material.REPLACEABLE_WATER_PLANT;
 	}
 	
 	public static boolean isWaterlogged(BlockState state) {
-		if (state.contains(Properties.WATERLOGGED))
-			return state.get(Properties.WATERLOGGED);
+		if (state.hasProperty(BlockStateProperties.WATERLOGGED))
+			return state.getValue(BlockStateProperties.WATERLOGGED);
 		
 		return isSeaweed(state);
 	}

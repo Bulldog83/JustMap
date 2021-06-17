@@ -1,13 +1,12 @@
 package ru.bulldog.justmap.map.icon;
 
+import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.MultiBufferSource;
 import ru.bulldog.justmap.map.minimap.Minimap;
 import ru.bulldog.justmap.util.math.Line;
 import ru.bulldog.justmap.util.math.MathUtil;
 import ru.bulldog.justmap.util.math.Point;
-
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.util.math.MatrixStack;
 
 public abstract class MapIcon<T extends MapIcon<T>> {
 	
@@ -18,7 +17,7 @@ public abstract class MapIcon<T extends MapIcon<T>> {
 	protected double x, y;
 	protected int height;
 	
-	protected static final MinecraftClient minecraft = MinecraftClient.getInstance();
+	protected static final Minecraft minecraft = Minecraft.getInstance();
 	
 	public MapIcon() {}
 	
@@ -66,5 +65,5 @@ public abstract class MapIcon<T extends MapIcon<T>> {
 		}
 	}
 	
-	public abstract void draw(MatrixStack matrixStack, VertexConsumerProvider consumerProvider, int mapX, int mapY, int mapW, int mapH, float rotation);
+	public abstract void draw(PoseStack matrixStack, MultiBufferSource consumerProvider, int mapX, int mapY, int mapW, int mapH, float rotation);
 }

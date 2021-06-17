@@ -6,25 +6,25 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 import me.shedaniel.clothconfig2.impl.builders.FieldBuilder;
-import net.minecraft.text.Text;
+import net.minecraft.network.chat.Component;
 
 public class FloatSliderBuilder extends FieldBuilder<Float, FloatSliderEntry> {
 
 	private Consumer<Float> saveConsumer = null;
-	private Function<Float, Optional<Text[]>> tooltipSupplier = i -> Optional.empty();
+	private Function<Float, Optional<Component[]>> tooltipSupplier = i -> Optional.empty();
 	private final float value;
 	private float max;
 	private float min;
-	private Function<Float, Text> textGetter = null;
+	private Function<Float, Component> textGetter = null;
 	
-	public FloatSliderBuilder(Text resetButtonKey, Text fieldNameKey, float value, float min, float max) {
+	public FloatSliderBuilder(Component resetButtonKey, Component fieldNameKey, float value, float min, float max) {
 		super(resetButtonKey, fieldNameKey);
 		this.value = value;
 		this.max = max;
 		this.min = min;
 	}
 
-	public FloatSliderBuilder setErrorSupplier(Function<Float, Optional<Text>> errorSupplier) {
+	public FloatSliderBuilder setErrorSupplier(Function<Float, Optional<Component>> errorSupplier) {
 		this.errorSupplier = errorSupplier;
 		return this;
 	}
@@ -34,7 +34,7 @@ public class FloatSliderBuilder extends FieldBuilder<Float, FloatSliderEntry> {
 		return this;
 	}
 	
-	public FloatSliderBuilder setTextGetter(Function<Float, Text> textGetter) {
+	public FloatSliderBuilder setTextGetter(Function<Float, Component> textGetter) {
 		this.textGetter = textGetter;
 		return this;
 	}
@@ -54,22 +54,22 @@ public class FloatSliderBuilder extends FieldBuilder<Float, FloatSliderEntry> {
 		return this;
 	}
 	
-	public FloatSliderBuilder setTooltipSupplier(Function<Float, Optional<Text[]>> tooltipSupplier) {
+	public FloatSliderBuilder setTooltipSupplier(Function<Float, Optional<Component[]>> tooltipSupplier) {
 		this.tooltipSupplier = tooltipSupplier;
 		return this;
 	}
 	
-	public FloatSliderBuilder setTooltipSupplier(Supplier<Optional<Text[]>> tooltipSupplier) {
+	public FloatSliderBuilder setTooltipSupplier(Supplier<Optional<Component[]>> tooltipSupplier) {
 		this.tooltipSupplier = i -> tooltipSupplier.get();
 		return this;
 	}
 	
-	public FloatSliderBuilder setTooltip(Optional<Text[]> tooltip) {
+	public FloatSliderBuilder setTooltip(Optional<Component[]> tooltip) {
 		this.tooltipSupplier = i -> tooltip;
 		return this;
 	}
 	
-	public FloatSliderBuilder setTooltip(Text... tooltip) {
+	public FloatSliderBuilder setTooltip(Component... tooltip) {
 		this.tooltipSupplier = i -> Optional.ofNullable(tooltip);
 		return this;
 	}

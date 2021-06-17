@@ -2,7 +2,14 @@ package ru.bulldog.justmap.mixins.server;
 
 import java.util.Objects;
 import java.util.function.Supplier;
-
+import net.minecraft.core.BlockPos;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.profiling.ProfilerFiller;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.dimension.DimensionType;
+import net.minecraft.world.level.storage.WritableLevelData;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -10,25 +17,13 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-
-import net.minecraft.block.BlockState;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.profiler.Profiler;
-import net.minecraft.util.registry.Registry;
-import net.minecraft.util.registry.RegistryKey;
-import net.minecraft.world.MutableWorldProperties;
-import net.minecraft.world.World;
-import net.minecraft.world.dimension.DimensionType;
-
 import ru.bulldog.justmap.util.JsonFactory;
 import ru.bulldog.justmap.util.StateUtil;
 
-@Mixin(ServerWorld.class)
-public abstract class ServerWorldMixin extends World {
-	protected ServerWorldMixin(MutableWorldProperties properties, RegistryKey<World> registryKey,
-			DimensionType dimensionType, Supplier<Profiler> supplier, boolean bl, boolean debugWorld, long l) {
+@Mixin(ServerLevel.class)
+public abstract class ServerWorldMixin extends Level {
+	protected ServerWorldMixin(WritableLevelData properties, ResourceKey<Level> registryKey,
+			DimensionType dimensionType, Supplier<ProfilerFiller> supplier, boolean bl, boolean debugWorld, long l) {
 		super(properties, registryKey, dimensionType, supplier, bl, debugWorld, l);
 	}
 

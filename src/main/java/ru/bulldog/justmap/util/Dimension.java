@@ -1,11 +1,11 @@
 package ru.bulldog.justmap.util;
 
-import net.minecraft.util.Identifier;
-import net.minecraft.world.World;
-import net.minecraft.world.dimension.DimensionType;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.dimension.DimensionType;
 
 public class Dimension {
-	public static int getId(World world) {
+	public static int getId(Level world) {
 		if (isNether(world)) return -1;
 		if (isOverworld(world)) return 0;
 		if (isEnd(world)) return 1;
@@ -13,37 +13,37 @@ public class Dimension {
 		return Integer.MIN_VALUE;
 	}
 	
-	public static Identifier fromId(int id) {
+	public static ResourceLocation fromId(int id) {
 		switch(id) {
-			case -1: return DimensionType.THE_NETHER_REGISTRY_KEY.getValue();
-			case 0: return DimensionType.OVERWORLD_REGISTRY_KEY.getValue();
-			case 1: return DimensionType.THE_END_REGISTRY_KEY.getValue();
+			case -1: return DimensionType.NETHER_LOCATION.location();
+			case 0: return DimensionType.OVERWORLD_LOCATION.location();
+			case 1: return DimensionType.END_LOCATION.location();
 		}
 		
-		return new Identifier("unknown");
+		return new ResourceLocation("unknown");
 	}
 	
-	public static boolean isEnd(World world) {
-		return isEnd(world.getRegistryKey().getValue());
+	public static boolean isEnd(Level world) {
+		return isEnd(world.dimension().location());
 	}
 
-	public static boolean isNether(World world) {
-		return isNether(world.getRegistryKey().getValue());
+	public static boolean isNether(Level world) {
+		return isNether(world.dimension().location());
 	}
 	
-	public static boolean isOverworld(World world) {
-		return isOverworld(world.getRegistryKey().getValue());
+	public static boolean isOverworld(Level world) {
+		return isOverworld(world.dimension().location());
 	}
 	
-	public static boolean isEnd(Identifier dimId) {
-		return dimId.equals(World.END.getValue());
+	public static boolean isEnd(ResourceLocation dimId) {
+		return dimId.equals(Level.END.location());
 	}
 	
-	public static boolean isNether(Identifier dimId) {
-		return dimId.equals(World.NETHER.getValue());
+	public static boolean isNether(ResourceLocation dimId) {
+		return dimId.equals(Level.NETHER.location());
 	}
 	
-	public static boolean isOverworld(Identifier dimId) {
-		return dimId.equals(World.OVERWORLD.getValue());
+	public static boolean isOverworld(ResourceLocation dimId) {
+		return dimId.equals(Level.OVERWORLD.location());
 	}
 }

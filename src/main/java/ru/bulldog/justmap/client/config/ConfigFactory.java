@@ -6,11 +6,10 @@ import me.shedaniel.clothconfig2.api.ConfigBuilder;
 import me.shedaniel.clothconfig2.api.ConfigCategory;
 import me.shedaniel.clothconfig2.api.ConfigEntryBuilder;
 import me.shedaniel.clothconfig2.impl.builders.EnumSelectorBuilder;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.text.LiteralText;
-import net.minecraft.text.Text;
-
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
 import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.config.ConfigKeeper.EnumEntry;
 import ru.bulldog.justmap.enums.ScreenPosition;
@@ -25,7 +24,7 @@ public final class ConfigFactory {
 	
 	private final static ClientConfig modConfig = JustMapClient.getConfig();
 	
-	private static Text lang(String key) {
+	private static Component lang(String key) {
 		return LangUtil.getText("configuration", key);
 	}
 	
@@ -37,7 +36,7 @@ public final class ConfigFactory {
 	}
 	
 	private static ConfigBuilder getConfigBuilder() {
-		ConfigBuilder configBuilder = ConfigBuilder.create().setTitle(new LiteralText("Just Map Configuration"));
+		ConfigBuilder configBuilder = ConfigBuilder.create().setTitle(new TextComponent("Just Map Configuration"));
 		ConfigEntryBuilder entryBuilder = ConfigEntryBuilder.create();
 		
 		ConfigCategory general = configBuilder.getOrCreateCategory(lang("category.general"));
@@ -51,10 +50,10 @@ public final class ConfigFactory {
 		mwDetectEntry.setSaveConsumer(val -> mwDetectConfig.setValue(val))
 					 .setDefaultValue(mwDetectConfig.getDefault());
 		
-		MinecraftClient minecraft = MinecraftClient.getInstance();
+		Minecraft minecraft = Minecraft.getInstance();
 		int offset = modConfig.getInt("map_offset");
-		int maxX = minecraft.getWindow().getScaledWidth();
-		int maxY = minecraft.getWindow().getScaledHeight();
+		int maxX = minecraft.getWindow().getGuiScaledWidth();
+		int maxY = minecraft.getWindow().getGuiScaledHeight();
 		
 		general.addEntry(drawPosEntry.build());
 		general.addEntry(entryBuilder.startIntField(lang("map_offset"), offset)

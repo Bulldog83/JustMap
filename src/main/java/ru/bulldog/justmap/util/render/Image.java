@@ -1,60 +1,61 @@
 package ru.bulldog.justmap.util.render;
 
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.texture.NativeImage;
-import net.minecraft.client.texture.TextureManager;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.Identifier;
+import com.mojang.blaze3d.platform.NativeImage;
+import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.texture.TextureManager;
+import net.minecraft.resources.ResourceLocation;
 
 public abstract class Image {
 
-	protected static TextureManager textureManager = MinecraftClient.getInstance().getTextureManager();
+	protected static TextureManager textureManager = Minecraft.getInstance().getTextureManager();
 	
 	protected final NativeImage image;
-	protected Identifier textureId;
+	protected ResourceLocation textureId;
 	protected int width;
 	protected int height;
 	
-	protected Image(Identifier id, NativeImage image) {
+	protected Image(ResourceLocation id, NativeImage image) {
 		this.width = image.getWidth();
 		this.height = image.getHeight();
 		this.textureId = id;
 		this.image = image;
 	}
 	
-	public abstract void draw(MatrixStack matrices, double x, double y, int w, int h);
+	public abstract void draw(PoseStack matrices, double x, double y, int w, int h);
 	
 	public int getWidth() {
-		return this.width;
+		return width;
 	}
 	
 	public int getHeight() {
-		return this.height;
+		return height;
 	}
 	
-	public Identifier getId() {
-		return this.textureId;
+	public ResourceLocation getId() {
+		return textureId;
 	}
 	
 	public void bindTexture() {
-		textureManager.bindTexture(textureId);
+		RenderSystem.setShaderTexture(0, textureId);
 	}
 	
 	public void draw(double x, double y) {
-		MatrixStack matrices = new MatrixStack();
+		PoseStack matrices = new PoseStack();
 		this.draw(matrices, x, y, this.getWidth(), this.getHeight());
 	}
 	
 	public void draw(double x, double y, int size) {
-		MatrixStack matrices = new MatrixStack();
+		PoseStack matrices = new PoseStack();
 		this.draw(matrices, x, y, size, size);
 	}
 	
-	public void draw(MatrixStack matrices, double x, double y, int size) {
+	public void draw(PoseStack matrices, double x, double y, int size) {
 		this.draw(matrices, x, y, size, size);
 	}
 	
-	protected void draw(MatrixStack matrices, double x, double y, float w, float h) {
+	protected void draw(PoseStack matrices, double x, double y, float w, float h) {
 		RenderUtil.drawImage(matrices, this, x, y, w, h);
 	}
 }
