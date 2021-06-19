@@ -27,8 +27,8 @@ public abstract class ServerWorldMixin extends Level {
 		super(properties, registryKey, dimensionType, supplier, bl, debugWorld, l);
 	}
 
-	@Inject(method = "onBlockChanged", at = @At("HEAD"))
-	public void onBlockChanged(BlockPos pos, BlockState oldBlock, BlockState newBlock, CallbackInfo info) {
+//	@Inject(method = "onBlockChanged", at = @At("HEAD"))
+//	public void onBlockChanged(BlockPos pos, BlockState oldBlock, BlockState newBlock, CallbackInfo info) {
 //		if (!Objects.equals(oldBlock.getBlock(), newBlock.getBlock())) {
 //			if (!StateUtil.isAir(newBlock)) {
 //				Identifier blockId = Registry.BLOCK.getId(newBlock.getBlock());
@@ -54,5 +54,5 @@ public abstract class ServerWorldMixin extends Level {
 //				}
 //			}
 //		}
-	}
+//	}
 }

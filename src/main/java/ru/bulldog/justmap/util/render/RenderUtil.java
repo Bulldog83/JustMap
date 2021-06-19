@@ -9,6 +9,7 @@ import com.mojang.math.Transformation;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiComponent;
+import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -75,21 +76,23 @@ public class RenderUtil extends GuiComponent {
 	}
 	
 	public static void drawDiamond(double x, double y, int width, int height, int color) {
-		drawTriangle(x, y + height / 2,
-				 x + width, y + height / 2,
-				 x + width / 2, y,
+		drawTriangle(x, y + (double) height / 2,
+				 x + width, y + (double) height / 2,
+				 x + (double) width / 2, y,
 				 color);		
-		drawTriangle(x, y + height / 2,
-				 x + width / 2, y + height,
-				 x + width, y + height / 2,
+		drawTriangle(x, y + (double) height / 2,
+				 x + (double) width / 2, y + height,
+				 x + width, y + (double) height / 2,
 				 color);
 	}
 	
 	public static void bindTexture(ResourceLocation id) {
+		RenderSystem.setShader(GameRenderer::getPositionTexShader);
 		RenderSystem.setShaderTexture(0, id);
     }
     
 	public static void bindTexture(int id) {
+		RenderSystem.setShader(GameRenderer::getPositionTexShader);
 		RenderSystem.setShaderTexture(0, id);
 	}
 	
@@ -151,7 +154,7 @@ public class RenderUtil extends GuiComponent {
     }
     
     public static void drawQuad(double x, double y, double w, double h) {
-    	startDraw();
+	    startDraw();
     	addQuad(x, y, w, h);
     	endDraw();
     }
@@ -168,6 +171,7 @@ public class RenderUtil extends GuiComponent {
 	
 		RenderSystem.disableTexture();
 		RenderSystem.setShaderColor(r, g, b, a);
+		RenderSystem.setShader(GameRenderer::getPositionShader);
 		startDraw(VertexFormat.Mode.TRIANGLES, DefaultVertexFormat.POSITION);
 		vertexBuffer.vertex(x1, y1, 0).endVertex();
 		vertexBuffer.vertex(x2, y2, 0).endVertex();
@@ -184,6 +188,7 @@ public class RenderUtil extends GuiComponent {
 	
 		RenderSystem.disableTexture();
 		RenderSystem.setShaderColor(r, g, b, a);
+		RenderSystem.setShader(GameRenderer::getPositionShader);
 		startDraw(VertexFormat.Mode.LINES, DefaultVertexFormat.POSITION);
 		vertexBuffer.vertex(x1, y1, 0).endVertex();
 		vertexBuffer.vertex(x2, y2, 0).endVertex();
@@ -208,6 +213,7 @@ public class RenderUtil extends GuiComponent {
 	    RenderSystem.disableTexture();
 	    RenderSystem.defaultBlendFunc();
 		RenderSystem.setShaderColor(r, g, b, a);
+		RenderSystem.setShader(GameRenderer::getPositionShader);
 		drawCircleVertices(x, y, radius);
 		RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 		RenderSystem.enableTexture();
@@ -241,10 +247,11 @@ public class RenderUtil extends GuiComponent {
 		float r = (float)(color >> 16 & 255) / 255.0F;
 		float g = (float)(color >> 8 & 255) / 255.0F;
 		float b = (float)(color & 255) / 255.0F;
-      
+
 		RenderSystem.enableBlend();
 		RenderSystem.disableTexture();
 		RenderSystem.defaultBlendFunc();
+		RenderSystem.setShader(GameRenderer::getPositionColorShader);
 		startDraw(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
 		vertexBuffer.vertex(matrix4f, (float) x, (float) (y + h), 0.0F).color(r, g, b, a).endVertex();
 		vertexBuffer.vertex(matrix4f, (float) (x + w), (float) (y + h), 0.0F).color(r, g, b, a).endVertex();
@@ -314,10 +321,9 @@ public class RenderUtil extends GuiComponent {
 		RenderSystem.enableBlend();
 		RenderSystem.enableCull();		
 		RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-		
+		RenderSystem.setShader(GameRenderer::getPositionTexShader);
 		skin.bindTexture();
 		startDrawNormal();
-		
 		draw(matrices, x, y, scaledBrd, scaledBrd, sMinU, sMinV, leftU, topV);
 		draw(matrices, rightC, y, scaledBrd, scaledBrd, rightU, sMinV, sMaxU, topV);
 		draw(matrices, x, bottomC, scaledBrd, scaledBrd, sMinU, bottomV, leftU, sMaxV);
@@ -364,30 +370,30 @@ public class RenderUtil extends GuiComponent {
 			draw(matrices, x, top, scaledBrd, vTail, sMinU, topV, leftU, vTailV);
 			draw(matrices, rightC, top, scaledBrd, vTail, rightU, topV, sMaxU, vTailV);
 		}
-		
 		endDraw();
 	}
 	
 	public static void drawImage(PoseStack matrices, Image image, double x, double y, float w, float h) {
+		RenderSystem.setShader(GameRenderer::getPositionTexShader);
 		image.bindTexture();
 		startDrawNormal();
 		draw(matrices, x, y, w, h, 0.0F, 0.0F, 1.0F, 1.0F);
 		endDraw();
 	}
 	
-	private static void draw(PoseStack matrixStack, double x, double y, float w, float h, float minU, float minV, float maxU, float maxV) {
+	private static void draw(PoseStack matrices, double x, double y, float w, float h, float minU, float minV, float maxU, float maxV) {
 		RenderSystem.enableBlend();
 		RenderSystem.enableCull();
 
-		matrixStack.pushPose();
-		matrixStack.translate(x, y, 0);
+		matrices.pushPose();
+		matrices.translate(x, y, 0);
 
-		Matrix4f m4f = matrixStack.last().pose();
-		Matrix3f m3f = matrixStack.last().normal();
+		Matrix4f m4f = matrices.last().pose();
+		Matrix3f m3f = matrices.last().normal();
 
 		addVertices(m4f, m3f, w, h, minU, minV, maxU, maxV);
 
-		matrixStack.popPose();
+		matrices.popPose();
 	}
 	
 	private static void addVertices(Matrix4f m4f, Matrix3f m3f, float maxX, float maxY, float minU, float minV, float maxU, float maxV) {
@@ -407,9 +413,19 @@ public class RenderUtil extends GuiComponent {
 		vertex(x + w, y, maxU, minV);
 		vertex(x, y, minU, minV);
 	}
+
+	public static void addQuad(PoseStack matrices, double x, double y, double w, double h, float minU, float minV, float maxU, float maxV) {
+		Matrix4f m4f = matrices.last().pose();
+		Matrix3f m3f = matrices.last().normal();
+
+		vertex(m4f, m3f, x, y + h, minU, maxV);
+		vertex(m4f, m3f, x + w, y + h, maxU, maxV);
+		vertex(m4f, m3f, x + w, y, maxU, minV);
+		vertex(m4f, m3f, x, y, minU, minV);
+	}
 	
-	private static void vertex(Matrix4f m4f, Matrix3f m3f, float x, float y, float u, float v) {
-		RenderUtil.vertexBuffer.vertex(m4f, x, y, (float) 1.0).uv(u, v).normal(m3f, 0.0F, 1.0F, 0.0F).endVertex();
+	private static void vertex(Matrix4f m4f, Matrix3f m3f, double x, double y, float u, float v) {
+		vertexBuffer.vertex(m4f, (float) x, (float) y, 1.0F).uv(u, v).normal(m3f, 0.0F, 1.0F, 0.0F).endVertex();
 	}
 	
 	private static void vertex(double x, double y, float u, float v) {

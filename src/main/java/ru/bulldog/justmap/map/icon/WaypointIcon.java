@@ -30,8 +30,8 @@ public class WaypointIcon extends MapIcon<WaypointIcon> {
 	}
 
 	public void draw(int size) {
-		double x = this.x - size / 2;
-		double y = this.y - size / 2;
+		double x = this.x - (double) size / 2.0;
+		double y = this.y - (double) size / 2.0;
 		
 		Waypoint.Icon icon = waypoint.getIcon();
 		if (icon != null) {
@@ -56,15 +56,15 @@ public class WaypointIcon extends MapIcon<WaypointIcon> {
 				float hmod;
 				if (hdiff < 0) {
 					hmod = MathUtil.clamp(Math.abs(hdiff) / 24F, 0.0F, 0.5F);
-					//RenderUtil.texEnvMode(GLC.GL_ADD);
+					RenderUtil.texEnvMode(GLC.GL_ADD);
 				} else {
 					hmod = MathUtil.clamp((24 - Math.abs(hdiff)) / 24F, 0.25F, 1.0F);
-					//RenderUtil.texEnvMode(GLC.GL_MODULATE);
+					RenderUtil.texEnvMode(GLC.GL_MODULATE);
 				}
 				RenderSystem.setShaderColor(hmod, hmod, hmod, 1.0F);
 			}
 			icon.draw(matrices, iconPos.x - offX, iconPos.y - offY, iconSize);
-			//RenderUtil.texEnvMode(GLC.GL_MODULATE);
+			RenderUtil.texEnvMode(GLC.GL_MODULATE);
 			RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 		}
 	}

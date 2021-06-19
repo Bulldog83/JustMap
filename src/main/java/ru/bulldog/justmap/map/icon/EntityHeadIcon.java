@@ -1,11 +1,14 @@
 package ru.bulldog.justmap.map.icon;
 
+import com.google.common.collect.Maps;
 import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
+
+import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
@@ -21,7 +24,7 @@ import ru.bulldog.justmap.util.storage.StorageUtil;
 
 public class EntityHeadIcon extends Image {
 	
-	private final static Map<ResourceLocation, EntityHeadIcon> ICONS = new HashMap<>();
+	private final static Map<ResourceLocation, EntityHeadIcon> ICONS = Maps.newHashMap();
 	
 	public static EntityHeadIcon getIcon(Entity entity) {
 		ResourceLocation id = EntityType.getKey(entity.getType());
@@ -65,11 +68,11 @@ public class EntityHeadIcon extends Image {
 			if (solid) {
 				RenderUtil.fill(matrices, x - thickness / 2, y - thickness / 2, w + thickness, h + thickness, this.color);
 			} else {
-				this.bindOutline();
+				bindOutline();
 				RenderUtil.draw(matrices, x - thickness / 2, y - thickness / 2, (float) (w + thickness), (float) (h + thickness));
 			}
 		}
-		this.draw(matrices, x, y, (float) w, (float) h);
+		draw(matrices, x, y, (float) w, (float) h);
 	}
 	
 	private void bindOutline() {
@@ -78,7 +81,7 @@ public class EntityHeadIcon extends Image {
 			DynamicTexture outTexture = new DynamicTexture(outline);
 			outlineId = textureManager.register(String.format("%s_%s_outline", id.getNamespace(), id.getPath()), outTexture);
 		}
-		RenderSystem.setShaderTexture(0, outlineId);
+		RenderUtil.bindTexture(outlineId);
 	}
 	
 	private boolean isSolid() {

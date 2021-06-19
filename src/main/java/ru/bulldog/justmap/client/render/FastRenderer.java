@@ -55,9 +55,9 @@ public class FastRenderer extends MapRenderer {
 		}
 		matrices.translate(-offX, -offY, 0.0);
 		
-		this.drawMap();
+		drawMap(matrices);
 		if (ClientSettings.showGrid) {
-			this.drawGrid();
+			drawGrid();
 		}
 		
 		MultiBufferSource.BufferSource consumerProvider = minecraft.renderBuffers().bufferSource();
@@ -77,7 +77,7 @@ public class FastRenderer extends MapRenderer {
 		RenderUtil.disableScissor();
 	}
 	
-	private void drawMap() {
+	private void drawMap(PoseStack matrices) {
 		int cornerX = lastX - scaledW / 2;
 		int cornerZ = lastZ - scaledH / 2;
 		
@@ -108,7 +108,7 @@ public class FastRenderer extends MapRenderer {
 				double scW = (double) texW / mapScale;
 				double scH = (double) texH / mapScale;
 				
-				region.draw(imgX + scX, imgY + scY, scW, scH, texX, texY, texW, texH);
+				region.draw(matrices,imgX + scX, imgY + scY, scW, scH, texX, texY, texW, texH);
 				
 				picY += texH > 0 ? texH : 512;
 			}

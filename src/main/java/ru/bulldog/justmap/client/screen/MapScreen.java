@@ -80,8 +80,8 @@ public class MapScreen extends Screen {
 	}
 	
 	public void renderTexture(int x, int y, int width, int height, float u, float v, ResourceLocation id) {
-		RenderUtil.bindTexture(id);
 		RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+		RenderUtil.bindTexture(id);
 		RenderUtil.startDraw();
 		RenderUtil.addQuad(x, y, width, height, 0.0F, 0.0F, u, v);
 		RenderUtil.endDraw();

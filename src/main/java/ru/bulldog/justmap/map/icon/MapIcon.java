@@ -65,5 +65,5 @@ public abstract class MapIcon<T extends MapIcon<T>> {
 		}
 	}
 	
-	public abstract void draw(PoseStack matrixStack, MultiBufferSource consumerProvider, int mapX, int mapY, int mapW, int mapH, float rotation);
+	public abstract void draw(PoseStack matrices, MultiBufferSource consumerProvider, int mapX, int mapY, int mapW, int mapH, float rotation);
 }

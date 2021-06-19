@@ -5,6 +5,7 @@ import com.mojang.blaze3d.vertex.BufferBuilder;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.blaze3d.vertex.VertexFormat;
+import net.minecraft.client.renderer.GameRenderer;
 import ru.bulldog.justmap.util.colors.Colors;
 import ru.bulldog.justmap.util.math.Line;
 import ru.bulldog.justmap.util.math.MathUtil;
@@ -27,9 +28,9 @@ public class ChunkGrid {
 	
 	public ChunkGrid(int x, int z, int rangeX, int rangeY, int rangeW, int rangeH, float scale) {
 		this.lines = new ArrayList<>();
-		this.updateRange(rangeX, rangeY, rangeW, rangeH, scale);
-		this.updateCenter(x, z);
-		this.updateGrid();
+		updateRange(rangeX, rangeY, rangeW, rangeH, scale);
+		updateCenter(x, z);
+		updateGrid();
 	}
 	
 	public void updateCenter(int x, int z) {
@@ -46,7 +47,7 @@ public class ChunkGrid {
 	}
 	
 	public void updateGrid() {
-		this.clear();
+		clear();
 		
 		double centerX = rangeX + rangeW / 2.0;
 		double centerY = rangeY + rangeH / 2.0;
@@ -58,7 +59,7 @@ public class ChunkGrid {
 		double xp = MathUtil.screenPos(startX, x, centerX, scale);
 		while (xp < right) {
 			if (xp > rangeX) {
-				this.lines.add(new GridLine(xp, rangeY, xp, bottom));
+				lines.add(new GridLine(xp, rangeY, xp, bottom));
 			}
 			startX += 16;
 			xp = MathUtil.screenPos(startX, x, centerX, scale);
@@ -66,7 +67,7 @@ public class ChunkGrid {
 		double yp = MathUtil.screenPos(startZ, z, centerY, scale);
 		while(yp < bottom) {
 			if (yp > rangeY) {
-				this.lines.add(new GridLine(rangeX, yp, right, yp));
+				lines.add(new GridLine(rangeX, yp, right, yp));
 			}
 			startZ += 16;
 			yp = MathUtil.screenPos(startZ, z, centerY, scale);
@@ -81,6 +82,7 @@ public class ChunkGrid {
 		
 		RenderSystem.disableTexture();
 		RenderSystem.setShaderColor(r, g, b, a);
+		RenderSystem.setShader(GameRenderer::getPositionShader);
 		RenderUtil.startDraw(VertexFormat.Mode.LINES, DefaultVertexFormat.POSITION);
 		BufferBuilder buffer = RenderUtil.getBuffer();
 		lines.forEach(line -> line.draw(buffer));
@@ -101,6 +103,6 @@ public class ChunkGrid {
 	}
 	
 	public void clear() {
-		this.lines.clear();
+		lines.clear();
 	}
 }

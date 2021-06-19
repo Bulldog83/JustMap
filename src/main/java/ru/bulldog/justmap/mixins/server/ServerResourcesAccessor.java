@@ -8,5 +8,5 @@ import net.minecraft.server.ServerResources;
 @Mixin(MinecraftServer.class)
 public interface ServerResourcesAccessor {
 	@Accessor
-	ServerResources getServerResourceManager();
+	ServerResources getResources();
 }

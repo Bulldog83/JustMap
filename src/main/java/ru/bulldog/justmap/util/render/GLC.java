@@ -22,7 +22,7 @@ public final class GLC {
 	public final static int GL_DST_ALPHA = GL11.GL_DST_ALPHA; //772
 	public final static int GL_ONE_MINUS_DST_ALPHA = GL11.GL_ONE_MINUS_DST_ALPHA; //773
 	public final static int GL_COLOR_BUFFER_BIT = GL11.GL_COLOR_BUFFER_BIT; //16384
-	public final static int GL_COLOR_OR_DEPTH_BUFFER_BIT = GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT;
+	public final static int GL_COLOR_OR_DEPTH_BUFFER_BIT = GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT; //16640
 	public final static int GL_TEXTURE_2D = GL11.GL_TEXTURE_2D; //3553
 	public final static int GL_RGBA = GL11.GL_RGBA; //6408
 	public final static int GL_RGBA8 = GL11.GL_RGBA8; //32856

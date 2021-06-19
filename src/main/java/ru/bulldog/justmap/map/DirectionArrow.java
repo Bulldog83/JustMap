@@ -5,6 +5,7 @@ import com.mojang.blaze3d.vertex.*;
 import com.mojang.math.Matrix3f;
 import com.mojang.math.Matrix4f;
 import com.mojang.math.Vector3f;
+import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.metadata.animation.AnimationMetadataSection;
 import net.minecraft.resources.ResourceLocation;
@@ -23,39 +24,32 @@ public class DirectionArrow extends TextureAtlasSprite {
 	}
 	
 	public static void draw(int x, int y, float rotation) {
-		draw(x, y, 14, rotation);
+		PoseStack matrices = new PoseStack();
+		draw(matrices, x, y, 14, rotation);
 	}
 	
-	public static void draw(double x, double y, int size, float rotation) {		
+	public static void draw(PoseStack matrices, double x, double y, int size, float rotation) {
 		if (!ClientSettings.simpleArrow) {
 			if (ARROW == null) {
 				ARROW = new DirectionArrow(new ResourceLocation(JustMap.MODID, "textures/icon/player_arrow.png"), 20, 20);
 			}
 			
-			PoseStack matrix = new PoseStack();
-			Tesselator tessellator = Tesselator.getInstance();
-			BufferBuilder builder = tessellator.getBuilder();
-			
-			builder.begin(VertexFormat.Mode.QUADS, RenderUtil.VF_POS_TEX_NORMAL);
-			
+			BufferBuilder builder = RenderUtil.getBuffer();
 			VertexConsumer vertexConsumer = ARROW.wrap(builder);
-			
-			RenderUtil.bindTexture(ARROW.getName());
-			
+
 			RenderSystem.enableCull();
 			RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+			RenderUtil.bindTexture(ARROW.getName());
 			
-			matrix.pushPose();
-			matrix.translate(x, y, 0);
-			matrix.mulPose(Vector3f.ZP.rotationDegrees(rotation + 180));
-			
-			Matrix4f m4f = matrix.last().pose();
-			Matrix3f m3f = matrix.last().normal();
-			
+			matrices.pushPose();
+			matrices.translate(x, y, 0);
+			matrices.mulPose(Vector3f.ZP.rotationDegrees(rotation + 180));
+			Matrix4f m4f = matrices.last().pose();
+			Matrix3f m3f = matrices.last().normal();
+			RenderUtil.startDrawNormal();
 			addVertices(m4f, m3f, vertexConsumer, size);
-			tessellator.end();
-			
-			matrix.popPose();
+			RenderUtil.endDraw();
+			matrices.popPose();
 		} else {
 			int l = 6;
 			double a1 = Math.toRadians((rotation + 90) % 360);
@@ -68,18 +62,17 @@ public class DirectionArrow extends TextureAtlasSprite {
 			double y2 = y + Math.sin(a2) * l;
 			double x3 = x + Math.cos(a3) * l;
 			double y3 = y + Math.sin(a3) * l;
-			
+
+			RenderSystem.setShader(GameRenderer::getPositionColorShader);
 			RenderUtil.drawTriangle(x1, y1, x2, y2, x3, y3, Colors.RED);
 		}
 	}
 	
 	private static void addVertices(Matrix4f m4f, Matrix3f m3f, VertexConsumer vertexConsumer, int size) {
-		float half = size / 2;		
-		
+		float half = (float) size / 2;
 		vertexConsumer.vertex(m4f, -half, -half, 0.0F).uv(0.0F, 0.0F).normal(m3f, 0.0F, 1.0F, 0.0F).endVertex();
 		vertexConsumer.vertex(m4f, -half, half, 0.0F).uv(0.0F, 1.0F).normal(m3f, 0.0F, 1.0F, 0.0F).endVertex();
 		vertexConsumer.vertex(m4f, half, half, 0.0F).uv(1.0F, 1.0F).normal(m3f, 0.0F, 1.0F, 0.0F).endVertex();
 		vertexConsumer.vertex(m4f, half, -half, 0.0F).uv(1.0F, 0.0F).normal(m3f, 0.0F, 1.0F, 0.0F).endVertex();
 	}
-	
 }

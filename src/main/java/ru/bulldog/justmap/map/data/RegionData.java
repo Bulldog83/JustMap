@@ -3,7 +3,12 @@ package ru.bulldog.justmap.map.data;
 import java.io.File;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+
+import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.world.level.ChunkPos;
+import org.jetbrains.annotations.Nullable;
 import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.client.config.ClientSettings;
 import ru.bulldog.justmap.map.IMap;
@@ -87,47 +92,47 @@ public class RegionData {
 	}
 	
 	private void loadImage(Layer layer, int level) {
-		File regionFile = this.imageFile(layer, level);
+		File regionFile = imageFile(layer, level);
 		if (images.containsKey(layer)) {
-			this.image = this.images.get(layer);
+			image = images.get(layer);
 		} else {
-			this.image = new MapTexture(regionFile, 512, 512, Colors.BLACK);
-			this.images.put(layer, image);
+			image = new MapTexture(regionFile, 512, 512, Colors.BLACK);
+			images.put(layer, image);
 		}
 		worker.execute(() -> {
 			synchronized (imageLock) {
 				if (!image.loadImage(regionFile)) {
-					this.image.fill(Colors.BLACK);
+					image.fill(Colors.BLACK);
 				}
 			}
-			this.updateImage(true);
+			updateImage(true);
 		});
 	}
 	
 	public void updateImage(boolean needUpdate) {
 		if (updating) return;
-		this.updating = true;
+		updating = true;
 		updater.execute(() -> {
-			this.updateMapParams(needUpdate);
-			this.update();
+			updateMapParams(needUpdate);
+			update();
 		});
 	}
 	
 	public void setCenter(ChunkPos centerPos) {
 		int radius = DataUtil.getGameOptions().renderDistance - 1;
-		this.center = centerPos;
-		this.updateArea = new Plane(center.x - radius, center.z - radius,
-									center.x + radius, center.z + radius);
+		center = centerPos;
+		updateArea = new Plane(center.x - radius, center.z - radius,
+				center.x + radius, center.z + radius);
 	}
 	
 	public ChunkPos getCenter() {
-		return this.center;
+		return center;
 	}
 	
 	private void updateMapParams(boolean needUpdate) {
 		this.needUpdate = needUpdate;
 		if (ClientSettings.hideWater != hideWater) {
-			this.hideWater = ClientSettings.hideWater;
+			hideWater = ClientSettings.hideWater;
 			this.needUpdate = true;
 		}
 		boolean waterTint = ClientSettings.alternateColorRender && ClientSettings.waterTint;
@@ -200,45 +205,46 @@ public class RegionData {
 	
 	public void writeChunkData(ChunkData mapChunk) {
 		updater.execute(() -> {
-			int x = (mapChunk.getX() << 4) - (this.getX() << 9);
-			int y = (mapChunk.getZ() << 4) - (this.getZ() << 9);
+			int x = (mapChunk.getX() << 4) - (getX() << 9);
+			int y = (mapChunk.getZ() << 4) - (getZ() << 9);
 			synchronized (imageLock) {
-				this.image.writeChunkData(x, y, mapChunk.getColorData(layer, level));
+				image.writeChunkData(x, y, mapChunk.getColorData(layer, level));
 				mapChunk.setSaved();
-				this.imageChanged = true;
+				imageChanged = true;
 			}
 		});
 	}
 	
 	private void updateTexture() {
 		synchronized (imageLock) {
-			this.texture.copyData(image);
-			this.image.changed = false;
-			this.texture.applyOverlay(overlay);		
-			this.overlay.changed = false;
+			texture.copyData(image);
+			image.changed = false;
+			texture.applyOverlay(overlay);
+			overlay.changed = false;
 		}
 	}
 	
 	private void updateOverlay(int x, int y, ChunkData mapChunk) {
 		if (renewOverlay) {
-			this.overlay.fill(x, y, 16, 16, Colors.TRANSPARENT);
+			overlay.fill(x, y, 16, 16, Colors.TRANSPARENT);
 		}
 		if (loadedOverlay && mapChunk.isChunkLoaded()) {
-			this.overlay.fill(x, y, 16, 16, Colors.LOADED_OVERLAY);
+			overlay.fill(x, y, 16, 16, Colors.LOADED_OVERLAY);
 		} else if (loadedOverlay && !renewOverlay) {
-			this.overlay.fill(x, y, 16, 16, Colors.TRANSPARENT);
+			overlay.fill(x, y, 16, 16, Colors.TRANSPARENT);
 		}
 		if (slimeOverlay && mapChunk.hasSlime()) {
-			this.overlay.fill(x, y, 16, 16, Colors.SLIME_OVERLAY);
+			overlay.fill(x, y, 16, 16, Colors.SLIME_OVERLAY);
 		}
 	}
 	
+	@Nullable
 	public Layer getLayer() {
-		return this.layer != null ? this.layer : null;
+		return layer;
 	}
 	
 	public int getLevel() {
-		return this.level;
+		return level;
 	}
 	
 	public void swapLayer(Layer layer, int level) {
@@ -288,7 +294,7 @@ public class RegionData {
 		return new File(dir, String.format("r%d.%d.png", regPos.x, regPos.z));
 	}
 	
-	public void draw(double x, double y, double width, double height, int imgX, int imgY, int imgW, int imgH) {
+	public void draw(PoseStack matrices, double x, double y, double width, double height, int imgX, int imgY, int imgW, int imgH) {
 		if (width <= 0 || height <= 0) return;
 		
 		float u1 = imgX / 512F;
@@ -296,20 +302,20 @@ public class RegionData {
 		float u2 = (imgX + imgW) / 512F;
 		float v2 = (imgY + imgH) / 512F;
 		
-		drawTexture(x, y, width, height, u1, v1, u2, v2);
+		drawTexture(matrices, x, y, width, height, u1, v1, u2, v2);
 	}
 	
-	private void drawTexture(double x, double y, double w, double h, float u1, float v1, float u2, float v2) {
+	private void drawTexture(PoseStack matrices, double x, double y, double w, double h, float u1, float v1, float u2, float v2) {
 		if (texture != null && texture.changed) {
 			texture.upload();
 		} else if (texture == null && image.changed) {
-			this.image.upload();
+			image.upload();
 		}
 		int id = texture != null ? texture.getId() : image.getId();
 		RenderUtil.bindTexture(id);
-		RenderUtil.applyFilter(false);
+		//RenderUtil.applyFilter(false);
 		RenderUtil.startDraw();
-		RenderUtil.addQuad(x, y, w, h, u1, v1, u2, v2);
+		RenderUtil.addQuad(matrices, x, y, w, h, u1, v1, u2, v2);
 		RenderUtil.endDraw();
 	}
 	
@@ -321,8 +327,8 @@ public class RegionData {
 				image.close();
 			});
 			if (texture != null) {
-				this.overlay.close();
-				this.texture.close();
+				overlay.close();
+				texture.close();
 			}
 		}
 	}

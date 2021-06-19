@@ -28,7 +28,7 @@ public abstract class PlayerManagerMixin {
 	@Shadow
 	private MinecraftServer server;
 	
-	@Inject(method = "onPlayerConnect", at = @At(value = "INVOKE", target = "Lnet/minecraft/network/packet/s2c/play/DifficultyS2CPacket;<init>(Lnet/minecraft/world/Difficulty;Z)V"))
+	@Inject(method = "placeNewPlayer", at = @At(value = "INVOKE", target = "Lnet/minecraft/network/packet/s2c/play/DifficultyS2CPacket;<init>(Lnet/minecraft/world/Difficulty;Z)V"))
 	public void onPlayerConnectPre(Connection connection, ServerPlayer player, CallbackInfo info) {
 		ServerNetworkHandler networkHandler = JustMapServer.getNetworkHandler();
 		if (networkHandler != null) {
@@ -36,7 +36,7 @@ public abstract class PlayerManagerMixin {
 		}
 	}
 	
-	@Inject(method = "onPlayerConnect", at = @At("TAIL"))
+	@Inject(method = "placeNewPlayer", at = @At("TAIL"))
 	public void onPlayerConnectPost(Connection clientConnection, ServerPlayer serverPlayerEntity, CallbackInfo info) {
 		BaseComponent command = new TextComponent("§0§0");
 		if (ServerSettings.useGameRules) {

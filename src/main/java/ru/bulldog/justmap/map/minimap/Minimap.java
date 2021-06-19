@@ -1,12 +1,17 @@
 package ru.bulldog.justmap.map.minimap;
 
+import com.mojang.blaze3d.platform.Window;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.ChatScreen;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.monster.Monster;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.AABB;
 import ru.bulldog.justmap.JustMap;
-import ru.bulldog.justmap.advancedinfo.AdvancedInfo;
-import ru.bulldog.justmap.advancedinfo.BiomeInfo;
-import ru.bulldog.justmap.advancedinfo.CoordsInfo;
-import ru.bulldog.justmap.advancedinfo.InfoText;
-import ru.bulldog.justmap.advancedinfo.TextManager;
-import ru.bulldog.justmap.advancedinfo.TimeInfo;
+import ru.bulldog.justmap.advancedinfo.*;
 import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.client.config.ClientConfig;
 import ru.bulldog.justmap.client.config.ClientSettings;
@@ -20,10 +25,10 @@ import ru.bulldog.justmap.enums.TextAlignment;
 import ru.bulldog.justmap.enums.TextPosition;
 import ru.bulldog.justmap.map.EntityRadar;
 import ru.bulldog.justmap.map.IMap;
+import ru.bulldog.justmap.map.data.Layer;
 import ru.bulldog.justmap.map.data.WorldData;
 import ru.bulldog.justmap.map.data.WorldKey;
 import ru.bulldog.justmap.map.data.WorldManager;
-import ru.bulldog.justmap.map.data.Layer;
 import ru.bulldog.justmap.map.icon.MapIcon;
 import ru.bulldog.justmap.map.icon.WaypointIcon;
 import ru.bulldog.justmap.map.minimap.skin.MapSkin;
@@ -34,38 +39,27 @@ import ru.bulldog.justmap.util.Dimension;
 import ru.bulldog.justmap.util.RuleUtil;
 import ru.bulldog.justmap.util.math.MathUtil;
 import ru.bulldog.justmap.util.math.RandomUtil;
-import ru.bulldog.justmap.util.render.ExtendedFramebuffer;
-import com.mojang.blaze3d.platform.Window;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screens.ChatScreen;
-import net.minecraft.core.BlockPos;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.Mob;
-import net.minecraft.world.entity.monster.Monster;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.phys.AABB;
 
 public class Minimap implements IMap {
-	private static TextManager textManager;
-	private static InfoText txtCoords = new CoordsInfo(TextAlignment.CENTER, "0, 0, 0");
-	private static InfoText txtBiome = new BiomeInfo(TextAlignment.CENTER, "");
-	private static InfoText txtTime = new TimeInfo(TextAlignment.CENTER, "");
+	private static final TextManager textManager;
+	private static final InfoText txtCoords = new CoordsInfo(TextAlignment.CENTER, "0, 0, 0");
+	private static final InfoText txtBiome = new BiomeInfo(TextAlignment.CENTER, "");
+	private static final InfoText txtTime = new TimeInfo(TextAlignment.CENTER, "");
 	
 	private final Minecraft minecraft;
 	private final FastRenderer fastRenderer;
 	private final BufferedRenderer bufferedRenderer;
-	private List<WaypointIcon> waypoints = new ArrayList<>();
+	private final List<WaypointIcon> waypoints = new ArrayList<>();
+	private final EntityRadar entityRadar;
 	private Player locPlayer = null;
 	private Layer mapLayer = Layer.SURFACE;
-	private EntityRadar entityRadar;
 	private WorldData worldData;
 	private MapSkin mapSkin;
 	private Level world;
-	private ScreenPosition mapPosition;
 	private boolean isMapVisible = true;
 	private boolean rotateMap = false;
 	private boolean bigMap = false;
@@ -91,7 +85,7 @@ public class Minimap implements IMap {
 	}
 
 	public void update() {
-		if (!this.isMapVisible()) {
+		if (!isMapVisible()) {
 			return;
 		}
 
@@ -101,8 +95,8 @@ public class Minimap implements IMap {
 				locPlayer = player;
 			}
 
-			this.prepareMap(player);
-			this.updateInfo(player);
+			prepareMap(player);
+			updateInfo();
 		} else {
 			locPlayer = null;
 		}
@@ -112,7 +106,7 @@ public class Minimap implements IMap {
 			double scale = window.getGuiScale();
 			if (winScale != scale) {
 				winScale = scale;
-				this.updateMapParams();
+				updateMapParams();
 			}
 		}
 	}
@@ -173,22 +167,25 @@ public class Minimap implements IMap {
 			this.mapSkin = null;
 		}
 		
-		this.updateMapPosition();
-		
+		updateMapPosition();
+		loadFramebuffers();
+	}
+
+	private void loadFramebuffers() {
 		if (!ClientSettings.fastRender) {
 			try {
-				if (ExtendedFramebuffer.canUseFramebuffer()) {
+				if (MapRenderer.canUseFramebuffer()) {
 					if (!bufferedRenderer.isFBOTried()) {
-						this.bufferedRenderer.loadFrameBuffers();
+						bufferedRenderer.loadFrameBuffers();
 					}
 				} else if (bufferedRenderer.isFBOLoaded()) {
-					this.bufferedRenderer.deleteFramebuffers();
+					bufferedRenderer.deleteFramebuffers();
 				}
 			} catch (RuntimeException ex) {
 				JustMap.LOGGER.error("Failed to load framebuffers!", ex);
 			}
 		} else if (bufferedRenderer.isFBOLoaded()) {
-			this.bufferedRenderer.deleteFramebuffers();
+			bufferedRenderer.deleteFramebuffers();
 		}
 	}
 	
@@ -197,46 +194,47 @@ public class Minimap implements IMap {
 		int winW = window.getGuiScaledWidth();
 		int winH = window.getGuiScaledHeight();
 		this.offset = ClientSettings.positionOffset;
-		this.mapPosition = ClientSettings.mapPosition;		
+		ScreenPosition mapPosition = ClientSettings.mapPosition;
 		
 		TextPosition textPos = TextPosition.UNDER;
 
 		int fullWidth = mapWidth + border * 2;
 		int fullHeight = mapHeight + border * 2;
 		switch (mapPosition) {
-			case USER_DEFINED:
+			case USER_DEFINED -> {
 				this.skinX = ClientSettings.mapPositionX;
 				this.skinY = ClientSettings.mapPositionY;
-				break;
-			case TOP_CENTER:
+			}
+			case TOP_CENTER -> {
 				this.skinX = winW / 2 - fullWidth / 2;
 				this.skinY = offset;
-				break;
-			case TOP_RIGHT:
+			}
+			case TOP_RIGHT -> {
 				this.skinX = winW - offset - fullWidth;
 				this.skinY = offset;
-				break;
-			case MIDDLE_RIGHT:
+			}
+			case MIDDLE_RIGHT -> {
 				this.skinX = winW - offset - fullWidth;
 				this.skinY = winH / 2 - fullHeight / 2;
-				break;
-			case MIDDLE_LEFT:
+			}
+			case MIDDLE_LEFT -> {
 				this.skinX = offset;
 				this.skinY = winH / 2 - fullHeight / 2;
-				break;
-			case BOTTOM_LEFT:
+			}
+			case BOTTOM_LEFT -> {
 				textPos = TextPosition.ABOVE;
 				this.skinX = offset;
 				this.skinY = winH - offset - fullHeight;
-				break;
-			case BOTTOM_RIGHT:
+			}
+			case BOTTOM_RIGHT -> {
 				textPos = TextPosition.ABOVE;
 				this.skinX = winW - offset - fullWidth;
 				this.skinY = winH - offset - fullHeight;
-				break;
-			default:
+			}
+			default -> {
 				this.skinX = offset;
 				this.skinY = offset;
+			}
 		}
 		
 		int limitW = winW - fullWidth - offset;
@@ -262,7 +260,7 @@ public class Minimap implements IMap {
 		);
 	}
 
-	private void updateInfo(Player player) {
+	private void updateInfo() {
 		if (!ClientSettings.mapInfo) {
 			txtCoords.setVisible(false);
 			txtBiome.setVisible(false);
@@ -326,18 +324,16 @@ public class Minimap implements IMap {
 		this.entityRadar.clear(pos, radius);
 		if (RuleUtil.allowEntityRadar()) {
 			int checkHeight = 24;
-			BlockPos start = new BlockPos(startX, posY - checkHeight / 2, startZ);
-			BlockPos end = new BlockPos(endX, posY + checkHeight / 2, endZ);
+			BlockPos start = new BlockPos(startX, posY - (double) checkHeight / 2, startZ);
+			BlockPos end = new BlockPos(endX, posY + (double) checkHeight / 2, endZ);
 			List<Entity> entities = world.getEntities(player, new AABB(start, end));
 		
 			int amount = 0;				
 			for (Entity entity : entities) {
-				if (entity instanceof Player && RuleUtil.allowPlayerRadar()) {
-					Player pEntity = (Player) entity;
+				if (entity instanceof Player pEntity && RuleUtil.allowPlayerRadar()) {
 					if (pEntity.isLocalPlayer()) continue;
 					this.entityRadar.addPlayer(pEntity);
-				} else if (entity instanceof Mob) {
-					Mob mobEntity = (Mob) entity;
+				} else if (entity instanceof Mob mobEntity) {
 					boolean hostile = mobEntity instanceof Monster;
 					if (hostile && RuleUtil.allowHostileRadar()) {
 						this.entityRadar.addCreature(mobEntity);
@@ -462,14 +458,6 @@ public class Minimap implements IMap {
 		return this.skinY;
 	}
 
-	public int getLastX() {
-		return this.lastPosX;
-	}
-
-	public int getLastZ() {
-		return this.lastPosZ;
-	}
-	
 	public int getBorder() {
 		return this.border;
 	}

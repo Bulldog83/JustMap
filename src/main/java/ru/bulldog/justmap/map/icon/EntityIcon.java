@@ -3,6 +3,7 @@ package ru.bulldog.justmap.map.icon;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Vector3f;
+import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.TamableAnimal;
@@ -38,7 +39,7 @@ public class EntityIcon extends MapIcon<EntityIcon> {
 			color = (hostile) ? Colors.DARK_RED : Colors.YELLOW;
 		}
 		int size = ClientSettings.entityIconSize;
-		this.updatePos(mapX, mapY, mapW, mapH, size);
+		updatePos(mapX, mapY, mapW, mapH, size);
 		if (!allowRender) return;
 		if (ClientSettings.renderEntityModel) {
 			EntityModelRenderer.renderModel(matrices, consumerProvider, entity, iconPos.x, iconPos.y);
@@ -51,15 +52,13 @@ public class EntityIcon extends MapIcon<EntityIcon> {
 					float hmod;
 					if (hdiff < 0) {
 						hmod = MathUtil.clamp(Math.abs(hdiff) / 24F, 0.0F, 0.5F);
-						//RenderUtil.texEnvMode(GLC.GL_ADD);
 					} else {
 						hmod = MathUtil.clamp((24 - Math.abs(hdiff)) / 24F, 0.25F, 1.0F);
-						//RenderUtil.texEnvMode(GLC.GL_MODULATE);
 					}
 					RenderSystem.setShaderColor(hmod, hmod, hmod, 1.0F);
 				}
-				double moveX = iconPos.x + size / 2;
-				double moveY = iconPos.y + size / 2;
+				double moveX = iconPos.x + size / 2.0;
+				double moveY = iconPos.y + size / 2.0;
 				float scale = MathUtil.clamp(1.0F / ClientSettings.mapScale, 0.5F, 1.5F);
 				matrices.pushPose();
 				matrices.translate(moveX, moveY, 0.0);
@@ -70,13 +69,14 @@ public class EntityIcon extends MapIcon<EntityIcon> {
 				matrices.translate(-moveX, -moveY, 0.0);
 				icon.draw(matrices, iconPos.x, iconPos.y, size);
 				matrices.popPose();
-				//RenderUtil.texEnvMode(GLC.GL_MODULATE);
 				RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 			} else {
-				RenderUtil.drawOutlineCircle(iconPos.x, iconPos.y, size / 3, 0.6, color);
+				RenderSystem.setShader(GameRenderer::getPositionShader);
+				RenderUtil.drawOutlineCircle(iconPos.x, iconPos.y, size / 3.0, 0.6, color);
 			}
 		} else {
-			RenderUtil.drawOutlineCircle(iconPos.x, iconPos.y, size / 3, 0.6, color);
+			RenderSystem.setShader(GameRenderer::getPositionShader);
+			RenderUtil.drawOutlineCircle(iconPos.x, iconPos.y, size / 3.0, 0.6, color);
 		}
 	}
 }

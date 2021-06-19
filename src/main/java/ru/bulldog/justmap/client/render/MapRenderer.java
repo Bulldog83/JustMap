@@ -3,6 +3,7 @@ package ru.bulldog.justmap.client.render;
 import com.mojang.blaze3d.platform.Window;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
+import org.lwjgl.opengl.GL;
 import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.advancedinfo.InfoText;
 import ru.bulldog.justmap.advancedinfo.MapText;
@@ -76,7 +77,14 @@ public abstract class MapRenderer {
 			textManager.add(dirW);
 		}
 	}
-	
+
+	public static boolean canUseFramebuffer() {
+        return GL.getCapabilities().OpenGL14 && (
+        		GL.getCapabilities().GL_ARB_framebuffer_object ||
+        	    GL.getCapabilities().GL_EXT_framebuffer_object ||
+        	    GL.getCapabilities().OpenGL30);
+    }
+
 	protected abstract void render(PoseStack matrices, double scale);
 	
 	public void updateParams() {
@@ -94,49 +102,11 @@ public abstract class MapRenderer {
 		this.delta = minecraft.getFrameTime();
 		this.currX = DataUtil.doubleX(delta);
 		this.currZ = DataUtil.doubleZ(delta);
-		
-		int mapW = minimap.getWidth();
-		int mapH = minimap.getHeight();
-		int mapX = minimap.getMapX();
-		int mapY = minimap.getMapY();
+
+		updateMapBounds();
+
 		int lastX = MathUtil.floor(currX);
 		int lastZ = MathUtil.floor(currZ);
-		float scale = minimap.getScale();
-		boolean rotateMap = minimap.isRotated();
-		if (mapWidth != mapW || mapHeight != mapH ||
-			this.mapX != mapX || this.mapY != mapY ||
-			mapScale != scale || mapRotation != rotateMap) {
-			
-			this.mapWidth = mapW;
-			this.mapHeight = mapH;
-			this.mapRotation = rotateMap;
-			this.mapScale = scale;
-			this.mapX = mapX;
-			this.mapY = mapY;	
-			this.centerX = mapX + mapWidth / 2;
-			this.centerY = mapY + mapHeight / 2;
-			this.scaledW = minimap.getScaledWidth();
-			this.scaledH = minimap.getScaledHeight();
-			
-			if (mapRotation) {
-				this.imgW = (int) (scaledW / mapScale);
-				this.imgH = (int) (scaledH / mapScale);
-				this.imgX = mapX - (imgW - mapW) / 2;
-				this.imgY = mapY - (imgH - mapH) / 2;
-			} else {
-				this.imgW = (int) (mapW * 1.25);
-				this.imgH = (int) (mapH * 1.25);
-				int deltaX = imgW - mapW;
-				int deltaY = imgH - mapH;
-				this.imgX = mapX - deltaX / 2;
-				this.imgY = mapY - deltaY / 2;
-				this.scaledW += deltaX * mapScale;
-				this.scaledH += deltaY * mapScale;
-			}
-			
-			this.paramsUpdated = true;
-		}
-		
 		if (this.lastX != lastX || this.lastZ != lastZ) {
 			this.lastX = lastX;
 			this.lastZ = lastZ;
@@ -168,10 +138,10 @@ public abstract class MapRenderer {
 			pointE.x = centerX + len;
 			pointW.x = centerX - len;
 			
-			this.calculatePos(center, pointN, mapR, mapB, angle);
-			this.calculatePos(center, pointS, mapR, mapB, angle);
-			this.calculatePos(center, pointE, mapR, mapB, angle);
-			this.calculatePos(center, pointW, mapR, mapB, angle);
+			calculatePos(center, pointN, mapR, mapB, angle);
+			calculatePos(center, pointS, mapR, mapB, angle);
+			calculatePos(center, pointE, mapR, mapB, angle);
+			calculatePos(center, pointW, mapR, mapB, angle);
 		}
 		
 		dirN.setPos((int) pointN.x, (int) pointN.y - 5);
@@ -179,7 +149,48 @@ public abstract class MapRenderer {
 		dirE.setPos((int) pointE.x, (int) pointE.y - 5);
 		dirW.setPos((int) pointW.x, (int) pointW.y - 5);
 	}
-	
+
+	protected void updateMapBounds() {
+		int mapW = minimap.getWidth();
+		int mapH = minimap.getHeight();
+		int mapX = minimap.getMapX();
+		int mapY = minimap.getMapY();
+		float scale = minimap.getScale();
+		boolean rotateMap = minimap.isRotated();
+		if (mapWidth != mapW || mapHeight != mapH ||
+			this.mapX != mapX || this.mapY != mapY ||
+			mapScale != scale || mapRotation != rotateMap)
+		{
+			this.mapWidth = mapW;
+			this.mapHeight = mapH;
+			this.mapRotation = rotateMap;
+			this.mapScale = scale;
+			this.mapX = mapX;
+			this.mapY = mapY;
+			this.centerX = mapX + mapWidth / 2;
+			this.centerY = mapY + mapHeight / 2;
+			this.scaledW = minimap.getScaledWidth();
+			this.scaledH = minimap.getScaledHeight();
+
+			if (mapRotation) {
+				this.imgW = (int) (scaledW / mapScale);
+				this.imgH = (int) (scaledH / mapScale);
+				this.imgX = mapX - (imgW - mapW) / 2;
+				this.imgY = mapY - (imgH - mapH) / 2;
+			} else {
+				this.imgW = (int) (mapW * 1.25);
+				this.imgH = (int) (mapH * 1.25);
+				int deltaX = imgW - mapW;
+				int deltaY = imgH - mapH;
+				this.imgX = mapX - deltaX / 2;
+				this.imgY = mapY - deltaY / 2;
+				this.scaledW += deltaX * mapScale;
+				this.scaledH += deltaY * mapScale;
+			}
+			this.paramsUpdated = true;
+		}
+	}
+
 	protected void calculatePos(Point center, Point dir, int mr, int mb, double angle) {		
 		Point pos = MathUtil.circlePos(dir, center, angle);
 		int posX = (int) MathUtil.clamp(pos.x, mapX, mr);
@@ -218,7 +229,7 @@ public abstract class MapRenderer {
 		int iconSize = ClientSettings.arrowIconSize;
 		if (ClientSettings.arrowIconType == ArrowType.DIRECTION_ARROW) {
 			float direction = mapRotation ? 180 : minecraft.player.yHeadRot;
-			DirectionArrow.draw(centerX, centerY, iconSize, direction);
+			DirectionArrow.draw(matrices, centerX, centerY, iconSize, direction);
 		} else {
 			MapPlayerManager.getPlayer(minecraft.player).getIcon().draw(centerX, centerY, iconSize, true);
 		}
