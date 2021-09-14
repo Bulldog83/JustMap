@@ -40,6 +40,10 @@ minecraft {}
 
 repositories {
 	maven { url "https://maven.fabricmc.net/" }
+	maven {
+		name 'Terraformers'
+		url 'https://maven.terraformersmc.com/releases/'
+	}
 	jcenter()
 	flatDir {
 		dirs 'libs'
@@ -52,7 +56,7 @@ dependencies {
 
 	modCompile "net.fabricmc:fabric-loader:${project.loader_version}"	
 	modCompile "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
-	modCompile "io.github.prospector:modmenu:${project.modmenu_version}"
+	modCompile "com.terraformersmc:modmenu:${project.modmenu_version}"
 	modCompile "me.shedaniel.cloth:config-2:${project.cloth_version}"
 	
 	include "me.shedaniel.cloth:config-2:${project.cloth_version}"
