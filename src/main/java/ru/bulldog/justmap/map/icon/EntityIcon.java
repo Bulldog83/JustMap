@@ -4,11 +4,10 @@ import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.client.util.math.Vector3f;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.entity.passive.TameableEntity;
-
+import net.minecraft.util.math.Vec3f;
 import ru.bulldog.justmap.client.config.ClientSettings;
 import ru.bulldog.justmap.client.render.EntityModelRenderer;
 import ru.bulldog.justmap.util.DataUtil;
@@ -67,7 +66,7 @@ public class EntityIcon extends MapIcon<EntityIcon> {
 				matrices.push();
 				matrices.translate(moveX, moveY, 0.0);
 				if (ClientSettings.rotateMap) {
-					matrices.multiply(Vector3f.POSITIVE_Z.getDegreesQuaternion(rotation + 180.0F));
+					matrices.multiply(Vec3f.POSITIVE_Z.getDegreesQuaternion(rotation + 180.0F));
 				}
 				matrices.scale(scale, scale, 1.0F);
 				matrices.translate(-moveX, -moveY, 0.0);

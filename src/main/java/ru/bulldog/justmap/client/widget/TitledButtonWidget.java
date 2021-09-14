@@ -4,10 +4,10 @@ import net.minecraft.client.sound.SoundManager;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.LiteralText;
 import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.widget.AbstractButtonWidget;
+import net.minecraft.client.gui.widget.ClickableWidget;
 
 
-public class TitledButtonWidget<W extends AbstractButtonWidget> extends AbstractButtonWidget {
+public class TitledButtonWidget<W extends ClickableWidget> extends ClickableWidget {
 	public final W widget;
 	public final LiteralText title;
 	private final TextRenderer font;
@@ -113,8 +113,8 @@ public class TitledButtonWidget<W extends AbstractButtonWidget> extends Abstract
 	}
 	
 	@Override
-	public void renderToolTip(MatrixStack matrixStack, int int_1, int int_2) {
-		this.widget.renderToolTip(matrixStack, int_1, int_2);
+	public void renderTooltip(MatrixStack matrixStack, int int_1, int int_2) {
+		this.widget.renderTooltip(matrixStack, int_1, int_2);
 	}
 	
 	@Override

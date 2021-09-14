@@ -116,7 +116,7 @@ abstract class HudMixin extends DrawableHelper {
 		   		});
 		   		if (ClientSettings.showEffectTimers) {
 			   		timers.add(() -> {
-			   			drawCenteredString(matrixStack, client.textRenderer, convertDuration(effectDuration), fx + size / 2, fy + (size + 1), Colors.WHITE);
+			   			drawCenteredText(matrixStack, client.textRenderer, convertDuration(effectDuration), fx + size / 2, fy + (size + 1), Colors.WHITE);
 			   		});
 		   		}
 			}

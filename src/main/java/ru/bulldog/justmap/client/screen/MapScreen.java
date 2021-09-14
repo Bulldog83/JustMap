@@ -74,7 +74,7 @@ public class MapScreen extends Screen {
 	
 	@Override
 	public void onClose() {
-		this.client.openScreen(parent);
+		this.client.setScreen(parent);
 	}
 	
 	public void renderTexture(int x, int y, int width, int height, float u, float v, Identifier id) {

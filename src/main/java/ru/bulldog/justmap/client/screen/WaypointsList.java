@@ -232,7 +232,7 @@ public class WaypointsList extends MapScreen {
 		if (screenTitle == null) {
 			screenTitle = info == null ? lang("unknown").getString() : I18n.translate(info.getFirst());
 		}
-		drawCenteredString(matrixStack, textRenderer, screenTitle, center, 15, Colors.WHITE);
+		drawCenteredText(matrixStack, textRenderer, screenTitle, center, 15, Colors.WHITE);
 		this.drawScrollBar();
 	}
 	
@@ -247,7 +247,7 @@ public class WaypointsList extends MapScreen {
 	private void drawScrollBar() {}
 	
 	private void edit(Waypoint waypoint) {
-		this.client.openScreen(new WaypointEditor(waypoint, this, null));
+		this.client.setScreen(new WaypointEditor(waypoint, this, null));
 	}
 	
 	private void add() {
@@ -257,7 +257,7 @@ public class WaypointsList extends MapScreen {
 		waypoint.pos = client.player.getBlockPos();
 		waypoint.name = "Waypoint";
 		
-		this.client.openScreen(new WaypointEditor(waypoint, this, keeper::addNew));
+		this.client.setScreen(new WaypointEditor(waypoint, this, keeper::addNew));
 	}
 	
 	private void delete(Waypoint waypoint) {

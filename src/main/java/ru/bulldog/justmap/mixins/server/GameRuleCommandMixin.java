@@ -25,7 +25,7 @@ public abstract class GameRuleCommandMixin {
 	private static <T extends GameRules.Rule<T>> void executeSet(CommandContext<ServerCommandSource> commandContext, GameRules.Key<T> Key, CallbackInfoReturnable<Integer> cir) {
 		if (ServerSettings.useGameRules) {
 			ServerCommandSource serverCommandSource = (ServerCommandSource)commandContext.getSource();
-			T rule = serverCommandSource.getMinecraftServer().getGameRules().get(Key);
+			T rule = serverCommandSource.getServer().getGameRules().get(Key);
 			
 			if (rule instanceof BooleanRule) {
 				Text command;
@@ -34,37 +34,37 @@ public abstract class GameRuleCommandMixin {
 				switch (Key.getName()) {
 					case "allowCavesMap":
 						command = new LiteralText(String.format("§0§0§a%s§f§f", val));
-						serverCommandSource.getMinecraftServer().getPlayerManager().sendToAll(
+						serverCommandSource.getServer().getPlayerManager().sendToAll(
 								new GameMessageS2CPacket(command, MessageType.SYSTEM, Util.NIL_UUID));
 						break;
 					case "allowEntityRadar":
 						command = new LiteralText(String.format("§0§0§b%s§f§f", val));
-						serverCommandSource.getMinecraftServer().getPlayerManager().sendToAll(
+						serverCommandSource.getServer().getPlayerManager().sendToAll(
 								new GameMessageS2CPacket(command, MessageType.SYSTEM, Util.NIL_UUID));
 						break;
 					case "allowPlayerRadar":
 						command = new LiteralText(String.format("§0§0§c%s§f§f", val));
-						serverCommandSource.getMinecraftServer().getPlayerManager().sendToAll(
+						serverCommandSource.getServer().getPlayerManager().sendToAll(
 								new GameMessageS2CPacket(command, MessageType.SYSTEM, Util.NIL_UUID));
 						break;
 					case "allowCreatureRadar":
 						command = new LiteralText(String.format("§0§0§d%s§f§f", val));
-						serverCommandSource.getMinecraftServer().getPlayerManager().sendToAll(
+						serverCommandSource.getServer().getPlayerManager().sendToAll(
 								new GameMessageS2CPacket(command, MessageType.SYSTEM, Util.NIL_UUID));
 						break;
 					case "allowHostileRadar":
 						command = new LiteralText(String.format("§0§0§e%s§f§f", val));
-						serverCommandSource.getMinecraftServer().getPlayerManager().sendToAll(
+						serverCommandSource.getServer().getPlayerManager().sendToAll(
 								new GameMessageS2CPacket(command, MessageType.SYSTEM, Util.NIL_UUID));
 						break;
 					case "allowSlimeChunks":
 						command = new LiteralText(String.format("§0§0§s%s§f§f", val));
-						serverCommandSource.getMinecraftServer().getPlayerManager().sendToAll(
+						serverCommandSource.getServer().getPlayerManager().sendToAll(
 								new GameMessageS2CPacket(command, MessageType.SYSTEM, Util.NIL_UUID));
 						break;
 					case "allowWaypointsJump":
 						command = new LiteralText(String.format("§0§0§t%s§f§f", val));
-						serverCommandSource.getMinecraftServer().getPlayerManager().sendToAll(
+						serverCommandSource.getServer().getPlayerManager().sendToAll(
 								new GameMessageS2CPacket(command, MessageType.SYSTEM, Util.NIL_UUID));
 						break;
 				}

@@ -1,8 +1,7 @@
 package ru.bulldog.justmap.client.control;
 
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
-import net.minecraft.client.options.KeyBinding;
-
+import net.minecraft.client.option.KeyBinding;
 import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.client.config.ConfigFactory;
@@ -88,7 +87,7 @@ public final class KeyHandler {
 		registerKey(new KeyParser(createKeyBinding("waypoints_list", GLFW.GLFW_KEY_U)) {
 			@Override
 			public void onKeyUp() {
-				MC.openScreen(new WaypointsList(null));
+				MC.setScreen(new WaypointsList(null));
 			}
 	
 			@Override
@@ -100,7 +99,7 @@ public final class KeyHandler {
 		registerKey(new KeyParser(createKeyBinding("show_config", GLFW.GLFW_KEY_J)) {
 			@Override
 			public void onKeyUp() {
-				MC.openScreen(ConfigFactory.getConfigScreen(null));
+				MC.setScreen(ConfigFactory.getConfigScreen(null));
 			}
 			
 			@Override
@@ -112,7 +111,7 @@ public final class KeyHandler {
 		registerKey(new KeyParser(createKeyBinding("show_worldmap", GLFW.GLFW_KEY_M)) {
 			@Override
 			public void onKeyUp() {
-				MC.openScreen(Worldmap.getScreen());
+				MC.setScreen(Worldmap.getScreen());
 			}
 			
 			@Override

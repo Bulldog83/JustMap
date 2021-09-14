@@ -92,7 +92,7 @@ public class EntityHeadIcon extends Image {
 		boolean solid = true;
 		for (int i = 0; i < width; i++) {
 			for (int j = 0; j < height; j++) {
-				int alpha = (icon.getPixelColor(i, j) >> 24) & 255;
+				int alpha = (icon.getColor(i, j) >> 24) & 255;
 				solid = alpha > 0;
 				if (!solid) break;
 			}

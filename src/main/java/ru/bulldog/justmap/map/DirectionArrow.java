@@ -12,8 +12,8 @@ import net.minecraft.client.resource.metadata.AnimationResourceMetadata;
 import net.minecraft.client.texture.Sprite;
 import net.minecraft.util.math.Matrix3f;
 import net.minecraft.util.math.Matrix4f;
+import net.minecraft.util.math.Vec3f;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.client.util.math.Vector3f;
 import net.minecraft.util.Identifier;
 
 import ru.bulldog.justmap.JustMap;
@@ -24,7 +24,7 @@ import ru.bulldog.justmap.util.colors.Colors;
 import ru.bulldog.justmap.util.render.RenderUtil;
 
 public class DirectionArrow extends Sprite {
-	private final static VertexFormat vertexFormat = new VertexFormat(ImmutableList.of(VertexFormats.POSITION_ELEMENT, VertexFormats.TEXTURE_ELEMENT, VertexFormats.NORMAL_ELEMENT, VertexFormats.PADDING_ELEMENT));
+	private final static VertexFormat vertexFormat = new VertexFormat(ImmutableList.of(VertexFormats.POSITION_ELEMENT, VertexFormats.TEXTURE_0_ELEMENT, VertexFormats.NORMAL_ELEMENT, VertexFormats.PADDING_ELEMENT));
 	private static DirectionArrow ARROW;
 	
 	private DirectionArrow(Identifier texture, int w, int h) {
@@ -56,7 +56,7 @@ public class DirectionArrow extends Sprite {
 			
 			matrix.push();
 			matrix.translate(x, y, 0);
-			matrix.multiply(Vector3f.POSITIVE_Z.getDegreesQuaternion(rotation + 180));
+			matrix.multiply(Vec3f.POSITIVE_Z.getDegreesQuaternion(rotation + 180));
 			
 			Matrix4f m4f = matrix.peek().getModel();
 			Matrix3f m3f = matrix.peek().getNormal();

@@ -2,7 +2,7 @@ package ru.bulldog.justmap.client.control;
 
 
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.options.KeyBinding;
+import net.minecraft.client.option.KeyBinding;
 
 public abstract class KeyParser {
 	public final KeyBinding keyBinding;

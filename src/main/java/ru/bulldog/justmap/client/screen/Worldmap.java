@@ -132,17 +132,17 @@ public class Worldmap extends MapScreen implements IMap {
 	
 	private void addMapMenu() {
 		LangUtil langUtil = new LangUtil("gui.worldmap");
-		this.mapMenu = this.addChild(new DropDownListWidget(25, paddingTop + 2, 100, 22));
+		this.mapMenu = this.addSelectableChild(new DropDownListWidget(25, paddingTop + 2, 100, 22));
 		this.mapMenu.addElement(new ListElementWidget(langUtil.getText("add_waypoint"), () -> {
 			JustMapClient.getMap().createWaypoint(world, centerPos);
 			return true;
 		}));
 		this.mapMenu.addElement(new ListElementWidget(langUtil.getText("set_map_pos"), () -> {
-			client.openScreen(new MapPositionScreen(this));
+			client.setScreen(new MapPositionScreen(this));
 			return true;
 		}));
 		this.mapMenu.addElement(new ListElementWidget(langUtil.getText("open_map_config"), () -> {
-			client.openScreen(ConfigFactory.getConfigScreen(this));
+			client.setScreen(ConfigFactory.getConfigScreen(this));
 			return true;
 		}));
 	}
@@ -157,7 +157,7 @@ public class Worldmap extends MapScreen implements IMap {
 		this.addButton(new ButtonWidget(width - 24, height / 2 + 1, 20, 20, new LiteralText("-"), (b) -> changeScale(+0.25F)));		
 		this.addButton(new ButtonWidget(width - 24, height - paddingBottom - 22, 20, 20, new LiteralText("\u271C"), (b) -> setCenterByPlayer()));
 		this.addButton(new ButtonWidget(4, paddingTop + 2, 20, 20, new LiteralText("\u2630"), (b) -> mapMenu.toggleVisible()));
-		this.addButton(new ButtonWidget(4, height - paddingBottom - 22, 20, 20, new LiteralText("\u2726"), (b) -> client.openScreen(new WaypointsList(this))));
+		this.addButton(new ButtonWidget(4, height - paddingBottom - 22, 20, 20, new LiteralText("\u2726"), (b) -> client.setScreen(new WaypointsList(this))));
 	}
 	
 	@Override
@@ -201,7 +201,7 @@ public class Worldmap extends MapScreen implements IMap {
 		MapPlayerManager.getPlayer(player).getIcon().draw(arrowX, arrowY, iconSize, true);
 		
 		this.drawBorders(paddingTop, paddingBottom);
-		drawCenteredString(matrices, client.textRenderer, cursorCoords, width / 2, paddingTop + 4, Colors.WHITE);
+		drawCenteredText(matrices, client.textRenderer, cursorCoords, width / 2, paddingTop + 4, Colors.WHITE);
 	}
 	
 	private void drawMap() {		

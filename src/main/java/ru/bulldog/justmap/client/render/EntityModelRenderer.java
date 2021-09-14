@@ -8,11 +8,11 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.EntityRenderDispatcher;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.client.util.math.Vector3f;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.boss.dragon.EnderDragonEntity;
 import net.minecraft.entity.mob.GhastEntity;
 import net.minecraft.entity.mob.WaterCreatureEntity;
+import net.minecraft.util.math.Vec3f;
 import net.minecraft.entity.LivingEntity;
 
 public class EntityModelRenderer {	
@@ -41,9 +41,9 @@ public class EntityModelRenderer {
 		matrices.translate(modelSize / 4, modelSize / 2, 0);
 		if (ClientSettings.rotateMap) {
 			float rotation = (float) MathUtil.correctAngle(minecraft.player.headYaw);
-			matrices.multiply(Vector3f.POSITIVE_Z.getDegreesQuaternion(rotation));
+			matrices.multiply(Vec3f.POSITIVE_Z.getDegreesQuaternion(rotation));
 		} else {
-			matrices.multiply(Vector3f.POSITIVE_X.getDegreesQuaternion(180.0F));
+			matrices.multiply(Vec3f.POSITIVE_X.getDegreesQuaternion(180.0F));
 		}
 		matrices.push();
 		matrices.scale(scale, scale, scale);

@@ -175,7 +175,7 @@ public class WaypointEditor extends MapScreen {
 	public void render(MatrixStack matrixStack, int mouseX, int mouseY, float delta) {
 		super.render(matrixStack, mouseX, mouseY, delta);
 		String dimensionName = info == null ? lang("unknown").asString() : I18n.translate(info.getFirst());
-		drawCenteredString(matrixStack, textRenderer, dimensionName, center, 15, Colors.WHITE);
+		drawCenteredText(matrixStack, textRenderer, dimensionName, center, 15, Colors.WHITE);
 	}
 	
 	private void cycleColor(int i) {
@@ -225,7 +225,7 @@ public class WaypointEditor extends MapScreen {
 	
 	@Override
 	public void onClose() {
-		this.client.openScreen(parent);
+		this.client.setScreen(parent);
 	}
 	
 	@Override
