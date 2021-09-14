@@ -97,7 +97,7 @@ public class DataUtil {
 		return serverWorld != null ? serverWorld : clientWorld;
 	}
 	
-	public static MutableRegistry<Biome> getBiomeRegistry(World world) {
+	public static Registry<Biome> getBiomeRegistry(World world) {
 		return world.getRegistryManager().get(Registry.BIOME_KEY);
 	}
 	
@@ -106,7 +106,7 @@ public class DataUtil {
 		return biomeId != null ? biomeId : BuiltinRegistries.BIOME.getId(biome);
 	}
 	
-	public static MutableRegistry<Biome> getBiomeRegistry() {
+	public static Registry<Biome> getBiomeRegistry() {
 		if (JustMap.getSide() == EnvType.CLIENT) {
 			MinecraftClient minecraft = MinecraftClient.getInstance();
 			ClientPlayNetworkHandler networkHandler = minecraft.getNetworkHandler();
