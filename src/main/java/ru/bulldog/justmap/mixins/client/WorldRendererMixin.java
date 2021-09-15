@@ -29,4 +29,5 @@ public abstract class WorldRendererMixin {
 	public void renderBeamFabulous(MatrixStack matrixStack, float f, long l, boolean bl, Camera camera, GameRenderer gameRenderer, LightmapTextureManager lightmapTextureManager, Matrix4f matrix4f, CallbackInfo ci) {
 		if (MinecraftClient.isFabulousGraphicsOrBetter()) WaypointRenderer.renderWaypoints(matrixStack, camera, f);
 	}
+	*/
 }
