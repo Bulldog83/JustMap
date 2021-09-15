@@ -214,12 +214,14 @@ public class WaypointsList extends MapScreen {
 		this.createEntries();
 		
 		this.maxScroll = waypoints.size() * 20;
-		this.children.clear();
-		this.children.addAll(entries);
-		this.children.add(addButton);
-		this.children.add(closeButton);
-		this.children.add(prevDimensionButton);
-		this.children.add(nextDimensionButton);
+		@SuppressWarnings("unchecked")
+		List<Element> children = (List<Element>) children();
+		children.clear();
+		children.addAll(entries);
+		children.add(addButton);
+		children.add(closeButton);
+		children.add(prevDimensionButton);
+		children.add(nextDimensionButton);
 	}
 	
 	@Override

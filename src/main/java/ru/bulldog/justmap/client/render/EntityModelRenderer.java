@@ -28,7 +28,7 @@ public class EntityModelRenderer {
 		float bodyYaw = livingEntity.bodyYaw;
 		float prevHeadYaw = livingEntity.prevHeadYaw;
 		float prevBodyYaw = livingEntity.prevBodyYaw;
-		float pitch = livingEntity.pitch;
+		float pitch = livingEntity.getPitch();
 		float prevPitch = livingEntity.prevPitch;
 		
 		setPitchAndYaw(livingEntity);
@@ -53,7 +53,7 @@ public class EntityModelRenderer {
 		matrices.pop();
 		matrices.pop();
 		
-		livingEntity.pitch = pitch;
+		livingEntity.setPitch(pitch);
 		livingEntity.headYaw = headYaw;
 		livingEntity.bodyYaw = bodyYaw;
 		livingEntity.prevPitch = prevPitch;
@@ -86,7 +86,7 @@ public class EntityModelRenderer {
 	}
 	
 	private static void setPitchAndYaw(LivingEntity livingEntity) {
-		livingEntity.pitch = 0.0F;
+		livingEntity.setPitch(0.0F);
 		livingEntity.prevPitch = 0.0F;
 		
 		switch(livingEntity.getMovementDirection()) {

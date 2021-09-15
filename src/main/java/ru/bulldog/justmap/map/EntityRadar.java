@@ -58,7 +58,7 @@ public class EntityRadar {
 		if (players.size() > 0) {
 			List<PlayerEntity> playersToClear = new ArrayList<>();
 			this.players.forEach(player -> {
-				if (player.removed) {
+				if (player.isRemoved()) {
 					playersToClear.add(player);
 				} else if (MathUtil.getDistance(center, player.getBlockPos()) > radius) {
 					playersToClear.add(player);
@@ -71,7 +71,7 @@ public class EntityRadar {
 			this.creatures.forEach(mob -> {
 				boolean tooFar = MathUtil.getDistance(center, mob.getBlockPos()) > radius ||
 						         Math.abs(mob.getY() - center.getY()) > 24;
-				if (mob.isDead() || mob.removed) {
+				if (mob.isDead() || mob.isRemoved()) {
 					mobsToClear.add(mob);
 				} else if (tooFar) {
 					mobsToClear.add(mob);

@@ -57,7 +57,7 @@ public class MapScreen extends Screen {
 		RenderSystem.disableDepthTest();
 		this.renderBackground(matrices);
 		this.renderForeground(matrices);
-		for (Element e : children) {
+		for (Element e : children()) {
 			if (e instanceof Drawable) {
 				((Drawable) e).render(matrices, mouseX, mouseY, delta);
 			}

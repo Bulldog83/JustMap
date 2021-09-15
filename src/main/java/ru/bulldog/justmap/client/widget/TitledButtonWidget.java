@@ -1,5 +1,7 @@
 package ru.bulldog.justmap.client.widget;
 
+import net.minecraft.client.gui.Element;
+import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
 import net.minecraft.client.sound.SoundManager;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.LiteralText;
@@ -7,7 +9,7 @@ import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.widget.ClickableWidget;
 
 
-public class TitledButtonWidget<W extends ClickableWidget> extends ClickableWidget {
+public class TitledButtonWidget<W extends ClickableWidget> extends ClickableWidget implements Element {
 	public final W widget;
 	public final LiteralText title;
 	private final TextRenderer font;
@@ -120,5 +122,10 @@ public class TitledButtonWidget<W extends ClickableWidget> extends ClickableWidg
 	@Override
 	public void playDownSound(SoundManager soundManager_1) {
 		this.widget.playDownSound(soundManager_1);
+	}
+
+	@Override
+	public void appendNarrations(NarrationMessageBuilder builder) {
+		// FIXME: implement?
 	}
 }

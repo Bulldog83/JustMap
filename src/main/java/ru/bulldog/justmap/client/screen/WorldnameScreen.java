@@ -78,7 +78,7 @@ public class WorldnameScreen extends Screen {
 	public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
 		this.renderBackground(matrices);
 		drawCenteredText(matrices, textRenderer, LangUtil.getString("gui", "worldname_title"), center, y + 25, Colors.WHITE);
-		for (Element child : children) {
+		for (Element child : children()) {
 			if (child instanceof Drawable) {
 				((Drawable) child).render(matrices, mouseX, mouseY, delta);
 			}
