@@ -132,7 +132,7 @@ public class Worldmap extends MapScreen implements IMap {
 	
 	private void addMapMenu() {
 		LangUtil langUtil = new LangUtil("gui.worldmap");
-		this.mapMenu = this.addSelectableChild(new DropDownListWidget(25, paddingTop + 2, 100, 22));
+		this.mapMenu = this.addDrawableChild(new DropDownListWidget(25, paddingTop + 2, 100, 22));
 		this.mapMenu.addElement(new ListElementWidget(langUtil.getText("add_waypoint"), () -> {
 			JustMapClient.getMap().createWaypoint(world, centerPos);
 			return true;
@@ -148,16 +148,16 @@ public class Worldmap extends MapScreen implements IMap {
 	}
 	
 	private void addMapButtons() {
-		this.addButton(new ButtonWidget(width - 24, 10, 20, 20, new LiteralText("x"), (b) -> onClose()));		
-		this.addButton(new ButtonWidget(width / 2 - 10, height - paddingBottom - 44, 20, 20, new LiteralText("\u2191"), (b) -> moveMap(Direction.NORTH)));
-		this.addButton(new ButtonWidget(width / 2 - 10, height - paddingBottom - 22, 20, 20, new LiteralText("\u2193"), (b) -> moveMap(Direction.SOUTH)));
-		this.addButton(new ButtonWidget(width / 2 - 32, height - paddingBottom - 32, 20, 20, new LiteralText("\u2190"), (b) -> moveMap(Direction.WEST)));
-		this.addButton(new ButtonWidget(width / 2 + 12, height - paddingBottom - 32, 20, 20, new LiteralText("\u2192"), (b) -> moveMap(Direction.EAST)));		
-		this.addButton(new ButtonWidget(width - 24, height / 2 - 21, 20, 20, new LiteralText("+"), (b) -> changeScale(-0.25F)));
-		this.addButton(new ButtonWidget(width - 24, height / 2 + 1, 20, 20, new LiteralText("-"), (b) -> changeScale(+0.25F)));		
-		this.addButton(new ButtonWidget(width - 24, height - paddingBottom - 22, 20, 20, new LiteralText("\u271C"), (b) -> setCenterByPlayer()));
-		this.addButton(new ButtonWidget(4, paddingTop + 2, 20, 20, new LiteralText("\u2630"), (b) -> mapMenu.toggleVisible()));
-		this.addButton(new ButtonWidget(4, height - paddingBottom - 22, 20, 20, new LiteralText("\u2726"), (b) -> client.setScreen(new WaypointsList(this))));
+		this.addDrawableChild(new ButtonWidget(width - 24, 10, 20, 20, new LiteralText("x"), (b) -> onClose()));
+		this.addDrawableChild(new ButtonWidget(width / 2 - 10, height - paddingBottom - 44, 20, 20, new LiteralText("\u2191"), (b) -> moveMap(Direction.NORTH)));
+		this.addDrawableChild(new ButtonWidget(width / 2 - 10, height - paddingBottom - 22, 20, 20, new LiteralText("\u2193"), (b) -> moveMap(Direction.SOUTH)));
+		this.addDrawableChild(new ButtonWidget(width / 2 - 32, height - paddingBottom - 32, 20, 20, new LiteralText("\u2190"), (b) -> moveMap(Direction.WEST)));
+		this.addDrawableChild(new ButtonWidget(width / 2 + 12, height - paddingBottom - 32, 20, 20, new LiteralText("\u2192"), (b) -> moveMap(Direction.EAST)));
+		this.addDrawableChild(new ButtonWidget(width - 24, height / 2 - 21, 20, 20, new LiteralText("+"), (b) -> changeScale(-0.25F)));
+		this.addDrawableChild(new ButtonWidget(width - 24, height / 2 + 1, 20, 20, new LiteralText("-"), (b) -> changeScale(+0.25F)));
+		this.addDrawableChild(new ButtonWidget(width - 24, height - paddingBottom - 22, 20, 20, new LiteralText("\u271C"), (b) -> setCenterByPlayer()));
+		this.addDrawableChild(new ButtonWidget(4, paddingTop + 2, 20, 20, new LiteralText("\u2630"), (b) -> mapMenu.toggleVisible()));
+		this.addDrawableChild(new ButtonWidget(4, height - paddingBottom - 22, 20, 20, new LiteralText("\u2726"), (b) -> client.setScreen(new WaypointsList(this))));
 	}
 	
 	@Override

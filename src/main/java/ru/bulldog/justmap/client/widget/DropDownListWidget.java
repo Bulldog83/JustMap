@@ -8,11 +8,13 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gui.AbstractParentElement;
 import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.Element;
+import net.minecraft.client.gui.Selectable;
+import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
 import net.minecraft.client.util.math.MatrixStack;
 import ru.bulldog.justmap.util.colors.Colors;
 import ru.bulldog.justmap.util.render.RenderUtil;
 
-public class DropDownListWidget extends AbstractParentElement implements Drawable {
+public class DropDownListWidget extends AbstractParentElement implements Drawable, Selectable {
 
 	private List<ListElementWidget> children = new ArrayList<>();
 	private boolean visible = false;
@@ -77,5 +79,16 @@ public class DropDownListWidget extends AbstractParentElement implements Drawabl
 	@Override
 	public List<? extends Element> children() {
 		return this.children;
+	}
+
+	@Override
+	public void appendNarrations(NarrationMessageBuilder builder) {
+		// FIXME: implement?
+	}
+
+	@Override
+	public SelectionType getType() {
+		// FIXME: correct?
+		return SelectionType.NONE;
 	}
 }

@@ -29,10 +29,10 @@ public class MapPositionScreen extends Screen {
 	public void init() {
 		int posX = width / 2;
 		int posY = height - 60;
-		this.addButton(new ButtonWidget(posX - 125, posY, 80, 20, LangUtil.getText("gui", "save"), button -> this.onSave()));
-		this.addButton(new ButtonWidget(posX - 40, posY, 80, 20, LangUtil.getText("gui", "reset"), button -> this.onReset()));
-		this.addButton(new ButtonWidget(posX + 45, posY, 80, 20, LangUtil.getText("gui", "cancel"), button -> this.onClose()));
-		this.mapHolder = this.addSelectableChild(new MapWidget(this, JustMapClient.getMap()));
+		this.addDrawableChild(new ButtonWidget(posX - 125, posY, 80, 20, LangUtil.getText("gui", "save"), button -> this.onSave()));
+		this.addDrawableChild(new ButtonWidget(posX - 40, posY, 80, 20, LangUtil.getText("gui", "reset"), button -> this.onReset()));
+		this.addDrawableChild(new ButtonWidget(posX + 45, posY, 80, 20, LangUtil.getText("gui", "cancel"), button -> this.onClose()));
+		this.mapHolder = this.addDrawable(new MapWidget(this, JustMapClient.getMap()));
 	}
 	
 	private void onReset() {
