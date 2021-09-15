@@ -71,11 +71,11 @@ public class PlayerIcon extends MapIcon<PlayerIcon> {
 					hmod = MathUtil.clamp((24 - Math.abs(hdiff)) / 24F, 0.25F, 1.0F);
 					RenderUtil.texEnvMode(GLC.GL_MODULATE);
 				}
-				RenderSystem.color3f(hmod, hmod, hmod);
+				RenderSystem.setShaderColor(hmod, hmod, hmod, 1.0F);
 			}
 			MapPlayerManager.getPlayer(player).getIcon().draw(matrices, iconPos.x, iconPos.y);
 			RenderUtil.texEnvMode(GLC.GL_MODULATE);
-			RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+			RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 		} else {
 			int darken = ColorUtil.colorBrigtness(color, -3);
 			RenderUtil.fill(iconPos.x - 0.5, iconPos.y - 0.5, size + 1, size + 1, darken);

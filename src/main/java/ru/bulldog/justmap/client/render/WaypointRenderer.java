@@ -92,7 +92,7 @@ public class WaypointRenderer {
 		
 		RenderSystem.enableBlend();
 		RenderSystem.defaultBlendFunc();
-		RenderSystem.enableAlphaTest();
+		RenderSystem.enableCull();
 		RenderSystem.enableDepthTest();
 		RenderSystem.enableTexture();
 		RenderSystem.depthMask(false);

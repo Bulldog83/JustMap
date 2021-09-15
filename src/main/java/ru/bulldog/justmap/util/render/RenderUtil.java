@@ -1,6 +1,6 @@
 package ru.bulldog.justmap.util.render;
 
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.MinecraftClient;
@@ -32,7 +32,7 @@ public class RenderUtil extends DrawableHelper {
 	
 	public final static RenderUtil DRAWER = new RenderUtil();
 	
-	private final static VertexFormat VF_POS_TEX_NORMAL = new VertexFormat(ImmutableList.of(VertexFormats.POSITION_ELEMENT, VertexFormats.TEXTURE_0_ELEMENT, VertexFormats.NORMAL_ELEMENT, VertexFormats.PADDING_ELEMENT));
+	private final static VertexFormat VF_POS_TEX_NORMAL = new VertexFormat(ImmutableMap.of("postition", VertexFormats.POSITION_ELEMENT, "texture", VertexFormats.TEXTURE_0_ELEMENT, "normal", VertexFormats.NORMAL_ELEMENT, "padding", VertexFormats.PADDING_ELEMENT));
 	private final static Tessellator tessellator = Tessellator.getInstance();
 	private final static BufferBuilder vertexBuffer = tessellator.getBuffer();
 	private final static TextRenderer textRenderer = MinecraftClient.getInstance().textRenderer;
@@ -147,10 +147,10 @@ public class RenderUtil extends DrawableHelper {
     }
     
     public static void startDraw(VertexFormat vertexFormat) {
-    	startDraw(GLC.GL_QUADS, vertexFormat);
+    	startDraw(VertexFormat.DrawMode.QUADS, vertexFormat);
     }
     
-    public static void startDraw(int mode, VertexFormat vertexFormat) {
+    public static void startDraw(VertexFormat.DrawMode mode, VertexFormat vertexFormat) {
     	vertexBuffer.begin(mode, vertexFormat);
     }
     
@@ -175,8 +175,8 @@ public class RenderUtil extends DrawableHelper {
 		float b = (float)(color & 255) / 255.0F;
 	
 		RenderSystem.disableTexture();
-		RenderSystem.color4f(r, g, b, a);
-		startDraw(GLC.GL_TRIANGLES, VertexFormats.POSITION);
+		RenderSystem.setShaderColor(r, g, b, a);
+		startDraw(VertexFormat.DrawMode.TRIANGLES, VertexFormats.POSITION);
 		vertexBuffer.vertex(x1, y1, 0).next();
 		vertexBuffer.vertex(x2, y2, 0).next();
 		vertexBuffer.vertex(x3, y3, 0).next();
@@ -191,12 +191,12 @@ public class RenderUtil extends DrawableHelper {
 		float b = (float)(color & 255) / 255.0F;
 	
 		RenderSystem.disableTexture();
-		RenderSystem.color4f(r, g, b, a);
-		startDraw(GLC.GL_LINES, VertexFormats.POSITION);
+		RenderSystem.setShaderColor(r, g, b, a);
+		startDraw(VertexFormat.DrawMode.LINES, VertexFormats.POSITION);
 		vertexBuffer.vertex(x1, y1, 0).next();
 		vertexBuffer.vertex(x2, y2, 0).next();
 		endDraw();
-		RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+		RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 		RenderSystem.enableTexture();
 	}	
 	
@@ -215,16 +215,16 @@ public class RenderUtil extends DrawableHelper {
 		RenderSystem.enableBlend();
 	    RenderSystem.disableTexture();
 	    RenderSystem.defaultBlendFunc();
-		RenderSystem.color4f(r, g, b, a);
+		RenderSystem.setShaderColor(r, g, b, a);
 		drawCircleVertices(x, y, radius);
-		RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+		RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 		RenderSystem.enableTexture();
 		RenderSystem.disableBlend();
 	}
 	
 	public static void drawCircleVertices(double x, double y, double radius) {
 		double pi2 = Math.PI * 2;
-		startDraw(GLC.GL_TRIANGLE_FAN, VertexFormats.POSITION);
+		startDraw(VertexFormat.DrawMode.TRIANGLE_FAN, VertexFormats.POSITION);
 		vertexBuffer.vertex(x, y, 0).next();
 		int sides = 50;
 		for (int i = 0; i <= sides; i++) {
@@ -253,7 +253,7 @@ public class RenderUtil extends DrawableHelper {
 		RenderSystem.enableBlend();
 		RenderSystem.disableTexture();
 		RenderSystem.defaultBlendFunc();
-		startDraw(GLC.GL_QUADS, VertexFormats.POSITION_COLOR);
+		startDraw(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
 		vertexBuffer.vertex(matrix4f, (float) x, (float) (y + h), 0.0F).color(r, g, b, a).next();
 		vertexBuffer.vertex(matrix4f, (float) (x + w), (float) (y + h), 0.0F).color(r, g, b, a).next();
 		vertexBuffer.vertex(matrix4f, (float) (x + w), (float) y, 0.0F).color(r, g, b, a).next();
@@ -272,7 +272,7 @@ public class RenderUtil extends DrawableHelper {
 	public static void drawPlayerHead(MatrixStack matrices, double x, double y, int w, int h) {
 		RenderSystem.enableBlend();
 		RenderSystem.defaultBlendFunc();
-		RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+		RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 		startDrawNormal();
 		draw(matrices, vertexBuffer, x, y, w, h, 0.125F, 0.125F, 0.25F, 0.25F);
 		draw(matrices, vertexBuffer, x, y, w, h, 0.625F, 0.125F, 0.75F, 0.25F);
@@ -320,8 +320,8 @@ public class RenderUtil extends DrawableHelper {
 		float bottomV = renderData.bottomV;
 		
 		RenderSystem.enableBlend();
-		RenderSystem.enableAlphaTest();		
-		RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+		RenderSystem.enableCull();		
+		RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 		
 		skin.bindTexture();
 		startDrawNormal();
@@ -385,7 +385,7 @@ public class RenderUtil extends DrawableHelper {
 	
 	private static void draw(MatrixStack matrixStack, VertexConsumer vertexConsumer, double x, double y, float w, float h, float minU, float minV, float maxU, float maxV) {
 		RenderSystem.enableBlend();
-		RenderSystem.enableAlphaTest();
+		RenderSystem.enableCull();
 
 		matrixStack.push();
 		matrixStack.translate(x, y, 0);

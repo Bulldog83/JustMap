@@ -16,7 +16,7 @@ import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
-import net.minecraft.client.texture.TextureUtil;
+import com.mojang.blaze3d.platform.TextureUtil;
 
 import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.util.colors.ColorUtil;
@@ -65,7 +65,7 @@ public class MapTexture {
 		if (bytes == null) return;
 		
 		if (this.glId == -1) {
-			this.glId = TextureUtil.generateId();
+			this.glId = TextureUtil.generateTextureId();
 		}
 		
 		this.refillBuffer();
@@ -294,12 +294,12 @@ public class MapTexture {
 		if (!RenderSystem.isOnRenderThread()) {
 			RenderSystem.recordRenderCall(() -> {
 				if (this.glId != -1) {
-					TextureUtil.deleteId(this.glId);
+					TextureUtil.releaseTextureId(this.glId);
 					this.glId = -1;
 				}
 			});
 		} else if (this.glId != -1) {
-			TextureUtil.deleteId(this.glId);
+			TextureUtil.releaseTextureId(this.glId);
 			this.glId = -1;
 		}
 	}

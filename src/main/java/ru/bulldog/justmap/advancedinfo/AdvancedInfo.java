@@ -94,7 +94,7 @@ public class AdvancedInfo {
 		if (!ClientSettings.advancedInfo) return;
 		if (minecraft.currentScreen != null &&
 		  !(minecraft.currentScreen instanceof ChatScreen)) return;
-		RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+		RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 		this.managers.forEach((position, manager) -> manager.draw(matrixStack));
 	}
 }

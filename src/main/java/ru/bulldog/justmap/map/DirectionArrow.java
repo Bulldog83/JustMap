@@ -1,6 +1,6 @@
 package ru.bulldog.justmap.map;
 
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.render.BufferBuilder;
@@ -24,7 +24,7 @@ import ru.bulldog.justmap.util.colors.Colors;
 import ru.bulldog.justmap.util.render.RenderUtil;
 
 public class DirectionArrow extends Sprite {
-	private final static VertexFormat vertexFormat = new VertexFormat(ImmutableList.of(VertexFormats.POSITION_ELEMENT, VertexFormats.TEXTURE_0_ELEMENT, VertexFormats.NORMAL_ELEMENT, VertexFormats.PADDING_ELEMENT));
+	private final static VertexFormat vertexFormat = new VertexFormat(ImmutableMap.of("postition", VertexFormats.POSITION_ELEMENT, "texture", VertexFormats.TEXTURE_0_ELEMENT, "normal", VertexFormats.NORMAL_ELEMENT, "padding", VertexFormats.PADDING_ELEMENT));
 	private static DirectionArrow ARROW;
 	
 	private DirectionArrow(Identifier texture, int w, int h) {
@@ -44,15 +44,16 @@ public class DirectionArrow extends Sprite {
 			MatrixStack matrix = new MatrixStack();
 			Tessellator tessellator = Tessellator.getInstance();
 			BufferBuilder builder = tessellator.getBuffer();
-			
-			builder.begin(7, vertexFormat);
+
+			// FIXME: is mode 7 really quads?
+			builder.begin(VertexFormat.DrawMode.QUADS, vertexFormat);
 			
 			VertexConsumer vertexConsumer = ARROW.getTextureSpecificVertexConsumer(builder);
 			
 			RenderUtil.bindTexture(ARROW.getId());
 			
-			RenderSystem.enableAlphaTest();
-			RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+			RenderSystem.enableCull();
+			RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 			
 			matrix.push();
 			matrix.translate(x, y, 0);

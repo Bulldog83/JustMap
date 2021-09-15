@@ -3,7 +3,7 @@ package ru.bulldog.justmap.map;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.lwjgl.opengl.GL11;
+import net.minecraft.client.render.VertexFormat;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
@@ -82,13 +82,13 @@ public class ChunkGrid {
 		float b = (float) (color & 255) / 255.0F;
 		
 		RenderSystem.disableTexture();
-		RenderSystem.color4f(r, g, b, a);
-		RenderUtil.startDraw(GL11.GL_LINES, VertexFormats.POSITION);
+		RenderSystem.setShaderColor(r, g, b, a);
+		RenderUtil.startDraw(VertexFormat.DrawMode.LINES, VertexFormats.POSITION);
 		BufferBuilder buffer = RenderUtil.getBuffer();
 		lines.forEach(line -> line.draw(buffer));
 		RenderUtil.endDraw();
 		RenderSystem.enableTexture();
-		RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+		RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 	}	
 	
 	private class GridLine extends Line {
