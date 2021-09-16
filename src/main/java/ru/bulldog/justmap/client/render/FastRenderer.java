@@ -9,6 +9,7 @@ import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.BlockPos;
 
+import net.minecraft.util.math.Vec3f;
 import ru.bulldog.justmap.client.config.ClientSettings;
 import ru.bulldog.justmap.map.ChunkGrid;
 import ru.bulldog.justmap.map.data.RegionData;
@@ -34,7 +35,7 @@ public class FastRenderer extends MapRenderer {
 		RenderUtil.enableScissor();
 		RenderUtil.applyScissor(scissX, scissY, scissW, scissH);
 		RenderSystem.enableBlend();
-        RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 		if (Minimap.isRound()) {
 			RenderSystem.colorMask(false, false, false, true);
 			RenderSystem.clearColor(0.0F, 0.0F, 0.0F, 0.0F);
@@ -46,17 +47,17 @@ public class FastRenderer extends MapRenderer {
 			RenderUtil.endDraw();
 			RenderSystem.blendFunc(GLC.GL_DST_ALPHA, GLC.GL_ONE_MINUS_DST_ALPHA);
 		}
-		RenderSystem.pushMatrix();
+		matrices.push();
 		if (mapRotation) {
 			float moveX = mapX + mapWidth / 2.0F;
 			float moveY = mapY + mapHeight / 2.0F;
-			RenderSystem.translatef(moveX, moveY, 0.0F);
-			RenderSystem.rotatef(-rotation + 180, 0.0F, 0.0F, 1.0F);
-			RenderSystem.translatef(-moveX, -moveY, 0.0F);
+			matrices.translate(moveX, moveY, 0.0);
+			matrices.multiply(Vec3f.POSITIVE_Z.getDegreesQuaternion(-rotation + 180));
+			matrices.translate(-moveX, -moveY, 0.0);
 		}
-		RenderSystem.translatef(-offX, -offY, 0.0F);
+		matrices.translate(-offX, -offY, 0.0);
 		
-		this.drawMap();
+		this.drawMap(matrices);
 		if (ClientSettings.showGrid) {
 			this.drawGrid();
 		}
@@ -68,7 +69,7 @@ public class FastRenderer extends MapRenderer {
 		}
 		consumerProvider.draw();
 		
-		RenderSystem.popMatrix();
+		matrices.pop();
 		
 		List<WaypointIcon> drawableWaypoints = minimap.getWaypoints(playerPos, centerX, centerY);
 		for (WaypointIcon icon : drawableWaypoints) {
@@ -78,7 +79,7 @@ public class FastRenderer extends MapRenderer {
 		RenderUtil.disableScissor();
 	}
 	
-	private void drawMap() {
+	private void drawMap(MatrixStack matrices) {
 		int cornerX = lastX - scaledW / 2;
 		int cornerZ = lastZ - scaledH / 2;
 		
@@ -109,7 +110,7 @@ public class FastRenderer extends MapRenderer {
 				double scW = (double) texW / mapScale;
 				double scH = (double) texH / mapScale;
 				
-				region.draw(imgX + scX, imgY + scY, scW, scH, texX, texY, texW, texH);
+				region.draw(matrices, imgX + scX, imgY + scY, scW, scH, texX, texY, texW, texH);
 				
 				picY += texH > 0 ? texH : 512;
 			}

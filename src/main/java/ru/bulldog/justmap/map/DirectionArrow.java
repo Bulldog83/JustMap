@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableMap;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexFormat;
@@ -78,7 +79,8 @@ public class DirectionArrow extends Sprite {
 			double y2 = y + Math.sin(a2) * l;
 			double x3 = x + Math.cos(a3) * l;
 			double y3 = y + Math.sin(a3) * l;
-			
+
+			RenderSystem.setShader(GameRenderer::getPositionColorShader);
 			RenderUtil.drawTriangle(x1, y1, x2, y2, x3, y3, Colors.RED);
 		}
 	}

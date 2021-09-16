@@ -80,7 +80,7 @@ public class EntityHeadIcon extends Image {
 			NativeImageBackedTexture outTexture = new NativeImageBackedTexture(outline);
 			this.outlineId = textureManager.registerDynamicTexture(String.format("%s_%s_outline", this.id.getNamespace(), this.id.getPath()), outTexture);
 		}
-		textureManager.bindTexture(outlineId);
+		RenderUtil.bindTexture(outlineId);
 	}
 	
 	private boolean isSolid() {

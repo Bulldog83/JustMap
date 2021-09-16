@@ -163,7 +163,7 @@ public class Worldmap extends MapScreen implements IMap {
 	@Override
 	public void renderBackground(MatrixStack matrixStack) {
 		fill(matrixStack, x, 0, x + width, height, 0xFF444444);
-		this.drawMap();
+		this.drawMap(matrixStack);
 	}
 	
 	@Override
@@ -204,7 +204,7 @@ public class Worldmap extends MapScreen implements IMap {
 		drawCenteredText(matrices, client.textRenderer, cursorCoords, width / 2, paddingTop + 4, Colors.WHITE);
 	}
 	
-	private void drawMap() {		
+	private void drawMap(MatrixStack matrices) {
 		int cornerX = centerPos.getX() - scaledWidth / 2;
 		int cornerZ = centerPos.getZ() - scaledHeight / 2;
 		
@@ -237,7 +237,7 @@ public class Worldmap extends MapScreen implements IMap {
 				
 				RenderSystem.enableBlend();
 				RenderSystem.defaultBlendFunc();
-				region.draw(scX, scY, scW, scH, imgX, imgY, imgW, imgH);
+				region.draw(matrices, scX, scY, scW, scH, imgX, imgY, imgW, imgH);
 				
 				picY += imgH > 0 ? imgH : 512;
 			}

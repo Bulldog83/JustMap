@@ -7,6 +7,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexFormat;
@@ -94,14 +95,18 @@ public class RenderUtil extends DrawableHelper {
 	}
 	
 	public static void bindTexture(Identifier id) {
-    	textureManager.bindTexture(id);
+		RenderSystem.setShader(GameRenderer::getPositionTexShader);
+		RenderSystem.setShaderTexture(0, id);
     }
     
 	public static void bindTexture(int id) {
-		RenderSystem.bindTexture(id);
+		RenderSystem.setShader(GameRenderer::getPositionTexShader);
+		RenderSystem.setShaderTexture(0, id);
 	}
 	
 	public static void applyFilter(boolean force) {
+		// This is not working properly. Is it even needed?
+		/*
 		if (force || ClientSettings.textureFilter) {
 			RenderSystem.texParameter(GLC.GL_TEXTURE_2D, GLC.GL_TEXTURE_MIN_FILTER, GLC.GL_LINEAR_MIPMAP_LINEAR);
 			RenderSystem.texParameter(GLC.GL_TEXTURE_2D, GLC.GL_TEXTURE_MAG_FILTER, GLC.GL_LINEAR);
@@ -109,6 +114,7 @@ public class RenderUtil extends DrawableHelper {
 			RenderSystem.texParameter(GLC.GL_TEXTURE_2D, GLC.GL_TEXTURE_MIN_FILTER, GLC.GL_LINEAR_MIPMAP_NEAREST);
 			RenderSystem.texParameter(GLC.GL_TEXTURE_2D, GLC.GL_TEXTURE_MAG_FILTER, GLC.GL_NEAREST);
 		}
+		 */
 	}
 	
 	public static void enable(int target) {
@@ -135,7 +141,8 @@ public class RenderUtil extends DrawableHelper {
 	}
 	
 	public static void texEnvMode(int mode) {
-		GL11.glTexEnvi(GLC.GL_TEXTURE_ENV, GLC.GL_TEXTURE_ENV_MODE, mode);
+		// Crashes, and does not seem to be needed?
+		// GL11.glTexEnvi(GLC.GL_TEXTURE_ENV, GLC.GL_TEXTURE_ENV_MODE, mode);
 	}
 	
     public static void startDraw() {
@@ -176,6 +183,7 @@ public class RenderUtil extends DrawableHelper {
 	
 		RenderSystem.disableTexture();
 		RenderSystem.setShaderColor(r, g, b, a);
+		RenderSystem.setShader(GameRenderer::getPositionShader);
 		startDraw(VertexFormat.DrawMode.TRIANGLES, VertexFormats.POSITION);
 		vertexBuffer.vertex(x1, y1, 0).next();
 		vertexBuffer.vertex(x2, y2, 0).next();
@@ -192,6 +200,7 @@ public class RenderUtil extends DrawableHelper {
 	
 		RenderSystem.disableTexture();
 		RenderSystem.setShaderColor(r, g, b, a);
+		RenderSystem.setShader(GameRenderer::getPositionShader);
 		startDraw(VertexFormat.DrawMode.LINES, VertexFormats.POSITION);
 		vertexBuffer.vertex(x1, y1, 0).next();
 		vertexBuffer.vertex(x2, y2, 0).next();
@@ -216,6 +225,7 @@ public class RenderUtil extends DrawableHelper {
 	    RenderSystem.disableTexture();
 	    RenderSystem.defaultBlendFunc();
 		RenderSystem.setShaderColor(r, g, b, a);
+		RenderSystem.setShader(GameRenderer::getPositionShader);
 		drawCircleVertices(x, y, radius);
 		RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 		RenderSystem.enableTexture();
@@ -253,6 +263,7 @@ public class RenderUtil extends DrawableHelper {
 		RenderSystem.enableBlend();
 		RenderSystem.disableTexture();
 		RenderSystem.defaultBlendFunc();
+		RenderSystem.setShader(GameRenderer::getPositionColorShader);
 		startDraw(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
 		vertexBuffer.vertex(matrix4f, (float) x, (float) (y + h), 0.0F).color(r, g, b, a).next();
 		vertexBuffer.vertex(matrix4f, (float) (x + w), (float) (y + h), 0.0F).color(r, g, b, a).next();
@@ -274,11 +285,11 @@ public class RenderUtil extends DrawableHelper {
 		RenderSystem.defaultBlendFunc();
 		RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 		startDrawNormal();
-		draw(matrices, vertexBuffer, x, y, w, h, 0.125F, 0.125F, 0.25F, 0.25F);
-		draw(matrices, vertexBuffer, x, y, w, h, 0.625F, 0.125F, 0.75F, 0.25F);
+		draw(matrices, x, y, w, h, 0.125F, 0.125F, 0.25F, 0.25F);
+		draw(matrices, x, y, w, h, 0.625F, 0.125F, 0.75F, 0.25F);
 		endDraw();
 	}
-	
+
 	public static void draw(MatrixStack matrices, double x, double y, int size, int isize, int ix, int iy, int tw, int th) {
 		draw(matrices, x, y, size, size, ix, iy, isize, isize, tw, th);
 	}
@@ -322,7 +333,7 @@ public class RenderUtil extends DrawableHelper {
 		RenderSystem.enableBlend();
 		RenderSystem.enableCull();		
 		RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-		
+		RenderSystem.setShader(GameRenderer::getPositionTexShader);
 		skin.bindTexture();
 		startDrawNormal();
 		
@@ -377,6 +388,7 @@ public class RenderUtil extends DrawableHelper {
 	}
 	
 	public static void drawImage(MatrixStack matrices, Image image, double x, double y, float w, float h) {
+		RenderSystem.setShader(GameRenderer::getPositionTexShader);
 		image.bindTexture();
 		startDrawNormal();
 		draw(matrices, vertexBuffer, x, y, w, h, 0.0F, 0.0F, 1.0F, 1.0F);
@@ -397,7 +409,11 @@ public class RenderUtil extends DrawableHelper {
 
 		matrixStack.pop();
 	}
-	
+
+	private static void draw(MatrixStack matrices, double x, double y, float w, float h, float minU, float minV, float maxU, float maxV) {
+		draw(matrices, vertexBuffer, x, y, w, h, minU, minV, maxU, maxV);
+	}
+
 	private static void addVertices(Matrix4f m4f, Matrix3f m3f, VertexConsumer vertexConsumer, float w, float h, float minU, float minV, float maxU, float maxV) {
 		addVertices(m4f, m3f, vertexConsumer, 0, w, 0, h, minU, minV, maxU, maxV);
 	}
@@ -419,7 +435,17 @@ public class RenderUtil extends DrawableHelper {
 		vertex(x + w, y, 0.0, maxU, minV);
 		vertex(x, y, 0.0, minU, minV);
 	}
-	
+
+	public static void addQuad(MatrixStack matrices, double x, double y, double w, double h, float minU, float minV, float maxU, float maxV) {
+		Matrix4f m4f = matrices.peek().getModel();
+		Matrix3f m3f = matrices.peek().getNormal();
+
+		vertex(m4f, m3f, vertexBuffer, (float) x, (float) (y + h), 1.0F, minU, maxV);
+		vertex(m4f, m3f, vertexBuffer, (float) (x + w), (float) (y + h), 1.0F, maxU, maxV);
+		vertex(m4f, m3f, vertexBuffer, (float) (x + w), (float) y, 1.0F, maxU, minV);
+		vertex(m4f, m3f, vertexBuffer, (float) x, (float) y, 1.0F, minU, minV);
+	}
+
 	private static void vertex(Matrix4f m4f, Matrix3f m3f, VertexConsumer vertexConsumer, float x, float y, float z, float u, float v) {
 		vertexConsumer.vertex(m4f, x, y, z).texture(u, v).normal(m3f, 0.0F, 1.0F, 0.0F).next();
 	}

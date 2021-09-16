@@ -8,6 +8,7 @@ import net.minecraft.client.render.VertexFormat;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexFormats;
 import ru.bulldog.justmap.util.colors.Colors;
@@ -83,6 +84,7 @@ public class ChunkGrid {
 		
 		RenderSystem.disableTexture();
 		RenderSystem.setShaderColor(r, g, b, a);
+		RenderSystem.setShader(GameRenderer::getPositionShader);
 		RenderUtil.startDraw(VertexFormat.DrawMode.LINES, VertexFormats.POSITION);
 		BufferBuilder buffer = RenderUtil.getBuffer();
 		lines.forEach(line -> line.draw(buffer));

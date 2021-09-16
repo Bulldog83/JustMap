@@ -9,8 +9,7 @@ import org.lwjgl.opengl.GL;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 
-import net.minecraft.client.texture.TextureUtil;
-import net.minecraft.client.MinecraftClient;
+import com.mojang.blaze3d.platform.TextureUtil;
 import net.minecraft.client.gl.Framebuffer;
 
 public class ExtendedFramebuffer extends Framebuffer {
@@ -19,7 +18,7 @@ public class ExtendedFramebuffer extends Framebuffer {
 	private FboType fboType;
 	
 	public ExtendedFramebuffer(int width, int height, boolean useDepthIn) {
-		super(width, height, useDepthIn, MinecraftClient.IS_SYSTEM_MAC);
+		super(useDepthIn);
 	}
 
 	public static boolean canUseFramebuffer() {
@@ -32,7 +31,7 @@ public class ExtendedFramebuffer extends Framebuffer {
 	@Override
 	public void resize(int width, int height, boolean isMac) {
 		RenderSystem.assertThread(RenderSystem::isOnRenderThreadOrInit);
-		GlStateManager.enableDepthTest();
+		RenderSystem.enableDepthTest();
 		if (fbo >= 0) {
 			this.delete();
 		}
@@ -48,20 +47,20 @@ public class ExtendedFramebuffer extends Framebuffer {
 		this.textureWidth = width;
 		this.textureHeight = height;
 		this.fbo = this.genFrameBuffers();
-		this.colorAttachment = TextureUtil.generateId();
+		this.colorAttachment = TextureUtil.generateTextureId();
 		if (useDepthAttachment) {
 			this.depthAttachment = this.genRenderbuffers();
-			GlStateManager.bindTexture(depthAttachment);
-			GlStateManager.texParameter(GLC.GL_TEXTURE_2D, GLC.GL_TEXTURE_MIN_FILTER, GLC.GL_NEAREST);
-			GlStateManager.texParameter(GLC.GL_TEXTURE_2D, GLC.GL_TEXTURE_MAG_FILTER, GLC.GL_NEAREST);
-			GlStateManager.texParameter(GLC.GL_TEXTURE_2D, GLC.GL_TEXTURE_WRAP_S, GLC.GL_CLAMP);
-			GlStateManager.texParameter(GLC.GL_TEXTURE_2D, GLC.GL_TEXTURE_WRAP_T, GLC.GL_CLAMP);
-			GlStateManager.texParameter(GLC.GL_TEXTURE_2D, 34892, 0);
-			GlStateManager.texImage2D(GLC.GL_TEXTURE_2D, 0, 6402, textureWidth, textureHeight, 0, 6402, 5126, null);
+			RenderSystem.bindTexture(depthAttachment);
+			RenderSystem.texParameter(GLC.GL_TEXTURE_2D, GLC.GL_TEXTURE_MIN_FILTER, GLC.GL_NEAREST);
+			RenderSystem.texParameter(GLC.GL_TEXTURE_2D, GLC.GL_TEXTURE_MAG_FILTER, GLC.GL_NEAREST);
+			RenderSystem.texParameter(GLC.GL_TEXTURE_2D, GLC.GL_TEXTURE_WRAP_S, GLC.GL_CLAMP);
+			RenderSystem.texParameter(GLC.GL_TEXTURE_2D, GLC.GL_TEXTURE_WRAP_T, GLC.GL_CLAMP);
+			RenderSystem.texParameter(GLC.GL_TEXTURE_2D, 34892, 0);
+			GlStateManager._texImage2D(GLC.GL_TEXTURE_2D, 0, 6402, textureWidth, textureHeight, 0, 6402, 5126, null);
 		}
 		this.setTexFilter(GLC.GL_NEAREST);
-		GlStateManager.bindTexture(colorAttachment);
-		GlStateManager.texImage2D(GLC.GL_TEXTURE_2D, 0, GLC.GL_RGBA8, textureWidth, textureHeight, 0, GLC.GL_RGBA, GLC.GL_UNSIGNED_BYTE, null);
+		RenderSystem.bindTexture(colorAttachment);
+		GlStateManager._texImage2D(GLC.GL_TEXTURE_2D, 0, GLC.GL_RGBA8, textureWidth, textureHeight, 0, GLC.GL_RGBA, GLC.GL_UNSIGNED_BYTE, null);
 		this.bindFramebuffer(GLC.GL_FRAMEBUFFER, fbo);
 		this.framebufferTexture2D(GLC.GL_FRAMEBUFFER, GLC.GL_COLOR_ATTACHMENT, GLC.GL_TEXTURE_2D, colorAttachment, 0);
 		if (useDepthAttachment) {
@@ -119,7 +118,7 @@ public class ExtendedFramebuffer extends Framebuffer {
 			this.depthAttachment = -1;
 		}
 		if (colorAttachment > -1) {
-			TextureUtil.deleteId(colorAttachment);
+			TextureUtil.releaseTextureId(colorAttachment);
 			this.colorAttachment = -1;
 		}
 		if (fbo > -1) {
@@ -311,7 +310,7 @@ public class ExtendedFramebuffer extends Framebuffer {
 	public void beginWrite(boolean setViewport) {
 		this.bindFramebuffer(GLC.GL_FRAMEBUFFER, fbo);
 		if (setViewport) {
-			GlStateManager.viewport(0, 0, viewportWidth, viewportHeight);
+			RenderSystem.viewport(0, 0, viewportWidth, viewportHeight);
 		}
 	}
 	
@@ -319,27 +318,28 @@ public class ExtendedFramebuffer extends Framebuffer {
 	public void endWrite() {
 		this.bindFramebuffer(GLC.GL_FRAMEBUFFER, 0);
 	}
-	
+
+	// yarn mapping missing for beginRead
 	@Override
-	public void beginRead() {
-		GlStateManager.bindTexture(colorAttachment);
+	public void method_35610() {
+		RenderSystem.bindTexture(colorAttachment);
 	}
 	
 	@Override
 	public void endRead() {
-		GlStateManager.bindTexture(0);
+		RenderSystem.bindTexture(0);
 	}
 	
 	@Override
 	public void setTexFilter(int filter) {
 		RenderSystem.assertThread(RenderSystem::isOnRenderThreadOrInit);
 		this.texFilter = filter;
-		GlStateManager.bindTexture(colorAttachment);
-		GlStateManager.texParameter(GLC.GL_TEXTURE_2D, GLC.GL_TEXTURE_MIN_FILTER, filter);
-		GlStateManager.texParameter(GLC.GL_TEXTURE_2D, GLC.GL_TEXTURE_MAG_FILTER, filter);
-		GlStateManager.texParameter(GLC.GL_TEXTURE_2D, GLC.GL_TEXTURE_WRAP_S, GLC.GL_CLAMP);
-		GlStateManager.texParameter(GLC.GL_TEXTURE_2D, GLC.GL_TEXTURE_WRAP_T, GLC.GL_CLAMP);
-		GlStateManager.bindTexture(0);
+		RenderSystem.bindTexture(colorAttachment);
+		RenderSystem.texParameter(GLC.GL_TEXTURE_2D, GLC.GL_TEXTURE_MIN_FILTER, filter);
+		RenderSystem.texParameter(GLC.GL_TEXTURE_2D, GLC.GL_TEXTURE_MAG_FILTER, filter);
+		RenderSystem.texParameter(GLC.GL_TEXTURE_2D, GLC.GL_TEXTURE_WRAP_S, GLC.GL_CLAMP);
+		RenderSystem.texParameter(GLC.GL_TEXTURE_2D, GLC.GL_TEXTURE_WRAP_T, GLC.GL_CLAMP);
+		RenderSystem.bindTexture(0);
 		this.bindFramebuffer(GLC.GL_FRAMEBUFFER, 0);
 	}
 	

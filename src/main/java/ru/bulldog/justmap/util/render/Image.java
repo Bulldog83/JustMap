@@ -37,7 +37,7 @@ public abstract class Image {
 	}
 	
 	public void bindTexture() {
-		textureManager.bindTexture(textureId);
+		RenderUtil.bindTexture(textureId);
 	}
 	
 	public void draw(double x, double y) {

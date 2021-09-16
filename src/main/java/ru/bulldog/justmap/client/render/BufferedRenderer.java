@@ -7,10 +7,13 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gl.Framebuffer;
 import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.BlockPos;
 
+import net.minecraft.util.math.Matrix4f;
+import net.minecraft.util.math.Vec3f;
 import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.client.config.ClientSettings;
 import ru.bulldog.justmap.map.ChunkGrid;
@@ -67,22 +70,20 @@ public class BufferedRenderer extends MapRenderer {
 			this.paramsUpdated = false;
 		}
 
-		RenderSystem.pushMatrix();
+		matrices.push();
 		this.primaryFramebuffer.beginWrite(true);
 		RenderSystem.clear(GLC.GL_COLOR_OR_DEPTH_BUFFER_BIT, isMac);
 		RenderSystem.enableTexture();
-		RenderSystem.matrixMode(GLC.GL_PROJECTION);
-		RenderSystem.pushMatrix();
-		RenderSystem.loadIdentity();
-		RenderSystem.ortho(0.0, scaledW, scaledH, 0.0, 1000.0, 3000.0);
-		RenderSystem.matrixMode(GLC.GL_MODELVIEW);
-		RenderSystem.pushMatrix();
-		RenderSystem.loadIdentity();
-		RenderSystem.translatef(0.0F, 0.0F, -2000.0F);
-		RenderSystem.scaled(scale, scale, 1.0);
+		RenderSystem.backupProjectionMatrix();
+		Matrix4f orthographic = Matrix4f.projectionMatrix(0.0F, scaledW, 0.0F, scaledH, 1000.0F, 3000.0F);
+		RenderSystem.setProjectionMatrix(orthographic);
+		matrices.loadIdentity();
+		matrices.translate(0.0F, 0.0F, -2000.0F);
+		matrices.scale((float) scale, (float) scale, 1.0F);
+		RenderSystem.applyModelViewMatrix();
 		RenderSystem.enableBlend();
-		RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
-		this.drawMap();
+		RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+		this.drawMap(matrices);
 		if (ClientSettings.showGrid) {
 			this.drawGrid();
 		}
@@ -90,20 +91,25 @@ public class BufferedRenderer extends MapRenderer {
 			this.drawEntities(matrices, consumerProvider);
 		}
 		this.primaryFramebuffer.endWrite();
-		RenderSystem.popMatrix();
+		matrices.pop();
 		
 		this.secondaryFramebuffer.beginWrite(false);
 		RenderSystem.clear(GLC.GL_COLOR_OR_DEPTH_BUFFER_BIT, isMac);
-		RenderSystem.pushMatrix();
+		matrices.push();
+		RenderSystem.applyModelViewMatrix();
+		RenderSystem.enableCull();
 		if (mapRotation) {
 			float shiftX = scaledW / 2.0F;
 			float shiftY = scaledH / 2.0F;
-			RenderSystem.translatef(shiftX, shiftY, 0.0F);
-			RenderSystem.rotatef(180.0F - rotation, 0.0F, 0.0F, 1.0F);
-			RenderSystem.translatef(-shiftX, -shiftY, 0.0F);
+			matrices.translate(shiftX, shiftY, 0.0);
+			matrices.multiply(Vec3f.POSITIVE_Z.getDegreesQuaternion(180.0F - rotation));
+			matrices.translate(-shiftX, -shiftY, 0.0);
 		}
-		RenderSystem.translated(-offX * scale, -offY * scale, 0.0);
-		this.primaryFramebuffer.beginRead();
+		matrices.translate(-offX * scale, -offY * scale, 0.0);
+		RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+		RenderSystem.setShader(GameRenderer::getPositionTexShader);
+		// yarn mapping missing for beginRead
+		this.primaryFramebuffer.method_35610();
 		RenderUtil.startDraw();
 		BufferBuilder buffer = RenderUtil.getBuffer();
 		buffer.vertex(0.0, scaledH, 0.0).texture(0.0F, 0.0F).next();
@@ -112,17 +118,16 @@ public class BufferedRenderer extends MapRenderer {
 		buffer.vertex(0.0, 0.0, 0.0).texture(0.0F, 1.0F).next();
 		RenderUtil.endDraw();
 		if (mapRotation) {
-			RenderSystem.pushMatrix();
-			RenderSystem.scaled(scale, scale, 1.0);
+			matrices.push();
+			matrices.scale((float) scale, (float) scale, 1.0F);
 			this.drawEntities(matrices, consumerProvider);
-			RenderSystem.popMatrix();
+			matrices.pop();
 		}
-		RenderSystem.popMatrix();
+		matrices.pop();
 		this.secondaryFramebuffer.endWrite();
-		RenderSystem.matrixMode(GLC.GL_PROJECTION);
-		RenderSystem.popMatrix();
-		RenderSystem.matrixMode(GLC.GL_MODELVIEW);
-		RenderSystem.popMatrix();
+		RenderSystem.restoreProjectionMatrix();
+		RenderSystem.applyModelViewMatrix();
+		matrices.pop();
 		
 		Framebuffer minecraftFramebuffer = minecraft.getFramebuffer();
 		int fbuffW = minecraftFramebuffer.viewportWidth;
@@ -145,7 +150,11 @@ public class BufferedRenderer extends MapRenderer {
 			RenderUtil.drawQuad(mapX, mapY, mapWidth, mapHeight);
 			RenderSystem.blendFunc(GLC.GL_DST_ALPHA, GLC.GL_ONE_MINUS_DST_ALPHA);
 		}
-		this.secondaryFramebuffer.beginRead();
+		matrices.push();
+		matrices.multiply(Vec3f.POSITIVE_Z.getDegreesQuaternion(180.0F));
+		RenderSystem.setShader(GameRenderer::getPositionTexShader);
+		// yarn mapping missing: beginRead
+		this.secondaryFramebuffer.method_35610();
 		RenderUtil.startDraw();
 		buffer = RenderUtil.getBuffer();
 		buffer.vertex(imgX, imgY + imgH, 0.0).texture(0.0F, 0.0F).next();
@@ -153,6 +162,7 @@ public class BufferedRenderer extends MapRenderer {
 		buffer.vertex(imgX + imgW, imgY, 0.0).texture(1.0F, 1.0F).next();
 		buffer.vertex(imgX, imgY, 0.0).texture(0.0F, 1.0F).next();
 		RenderUtil.endDraw();
+		matrices.pop();
 		List<WaypointIcon> drawableWaypoints = minimap.getWaypoints(playerPos, centerX, centerY);
 		for (WaypointIcon icon : drawableWaypoints) {
 			icon.draw(matrices, consumerProvider, mapX, mapY, mapWidth, mapHeight, offX, offY, rotation);
@@ -161,7 +171,7 @@ public class BufferedRenderer extends MapRenderer {
 		RenderUtil.disableScissor();
 	}
 	
-	private void drawMap() {
+	private void drawMap(MatrixStack matrices) {
 		int cornerX = lastX - scaledW / 2;
 		int cornerZ = lastZ - scaledH / 2;
 		
@@ -192,7 +202,7 @@ public class BufferedRenderer extends MapRenderer {
 				double scW = (double) texW / mapScale;
 				double scH = (double) texH / mapScale;
 				
-				region.draw(scX, scY, scW, scH, texX, texY, texW, texH);
+				region.draw(matrices, scX, scY, scW, scH, texX, texY, texW, texH);
 				
 				picY += texH > 0 ? texH : 512;
 			}
