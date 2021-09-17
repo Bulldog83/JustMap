@@ -31,7 +31,7 @@ public class StateUtil {
 	public static boolean isPlant(BlockState state) {
 		Material material = state.getMaterial();
 		return material == Material.PLANT || material == Material.REPLACEABLE_PLANT ||
-			   material == Material.MOSS_BLOCK || isSeaweed(state);
+			   isSeaweed(state);
 	}
 	
 	public static boolean isSeaweed(BlockState state) {
