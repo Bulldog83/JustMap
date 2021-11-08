@@ -21,8 +21,8 @@ import net.minecraft.network.MessageType;
 
 import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.map.MapGameRules;
+import ru.bulldog.justmap.map.data.MapDataProvider;
 import ru.bulldog.justmap.map.data.WorldKey;
-import ru.bulldog.justmap.map.data.IWorldManager;
 import ru.bulldog.justmap.map.waypoint.Waypoint;
 
 @Mixin(value = ClientPlayNetworkHandler.class, priority = 100)
@@ -33,13 +33,13 @@ public abstract class ClientPlayNetworkHandlerMixin {
 	
 	@Inject(method = "<init>", at = @At("TAIL"))
 	public void onConnect(MinecraftClient client, Screen screen, ClientConnection connection, GameProfile profile, CallbackInfo cinfo) {
-		IWorldManager.load();
+		MapDataProvider.getWorldManager().load();
 	}
 	
 	@Inject(method = "onPlayerSpawnPosition", at = @At("TAIL"))
 	public void onPlayerSpawnPosition(PlayerSpawnPositionS2CPacket packet, CallbackInfo cinfo) {
 		JustMap.LOGGER.debug("World spawn position set to {}", packet.getPos().toShortString());
-		IWorldManager.onWorldPosChanged(packet.getPos());
+		MapDataProvider.getWorldManager().onWorldPosChanged(packet.getPos());
 	}
 	
 	@Inject(method = "onGameMessage", at = @At("HEAD"), cancellable = true)
@@ -65,7 +65,7 @@ public abstract class ClientPlayNetworkHandlerMixin {
 	public void onHealthUpdate(HealthUpdateS2CPacket healthUpdateS2CPacket, CallbackInfo cinfo) {
 		float health = healthUpdateS2CPacket.getHealth();
 		if (health <= 0.0F) {
-	    	WorldKey world = IWorldManager.getWorldKey();
+	    	WorldKey world = MapDataProvider.getWorldManager().getWorldKey();
 	    	BlockPos playerPos = this.client.player.getBlockPos();
 	    	Waypoint.createOnDeath(world, playerPos);
 	    }

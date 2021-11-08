@@ -22,15 +22,15 @@ import ru.bulldog.justmap.client.config.ClientSettings;
 import ru.bulldog.justmap.client.config.ConfigFactory;
 import ru.bulldog.justmap.client.widget.DropDownListWidget;
 import ru.bulldog.justmap.client.widget.ListElementWidget;
-import ru.bulldog.justmap.map.data.Layer;
-import ru.bulldog.justmap.map.data.IWorldData;
-import ru.bulldog.justmap.map.data.WorldKey;
-import ru.bulldog.justmap.map.data.IWorldManager;
 import ru.bulldog.justmap.map.ChunkGrid;
 import ru.bulldog.justmap.map.IMap;
 import ru.bulldog.justmap.map.MapPlayerManager;
 import ru.bulldog.justmap.map.data.IChunkData;
 import ru.bulldog.justmap.map.data.IRegionData;
+import ru.bulldog.justmap.map.data.IWorldData;
+import ru.bulldog.justmap.map.data.Layer;
+import ru.bulldog.justmap.map.data.MapDataProvider;
+import ru.bulldog.justmap.map.data.WorldKey;
 import ru.bulldog.justmap.map.icon.PlayerIcon;
 import ru.bulldog.justmap.map.icon.WaypointIcon;
 import ru.bulldog.justmap.map.waypoint.Waypoint;
@@ -87,8 +87,8 @@ public class Worldmap extends MapScreen implements IMap {
 		this.centerX = width / 2.0;
 		this.centerY = height / 2.0;
 		
-		this.worldData = IWorldManager.getData();
-		WorldKey worldKey = IWorldManager.getWorldKey();
+		this.worldData = MapDataProvider.getWorldManager().getData();
+		WorldKey worldKey = MapDataProvider.getWorldManager().getWorldKey();
 		if (centerPos == null || !worldKey.equals(world)) {
 			this.centerPos = DataUtil.currentPos();
 			this.world = worldKey;

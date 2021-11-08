@@ -14,7 +14,7 @@ import ru.bulldog.justmap.enums.ArrowType;
 import ru.bulldog.justmap.enums.MapShape;
 import ru.bulldog.justmap.enums.MultiworldDetection;
 import ru.bulldog.justmap.enums.ScreenPosition;
-import ru.bulldog.justmap.map.data.IWorldManager;
+import ru.bulldog.justmap.map.data.MapDataProvider;
 
 public class ClientConfig extends Config {
 	
@@ -141,6 +141,6 @@ public class ClientConfig extends Config {
 	public void saveChanges() {
 		ConfigWriter.save(KEEPER.toJson());
 		JustMapClient.getMap().updateMapParams();
-		IWorldManager.onConfigUpdate();
+		MapDataProvider.getWorldManager().onConfigUpdate();
 	}
 }

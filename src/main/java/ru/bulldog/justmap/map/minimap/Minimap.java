@@ -21,8 +21,8 @@ import ru.bulldog.justmap.enums.TextPosition;
 import ru.bulldog.justmap.map.EntityRadar;
 import ru.bulldog.justmap.map.IMap;
 import ru.bulldog.justmap.map.data.IWorldData;
+import ru.bulldog.justmap.map.data.MapDataProvider;
 import ru.bulldog.justmap.map.data.WorldKey;
-import ru.bulldog.justmap.map.data.IWorldManager;
 import ru.bulldog.justmap.map.data.Layer;
 import ru.bulldog.justmap.map.icon.MapIcon;
 import ru.bulldog.justmap.map.icon.WaypointIcon;
@@ -288,7 +288,7 @@ public class Minimap implements IMap {
 
 	public void prepareMap(PlayerEntity player) {
 		this.world = player.world;
-		this.worldData = IWorldManager.getData();
+		this.worldData = MapDataProvider.getWorldManager().getData();
 		BlockPos pos = DataUtil.currentPos();
 
 		int posX = pos.getX();
@@ -368,7 +368,7 @@ public class Minimap implements IMap {
 	}
 
 	public void createWaypoint() {
-		this.createWaypoint(IWorldManager.getWorldKey(), DataUtil.currentPos());
+		this.createWaypoint(MapDataProvider.getWorldManager().getWorldKey(), DataUtil.currentPos());
 	}
 	
 	public MapRenderer getRenderer() {
@@ -402,7 +402,7 @@ public class Minimap implements IMap {
 	public List<WaypointIcon> getWaypoints(BlockPos currentPos, int screenX, int screenY) {
 		this.waypoints.clear();
 		if (ClientSettings.showWaypoints) {
-			List<Waypoint> wps = WaypointKeeper.getInstance().getWaypoints(IWorldManager.getWorldKey(), true);
+			List<Waypoint> wps = WaypointKeeper.getInstance().getWaypoints(MapDataProvider.getWorldManager().getWorldKey(), true);
 			if (wps != null) {
 				Stream<Waypoint> stream = wps.stream()
 						.filter(wp -> MathUtil.getDistance(currentPos, wp.pos, false) <= wp.showRange);

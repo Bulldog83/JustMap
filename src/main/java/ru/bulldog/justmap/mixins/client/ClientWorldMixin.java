@@ -23,8 +23,8 @@ import ru.bulldog.justmap.event.ChunkUpdateListener;
 import ru.bulldog.justmap.map.IMap;
 import ru.bulldog.justmap.map.data.IChunkData;
 import ru.bulldog.justmap.map.data.IWorldData;
-import ru.bulldog.justmap.map.data.IWorldManager;
 import ru.bulldog.justmap.map.data.Layer;
+import ru.bulldog.justmap.map.data.MapDataProvider;
 import ru.bulldog.justmap.util.DataUtil;
 
 @Mixin(ClientWorld.class)
@@ -43,7 +43,7 @@ public abstract class ClientWorldMixin extends World {
 			Layer layer = DataUtil.getLayer(this, pos);
 			int level = DataUtil.getLevel(layer, pos.getY());
 			if (layer.equals(map.getLayer()) && level == map.getLevel()) {
-				IWorldData mapData = IWorldManager.getData();
+				IWorldData mapData = MapDataProvider.getWorldManager().getData();
 				if (mapData == null) return;
 				ChunkPos chunkPos = worldChunk.getPos();
 				int chunkX = chunkPos.x;

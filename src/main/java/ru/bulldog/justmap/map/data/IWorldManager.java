@@ -3,56 +3,31 @@ package ru.bulldog.justmap.map.data;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.WorldChunk;
-import ru.bulldog.justmap.map.data.classic.WorldManager;
 
 import java.util.List;
 
 public interface IWorldManager {
-    static void onConfigUpdate() {
-        WorldManager.onConfigUpdate();
-    }
+     void onConfigUpdate();
 
-    static void load() {
-        WorldManager.load();
-    }
+     void load();
 
-    static void onWorldPosChanged(BlockPos newPos) {
-        WorldManager.onWorldPosChanged(newPos);
-    }
+     void onWorldPosChanged(BlockPos newPos);
 
-    static WorldKey getWorldKey() {
-        return WorldManager.getWorldKey();
-    }
+     WorldKey getWorldKey();
 
-    static IWorldData getData() {
-        return WorldManager.getData();
-    }
+     IWorldData getData();
 
-    static void onChunkLoad(World world, WorldChunk worldChunk) {
-        WorldManager.onChunkLoad(world, worldChunk);
-    }
+     void onChunkLoad(World world, WorldChunk worldChunk);
 
-    static void update() {
-        WorldManager.update();
-    }
+     void update();
 
-    static void memoryControl() {
-        WorldManager.memoryControl();
-    }
+     void memoryControl();
 
-    static void close() {
-        WorldManager.close();
-    }
+     void close();
 
-    static void onWorldChanged(World world) {
-        WorldManager.onWorldChanged(world);
-    }
+     void onWorldChanged(World world);
 
-    static List<WorldKey> registeredWorlds() {
-        return WorldManager.registeredWorlds();
-    }
+     List<WorldKey> registeredWorlds();
 
-    static void setCurrentWorldName(String name) {
-        WorldManager.setCurrentWorldName(name);
-    }
+     void setCurrentWorldName(String name);
 }
