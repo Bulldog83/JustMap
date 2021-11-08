@@ -28,8 +28,7 @@ public interface IWorldManager {
 
      void onWorldChanged(World world);
 
-     /** New spawn point set */
-     void onWorldPosChanged(BlockPos newPos);
+     void onWorldSpawnPosChanged(BlockPos newPos);
 
      void onChunkLoad(World world, WorldChunk worldChunk);
 

@@ -91,12 +91,12 @@ public final class WorldManager implements IWorldManager {
 				clearData();
 			}
 			assert minecraft.world != null;
-			onWorldPosChanged(minecraft.world.getSpawnPos());
+			onWorldSpawnPosChanged(minecraft.world.getSpawnPos());
 			return;
 		} else if (MultiworldDetection.isMixed()) {
 			if (currentWorldPos == null) {
 				assert minecraft.world != null;
-				onWorldPosChanged(minecraft.world.getSpawnPos());
+				onWorldSpawnPosChanged(minecraft.world.getSpawnPos());
 			} else if (currentWorldName == null) {
 				requestWorldName = true;
 			} else {
@@ -122,7 +122,7 @@ public final class WorldManager implements IWorldManager {
 		}
 	}
 	
-	public void onWorldPosChanged(BlockPos newPos) {
+	public void onWorldSpawnPosChanged(BlockPos newPos) {
 		if (!RuleUtil.detectMultiworlds()) {
 			return;
 		}

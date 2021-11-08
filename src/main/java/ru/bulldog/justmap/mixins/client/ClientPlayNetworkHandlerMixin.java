@@ -39,7 +39,7 @@ public abstract class ClientPlayNetworkHandlerMixin {
 	@Inject(method = "onPlayerSpawnPosition", at = @At("TAIL"))
 	public void onPlayerSpawnPosition(PlayerSpawnPositionS2CPacket packet, CallbackInfo cinfo) {
 		JustMap.LOGGER.debug("World spawn position set to {}", packet.getPos().toShortString());
-		MapDataProvider.getWorldManager().onWorldPosChanged(packet.getPos());
+		MapDataProvider.getWorldManager().onWorldSpawnPosChanged(packet.getPos());
 	}
 	
 	@Inject(method = "onGameMessage", at = @At("HEAD"), cancellable = true)
