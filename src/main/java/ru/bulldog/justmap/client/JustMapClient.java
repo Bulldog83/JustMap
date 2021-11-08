@@ -24,7 +24,6 @@ import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.advancedinfo.AdvancedInfo;
 import ru.bulldog.justmap.client.config.ClientConfig;
 import ru.bulldog.justmap.client.control.KeyHandler;
-import ru.bulldog.justmap.map.data.classic.event.ChunkUpdateListener;
 import ru.bulldog.justmap.map.data.MapDataProvider;
 import ru.bulldog.justmap.map.minimap.Minimap;
 import ru.bulldog.justmap.network.ClientNetworkHandler;
@@ -76,7 +75,7 @@ public class JustMapClient implements ClientModInitializer {
 			DataUtil.update();
 			JustMapClient.map.update();
 			MapDataProvider.getWorldManager().memoryControl();
-			ChunkUpdateListener.proceed();
+			MapDataProvider.getWorldManager().onTick();
 		});
 		ClientLifecycleEvents.CLIENT_STOPPING.register(client -> {
 			JustMapClient.stop();
@@ -87,7 +86,7 @@ public class JustMapClient implements ClientModInitializer {
 	
 	private static void stop() {
 		stopMapping();
-		ChunkUpdateListener.stop();
+		MapDataProvider.getWorldManager().onWorldStop();
 		JustMap.WORKER.execute("Clearing map cache...", MapDataProvider.getWorldManager()::close);
 		Colors.INSTANCE.saveData();
 	}

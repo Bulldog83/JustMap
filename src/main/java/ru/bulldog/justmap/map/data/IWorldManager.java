@@ -1,5 +1,6 @@
 package ru.bulldog.justmap.map.data;
 
+import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.WorldChunk;
@@ -37,4 +38,10 @@ public interface IWorldManager {
      void onChunkLoad(World world, WorldChunk worldChunk);
 
      void onConfigUpdate();
+
+     void onSetBlockState(BlockPos pos, BlockState state, World world);
+
+     void onTick();
+
+     void onWorldStop();
 }

@@ -9,6 +9,7 @@ import java.util.Map.Entry;
 
 import com.google.gson.*;
 
+import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ProgressScreen;
 import net.minecraft.util.JsonHelper;
@@ -106,7 +107,7 @@ public final class WorldManager implements IWorldManager {
 		}
 		JustMapClient.startMapping();
 	}
-	
+
 	public void onWorldChanged(World world) {
 		currentWorld = world;
 		if (RuleUtil.detectMultiworlds()) {
@@ -364,5 +365,20 @@ public final class WorldManager implements IWorldManager {
 			clearData();
 			loaded = false;
 		}
+	}
+
+	@Override
+	public void onSetBlockState(BlockPos pos, BlockState state, World world) {
+		ChunkUpdateListener.onSetBlockState(pos, state, world);
+	}
+
+	@Override
+	public void onTick() {
+		ChunkUpdateListener.proceed();
+	}
+
+	@Override
+	public void onWorldStop() {
+		ChunkUpdateListener.stop();
 	}
 }
