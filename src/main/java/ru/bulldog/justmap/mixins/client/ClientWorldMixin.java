@@ -21,15 +21,15 @@ import net.minecraft.world.dimension.DimensionType;
 import ru.bulldog.justmap.event.ChunkUpdateEvent;
 import ru.bulldog.justmap.event.ChunkUpdateListener;
 import ru.bulldog.justmap.map.IMap;
-import ru.bulldog.justmap.map.data.ChunkData;
-import ru.bulldog.justmap.map.data.WorldData;
-import ru.bulldog.justmap.map.data.WorldManager;
+import ru.bulldog.justmap.map.data.IChunkData;
+import ru.bulldog.justmap.map.data.IWorldData;
+import ru.bulldog.justmap.map.data.IWorldManager;
 import ru.bulldog.justmap.map.data.Layer;
 import ru.bulldog.justmap.util.DataUtil;
 
 @Mixin(ClientWorld.class)
 public abstract class ClientWorldMixin extends World {
-	
+
 	protected ClientWorldMixin(MutableWorldProperties properties, RegistryKey<World> registryKey,
 			DimensionType dimensionType, Supplier<Profiler> supplier, boolean bl, boolean debugWorld, long l) {
 		super(properties, registryKey, dimensionType, supplier, bl, debugWorld, l);
@@ -43,7 +43,7 @@ public abstract class ClientWorldMixin extends World {
 			Layer layer = DataUtil.getLayer(this, pos);
 			int level = DataUtil.getLevel(layer, pos.getY());
 			if (layer.equals(map.getLayer()) && level == map.getLevel()) {
-				WorldData mapData = WorldManager.getData();
+				IWorldData mapData = IWorldManager.getData();
 				if (mapData == null) return;
 				ChunkPos chunkPos = worldChunk.getPos();
 				int chunkX = chunkPos.x;
@@ -89,10 +89,10 @@ public abstract class ClientWorldMixin extends World {
 		}
 	}
 	
-	private void updateChunk(WorldData mapData, Layer layer, int level, int chx, int chz, int x, int z, int w, int h) {
+	private void updateChunk(IWorldData mapData, Layer layer, int level, int chx, int chz, int x, int z, int w, int h) {
 		WorldChunk worldChunk = this.getChunk(chx, chz);
 		if (worldChunk.isEmpty()) return;
-		ChunkData mapChunk = mapData.getChunk(worldChunk.getPos());
+		IChunkData mapChunk = mapData.getChunk(worldChunk.getPos());
 		ChunkUpdateListener.accept(new ChunkUpdateEvent(worldChunk, mapChunk, layer, level, x, z, w, h, true));
 	}
 }

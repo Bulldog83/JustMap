@@ -12,7 +12,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3f;
 import ru.bulldog.justmap.client.config.ClientSettings;
 import ru.bulldog.justmap.map.ChunkGrid;
-import ru.bulldog.justmap.map.data.RegionData;
+import ru.bulldog.justmap.map.data.IRegionData;
 import ru.bulldog.justmap.map.icon.MapIcon;
 import ru.bulldog.justmap.map.icon.WaypointIcon;
 import ru.bulldog.justmap.map.minimap.Minimap;
@@ -97,7 +97,7 @@ public class FastRenderer extends MapRenderer {
 				if (picY + texH > scaledH) texH = scaledH - picY;
 				
 				int cZ = cornerZ + picY;
-				RegionData region = worldData.getRegion(minimap, currentPos.set(cX, 0, cZ));
+				IRegionData region = worldData.getRegion(minimap, currentPos.set(cX, 0, cZ));
 				region.swapLayer(minimap.getLayer(), minimap.getLevel());
 				
 				int texX = cX - (region.getX() << 9);

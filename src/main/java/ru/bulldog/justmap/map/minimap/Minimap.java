@@ -20,9 +20,9 @@ import ru.bulldog.justmap.enums.TextAlignment;
 import ru.bulldog.justmap.enums.TextPosition;
 import ru.bulldog.justmap.map.EntityRadar;
 import ru.bulldog.justmap.map.IMap;
-import ru.bulldog.justmap.map.data.WorldData;
+import ru.bulldog.justmap.map.data.IWorldData;
 import ru.bulldog.justmap.map.data.WorldKey;
-import ru.bulldog.justmap.map.data.WorldManager;
+import ru.bulldog.justmap.map.data.IWorldManager;
 import ru.bulldog.justmap.map.data.Layer;
 import ru.bulldog.justmap.map.icon.MapIcon;
 import ru.bulldog.justmap.map.icon.WaypointIcon;
@@ -64,7 +64,7 @@ public class Minimap implements IMap {
 	private PlayerEntity locPlayer = null;
 	private Layer mapLayer = Layer.SURFACE;
 	private EntityRadar entityRadar;
-	private WorldData worldData;
+	private IWorldData worldData;
 	private MapSkin mapSkin;
 	private World world;
 	private ScreenPosition mapPosition;
@@ -288,7 +288,7 @@ public class Minimap implements IMap {
 
 	public void prepareMap(PlayerEntity player) {
 		this.world = player.world;
-		this.worldData = WorldManager.getData();
+		this.worldData = IWorldManager.getData();
 		BlockPos pos = DataUtil.currentPos();
 
 		int posX = pos.getX();
@@ -368,7 +368,7 @@ public class Minimap implements IMap {
 	}
 
 	public void createWaypoint() {
-		this.createWaypoint(WorldManager.getWorldKey(), DataUtil.currentPos());
+		this.createWaypoint(IWorldManager.getWorldKey(), DataUtil.currentPos());
 	}
 	
 	public MapRenderer getRenderer() {
@@ -382,7 +382,7 @@ public class Minimap implements IMap {
 		return this.world;
 	}
 
-	public WorldData getWorldData() {
+	public IWorldData getWorldData() {
 		return this.worldData;
 	}
 	
@@ -402,7 +402,7 @@ public class Minimap implements IMap {
 	public List<WaypointIcon> getWaypoints(BlockPos currentPos, int screenX, int screenY) {
 		this.waypoints.clear();
 		if (ClientSettings.showWaypoints) {
-			List<Waypoint> wps = WaypointKeeper.getInstance().getWaypoints(WorldManager.getWorldKey(), true);
+			List<Waypoint> wps = WaypointKeeper.getInstance().getWaypoints(IWorldManager.getWorldKey(), true);
 			if (wps != null) {
 				Stream<Waypoint> stream = wps.stream()
 						.filter(wp -> MathUtil.getDistance(currentPos, wp.pos, false) <= wp.showRange);

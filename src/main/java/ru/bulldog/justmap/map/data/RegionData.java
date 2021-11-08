@@ -21,7 +21,7 @@ import ru.bulldog.justmap.util.render.RenderUtil;
 import ru.bulldog.justmap.util.storage.StorageUtil;
 import ru.bulldog.justmap.util.tasks.TaskManager;
 
-public class RegionData {
+public class RegionData implements IRegionData {
 	
 	private static TaskManager updater = TaskManager.getManager("region-updater");
 	private static TaskManager worker = JustMap.WORKER;
@@ -78,10 +78,12 @@ public class RegionData {
 		return this.regPos;
 	}
 	
+	@Override
 	public int getX() {
 		return this.regPos.x;
 	}
 	
+	@Override
 	public int getZ() {
 		return this.regPos.z;
 	}
@@ -245,6 +247,7 @@ public class RegionData {
 		return this.level;
 	}
 	
+	@Override
 	public void swapLayer(Layer layer, int level) {
 		if (this.layer.equals(layer) &&
 			this.level == level) {
@@ -292,6 +295,7 @@ public class RegionData {
 		return new File(dir, String.format("r%d.%d.png", regPos.x, regPos.z));
 	}
 	
+	@Override
 	public void draw(MatrixStack matrices, double x, double y, double width, double height, int imgX, int imgY, int imgW, int imgH) {
 		if (width <= 0 || height <= 0) return;
 		

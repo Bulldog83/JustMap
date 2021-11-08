@@ -15,7 +15,7 @@ import net.minecraft.world.chunk.WorldChunk;
 import java.util.HashMap;
 import java.util.Map;
 
-public class WorldData {
+public class WorldData implements IWorldData {
 	private World world;
 	private final ChunkDataManager chunkManager;
 	private final Map<RegionPos, RegionData> regions;
@@ -37,6 +37,7 @@ public class WorldData {
 		return this.getRegion(DataUtil.getMap(), blockPos);
 	}
 	
+	@Override
 	public RegionData getRegion(IMap map, BlockPos blockPos) {
 		RegionPos regPos = new RegionPos(blockPos);
 		RegionData region;
@@ -61,7 +62,8 @@ public class WorldData {
 	public ChunkData getChunk(BlockPos pos) {
 		return this.chunkManager.getChunk(pos.getX() >> 4, pos.getZ() >> 4);
 	}
-	
+
+	@Override
 	public ChunkData getChunk(ChunkPos chunkPos) {
 		return this.chunkManager.getChunk(chunkPos.x, chunkPos.z);
 	}

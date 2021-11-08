@@ -25,7 +25,7 @@ import ru.bulldog.justmap.advancedinfo.AdvancedInfo;
 import ru.bulldog.justmap.client.config.ClientConfig;
 import ru.bulldog.justmap.client.control.KeyHandler;
 import ru.bulldog.justmap.event.ChunkUpdateListener;
-import ru.bulldog.justmap.map.data.WorldManager;
+import ru.bulldog.justmap.map.data.IWorldManager;
 import ru.bulldog.justmap.map.minimap.Minimap;
 import ru.bulldog.justmap.network.ClientNetworkHandler;
 import ru.bulldog.justmap.util.DataUtil;
@@ -52,7 +52,7 @@ public class JustMapClient implements ClientModInitializer {
 			map = new Minimap();
 			Colors.INSTANCE.loadData();
 		});
-		ClientChunkEvents.CHUNK_LOAD.register(WorldManager::onChunkLoad);
+		ClientChunkEvents.CHUNK_LOAD.register(IWorldManager::onChunkLoad);
 		HudRenderCallback.EVENT.register((matrices, delta) -> {
 			if (!minecraft.options.debugEnabled) {
 				JustMapClient.map.getRenderer().renderMap(matrices);
@@ -68,14 +68,14 @@ public class JustMapClient implements ClientModInitializer {
 			isOnTitleScreen = isTitle;
 			
 			AdvancedInfo.getInstance().updateInfo();
-			WorldManager.update();
+			IWorldManager.update();
 			KeyHandler.update();
 
 			if (!canMapping()) return;
 
 			DataUtil.update();
 			JustMapClient.map.update();
-			WorldManager.memoryControl();
+			IWorldManager.memoryControl();
 			ChunkUpdateListener.proceed();
 		});
 		ClientLifecycleEvents.CLIENT_STOPPING.register(client -> {
@@ -88,7 +88,7 @@ public class JustMapClient implements ClientModInitializer {
 	private static void stop() {
 		stopMapping();
 		ChunkUpdateListener.stop();
-		JustMap.WORKER.execute("Clearing map cache...", WorldManager::close);
+		JustMap.WORKER.execute("Clearing map cache...", IWorldManager::close);
 		Colors.INSTANCE.saveData();
 	}
 	

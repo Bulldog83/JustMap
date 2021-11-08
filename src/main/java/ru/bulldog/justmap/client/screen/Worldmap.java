@@ -23,14 +23,14 @@ import ru.bulldog.justmap.client.config.ConfigFactory;
 import ru.bulldog.justmap.client.widget.DropDownListWidget;
 import ru.bulldog.justmap.client.widget.ListElementWidget;
 import ru.bulldog.justmap.map.data.Layer;
-import ru.bulldog.justmap.map.data.WorldData;
+import ru.bulldog.justmap.map.data.IWorldData;
 import ru.bulldog.justmap.map.data.WorldKey;
-import ru.bulldog.justmap.map.data.WorldManager;
+import ru.bulldog.justmap.map.data.IWorldManager;
 import ru.bulldog.justmap.map.ChunkGrid;
 import ru.bulldog.justmap.map.IMap;
 import ru.bulldog.justmap.map.MapPlayerManager;
-import ru.bulldog.justmap.map.data.ChunkData;
-import ru.bulldog.justmap.map.data.RegionData;
+import ru.bulldog.justmap.map.data.IChunkData;
+import ru.bulldog.justmap.map.data.IRegionData;
 import ru.bulldog.justmap.map.icon.PlayerIcon;
 import ru.bulldog.justmap.map.icon.WaypointIcon;
 import ru.bulldog.justmap.map.waypoint.Waypoint;
@@ -64,7 +64,7 @@ public class Worldmap extends MapScreen implements IMap {
 	private boolean playerTracking = true;
 	private int mapLevel = 0;
 	private DropDownListWidget mapMenu;
-	private WorldData worldData;
+	private IWorldData worldData;
 	private WorldKey world;
 	private BlockPos centerPos;
 	private String cursorCoords;
@@ -87,8 +87,8 @@ public class Worldmap extends MapScreen implements IMap {
 		this.centerX = width / 2.0;
 		this.centerY = height / 2.0;
 		
-		this.worldData = WorldManager.getData();
-		WorldKey worldKey = WorldManager.getWorldKey();
+		this.worldData = IWorldManager.getData();
+		WorldKey worldKey = IWorldManager.getWorldKey();
 		if (centerPos == null || !worldKey.equals(world)) {
 			this.centerPos = DataUtil.currentPos();
 			this.world = worldKey;
@@ -217,7 +217,7 @@ public class Worldmap extends MapScreen implements IMap {
 			while (picY < scaledHeight) {				
 				int cZ = cornerZ + picY;
 				
-				RegionData region = worldData.getRegion(this, currentPos.set(cX, 0, cZ));
+				IRegionData region = worldData.getRegion(this, currentPos.set(cX, 0, cZ));
 				region.swapLayer(mapLayer, mapLevel);
 				
 				imgW = 512;
@@ -366,7 +366,7 @@ public class Worldmap extends MapScreen implements IMap {
 		int chunkX = posX >> 4;
 		int chunkZ = posZ >> 4;
 		
-		ChunkData mapChunk = this.worldData.getChunk(chunkX, chunkZ);
+		IChunkData mapChunk = this.worldData.getChunk(chunkX, chunkZ);
 		
 		int cx = posX - (chunkX << 4);
 		int cz = posZ - (chunkZ << 4);

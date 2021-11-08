@@ -7,7 +7,7 @@ import net.minecraft.block.BlockState;
 
 import ru.bulldog.justmap.util.StateUtil;
 
-public class ChunkLevel {
+public class ChunkLevel implements IChunkLevel {
 	
 	int[] statemap;
 	int[] heightmap;
@@ -47,7 +47,8 @@ public class ChunkLevel {
 			this.statemap[index(x, z)] = Block.getRawIdFromState(blockState);
 		}
 	}
-	
+
+	@Override
 	public int sampleHeightmap(int x, int z) {
 		return this.sampleHeightmap(index(x, z));
 	}

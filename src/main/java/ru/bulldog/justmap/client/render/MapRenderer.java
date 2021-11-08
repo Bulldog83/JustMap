@@ -13,7 +13,7 @@ import ru.bulldog.justmap.enums.ArrowType;
 import ru.bulldog.justmap.map.ChunkGrid;
 import ru.bulldog.justmap.map.DirectionArrow;
 import ru.bulldog.justmap.map.MapPlayerManager;
-import ru.bulldog.justmap.map.data.WorldData;
+import ru.bulldog.justmap.map.data.IWorldData;
 import ru.bulldog.justmap.map.minimap.Minimap;
 import ru.bulldog.justmap.map.minimap.skin.MapSkin;
 import ru.bulldog.justmap.util.DataUtil;
@@ -61,7 +61,7 @@ public abstract class MapRenderer {
 	protected boolean playerMoved = false;
 	protected final Minimap minimap;
 	protected BlockPos.Mutable playerPos;
-	protected WorldData worldData;
+	protected IWorldData worldData;
 	protected ChunkGrid chunkGrid;
 	protected MapSkin mapSkin;
 	

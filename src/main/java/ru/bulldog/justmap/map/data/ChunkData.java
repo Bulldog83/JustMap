@@ -23,7 +23,7 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class ChunkData {
+public class ChunkData implements IChunkData {
 	
 	public final static ChunkLevel EMPTY_LEVEL = new ChunkLevel(-1);
 	
@@ -91,7 +91,8 @@ public class ChunkData {
 		int levels = this.world.getDimension().getHeight() / layer.height;
 		this.levels.put(layer, new ChunkLevel[levels]);
 	}
-	
+
+	@Override
 	public ChunkLevel getChunkLevel(Layer layer, int level) {
 		synchronized (levelLock) {
 			if (!levels.containsKey(layer)) {
@@ -146,7 +147,8 @@ public class ChunkData {
 	private boolean checkUpdating(Layer layer, int level) {
 		return this.getChunkLevel(layer, level).updating;
 	}
-	
+
+	@Override
 	public void updateWorldChunk(WorldChunk lifeChunk) {
 		if (lifeChunk != null && !lifeChunk.isEmpty()) {
 			this.worldChunk = new SoftReference<>(lifeChunk);
@@ -166,10 +168,12 @@ public class ChunkData {
 		return currentChunk;
 	}
 	
+	@Override
 	public boolean updateFullChunk(Layer layer, int level, boolean forceUpdate) {
 		return this.updateChunkArea(layer, level, forceUpdate, 0, 0, 16, 16);
 	}
-	
+
+	@Override
 	public boolean updateChunkArea(Layer layer, int level, boolean forceUpdate, int x, int z, int width, int height) {
 		if (!JustMapClient.canMapping()) return false;
 		if (purged || checkUpdating(layer, level)) return false;
