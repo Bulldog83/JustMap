@@ -20,11 +20,9 @@ public interface IWorldManager {
 
      IWorldData getData();
 
-     void onWorldLoad();
-
-     void update();
-
      // Callbacks
+
+     void onWorldLoad();
 
      void onWorldChanged(World world);
 

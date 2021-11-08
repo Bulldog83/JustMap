@@ -375,6 +375,7 @@ public final class WorldManager implements IWorldManager {
 	@Override
 	public void onTick(boolean isServer) {
 		if (!isServer) {
+			update();
 			memoryControl();
 		}
 		ChunkUpdateListener.proceed();

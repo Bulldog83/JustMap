@@ -67,7 +67,6 @@ public class JustMapClient implements ClientModInitializer {
 			isOnTitleScreen = isTitle;
 			
 			AdvancedInfo.getInstance().updateInfo();
-			MapDataProvider.getWorldManager().update();
 			KeyHandler.update();
 
 			if (!canMapping()) return;
