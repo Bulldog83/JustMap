@@ -1,4 +1,4 @@
-package ru.bulldog.justmap.map.data.classic.fast;
+package ru.bulldog.justmap.map.data.fast;
 
 import net.minecraft.client.util.math.MatrixStack;
 import ru.bulldog.justmap.map.data.IRegionData;
