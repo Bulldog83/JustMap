@@ -4,7 +4,6 @@ import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.WorldChunk;
-import ru.bulldog.justmap.map.data.IWorldData;
 import ru.bulldog.justmap.map.data.IWorldManager;
 import ru.bulldog.justmap.map.data.WorldKey;
 
@@ -27,7 +26,7 @@ public class WorldManager implements IWorldManager {
     }
 
     @Override
-    public IWorldData getData() {
+    public WorldData getData() {
         return null;
     }
 
