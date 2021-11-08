@@ -22,11 +22,7 @@ public interface IWorldManager {
 
      void load();
 
-     void close();
-
      void update();
-
-     void memoryControl();
 
      // Callbacks
 
@@ -41,7 +37,7 @@ public interface IWorldManager {
 
      void onSetBlockState(BlockPos pos, BlockState state, World world);
 
-     void onTick();
+     void onTick(boolean isServer);
 
      void onWorldStop();
 }

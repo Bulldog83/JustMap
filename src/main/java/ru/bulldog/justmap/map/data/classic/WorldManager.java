@@ -373,12 +373,16 @@ public final class WorldManager implements IWorldManager {
 	}
 
 	@Override
-	public void onTick() {
+	public void onTick(boolean isServer) {
+		if (!isServer) {
+			memoryControl();
+		}
 		ChunkUpdateListener.proceed();
 	}
 
 	@Override
 	public void onWorldStop() {
 		ChunkUpdateListener.stop();
+		JustMap.WORKER.execute("Clearing map cache...", this::close);
 	}
 }
