@@ -1,4 +1,4 @@
-package ru.bulldog.justmap.event;
+package ru.bulldog.justmap.map.data.classic.event;
 
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;

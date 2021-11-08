@@ -1,8 +1,8 @@
 package ru.bulldog.justmap.map.data.classic;
 
 import ru.bulldog.justmap.client.config.ClientSettings;
-import ru.bulldog.justmap.event.ChunkUpdateEvent;
-import ru.bulldog.justmap.event.ChunkUpdateListener;
+import ru.bulldog.justmap.map.data.classic.event.ChunkUpdateEvent;
+import ru.bulldog.justmap.map.data.classic.event.ChunkUpdateListener;
 import ru.bulldog.justmap.map.IMap;
 import ru.bulldog.justmap.map.data.IWorldData;
 import ru.bulldog.justmap.map.data.Layer;

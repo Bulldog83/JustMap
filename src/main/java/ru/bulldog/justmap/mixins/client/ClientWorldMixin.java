@@ -18,8 +18,8 @@ import net.minecraft.world.World;
 import net.minecraft.world.chunk.WorldChunk;
 import net.minecraft.world.dimension.DimensionType;
 
-import ru.bulldog.justmap.event.ChunkUpdateEvent;
-import ru.bulldog.justmap.event.ChunkUpdateListener;
+import ru.bulldog.justmap.map.data.classic.event.ChunkUpdateEvent;
+import ru.bulldog.justmap.map.data.classic.event.ChunkUpdateListener;
 import ru.bulldog.justmap.map.IMap;
 import ru.bulldog.justmap.map.data.IChunkData;
 import ru.bulldog.justmap.map.data.IWorldData;
