@@ -20,7 +20,7 @@ public interface IWorldManager {
 
      IWorldData getData();
 
-     void load();
+     void onWorldLoad();
 
      void update();
 

@@ -264,7 +264,7 @@ public final class WorldManager implements IWorldManager {
 		}
 	}
 	
-	public void load() {
+	public void onWorldLoad() {
 		loaded = true;
 		loadConfig();
 		File worldsFile = new File(StorageUtil.filesDir(), "worlds.json");
