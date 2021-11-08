@@ -1,10 +1,11 @@
-package ru.bulldog.justmap.map.data;
+package ru.bulldog.justmap.map.data.classic;
 
 import java.util.Arrays;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 
+import ru.bulldog.justmap.map.data.IChunkLevel;
 import ru.bulldog.justmap.util.StateUtil;
 
 public class ChunkLevel implements IChunkLevel {

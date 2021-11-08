@@ -1,4 +1,4 @@
-package ru.bulldog.justmap.map.data;
+package ru.bulldog.justmap.map.data.classic;
 
 import java.io.IOException;
 import java.util.ArrayList;

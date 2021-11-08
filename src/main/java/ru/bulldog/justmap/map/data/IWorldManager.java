@@ -3,6 +3,8 @@ package ru.bulldog.justmap.map.data;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.WorldChunk;
+import ru.bulldog.justmap.map.data.classic.WorldData;
+import ru.bulldog.justmap.map.data.classic.WorldManager;
 
 import java.util.List;
 

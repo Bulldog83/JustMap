@@ -1,4 +1,4 @@
-package ru.bulldog.justmap.map.data;
+package ru.bulldog.justmap.map.data.classic;
 
 import java.io.File;
 import java.util.Map;
@@ -10,6 +10,9 @@ import net.minecraft.util.math.ChunkPos;
 import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.client.config.ClientSettings;
 import ru.bulldog.justmap.map.IMap;
+import ru.bulldog.justmap.map.data.IRegionData;
+import ru.bulldog.justmap.map.data.Layer;
+import ru.bulldog.justmap.map.data.RegionPos;
 import ru.bulldog.justmap.util.DataUtil;
 import ru.bulldog.justmap.util.Logger;
 import ru.bulldog.justmap.util.RuleUtil;
