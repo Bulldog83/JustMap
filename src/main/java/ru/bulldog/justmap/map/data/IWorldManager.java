@@ -7,27 +7,34 @@ import net.minecraft.world.chunk.WorldChunk;
 import java.util.List;
 
 public interface IWorldManager {
-     void onConfigUpdate();
-
-     void load();
-
-     void onWorldPosChanged(BlockPos newPos);
+     // WorldKey management
 
      WorldKey getWorldKey();
 
+     List<WorldKey> registeredWorlds();
+
+     void setCurrentWorldName(String name);
+
+     // World map management
+
      IWorldData getData();
 
-     void onChunkLoad(World world, WorldChunk worldChunk);
+     void load();
+
+     void close();
 
      void update();
 
      void memoryControl();
 
-     void close();
+     // Callbacks
 
      void onWorldChanged(World world);
 
-     List<WorldKey> registeredWorlds();
+     /** New spawn point set */
+     void onWorldPosChanged(BlockPos newPos);
 
-     void setCurrentWorldName(String name);
+     void onChunkLoad(World world, WorldChunk worldChunk);
+
+     void onConfigUpdate();
 }
