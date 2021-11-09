@@ -9,6 +9,11 @@ public class RegionPos {
 		this.z = blockZ >> 9;
 	}
 
+	public RegionPos(ChunkPos chunkPos) {
+		this.x = chunkPos.getRegionX();
+		this.z = chunkPos.getRegionZ();
+	}
+
 	@Override
 	public String toString() {
 		return String.format("r.%d.%d", x, z);
