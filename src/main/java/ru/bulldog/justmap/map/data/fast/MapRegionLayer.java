@@ -5,7 +5,9 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.chunk.WorldChunk;
+import org.jetbrains.annotations.NotNull;
 import org.lwjgl.opengl.GL11;
 import ru.bulldog.justmap.util.render.GLC;
 import ru.bulldog.justmap.util.render.RenderUtil;
@@ -18,8 +20,9 @@ public class MapRegionLayer {
     public final static int HEIGHT = 512;
     public final static int SIZE = 4 * WIDTH * HEIGHT;
 
-    private final byte[] bytes = new byte[SIZE];
-    private final ByteBuffer buffer = ByteBuffer.allocateDirect(bytes.length).order(ByteOrder.nativeOrder());
+    private MapChunk[][] chunks = new MapChunk[32][32];
+
+    private final ByteBuffer buffer = ByteBuffer.allocateDirect(SIZE).order(ByteOrder.nativeOrder());
 
     private int glId = -1;
     private volatile boolean isModified;
@@ -66,26 +69,49 @@ public class MapRegionLayer {
         RenderUtil.endDraw();
     }
 
-    private void refillBuffer() {
-        this.buffer.clear();
-        this.buffer.put(this.bytes);
-        this.buffer.position(0).limit(bytes.length);
+    public void updateChunk(WorldChunk worldChunk) {
+        // FIXME: verify/assert that chunkpos is inside region?
+        MapChunk mapChunk = getMapChunk(worldChunk.getPos());
+
+        mapChunk.updateChunk(worldChunk);
+        mapChunk.writeToTextureBuffer(buffer);
+        isModified = true;
     }
 
-    public void updateChunk(WorldChunk worldChunk) {
-        // FIXME: This is where the magic happens...
-        for (int i = 0; i < bytes.length; i++) {
-            bytes[i] = (byte) (i % 256);
+    private void regenerateTexture() {
+        buffer.clear();
+        for (int chunkX = 0; chunkX < 32; chunkX++) {
+            for (int chunkZ = 0; chunkZ < 32; chunkZ++) {
+                MapChunk mapChunk = chunks[chunkX][chunkZ];
+                if (mapChunk != null) {
+                    mapChunk.writeToTextureBuffer(buffer);
+                }
+            }
         }
-        this.refillBuffer();
+        buffer.position(0).limit(SIZE);
 
         isModified = true;
     }
 
-    public void updateBlock(BlockPos pos, BlockState state) {
-        // FIXME: This is where the magic happens...
-        this.refillBuffer();
+    @NotNull
+    private MapChunk getMapChunk(ChunkPos chunkPos) {
+        int relRegX = chunkPos.getRegionRelativeX();
+        int relRegZ = chunkPos.getRegionRelativeZ();
 
+        MapChunk mapChunk = chunks[relRegX][relRegZ];
+        if (mapChunk == null) {
+            mapChunk = new MapChunk(relRegX, relRegZ);
+            chunks[relRegX][relRegZ] = mapChunk;
+        }
+        return mapChunk;
+    }
+
+    public void updateBlock(BlockPos pos, BlockState state) {
+        ChunkPos chunkPos = new ChunkPos(pos);
+        MapChunk mapChunk = getMapChunk(chunkPos);
+        mapChunk.updateChunk(null);
+
+        mapChunk.writeToTextureBuffer(buffer);
         isModified = true;
     }
 }
