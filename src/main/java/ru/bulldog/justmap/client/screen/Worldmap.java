@@ -63,7 +63,7 @@ public class Worldmap extends MapScreen implements IMap {
 	private boolean playerTracking = true;
 	private int mapLevel = 0;
 	private DropDownListWidget mapMenu;
-	private MapRegionProvider worldData;
+	private MapRegionProvider mapRegionProvider;
 	private WorldKey world;
 	private BlockPos centerPos;
 	private String cursorCoords;
@@ -86,7 +86,7 @@ public class Worldmap extends MapScreen implements IMap {
 		this.centerX = width / 2.0;
 		this.centerY = height / 2.0;
 		
-		this.worldData = MapDataProvider.getManager().getMapRegionProvider();
+		this.mapRegionProvider = MapDataProvider.getManager().getMapRegionProvider();
 		WorldKey worldKey = MapDataProvider.getManager().getWorldKey();
 		if (centerPos == null || !worldKey.equals(world)) {
 			this.centerPos = DataUtil.currentPos();
@@ -216,7 +216,7 @@ public class Worldmap extends MapScreen implements IMap {
 			while (picY < scaledHeight) {				
 				int cZ = cornerZ + picY;
 				
-				MapRegion region = worldData.getMapRegion(this, currentPos.set(cX, 0, cZ));
+				MapRegion region = mapRegionProvider.getMapRegion(this, currentPos.set(cX, 0, cZ));
 
 				imgW = 512;
 				imgH = 512;

@@ -97,7 +97,7 @@ public class FastRenderer extends MapRenderer {
 				if (picY + texH > scaledH) texH = scaledH - picY;
 				
 				int cZ = cornerZ + picY;
-				MapRegion region = worldData.getMapRegion(minimap, currentPos.set(cX, 0, cZ));
+				MapRegion region = mapRegionProvider.getMapRegion(minimap, currentPos.set(cX, 0, cZ));
 
 				int texX = cX - (region.getPos().x << 9);
 				int texY = cZ - (region.getPos().z << 9);

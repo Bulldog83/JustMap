@@ -64,7 +64,7 @@ public class Minimap implements IMap {
 	private PlayerEntity locPlayer = null;
 	private Layer mapLayer = Layer.SURFACE;
 	private EntityRadar entityRadar;
-	private MapRegionProvider worldData;
+	private MapRegionProvider mapRegionProvider;
 	private MapSkin mapSkin;
 	private World world;
 	private ScreenPosition mapPosition;
@@ -288,7 +288,7 @@ public class Minimap implements IMap {
 
 	public void prepareMap(PlayerEntity player) {
 		this.world = player.world;
-		this.worldData = MapDataProvider.getManager().getMapRegionProvider();
+		this.mapRegionProvider = MapDataProvider.getManager().getMapRegionProvider();
 		BlockPos pos = DataUtil.currentPos();
 
 		int posX = pos.getX();
@@ -382,8 +382,8 @@ public class Minimap implements IMap {
 		return this.world;
 	}
 
-	public MapRegionProvider getWorldData() {
-		return this.worldData;
+	public MapRegionProvider getMapRegionProvider() {
+		return this.mapRegionProvider;
 	}
 	
 	public MapSkin getSkin() {

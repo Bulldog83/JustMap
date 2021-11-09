@@ -1,6 +1,7 @@
 package ru.bulldog.justmap.map.data.classic;
 
 import ru.bulldog.justmap.client.config.ClientSettings;
+import ru.bulldog.justmap.map.data.MapRegion;
 import ru.bulldog.justmap.map.data.classic.event.ChunkUpdateEvent;
 import ru.bulldog.justmap.map.data.classic.event.ChunkUpdateListener;
 import ru.bulldog.justmap.map.IMap;
@@ -37,11 +38,10 @@ public class WorldData implements MapRegionProvider {
 	}
 	
 	public RegionData getRegion(BlockPos blockPos) {
-		return this.getMapRegion(DataUtil.getMap(), blockPos);
+		return this.getRegionData(DataUtil.getMap(), blockPos);
 	}
 	
-	@Override
-	public RegionData getMapRegion(IMap map, BlockPos blockPos) {
+	public RegionData getRegionData(IMap map, BlockPos blockPos) {
 		RegionPos regPos = new RegionPos(blockPos);
 		RegionData region;
 		synchronized (regions) {
@@ -61,7 +61,12 @@ public class WorldData implements MapRegionProvider {
 		
 		return region;
 	}
-	
+
+	@Override
+	public MapRegion getMapRegion(IMap map, BlockPos blockPos) {
+		return getRegionData(map, blockPos);
+	}
+
 	public ChunkData getChunk(BlockPos pos) {
 		return this.chunkManager.getChunk(pos.getX() >> 4, pos.getZ() >> 4);
 	}

@@ -26,6 +26,7 @@ import ru.bulldog.justmap.config.ConfigKeeper.BooleanEntry;
 import ru.bulldog.justmap.config.ConfigKeeper.EnumEntry;
 import ru.bulldog.justmap.enums.MultiworldDetection;
 import ru.bulldog.justmap.map.data.Layer;
+import ru.bulldog.justmap.map.data.MapRegionProvider;
 import ru.bulldog.justmap.map.data.classic.event.ChunkUpdateEvent;
 import ru.bulldog.justmap.map.data.classic.event.ChunkUpdateListener;
 import ru.bulldog.justmap.map.IMap;
@@ -193,8 +194,12 @@ public final class WorldManager implements MapDataManager {
 		}
 	}
 
-	public WorldData getMapRegionProvider() {
+	public WorldData getData() {
 		return getData(currentWorld, currentWorldKey);
+	}
+
+	public MapRegionProvider getMapRegionProvider() {
+		return getData();
 	}
 
 	public WorldData getData(World world, WorldKey worldKey) {
@@ -221,7 +226,7 @@ public final class WorldManager implements MapDataManager {
 	public void onChunkLoad(World world, WorldChunk worldChunk) {
 		if (world == null || worldChunk == null || worldChunk.isEmpty()) return;
 		IMap map = DataUtil.getMap();
-		WorldData mapData = getMapRegionProvider();
+		WorldData mapData = getData();
 		if (mapData == null) return;
 		ChunkData mapChunk = mapData.getChunk(worldChunk.getPos());
 		ChunkUpdateEvent updateEvent = new ChunkUpdateEvent(worldChunk, mapChunk, map.getLayer(), map.getLevel(), 0, 0, 16, 16, true);
@@ -234,7 +239,7 @@ public final class WorldManager implements MapDataManager {
 			requestWorldName = false;
 		}
 		if (!JustMapClient.canMapping()) return;
-		getMapRegionProvider().updateMap();
+		getData().updateMap();
 		JustMap.WORKER.execute(() -> {
 			synchronized (worldsData) {
 				worldsData.forEach((id, data) -> {
@@ -395,12 +400,11 @@ public final class WorldManager implements MapDataManager {
 		int chunkX = posX >> 4;
 		int chunkZ = posZ >> 4;
 
-		ChunkData mapChunk = this.getMapRegionProvider().getChunk(chunkX, chunkZ);
+		ChunkData mapChunk = this.getData().getChunk(chunkX, chunkZ);
 
 		int cx = posX - (chunkX << 4);
 		int cz = posZ - (chunkZ << 4);
 
-		int posY = mapChunk.getChunkLevel(mapLayer, mapLevel).sampleHeightmap(cx, cz);
-		return posY;
+		return mapChunk.getChunkLevel(mapLayer, mapLevel).sampleHeightmap(cx, cz);
 	}
 }

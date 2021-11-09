@@ -70,7 +70,7 @@ public class ChunkUpdateListener {
 			Layer layer = DataUtil.getLayer(world, pos);
 			int level = DataUtil.getLevel(layer, pos.getY());
 			if (layer.equals(map.getLayer()) && level == map.getLevel()) {
-				WorldData mapData = WorldManager.WORLD_MANAGER.getMapRegionProvider();
+				WorldData mapData = WorldManager.WORLD_MANAGER.getData();
 				if (mapData == null) return;
 				ChunkPos chunkPos = worldChunk.getPos();
 				int chunkX = chunkPos.x;
