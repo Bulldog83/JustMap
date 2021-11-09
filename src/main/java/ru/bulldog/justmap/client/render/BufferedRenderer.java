@@ -175,8 +175,6 @@ public class BufferedRenderer extends MapRenderer {
 		int cornerX = lastX - scaledW / 2;
 		int cornerZ = lastZ - scaledH / 2;
 		
-		BlockPos.Mutable currentPos = new BlockPos.Mutable();
-		
 		int picX = 0;
 		while(picX < scaledW) {
 			int texW = 512;
@@ -189,7 +187,7 @@ public class BufferedRenderer extends MapRenderer {
 				if (picY + texH > scaledH) texH = scaledH - picY;
 				
 				int cZ = cornerZ + picY;
-				MapRegion region = mapRegionProvider.getMapRegion(minimap, currentPos.set(cX, 0, cZ));
+				MapRegion region = mapRegionProvider.getMapRegion(minimap, cX, cZ);
 
 				int texX = cX - (region.getPos().x << 9);
 				int texY = cZ - (region.getPos().z << 9);

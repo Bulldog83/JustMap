@@ -7,18 +7,9 @@ public class RegionPos {
 	public final int x;
 	public final int z;
 	
-	public RegionPos(BlockPos blockPos) {
-		this(new ChunkPos(blockPos));
-	}
-	
-	public RegionPos(ChunkPos pos) {
-		this(pos.getRegionX(),
-			 pos.getRegionZ());
-	}
-	
-	public RegionPos(int x, int z) {
-		this.x = x;
-		this.z = z;
+	public RegionPos(int blockX, int blockZ) {
+		this.x = blockX >> 9;
+		this.z = blockZ >> 9;
 	}
 	
 	@Override

@@ -207,8 +207,6 @@ public class Worldmap extends MapScreen implements IMap {
 		int cornerX = centerPos.getX() - scaledWidth / 2;
 		int cornerZ = centerPos.getZ() - scaledHeight / 2;
 		
-		BlockPos.Mutable currentPos = new BlockPos.Mutable();
-		
 		int picX = 0, imgW = 0;
 		while(picX < scaledWidth) {
 			int cX = cornerX + picX;
@@ -216,7 +214,7 @@ public class Worldmap extends MapScreen implements IMap {
 			while (picY < scaledHeight) {				
 				int cZ = cornerZ + picY;
 				
-				MapRegion region = mapRegionProvider.getMapRegion(this, currentPos.set(cX, 0, cZ));
+				MapRegion region = mapRegionProvider.getMapRegion(this, cX, cZ);
 
 				imgW = 512;
 				imgH = 512;

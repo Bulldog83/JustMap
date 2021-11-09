@@ -38,11 +38,11 @@ public class WorldData implements MapRegionProvider {
 	}
 	
 	public RegionData getRegion(BlockPos blockPos) {
-		return this.getRegionData(DataUtil.getMap(), blockPos);
+		return this.getRegionData(DataUtil.getMap(), blockPos.getX(), blockPos.getZ());
 	}
 	
-	public RegionData getRegionData(IMap map, BlockPos blockPos) {
-		RegionPos regPos = new RegionPos(blockPos);
+	public RegionData getRegionData(IMap map, int x, int z) {
+		RegionPos regPos = new RegionPos(x, z);
 		RegionData region;
 		synchronized (regions) {
 			if(regions.containsKey(regPos)) {
@@ -63,8 +63,8 @@ public class WorldData implements MapRegionProvider {
 	}
 
 	@Override
-	public MapRegion getMapRegion(IMap map, BlockPos blockPos) {
-		return getRegionData(map, blockPos);
+	public MapRegion getMapRegion(IMap map, int x, int z) {
+		return getRegionData(map, x, z);
 	}
 
 	public ChunkData getChunk(BlockPos pos) {
