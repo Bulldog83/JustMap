@@ -76,17 +76,16 @@ public class RegionData implements IRegionData {
 		this.regPos = regPos;
 		this.cacheDir = StorageUtil.cacheDir();
 	}
-	
+
+	@Override
 	public RegionPos getPos() {
 		return this.regPos;
 	}
 	
-	@Override
 	public int getX() {
 		return this.regPos.x;
 	}
 	
-	@Override
 	public int getZ() {
 		return this.regPos.z;
 	}
@@ -250,7 +249,6 @@ public class RegionData implements IRegionData {
 		return this.level;
 	}
 	
-	@Override
 	public void swapLayer(Layer layer, int level) {
 		if (this.layer.equals(layer) &&
 			this.level == level) {
@@ -298,7 +296,6 @@ public class RegionData implements IRegionData {
 		return new File(dir, String.format("r%d.%d.png", regPos.x, regPos.z));
 	}
 	
-	@Override
 	public void draw(MatrixStack matrices, double x, double y, double width, double height, int imgX, int imgY, int imgW, int imgH) {
 		if (width <= 0 || height <= 0) return;
 		
@@ -309,7 +306,13 @@ public class RegionData implements IRegionData {
 		
 		this.drawTexture(matrices, x, y, width, height, u1, v1, u2, v2);
 	}
-	
+
+	@Override
+	public void drawLayer(MatrixStack matrices, Layer layer, int level, double x, double y, double width, double height, int imgX, int imgY, int imgW, int imgH) {
+		swapLayer(layer, level);
+		draw(matrices, x, y, width, height, imgX, imgY, imgW, imgH);
+	}
+
 	private void drawTexture(MatrixStack matrices, double x, double y, double w, double h, float u1, float v1, float u2, float v2) {
 		if (texture != null && texture.changed) {
 			this.texture.upload();

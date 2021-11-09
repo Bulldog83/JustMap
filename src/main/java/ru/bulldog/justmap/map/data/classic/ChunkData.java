@@ -2,7 +2,6 @@ package ru.bulldog.justmap.map.data.classic;
 
 import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.client.config.ClientSettings;
-import ru.bulldog.justmap.map.data.IChunkData;
 import ru.bulldog.justmap.map.data.Layer;
 import ru.bulldog.justmap.network.ClientNetworkHandler;
 import ru.bulldog.justmap.util.DataUtil;
@@ -25,7 +24,7 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class ChunkData implements IChunkData {
+public class ChunkData {
 	
 	public final static ChunkLevel EMPTY_LEVEL = new ChunkLevel(-1);
 	
@@ -94,7 +93,6 @@ public class ChunkData implements IChunkData {
 		this.levels.put(layer, new ChunkLevel[levels]);
 	}
 
-	@Override
 	public ChunkLevel getChunkLevel(Layer layer, int level) {
 		synchronized (levelLock) {
 			if (!levels.containsKey(layer)) {
@@ -150,7 +148,6 @@ public class ChunkData implements IChunkData {
 		return this.getChunkLevel(layer, level).updating;
 	}
 
-	@Override
 	public void updateWorldChunk(WorldChunk lifeChunk) {
 		if (lifeChunk != null && !lifeChunk.isEmpty()) {
 			this.worldChunk = new SoftReference<>(lifeChunk);
@@ -170,12 +167,10 @@ public class ChunkData implements IChunkData {
 		return currentChunk;
 	}
 	
-	@Override
 	public boolean updateFullChunk(Layer layer, int level, boolean forceUpdate) {
 		return this.updateChunkArea(layer, level, forceUpdate, 0, 0, 16, 16);
 	}
 
-	@Override
 	public boolean updateChunkArea(Layer layer, int level, boolean forceUpdate, int x, int z, int width, int height) {
 		if (!JustMapClient.canMapping()) return false;
 		if (purged || checkUpdating(layer, level)) return false;

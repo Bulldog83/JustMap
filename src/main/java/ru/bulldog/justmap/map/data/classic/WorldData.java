@@ -66,7 +66,6 @@ public class WorldData implements IWorldData {
 		return this.chunkManager.getChunk(pos.getX() >> 4, pos.getZ() >> 4);
 	}
 
-	@Override
 	public ChunkData getChunk(ChunkPos chunkPos) {
 		return this.chunkManager.getChunk(chunkPos.x, chunkPos.z);
 	}

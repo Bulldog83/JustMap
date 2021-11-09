@@ -33,7 +33,7 @@ public abstract class ClientPlayNetworkHandlerMixin {
 	
 	@Inject(method = "<init>", at = @At("TAIL"))
 	public void onConnect(MinecraftClient client, Screen screen, ClientConnection connection, GameProfile profile, CallbackInfo cinfo) {
-		MapDataProvider.getWorldManager().onWorldLoad();
+		MapDataProvider.getWorldManager().onServerConnect();
 	}
 	
 	@Inject(method = "onPlayerSpawnPosition", at = @At("TAIL"))

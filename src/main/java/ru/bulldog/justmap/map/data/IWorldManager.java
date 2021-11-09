@@ -20,9 +20,11 @@ public interface IWorldManager {
 
      IWorldData getData();
 
+     int getMapHeight(Layer mapLayer, int mapLevel, int posX, int posZ);
+
      // Callbacks
 
-     void onWorldLoad();
+     void onServerConnect();
 
      void onWorldChanged(World world);
 

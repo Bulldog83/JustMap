@@ -98,10 +98,9 @@ public class FastRenderer extends MapRenderer {
 				
 				int cZ = cornerZ + picY;
 				IRegionData region = worldData.getRegion(minimap, currentPos.set(cX, 0, cZ));
-				region.swapLayer(minimap.getLayer(), minimap.getLevel());
-				
-				int texX = cX - (region.getX() << 9);
-				int texY = cZ - (region.getZ() << 9);
+
+				int texX = cX - (region.getPos().x << 9);
+				int texY = cZ - (region.getPos().z << 9);
 				if (texX + texW >= 512) texW = 512 - texX;
 				if (texY + texH >= 512) texH = 512 - texY;
 				
@@ -110,8 +109,8 @@ public class FastRenderer extends MapRenderer {
 				double scW = (double) texW / mapScale;
 				double scH = (double) texH / mapScale;
 				
-				region.draw(matrices, imgX + scX, imgY + scY, scW, scH, texX, texY, texW, texH);
-				
+				region.drawLayer(matrices, minimap.getLayer(), minimap.getLevel(), imgX + scX, imgY + scY, scW, scH, texX, texY, texW, texH);
+
 				picY += texH > 0 ? texH : 512;
 			}
 			

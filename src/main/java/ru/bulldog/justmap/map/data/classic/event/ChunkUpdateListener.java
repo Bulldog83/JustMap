@@ -10,10 +10,10 @@ import net.minecraft.world.World;
 import net.minecraft.world.chunk.WorldChunk;
 import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.map.IMap;
-import ru.bulldog.justmap.map.data.IChunkData;
-import ru.bulldog.justmap.map.data.IWorldData;
 import ru.bulldog.justmap.map.data.Layer;
-import ru.bulldog.justmap.map.data.MapDataProvider;
+import ru.bulldog.justmap.map.data.classic.ChunkData;
+import ru.bulldog.justmap.map.data.classic.WorldData;
+import ru.bulldog.justmap.map.data.classic.WorldManager;
 import ru.bulldog.justmap.util.DataUtil;
 import ru.bulldog.justmap.util.math.Plane;
 import ru.bulldog.justmap.util.tasks.TaskManager;
@@ -70,7 +70,7 @@ public class ChunkUpdateListener {
 			Layer layer = DataUtil.getLayer(world, pos);
 			int level = DataUtil.getLevel(layer, pos.getY());
 			if (layer.equals(map.getLayer()) && level == map.getLevel()) {
-				IWorldData mapData = MapDataProvider.getWorldManager().getData();
+				WorldData mapData = WorldManager.WORLD_MANAGER.getData();
 				if (mapData == null) return;
 				ChunkPos chunkPos = worldChunk.getPos();
 				int chunkX = chunkPos.x;
@@ -116,9 +116,9 @@ public class ChunkUpdateListener {
 		}
 	}
 
-	private static void updateChunk(IWorldData mapData, WorldChunk worldChunk, Layer layer, int level, int chx, int chz, int x, int z, int w, int h) {
+	private static void updateChunk(WorldData mapData, WorldChunk worldChunk, Layer layer, int level, int chx, int chz, int x, int z, int w, int h) {
 		if (worldChunk.isEmpty()) return;
-		IChunkData mapChunk = mapData.getChunk(worldChunk.getPos());
+		ChunkData mapChunk = mapData.getChunk(worldChunk.getPos());
 		ChunkUpdateListener.accept(new ChunkUpdateEvent(worldChunk, mapChunk, layer, level, x, z, w, h, true));
 	}
 }

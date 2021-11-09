@@ -5,10 +5,9 @@ import java.util.Arrays;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 
-import ru.bulldog.justmap.map.data.IChunkLevel;
 import ru.bulldog.justmap.util.StateUtil;
 
-public class ChunkLevel implements IChunkLevel {
+public class ChunkLevel {
 	
 	int[] statemap;
 	int[] heightmap;
@@ -49,7 +48,6 @@ public class ChunkLevel implements IChunkLevel {
 		}
 	}
 
-	@Override
 	public int sampleHeightmap(int x, int z) {
 		return this.sampleHeightmap(index(x, z));
 	}

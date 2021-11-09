@@ -25,6 +25,7 @@ import ru.bulldog.justmap.client.screen.WorldnameScreen;
 import ru.bulldog.justmap.config.ConfigKeeper.BooleanEntry;
 import ru.bulldog.justmap.config.ConfigKeeper.EnumEntry;
 import ru.bulldog.justmap.enums.MultiworldDetection;
+import ru.bulldog.justmap.map.data.Layer;
 import ru.bulldog.justmap.map.data.classic.event.ChunkUpdateEvent;
 import ru.bulldog.justmap.map.data.classic.event.ChunkUpdateListener;
 import ru.bulldog.justmap.map.IMap;
@@ -37,6 +38,8 @@ import ru.bulldog.justmap.util.storage.StorageUtil;
 import ru.bulldog.justmap.util.tasks.MemoryUtil;
 
 public final class WorldManager implements IWorldManager {
+
+	public static final WorldManager WORLD_MANAGER = new WorldManager();
 
 	private final Map<WorldKey, WorldData> worldsData = new HashMap<>();
 	// used only in mixed mode to associate world names with worlds
@@ -264,7 +267,7 @@ public final class WorldManager implements IWorldManager {
 		}
 	}
 	
-	public void onWorldLoad() {
+	public void onServerConnect() {
 		loaded = true;
 		loadConfig();
 		File worldsFile = new File(StorageUtil.filesDir(), "worlds.json");
@@ -385,5 +388,19 @@ public final class WorldManager implements IWorldManager {
 	public void onWorldStop() {
 		ChunkUpdateListener.stop();
 		JustMap.WORKER.execute("Clearing map cache...", this::close);
+	}
+
+	@Override
+	public int getMapHeight(Layer mapLayer, int mapLevel, int posX, int posZ) {
+		int chunkX = posX >> 4;
+		int chunkZ = posZ >> 4;
+
+		ChunkData mapChunk = this.getData().getChunk(chunkX, chunkZ);
+
+		int cx = posX - (chunkX << 4);
+		int cz = posZ - (chunkZ << 4);
+
+		int posY = mapChunk.getChunkLevel(mapLayer, mapLevel).sampleHeightmap(cx, cz);
+		return posY;
 	}
 }

@@ -2,20 +2,20 @@ package ru.bulldog.justmap.map.data.classic.event;
 
 import net.minecraft.world.chunk.WorldChunk;
 
-import ru.bulldog.justmap.map.data.IChunkData;
 import ru.bulldog.justmap.map.data.Layer;
+import ru.bulldog.justmap.map.data.classic.ChunkData;
 import ru.bulldog.justmap.util.math.Plane;
 
 public class ChunkUpdateEvent {
 	public final WorldChunk worldChunk;
-	public final IChunkData mapChunk;
+	public final ChunkData mapChunk;
 	public final Layer layer;
 	public final Plane updateArea;
 	public final boolean update;
 	public final boolean full;
 	public final int level;
 	
-	public ChunkUpdateEvent(WorldChunk worldChunk, IChunkData mapChunk, Layer layer, int level, int x, int z, int w, int h, boolean update) {
+	public ChunkUpdateEvent(WorldChunk worldChunk, ChunkData mapChunk, Layer layer, int level, int x, int z, int w, int h, boolean update) {
 		this.full = (x == 0 && z == 0 && w == 16 && h == 16);
 		this.worldChunk = worldChunk;
 		this.mapChunk = mapChunk;
