@@ -29,6 +29,53 @@ public class MapRegionLayer {
     private int glId = -1;
     private volatile boolean isModified;
 
+
+    public void updateChunk(WorldChunk worldChunk) {
+        // FIXME: verify/assert that chunkpos is inside region?
+        MapChunk mapChunk = getMapChunk(worldChunk.getPos());
+
+        mapChunk.updateChunk(worldChunk);
+        mapChunk.writeToTextureBuffer(buffer);
+        isModified = true;
+    }
+
+    public void updateBlock(BlockPos pos, BlockState state) {
+        ChunkPos chunkPos = new ChunkPos(pos);
+        MapChunk mapChunk = getMapChunk(chunkPos);
+
+        mapChunk.updateChunk(null);
+        mapChunk.writeToTextureBuffer(buffer);
+        isModified = true;
+    }
+
+    @NotNull
+    private MapChunk getMapChunk(ChunkPos chunkPos) {
+        int relRegX = chunkPos.getRegionRelativeX();
+        int relRegZ = chunkPos.getRegionRelativeZ();
+
+        MapChunk mapChunk = chunks[relRegX][relRegZ];
+        if (mapChunk == null) {
+            mapChunk = new MapChunk(relRegX, relRegZ);
+            chunks[relRegX][relRegZ] = mapChunk;
+        }
+        return mapChunk;
+    }
+
+    private void regenerateTexture() {
+        buffer.clear();
+        for (int chunkX = 0; chunkX < 32; chunkX++) {
+            for (int chunkZ = 0; chunkZ < 32; chunkZ++) {
+                MapChunk mapChunk = chunks[chunkX][chunkZ];
+                if (mapChunk != null) {
+                    mapChunk.writeToTextureBuffer(buffer);
+                }
+            }
+        }
+        buffer.position(0).limit(BUFFER_SIZE);
+
+        isModified = true;
+    }
+
     public void draw(MatrixStack matrices, double x, double y, double width, double height, int imgX, int imgY, int imgW, int imgH) {
         if (width <= 0 || height <= 0) return;
 
@@ -69,51 +116,5 @@ public class MapRegionLayer {
         RenderUtil.startDraw();
         RenderUtil.addQuad(matrices, x, y, w, h, u1, v1, u2, v2);
         RenderUtil.endDraw();
-    }
-
-    public void updateChunk(WorldChunk worldChunk) {
-        // FIXME: verify/assert that chunkpos is inside region?
-        MapChunk mapChunk = getMapChunk(worldChunk.getPos());
-
-        mapChunk.updateChunk(worldChunk);
-        mapChunk.writeToTextureBuffer(buffer);
-        isModified = true;
-    }
-
-    private void regenerateTexture() {
-        buffer.clear();
-        for (int chunkX = 0; chunkX < 32; chunkX++) {
-            for (int chunkZ = 0; chunkZ < 32; chunkZ++) {
-                MapChunk mapChunk = chunks[chunkX][chunkZ];
-                if (mapChunk != null) {
-                    mapChunk.writeToTextureBuffer(buffer);
-                }
-            }
-        }
-        buffer.position(0).limit(BUFFER_SIZE);
-
-        isModified = true;
-    }
-
-    @NotNull
-    private MapChunk getMapChunk(ChunkPos chunkPos) {
-        int relRegX = chunkPos.getRegionRelativeX();
-        int relRegZ = chunkPos.getRegionRelativeZ();
-
-        MapChunk mapChunk = chunks[relRegX][relRegZ];
-        if (mapChunk == null) {
-            mapChunk = new MapChunk(relRegX, relRegZ);
-            chunks[relRegX][relRegZ] = mapChunk;
-        }
-        return mapChunk;
-    }
-
-    public void updateBlock(BlockPos pos, BlockState state) {
-        ChunkPos chunkPos = new ChunkPos(pos);
-        MapChunk mapChunk = getMapChunk(chunkPos);
-        mapChunk.updateChunk(null);
-
-        mapChunk.writeToTextureBuffer(buffer);
-        isModified = true;
     }
 }
