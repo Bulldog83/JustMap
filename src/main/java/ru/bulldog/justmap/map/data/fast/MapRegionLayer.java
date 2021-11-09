@@ -16,7 +16,7 @@ import java.nio.ByteOrder;
 public class MapRegionLayer {
     public final static int WIDTH = 512;
     public final static int HEIGHT = 512;
-    public final static int SIZE = 4 * WIDTH * (HEIGHT - 1) + 4 * WIDTH;
+    public final static int SIZE = 4 * WIDTH * HEIGHT;
 
     private final byte[] bytes = new byte[SIZE];
     private final ByteBuffer buffer = ByteBuffer.allocateDirect(bytes.length).order(ByteOrder.nativeOrder());
@@ -54,7 +54,7 @@ public class MapRegionLayer {
             RenderSystem.pixelStore(GLC.GL_UNPACK_SKIP_PIXELS, 0);
             RenderSystem.pixelStore(GLC.GL_UNPACK_SKIP_ROWS, 0);
 
-            GL11.glTexImage2D(GLC.GL_TEXTURE_2D, 0, GLC.GL_RGBA, 512, 512, 0, GLC.GL_RGBA, GLC.GL_UNSIGNED_INT_8_8_8_8, this.buffer);
+            GL11.glTexImage2D(GLC.GL_TEXTURE_2D, 0, GL11.GL_RGB, 512, 512, 0, GL11.GL_RGBA, GLC.GL_UNSIGNED_INT_8_8_8_8, this.buffer);
 
             isModified = false;
         }
@@ -74,6 +74,9 @@ public class MapRegionLayer {
 
     public void updateChunk(WorldChunk worldChunk) {
         // FIXME: This is where the magic happens...
+        for (int i = 0; i < bytes.length; i++) {
+            bytes[i] = (byte) (i % 256);
+        }
         this.refillBuffer();
 
         isModified = true;
