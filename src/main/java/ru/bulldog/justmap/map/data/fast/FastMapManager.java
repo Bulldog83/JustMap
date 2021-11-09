@@ -6,7 +6,6 @@ import net.minecraft.world.World;
 import net.minecraft.world.chunk.WorldChunk;
 import ru.bulldog.justmap.map.data.Layer;
 import ru.bulldog.justmap.map.data.MapDataManager;
-import ru.bulldog.justmap.map.data.MapRegion;
 import ru.bulldog.justmap.map.data.MapRegionProvider;
 import ru.bulldog.justmap.map.data.WorldKey;
 
@@ -56,7 +55,7 @@ public class FastMapManager implements MapDataManager {
     public void onWorldChanged(World world) {
         FastMapWorld mapWorld = mapWorlds.get(world);
         if (mapWorld == null) {
-            mapWorld = new FastMapWorld();
+            mapWorld = new FastMapWorld(world);
             mapWorlds.put(world, mapWorld);
         }
 

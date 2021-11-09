@@ -8,16 +8,18 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.chunk.WorldChunk;
 import org.lwjgl.opengl.GL11;
 import ru.bulldog.justmap.util.render.GLC;
-import ru.bulldog.justmap.util.render.MapTexture;
 import ru.bulldog.justmap.util.render.RenderUtil;
 
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 
 public class MapRegionLayer {
-    private MapTexture image;
-    private MapTexture texture;
-    private ByteBuffer buffer;
-    private byte[] bytes;
+    public final static int WIDTH = 512;
+    public final static int HEIGHT = 512;
+    public final static int SIZE = 4 * WIDTH * (HEIGHT - 1) + 4 * WIDTH;
+
+    private final byte[] bytes = new byte[SIZE];
+    private final ByteBuffer buffer = ByteBuffer.allocateDirect(bytes.length).order(ByteOrder.nativeOrder());
 
     private int glId = -1;
     private volatile boolean isModified;

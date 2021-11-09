@@ -1,9 +1,15 @@
 package ru.bulldog.justmap.map.data.fast;
 
+import net.minecraft.world.World;
 import ru.bulldog.justmap.map.data.WorldKey;
 
 public class FastMapWorld {
     private final MapRegionRegistry registry = new MapRegionRegistry();
+    private final WorldKey worldKey;
+
+    public FastMapWorld(World world) {
+        this.worldKey = new WorldKey(world.getRegistryKey().getValue());
+    }
 
     public WorldKey getWorldKey() {
         return null;
