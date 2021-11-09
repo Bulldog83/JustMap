@@ -12,7 +12,7 @@ public class FastMapWorld {
     }
 
     public WorldKey getWorldKey() {
-        return null;
+        return worldKey;
     }
 
     public void setWorldName(String name) {
