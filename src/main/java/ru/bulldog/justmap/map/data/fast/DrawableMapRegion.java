@@ -4,15 +4,16 @@ import com.mojang.blaze3d.platform.TextureUtil;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.util.math.MatrixStack;
 import org.lwjgl.opengl.GL11;
-import ru.bulldog.justmap.map.data.IRegionData;
 import ru.bulldog.justmap.map.data.Layer;
+import ru.bulldog.justmap.map.data.MapRegion;
+import ru.bulldog.justmap.map.data.RegionPos;
 import ru.bulldog.justmap.util.render.GLC;
 import ru.bulldog.justmap.util.render.MapTexture;
 import ru.bulldog.justmap.util.render.RenderUtil;
 
 import java.nio.ByteBuffer;
 
-public class RegionData implements IRegionData {
+public class DrawableMapRegion implements MapRegion {
     private MapTexture image;
     private MapTexture texture;
     private ByteBuffer buffer;
@@ -20,22 +21,7 @@ public class RegionData implements IRegionData {
     private int glId = -1;
 
     @Override
-    public int getX() {
-        return 0;
-    }
-
-    @Override
-    public int getZ() {
-        return 0;
-    }
-
-    @Override
-    public void swapLayer(Layer layer, int level) {
-
-    }
-
-    @Override
-    public void draw(MatrixStack matrices, double x, double y, double width, double height, int imgX, int imgY, int imgW, int imgH) {
+    public void drawLayer(MatrixStack matrices, Layer layer, int level, double x, double y, double width, double height, int imgX, int imgY, int imgW, int imgH) {
         if (width <= 0 || height <= 0) return;
 
         float u1 = imgX / 512F;
@@ -87,6 +73,11 @@ public class RegionData implements IRegionData {
         RenderSystem.pixelStore(GLC.GL_UNPACK_SKIP_ROWS, 0);
 
         GL11.glTexImage2D(GLC.GL_TEXTURE_2D, 0, GLC.GL_RGBA, 512, 512, 0, GLC.GL_RGBA, GLC.GL_UNSIGNED_INT_8_8_8_8, this.buffer);
+    }
+
+    @Override
+    public RegionPos getPos() {
+        return null;
     }
 
 }

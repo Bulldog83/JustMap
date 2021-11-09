@@ -4,12 +4,14 @@ import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.WorldChunk;
-import ru.bulldog.justmap.map.data.IWorldManager;
+import ru.bulldog.justmap.map.data.Layer;
+import ru.bulldog.justmap.map.data.MapDataManager;
+import ru.bulldog.justmap.map.data.MapRegionProvider;
 import ru.bulldog.justmap.map.data.WorldKey;
 
 import java.util.List;
 
-public class WorldManager implements IWorldManager {
+public class FastMapManager implements MapDataManager {
     @Override
     public WorldKey getWorldKey() {
         return null;
@@ -26,12 +28,17 @@ public class WorldManager implements IWorldManager {
     }
 
     @Override
-    public WorldData getData() {
+    public MapRegionProvider getMapRegionProvider() {
         return null;
     }
 
     @Override
-    public void onWorldLoad() {
+    public int getMapHeight(Layer mapLayer, int mapLevel, int posX, int posZ) {
+        return 0;
+    }
+
+    @Override
+    public void onServerConnect() {
 
     }
 
