@@ -42,6 +42,7 @@ public class MapRegionLayer {
         }
 
         if (isModified) {
+            // FIXME: might need cooldown..?
             // Need to update the texture with GL
             RenderSystem.bindTexture(this.glId);
             RenderSystem.texParameter(GLC.GL_TEXTURE_2D, GLC.GL_TEXTURE_MIN_FILTER, GLC.GL_NEAREST);

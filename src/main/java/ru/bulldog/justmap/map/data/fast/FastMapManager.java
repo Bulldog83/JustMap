@@ -4,6 +4,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.WorldChunk;
+import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.map.data.Layer;
 import ru.bulldog.justmap.map.data.MapDataManager;
 import ru.bulldog.justmap.map.data.MapRegionProvider;
@@ -48,11 +49,15 @@ public class FastMapManager implements MapDataManager {
 
     @Override
     public void onServerConnect() {
+        JustMapClient.startMapping();
+
 
     }
 
     @Override
     public void onWorldChanged(World world) {
+        JustMapClient.startMapping();
+
         FastMapWorld mapWorld = mapWorlds.get(world);
         if (mapWorld == null) {
             mapWorld = new FastMapWorld(world);
@@ -76,6 +81,8 @@ public class FastMapManager implements MapDataManager {
 
     @Override
     public void onConfigUpdate() {
+        JustMapClient.startMapping();
+
 
     }
 
@@ -92,6 +99,6 @@ public class FastMapManager implements MapDataManager {
 
     @Override
     public void onWorldStop() {
-
+        JustMapClient.stopMapping();
     }
 }
