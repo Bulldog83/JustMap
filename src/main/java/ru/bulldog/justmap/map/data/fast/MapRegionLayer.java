@@ -16,13 +16,15 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 public class MapRegionLayer {
-    public final static int WIDTH = 512;
-    public final static int HEIGHT = 512;
-    public final static int SIZE = 4 * WIDTH * HEIGHT;
+    public final static int REGION_SIZE = 512;
+    public final static int CHUNK_SIZE = 16;
+    public final static int BYTES_PER_PIXEL = 4;
 
-    private MapChunk[][] chunks = new MapChunk[32][32];
+    private final static int BUFFER_SIZE = REGION_SIZE * REGION_SIZE * BYTES_PER_PIXEL;
 
-    private final ByteBuffer buffer = ByteBuffer.allocateDirect(SIZE).order(ByteOrder.nativeOrder());
+    private final MapChunk[][] chunks = new MapChunk[32][32];
+
+    private final ByteBuffer buffer = ByteBuffer.allocateDirect(BUFFER_SIZE).order(ByteOrder.nativeOrder());
 
     private int glId = -1;
     private volatile boolean isModified;
@@ -57,7 +59,7 @@ public class MapRegionLayer {
             RenderSystem.pixelStore(GLC.GL_UNPACK_SKIP_PIXELS, 0);
             RenderSystem.pixelStore(GLC.GL_UNPACK_SKIP_ROWS, 0);
 
-            GL11.glTexImage2D(GLC.GL_TEXTURE_2D, 0, GL11.GL_RGB, 512, 512, 0, GL11.GL_RGBA, GLC.GL_UNSIGNED_INT_8_8_8_8, this.buffer);
+            GL11.glTexImage2D(GLC.GL_TEXTURE_2D, 0, GL11.GL_RGB, REGION_SIZE, REGION_SIZE, 0, GL11.GL_RGBA, GLC.GL_UNSIGNED_INT_8_8_8_8, this.buffer);
 
             isModified = false;
         }
@@ -88,7 +90,7 @@ public class MapRegionLayer {
                 }
             }
         }
-        buffer.position(0).limit(SIZE);
+        buffer.position(0).limit(BUFFER_SIZE);
 
         isModified = true;
     }
