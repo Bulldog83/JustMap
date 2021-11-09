@@ -43,7 +43,7 @@ public class WaypointRenderer {
 			return;
 		}
 	
-		List<Waypoint> wayPoints = WaypointKeeper.getInstance().getWaypoints(MapDataProvider.getWorldManager().getWorldKey(), true);
+		List<Waypoint> wayPoints = WaypointKeeper.getInstance().getWaypoints(MapDataProvider.getManager().getWorldKey(), true);
 		for (Waypoint wp : wayPoints) {
 			int dist = (int) MathUtil.getDistance(wp.pos, minecraft.player.getBlockPos(), false);
 			if (wp.tracking && dist <= wp.showRange) {
@@ -98,7 +98,7 @@ public class WaypointRenderer {
 		RenderSystem.depthMask(false);
 		
 		VertexConsumerProvider.Immediate consumerProvider = minecraft.getBufferBuilders().getEntityVertexConsumers();
-		List<Waypoint> wayPoints = WaypointKeeper.getInstance().getWaypoints(MapDataProvider.getWorldManager().getWorldKey(), true);
+		List<Waypoint> wayPoints = WaypointKeeper.getInstance().getWaypoints(MapDataProvider.getManager().getWorldKey(), true);
 		for (Waypoint wp : wayPoints) {
 			int dist = (int) MathUtil.getDistance(wp.pos, playerPos, false);
 			if (wp.render && dist >= ClientSettings.minRenderDist && dist <= wp.showRange) {

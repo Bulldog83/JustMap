@@ -7,7 +7,7 @@ import net.minecraft.world.chunk.WorldChunk;
 
 import java.util.List;
 
-public interface IWorldManager {
+public interface MapDataManager {
      // WorldKey management
 
      WorldKey getWorldKey();
@@ -18,7 +18,7 @@ public interface IWorldManager {
 
      // World map management
 
-     IWorldData getData();
+     MapRegionProvider getMapRegionProvider();
 
      int getMapHeight(Layer mapLayer, int mapLevel, int posX, int posZ);
 

@@ -26,6 +26,6 @@ public abstract class ClientWorldMixin extends World {
 
 	@Inject(method = "setBlockStateWithoutNeighborUpdates", at = @At("TAIL"))
 	public void onSetBlockState(BlockPos pos, BlockState state, CallbackInfo info) {
-		MapDataProvider.getWorldManager().onSetBlockState(pos, state, this);
+		MapDataProvider.getManager().onSetBlockState(pos, state, this);
 	}
 }

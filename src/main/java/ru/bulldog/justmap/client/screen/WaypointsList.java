@@ -152,7 +152,7 @@ public class WaypointsList extends MapScreen {
 
 	@Override
 	protected void init() {
-		MapDataProvider.getWorldManager().registeredWorlds().forEach(world -> {
+		MapDataProvider.getManager().registeredWorlds().forEach(world -> {
 			if (!worlds.contains(world)) {
 				this.worlds.add(world);
 			}
@@ -164,7 +164,7 @@ public class WaypointsList extends MapScreen {
 		this.nextDimensionButton = new ButtonWidget(x + screenWidth - 30, 6, 20, 20, new LiteralText(">"), (b) -> cycleDimension(1));		
 		this.addButton = new ButtonWidget(center - 62, height - 26, 60, 20, lang("create"), (b) -> add());
 		this.closeButton = new ButtonWidget(center + 2, height - 26, 60, 20, lang("close"), (b) -> onClose());
-		this.currentWorld = MapDataProvider.getWorldManager().getWorldKey();
+		this.currentWorld = MapDataProvider.getManager().getWorldKey();
 		this.currentIndex = this.getIndex(currentWorld);
 		
 		this.reset();
@@ -269,7 +269,7 @@ public class WaypointsList extends MapScreen {
 	}
 	
 	public void teleport(Waypoint waypoint) {
-		if (!MapDataProvider.getWorldManager().getWorldKey().equals(currentWorld)) return;
+		if (!MapDataProvider.getManager().getWorldKey().equals(currentWorld)) return;
 		int y = waypoint.pos.getY() > 0 ? waypoint.pos.getY() : (Dimension.isNether(client.world) ? 128 : 64);
 		this.client.player.sendChatMessage("/tp " + this.client.player.getName().asString() + " " + waypoint.pos.getX() + " " + y + " " + waypoint.pos.getZ());
 		this.onClose();

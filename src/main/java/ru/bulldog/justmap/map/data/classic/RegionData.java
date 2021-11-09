@@ -10,7 +10,7 @@ import net.minecraft.util.math.ChunkPos;
 import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.client.config.ClientSettings;
 import ru.bulldog.justmap.map.IMap;
-import ru.bulldog.justmap.map.data.IRegionData;
+import ru.bulldog.justmap.map.data.MapRegion;
 import ru.bulldog.justmap.map.data.Layer;
 import ru.bulldog.justmap.map.data.RegionPos;
 import ru.bulldog.justmap.util.DataUtil;
@@ -24,7 +24,7 @@ import ru.bulldog.justmap.util.render.RenderUtil;
 import ru.bulldog.justmap.util.storage.StorageUtil;
 import ru.bulldog.justmap.util.tasks.TaskManager;
 
-public class RegionData implements IRegionData {
+public class RegionData implements MapRegion {
 	
 	private static TaskManager updater = TaskManager.getManager("region-updater");
 	private static TaskManager worker = JustMap.WORKER;

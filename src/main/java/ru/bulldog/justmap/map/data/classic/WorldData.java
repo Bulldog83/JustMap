@@ -4,7 +4,7 @@ import ru.bulldog.justmap.client.config.ClientSettings;
 import ru.bulldog.justmap.map.data.classic.event.ChunkUpdateEvent;
 import ru.bulldog.justmap.map.data.classic.event.ChunkUpdateListener;
 import ru.bulldog.justmap.map.IMap;
-import ru.bulldog.justmap.map.data.IWorldData;
+import ru.bulldog.justmap.map.data.MapRegionProvider;
 import ru.bulldog.justmap.map.data.Layer;
 import ru.bulldog.justmap.map.data.RegionPos;
 import ru.bulldog.justmap.util.DataUtil;
@@ -18,7 +18,7 @@ import net.minecraft.world.chunk.WorldChunk;
 import java.util.HashMap;
 import java.util.Map;
 
-public class WorldData implements IWorldData {
+public class WorldData implements MapRegionProvider {
 	private World world;
 	private final ChunkDataManager chunkManager;
 	private final Map<RegionPos, RegionData> regions;
@@ -37,11 +37,11 @@ public class WorldData implements IWorldData {
 	}
 	
 	public RegionData getRegion(BlockPos blockPos) {
-		return this.getRegion(DataUtil.getMap(), blockPos);
+		return this.getMapRegion(DataUtil.getMap(), blockPos);
 	}
 	
 	@Override
-	public RegionData getRegion(IMap map, BlockPos blockPos) {
+	public RegionData getMapRegion(IMap map, BlockPos blockPos) {
 		RegionPos regPos = new RegionPos(blockPos);
 		RegionData region;
 		synchronized (regions) {

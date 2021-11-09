@@ -141,6 +141,6 @@ public class ClientConfig extends Config {
 	public void saveChanges() {
 		ConfigWriter.save(KEEPER.toJson());
 		JustMapClient.getMap().updateMapParams();
-		MapDataProvider.getWorldManager().onConfigUpdate();
+		MapDataProvider.getManager().onConfigUpdate();
 	}
 }

@@ -29,7 +29,7 @@ import ru.bulldog.justmap.map.data.Layer;
 import ru.bulldog.justmap.map.data.classic.event.ChunkUpdateEvent;
 import ru.bulldog.justmap.map.data.classic.event.ChunkUpdateListener;
 import ru.bulldog.justmap.map.IMap;
-import ru.bulldog.justmap.map.data.IWorldManager;
+import ru.bulldog.justmap.map.data.MapDataManager;
 import ru.bulldog.justmap.map.data.WorldKey;
 import ru.bulldog.justmap.util.DataUtil;
 import ru.bulldog.justmap.util.JsonFactory;
@@ -37,7 +37,7 @@ import ru.bulldog.justmap.util.RuleUtil;
 import ru.bulldog.justmap.util.storage.StorageUtil;
 import ru.bulldog.justmap.util.tasks.MemoryUtil;
 
-public final class WorldManager implements IWorldManager {
+public final class WorldManager implements MapDataManager {
 
 	public static final WorldManager WORLD_MANAGER = new WorldManager();
 
@@ -193,7 +193,7 @@ public final class WorldManager implements IWorldManager {
 		}
 	}
 
-	public WorldData getData() {
+	public WorldData getMapRegionProvider() {
 		return getData(currentWorld, currentWorldKey);
 	}
 
@@ -221,7 +221,7 @@ public final class WorldManager implements IWorldManager {
 	public void onChunkLoad(World world, WorldChunk worldChunk) {
 		if (world == null || worldChunk == null || worldChunk.isEmpty()) return;
 		IMap map = DataUtil.getMap();
-		WorldData mapData = getData();
+		WorldData mapData = getMapRegionProvider();
 		if (mapData == null) return;
 		ChunkData mapChunk = mapData.getChunk(worldChunk.getPos());
 		ChunkUpdateEvent updateEvent = new ChunkUpdateEvent(worldChunk, mapChunk, map.getLayer(), map.getLevel(), 0, 0, 16, 16, true);
@@ -234,7 +234,7 @@ public final class WorldManager implements IWorldManager {
 			requestWorldName = false;
 		}
 		if (!JustMapClient.canMapping()) return;
-		getData().updateMap();
+		getMapRegionProvider().updateMap();
 		JustMap.WORKER.execute(() -> {
 			synchronized (worldsData) {
 				worldsData.forEach((id, data) -> {
@@ -395,7 +395,7 @@ public final class WorldManager implements IWorldManager {
 		int chunkX = posX >> 4;
 		int chunkZ = posZ >> 4;
 
-		ChunkData mapChunk = this.getData().getChunk(chunkX, chunkZ);
+		ChunkData mapChunk = this.getMapRegionProvider().getChunk(chunkX, chunkZ);
 
 		int cx = posX - (chunkX << 4);
 		int cz = posZ - (chunkZ << 4);

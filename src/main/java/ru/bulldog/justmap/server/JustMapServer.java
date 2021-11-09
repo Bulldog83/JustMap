@@ -30,7 +30,7 @@ public class JustMapServer implements DedicatedServerModInitializer {
 			networkHandler = null;
 		});
 		ServerTickEvents.END_SERVER_TICK.register(server -> {
-			MapDataProvider.getWorldManager().onTick(true);
+			MapDataProvider.getManager().onTick(true);
 		});
 	}
 	

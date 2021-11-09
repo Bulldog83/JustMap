@@ -51,7 +51,7 @@ public class JustMapClient implements ClientModInitializer {
 			map = new Minimap();
 			Colors.INSTANCE.loadData();
 		});
-		ClientChunkEvents.CHUNK_LOAD.register(MapDataProvider.getWorldManager()::onChunkLoad);
+		ClientChunkEvents.CHUNK_LOAD.register(MapDataProvider.getManager()::onChunkLoad);
 		HudRenderCallback.EVENT.register((matrices, delta) -> {
 			if (!minecraft.options.debugEnabled) {
 				JustMapClient.map.getRenderer().renderMap(matrices);
@@ -73,7 +73,7 @@ public class JustMapClient implements ClientModInitializer {
 
 			DataUtil.update();
 			JustMapClient.map.update();
-			MapDataProvider.getWorldManager().onTick(false);
+			MapDataProvider.getManager().onTick(false);
 		});
 		ClientLifecycleEvents.CLIENT_STOPPING.register(client -> {
 			JustMapClient.stop();
@@ -84,7 +84,7 @@ public class JustMapClient implements ClientModInitializer {
 	
 	private static void stop() {
 		stopMapping();
-		MapDataProvider.getWorldManager().onWorldStop();
+		MapDataProvider.getManager().onWorldStop();
 		Colors.INSTANCE.saveData();
 	}
 	

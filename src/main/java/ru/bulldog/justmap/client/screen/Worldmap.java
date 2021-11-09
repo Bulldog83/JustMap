@@ -25,8 +25,8 @@ import ru.bulldog.justmap.client.widget.ListElementWidget;
 import ru.bulldog.justmap.map.ChunkGrid;
 import ru.bulldog.justmap.map.IMap;
 import ru.bulldog.justmap.map.MapPlayerManager;
-import ru.bulldog.justmap.map.data.IRegionData;
-import ru.bulldog.justmap.map.data.IWorldData;
+import ru.bulldog.justmap.map.data.MapRegion;
+import ru.bulldog.justmap.map.data.MapRegionProvider;
 import ru.bulldog.justmap.map.data.Layer;
 import ru.bulldog.justmap.map.data.MapDataProvider;
 import ru.bulldog.justmap.map.data.WorldKey;
@@ -63,7 +63,7 @@ public class Worldmap extends MapScreen implements IMap {
 	private boolean playerTracking = true;
 	private int mapLevel = 0;
 	private DropDownListWidget mapMenu;
-	private IWorldData worldData;
+	private MapRegionProvider worldData;
 	private WorldKey world;
 	private BlockPos centerPos;
 	private String cursorCoords;
@@ -86,8 +86,8 @@ public class Worldmap extends MapScreen implements IMap {
 		this.centerX = width / 2.0;
 		this.centerY = height / 2.0;
 		
-		this.worldData = MapDataProvider.getWorldManager().getData();
-		WorldKey worldKey = MapDataProvider.getWorldManager().getWorldKey();
+		this.worldData = MapDataProvider.getManager().getMapRegionProvider();
+		WorldKey worldKey = MapDataProvider.getManager().getWorldKey();
 		if (centerPos == null || !worldKey.equals(world)) {
 			this.centerPos = DataUtil.currentPos();
 			this.world = worldKey;
@@ -216,7 +216,7 @@ public class Worldmap extends MapScreen implements IMap {
 			while (picY < scaledHeight) {				
 				int cZ = cornerZ + picY;
 				
-				IRegionData region = worldData.getRegion(this, currentPos.set(cX, 0, cZ));
+				MapRegion region = worldData.getMapRegion(this, currentPos.set(cX, 0, cZ));
 
 				imgW = 512;
 				imgH = 512;
@@ -359,7 +359,7 @@ public class Worldmap extends MapScreen implements IMap {
 	private BlockPos cursorBlockPos(double x, double y) {
 		int posX = this.pixelToPos(x, centerPos.getX(), centerX);
 		int posZ = this.pixelToPos(y, centerPos.getZ(), centerY);
-		int posY = MapDataProvider.getWorldManager().getMapHeight(mapLayer, mapLevel, posX, posZ);
+		int posY = MapDataProvider.getManager().getMapHeight(mapLayer, mapLevel, posX, posZ);
 		posY = posY == -1 ? centerPos.getY() : posY;
 
 		return new BlockPos(posX, posY, posZ);
