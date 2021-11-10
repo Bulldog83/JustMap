@@ -214,12 +214,14 @@ public class WaypointsList extends MapScreen {
 		this.createEntries();
 		
 		this.maxScroll = waypoints.size() * 20;
-		this.children.clear();
-		this.children.addAll(entries);
-		this.children.add(addButton);
-		this.children.add(closeButton);
-		this.children.add(prevDimensionButton);
-		this.children.add(nextDimensionButton);
+		@SuppressWarnings("unchecked")
+		List<Element> children = (List<Element>) children();
+		children.clear();
+		children.addAll(entries);
+		children.add(addButton);
+		children.add(closeButton);
+		children.add(prevDimensionButton);
+		children.add(nextDimensionButton);
 	}
 	
 	@Override
@@ -232,7 +234,7 @@ public class WaypointsList extends MapScreen {
 		if (screenTitle == null) {
 			screenTitle = info == null ? lang("unknown").getString() : I18n.translate(info.getFirst());
 		}
-		drawCenteredString(matrixStack, textRenderer, screenTitle, center, 15, Colors.WHITE);
+		drawCenteredText(matrixStack, textRenderer, screenTitle, center, 15, Colors.WHITE);
 		this.drawScrollBar();
 	}
 	
@@ -247,7 +249,7 @@ public class WaypointsList extends MapScreen {
 	private void drawScrollBar() {}
 	
 	private void edit(Waypoint waypoint) {
-		this.client.openScreen(new WaypointEditor(waypoint, this, null));
+		this.client.setScreen(new WaypointEditor(waypoint, this, null));
 	}
 	
 	private void add() {
@@ -257,7 +259,7 @@ public class WaypointsList extends MapScreen {
 		waypoint.pos = client.player.getBlockPos();
 		waypoint.name = "Waypoint";
 		
-		this.client.openScreen(new WaypointEditor(waypoint, this, keeper::addNew));
+		this.client.setScreen(new WaypointEditor(waypoint, this, keeper::addNew));
 	}
 	
 	private void delete(Waypoint waypoint) {

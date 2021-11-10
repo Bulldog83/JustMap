@@ -88,7 +88,7 @@ public class ChunkData {
 	}
 	
 	private void initLayer(Layer layer) {
-		int levels = this.world.getDimensionHeight() / layer.height;		
+		int levels = this.world.getDimension().getHeight() / layer.height;
 		this.levels.put(layer, new ChunkLevel[levels]);
 	}
 	

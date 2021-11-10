@@ -212,7 +212,7 @@ public class ColorUtil {
 		if (quads.size() > 0) {
 			blockSprite = ((BakedSpriteAccessor) quads.get(0)).getSprite().getId();
 		} else {
-			blockSprite = blockModels.getSprite(state).getId();
+			blockSprite = blockModels.getModelParticleSprite(state).getId();
 		}
 		
 		int color = colorPalette.getTextureColor(state, blockSprite);
@@ -226,7 +226,7 @@ public class ColorUtil {
 		List<Integer> colors = new ArrayList<>();
 		for (int i = 0; i < image.getWidth(); i++) {
 			for (int j = 0; j < height; j++) {
-				int col = image.getPixelColor(i, j);
+				int col = image.getColor(i, j);
 				if (((col >> 24) & 255) > 0) {
 					colors.add(ABGRtoARGB(col));
 				}
@@ -296,7 +296,7 @@ public class ColorUtil {
 	}
 	
 	public static int blockColor(World world, BlockState state, BlockPos pos) {
-		int materialColor = state.getTopMaterialColor(world, pos).color;
+		int materialColor = state.getMapColor(world, pos).color;
 		if (ClientSettings.alternateColorRender) {
 			int blockColor = colorPalette.getBlockColor(state);
 			if (blockColor != 0x0) {

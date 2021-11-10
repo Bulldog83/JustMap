@@ -15,6 +15,7 @@ import ru.bulldog.justmap.util.colors.ColorUtil;
 import ru.bulldog.justmap.util.colors.Colors;
 import ru.bulldog.justmap.util.math.RandomUtil;
 import ru.bulldog.justmap.util.render.Image;
+import ru.bulldog.justmap.util.render.RenderUtil;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.texture.NativeImageBackedTexture;
 import net.minecraft.client.util.math.MatrixStack;
@@ -187,6 +188,7 @@ public class Waypoint {
 		
 		public final int key;
 		public final int color;
+		private Identifier colorId;
 		
 		private final static Map<Integer, Icon> coloredIcons = new HashMap<>();
 		
@@ -220,7 +222,7 @@ public class Waypoint {
 		
 		@Override
 		public void bindTexture() {
-			textureManager.bindTexture(this.getTexture());
+			RenderUtil.bindTexture(this.getTexture());
 		}
 		
 		@Override
@@ -230,11 +232,11 @@ public class Waypoint {
 		}
 		
 		private Identifier getColoredTexture() {
-			Identifier id = new Identifier(JustMap.MODID, String.format("wp_icon_%d", this.color));
-			if (textureManager.getTexture(id) == null) {
-				textureManager.registerTexture(id, new NativeImageBackedTexture(this.image));
+			if (colorId == null) {
+				colorId = new Identifier(JustMap.MODID, String.format("wp_icon_%d", this.color));
+				textureManager.registerTexture(colorId, new NativeImageBackedTexture(this.image));
 			}
-			return id;
+			return colorId;
 		}
 		
 		public Identifier getTexture() {

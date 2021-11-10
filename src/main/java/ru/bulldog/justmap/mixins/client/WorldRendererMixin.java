@@ -23,8 +23,8 @@ public abstract class WorldRendererMixin {
 	public void renderBeam(MatrixStack matrixStack, float f, long l, boolean bl, Camera camera, GameRenderer gameRenderer, LightmapTextureManager lightmapTextureManager, Matrix4f matrix4f, CallbackInfo ci) {
 		if (!MinecraftClient.isFabulousGraphicsOrBetter()) WaypointRenderer.renderWaypoints(matrixStack, camera, f);
 	}
-	
-	@Inject(method = "render", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/RenderSystem;pushMatrix()V", shift = Shift.BEFORE, ordinal = 1))
+
+	@Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gl/ShaderEffect;render(F)V", shift = Shift.BEFORE, ordinal = 1))
 	public void renderBeamFabulous(MatrixStack matrixStack, float f, long l, boolean bl, Camera camera, GameRenderer gameRenderer, LightmapTextureManager lightmapTextureManager, Matrix4f matrix4f, CallbackInfo ci) {
 		if (MinecraftClient.isFabulousGraphicsOrBetter()) WaypointRenderer.renderWaypoints(matrixStack, camera, f);
 	}

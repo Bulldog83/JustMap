@@ -21,26 +21,29 @@ public class PlayerHeadIcon {
 	public boolean success = false;
 	
 	private ResourceTexture playerSkin;
+	private Identifier skinId;
 	
 	public void draw(MatrixStack matrices, double x, double y) {
+		// Draw other players
 		int size = ClientSettings.entityIconSize;
 		this.draw(matrices, x, y, size, ClientSettings.showIconsOutline);
 	}
 	
 	public void draw(double x, double y, int size, boolean outline) {
+		// Draw yourself
 		MatrixStack matrix = new MatrixStack();
 		this.draw(matrix, x, y, size, outline);
 	}
 
-	public void draw(MatrixStack matrices, double x, double y, int size, boolean outline) {		
+	public void draw(MatrixStack matrices, double x, double y, int size, boolean outline) {
 		double drawX = x - size / 2;
 		double drawY = y - size / 2;
 		y -= size / 2;
 		if (outline) {
 			double thickness = ClientSettings.entityOutlineSize;
-			RenderUtil.fill(drawX - thickness / 2, drawY - thickness / 2, size + thickness, size + thickness, Colors.LIGHT_GRAY);
+			RenderUtil.fill(matrices, drawX - thickness / 2, drawY - thickness / 2, size + thickness, size + thickness, Colors.LIGHT_GRAY);
 		}
-		this.playerSkin.bindTexture();	
+		RenderUtil.bindTexture(this.skinId);
 		RenderUtil.drawPlayerHead(matrices, drawX, drawY, size, size);
 	}
 	
@@ -60,6 +63,7 @@ public class PlayerHeadIcon {
 					this.playerSkin.clearGlId();
 				}
 				this.playerSkin = skinTexture;
+				this.skinId = player.getSkinTexture();
 
 				try {
 					this.playerSkin.load(MinecraftClient.getInstance().getResourceManager());
@@ -70,6 +74,7 @@ public class PlayerHeadIcon {
 			}
 		} else if (this.playerSkin == null) {
 			this.playerSkin = new ResourceTexture(defaultSkin);
+			this.skinId = defaultSkin;
 			this.success = false;
 			
 			try {

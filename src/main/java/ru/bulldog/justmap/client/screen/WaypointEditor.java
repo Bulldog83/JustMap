@@ -1,5 +1,6 @@
 package ru.bulldog.justmap.client.screen;
 
+import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.widget.SliderWidget;
 import net.minecraft.util.math.MathHelper;
 
@@ -25,6 +26,7 @@ import net.minecraft.util.math.BlockPos;
 
 import org.lwjgl.glfw.GLFW;
 
+import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
@@ -82,8 +84,10 @@ public class WaypointEditor extends MapScreen {
 		this.nameField.widget.setMaxLength(48);
 		this.nameField.widget.setText(waypoint.name);
 		
-		this.children.add(nameField);
-		
+		@SuppressWarnings("unchecked")
+		List<Element> children = (List<Element>) children();
+		children.add(nameField);
+
 		Predicate<String> validNumber = (s) -> Predicates.or(s, Predicates.isInteger, Predicates.isEmpty, "-"::equals);
 		
 		ew = 60;
@@ -106,26 +110,26 @@ public class WaypointEditor extends MapScreen {
 		this.zField.setMaxLength(7);
 		this.zField.setText(waypoint.pos.getZ() + "");
 		
-		this.children.add(xField);
-		this.children.add(yField);
-		this.children.add(zField);
+		children.add(xField);
+		children.add(yField);
+		children.add(zField);
 		
 		ey += row;
 		
 		ew = 20;
 		this.prevColorButton = new ButtonWidget(ex, ey, ew, rowH, new LiteralText("<"), (b) -> cycleColor(-1));
-		this.children.add(prevColorButton);
+		children.add(prevColorButton);
 		
 		this.nextColorButton = new ButtonWidget(x + screenW - ew - padding, ey, ew, rowH, new LiteralText(">"), (b) -> cycleColor(1));
-		this.children.add(nextColorButton);
+		children.add(nextColorButton);
 		
 		ey += row;
 		
 		this.prevIconButton = new ButtonWidget(ex, ey, ew, rowH, new LiteralText("<"), (b) -> cycleIcon(-1));
-		this.children.add(prevIconButton);
+		children.add(prevIconButton);
 		
 		this.nextIconButton = new ButtonWidget(x + screenW - ew - padding, ey, ew, rowH, new LiteralText(">"), (b) -> cycleIcon(1));
-		this.children.add(nextIconButton);
+		children.add(nextIconButton);
 		
 		ey += row * 1.5;
 		
@@ -135,16 +139,16 @@ public class WaypointEditor extends MapScreen {
 		this.isHidden = new CheckboxWidget(elemX, ey, ew, rowH, lang("wp_hidden"), waypoint.hidden);
 		this.isTrackable = new CheckboxWidget(elemX + 100, ey, ew, rowH, lang("wp_tracking"), waypoint.tracking);
 		this.isRenderable = new CheckboxWidget(elemX + 200, ey, ew, rowH, lang("wp_render"), waypoint.render);
-		this.children.add(isHidden);
-		this.children.add(isTrackable);
-		this.children.add(isRenderable);
+		children.add(isHidden);
+		children.add(isTrackable);
+		children.add(isRenderable);
 
 		ey += row * 1.25;
 
 		IntegerRange maxRangeConfig = JustMapClient.getConfig().getEntry("max_render_dist");
 		final int SHOW_RANGE_MAX = maxRangeConfig.maxValue();
 		this.showRange = waypoint.showRange;
-		this.children.add(new SliderWidget(elemX, ey, sliderW, rowH, LiteralText.EMPTY, (double) this.showRange / SHOW_RANGE_MAX) {
+		children.add(new SliderWidget(elemX, ey, sliderW, rowH, LiteralText.EMPTY, (double) this.showRange / SHOW_RANGE_MAX) {
 			{
 				this.updateMessage();
 			}
@@ -163,10 +167,10 @@ public class WaypointEditor extends MapScreen {
 		ew = 60;
 		ey = height - (rowH / 2 + 16);
 		this.saveButton = new ButtonWidget(center - ew - 2, ey, ew, rowH, lang("save"), (b) -> { save(); onClose(); });
-		this.children.add(saveButton);
+		children.add(saveButton);
 		
 		this.cancelButton = new ButtonWidget(center + 2, ey, ew, rowH, lang("cancel"), (b) -> onClose());
-		this.children.add(cancelButton);
+		children.add(cancelButton);
 		
 		this.setInitialFocus(nameField);
 	}
@@ -175,7 +179,7 @@ public class WaypointEditor extends MapScreen {
 	public void render(MatrixStack matrixStack, int mouseX, int mouseY, float delta) {
 		super.render(matrixStack, mouseX, mouseY, delta);
 		String dimensionName = info == null ? lang("unknown").asString() : I18n.translate(info.getFirst());
-		drawCenteredString(matrixStack, textRenderer, dimensionName, center, 15, Colors.WHITE);
+		drawCenteredText(matrixStack, textRenderer, dimensionName, center, 15, Colors.WHITE);
 	}
 	
 	private void cycleColor(int i) {
@@ -225,7 +229,7 @@ public class WaypointEditor extends MapScreen {
 	
 	@Override
 	public void onClose() {
-		this.client.openScreen(parent);
+		this.client.setScreen(parent);
 	}
 	
 	@Override

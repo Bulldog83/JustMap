@@ -20,14 +20,13 @@ import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.client.util.math.Vector3f;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Matrix3f;
 import net.minecraft.util.math.Matrix4f;
 import net.minecraft.util.math.Vec3d;
-
+import net.minecraft.util.math.Vec3f;
 import java.util.List;
 
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -93,7 +92,7 @@ public class WaypointRenderer {
 		
 		RenderSystem.enableBlend();
 		RenderSystem.defaultBlendFunc();
-		RenderSystem.enableAlphaTest();
+		RenderSystem.enableCull();
 		RenderSystem.enableDepthTest();
 		RenderSystem.enableTexture();
 		RenderSystem.depthMask(false);
@@ -140,8 +139,8 @@ public class WaypointRenderer {
 				matrixStack.translate(0.0, swing, 0.0);
 			}
 			matrixStack.multiply(camera.getRotation());
-   	 		matrixStack.multiply(Vector3f.POSITIVE_Y.getDegreesQuaternion(180.0F));
-   	 		matrixStack.multiply(Vector3f.POSITIVE_Z.getDegreesQuaternion(-90.0F));
+   	 		matrixStack.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion(180.0F));
+   	 		matrixStack.multiply(Vec3f.POSITIVE_Z.getDegreesQuaternion(-90.0F));
    	 		
    	 		alpha = MathUtil.clamp(alpha * 3, 0.0F, 1.0F);
    	 		
@@ -174,7 +173,7 @@ public class WaypointRenderer {
 		float blue = colors[2];
 		
 		matrixStack.push();
-		matrixStack.multiply(Vector3f.POSITIVE_Y.getDegreesQuaternion(tick * 2.25F - 45.0F));
+		matrixStack.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion(tick * 2.25F - 45.0F));
 		float af = 0.0F;
 		float ai = 0.0F;
 		float aj = -h;

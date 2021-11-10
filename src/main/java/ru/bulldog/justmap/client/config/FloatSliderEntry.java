@@ -14,7 +14,9 @@ import me.shedaniel.clothconfig2.gui.entries.TooltipListEntry;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.Element;
+import net.minecraft.client.gui.Selectable;
 import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.client.gui.widget.SliderWidget;
 import net.minecraft.client.util.NarratorManager;
 import net.minecraft.client.util.Window;
@@ -33,7 +35,7 @@ public class FloatSliderEntry extends TooltipListEntry<Float> {
 	private Consumer<Float> saveConsumer;
 	private Supplier<Float> defaultValue;
 	private Function<Float, Text> textGetter = value -> new LiteralText(String.format("Value: %.1f", value));
-	private List<Element> widgets;	
+	private List<ClickableWidget> widgets;
 	private TextRenderer textRenderer;
 	
 	@Deprecated
@@ -141,7 +143,12 @@ public class FloatSliderEntry extends TooltipListEntry<Float> {
 		resetButton.render(matrices, mouseX, mouseY, delta);
 		sliderWidget.render(matrices, mouseX, mouseY, delta);
 	}
-	
+
+	@Override
+	public List<? extends Selectable> narratables() {
+		return this.widgets;
+	}
+
 	private class Slider extends SliderWidget {
 		protected Slider(int x, int y, int width, int height, double value) {
 			super(x, y, width, height, NarratorManager.EMPTY, value);

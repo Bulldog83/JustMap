@@ -132,38 +132,38 @@ public class Worldmap extends MapScreen implements IMap {
 	
 	private void addMapMenu() {
 		LangUtil langUtil = new LangUtil("gui.worldmap");
-		this.mapMenu = this.addChild(new DropDownListWidget(25, paddingTop + 2, 100, 22));
+		this.mapMenu = this.addDrawableChild(new DropDownListWidget(25, paddingTop + 2, 100, 22));
 		this.mapMenu.addElement(new ListElementWidget(langUtil.getText("add_waypoint"), () -> {
 			JustMapClient.getMap().createWaypoint(world, centerPos);
 			return true;
 		}));
 		this.mapMenu.addElement(new ListElementWidget(langUtil.getText("set_map_pos"), () -> {
-			client.openScreen(new MapPositionScreen(this));
+			client.setScreen(new MapPositionScreen(this));
 			return true;
 		}));
 		this.mapMenu.addElement(new ListElementWidget(langUtil.getText("open_map_config"), () -> {
-			client.openScreen(ConfigFactory.getConfigScreen(this));
+			client.setScreen(ConfigFactory.getConfigScreen(this));
 			return true;
 		}));
 	}
 	
 	private void addMapButtons() {
-		this.addButton(new ButtonWidget(width - 24, 10, 20, 20, new LiteralText("x"), (b) -> onClose()));		
-		this.addButton(new ButtonWidget(width / 2 - 10, height - paddingBottom - 44, 20, 20, new LiteralText("\u2191"), (b) -> moveMap(Direction.NORTH)));
-		this.addButton(new ButtonWidget(width / 2 - 10, height - paddingBottom - 22, 20, 20, new LiteralText("\u2193"), (b) -> moveMap(Direction.SOUTH)));
-		this.addButton(new ButtonWidget(width / 2 - 32, height - paddingBottom - 32, 20, 20, new LiteralText("\u2190"), (b) -> moveMap(Direction.WEST)));
-		this.addButton(new ButtonWidget(width / 2 + 12, height - paddingBottom - 32, 20, 20, new LiteralText("\u2192"), (b) -> moveMap(Direction.EAST)));		
-		this.addButton(new ButtonWidget(width - 24, height / 2 - 21, 20, 20, new LiteralText("+"), (b) -> changeScale(-0.25F)));
-		this.addButton(new ButtonWidget(width - 24, height / 2 + 1, 20, 20, new LiteralText("-"), (b) -> changeScale(+0.25F)));		
-		this.addButton(new ButtonWidget(width - 24, height - paddingBottom - 22, 20, 20, new LiteralText("\u271C"), (b) -> setCenterByPlayer()));
-		this.addButton(new ButtonWidget(4, paddingTop + 2, 20, 20, new LiteralText("\u2630"), (b) -> mapMenu.toggleVisible()));
-		this.addButton(new ButtonWidget(4, height - paddingBottom - 22, 20, 20, new LiteralText("\u2726"), (b) -> client.openScreen(new WaypointsList(this))));
+		this.addDrawableChild(new ButtonWidget(width - 24, 10, 20, 20, new LiteralText("x"), (b) -> onClose()));
+		this.addDrawableChild(new ButtonWidget(width / 2 - 10, height - paddingBottom - 44, 20, 20, new LiteralText("\u2191"), (b) -> moveMap(Direction.NORTH)));
+		this.addDrawableChild(new ButtonWidget(width / 2 - 10, height - paddingBottom - 22, 20, 20, new LiteralText("\u2193"), (b) -> moveMap(Direction.SOUTH)));
+		this.addDrawableChild(new ButtonWidget(width / 2 - 32, height - paddingBottom - 32, 20, 20, new LiteralText("\u2190"), (b) -> moveMap(Direction.WEST)));
+		this.addDrawableChild(new ButtonWidget(width / 2 + 12, height - paddingBottom - 32, 20, 20, new LiteralText("\u2192"), (b) -> moveMap(Direction.EAST)));
+		this.addDrawableChild(new ButtonWidget(width - 24, height / 2 - 21, 20, 20, new LiteralText("+"), (b) -> changeScale(-0.25F)));
+		this.addDrawableChild(new ButtonWidget(width - 24, height / 2 + 1, 20, 20, new LiteralText("-"), (b) -> changeScale(+0.25F)));
+		this.addDrawableChild(new ButtonWidget(width - 24, height - paddingBottom - 22, 20, 20, new LiteralText("\u271C"), (b) -> setCenterByPlayer()));
+		this.addDrawableChild(new ButtonWidget(4, paddingTop + 2, 20, 20, new LiteralText("\u2630"), (b) -> mapMenu.toggleVisible()));
+		this.addDrawableChild(new ButtonWidget(4, height - paddingBottom - 22, 20, 20, new LiteralText("\u2726"), (b) -> client.setScreen(new WaypointsList(this))));
 	}
 	
 	@Override
 	public void renderBackground(MatrixStack matrixStack) {
 		fill(matrixStack, x, 0, x + width, height, 0xFF444444);
-		this.drawMap();
+		this.drawMap(matrixStack);
 	}
 	
 	@Override
@@ -201,10 +201,10 @@ public class Worldmap extends MapScreen implements IMap {
 		MapPlayerManager.getPlayer(player).getIcon().draw(arrowX, arrowY, iconSize, true);
 		
 		this.drawBorders(paddingTop, paddingBottom);
-		drawCenteredString(matrices, client.textRenderer, cursorCoords, width / 2, paddingTop + 4, Colors.WHITE);
+		drawCenteredText(matrices, client.textRenderer, cursorCoords, width / 2, paddingTop + 4, Colors.WHITE);
 	}
 	
-	private void drawMap() {		
+	private void drawMap(MatrixStack matrices) {
 		int cornerX = centerPos.getX() - scaledWidth / 2;
 		int cornerZ = centerPos.getZ() - scaledHeight / 2;
 		
@@ -237,7 +237,7 @@ public class Worldmap extends MapScreen implements IMap {
 				
 				RenderSystem.enableBlend();
 				RenderSystem.defaultBlendFunc();
-				region.draw(scX, scY, scW, scH, imgX, imgY, imgW, imgH);
+				region.draw(matrices, scX, scY, scW, scH, imgX, imgY, imgW, imgH);
 				
 				picY += imgH > 0 ? imgH : 512;
 			}

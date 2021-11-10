@@ -363,7 +363,7 @@ public class Minimap implements IMap {
 		waypoint.color = RandomUtil.getElement(Waypoint.WAYPOINT_COLORS);
 		waypoint.pos = pos;
 
-		minecraft.openScreen(
+		minecraft.setScreen(
 				new WaypointEditor(waypoint, minecraft.currentScreen, WaypointKeeper.getInstance()::addNew));
 	}
 

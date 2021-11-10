@@ -7,7 +7,7 @@ import net.fabricmc.api.Environment;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
-import net.minecraft.client.options.GameOptions;
+import net.minecraft.client.option.GameOptions;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
 import net.minecraft.server.MinecraftServer;
@@ -97,7 +97,7 @@ public class DataUtil {
 		return serverWorld != null ? serverWorld : clientWorld;
 	}
 	
-	public static MutableRegistry<Biome> getBiomeRegistry(World world) {
+	public static Registry<Biome> getBiomeRegistry(World world) {
 		return world.getRegistryManager().get(Registry.BIOME_KEY);
 	}
 	
@@ -106,7 +106,7 @@ public class DataUtil {
 		return biomeId != null ? biomeId : BuiltinRegistries.BIOME.getId(biome);
 	}
 	
-	public static MutableRegistry<Biome> getBiomeRegistry() {
+	public static Registry<Biome> getBiomeRegistry() {
 		if (JustMap.getSide() == EnvType.CLIENT) {
 			MinecraftClient minecraft = MinecraftClient.getInstance();
 			ClientPlayNetworkHandler networkHandler = minecraft.getNetworkHandler();

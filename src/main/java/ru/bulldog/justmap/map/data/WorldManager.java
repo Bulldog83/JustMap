@@ -224,7 +224,7 @@ public final class WorldManager {
 	
 	public static void update() {
 		if (requestWorldName && !(minecraft.currentScreen instanceof ProgressScreen)) {
-			minecraft.openScreen(new WorldnameScreen(minecraft.currentScreen));
+			minecraft.setScreen(new WorldnameScreen(minecraft.currentScreen));
 			requestWorldName = false;
 		}
 		if (!JustMapClient.canMapping()) return;

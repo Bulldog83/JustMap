@@ -1,9 +1,10 @@
 package ru.bulldog.justmap.map;
 
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexFormat;
@@ -12,8 +13,8 @@ import net.minecraft.client.resource.metadata.AnimationResourceMetadata;
 import net.minecraft.client.texture.Sprite;
 import net.minecraft.util.math.Matrix3f;
 import net.minecraft.util.math.Matrix4f;
+import net.minecraft.util.math.Vec3f;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.client.util.math.Vector3f;
 import net.minecraft.util.Identifier;
 
 import ru.bulldog.justmap.JustMap;
@@ -24,7 +25,7 @@ import ru.bulldog.justmap.util.colors.Colors;
 import ru.bulldog.justmap.util.render.RenderUtil;
 
 public class DirectionArrow extends Sprite {
-	private final static VertexFormat vertexFormat = new VertexFormat(ImmutableList.of(VertexFormats.POSITION_ELEMENT, VertexFormats.TEXTURE_ELEMENT, VertexFormats.NORMAL_ELEMENT, VertexFormats.PADDING_ELEMENT));
+	private final static VertexFormat vertexFormat = new VertexFormat(ImmutableMap.of("postition", VertexFormats.POSITION_ELEMENT, "texture", VertexFormats.TEXTURE_0_ELEMENT, "normal", VertexFormats.NORMAL_ELEMENT, "padding", VertexFormats.PADDING_ELEMENT));
 	private static DirectionArrow ARROW;
 	
 	private DirectionArrow(Identifier texture, int w, int h) {
@@ -44,19 +45,20 @@ public class DirectionArrow extends Sprite {
 			MatrixStack matrix = new MatrixStack();
 			Tessellator tessellator = Tessellator.getInstance();
 			BufferBuilder builder = tessellator.getBuffer();
-			
-			builder.begin(7, vertexFormat);
+
+			// FIXME: is mode 7 really quads?
+			builder.begin(VertexFormat.DrawMode.QUADS, vertexFormat);
 			
 			VertexConsumer vertexConsumer = ARROW.getTextureSpecificVertexConsumer(builder);
 			
 			RenderUtil.bindTexture(ARROW.getId());
 			
-			RenderSystem.enableAlphaTest();
-			RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+			RenderSystem.enableCull();
+			RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 			
 			matrix.push();
 			matrix.translate(x, y, 0);
-			matrix.multiply(Vector3f.POSITIVE_Z.getDegreesQuaternion(rotation + 180));
+			matrix.multiply(Vec3f.POSITIVE_Z.getDegreesQuaternion(rotation + 180));
 			
 			Matrix4f m4f = matrix.peek().getModel();
 			Matrix3f m3f = matrix.peek().getNormal();
@@ -77,7 +79,8 @@ public class DirectionArrow extends Sprite {
 			double y2 = y + Math.sin(a2) * l;
 			double x3 = x + Math.cos(a3) * l;
 			double y3 = y + Math.sin(a3) * l;
-			
+
+			RenderSystem.setShader(GameRenderer::getPositionColorShader);
 			RenderUtil.drawTriangle(x1, y1, x2, y2, x3, y3, Colors.RED);
 		}
 	}

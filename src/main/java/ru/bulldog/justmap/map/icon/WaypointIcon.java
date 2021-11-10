@@ -62,11 +62,11 @@ public class WaypointIcon extends MapIcon<WaypointIcon> {
 					hmod = MathUtil.clamp((24 - Math.abs(hdiff)) / 24F, 0.25F, 1.0F);
 					RenderUtil.texEnvMode(GLC.GL_MODULATE);
 				}
-				RenderSystem.color3f(hmod, hmod, hmod);
+				RenderSystem.setShaderColor(hmod, hmod, hmod, 1.0F);
 			}
 			icon.draw(matrices, iconPos.x - offX, iconPos.y - offY, iconSize);
 			RenderUtil.texEnvMode(GLC.GL_MODULATE);
-			RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+			RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 		}
 	}
 	

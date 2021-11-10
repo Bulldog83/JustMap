@@ -57,7 +57,7 @@ public class MapScreen extends Screen {
 		RenderSystem.disableDepthTest();
 		this.renderBackground(matrices);
 		this.renderForeground(matrices);
-		for (Element e : children) {
+		for (Element e : children()) {
 			if (e instanceof Drawable) {
 				((Drawable) e).render(matrices, mouseX, mouseY, delta);
 			}
@@ -74,12 +74,12 @@ public class MapScreen extends Screen {
 	
 	@Override
 	public void onClose() {
-		this.client.openScreen(parent);
+		this.client.setScreen(parent);
 	}
 	
 	public void renderTexture(int x, int y, int width, int height, float u, float v, Identifier id) {
 		RenderUtil.bindTexture(id);
-		RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+		RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 		RenderUtil.startDraw();
 		RenderUtil.addQuad(x, y, width, height, 0.0F, 0.0F, u, v);
 		RenderUtil.endDraw();

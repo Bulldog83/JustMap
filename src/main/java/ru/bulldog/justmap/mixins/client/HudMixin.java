@@ -70,7 +70,7 @@ abstract class HudMixin extends DrawableHelper {
 		StatusEffectSpriteManager statusEffectSpriteManager = this.client.getStatusEffectSpriteManager();
 		List<Runnable> icons = Lists.newArrayListWithExpectedSize(statusEffects.size());
 		List<Runnable> timers = Lists.newArrayListWithExpectedSize(statusEffects.size());
-		this.client.getTextureManager().bindTexture(HandledScreen.BACKGROUND_TEXTURE);
+		RenderSystem.setShaderTexture(0, HandledScreen.BACKGROUND_TEXTURE);
 		Iterator<StatusEffectInstance> effectsIterator = Ordering.natural().reverse().sortedCopy(statusEffects).iterator();
 
 	 	int i = 0, j = 0;
@@ -94,7 +94,7 @@ abstract class HudMixin extends DrawableHelper {
 			   	}
 
 		   		int effectDuration = statusEffectInstance.getDuration();
-		   		RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+		   		RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 		   		float alpha = 1.0F;
 		   		if (statusEffectInstance.isAmbient()) {
 		   			this.drawTexture(matrixStack, x, y, 165, 166, size, size);
@@ -110,13 +110,13 @@ abstract class HudMixin extends DrawableHelper {
 		   		final int fx = x, fy = y;
 		   		final float fa = alpha;
 		   		icons.add(() -> {
-		   			this.client.getTextureManager().bindTexture(sprite.getAtlas().getId());
-					RenderSystem.color4f(1.0F, 1.0F, 1.0F, fa);
+					RenderSystem.setShaderTexture(0, sprite.getAtlas().getId());
+					RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, fa);
 					drawSprite(matrixStack, fx + 3, fy + 3, this.getZOffset(), 18, 18, sprite);
 		   		});
 		   		if (ClientSettings.showEffectTimers) {
 			   		timers.add(() -> {
-			   			drawCenteredString(matrixStack, client.textRenderer, convertDuration(effectDuration), fx + size / 2, fy + (size + 1), Colors.WHITE);
+			   			drawCenteredText(matrixStack, client.textRenderer, convertDuration(effectDuration), fx + size / 2, fy + (size + 1), Colors.WHITE);
 			   		});
 		   		}
 			}

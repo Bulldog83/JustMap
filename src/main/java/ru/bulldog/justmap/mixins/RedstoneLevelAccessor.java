@@ -4,12 +4,12 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
 import net.minecraft.block.RedstoneWireBlock;
-import net.minecraft.client.util.math.Vector3f;
+import net.minecraft.util.math.Vec3d;
 
 @Mixin(RedstoneWireBlock.class)
 public interface RedstoneLevelAccessor {
-	@Accessor(value = "field_24466")
-	static Vector3f[] getPowerVectors() {
+	@Accessor(value = "COLORS")
+	static Vec3d[] getPowerVectors() {
 		return null;
 	}
 }

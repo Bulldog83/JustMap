@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.ChunkPos;
 
 import ru.bulldog.justmap.JustMap;
@@ -291,7 +292,7 @@ public class RegionData {
 		return new File(dir, String.format("r%d.%d.png", regPos.x, regPos.z));
 	}
 	
-	public void draw(double x, double y, double width, double height, int imgX, int imgY, int imgW, int imgH) {
+	public void draw(MatrixStack matrices, double x, double y, double width, double height, int imgX, int imgY, int imgW, int imgH) {
 		if (width <= 0 || height <= 0) return;
 		
 		float u1 = imgX / 512F;
@@ -299,10 +300,10 @@ public class RegionData {
 		float u2 = (imgX + imgW) / 512F;
 		float v2 = (imgY + imgH) / 512F;
 		
-		this.drawTexture(x, y, width, height, u1, v1, u2, v2);
+		this.drawTexture(matrices, x, y, width, height, u1, v1, u2, v2);
 	}
 	
-	private void drawTexture(double x, double y, double w, double h, float u1, float v1, float u2, float v2) {
+	private void drawTexture(MatrixStack matrices, double x, double y, double w, double h, float u1, float v1, float u2, float v2) {
 		if (texture != null && texture.changed) {
 			this.texture.upload();
 		} else if (texture == null && image.changed) {
@@ -312,7 +313,7 @@ public class RegionData {
 		RenderUtil.bindTexture(id);
 		RenderUtil.applyFilter(false);
 		RenderUtil.startDraw();
-		RenderUtil.addQuad(x, y, w, h, u1, v1, u2, v2);
+		RenderUtil.addQuad(matrices, x, y, w, h, u1, v1, u2, v2);
 		RenderUtil.endDraw();
 	}
 	
