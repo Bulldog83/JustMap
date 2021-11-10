@@ -17,7 +17,7 @@ import net.minecraft.util.math.Vec3f;
 import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.client.config.ClientSettings;
 import ru.bulldog.justmap.map.ChunkGrid;
-import ru.bulldog.justmap.map.data.RegionData;
+import ru.bulldog.justmap.map.data.MapRegion;
 import ru.bulldog.justmap.map.icon.MapIcon;
 import ru.bulldog.justmap.map.icon.WaypointIcon;
 import ru.bulldog.justmap.map.minimap.Minimap;
@@ -175,8 +175,6 @@ public class BufferedRenderer extends MapRenderer {
 		int cornerX = lastX - scaledW / 2;
 		int cornerZ = lastZ - scaledH / 2;
 		
-		BlockPos.Mutable currentPos = new BlockPos.Mutable();
-		
 		int picX = 0;
 		while(picX < scaledW) {
 			int texW = 512;
@@ -189,11 +187,10 @@ public class BufferedRenderer extends MapRenderer {
 				if (picY + texH > scaledH) texH = scaledH - picY;
 				
 				int cZ = cornerZ + picY;
-				RegionData region = worldData.getRegion(minimap, currentPos.set(cX, 0, cZ));
-				region.swapLayer(minimap.getLayer(), minimap.getLevel());
-				
-				int texX = cX - (region.getX() << 9);
-				int texY = cZ - (region.getZ() << 9);
+				MapRegion region = mapRegionProvider.getMapRegion(minimap, cX, cZ);
+
+				int texX = cX - (region.getPos().x << 9);
+				int texY = cZ - (region.getPos().z << 9);
 				if (texX + texW >= 512) texW = 512 - texX;
 				if (texY + texH >= 512) texH = 512 - texY;
 				
@@ -202,7 +199,7 @@ public class BufferedRenderer extends MapRenderer {
 				double scW = (double) texW / mapScale;
 				double scH = (double) texH / mapScale;
 				
-				region.draw(matrices, scX, scY, scW, scH, texX, texY, texW, texH);
+				region.drawLayer(matrices, minimap.getLayer(), minimap.getLevel(), scX, scY, scW, scH, texX, texY, texW, texH);
 				
 				picY += texH > 0 ? texH : 512;
 			}

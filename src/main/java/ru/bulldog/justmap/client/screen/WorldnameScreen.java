@@ -15,7 +15,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
 import ru.bulldog.justmap.JustMap;
-import ru.bulldog.justmap.map.data.WorldManager;
+import ru.bulldog.justmap.map.data.MapDataProvider;
 import ru.bulldog.justmap.util.LangUtil;
 import ru.bulldog.justmap.util.colors.Colors;
 import ru.bulldog.justmap.util.render.RenderUtil;
@@ -69,7 +69,7 @@ public class WorldnameScreen extends Screen {
 		if (worldName == "") {
 			worldName = "Default";
 		}
-		WorldManager.setCurrentWorldName(worldName);
+		MapDataProvider.getManager().setCurrentWorldName(worldName);
 		this.success = true;
 		this.onClose();
 	}
@@ -112,7 +112,7 @@ public class WorldnameScreen extends Screen {
 	@Override
 	public void onClose() {
 		if (!success) {
-			WorldManager.setCurrentWorldName("Default");
+			MapDataProvider.getManager().setCurrentWorldName("Default");
 		}
 		this.client.setScreen(parent);
 	}

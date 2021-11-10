@@ -1,9 +1,13 @@
-package ru.bulldog.justmap.map.data;
+package ru.bulldog.justmap.map.data.classic;
 
 import ru.bulldog.justmap.client.config.ClientSettings;
-import ru.bulldog.justmap.event.ChunkUpdateEvent;
-import ru.bulldog.justmap.event.ChunkUpdateListener;
+import ru.bulldog.justmap.map.data.MapRegion;
+import ru.bulldog.justmap.map.data.classic.event.ChunkUpdateEvent;
+import ru.bulldog.justmap.map.data.classic.event.ChunkUpdateListener;
 import ru.bulldog.justmap.map.IMap;
+import ru.bulldog.justmap.map.data.MapRegionProvider;
+import ru.bulldog.justmap.map.data.Layer;
+import ru.bulldog.justmap.map.data.RegionPos;
 import ru.bulldog.justmap.util.DataUtil;
 import ru.bulldog.justmap.util.math.MathUtil;
 
@@ -15,7 +19,7 @@ import net.minecraft.world.chunk.WorldChunk;
 import java.util.HashMap;
 import java.util.Map;
 
-public class WorldData {
+public class WorldData implements MapRegionProvider {
 	private World world;
 	private final ChunkDataManager chunkManager;
 	private final Map<RegionPos, RegionData> regions;
@@ -34,11 +38,11 @@ public class WorldData {
 	}
 	
 	public RegionData getRegion(BlockPos blockPos) {
-		return this.getRegion(DataUtil.getMap(), blockPos);
+		return this.getRegionData(DataUtil.getMap(), blockPos.getX(), blockPos.getZ());
 	}
 	
-	public RegionData getRegion(IMap map, BlockPos blockPos) {
-		RegionPos regPos = new RegionPos(blockPos);
+	public RegionData getRegionData(IMap map, int x, int z) {
+		RegionPos regPos = new RegionPos(x, z);
 		RegionData region;
 		synchronized (regions) {
 			if(regions.containsKey(regPos)) {
@@ -57,11 +61,16 @@ public class WorldData {
 		
 		return region;
 	}
-	
+
+	@Override
+	public MapRegion getMapRegion(IMap map, int x, int z) {
+		return getRegionData(map, x, z);
+	}
+
 	public ChunkData getChunk(BlockPos pos) {
 		return this.chunkManager.getChunk(pos.getX() >> 4, pos.getZ() >> 4);
 	}
-	
+
 	public ChunkData getChunk(ChunkPos chunkPos) {
 		return this.chunkManager.getChunk(chunkPos.x, chunkPos.z);
 	}

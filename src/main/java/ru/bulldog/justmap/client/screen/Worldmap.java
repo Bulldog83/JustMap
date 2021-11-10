@@ -22,15 +22,14 @@ import ru.bulldog.justmap.client.config.ClientSettings;
 import ru.bulldog.justmap.client.config.ConfigFactory;
 import ru.bulldog.justmap.client.widget.DropDownListWidget;
 import ru.bulldog.justmap.client.widget.ListElementWidget;
-import ru.bulldog.justmap.map.data.Layer;
-import ru.bulldog.justmap.map.data.WorldData;
-import ru.bulldog.justmap.map.data.WorldKey;
-import ru.bulldog.justmap.map.data.WorldManager;
 import ru.bulldog.justmap.map.ChunkGrid;
 import ru.bulldog.justmap.map.IMap;
 import ru.bulldog.justmap.map.MapPlayerManager;
-import ru.bulldog.justmap.map.data.ChunkData;
-import ru.bulldog.justmap.map.data.RegionData;
+import ru.bulldog.justmap.map.data.MapRegion;
+import ru.bulldog.justmap.map.data.MapRegionProvider;
+import ru.bulldog.justmap.map.data.Layer;
+import ru.bulldog.justmap.map.data.MapDataProvider;
+import ru.bulldog.justmap.map.data.WorldKey;
 import ru.bulldog.justmap.map.icon.PlayerIcon;
 import ru.bulldog.justmap.map.icon.WaypointIcon;
 import ru.bulldog.justmap.map.waypoint.Waypoint;
@@ -64,7 +63,7 @@ public class Worldmap extends MapScreen implements IMap {
 	private boolean playerTracking = true;
 	private int mapLevel = 0;
 	private DropDownListWidget mapMenu;
-	private WorldData worldData;
+	private MapRegionProvider mapRegionProvider;
 	private WorldKey world;
 	private BlockPos centerPos;
 	private String cursorCoords;
@@ -87,8 +86,8 @@ public class Worldmap extends MapScreen implements IMap {
 		this.centerX = width / 2.0;
 		this.centerY = height / 2.0;
 		
-		this.worldData = WorldManager.getData();
-		WorldKey worldKey = WorldManager.getWorldKey();
+		this.mapRegionProvider = MapDataProvider.getManager().getMapRegionProvider();
+		WorldKey worldKey = MapDataProvider.getManager().getWorldKey();
 		if (centerPos == null || !worldKey.equals(world)) {
 			this.centerPos = DataUtil.currentPos();
 			this.world = worldKey;
@@ -208,8 +207,6 @@ public class Worldmap extends MapScreen implements IMap {
 		int cornerX = centerPos.getX() - scaledWidth / 2;
 		int cornerZ = centerPos.getZ() - scaledHeight / 2;
 		
-		BlockPos.Mutable currentPos = new BlockPos.Mutable();
-		
 		int picX = 0, imgW = 0;
 		while(picX < scaledWidth) {
 			int cX = cornerX + picX;
@@ -217,13 +214,12 @@ public class Worldmap extends MapScreen implements IMap {
 			while (picY < scaledHeight) {				
 				int cZ = cornerZ + picY;
 				
-				RegionData region = worldData.getRegion(this, currentPos.set(cX, 0, cZ));
-				region.swapLayer(mapLayer, mapLevel);
-				
+				MapRegion region = mapRegionProvider.getMapRegion(this, cX, cZ);
+
 				imgW = 512;
 				imgH = 512;
-				int imgX = cX - (region.getX() << 9);
-				int imgY = cZ - (region.getZ() << 9);
+				int imgX = cX - (region.getPos().x << 9);
+				int imgY = cZ - (region.getPos().z << 9);
 				
 				if (picX + imgW >= scaledWidth) imgW = (int) (scaledWidth - picX);
 				if (picY + imgH >= scaledHeight) imgH = (int) (scaledHeight - picY);
@@ -237,8 +233,8 @@ public class Worldmap extends MapScreen implements IMap {
 				
 				RenderSystem.enableBlend();
 				RenderSystem.defaultBlendFunc();
-				region.draw(matrices, scX, scY, scW, scH, imgX, imgY, imgW, imgH);
-				
+				region.drawLayer(matrices, mapLayer, mapLevel, scX, scY, scW, scH, imgX, imgY, imgW, imgH);
+
 				picY += imgH > 0 ? imgH : 512;
 			}
 			
@@ -359,24 +355,14 @@ public class Worldmap extends MapScreen implements IMap {
 	}
 	
 	private BlockPos cursorBlockPos(double x, double y) {
-		
 		int posX = this.pixelToPos(x, centerPos.getX(), centerX);
 		int posZ = this.pixelToPos(y, centerPos.getZ(), centerY);
-		
-		int chunkX = posX >> 4;
-		int chunkZ = posZ >> 4;
-		
-		ChunkData mapChunk = this.worldData.getChunk(chunkX, chunkZ);
-		
-		int cx = posX - (chunkX << 4);
-		int cz = posZ - (chunkZ << 4);
-		
-		int posY = mapChunk.getChunkLevel(mapLayer, mapLevel).sampleHeightmap(cx, cz);
+		int posY = MapDataProvider.getManager().getMapHeight(mapLayer, mapLevel, posX, posZ);
 		posY = posY == -1 ? centerPos.getY() : posY;
-		
+
 		return new BlockPos(posX, posY, posZ);
 	}
-	
+
 	@Override
 	public void mouseMoved(double d, double e) {		
 		this.cursorCoords = PosUtil.posToString(cursorBlockPos(d, e));

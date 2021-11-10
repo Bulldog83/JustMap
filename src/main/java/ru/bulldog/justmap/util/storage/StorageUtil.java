@@ -19,7 +19,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.storage.VersionedChunkStorage;
 
 import ru.bulldog.justmap.JustMap;
-import ru.bulldog.justmap.map.data.WorldManager;
+import ru.bulldog.justmap.map.data.MapDataProvider;
 import ru.bulldog.justmap.map.data.WorldKey;
 import ru.bulldog.justmap.mixins.SessionAccessor;
 import ru.bulldog.justmap.util.DataUtil;
@@ -87,7 +87,7 @@ public final class StorageUtil {
 			dimension = dimKey.getValue().getPath();			
 		}
 
-		WorldKey worldKey = WorldManager.getWorldKey();
+		WorldKey worldKey = MapDataProvider.getManager().getWorldKey();
 		File cacheDir = new File(filesDir(), worldKey.toFolder());
 		File oldCacheDir = new File(filesDir(), String.format("cache/%s", dimension));
 		if (world != null) {

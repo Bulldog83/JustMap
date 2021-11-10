@@ -6,7 +6,7 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.server.MinecraftServer;
 import ru.bulldog.justmap.JustMap;
-import ru.bulldog.justmap.event.ChunkUpdateListener;
+import ru.bulldog.justmap.map.data.MapDataProvider;
 import ru.bulldog.justmap.network.ServerNetworkHandler;
 import ru.bulldog.justmap.server.config.ServerConfig;
 import ru.bulldog.justmap.util.tasks.TaskManager;
@@ -30,7 +30,7 @@ public class JustMapServer implements DedicatedServerModInitializer {
 			networkHandler = null;
 		});
 		ServerTickEvents.END_SERVER_TICK.register(server -> {
-			ChunkUpdateListener.proceed();
+			MapDataProvider.getManager().onTick(true);
 		});
 	}
 	

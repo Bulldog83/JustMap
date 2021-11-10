@@ -1,9 +1,9 @@
-package ru.bulldog.justmap.event;
+package ru.bulldog.justmap.map.data.classic.event;
 
 import net.minecraft.world.chunk.WorldChunk;
 
-import ru.bulldog.justmap.map.data.ChunkData;
 import ru.bulldog.justmap.map.data.Layer;
+import ru.bulldog.justmap.map.data.classic.ChunkData;
 import ru.bulldog.justmap.util.math.Plane;
 
 public class ChunkUpdateEvent {

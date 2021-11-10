@@ -1,6 +1,7 @@
-package ru.bulldog.justmap.map.data;
+package ru.bulldog.justmap.map.data.classic;
 
 import ru.bulldog.justmap.client.config.ClientSettings;
+import ru.bulldog.justmap.map.data.Layer;
 import ru.bulldog.justmap.util.StateUtil;
 
 import net.minecraft.block.BlockState;

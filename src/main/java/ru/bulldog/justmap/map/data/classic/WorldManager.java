@@ -1,4 +1,4 @@
-package ru.bulldog.justmap.map.data;
+package ru.bulldog.justmap.map.data.classic;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -9,6 +9,7 @@ import java.util.Map.Entry;
 
 import com.google.gson.*;
 
+import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ProgressScreen;
 import net.minecraft.util.JsonHelper;
@@ -24,40 +25,46 @@ import ru.bulldog.justmap.client.screen.WorldnameScreen;
 import ru.bulldog.justmap.config.ConfigKeeper.BooleanEntry;
 import ru.bulldog.justmap.config.ConfigKeeper.EnumEntry;
 import ru.bulldog.justmap.enums.MultiworldDetection;
-import ru.bulldog.justmap.event.ChunkUpdateEvent;
-import ru.bulldog.justmap.event.ChunkUpdateListener;
+import ru.bulldog.justmap.map.data.Layer;
+import ru.bulldog.justmap.map.data.MapRegionProvider;
+import ru.bulldog.justmap.map.data.classic.event.ChunkUpdateEvent;
+import ru.bulldog.justmap.map.data.classic.event.ChunkUpdateListener;
 import ru.bulldog.justmap.map.IMap;
+import ru.bulldog.justmap.map.data.MapDataManager;
+import ru.bulldog.justmap.map.data.WorldKey;
 import ru.bulldog.justmap.util.DataUtil;
 import ru.bulldog.justmap.util.JsonFactory;
 import ru.bulldog.justmap.util.RuleUtil;
 import ru.bulldog.justmap.util.storage.StorageUtil;
 import ru.bulldog.justmap.util.tasks.MemoryUtil;
 
-public final class WorldManager {
+public final class WorldManager implements MapDataManager {
 
-	private final static Map<WorldKey, WorldData> worldsData = new HashMap<>();
+	public static final WorldManager WORLD_MANAGER = new WorldManager();
+
+	private final Map<WorldKey, WorldData> worldsData = new HashMap<>();
 	// used only in mixed mode to associate world names with worlds
-	private final static Map<MultiworldIdentifier, String> worldAssociations = new HashMap<>();
-	private final static MinecraftClient minecraft = MinecraftClient.getInstance();
-	private final static ClientConfig modConfig = JustMapClient.getConfig();
+	private final Map<MultiworldIdentifier, String> worldAssociations = new HashMap<>();
+	private final MinecraftClient minecraft = MinecraftClient.getInstance();
+	private final ClientConfig modConfig = JustMapClient.getConfig();
 
-	private static World currentWorld;
-	private static WorldKey currentWorldKey;
-	private static BlockPos currentWorldPos;
-	private static String currentWorldName;
-	private static boolean cacheClearing = false;
-	private static boolean requestWorldName = false;
-	private static boolean loaded = false;
+	private World currentWorld;
+	private WorldKey currentWorldKey;
+	private BlockPos currentWorldPos;
+	private String currentWorldName;
+	private boolean cacheClearing = false;
+	private boolean requestWorldName = false;
+	private boolean loaded = false;
 	
-	public static List<WorldKey> registeredWorlds() {
+	public List<WorldKey> registeredWorlds() {
 		return new ArrayList<>(worldsData.keySet());
 	}
 	
-	public static String currentWorldName() {
+	public String currentWorldName() {
 		return currentWorldName != null ? currentWorldName : "Default";
 	}
 	
-	public static void onConfigUpdate() {
+	public void onConfigUpdate() {
 		if (currentWorld == null) return;
 		saveConfig();
 		JustMapClient.stopMapping();
@@ -88,12 +95,12 @@ public final class WorldManager {
 				clearData();
 			}
 			assert minecraft.world != null;
-			onWorldPosChanged(minecraft.world.getSpawnPos());
+			onWorldSpawnPosChanged(minecraft.world.getSpawnPos());
 			return;
 		} else if (MultiworldDetection.isMixed()) {
 			if (currentWorldPos == null) {
 				assert minecraft.world != null;
-				onWorldPosChanged(minecraft.world.getSpawnPos());
+				onWorldSpawnPosChanged(minecraft.world.getSpawnPos());
 			} else if (currentWorldName == null) {
 				requestWorldName = true;
 			} else {
@@ -104,8 +111,8 @@ public final class WorldManager {
 		}
 		JustMapClient.startMapping();
 	}
-	
-	public static void onWorldChanged(World world) {
+
+	public void onWorldChanged(World world) {
 		currentWorld = world;
 		if (RuleUtil.detectMultiworlds()) {
 			JustMap.LOGGER.debug("World changed, stop mapping!");
@@ -119,7 +126,7 @@ public final class WorldManager {
 		}
 	}
 	
-	public static void onWorldPosChanged(BlockPos newPos) {
+	public void onWorldSpawnPosChanged(BlockPos newPos) {
 		if (!RuleUtil.detectMultiworlds()) {
 			return;
 		}
@@ -148,7 +155,7 @@ public final class WorldManager {
 		}
 	}
 	
-	public static void setCurrentWorldName(String name) {
+	public void setCurrentWorldName(String name) {
 		if (!RuleUtil.detectMultiworlds()) {
 			return;
 		}
@@ -162,11 +169,11 @@ public final class WorldManager {
 		JustMapClient.startMapping();
 	}
 	
-	public static WorldKey getWorldKey() {
+	public WorldKey getWorldKey() {
 		return currentWorldKey;
 	}
 	
-	public static WorldKey createWorldKey(World world, BlockPos blockPos, String worldName) {
+	public WorldKey createWorldKey(World world, BlockPos blockPos, String worldName) {
 		WorldKey newKey = new WorldKey(world.getRegistryKey());
 		if (RuleUtil.detectMultiworlds()) {
 			if (blockPos != null) {
@@ -180,18 +187,22 @@ public final class WorldManager {
 		return newKey;
 	}
 	
-	private static void updateWorldKey() {
+	private void updateWorldKey() {
 		WorldKey newKey = createWorldKey(currentWorld, currentWorldPos, currentWorldName);
 		if (!newKey.equals(currentWorldKey)) {
 			currentWorldKey = newKey;
 		}
 	}
 
-	public static WorldData getData() {
+	public WorldData getData() {
 		return getData(currentWorld, currentWorldKey);
 	}
 
-	public static WorldData getData(World world, WorldKey worldKey) {
+	public MapRegionProvider getMapRegionProvider() {
+		return getData();
+	}
+
+	public WorldData getData(World world, WorldKey worldKey) {
 		if (world == null || worldKey == null) return null;
 		
 		WorldData data;
@@ -212,7 +223,7 @@ public final class WorldManager {
 		return data;
 	}
 	
-	public static void onChunkLoad(World world, WorldChunk worldChunk) {
+	public void onChunkLoad(World world, WorldChunk worldChunk) {
 		if (world == null || worldChunk == null || worldChunk.isEmpty()) return;
 		IMap map = DataUtil.getMap();
 		WorldData mapData = getData();
@@ -222,7 +233,7 @@ public final class WorldManager {
 		ChunkUpdateListener.accept(updateEvent);
 	}
 	
-	public static void update() {
+	public void update() {
 		if (requestWorldName && !(minecraft.currentScreen instanceof ProgressScreen)) {
 			minecraft.setScreen(new WorldnameScreen(minecraft.currentScreen));
 			requestWorldName = false;
@@ -238,7 +249,7 @@ public final class WorldManager {
 		});
 	}
 
-	public static void memoryControl() {
+	public void memoryControl() {
 		if (cacheClearing) return;
 		long usedPct = MemoryUtil.getMemoryUsage();
 		if (usedPct >= 85L) {
@@ -261,7 +272,7 @@ public final class WorldManager {
 		}
 	}
 	
-	public static void load() {
+	public void onServerConnect() {
 		loaded = true;
 		loadConfig();
 		File worldsFile = new File(StorageUtil.filesDir(), "worlds.json");
@@ -291,7 +302,7 @@ public final class WorldManager {
 		}
 	}
 	
-	private static void saveWorlds() {
+	private void saveWorlds() {
 		JsonArray worldsArray = new JsonArray();
 		for (Entry<MultiworldIdentifier, String> entry : worldAssociations.entrySet()) {
 			JsonObject object = entry.getKey().toJson();
@@ -304,7 +315,7 @@ public final class WorldManager {
 		JsonFactory.storeJson(worldsFile, jsonObject);
 	}
 	
-	private static void saveConfig() {
+	private void saveConfig() {
 		EnumEntry<MultiworldDetection> detectionType = modConfig.getEntry("multiworld_detection");
 		BooleanEntry detectMultiworlds = modConfig.getEntry("detect_multiworlds");
 		File configFile = new File(StorageUtil.filesDir(), "config.json");
@@ -315,7 +326,7 @@ public final class WorldManager {
 	}
 
 	// try to load local configuration, return false if not successful
-	private static boolean tryLoadConfig() {
+	private boolean tryLoadConfig() {
 		File configFile = new File(StorageUtil.filesDir(), "config.json");
 		if (!configFile.exists()) return false;
 		try {
@@ -330,7 +341,7 @@ public final class WorldManager {
 		return true;
 	}
 	
-	private static void loadConfig() {
+	private void loadConfig() {
 		if (!tryLoadConfig()) {
 			// load defaults
 			EnumEntry<MultiworldDetection> detectionType = modConfig.getEntry("multiworld_detection");
@@ -342,7 +353,7 @@ public final class WorldManager {
 		}
 	}
 	
-	private static void clearData() {
+	private void clearData() {
 		synchronized (worldsData) {
 			if (worldsData.size() > 0) {
 				worldsData.forEach((id, data) -> {
@@ -353,7 +364,7 @@ public final class WorldManager {
 		}
 	}
 	
-	public static void close() {
+	public void close() {
 		modConfig.reloadFromDisk();
 		currentWorld = null;
 		if (loaded) {
@@ -362,5 +373,38 @@ public final class WorldManager {
 			clearData();
 			loaded = false;
 		}
+	}
+
+	@Override
+	public void onSetBlockState(BlockPos pos, BlockState state, World world) {
+		ChunkUpdateListener.onSetBlockState(pos, state, world);
+	}
+
+	@Override
+	public void onTick(boolean isServer) {
+		if (!isServer) {
+			update();
+			memoryControl();
+		}
+		ChunkUpdateListener.proceed();
+	}
+
+	@Override
+	public void onWorldStop() {
+		ChunkUpdateListener.stop();
+		JustMap.WORKER.execute("Clearing map cache...", this::close);
+	}
+
+	@Override
+	public int getMapHeight(Layer mapLayer, int mapLevel, int posX, int posZ) {
+		int chunkX = posX >> 4;
+		int chunkZ = posZ >> 4;
+
+		ChunkData mapChunk = this.getData().getChunk(chunkX, chunkZ);
+
+		int cx = posX - (chunkX << 4);
+		int cz = posZ - (chunkZ << 4);
+
+		return mapChunk.getChunkLevel(mapLayer, mapLevel).sampleHeightmap(cx, cz);
 	}
 }

@@ -1,4 +1,4 @@
-package ru.bulldog.justmap.map.data;
+package ru.bulldog.justmap.map.data.classic;
 
 import java.util.Arrays;
 
@@ -47,7 +47,7 @@ public class ChunkLevel {
 			this.statemap[index(x, z)] = Block.getRawIdFromState(blockState);
 		}
 	}
-	
+
 	public int sampleHeightmap(int x, int z) {
 		return this.sampleHeightmap(index(x, z));
 	}

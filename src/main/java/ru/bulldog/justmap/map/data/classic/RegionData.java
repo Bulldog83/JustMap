@@ -1,4 +1,4 @@
-package ru.bulldog.justmap.map.data;
+package ru.bulldog.justmap.map.data.classic;
 
 import java.io.File;
 import java.util.Map;
@@ -10,6 +10,9 @@ import net.minecraft.util.math.ChunkPos;
 import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.client.config.ClientSettings;
 import ru.bulldog.justmap.map.IMap;
+import ru.bulldog.justmap.map.data.MapRegion;
+import ru.bulldog.justmap.map.data.Layer;
+import ru.bulldog.justmap.map.data.RegionPos;
 import ru.bulldog.justmap.util.DataUtil;
 import ru.bulldog.justmap.util.Logger;
 import ru.bulldog.justmap.util.RuleUtil;
@@ -21,7 +24,7 @@ import ru.bulldog.justmap.util.render.RenderUtil;
 import ru.bulldog.justmap.util.storage.StorageUtil;
 import ru.bulldog.justmap.util.tasks.TaskManager;
 
-public class RegionData {
+public class RegionData implements MapRegion {
 	
 	private static TaskManager updater = TaskManager.getManager("region-updater");
 	private static TaskManager worker = JustMap.WORKER;
@@ -73,7 +76,8 @@ public class RegionData {
 		this.regPos = regPos;
 		this.cacheDir = StorageUtil.cacheDir();
 	}
-	
+
+	@Override
 	public RegionPos getPos() {
 		return this.regPos;
 	}
@@ -302,7 +306,13 @@ public class RegionData {
 		
 		this.drawTexture(matrices, x, y, width, height, u1, v1, u2, v2);
 	}
-	
+
+	@Override
+	public void drawLayer(MatrixStack matrices, Layer layer, int level, double x, double y, double width, double height, int imgX, int imgY, int imgW, int imgH) {
+		swapLayer(layer, level);
+		draw(matrices, x, y, width, height, imgX, imgY, imgW, imgH);
+	}
+
 	private void drawTexture(MatrixStack matrices, double x, double y, double w, double h, float u1, float v1, float u2, float v2) {
 		if (texture != null && texture.changed) {
 			this.texture.upload();

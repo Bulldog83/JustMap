@@ -13,7 +13,7 @@ import ru.bulldog.justmap.enums.ArrowType;
 import ru.bulldog.justmap.map.ChunkGrid;
 import ru.bulldog.justmap.map.DirectionArrow;
 import ru.bulldog.justmap.map.MapPlayerManager;
-import ru.bulldog.justmap.map.data.WorldData;
+import ru.bulldog.justmap.map.data.MapRegionProvider;
 import ru.bulldog.justmap.map.minimap.Minimap;
 import ru.bulldog.justmap.map.minimap.skin.MapSkin;
 import ru.bulldog.justmap.util.DataUtil;
@@ -61,7 +61,7 @@ public abstract class MapRenderer {
 	protected boolean playerMoved = false;
 	protected final Minimap minimap;
 	protected BlockPos.Mutable playerPos;
-	protected WorldData worldData;
+	protected MapRegionProvider mapRegionProvider;
 	protected ChunkGrid chunkGrid;
 	protected MapSkin mapSkin;
 	
@@ -81,7 +81,7 @@ public abstract class MapRenderer {
 	protected abstract void render(MatrixStack matrices, double scale);
 	
 	public void updateParams() {
-		this.worldData = minimap.getWorldData();
+		this.mapRegionProvider = minimap.getMapRegionProvider();
 		this.mapSkin = minimap.getSkin();
 		
 		int winW = minecraft.getWindow().getWidth();
@@ -194,7 +194,7 @@ public abstract class MapRenderer {
 		
 		this.updateParams();
 		
-		if (worldData == null) return;
+		if (mapRegionProvider == null) return;
 		
 		Window window = minecraft.getWindow();
 		double scale = window.getScaleFactor();
