@@ -43,7 +43,7 @@ public class MapRegionLayer {
         ChunkPos chunkPos = new ChunkPos(pos);
         MapChunk mapChunk = getMapChunk(chunkPos);
 
-        mapChunk.updateChunk(null);
+        mapChunk.updateBlock(pos, state);
         mapChunk.writeToTextureBuffer(buffer);
         isModified = true;
     }

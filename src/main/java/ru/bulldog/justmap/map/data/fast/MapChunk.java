@@ -1,6 +1,11 @@
 package ru.bulldog.justmap.map.data.fast;
 
+import net.minecraft.block.BlockState;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.Heightmap;
 import net.minecraft.world.chunk.WorldChunk;
+import ru.bulldog.justmap.util.colors.ColorUtil;
+import ru.bulldog.justmap.util.colors.Colors;
 
 import java.nio.ByteBuffer;
 import java.util.Random;
@@ -8,6 +13,7 @@ import java.util.Random;
 public class MapChunk {
     private final int relRegX;
     private final int relRegZ;
+    Random rnd = new Random();
 
     private byte[][] colorData = new byte[MapRegionLayer.CHUNK_SIZE][MapRegionLayer.CHUNK_SIZE * MapRegionLayer.BYTES_PER_PIXEL];
 
@@ -16,12 +22,32 @@ public class MapChunk {
         this.relRegZ = relRegZ;
     }
 
+    private int getTopBlockY(WorldChunk worldChunk, int x, int z) {
+        return worldChunk.sampleHeightmap(Heightmap.Type.WORLD_SURFACE, x, z);
+    }
+
     public void updateChunk(WorldChunk worldChunk) {
-        // FIXME: Read actual colors from chunk
-        Random rnd = new Random();
-        for (int x = 0; x < MapRegionLayer.CHUNK_SIZE; x++) {
-            for (int z = 0; z < MapRegionLayer.CHUNK_SIZE * MapRegionLayer.BYTES_PER_PIXEL; z++) {
-                colorData[x][z] = (byte) rnd.nextInt(256);
+        BlockPos.Mutable blockPos = new BlockPos.Mutable();
+
+        for (int z = 0; z < MapRegionLayer.CHUNK_SIZE; z++) {
+            blockPos.setZ(z);
+            for (int x = 0; x < MapRegionLayer.CHUNK_SIZE; x++) {
+                blockPos.setX(x);
+                int y = getTopBlockY(worldChunk, x, z);
+                blockPos.setY(y);
+           //     BlockState blockState = worldChunk.getBlockState(blockPos);
+           //     int color = Colors.INSTANCE.getBlockColor(blockState);
+                int color = ColorUtil.blockColor(worldChunk, blockPos);
+
+                if (color == 0) {
+                    color = rnd.nextInt();
+                }
+
+                int xOffset = x *4;
+                colorData[z][xOffset+0] = (byte) (255);
+                colorData[z][xOffset+1] = (byte) ((color >> 16) & 255);
+                colorData[z][xOffset+2] = (byte) ((color >> 8) & 255);
+                colorData[z][xOffset+3] = (byte) (color & 255);
             }
         }
     }
@@ -30,5 +56,24 @@ public class MapChunk {
         for (int row = 0; row < MapRegionLayer.CHUNK_SIZE; row++) {
             buffer.put((relRegZ* MapRegionLayer.CHUNK_SIZE + row)* MapRegionLayer.REGION_SIZE * MapRegionLayer.BYTES_PER_PIXEL + (relRegX * MapRegionLayer.CHUNK_SIZE * MapRegionLayer.BYTES_PER_PIXEL), colorData[row], 0, MapRegionLayer.CHUNK_SIZE * MapRegionLayer.BYTES_PER_PIXEL);
         }
+    }
+
+    public void updateBlock(BlockPos blockPos, BlockState blockState) {
+        int x = blockPos.getX() % 16;
+        int z = blockPos.getZ() % 16;
+        if (x < 0) x += 16;
+        if (z < 0) z += 16;
+
+        int color = Colors.INSTANCE.getBlockColor(blockState);
+
+        if (color == 0) {
+            color = rnd.nextInt();
+        }
+
+        int xOffset = x *4;
+        colorData[z][xOffset+0] = (byte) (255);
+        colorData[z][xOffset+1] = (byte) ((color >> 16) & 255);
+        colorData[z][xOffset+2] = (byte) ((color >> 8) & 255);
+        colorData[z][xOffset+3] = (byte) (color & 255);
     }
 }
