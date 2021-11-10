@@ -22,7 +22,8 @@ public class DrawableMapRegion implements MapRegion {
             return surfaceLayer;
         } else {
             // FIXME: implement nether and caves, using a level-based array
-            throw new UnsupportedOperationException();
+            //throw new UnsupportedOperationException();
+            return surfaceLayer;
         }
     }
 

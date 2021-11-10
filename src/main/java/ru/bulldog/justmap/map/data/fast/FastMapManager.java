@@ -20,7 +20,7 @@ public class FastMapManager implements MapDataManager {
 
     private final Map<World, FastMapWorld> mapWorlds = new HashMap();
     private FastMapWorld currentMapWorld;
-    private World currentWorld;
+    World currentWorld;  // package private
 
     @Override
     public WorldKey getWorldKey() {

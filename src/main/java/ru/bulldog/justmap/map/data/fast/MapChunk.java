@@ -4,8 +4,8 @@ import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.Heightmap;
 import net.minecraft.world.chunk.WorldChunk;
+import ru.bulldog.justmap.util.StateUtil;
 import ru.bulldog.justmap.util.colors.ColorUtil;
-import ru.bulldog.justmap.util.colors.Colors;
 
 import java.nio.ByteBuffer;
 import java.util.Random;
@@ -60,7 +60,8 @@ public class MapChunk {
         int x = getChunkRelativeX(blockPos);
         int z = getChunkRelativeZ(blockPos);
 
-        int color = Colors.INSTANCE.getBlockColor(blockState);
+    //    int color = Colors.INSTANCE.getBlockColor(blockState);
+        int color = ColorUtil.blockColor(FastMapManager.MANAGER.currentWorld, blockPos, blockState, StateUtil.AIR);
 
         setColor(x, z, color);
     }
@@ -80,8 +81,8 @@ public class MapChunk {
 
         int xOffset = x * 4;
         colorData[z][xOffset + 0] = (byte) (255);
-        colorData[z][xOffset + 1] = (byte) ((color >> 16) & 255);
+        colorData[z][xOffset + 1] = (byte) (color & 255);
         colorData[z][xOffset + 2] = (byte) ((color >> 8) & 255);
-        colorData[z][xOffset + 3] = (byte) (color & 255);
+        colorData[z][xOffset + 3] = (byte) ((color >> 16) & 255);
     }
 }
