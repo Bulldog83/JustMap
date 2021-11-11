@@ -1,5 +1,6 @@
 package ru.bulldog.justmap.map.data.fast;
 
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.MapColor;
 import net.minecraft.tag.FluidTags;
@@ -21,6 +22,7 @@ public class MapChunk {
 
     private final byte[][] colorData = new byte[MapRegionLayer.CHUNK_SIZE][MapRegionLayer.CHUNK_SIZE * MapRegionLayer.BYTES_PER_PIXEL];
     private final byte[][] heightData = new byte[MapRegionLayer.CHUNK_SIZE][MapRegionLayer.CHUNK_SIZE];
+    private final int[][] blockStateData = new int[MapRegionLayer.CHUNK_SIZE][MapRegionLayer.CHUNK_SIZE];
 
     public MapChunk(int relRegX, int relRegZ) {
         this.relRegX = relRegX;
@@ -28,8 +30,7 @@ public class MapChunk {
     }
 
     private int getChunkRelative(int coord) {
-        int relCoord = coord % 16;
-        return (relCoord < 0) ? relCoord + 16 : relCoord;
+        return coord & 15;
     }
 
     private int getChunkRelativeX(BlockPos blockPos) {
@@ -100,6 +101,15 @@ public class MapChunk {
 
         return heightData[z][x];
     }
+
+    public BlockState getBlockState(int x, int z) {
+        return Block.getStateFromRawId(blockStateData[z][x]);
+    }
+
+    public void setBlockState(int x, int z, BlockState blockState) {
+        blockStateData[z][x] = Block.getRawIdFromState(blockState);
+    }
+
 
     private int blockColorChunk(WorldChunk worldChunk, BlockPos pos) {
         // return ColorUtil.blockColor(world, blockState, pos);
@@ -180,6 +190,7 @@ public class MapChunk {
                 }
             }
             mapColor = blockState.getMapColor(world, thisBlockPos);
+            setBlockState(chunkRelX, chunkRelZ, blockState);
         }
 
         if (mapColor == MapColor.CLEAR) {
