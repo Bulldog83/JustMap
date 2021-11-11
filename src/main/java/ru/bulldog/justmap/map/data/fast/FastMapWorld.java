@@ -1,6 +1,7 @@
 package ru.bulldog.justmap.map.data.fast;
 
 import net.minecraft.world.World;
+
 import ru.bulldog.justmap.map.data.WorldKey;
 
 public class FastMapWorld {

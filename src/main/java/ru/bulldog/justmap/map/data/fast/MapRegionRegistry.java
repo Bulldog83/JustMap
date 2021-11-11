@@ -1,16 +1,17 @@
 package ru.bulldog.justmap.map.data.fast;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.chunk.WorldChunk;
 import org.jetbrains.annotations.NotNull;
+
 import ru.bulldog.justmap.map.IMap;
 import ru.bulldog.justmap.map.data.MapRegion;
 import ru.bulldog.justmap.map.data.MapRegionProvider;
 import ru.bulldog.justmap.map.data.RegionPos;
-
-import java.util.HashMap;
-import java.util.Map;
 
 public class MapRegionRegistry implements MapRegionProvider {
 	private final Map<RegionPos, DrawableMapRegion> registry = new HashMap<>();
@@ -19,9 +20,7 @@ public class MapRegionRegistry implements MapRegionProvider {
 	public MapRegion getMapRegion(IMap map, int blockX, int blockZ) {
 		RegionPos regionPos = new RegionPos(blockX, blockZ);
 
-		DrawableMapRegion region = getOrCreateRegion(regionPos);
-
-		return region;
+		return getOrCreateRegion(regionPos);
 	}
 
 	@NotNull

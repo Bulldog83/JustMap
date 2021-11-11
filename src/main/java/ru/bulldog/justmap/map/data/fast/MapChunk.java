@@ -1,5 +1,7 @@
 package ru.bulldog.justmap.map.data.fast;
 
+import java.nio.ByteBuffer;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.MapColor;
@@ -10,9 +12,8 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.world.Heightmap;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.WorldChunk;
-import ru.bulldog.justmap.util.colors.Colors;
 
-import java.nio.ByteBuffer;
+import ru.bulldog.justmap.util.colors.Colors;
 
 import static ru.bulldog.justmap.util.colors.ColorUtil.ABGRtoARGB;
 

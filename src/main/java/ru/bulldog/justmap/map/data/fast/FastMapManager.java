@@ -1,24 +1,24 @@
 package ru.bulldog.justmap.map.data.fast;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.WorldChunk;
+
 import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.map.data.Layer;
 import ru.bulldog.justmap.map.data.MapDataManager;
 import ru.bulldog.justmap.map.data.MapRegionProvider;
 import ru.bulldog.justmap.map.data.WorldKey;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
 public class FastMapManager implements MapDataManager {
 	public static final FastMapManager MANAGER = new FastMapManager();
 
-	private final Map<World, FastMapWorld> mapWorlds = new HashMap();
+	private final Map<World, FastMapWorld> mapWorlds = new HashMap<>();
 	private FastMapWorld currentMapWorld;
 	World currentWorld;  // package private
 
@@ -29,7 +29,7 @@ public class FastMapManager implements MapDataManager {
 
 	@Override
 	public List<WorldKey> registeredWorlds() {
-		return mapWorlds.keySet().stream().map(k -> getWorldKey()).collect(Collectors.toUnmodifiableList());
+		return mapWorlds.keySet().stream().map(k -> getWorldKey()).toList();
 	}
 
 	@Override

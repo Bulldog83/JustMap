@@ -1,5 +1,8 @@
 package ru.bulldog.justmap.map.data.fast;
 
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+
 import com.mojang.blaze3d.platform.TextureUtil;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.block.BlockState;
@@ -9,11 +12,9 @@ import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.chunk.WorldChunk;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.opengl.GL11;
+
 import ru.bulldog.justmap.util.render.GLC;
 import ru.bulldog.justmap.util.render.RenderUtil;
-
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 
 public class MapRegionLayer {
 	public final static int REGION_SIZE = 512;
@@ -59,21 +60,6 @@ public class MapRegionLayer {
 			chunks[relRegX][relRegZ] = mapChunk;
 		}
 		return mapChunk;
-	}
-
-	private void regenerateTexture() {
-		buffer.clear();
-		for (int chunkX = 0; chunkX < 32; chunkX++) {
-			for (int chunkZ = 0; chunkZ < 32; chunkZ++) {
-				MapChunk mapChunk = chunks[chunkX][chunkZ];
-				if (mapChunk != null) {
-					mapChunk.writeToTextureBuffer(buffer);
-				}
-			}
-		}
-		buffer.position(0).limit(BUFFER_SIZE);
-
-		isModified = true;
 	}
 
 	public void draw(MatrixStack matrices, double x, double y, double width, double height, int imgX, int imgY, int imgW, int imgH) {
