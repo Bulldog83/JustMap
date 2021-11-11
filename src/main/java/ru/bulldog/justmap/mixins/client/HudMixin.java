@@ -17,6 +17,7 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.util.math.MathHelper;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -31,6 +32,7 @@ import ru.bulldog.justmap.util.colors.Colors;
 @Mixin(InGameHud.class)
 abstract class HudMixin extends DrawableHelper {
 	
+	@Final
 	@Shadow
 	private MinecraftClient client;
 	
