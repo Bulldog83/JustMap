@@ -13,36 +13,36 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class MapRegionRegistry implements MapRegionProvider {
-    private final Map<RegionPos, DrawableMapRegion> registry = new HashMap<>();
+	private final Map<RegionPos, DrawableMapRegion> registry = new HashMap<>();
 
-    @Override
-    public MapRegion getMapRegion(IMap map, int blockX, int blockZ) {
-        RegionPos regionPos = new RegionPos(blockX, blockZ);
+	@Override
+	public MapRegion getMapRegion(IMap map, int blockX, int blockZ) {
+		RegionPos regionPos = new RegionPos(blockX, blockZ);
 
-        DrawableMapRegion region = getOrCreateRegion(regionPos);
+		DrawableMapRegion region = getOrCreateRegion(regionPos);
 
-        return region;
-    }
+		return region;
+	}
 
-    @NotNull
-    private DrawableMapRegion getOrCreateRegion(RegionPos regionPos) {
-        DrawableMapRegion region = registry.get(regionPos);
-        if (region == null) {
-            region = new DrawableMapRegion(regionPos);
-            registry.put(regionPos, region);
-        }
-        return region;
-    }
+	@NotNull
+	private DrawableMapRegion getOrCreateRegion(RegionPos regionPos) {
+		DrawableMapRegion region = registry.get(regionPos);
+		if (region == null) {
+			region = new DrawableMapRegion(regionPos);
+			registry.put(regionPos, region);
+		}
+		return region;
+	}
 
-    public void updateChunk(WorldChunk worldChunk) {
-        RegionPos regionPos = new RegionPos(worldChunk.getPos());
-        DrawableMapRegion region = getOrCreateRegion(regionPos);
-        region.updateChunk(worldChunk);
-    }
+	public void updateChunk(WorldChunk worldChunk) {
+		RegionPos regionPos = new RegionPos(worldChunk.getPos());
+		DrawableMapRegion region = getOrCreateRegion(regionPos);
+		region.updateChunk(worldChunk);
+	}
 
-    public void updateBlock(BlockPos pos, BlockState state) {
-        RegionPos regionPos = new RegionPos(pos.getX(), pos.getZ());
-        DrawableMapRegion region = getOrCreateRegion(regionPos);
-        region.updateBlock(pos, state);
-    }
+	public void updateBlock(BlockPos pos, BlockState state) {
+		RegionPos regionPos = new RegionPos(pos.getX(), pos.getZ());
+		DrawableMapRegion region = getOrCreateRegion(regionPos);
+		region.updateBlock(pos, state);
+	}
 }

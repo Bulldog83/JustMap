@@ -16,89 +16,89 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public class FastMapManager implements MapDataManager {
-    public static final FastMapManager MANAGER = new FastMapManager();
+	public static final FastMapManager MANAGER = new FastMapManager();
 
-    private final Map<World, FastMapWorld> mapWorlds = new HashMap();
-    private FastMapWorld currentMapWorld;
-    World currentWorld;  // package private
+	private final Map<World, FastMapWorld> mapWorlds = new HashMap();
+	private FastMapWorld currentMapWorld;
+	World currentWorld;  // package private
 
-    @Override
-    public WorldKey getWorldKey() {
-        return currentMapWorld.getWorldKey();
-    }
+	@Override
+	public WorldKey getWorldKey() {
+		return currentMapWorld.getWorldKey();
+	}
 
-    @Override
-    public List<WorldKey> registeredWorlds() {
-        return mapWorlds.keySet().stream().map(k -> getWorldKey()).collect(Collectors.toUnmodifiableList());
-    }
+	@Override
+	public List<WorldKey> registeredWorlds() {
+		return mapWorlds.keySet().stream().map(k -> getWorldKey()).collect(Collectors.toUnmodifiableList());
+	}
 
-    @Override
-    public void setCurrentWorldName(String name) {
-        currentMapWorld.setWorldName(name);
-    }
+	@Override
+	public void setCurrentWorldName(String name) {
+		currentMapWorld.setWorldName(name);
+	}
 
-    @Override
-    public MapRegionProvider getMapRegionProvider() {
-        return currentMapWorld.getMapRegionProvider();
-    }
+	@Override
+	public MapRegionProvider getMapRegionProvider() {
+		return currentMapWorld.getMapRegionProvider();
+	}
 
-    @Override
-    public int getMapHeight(Layer mapLayer, int mapLevel, int posX, int posZ) {
-        return 0;
-    }
+	@Override
+	public int getMapHeight(Layer mapLayer, int mapLevel, int posX, int posZ) {
+		return 0;
+	}
 
-    @Override
-    public void onServerConnect() {
-        JustMapClient.startMapping();
-
-
-    }
-
-    @Override
-    public void onWorldChanged(World world) {
-        JustMapClient.startMapping();
-
-        FastMapWorld mapWorld = mapWorlds.get(world);
-        if (mapWorld == null) {
-            mapWorld = new FastMapWorld(world);
-            mapWorlds.put(world, mapWorld);
-        }
-
-        currentMapWorld = mapWorld;
-        currentWorld = world;
-    }
-
-    @Override
-    public void onWorldSpawnPosChanged(BlockPos newPos) {
-
-    }
-
-    @Override
-    public void onChunkLoad(World world, WorldChunk worldChunk) {
-        assert(world == currentWorld);
-        currentMapWorld.getMapRegionProvider().updateChunk(worldChunk);
-    }
-
-    @Override
-    public void onConfigUpdate() {
-        JustMapClient.startMapping();
+	@Override
+	public void onServerConnect() {
+		JustMapClient.startMapping();
 
 
-    }
+	}
 
-    @Override
-    public void onSetBlockState(BlockPos pos, BlockState state, World world) {
-        assert(world == currentWorld);
-        currentMapWorld.getMapRegionProvider().updateBlock(pos, state);
-    }
+	@Override
+	public void onWorldChanged(World world) {
+		JustMapClient.startMapping();
 
-    @Override
-    public void onTick(boolean isServer) {
+		FastMapWorld mapWorld = mapWorlds.get(world);
+		if (mapWorld == null) {
+			mapWorld = new FastMapWorld(world);
+			mapWorlds.put(world, mapWorld);
+		}
 
-    }
+		currentMapWorld = mapWorld;
+		currentWorld = world;
+	}
 
-    @Override
-    public void onWorldStop() {
-        JustMapClient.stopMapping();
-    }
+	@Override
+	public void onWorldSpawnPosChanged(BlockPos newPos) {
+
+	}
+
+	@Override
+	public void onChunkLoad(World world, WorldChunk worldChunk) {
+		assert(world == currentWorld);
+		currentMapWorld.getMapRegionProvider().updateChunk(worldChunk);
+	}
+
+	@Override
+	public void onConfigUpdate() {
+		JustMapClient.startMapping();
+
+
+	}
+
+	@Override
+	public void onSetBlockState(BlockPos pos, BlockState state, World world) {
+		assert(world == currentWorld);
+		currentMapWorld.getMapRegionProvider().updateBlock(pos, state);
+	}
+
+	@Override
+	public void onTick(boolean isServer) {
+
+	}
+
+	@Override
+	public void onWorldStop() {
+		JustMapClient.stopMapping();
+	}
 }
