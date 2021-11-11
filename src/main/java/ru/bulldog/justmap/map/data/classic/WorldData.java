@@ -25,9 +25,7 @@ public class WorldData implements MapRegionProvider {
 	private final ChunkDataManager chunkManager;
 	private final Map<RegionPos, RegionData> regions;
 	private long lastPurged = 0;
-	private long purgeDelay = 1000;
-	private int purgeAmount = 500;
-	
+
 	public WorldData(World world) {
 		this.regions = new HashMap<>();
 		this.chunkManager = new ChunkDataManager(this, world);
@@ -157,8 +155,8 @@ public class WorldData implements MapRegionProvider {
 	}
 	
 	public void clearCache() {
-		this.purgeDelay = ClientSettings.purgeDelay * 1000;
-		this.purgeAmount = ClientSettings.purgeAmount;
+		long purgeDelay = ClientSettings.purgeDelay * 1000;
+		int purgeAmount = ClientSettings.purgeAmount;
 		
 		long currentTime = System.currentTimeMillis();
 		if (currentTime - lastPurged > purgeDelay) {

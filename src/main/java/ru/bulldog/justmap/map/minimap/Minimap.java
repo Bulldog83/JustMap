@@ -67,7 +67,6 @@ public class Minimap implements IMap {
 	private MapRegionProvider mapRegionProvider;
 	private MapSkin mapSkin;
 	private World world;
-	private ScreenPosition mapPosition;
 	private boolean isMapVisible = true;
 	private boolean rotateMap = false;
 	private boolean bigMap = false;
@@ -199,7 +198,7 @@ public class Minimap implements IMap {
 		int winW = window.getScaledWidth();
 		int winH = window.getScaledHeight();
 		this.offset = ClientSettings.positionOffset;
-		this.mapPosition = ClientSettings.mapPosition;		
+		ScreenPosition mapPosition = ClientSettings.mapPosition;
 		
 		TextPosition textPos = TextPosition.UNDER;
 

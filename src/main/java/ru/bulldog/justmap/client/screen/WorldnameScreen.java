@@ -98,13 +98,11 @@ public class WorldnameScreen extends Screen {
 	
 	@Override
 	public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-		switch (keyCode) {
-			case GLFW.GLFW_KEY_ENTER:
-				this.onPressSave(null);
-				return true;
-		  	default:
-		  		return super.keyPressed(keyCode, scanCode, modifiers);
+		if (keyCode == GLFW.GLFW_KEY_ENTER) {
+			this.onPressSave(null);
+			return true;
 		}
+		return super.keyPressed(keyCode, scanCode, modifiers);
 	}
 
 	@Override

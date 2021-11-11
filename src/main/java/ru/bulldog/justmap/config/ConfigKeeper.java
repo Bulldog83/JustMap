@@ -99,7 +99,7 @@ public final class ConfigKeeper {
 
 		@Override
 		public void fromString(String value) {
-			setValue(value.equals("true") ? true : false);
+			setValue(value.equals("true"));
 		}
 
 	}

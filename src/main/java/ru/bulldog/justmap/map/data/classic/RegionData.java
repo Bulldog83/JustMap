@@ -51,8 +51,7 @@ public class RegionData implements MapRegion {
 	private boolean alternateRender = true;
 	private boolean slimeOverlay = false;
 	private boolean loadedOverlay = false;
-	private final boolean gridOverlay = false;
-	private boolean imageChanged = false;	
+	private boolean imageChanged = false;
 	private boolean isWorldmap = false;
 	
 	public long updated = 0;
@@ -156,7 +155,7 @@ public class RegionData implements MapRegion {
 			this.loadedOverlay = ClientSettings.showLoadedChunks;
 			this.renewOverlay = true;
 		}
-		this.overlayNeeded = gridOverlay || slimeOverlay || loadedOverlay;
+		this.overlayNeeded = slimeOverlay || loadedOverlay;
 		synchronized (imageLock) {
 			if (overlayNeeded && texture == null) {
 				this.texture = new MapTexture(null, image);

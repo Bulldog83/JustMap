@@ -37,7 +37,6 @@ public class ChunkData {
 	private final World world;
 	private SoftReference<WorldChunk> worldChunk;
 	private boolean outdated = false;
-	private final boolean purged = false;
 	private boolean slime = false;
 	private boolean saved = true;
 	private long refreshed = 0;
@@ -173,7 +172,7 @@ public class ChunkData {
 
 	public boolean updateChunkArea(Layer layer, int level, boolean forceUpdate, int x, int z, int width, int height) {
 		if (!JustMapClient.canMapping()) return false;
-		if (purged || checkUpdating(layer, level)) return false;
+		if (checkUpdating(layer, level)) return false;
 		if (!outdated && forceUpdate) {
 			this.outdated = forceUpdate;
 		}
