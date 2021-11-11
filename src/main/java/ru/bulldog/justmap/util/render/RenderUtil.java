@@ -30,7 +30,7 @@ public class RenderUtil extends DrawableHelper {
 
 	public final static RenderUtil DRAWER = new RenderUtil();
 
-	private final static VertexFormat VF_POS_TEX_NORMAL = new VertexFormat(ImmutableMap.of("postition", VertexFormats.POSITION_ELEMENT, "texture", VertexFormats.TEXTURE_0_ELEMENT, "normal", VertexFormats.NORMAL_ELEMENT, "padding", VertexFormats.PADDING_ELEMENT));
+	private final static VertexFormat VF_POS_TEX_NORMAL = new VertexFormat(ImmutableMap.of("position", VertexFormats.POSITION_ELEMENT, "texture", VertexFormats.TEXTURE_0_ELEMENT, "normal", VertexFormats.NORMAL_ELEMENT, "padding", VertexFormats.PADDING_ELEMENT));
 	private final static Tessellator tessellator = Tessellator.getInstance();
 	private final static BufferBuilder vertexBuffer = tessellator.getBuffer();
 	private final static TextRenderer textRenderer = MinecraftClient.getInstance().textRenderer;

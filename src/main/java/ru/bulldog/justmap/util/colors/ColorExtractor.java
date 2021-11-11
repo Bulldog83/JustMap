@@ -22,7 +22,7 @@ public class ColorExtractor {
 		}
 	}
 
-	public int analize() {
+	public int analyze() {
 		boolean moved = true;
 		while (moved) {
 			this.remap();

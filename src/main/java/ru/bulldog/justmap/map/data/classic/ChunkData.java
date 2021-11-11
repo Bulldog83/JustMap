@@ -296,7 +296,7 @@ public class ChunkData {
 		if (color != -1) {
 			int heightDiff = chunkLevel.levelmap[index];
 			float topoLevel = chunkLevel.topomap[index] / 100F;
-			color = ColorUtil.proccessColor(color, heightDiff, topoLevel);
+			color = ColorUtil.processColor(color, heightDiff, topoLevel);
 			if (ClientSettings.showTopography) {
 				return MathUtil.isOdd(chunkLevel.sampleHeightmap(index)) ?
 						ColorUtil.colorBrigtness(color, -0.6F) : color;
