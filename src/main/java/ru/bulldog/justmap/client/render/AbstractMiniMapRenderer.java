@@ -33,7 +33,7 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 
 @Environment(EnvType.CLIENT)
-public abstract class MapRenderer {
+public abstract class AbstractMiniMapRenderer {
 	
 	protected static Identifier roundMask = new Identifier(JustMap.MODID, "textures/round_mask.png");
 	protected static MinecraftClient minecraft = MinecraftClient.getInstance();
@@ -65,7 +65,7 @@ public abstract class MapRenderer {
 	protected ChunkGrid chunkGrid;
 	protected MapSkin mapSkin;
 	
-	public MapRenderer(Minimap map) {
+	public AbstractMiniMapRenderer(Minimap map) {
 		this.playerPos = new BlockPos.Mutable(0, 0, 0);
 		this.minimap = map;
 		if (textManager == null) {

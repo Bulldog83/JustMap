@@ -42,15 +42,15 @@ import ru.bulldog.justmap.util.RuleUtil;
 import ru.bulldog.justmap.util.colors.Colors;
 import ru.bulldog.justmap.util.math.MathUtil;
 
-public class Worldmap extends MapScreen implements IMap {
+public class WorldmapScreen extends AbstractMapScreen implements IMap {
 
 	private final static LiteralText TITLE = new LiteralText("Worldmap");
 	
-	private static Worldmap worldmap;
+	private static WorldmapScreen worldmap;
 	
-	public static Worldmap getScreen() {
+	public static WorldmapScreen getScreen() {
 		if (worldmap == null) {
-			worldmap = new Worldmap();
+			worldmap = new WorldmapScreen();
 		}
 		return worldmap;
 	}
@@ -73,7 +73,7 @@ public class Worldmap extends MapScreen implements IMap {
 	private List<WaypointIcon> waypoints = new ArrayList<>();
 	private List<PlayerIcon> players = new ArrayList<>();
 	
-	private Worldmap() {
+	private WorldmapScreen() {
 		super(TITLE);
 	}
 
@@ -133,7 +133,7 @@ public class Worldmap extends MapScreen implements IMap {
 		LangUtil langUtil = new LangUtil("gui.worldmap");
 		this.mapMenu = this.addDrawableChild(new DropDownListWidget(25, paddingTop + 2, 100, 22));
 		this.mapMenu.addElement(new ListElementWidget(langUtil.getText("add_waypoint"), () -> {
-			JustMapClient.getMap().createWaypoint(world, centerPos);
+			JustMapClient.getMiniMap().createWaypoint(world, centerPos);
 			return true;
 		}));
 		this.mapMenu.addElement(new ListElementWidget(langUtil.getText("set_map_pos"), () -> {
@@ -156,7 +156,7 @@ public class Worldmap extends MapScreen implements IMap {
 		this.addDrawableChild(new ButtonWidget(width - 24, height / 2 + 1, 20, 20, new LiteralText("-"), (b) -> changeScale(+0.25F)));
 		this.addDrawableChild(new ButtonWidget(width - 24, height - paddingBottom - 22, 20, 20, new LiteralText("\u271C"), (b) -> setCenterByPlayer()));
 		this.addDrawableChild(new ButtonWidget(4, paddingTop + 2, 20, 20, new LiteralText("\u2630"), (b) -> mapMenu.toggleVisible()));
-		this.addDrawableChild(new ButtonWidget(4, height - paddingBottom - 22, 20, 20, new LiteralText("\u2726"), (b) -> client.setScreen(new WaypointsList(this))));
+		this.addDrawableChild(new ButtonWidget(4, height - paddingBottom - 22, 20, 20, new LiteralText("\u2726"), (b) -> client.setScreen(new WaypointsListScreen(this))));
 	}
 	
 	@Override
@@ -380,7 +380,7 @@ public class Worldmap extends MapScreen implements IMap {
 			if (time - clicked > 300) clicks = 0;
 			
 			if (++clicks == 2) {			
-				JustMapClient.getMap().createWaypoint(world, cursorBlockPos(d, e));
+				JustMapClient.getMiniMap().createWaypoint(world, cursorBlockPos(d, e));
 				
 				clicked = 0;
 				clicks = 0;

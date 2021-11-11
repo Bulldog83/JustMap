@@ -5,8 +5,8 @@ import net.minecraft.client.option.KeyBinding;
 import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.client.config.ConfigFactory;
-import ru.bulldog.justmap.client.screen.WaypointsList;
-import ru.bulldog.justmap.client.screen.Worldmap;
+import ru.bulldog.justmap.client.screen.WaypointsListScreen;
+import ru.bulldog.justmap.client.screen.WorldmapScreen;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +25,7 @@ public final class KeyHandler {
 		registerKey(new KeyParser(createKeyBinding("create_waypoint", GLFW.GLFW_KEY_B)) {
 			@Override
 			public void onKeyUp() {
-				JustMapClient.getMap().createWaypoint();
+				JustMapClient.getMiniMap().createWaypoint();
 			}
 
 			@Override
@@ -59,7 +59,7 @@ public final class KeyHandler {
 	
 			@Override
 			public boolean isListening() {
-				return JustMapClient.getMap().isMapVisible();
+				return JustMapClient.getMiniMap().isMapVisible();
 			}
 		});
 		
@@ -72,7 +72,7 @@ public final class KeyHandler {
 	
 			@Override
 			public boolean isListening() {
-				return JustMapClient.getMap().isMapVisible();
+				return JustMapClient.getMiniMap().isMapVisible();
 			}
 		});
 		
@@ -87,7 +87,7 @@ public final class KeyHandler {
 		registerKey(new KeyParser(createKeyBinding("waypoints_list", GLFW.GLFW_KEY_U)) {
 			@Override
 			public void onKeyUp() {
-				MC.setScreen(new WaypointsList(null));
+				MC.setScreen(new WaypointsListScreen(null));
 			}
 	
 			@Override
@@ -111,7 +111,7 @@ public final class KeyHandler {
 		registerKey(new KeyParser(createKeyBinding("show_worldmap", GLFW.GLFW_KEY_M)) {
 			@Override
 			public void onKeyUp() {
-				MC.setScreen(Worldmap.getScreen());
+				MC.setScreen(WorldmapScreen.getScreen());
 			}
 			
 			@Override
@@ -128,7 +128,7 @@ public final class KeyHandler {
 	
 			@Override
 			public boolean isListening() {
-				return JustMapClient.getMap().isMapVisible();
+				return JustMapClient.getMiniMap().isMapVisible();
 			}
 		});
 		
@@ -140,7 +140,7 @@ public final class KeyHandler {
 	
 			@Override
 			public boolean isListening() {
-				return JustMapClient.getMap().isMapVisible();
+				return JustMapClient.getMiniMap().isMapVisible();
 			}
 		});
 	}

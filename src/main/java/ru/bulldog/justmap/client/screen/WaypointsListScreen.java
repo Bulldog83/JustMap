@@ -32,7 +32,7 @@ import java.util.List;
 
 import org.lwjgl.glfw.GLFW;
 
-public class WaypointsList extends MapScreen {
+public class WaypointsListScreen extends AbstractMapScreen {
 	private static class Entry implements Element {
 		private MinecraftClient minecraft;
 	
@@ -43,7 +43,7 @@ public class WaypointsList extends MapScreen {
 		private ButtonWidget tpButton;
 		private Waypoint waypoint;
 	
-		public Entry(WaypointsList wayPointListEditor, int x, int y, int width, int height, Waypoint waypoint) {
+		public Entry(WaypointsListScreen wayPointListEditor, int x, int y, int width, int height, Waypoint waypoint) {
 			this.width = width;
 			this.height = height + 2;
 			this.waypoint = waypoint;
@@ -145,7 +145,7 @@ public class WaypointsList extends MapScreen {
 	private ButtonWidget prevDimensionButton, nextDimensionButton;
 	private ButtonWidget addButton, closeButton;
 	
-	public WaypointsList(Screen parent) {
+	public WaypointsListScreen(Screen parent) {
 		super(TITLE, parent);
 		this.worlds = this.keeper.getWorlds();
 	}
@@ -249,7 +249,7 @@ public class WaypointsList extends MapScreen {
 	private void drawScrollBar() {}
 	
 	private void edit(Waypoint waypoint) {
-		this.client.setScreen(new WaypointEditor(waypoint, this, null));
+		this.client.setScreen(new WaypointEditorScreen(waypoint, this, null));
 	}
 	
 	private void add() {
@@ -259,7 +259,7 @@ public class WaypointsList extends MapScreen {
 		waypoint.pos = client.player.getBlockPos();
 		waypoint.name = "Waypoint";
 		
-		this.client.setScreen(new WaypointEditor(waypoint, this, keeper::addNew));
+		this.client.setScreen(new WaypointEditorScreen(waypoint, this, keeper::addNew));
 	}
 	
 	private void delete(Waypoint waypoint) {

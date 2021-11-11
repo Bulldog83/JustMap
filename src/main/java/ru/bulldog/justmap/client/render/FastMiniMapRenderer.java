@@ -7,7 +7,6 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gl.Framebuffer;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.math.BlockPos;
 
 import net.minecraft.util.math.Vec3f;
 import ru.bulldog.justmap.client.config.ClientSettings;
@@ -19,9 +18,9 @@ import ru.bulldog.justmap.map.minimap.Minimap;
 import ru.bulldog.justmap.util.render.GLC;
 import ru.bulldog.justmap.util.render.RenderUtil;
 
-public class FastRenderer extends MapRenderer {
+public class FastMiniMapRenderer extends AbstractMiniMapRenderer {
 
-	public FastRenderer(Minimap map) {
+	public FastMiniMapRenderer(Minimap map) {
 		super(map);
 	}
 	

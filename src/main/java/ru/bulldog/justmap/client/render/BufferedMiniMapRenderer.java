@@ -10,7 +10,6 @@ import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.math.BlockPos;
 
 import net.minecraft.util.math.Matrix4f;
 import net.minecraft.util.math.Vec3f;
@@ -25,14 +24,14 @@ import ru.bulldog.justmap.util.render.ExtendedFramebuffer;
 import ru.bulldog.justmap.util.render.GLC;
 import ru.bulldog.justmap.util.render.RenderUtil;
 
-public class BufferedRenderer extends MapRenderer {
+public class BufferedMiniMapRenderer extends AbstractMiniMapRenderer {
 	
 	private Framebuffer primaryFramebuffer;
 	private Framebuffer secondaryFramebuffer;
 	private boolean triedFBO = false;
 	private boolean loadedFBO = false;
 	
-	public BufferedRenderer(Minimap map) {
+	public BufferedMiniMapRenderer(Minimap map) {
 		super(map);
 	}
 	

@@ -63,7 +63,7 @@ public class EntityModelRenderer {
 	
 	private static double getScale(LivingEntity livingEntity) {
 		int modelSize = ClientSettings.entityModelSize;
-		double mapScale = JustMapClient.getMap().getScale();
+		double mapScale = JustMapClient.getMiniMap().getScale();
 		
 		modelSize = (int) Math.min(modelSize, modelSize / mapScale);
 		

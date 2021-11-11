@@ -33,7 +33,7 @@ import ru.bulldog.justmap.util.tasks.TaskManager;
 
 public class JustMapClient implements ClientModInitializer {
 	private static ClientConfig config = ClientConfig.get();
-	private static Minimap map = new Minimap();
+	private static Minimap minimap = new Minimap();
 	private static MinecraftClient minecraft;
 	private static ClientNetworkHandler networkHandler;
 	private static boolean canMapping = false;	
@@ -48,13 +48,13 @@ public class JustMapClient implements ClientModInitializer {
 			networkHandler = new ClientNetworkHandler();
 			networkHandler.registerPacketsListeners();
 			config = ClientConfig.get();
-			map = new Minimap();
+			minimap = new Minimap();
 			Colors.INSTANCE.loadData();
 		});
 		ClientChunkEvents.CHUNK_LOAD.register(MapDataProvider.getManager()::onChunkLoad);
 		HudRenderCallback.EVENT.register((matrices, delta) -> {
 			if (!minecraft.options.debugEnabled) {
-				JustMapClient.map.getRenderer().renderMap(matrices);
+				JustMapClient.minimap.getRenderer().renderMap(matrices);
 				AdvancedInfo.getInstance().draw(matrices);
 			}
 		});
@@ -72,7 +72,7 @@ public class JustMapClient implements ClientModInitializer {
 			if (!canMapping()) return;
 
 			DataUtil.update();
-			JustMapClient.map.update();
+			JustMapClient.minimap.update();
 			MapDataProvider.getManager().onTick(false);
 		});
 		ClientLifecycleEvents.CLIENT_STOPPING.register(client -> {
@@ -101,8 +101,8 @@ public class JustMapClient implements ClientModInitializer {
 				(minecraft.getCameraEntity() != null || minecraft.player != null);
 	}
 	
-	public static Minimap getMap() {
-		return map;
+	public static Minimap getMiniMap() {
+		return minimap;
 	}
 	
 	public static ClientConfig getConfig() {

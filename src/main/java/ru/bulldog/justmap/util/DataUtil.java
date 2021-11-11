@@ -16,7 +16,6 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.registry.BuiltinRegistries;
 import net.minecraft.util.registry.DynamicRegistryManager;
-import net.minecraft.util.registry.MutableRegistry;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.LightType;
@@ -26,7 +25,7 @@ import net.minecraft.world.biome.Biome;
 
 import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.client.JustMapClient;
-import ru.bulldog.justmap.client.screen.Worldmap;
+import ru.bulldog.justmap.client.screen.WorldmapScreen;
 import ru.bulldog.justmap.map.IMap;
 import ru.bulldog.justmap.map.data.Layer;
 import ru.bulldog.justmap.server.JustMapServer;
@@ -83,9 +82,9 @@ public class DataUtil {
 		return !MinecraftClient.getInstance().isIntegratedServerRunning();
 	}
 	
-	public static IMap getMap() {
+	public static IMap getCurrentlyShownMap() {
 		MinecraftClient minecraft = MinecraftClient.getInstance();
-		return minecraft.currentScreen instanceof Worldmap ? (Worldmap) minecraft.currentScreen : JustMapClient.getMap();
+		return minecraft.currentScreen instanceof WorldmapScreen ? (WorldmapScreen) minecraft.currentScreen : JustMapClient.getMiniMap();
 	}
 	
 	@Environment(EnvType.SERVER)

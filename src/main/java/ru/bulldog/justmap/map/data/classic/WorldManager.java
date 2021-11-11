@@ -225,7 +225,7 @@ public final class WorldManager implements MapDataManager {
 	
 	public void onChunkLoad(World world, WorldChunk worldChunk) {
 		if (world == null || worldChunk == null || worldChunk.isEmpty()) return;
-		IMap map = DataUtil.getMap();
+		IMap map = DataUtil.getCurrentlyShownMap();
 		WorldData mapData = getData();
 		if (mapData == null) return;
 		ChunkData mapChunk = mapData.getChunk(worldChunk.getPos());

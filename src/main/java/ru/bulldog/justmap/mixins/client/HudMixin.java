@@ -44,7 +44,7 @@ abstract class HudMixin extends DrawableHelper {
 			int posX = this.scaledWidth;
 			int posY = ClientSettings.positionOffset;
 			if (ClientSettings.mapPosition == ScreenPosition.TOP_RIGHT) {
-				posX = JustMapClient.getMap().getSkinX();
+				posX = JustMapClient.getMiniMap().getSkinX();
 			}
 			
 			this.drawMovedEffects(matrices, posX, posY);			

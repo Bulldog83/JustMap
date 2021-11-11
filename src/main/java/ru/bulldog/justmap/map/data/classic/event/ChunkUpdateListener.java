@@ -66,7 +66,7 @@ public class ChunkUpdateListener {
 	public static void onSetBlockState(BlockPos pos, BlockState state, World world) {
 		WorldChunk worldChunk = world.getWorldChunk(pos);
 		if (!worldChunk.isEmpty()) {
-			IMap map = DataUtil.getMap();
+			IMap map = DataUtil.getCurrentlyShownMap();
 			Layer layer = DataUtil.getLayer(world, pos);
 			int level = DataUtil.getLevel(layer, pos.getY());
 			if (layer.equals(map.getLayer()) && level == map.getLevel()) {

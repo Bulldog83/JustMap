@@ -10,10 +10,10 @@ import ru.bulldog.justmap.advancedinfo.TimeInfo;
 import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.client.config.ClientConfig;
 import ru.bulldog.justmap.client.config.ClientSettings;
-import ru.bulldog.justmap.client.render.BufferedRenderer;
-import ru.bulldog.justmap.client.render.FastRenderer;
-import ru.bulldog.justmap.client.render.MapRenderer;
-import ru.bulldog.justmap.client.screen.WaypointEditor;
+import ru.bulldog.justmap.client.render.AbstractMiniMapRenderer;
+import ru.bulldog.justmap.client.render.BufferedMiniMapRenderer;
+import ru.bulldog.justmap.client.render.FastMiniMapRenderer;
+import ru.bulldog.justmap.client.screen.WaypointEditorScreen;
 import ru.bulldog.justmap.enums.MapShape;
 import ru.bulldog.justmap.enums.ScreenPosition;
 import ru.bulldog.justmap.enums.TextAlignment;
@@ -58,8 +58,8 @@ public class Minimap implements IMap {
 	private static InfoText txtTime = new TimeInfo(TextAlignment.CENTER, "");
 	
 	private final MinecraftClient minecraft;
-	private final FastRenderer fastRenderer;
-	private final BufferedRenderer bufferedRenderer;
+	private final FastMiniMapRenderer fastRenderer;
+	private final BufferedMiniMapRenderer bufferedRenderer;
 	private List<WaypointIcon> waypoints = new ArrayList<>();
 	private PlayerEntity locPlayer = null;
 	private Layer mapLayer = Layer.SURFACE;
@@ -88,8 +88,8 @@ public class Minimap implements IMap {
 	public Minimap() {
 		this.minecraft = MinecraftClient.getInstance();
 		this.entityRadar = new EntityRadar();
-		this.fastRenderer = new FastRenderer(this);
-		this.bufferedRenderer = new BufferedRenderer(this);
+		this.fastRenderer = new FastMiniMapRenderer(this);
+		this.bufferedRenderer = new BufferedMiniMapRenderer(this);
 	}
 
 	public void update() {
@@ -364,14 +364,14 @@ public class Minimap implements IMap {
 		waypoint.pos = pos;
 
 		minecraft.setScreen(
-				new WaypointEditor(waypoint, minecraft.currentScreen, WaypointKeeper.getInstance()::addNew));
+				new WaypointEditorScreen(waypoint, minecraft.currentScreen, WaypointKeeper.getInstance()::addNew));
 	}
 
 	public void createWaypoint() {
 		this.createWaypoint(MapDataProvider.getManager().getWorldKey(), DataUtil.currentPos());
 	}
 	
-	public MapRenderer getRenderer() {
+	public AbstractMiniMapRenderer getRenderer() {
 		if (bufferedRenderer.isFBOLoaded()) {
 			return this.bufferedRenderer;
 		}

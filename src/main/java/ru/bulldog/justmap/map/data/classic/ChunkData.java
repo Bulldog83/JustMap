@@ -291,17 +291,13 @@ public class ChunkData {
 		for (int x = 0; x < 16; x++) {
 			for (int z = 0; z < 16; z++) {
 				int index = x + (z << 4);
-				colordata[index] = this.getBlockColor(chunkLevel, index);
+				colordata[index] = this.getProcessedBlockColor(chunkLevel, index);
 			}
 		}
 		return colordata;
 	}
 	
-	public int getBlockColor(Layer layer, int level, int x, int z) {
-		return this.getBlockColor(getChunkLevel(layer, level), x + (z << 4));
-	}
-	
-	private int getBlockColor(ChunkLevel chunkLevel, int index) {
+	private int getProcessedBlockColor(ChunkLevel chunkLevel, int index) {
 		int color = chunkLevel.colormap[index];
 		if (color != -1) {
 			int heightDiff = chunkLevel.levelmap[index];
