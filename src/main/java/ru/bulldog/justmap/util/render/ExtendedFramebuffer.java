@@ -68,7 +68,9 @@ public class ExtendedFramebuffer extends Framebuffer {
 		try {
 			this.checkFramebufferStatus();
 			this.clear(isMac);
-		} catch (Exception ex) {}
+		} catch (Exception ex) {
+			// ignore
+		}
 		this.endRead();
 	}
 	

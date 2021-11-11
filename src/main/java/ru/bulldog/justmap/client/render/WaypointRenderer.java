@@ -46,12 +46,12 @@ public class WaypointRenderer {
 		for (Waypoint wp : wayPoints) {
 			int dist = (int) MathUtil.getDistance(wp.pos, minecraft.player.getBlockPos(), false);
 			if (wp.tracking && dist <= wp.showRange) {
-				renderer.renderHUD(wp, minecraft, delta, fov, dist);
+				renderer.renderHUD(wp, delta, fov, dist);
 			}
 		}
 	}
 	
-	private void renderHUD(Waypoint waypoint, MinecraftClient minecraft, float delta, float fov, int dist) {
+	private void renderHUD(Waypoint waypoint, float delta, float fov, int dist) {
 		int wpX = waypoint.pos.getX();
 		int wpZ = waypoint.pos.getZ();
 		
@@ -61,9 +61,9 @@ public class WaypointRenderer {
 		int screenWidth = minecraft.getWindow().getScaledWidth();
 		
 		double dx = minecraft.player.getX() - wpX;
-		double dy = wpZ - minecraft.player.getZ();		
+		double dy = wpZ - minecraft.player.getZ();
 		double wfi = correctAngle((float) (Math.atan2(dx, dy) * (180 / Math.PI)));		
-		double pfi = correctAngle(minecraft.player.getYaw(delta) % 360);		
+		double pfi = correctAngle(minecraft.player.getYaw(delta) % 360);
 		double a0 = pfi - fov / 2;
 		double a1 = pfi + fov / 2;		
 		double ax = correctAngle((float) (2 * pfi - wfi));		

@@ -130,16 +130,10 @@ public class BiomeColors {
 	}
 	
 	public String toString() {
-		StringBuilder builder = new StringBuilder();
-		builder.append("[")
-			   .append("foliage=" + foliageColor)
-			   .append(",")
-			   .append("grass=" + grassColor)
-			   .append(",")
-			   .append("water=" + waterColor)
-			   .append("]");
-		
-		return builder.toString();
+		return "[" + "foliage=" + foliageColor +
+				"," + "grass=" + grassColor +
+				"," + "water=" + waterColor +
+				"]";
 	}
 	
 	static {

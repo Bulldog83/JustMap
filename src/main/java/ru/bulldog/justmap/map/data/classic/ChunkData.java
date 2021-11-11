@@ -46,12 +46,7 @@ public class ChunkData {
 	public long requested = 0;
 	
 	private final Object levelLock = new Object();
-	
-	public ChunkData(WorldData data, WorldChunk lifeChunk) {
-		this(data, lifeChunk.getPos());
-		this.updateWorldChunk(lifeChunk);
-	}
-	
+
 	public ChunkData(WorldData data, ChunkPos pos) {
 		this.mapData = data;
 		this.world = data.getWorld();

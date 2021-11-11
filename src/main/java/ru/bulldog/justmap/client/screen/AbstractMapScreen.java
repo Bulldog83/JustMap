@@ -87,11 +87,7 @@ public abstract class AbstractMapScreen extends Screen {
 	public void renderTextureModal(int x, int y, int width, int height, int textureWidth, int textureHeight, Identifier id) {
 		this.renderTexture(x, y, width, height, (float) width / textureWidth, (float) height / textureHeight, id);
 	}
-	
-	public void renderTextureRepeating(int x, int y, int width, int height, int textureHeight, int textureWidth, String id) {
-		this.renderTextureRepeating(x, y, width, height, textureHeight, textureWidth, new Identifier(id));
-	}
-	
+
 	public void renderTextureRepeating(int x, int y, int width, int height, int textureHeight, int textureWidth, Identifier id) {
 		for (int xp = 0; xp < width; xp += textureWidth) {
 			int w = (xp + textureWidth < width) ? textureWidth : width - xp;
