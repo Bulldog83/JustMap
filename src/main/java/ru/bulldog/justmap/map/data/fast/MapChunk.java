@@ -20,6 +20,7 @@ public class MapChunk {
     private final int relRegZ;
 
     private final byte[][] colorData = new byte[MapRegionLayer.CHUNK_SIZE][MapRegionLayer.CHUNK_SIZE * MapRegionLayer.BYTES_PER_PIXEL];
+    private final byte[][] heightData = new byte[MapRegionLayer.CHUNK_SIZE][MapRegionLayer.CHUNK_SIZE];
 
     public MapChunk(int relRegX, int relRegZ) {
         this.relRegX = relRegX;
@@ -52,6 +53,7 @@ public class MapChunk {
                 blockPos.setZ(z);
                 int y = getTopBlockY(worldChunk, x, z);
                 blockPos.setY(y);
+                setHeight(x, z, y);
            //     BlockState blockState = worldChunk.getBlockState(blockPos);
            //     int color = Colors.INSTANCE.getBlockColor(blockState);
                 int color = blockColorChunk(worldChunk, blockPos);
@@ -89,6 +91,16 @@ public class MapChunk {
         colorData[z][xOffset + 3] = (byte) ((color >> 16) & 255);
     }
 
+    private void setHeight(int x, int z, int height) {
+        heightData[z][x] = (byte) height;
+    }
+
+    private int getHeight(int x, int z) {
+        if (x < 0 || z < 0) return 0;
+
+        return heightData[z][x];
+    }
+
     private int blockColorChunk(WorldChunk worldChunk, BlockPos pos) {
         // return ColorUtil.blockColor(world, blockState, pos);
         return blockColorVanilla(FastMapManager.MANAGER.currentWorld, worldChunk, pos);
@@ -103,7 +115,7 @@ public class MapChunk {
         ChunkPos chunkPos = worldChunk.getPos();
         int chunkRelX = getChunkRelativeX(pos);
         int chunkRelZ = getChunkRelativeZ(pos);
-        int waterShade = 0;
+        int shade = 0;
 
         // FIXME: Redundant if coming here through chunk updates
         int maxY = getTopBlockY(worldChunk, chunkRelX, chunkRelZ);
@@ -136,20 +148,35 @@ public class MapChunk {
                         fluidBlockState = worldChunk.getBlockState(fluidBlockPos);
                     } while (fluidMaxY > world.getBottomY() && !fluidBlockState.getFluidState().isEmpty());
 
+                    // For water, calculate shading according to depth
                     int waterDepth = maxY - fluidMaxY;
                     double shadeArg = (double)waterDepth * 0.1d + (double)(chunkRelX + chunkRelZ & 1) * 0.2d;
                     if (shadeArg < 0.5d) {
-                        waterShade = 2;
+                        shade = 2;
                     } else if (shadeArg > 0.9d) {
-                        waterShade = 0;
+                        shade = 0;
                     } else {
-                        waterShade = 1;
+                        shade = 1;
                     }
                 }
 
                 // Set block state from fluid instead, if applicable
                 if (!blockState.isSideSolidFullSquare(world, thisBlockPos, Direction.UP)) {
                     blockState = blockState.getFluidState().getBlockState();
+                }
+            } else {
+                // For terrain, calculate shading according to height difference
+                // with north (z-1) neighbor
+                // FIXME: this breaks at chunk border!
+                double northMaxY = getHeight(chunkRelX, chunkRelZ - 1);
+                double shadeArg = ((double)maxY - northMaxY) * 4.0d/5.0d
+                        + ((double)(chunkRelX + chunkRelZ & 1) - 0.5D) * 0.4D;
+                if (shadeArg > 0.6D) {
+                    shade = 2;
+                } else if (shadeArg < -0.6D) {
+                    shade = 0;
+                } else {
+                    shade = 1;
                 }
             }
             mapColor = blockState.getMapColor(world, thisBlockPos);
@@ -158,7 +185,7 @@ public class MapChunk {
         if (mapColor == MapColor.CLEAR) {
             return Colors.BLACK;
         } else {
-            return ABGRtoARGB(MapColor.COLORS[mapColor.id].getRenderColor(waterShade));
+            return ABGRtoARGB(MapColor.COLORS[mapColor.id].getRenderColor(shade));
         }
     }
 }
