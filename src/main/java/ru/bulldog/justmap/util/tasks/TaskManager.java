@@ -100,9 +100,8 @@ public class TaskManager implements Executor {
 	}
 
 	public void stop() {
-		this.execute("Stopping " + this.name, () -> {
-			this.running = false;
-		});
+		this.execute("Stopping " + this.name, () ->
+			this.running = false);
 	}
 
 	public int queueSize() {

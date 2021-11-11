@@ -8,14 +8,6 @@ public class MathUtil {
 
 	public final static double SQRT2 = Math.sqrt(2.0);
 	public final static double BIG_SQRT2 = SQRT2 * 0.625 + 1.0;
-	public final static Comparator<Integer> INT_COMPARATOR = new Comparator<Integer>() {
-		@Override
-		public int compare(Integer int1, Integer int2) {
-			if (int1 == null) return -1;
-			if (int2 == null) return 1;
-			return Integer.compare(int1, int2);
-		}
-	};
 
 	public static int clamp(int val, int min, int max) {
 		return val < min ? min : Math.min(val, max);

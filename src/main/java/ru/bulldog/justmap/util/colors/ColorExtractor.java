@@ -40,8 +40,7 @@ public class ColorExtractor {
 			}
 		});
 		if (toClear.size() > 0) {
-			toClear.forEach(clear ->
-				centers.remove(clear));
+			toClear.forEach(centers::remove);
 		}
 		this.centers.sort(Center.COMPARATOR);
 
@@ -94,12 +93,7 @@ public class ColorExtractor {
 	}
 
 	private static class Center {
-		static final Comparator<Center> COMPARATOR = new Comparator<Center>() {
-			@Override
-			public int compare(Center c1, Center c2) {
-				return Integer.compare(c1.getColor(), c2.getColor());
-			}
-		};
+		static final Comparator<Center> COMPARATOR = Comparator.comparingInt(Center::getColor);
 
 		final List<Integer> colors = new ArrayList<>();
 		double a, r, g, b;

@@ -30,8 +30,8 @@ public class ClientConfig extends Config {
 
 	private ClientConfig() {
 		KEEPER.registerEntry("map_visible", new BooleanEntry(ClientSettings.mapVisible, (b) -> ClientSettings.mapVisible = b, () -> ClientSettings.mapVisible));
-		KEEPER.registerEntry("map_position", new EnumEntry<ScreenPosition>(ClientSettings.mapPosition, (e) -> ClientSettings.mapPosition = e, () -> ClientSettings.mapPosition));
-		KEEPER.registerEntry("arrow_type", new EnumEntry<ArrowType>(ClientSettings.arrowIconType, (e) -> ClientSettings.arrowIconType = e, () -> ClientSettings.arrowIconType));
+		KEEPER.registerEntry("map_position", new EnumEntry<>(ClientSettings.mapPosition, (e) -> ClientSettings.mapPosition = e, () -> ClientSettings.mapPosition));
+		KEEPER.registerEntry("arrow_type", new EnumEntry<>(ClientSettings.arrowIconType, (e) -> ClientSettings.arrowIconType = e, () -> ClientSettings.arrowIconType));
 		KEEPER.registerEntry("map_offset", new IntegerEntry(ClientSettings.positionOffset, (i) -> ClientSettings.positionOffset = i, () -> ClientSettings.positionOffset));
 		KEEPER.registerEntry("map_position_x", new IntegerEntry(ClientSettings.mapPositionX, (i) -> ClientSettings.mapPositionX = i, () -> ClientSettings.mapPositionX));
 		KEEPER.registerEntry("map_position_y", new IntegerEntry(ClientSettings.mapPositionY, (i) -> ClientSettings.mapPositionY = i, () -> ClientSettings.mapPositionY));
@@ -108,10 +108,10 @@ public class ClientConfig extends Config {
 		KEEPER.registerEntry("entity_outline_size", new IntegerRange(ClientSettings.entityOutlineSize, (i) -> ClientSettings.entityOutlineSize = i, () -> ClientSettings.entityOutlineSize, 1, 5));
 		KEEPER.registerEntry("arrow_size", new IntegerRange(ClientSettings.arrowIconSize, (i) -> ClientSettings.arrowIconSize = i, () -> ClientSettings.arrowIconSize, 6, 16));
 		KEEPER.registerEntry("worldmap_icon_size", new IntegerRange(ClientSettings.worldmapIconSize, (i) -> ClientSettings.worldmapIconSize = i, () -> ClientSettings.worldmapIconSize, 8, 16));
-		KEEPER.registerEntry("info_position", new EnumEntry<ScreenPosition>(ClientSettings.infoPosition, (e) -> ClientSettings.infoPosition = e, () -> ClientSettings.infoPosition));
-		KEEPER.registerEntry("items_position", new EnumEntry<ScreenPosition>(ClientSettings.itemsPosition, (e) -> ClientSettings.itemsPosition = e, () -> ClientSettings.itemsPosition));
-		KEEPER.registerEntry("map_shape", new EnumEntry<MapShape>(ClientSettings.mapShape, (e) -> ClientSettings.mapShape = e, () -> ClientSettings.mapShape));
-		KEEPER.registerEntry("multiworld_detection", new EnumEntry<MultiworldDetection>(ClientSettings.multiworldDetection, (e) -> ClientSettings.multiworldDetection = e, () -> ClientSettings.multiworldDetection));
+		KEEPER.registerEntry("info_position", new EnumEntry<>(ClientSettings.infoPosition, (e) -> ClientSettings.infoPosition = e, () -> ClientSettings.infoPosition));
+		KEEPER.registerEntry("items_position", new EnumEntry<>(ClientSettings.itemsPosition, (e) -> ClientSettings.itemsPosition = e, () -> ClientSettings.itemsPosition));
+		KEEPER.registerEntry("map_shape", new EnumEntry<>(ClientSettings.mapShape, (e) -> ClientSettings.mapShape = e, () -> ClientSettings.mapShape));
+		KEEPER.registerEntry("multiworld_detection", new EnumEntry<>(ClientSettings.multiworldDetection, (e) -> ClientSettings.multiworldDetection = e, () -> ClientSettings.multiworldDetection));
 
 		JsonObject config = ConfigWriter.load();
 		if (config.size() > 0) {

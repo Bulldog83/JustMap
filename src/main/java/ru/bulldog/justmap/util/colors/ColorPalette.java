@@ -25,7 +25,7 @@ import ru.bulldog.justmap.util.JsonFactory;
 
 public class ColorPalette {
 
-	private static final Function<Entry<Property<?>, Comparable<?>>, String> PROPERTY_PRINTER = new Function<Entry<Property<?>, Comparable<?>>, String>() {
+	private static final Function<Entry<Property<?>, Comparable<?>>, String> PROPERTY_PRINTER = new Function<>() {
 		public String apply(@Nullable Entry<Property<?>, Comparable<?>> entry) {
 			if (entry == null) {
 				return "";
@@ -108,7 +108,7 @@ public class ColorPalette {
 		this.blockColors.forEach((keys, value) -> {
 			JsonObject block = new JsonObject();
 			JsonArray keysArray = new JsonArray();
-			keys.forEach(key -> keysArray.add(key));
+			keys.forEach(keysArray::add);
 			block.add("blocks", keysArray);
 			block.addProperty("color", Integer.toHexString(value));
 			blocks.add(block);
@@ -119,7 +119,7 @@ public class ColorPalette {
 		this.fluidColors.forEach((keys, value) -> {
 			JsonObject fluid = new JsonObject();
 			JsonArray keysArray = new JsonArray();
-			keys.forEach(key -> keysArray.add(key));
+			keys.forEach(keysArray::add);
 			fluid.add("fluids", keysArray);
 			fluid.addProperty("color", Integer.toHexString(value));
 			fluids.add(fluid);
@@ -127,15 +127,13 @@ public class ColorPalette {
 		JsonFactory.storeJson(new File(folder, "fluidcolors.json"), fluids);
 
 		JsonObject textures = new JsonObject();
-		this.textureColors.forEach((id, color) -> {
-			textures.addProperty(id.toString(), Integer.toHexString(color));
-		});
+		this.textureColors.forEach((id, color) ->
+				textures.addProperty(id.toString(), Integer.toHexString(color)));
 		JsonFactory.storeJson(new File(folder, "texturecolors.json"), textures);
 
 		JsonObject biomes = new JsonObject();
-		this.biomeColors.forEach((id, biome) -> {
-			biomes.add(id.toString(), biome.toJson());
-		});
+		this.biomeColors.forEach((id, biome) ->
+				biomes.add(id.toString(), biome.toJson()));
 		JsonFactory.storeJson(new File(folder, "biomecolors.json"), biomes);
 	}
 
@@ -153,9 +151,7 @@ public class ColorPalette {
 						JsonArray keysArray = entry.get("blocks").getAsJsonArray();
 						if (keysArray.size() == 0) return;
 						Set<String> keySet = new HashSet<>();
-						keysArray.forEach(key -> {
-							keySet.add(key.getAsString());
-						});
+						keysArray.forEach(key -> keySet.add(key.getAsString()));
 						String hexColor = entry.get("color").getAsString();
 						int color = ColorUtil.parseHex(hexColor);
 						this.blockColors.put(keySet, color);
@@ -171,9 +167,7 @@ public class ColorPalette {
 						JsonArray keysArray = entry.get("fluids").getAsJsonArray();
 						if (keysArray.size() == 0) return;
 						Set<String> keySet = new HashSet<>();
-						keysArray.forEach(key -> {
-							keySet.add(key.getAsString());
-						});
+						keysArray.forEach(key -> keySet.add(key.getAsString()));
 						String hexColor = entry.get("color").getAsString();
 						int color = ColorUtil.parseHex(hexColor);
 						this.fluidColors.put(keySet, color);

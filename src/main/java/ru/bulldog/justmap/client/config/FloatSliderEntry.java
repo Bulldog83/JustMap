@@ -59,9 +59,8 @@ public class FloatSliderEntry extends TooltipListEntry<Float> {
 		this.minimum = minimum;
 		this.sliderWidget = new Slider(0, 0, 152, 20, (this.value.get() - minimum) / Math.abs(maximum - minimum));
 		int width = textRenderer.getWidth(resetButtonKey);
-		this.resetButton = new ButtonWidget(0, 0, width + 6, 20, resetButtonKey, widget -> {
-			setValue(defaultValue.get());
-		});
+		this.resetButton = new ButtonWidget(0, 0, width + 6, 20, resetButtonKey, widget ->
+				setValue(defaultValue.get()));
 		this.sliderWidget.setMessage(textGetter.apply((float) FloatSliderEntry.this.value.get()));
 		this.widgets = Lists.newArrayList(sliderWidget, resetButton);
 	}

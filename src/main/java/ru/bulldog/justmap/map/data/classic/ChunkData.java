@@ -59,9 +59,7 @@ public class ChunkData {
 				this.slime = ChunkRandom.getSlimeRandom(chunkPos.x, chunkPos.z,
 						serverWorld.getSeed(), 987234911L).nextInt(10) == 0;
 			} else if (networkHandler.canRequestData()) {
-				networkHandler.requestChunkHasSlime(chunkPos, result -> {
-					this.slime = result;
-				});
+				networkHandler.requestChunkHasSlime(chunkPos, result -> this.slime = result);
 			}
 		}
 		if (Dimension.isNether(world)) {

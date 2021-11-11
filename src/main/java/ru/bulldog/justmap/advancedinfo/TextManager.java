@@ -131,7 +131,7 @@ public class TextManager {
 	}
 
 	public void update() {
-		this.elements.forEach(element -> element.update());
+		this.elements.forEach(InfoText::update);
 	}
 
 	public int size() {

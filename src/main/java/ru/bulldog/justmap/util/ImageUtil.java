@@ -274,9 +274,8 @@ public class ImageUtil {
 				}
 			}
 		}
-		outlinePixels.forEach(pixel -> {
-			outline.setColor((int) pixel.x, (int) pixel.y, outlineColor);
-		});
+		outlinePixels.forEach(pixel ->
+			outline.setColor((int) pixel.x, (int) pixel.y, outlineColor));
 
 		return outline;
 	}
