@@ -18,8 +18,6 @@ public abstract class MapIcon<T extends MapIcon<T>> {
 	protected double x, y;
 	protected int height;
 	
-	protected static final MinecraftClient minecraft = MinecraftClient.getInstance();
-	
 	public MapIcon() {}
 	
 	public void setPosition(double x, double y, int height) {

@@ -43,12 +43,7 @@ public class RenderUtil extends DrawableHelper {
 	public static int getWidth(String string) {
 		return textRenderer.getWidth(string);
 	}
-	
-	public static void drawCenteredString(String string, double x, double y, int color) {
-		MatrixStack matrices = new MatrixStack();
-		drawCenteredString(matrices, string, x, y, color);
-	}
-	
+
 	public static void drawCenteredString(MatrixStack matrices, String string, double x, double y, int color) {
 		textRenderer.drawWithShadow(matrices, string, (float) (x - textRenderer.getWidth(string) / 2), (float) y, color);
 	}
@@ -287,10 +282,6 @@ public class RenderUtil extends DrawableHelper {
 		endDraw();
 	}
 
-	public static void draw(MatrixStack matrices, double x, double y, int size, int isize, int ix, int iy, int tw, int th) {
-		draw(matrices, x, y, size, size, ix, iy, isize, isize, tw, th);
-	}
-	
 	public static void draw(MatrixStack matrices, double x, double y, int w, int h, int ix, int iy, int iw, int ih, int tw, int th) {
 		float minU = (float) ix / tw;
 		float minV = (float) iy / th;

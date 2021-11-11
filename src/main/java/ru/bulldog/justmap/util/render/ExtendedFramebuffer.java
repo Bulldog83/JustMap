@@ -14,7 +14,7 @@ public class ExtendedFramebuffer extends Framebuffer {
 	private int depthAttachment;
 	private FboType fboType;
 	
-	public ExtendedFramebuffer(int width, int height, boolean useDepthIn) {
+	public ExtendedFramebuffer(boolean useDepthIn) {
 		super(useDepthIn);
 	}
 

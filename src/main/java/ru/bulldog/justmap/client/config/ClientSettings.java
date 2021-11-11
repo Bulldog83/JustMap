@@ -36,7 +36,6 @@ public class ClientSettings {
 	public static boolean showTopography = true;
 	public static boolean showSlime = false;
 	public static boolean showLoadedChunks = false;
-	public static boolean showMobSpawn = false;
 	public static int terrainStrength = 4;
 
 	public static boolean useSkins = true;

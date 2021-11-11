@@ -101,7 +101,7 @@ public class WaypointRenderer {
 		for (Waypoint wp : wayPoints) {
 			int dist = (int) MathUtil.getDistance(wp.pos, playerPos, false);
 			if (wp.render && dist >= ClientSettings.minRenderDist && dist <= wp.showRange) {
-				renderer.renderWaypoint(matrixStack, consumerProvider, wp, minecraft, camera, tick, dist);
+				renderer.renderWaypoint(matrixStack, consumerProvider, wp, camera, tick, dist);
 			}
 		}
 		consumerProvider.draw();
@@ -109,7 +109,7 @@ public class WaypointRenderer {
 		RenderSystem.depthMask(true);
 	}
 	
-	private void renderWaypoint(MatrixStack matrixStack, VertexConsumerProvider consumerProvider, Waypoint waypoint, MinecraftClient client, Camera camera, float tick, int dist) {
+	private void renderWaypoint(MatrixStack matrixStack, VertexConsumerProvider consumerProvider, Waypoint waypoint, Camera camera, float tick, int dist) {
 		int wpX = waypoint.pos.getX();
 		int wpY = waypoint.pos.getY();
 		int wpZ = waypoint.pos.getZ();
@@ -145,13 +145,13 @@ public class WaypointRenderer {
    	 		
    	 		Identifier texture = waypoint.getIcon().getTexture();
    	 		VertexConsumer vertexConsumer = consumerProvider.getBuffer(RenderLayer.getBeaconBeam(texture, true));
-   	 		this.renderIcon(matrixStack, vertexConsumer, colors, alpha, waypoint.getIcon().getWidth());
+   	 		this.renderIcon(matrixStack, vertexConsumer, colors, alpha);
    	 		matrixStack.pop();
 		}
 		matrixStack.pop();
 	}
 	
-	private void renderIcon(MatrixStack matrixStack, VertexConsumer vertexConsumer, float[] colors, float alpha, int size) {
+	private void renderIcon(MatrixStack matrixStack, VertexConsumer vertexConsumer, float[] colors, float alpha) {
 		MatrixStack.Entry entry = matrixStack.peek();
 		Matrix4f matrix4f = entry.getModel();
 		Matrix3f matrix3f = entry.getNormal();

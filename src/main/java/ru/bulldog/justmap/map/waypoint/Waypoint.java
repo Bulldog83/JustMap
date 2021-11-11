@@ -198,7 +198,7 @@ public class Waypoint {
 			this.color = color;
 		}
 		
-		private Icon(int key, Identifier icon, NativeImage texture, int color, int w, int h) {
+		private Icon(int key, Identifier icon, NativeImage texture, int color) {
 			super(icon, texture);
 			this.key = key;
 			this.color = color;
@@ -214,7 +214,7 @@ public class Waypoint {
 			texture.copyFrom(DEFAULT_TEXTURE);
 			ImageUtil.applyColor(texture, color);
 			
-			Icon icon = new Icon(-1, DEFAULT_ICON, texture, color, 18, 18);
+			Icon icon = new Icon(-1, DEFAULT_ICON, texture, color);
 			coloredIcons.put(color, icon);
 			
 			return icon;

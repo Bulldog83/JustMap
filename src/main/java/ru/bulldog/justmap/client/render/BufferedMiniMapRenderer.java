@@ -41,8 +41,8 @@ public class BufferedMiniMapRenderer extends AbstractMiniMapRenderer {
 			double scale = minecraft.getWindow().getScaleFactor();
 			int scaledW = (int) (imgW * scale);
 			int scaledH = (int) (imgH * scale);
-			this.primaryFramebuffer = new ExtendedFramebuffer(scaledW, scaledH, false);
-			this.secondaryFramebuffer = new ExtendedFramebuffer(scaledW, scaledH, false);
+			this.primaryFramebuffer = new ExtendedFramebuffer(false);
+			this.secondaryFramebuffer = new ExtendedFramebuffer(false);
 			this.loadedFBO = (this.primaryFramebuffer.fbo != -1 && this.secondaryFramebuffer.fbo != -1);
 		}
 		this.triedFBO = true;
