@@ -62,32 +62,29 @@ public abstract class InfoText {
 		}
 	}
 	
-	public InfoText setPos(int x, int y) {
+	public void setPos(int x, int y) {
 		if (!fixed) this.fixed = true;
 		this.x = x;
-		this.y = y;		
-		return this;
-	}
+		this.y = y;
+    }
 	
 	public InfoText setAlignment(TextAlignment alignment) {
 		this.alignment = alignment;
 		return this;
 	}
 	
-	public InfoText setText(String text) {
+	public void setText(String text) {
 		this.text = new LiteralText(text);
-		return this;
-	}
+    }
 	
 	public InfoText setColor(int color) {
 		this.color = color;
 		return this;
 	}
 	
-	public InfoText setVisible(boolean visible) {
+	public void setVisible(boolean visible) {
 		if (this.visible != visible) {
 			this.visible = visible;
 		}
-		return this;
-	}
+    }
 }

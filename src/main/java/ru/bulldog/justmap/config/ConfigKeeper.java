@@ -276,15 +276,12 @@ public final class ConfigKeeper {
 		}
 		
 		@SuppressWarnings("unchecked")
-		public boolean setValue(String name) {
+		public void setValue(String name) {
 			try {
 				this.setter.accept((T) Enum.valueOf(this.defaultValue.getClass(), name));
-				return true;
 			} catch(IllegalArgumentException ex) {
 				JustMap.LOGGER.catching(ex);
 			}
-			
-			return false;
 		}
 		
 		@Override

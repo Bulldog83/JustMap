@@ -76,10 +76,9 @@ public class FloatSliderEntry extends TooltipListEntry<Float> {
 		return textGetter;
 	}
 	
-	public FloatSliderEntry setTextGetter(Function<Float, Text> textGetter) {
+	public void setTextGetter(Function<Float, Text> textGetter) {
 		this.textGetter = textGetter;
 		this.sliderWidget.setMessage(textGetter.apply((float) FloatSliderEntry.this.value.get()));
-		return this;
 	}
 	
 	@Override

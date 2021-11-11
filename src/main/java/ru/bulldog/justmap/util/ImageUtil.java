@@ -64,7 +64,7 @@ public class ImageUtil {
 		return new NativeImage(w, h, false);
 	}
 	
-	public static NativeImage applyColor(NativeImage image, int color) {
+	public static void applyColor(NativeImage image, int color) {
 		for (int i = 0; i < image.getWidth(); i++) {
 			for (int j = 0; j < image.getHeight(); j++) {
 				if (image.getOpacity(i, j) == -1) {
@@ -73,8 +73,6 @@ public class ImageUtil {
 				}
 			}
 		}
-		
-		return image;
 	}
 	
 	public static void fillImage(NativeImage image, int color) {

@@ -187,15 +187,13 @@ public class MapSkin extends Image {
 	}
 	
 	public static List<MapSkin> getSquareSkins() {
-		return Collections.unmodifiableList(SKINS.stream()
-												 .filter(MapSkin::isSquare)
-												 .collect(Collectors.toList()));
+		return SKINS.stream()
+				.filter(MapSkin::isSquare).collect(Collectors.toUnmodifiableList());
 	}
 	
 	public static List<MapSkin> getRoundSkins() {
-		return Collections.unmodifiableList(SKINS.stream()
-												 .filter(MapSkin::isRound)
-												 .collect(Collectors.toList()));
+		return SKINS.stream()
+				.filter(MapSkin::isRound).collect(Collectors.toUnmodifiableList());
 	}
 	
 	public static MapSkin getCurrentSkin() {

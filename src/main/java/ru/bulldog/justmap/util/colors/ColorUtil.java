@@ -68,7 +68,7 @@ public class ColorUtil {
 		return floatBuffer;
 	}
 	
-	public static float[] RGBtoHSB(int r, int g, int b, float[] hsbvals) {
+	public static void RGBtoHSB(int r, int g, int b, float[] hsbvals) {
 		float hue, saturation, brightness;
 		if (hsbvals == null) {
 			hsbvals = floatBuffer;
@@ -102,7 +102,6 @@ public class ColorUtil {
 		hsbvals[0] = hue;
 		hsbvals[1] = saturation;
 		hsbvals[2] = brightness;
-		return hsbvals;
 	}
 	
 	public static int HSBtoRGB(float hue, float saturation, float brightness) {
