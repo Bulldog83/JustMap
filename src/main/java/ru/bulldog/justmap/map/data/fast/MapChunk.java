@@ -1,19 +1,24 @@
 package ru.bulldog.justmap.map.data.fast;
 
 import net.minecraft.block.BlockState;
+import net.minecraft.block.MapColor;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.ChunkPos;
+import net.minecraft.util.math.Direction;
 import net.minecraft.world.Heightmap;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.WorldChunk;
-import ru.bulldog.justmap.util.colors.ColorUtil;
+import ru.bulldog.justmap.util.colors.Colors;
 
 import java.nio.ByteBuffer;
+
+import static ru.bulldog.justmap.util.colors.ColorUtil.ABGRtoARGB;
 
 public class MapChunk {
     private final int relRegX;
     private final int relRegZ;
 
-    private byte[][] colorData = new byte[MapRegionLayer.CHUNK_SIZE][MapRegionLayer.CHUNK_SIZE * MapRegionLayer.BYTES_PER_PIXEL];
+    private final byte[][] colorData = new byte[MapRegionLayer.CHUNK_SIZE][MapRegionLayer.CHUNK_SIZE * MapRegionLayer.BYTES_PER_PIXEL];
 
     public MapChunk(int relRegX, int relRegZ) {
         this.relRegX = relRegX;
@@ -48,7 +53,7 @@ public class MapChunk {
                 blockPos.setY(y);
            //     BlockState blockState = worldChunk.getBlockState(blockPos);
            //     int color = Colors.INSTANCE.getBlockColor(blockState);
-                int color = blockColor(worldChunk, blockPos);
+                int color = blockColorChunk(worldChunk, blockPos);
 
                 setColor(x, z, color);
             }
@@ -60,7 +65,7 @@ public class MapChunk {
         int z = getChunkRelativeZ(blockPos);
 
     //    int color = Colors.INSTANCE.getBlockColor(blockState);
-        int color = blockColor(FastMapManager.MANAGER.currentWorld, blockPos, blockState);
+        int color = blockColorPos(FastMapManager.MANAGER.currentWorld, blockPos, blockState);
 
         setColor(x, z, color);
     }
@@ -83,14 +88,52 @@ public class MapChunk {
         colorData[z][xOffset + 3] = (byte) ((color >> 16) & 255);
     }
 
-    private int blockColor(World world, BlockPos pos, BlockState blockState) {
-        return ColorUtil.blockColor(world, blockState, pos);
+    private int blockColorChunk(WorldChunk worldChunk, BlockPos pos) {
+        // return ColorUtil.blockColor(world, blockState, pos);
+        return blockColorVanilla(FastMapManager.MANAGER.currentWorld, worldChunk, pos);
     }
 
-    private int blockColor(WorldChunk worldChunk, BlockPos pos) {
-        World world = worldChunk.getWorld();
-        BlockState blockState = worldChunk.getBlockState(pos);
+    private int blockColorPos(World world, BlockPos pos, BlockState blockState) {
+        WorldChunk worldChunk = world.getWorldChunk(pos);
+        return blockColorVanilla(world, worldChunk, pos);
+    }
 
-        return blockColor(world, pos, blockState);
+    private int blockColorVanilla(World world, WorldChunk worldChunk, BlockPos pos) {
+        ChunkPos chunkPos = worldChunk.getPos();
+        int chunkRelX = getChunkRelativeX(pos);
+        int chunkRelZ = getChunkRelativeZ(pos);
+
+        // FIXME: Redundant if coming here through chunk updates
+        int maxY = getTopBlockY(worldChunk, chunkRelX, chunkRelZ);
+        MapColor mapColor;
+        if (maxY <= world.getBottomY()) {
+            mapColor = MapColor.CLEAR;
+        } else {
+            BlockPos.Mutable thisBlockPos = new BlockPos.Mutable();
+            thisBlockPos.set(pos);
+
+            // Find top-most solid block (without mapcolor "clear")
+            BlockState blockState = worldChunk.getBlockState(thisBlockPos);
+            while (blockState.getMapColor(world, thisBlockPos) == MapColor.CLEAR && maxY > world.getBottomY()) {
+                maxY--;
+                thisBlockPos.set(chunkPos.getStartX() + chunkRelX, maxY, chunkPos.getStartZ() + chunkRelZ);
+                blockState = worldChunk.getBlockState(thisBlockPos);
+            }
+
+            // Is top-most block a fluid?
+            if (maxY > world.getBottomY() && !blockState.getFluidState().isEmpty()) {
+                // Set block state from fluid instead, if applicable
+                if (!blockState.isSideSolidFullSquare(world, thisBlockPos, Direction.UP)) {
+                    blockState = blockState.getFluidState().getBlockState();
+                }
+            }
+            mapColor = blockState.getMapColor(world, thisBlockPos);
+        }
+
+        if (mapColor == MapColor.CLEAR) {
+            return Colors.BLACK;
+        } else {
+            return ABGRtoARGB(MapColor.COLORS[mapColor.id].getRenderColor(0));
+        }
     }
 }
