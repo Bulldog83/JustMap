@@ -2,6 +2,7 @@ package ru.bulldog.justmap.map.data.fast;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.block.MapColor;
+import net.minecraft.tag.FluidTags;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.Direction;
@@ -102,6 +103,7 @@ public class MapChunk {
         ChunkPos chunkPos = worldChunk.getPos();
         int chunkRelX = getChunkRelativeX(pos);
         int chunkRelZ = getChunkRelativeZ(pos);
+        int waterShade = 0;
 
         // FIXME: Redundant if coming here through chunk updates
         int maxY = getTopBlockY(worldChunk, chunkRelX, chunkRelZ);
@@ -122,6 +124,29 @@ public class MapChunk {
 
             // Is top-most block a fluid?
             if (maxY > world.getBottomY() && !blockState.getFluidState().isEmpty()) {
+                if (blockState.getFluidState().isIn(FluidTags.WATER)) {
+                    // Calculate water depth
+                    BlockPos.Mutable fluidBlockPos = new BlockPos.Mutable();
+                    fluidBlockPos.set(thisBlockPos);
+                    int fluidMaxY = maxY;
+                    BlockState fluidBlockState;
+                    do {
+                        fluidMaxY--;
+                        fluidBlockPos.setY(fluidMaxY);
+                        fluidBlockState = worldChunk.getBlockState(fluidBlockPos);
+                    } while (fluidMaxY > world.getBottomY() && !fluidBlockState.getFluidState().isEmpty());
+
+                    int waterDepth = maxY - fluidMaxY;
+                    double shadeArg = (double)waterDepth * 0.1d + (double)(chunkRelX + chunkRelZ & 1) * 0.2d;
+                    if (shadeArg < 0.5d) {
+                        waterShade = 2;
+                    } else if (shadeArg > 0.9d) {
+                        waterShade = 0;
+                    } else {
+                        waterShade = 1;
+                    }
+                }
+
                 // Set block state from fluid instead, if applicable
                 if (!blockState.isSideSolidFullSquare(world, thisBlockPos, Direction.UP)) {
                     blockState = blockState.getFluidState().getBlockState();
@@ -133,7 +158,7 @@ public class MapChunk {
         if (mapColor == MapColor.CLEAR) {
             return Colors.BLACK;
         } else {
-            return ABGRtoARGB(MapColor.COLORS[mapColor.id].getRenderColor(0));
+            return ABGRtoARGB(MapColor.COLORS[mapColor.id].getRenderColor(waterShade));
         }
     }
 }
