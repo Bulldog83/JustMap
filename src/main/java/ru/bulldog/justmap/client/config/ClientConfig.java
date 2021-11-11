@@ -10,10 +10,6 @@ import ru.bulldog.justmap.config.ConfigKeeper.FloatRange;
 import ru.bulldog.justmap.config.ConfigKeeper.IntegerEntry;
 import ru.bulldog.justmap.config.ConfigKeeper.IntegerRange;
 import ru.bulldog.justmap.config.ConfigWriter;
-import ru.bulldog.justmap.enums.ArrowType;
-import ru.bulldog.justmap.enums.MapShape;
-import ru.bulldog.justmap.enums.MultiworldDetection;
-import ru.bulldog.justmap.enums.ScreenPosition;
 import ru.bulldog.justmap.map.data.MapDataProvider;
 
 public class ClientConfig extends Config {

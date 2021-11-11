@@ -1,7 +1,5 @@
 package ru.bulldog.justmap.util.math;
 
-import java.util.Comparator;
-
 import net.minecraft.util.math.BlockPos;
 
 public class MathUtil {

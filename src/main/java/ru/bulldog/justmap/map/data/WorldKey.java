@@ -69,8 +69,8 @@ public class WorldKey {
 	}
 
 	public String toFolder() {
-		String folder = this.worldId.replaceAll("[\\/ ]+", "_");
-		folder = folder.replaceAll("[,:&\"\\|\\<\\>\\?\\*]", "_");
+		String folder = this.worldId.replaceAll("[/ ]+", "_");
+		folder = folder.replaceAll("[,:&\"|<>?*]", "_");
 
 		return folder;
 	}

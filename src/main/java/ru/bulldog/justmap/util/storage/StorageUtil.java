@@ -150,8 +150,8 @@ public final class StorageUtil {
 	}
 
 	private static String scrubFileName(String input) {
-		input = input.replaceAll("[/\\ ]+", "_");
-		input = input.replaceAll("[,:&\"\\|\\<\\>\\?\\*]", "_");
+		input = input.replaceAll("[/ ]+", "_");
+		input = input.replaceAll("[,:&\"|<>?*]", "_");
 
 		return input;
 	}
