@@ -38,7 +38,6 @@ public class PlayerHeadIcon {
 	public void draw(MatrixStack matrices, double x, double y, int size, boolean outline) {
 		double drawX = x - size / 2;
 		double drawY = y - size / 2;
-		y -= size / 2;
 		if (outline) {
 			double thickness = ClientSettings.entityOutlineSize;
 			RenderUtil.fill(matrices, drawX - thickness / 2, drawY - thickness / 2, size + thickness, size + thickness, Colors.LIGHT_GRAY);

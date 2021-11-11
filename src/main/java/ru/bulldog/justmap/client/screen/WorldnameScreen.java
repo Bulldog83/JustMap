@@ -40,8 +40,8 @@ public class WorldnameScreen extends Screen {
 	public void init() {
 		this.center = width / 2;
 		this.frameWidth = width / 3;
-		this.frameWidth = frameWidth > 320 ? frameWidth : width > 320 ? 320 : width;
-		int btnY = 0;
+		this.frameWidth = frameWidth > 320 ? frameWidth : Math.min(width, 320);
+		int btnY;
 		if (frameWidth == width) {
 			this.frameHeight = height;
 			btnY = height - 40;

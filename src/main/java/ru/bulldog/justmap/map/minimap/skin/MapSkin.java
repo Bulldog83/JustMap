@@ -1,9 +1,7 @@
 package ru.bulldog.justmap.map.minimap.skin;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.fabricmc.api.EnvType;
@@ -187,13 +185,11 @@ public class MapSkin extends Image {
 	}
 
 	public static List<MapSkin> getSquareSkins() {
-		return SKINS.stream()
-				.filter(MapSkin::isSquare).collect(Collectors.toUnmodifiableList());
+		return SKINS.stream().filter(MapSkin::isSquare).toList();
 	}
 
 	public static List<MapSkin> getRoundSkins() {
-		return SKINS.stream()
-				.filter(MapSkin::isRound).collect(Collectors.toUnmodifiableList());
+		return SKINS.stream().filter(MapSkin::isRound).toList();
 	}
 
 	public static MapSkin getCurrentSkin() {

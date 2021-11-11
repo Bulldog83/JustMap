@@ -66,7 +66,7 @@ public class WaypointEditorScreen extends AbstractMapScreen {
 
 		this.center = width / 2;
 
-		int screenW = center > 480 ? center : width > 480 ? 480 : width;
+		int screenW = center > 480 ? center : Math.min(width, 480);
 
 		this.x = center - screenW / 2;
 		this.y = 60;

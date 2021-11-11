@@ -33,7 +33,7 @@ public class RuleUtil {
 	}
 
 	public static boolean needRenderCaves(World world, BlockPos pos) {
-		boolean allowCaves = false;
+		boolean allowCaves;
 		if (JustMap.getSide() == EnvType.SERVER) {
 			allowCaves = isAllowed(ServerSettings.allowCavesMap, MapGameRules.ALLOW_CAVES_MAP, true);
 		} else {

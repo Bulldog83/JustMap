@@ -173,8 +173,8 @@ public class WaypointRenderer {
 
 		matrixStack.push();
 		matrixStack.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion(tick * 2.25F - 45.0F));
-		float af = 0.0F;
-		float ai = 0.0F;
+		float af;
+		float ai;
 		float aj = -h;
 		float aa = -h;
 		float ap = -1.0F + p;
@@ -214,6 +214,6 @@ public class WaypointRenderer {
 	}
 
 	private double correctAngle(float angle) {
-		return angle < 0 ? angle += 360.0D : angle >= 360.0D ? angle -= 360.0D : angle;
+		return angle < 0 ? angle + 360.0D : angle >= 360.0D ? angle - 360.0D : angle;
 	}
 }

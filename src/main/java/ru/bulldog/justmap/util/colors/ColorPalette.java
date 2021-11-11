@@ -223,9 +223,7 @@ public class ColorPalette {
 				if (map.containsKey(key)) {
 					key.remove(blockKey);
 				}
-				if (!hasKey.contains(blockKey)) {
-					hasKey.add(blockKey);
-				}
+				hasKey.add(blockKey);
 				return;
 			}
 			map.put(key, color);

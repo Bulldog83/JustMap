@@ -251,7 +251,8 @@ public class ChunkData {
 			chunkLevel.setBlockState(x, z, worldState);
 
 			int height = layer.height;
-			int bottom = 0, baseHeight = 0;
+			int bottom;
+			int baseHeight;
 			if (layer == Layer.NETHER) {
 				bottom = level * height;
 				baseHeight = 128;

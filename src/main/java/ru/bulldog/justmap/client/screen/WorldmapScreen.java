@@ -208,7 +208,8 @@ public class WorldmapScreen extends AbstractMapScreen implements IMap {
 		int picX = 0, imgW = 0;
 		while(picX < scaledWidth) {
 			int cX = cornerX + picX;
-			int picY = 0, imgH = 0;
+			int picY = 0;
+			int imgH;
 			while (picY < scaledHeight) {
 				int cZ = cornerZ + picY;
 

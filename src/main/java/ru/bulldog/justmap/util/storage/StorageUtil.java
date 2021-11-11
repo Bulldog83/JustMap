@@ -47,7 +47,7 @@ public final class StorageUtil {
 	}
 
 	public static File savesDir(ServerWorld world) {
-		if (!(world instanceof ServerWorld)) return null;
+		if (world == null) return null;
 		return ((SessionAccessor) world.getServer()).getServerSession().getWorldDirectory(world.getRegistryKey());
 	}
 
