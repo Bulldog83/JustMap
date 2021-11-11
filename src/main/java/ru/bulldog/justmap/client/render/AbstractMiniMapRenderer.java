@@ -33,13 +33,13 @@ import ru.bulldog.justmap.util.render.RenderUtil;
 @Environment(EnvType.CLIENT)
 public abstract class AbstractMiniMapRenderer {
 	
-	protected static Identifier roundMask = new Identifier(JustMap.MODID, "textures/round_mask.png");
-	protected static MinecraftClient minecraft = MinecraftClient.getInstance();
+	protected static final Identifier roundMask = new Identifier(JustMap.MODID, "textures/round_mask.png");
+	protected static final MinecraftClient minecraft = MinecraftClient.getInstance();
 	protected static TextManager textManager;
-	protected static InfoText dirN = new MapText(TextAlignment.CENTER, "N");
-	protected static InfoText dirS = new MapText(TextAlignment.CENTER, "S");
-	protected static InfoText dirE = new MapText(TextAlignment.CENTER, "E");
-	protected static InfoText dirW = new MapText(TextAlignment.CENTER, "W");
+	protected static final InfoText dirN = new MapText(TextAlignment.CENTER, "N");
+	protected static final InfoText dirS = new MapText(TextAlignment.CENTER, "S");
+	protected static final InfoText dirE = new MapText(TextAlignment.CENTER, "E");
+	protected static final InfoText dirW = new MapText(TextAlignment.CENTER, "W");
 	
 	protected int winWidth, winHeight;
 	protected int mapWidth, mapHeight;
@@ -58,7 +58,7 @@ public abstract class AbstractMiniMapRenderer {
 	protected boolean paramsUpdated = false;
 	protected boolean playerMoved = false;
 	protected final Minimap minimap;
-	protected BlockPos.Mutable playerPos;
+	protected final BlockPos.Mutable playerPos;
 	protected MapRegionProvider mapRegionProvider;
 	protected ChunkGrid chunkGrid;
 	protected MapSkin mapSkin;

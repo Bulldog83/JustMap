@@ -219,8 +219,8 @@ public class WorldmapScreen extends AbstractMapScreen implements IMap {
 				int imgX = cX - (region.getPos().x << 9);
 				int imgY = cZ - (region.getPos().z << 9);
 				
-				if (picX + imgW >= scaledWidth) imgW = (int) (scaledWidth - picX);
-				if (picY + imgH >= scaledHeight) imgH = (int) (scaledHeight - picY);
+				if (picX + imgW >= scaledWidth) imgW = scaledWidth - picX;
+				if (picY + imgH >= scaledHeight) imgH = scaledHeight - picY;
 				if (imgX + imgW >= 512) imgW = 512 - imgX;
 				if (imgY + imgH >= 512) imgH = 512 - imgY;
 				

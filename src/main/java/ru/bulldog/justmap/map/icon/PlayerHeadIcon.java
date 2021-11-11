@@ -17,7 +17,7 @@ import ru.bulldog.justmap.util.render.RenderUtil;
 public class PlayerHeadIcon {
 	
 	public long lastCheck;
-	public int delay = 5000;
+	public final int delay = 5000;
 	public boolean success = false;
 	
 	private ResourceTexture playerSkin;

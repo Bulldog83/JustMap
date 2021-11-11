@@ -77,7 +77,7 @@ public class WaypointRenderer {
 		} else {
 			RenderUtil.drawDiamond(x, y, size, size, waypoint.color);
 		}
-		RenderUtil.drawBoundedString((int) dist + "m", x + size / 2, y + size + 2, 0, screenWidth, Colors.WHITE);
+		RenderUtil.drawBoundedString(dist + "m", x + size / 2, y + size + 2, 0, screenWidth, Colors.WHITE);
 	}
 	
 	public static void renderWaypoints(MatrixStack matrixStack, Camera camera, float tickDelta) {

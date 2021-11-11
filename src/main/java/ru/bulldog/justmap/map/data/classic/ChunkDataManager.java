@@ -115,7 +115,7 @@ class ChunkDataManager {
         }
 		
 		ServerWorld serverWorld = (ServerWorld) world;
-		try (VersionedChunkStorage storage = StorageUtil.getChunkStorage(serverWorld);) {		
+		try (VersionedChunkStorage storage = StorageUtil.getChunkStorage(serverWorld)) {
 			NbtCompound chunkTag = storage.updateChunkNbt(serverWorld.getRegistryKey(),
 					DataUtil.getPersistentSupplier(), storage.getNbt(chunkPos));
 			if (chunkTag == null) return this.emptyChunk;

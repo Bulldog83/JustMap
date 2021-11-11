@@ -218,8 +218,8 @@ public class BufferedMiniMapRenderer extends AbstractMiniMapRenderer {
 	private void drawEntities(MatrixStack matrices, VertexConsumerProvider.Immediate consumerProvider) {
 		float halfW = imgW / 2.0F;
 		float halfH = imgH / 2.0F;
-		int iconX = (int) (imgW - mapWidth);
-		int iconY = (int) (imgH - mapHeight);
+		int iconX = imgW - mapWidth;
+		int iconY = imgH - mapHeight;
 		List<MapIcon<?>> drawableEntities = minimap.getDrawableIcons(lastX, lastZ, halfW, halfH, delta);
 		for (MapIcon<?> icon : drawableEntities) {
 			icon.draw(matrices, consumerProvider, iconX, iconY, mapWidth, mapHeight, rotation);

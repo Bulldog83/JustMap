@@ -92,7 +92,7 @@ public class ChunkGrid {
 		RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 	}	
 	
-	private class GridLine extends Line {
+	private static class GridLine extends Line {
 		private GridLine(double sx, double sy, double ex, double ey) {
 			super(sx, sy, ex, ey);
 		}

@@ -25,9 +25,9 @@ import net.minecraft.util.math.MathHelper;
 
 public class FloatSliderEntry extends TooltipListEntry<Float> {
 
-	protected Slider sliderWidget;
-	protected ButtonWidget resetButton;
-	protected AtomicDouble value;
+	protected final Slider sliderWidget;
+	protected final ButtonWidget resetButton;
+	protected final AtomicDouble value;
 	protected final float orginial;
 	private float minimum, maximum;
 	private final Consumer<Float> saveConsumer;
@@ -57,7 +57,7 @@ public class FloatSliderEntry extends TooltipListEntry<Float> {
 		this.saveConsumer = saveConsumer;
 		this.maximum = maximum;
 		this.minimum = minimum;
-		this.sliderWidget = new Slider(0, 0, 152, 20, ((double) this.value.get() - minimum) / Math.abs(maximum - minimum));
+		this.sliderWidget = new Slider(0, 0, 152, 20, (this.value.get() - minimum) / Math.abs(maximum - minimum));
 		int width = textRenderer.getWidth(resetButtonKey);
 		this.resetButton = new ButtonWidget(0, 0, width + 6, 20, resetButtonKey, widget -> {
 			setValue(defaultValue.get());

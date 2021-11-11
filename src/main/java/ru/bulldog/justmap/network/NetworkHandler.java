@@ -41,7 +41,7 @@ public class NetworkHandler {
 		sendToServer(packet, null);
 	}
 	
-	public static enum PacketType {
+	public enum PacketType {
 		SLIME_CHUNK_PACKET,
 		GET_IMAGE_PACKET;
 		

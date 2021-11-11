@@ -21,7 +21,7 @@ import ru.bulldog.justmap.util.render.RenderUtil;
 public class EntityIcon extends MapIcon<EntityIcon> {
 	
 	private final Entity entity;
-	boolean hostile;
+	final boolean hostile;
 		
 	public EntityIcon(Entity entity) {
 		this.hostile = entity instanceof HostileEntity;

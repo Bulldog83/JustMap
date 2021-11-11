@@ -266,7 +266,7 @@ public class MapTexture {
 				JustMap.LOGGER.debug("Image loaded: {}", png);
 				return true;
 			} catch (Exception ex) {
-				JustMap.LOGGER.warning("Can't load image: " + png.toString());
+				JustMap.LOGGER.warning("Can't load image: " + png);
 				JustMap.LOGGER.warning(ex.getLocalizedMessage());
 				return false;
 			}

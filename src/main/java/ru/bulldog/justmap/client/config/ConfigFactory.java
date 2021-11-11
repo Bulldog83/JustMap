@@ -70,7 +70,7 @@ public final class ConfigFactory {
 				.setDefaultValue((int) modConfig.getDefault("map_position_y"))
 				.build());
 		general.addEntry(entryBuilder.startDropdownMenu(lang("map_size"), modConfig.getInt("map_size"), (val) -> {
-					return getIntValue(val, (int) modConfig.getDefault("map_size"));
+					return getIntValue(val, modConfig.getDefault("map_size"));
 				})
 				.setSaveConsumer(val -> modConfig.setRanged("map_size", val))
 				.setDefaultValue((int) modConfig.getDefault("map_size"))
@@ -81,7 +81,7 @@ public final class ConfigFactory {
 				.setDefaultValue((boolean) modConfig.getDefault("show_big_map"))
 				.build());
 		general.addEntry(entryBuilder.startDropdownMenu(lang("big_map_size"), modConfig.getInt("big_map_size"), (val) -> {
-					return getIntValue(val, (int) modConfig.getDefault("big_map_size"));
+					return getIntValue(val, modConfig.getDefault("big_map_size"));
 				})
 				.setSaveConsumer(val -> modConfig.setRanged("big_map_size", val))
 				.setDefaultValue((int) modConfig.getDefault("big_map_size"))

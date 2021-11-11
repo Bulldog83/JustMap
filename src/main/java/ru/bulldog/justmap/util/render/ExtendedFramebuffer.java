@@ -340,10 +340,10 @@ public class ExtendedFramebuffer extends Framebuffer {
 		this.bindFramebuffer(GLC.GL_FRAMEBUFFER, 0);
 	}
 	
-	public static enum FboType {
+	public enum FboType {
 		BASE,
 		ARB,
 		EXT,
-		NONE;
-	}
+		NONE
+    }
 }

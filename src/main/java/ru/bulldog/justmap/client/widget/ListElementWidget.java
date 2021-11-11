@@ -14,7 +14,7 @@ public class ListElementWidget implements Drawable, Element {
 	
 	private final Supplier<Boolean> onPress;
 	private final Text text;
-	int padding = 2;
+	final int padding = 2;
 	int width, height;
 	int x, y;
 	

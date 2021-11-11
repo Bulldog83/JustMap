@@ -30,7 +30,7 @@ public abstract class AbstractMapScreen extends Screen {
 	
 	protected final Screen parent;	
 	protected Pair<String, Identifier> info;
-	protected LangUtil langUtil;
+	protected final LangUtil langUtil;
 	protected int x, y, center;
 	protected int paddingTop;
 	protected int paddingBottom;

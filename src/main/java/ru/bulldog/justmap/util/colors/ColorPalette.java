@@ -199,7 +199,6 @@ public class ColorPalette {
 						Biome biome = DataUtil.getBiomeRegistry().get(biomeId);
 						this.biomeColors.put(biomeId, BiomeColors.fromJson(biome, biomeJson));
 					});
-					continue;
 				}
 			}
 		}

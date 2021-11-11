@@ -88,7 +88,7 @@ public class MapGameRules {
 		codes.forEach((key, rule) -> {
 			if (command.contains(key)) {
 				int valPos = command.indexOf(key) + 2;
-				boolean value = command.substring(valPos, valPos + 2).equals("§1");
+				boolean value = command.startsWith("§1", valPos);
 				gameRules.get(rule).set(value, server);
 				JustMap.LOGGER.info("Map rule {} switched to: {}", rule, value);
 			}

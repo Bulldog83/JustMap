@@ -127,7 +127,7 @@ public class TaskManager implements Executor {
         }
     }
     
-    private class Task implements Runnable {
+    private static class Task implements Runnable {
     	
     	private final Runnable task;
     	private final String reason;
@@ -156,7 +156,7 @@ public class TaskManager implements Executor {
     	}
     }
     
-    private class QueueBlocker {
+    private static class QueueBlocker {
     	private final String name;
     	
     	private QueueBlocker(String name) {

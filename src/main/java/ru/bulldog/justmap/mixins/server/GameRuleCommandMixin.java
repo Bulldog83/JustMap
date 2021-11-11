@@ -23,7 +23,7 @@ public abstract class GameRuleCommandMixin {
 	@Inject(method = "executeSet", at = @At("RETURN"))
 	private static <T extends GameRules.Rule<T>> void executeSet(CommandContext<ServerCommandSource> commandContext, GameRules.Key<T> Key, CallbackInfoReturnable<Integer> cir) {
 		if (ServerSettings.useGameRules) {
-			ServerCommandSource serverCommandSource = (ServerCommandSource)commandContext.getSource();
+			ServerCommandSource serverCommandSource = commandContext.getSource();
 			T rule = serverCommandSource.getServer().getGameRules().get(Key);
 			
 			if (rule instanceof BooleanRule) {

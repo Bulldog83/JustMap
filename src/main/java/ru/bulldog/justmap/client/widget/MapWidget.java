@@ -11,12 +11,17 @@ import ru.bulldog.justmap.util.render.RenderUtil;
 public class MapWidget implements Element, Drawable {
 
 	final Minimap map;
-	int left, right;
-	int top, bottom;
-	int width, height;
-	int bgW, bgH;
-	int border;
-	double initX, initY;
+	final int left;
+	final int right;
+	final int top;
+	final int bottom;
+	final int width;
+	final int height;
+	final int bgW;
+	final int bgH;
+	final int border;
+	final double initX;
+	final double initY;
 	double x, y;
 	
 	public MapWidget(Screen parent, Minimap map) {

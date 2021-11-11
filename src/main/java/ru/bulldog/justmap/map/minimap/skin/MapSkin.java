@@ -26,7 +26,7 @@ import ru.bulldog.justmap.util.render.RenderUtil;
 
 @Environment(EnvType.CLIENT)
 public class MapSkin extends Image {	
-	public static enum SkinType {
+	public enum SkinType {
 		UNIVERSAL,
 		SQUARE,
 		ROUND

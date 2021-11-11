@@ -8,7 +8,7 @@ import net.minecraft.util.Identifier;
 
 public abstract class Image {
 
-	protected static TextureManager textureManager = MinecraftClient.getInstance().getTextureManager();
+	protected static final TextureManager textureManager = MinecraftClient.getInstance().getTextureManager();
 	
 	protected final NativeImage image;
 	protected Identifier textureId;
