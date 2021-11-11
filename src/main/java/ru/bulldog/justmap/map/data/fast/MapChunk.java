@@ -150,7 +150,7 @@ public class MapChunk {
 
                     // For water, calculate shading according to depth
                     int waterDepth = maxY - fluidMaxY;
-                    double shadeArg = (double)waterDepth * 0.1d + (double)(chunkRelX + chunkRelZ & 1) * 0.2d;
+                    double shadeArg = waterDepth * 0.1d + (chunkRelX + chunkRelZ & 1) * 0.2d;
                     if (shadeArg < 0.5d) {
                         shade = 2;
                     } else if (shadeArg > 0.9d) {
@@ -169,11 +169,11 @@ public class MapChunk {
                 // with north (z-1) neighbor
                 // FIXME: this breaks at chunk border!
                 double northMaxY = getHeight(chunkRelX, chunkRelZ - 1);
-                double shadeArg = ((double)maxY - northMaxY) * 4.0d/5.0d
-                        + ((double)(chunkRelX + chunkRelZ & 1) - 0.5D) * 0.4D;
-                if (shadeArg > 0.6D) {
+                double shadeArg = (maxY - northMaxY) * 4/5.0d
+                        + ((chunkRelX + chunkRelZ & 1) - 0.5d) * 0.4d;
+                if (shadeArg > 0.6d) {
                     shade = 2;
-                } else if (shadeArg < -0.6D) {
+                } else if (shadeArg < -0.6d) {
                     shade = 0;
                 } else {
                     shade = 1;
