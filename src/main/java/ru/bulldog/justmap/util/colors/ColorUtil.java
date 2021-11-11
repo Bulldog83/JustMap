@@ -157,7 +157,7 @@ public class ColorUtil {
 		}
 
 		int color, shift;
-		if(len == 6) {
+		if (len == 6) {
 			color = 0xFF000000; shift = 16;
 		} else {
 			color = 0; shift = 24;
@@ -322,7 +322,7 @@ public class ColorUtil {
 					blockColor = fluidColor(world, state, pos, textureColor);
 					colorPalette.addFluidColor(state, blockColor);
 				}
-			} else if (blockColor != -1){
+			} else if (blockColor != -1) {
 				blockColor = ColorHelper.multiplyColor(textureColor, blockColor);
 				if (block.equals(Blocks.BIRCH_LEAVES) || block.equals(Blocks.SPRUCE_LEAVES)) {
 					colorPalette.addBlockColor(state, blockColor);

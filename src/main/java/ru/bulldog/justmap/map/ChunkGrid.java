@@ -66,7 +66,7 @@ public class ChunkGrid {
 			xp = MathUtil.screenPos(startX, x, centerX, scale);
 		}
 		double yp = MathUtil.screenPos(startZ, z, centerY, scale);
-		while(yp < bottom) {
+		while (yp < bottom) {
 			if (yp > rangeY) {
 				this.lines.add(new GridLine(rangeX, yp, right, yp));
 			}

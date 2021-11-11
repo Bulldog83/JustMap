@@ -75,7 +75,7 @@ abstract class HudMixin extends DrawableHelper {
 		Iterator<StatusEffectInstance> effectsIterator = Ordering.natural().reverse().sortedCopy(statusEffects).iterator();
 
 	 	int i = 0, j = 0;
-		while(effectsIterator.hasNext()) {
+		while (effectsIterator.hasNext()) {
 	 		StatusEffectInstance statusEffectInstance = effectsIterator.next();
 			StatusEffect statusEffect = statusEffectInstance.getEffectType();
 			if (statusEffectInstance.shouldShowIcon()) {

@@ -85,9 +85,9 @@ public class ImageUtil {
 		int imgH = texture.getHeight();
 		int imgX = 0, imgY = 0;
 		int y = 0;
-		while(y < height) {
+		while (y < height) {
 			int x = 0;
-			while(x < width) {
+			while (x < width) {
 				if (imgX >= imgW) imgX = 0;
 				if ((x >= width - border || x <= border) ||
 					(y >= height - border || y <= border)) {
@@ -116,9 +116,9 @@ public class ImageUtil {
 		int rOut = centerX;
 		int rIn = rOut - border;
 		int y = 0;
-		while(y < height) {
+		while (y < height) {
 			int x = 0;
-			while(x < width) {
+			while (x < width) {
 				if (imgX >= imgW) imgX = 0;
 				int len = 0;
 				if (centerX != x || centerY != y) {

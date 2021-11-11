@@ -49,7 +49,7 @@ public class TaskManager implements Executor {
 			if (manager.isRunning()) {
 				manager.stop();
 				long time = System.currentTimeMillis();
-				while(manager.isRunning()) {
+				while (manager.isRunning()) {
 					long now = System.currentTimeMillis();
 					if (now - time > timeout) {
 						manager.running = false;
