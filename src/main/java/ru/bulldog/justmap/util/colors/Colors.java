@@ -4,12 +4,12 @@ import java.io.File;
 import java.util.Map;
 
 import com.google.common.collect.Maps;
-
 import net.minecraft.block.BlockState;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
+
 import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.util.DataUtil;
 import ru.bulldog.justmap.util.storage.StorageUtil;

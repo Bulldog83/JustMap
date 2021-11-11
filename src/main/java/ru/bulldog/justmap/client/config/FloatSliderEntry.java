@@ -8,9 +8,7 @@ import java.util.function.Supplier;
 
 import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.AtomicDouble;
-
 import me.shedaniel.clothconfig2.gui.entries.TooltipListEntry;
-
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.Element;

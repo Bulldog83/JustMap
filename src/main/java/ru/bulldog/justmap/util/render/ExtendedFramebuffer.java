@@ -1,16 +1,13 @@
 package ru.bulldog.justmap.util.render;
 
-import org.lwjgl.opengl.EXTFramebufferObject;
-
-import org.lwjgl.opengl.ARBFramebufferObject;
-import org.lwjgl.opengl.GL30;
-import org.lwjgl.opengl.GL;
-
 import com.mojang.blaze3d.platform.GlStateManager;
-import com.mojang.blaze3d.systems.RenderSystem;
-
 import com.mojang.blaze3d.platform.TextureUtil;
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gl.Framebuffer;
+import org.lwjgl.opengl.ARBFramebufferObject;
+import org.lwjgl.opengl.EXTFramebufferObject;
+import org.lwjgl.opengl.GL;
+import org.lwjgl.opengl.GL30;
 
 public class ExtendedFramebuffer extends Framebuffer {
 	private int colorAttachment;

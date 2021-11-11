@@ -2,7 +2,6 @@ package ru.bulldog.justmap.util;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-
 import net.minecraft.util.JsonHelper;
 import net.minecraft.util.math.BlockPos;
 

@@ -3,18 +3,17 @@ package ru.bulldog.justmap.map;
 import java.util.HashMap;
 import java.util.Map;
 
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.world.GameRules;
+import net.minecraft.world.GameRules.Key;
+
 import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.mixins.BooleanRuleAccessor;
 import ru.bulldog.justmap.mixins.GameRulesAccessor;
 import ru.bulldog.justmap.server.JustMapServer;
-
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
-
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.world.GameRules;
-import net.minecraft.world.GameRules.Key;
-import net.minecraft.server.MinecraftServer;
 
 public class MapGameRules {
 

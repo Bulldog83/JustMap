@@ -1,7 +1,12 @@
 package ru.bulldog.justmap.config;
 
 import ru.bulldog.justmap.JustMap;
-import ru.bulldog.justmap.config.ConfigKeeper.*;
+import ru.bulldog.justmap.config.ConfigKeeper.BooleanEntry;
+import ru.bulldog.justmap.config.ConfigKeeper.Entry;
+import ru.bulldog.justmap.config.ConfigKeeper.FloatEntry;
+import ru.bulldog.justmap.config.ConfigKeeper.IntegerEntry;
+import ru.bulldog.justmap.config.ConfigKeeper.RangeEntry;
+import ru.bulldog.justmap.config.ConfigKeeper.StringEntry;
 
 public abstract class Config {
 	

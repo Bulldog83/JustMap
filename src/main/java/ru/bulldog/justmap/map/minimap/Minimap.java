@@ -1,5 +1,20 @@
 package ru.bulldog.justmap.map.minimap;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Stream;
+
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.screen.ChatScreen;
+import net.minecraft.client.util.Window;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.mob.HostileEntity;
+import net.minecraft.entity.mob.MobEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Box;
+import net.minecraft.world.World;
+
 import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.advancedinfo.AdvancedInfo;
 import ru.bulldog.justmap.advancedinfo.BiomeInfo;
@@ -20,10 +35,10 @@ import ru.bulldog.justmap.enums.TextAlignment;
 import ru.bulldog.justmap.enums.TextPosition;
 import ru.bulldog.justmap.map.EntityRadar;
 import ru.bulldog.justmap.map.IMap;
-import ru.bulldog.justmap.map.data.MapRegionProvider;
-import ru.bulldog.justmap.map.data.MapDataProvider;
-import ru.bulldog.justmap.map.data.WorldKey;
 import ru.bulldog.justmap.map.data.Layer;
+import ru.bulldog.justmap.map.data.MapDataProvider;
+import ru.bulldog.justmap.map.data.MapRegionProvider;
+import ru.bulldog.justmap.map.data.WorldKey;
 import ru.bulldog.justmap.map.icon.MapIcon;
 import ru.bulldog.justmap.map.icon.WaypointIcon;
 import ru.bulldog.justmap.map.minimap.skin.MapSkin;
@@ -35,21 +50,6 @@ import ru.bulldog.justmap.util.RuleUtil;
 import ru.bulldog.justmap.util.math.MathUtil;
 import ru.bulldog.justmap.util.math.RandomUtil;
 import ru.bulldog.justmap.util.render.ExtendedFramebuffer;
-
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.screen.ChatScreen;
-import net.minecraft.client.util.Window;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.mob.HostileEntity;
-import net.minecraft.entity.mob.MobEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.world.World;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Stream;
 
 public class Minimap implements IMap {
 	private static TextManager textManager;

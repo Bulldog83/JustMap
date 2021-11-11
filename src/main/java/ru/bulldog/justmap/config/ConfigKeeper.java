@@ -7,7 +7,6 @@ import java.util.function.Supplier;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-
 import net.minecraft.util.JsonHelper;
 
 import ru.bulldog.justmap.JustMap;

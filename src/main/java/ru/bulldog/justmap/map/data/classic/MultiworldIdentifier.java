@@ -1,7 +1,6 @@
 package ru.bulldog.justmap.map.data.classic;
 
 import com.google.gson.JsonObject;
-
 import net.minecraft.util.Identifier;
 import net.minecraft.util.JsonHelper;
 import net.minecraft.util.math.BlockPos;

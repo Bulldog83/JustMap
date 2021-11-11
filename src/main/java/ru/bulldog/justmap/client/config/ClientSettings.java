@@ -1,9 +1,9 @@
 package ru.bulldog.justmap.client.config;
 
-import ru.bulldog.justmap.enums.ScreenPosition;
+import ru.bulldog.justmap.enums.ArrowType;
 import ru.bulldog.justmap.enums.MapShape;
 import ru.bulldog.justmap.enums.MultiworldDetection;
-import ru.bulldog.justmap.enums.ArrowType;
+import ru.bulldog.justmap.enums.ScreenPosition;
 
 public class ClientSettings {
 	public static ScreenPosition mapPosition = ScreenPosition.TOP_RIGHT;

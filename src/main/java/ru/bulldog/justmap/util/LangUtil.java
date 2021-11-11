@@ -2,6 +2,7 @@ package ru.bulldog.justmap.util;
 
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.text.TranslatableText;
+
 import ru.bulldog.justmap.JustMap;
 
 public class LangUtil {

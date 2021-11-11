@@ -2,6 +2,7 @@ package ru.bulldog.justmap.util;
 
 import net.minecraft.client.texture.SpriteAtlasTexture;
 import net.minecraft.util.Identifier;
+
 import ru.bulldog.justmap.JustMap;
 
 public class SpriteAtlas {

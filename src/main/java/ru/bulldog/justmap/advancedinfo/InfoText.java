@@ -1,14 +1,14 @@
 package ru.bulldog.justmap.advancedinfo;
 
-import ru.bulldog.justmap.enums.TextAlignment;
-import ru.bulldog.justmap.util.colors.Colors;
-import ru.bulldog.justmap.util.render.RenderUtil;
-
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
+
+import ru.bulldog.justmap.enums.TextAlignment;
+import ru.bulldog.justmap.util.colors.Colors;
+import ru.bulldog.justmap.util.render.RenderUtil;
 
 public abstract class InfoText {
 	TextAlignment alignment;

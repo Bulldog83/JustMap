@@ -1,20 +1,9 @@
 package ru.bulldog.justmap.client.screen;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.mojang.datafixers.util.Pair;
-
-import ru.bulldog.justmap.JustMap;
-import ru.bulldog.justmap.map.data.MapDataProvider;
-import ru.bulldog.justmap.map.data.WorldKey;
-import ru.bulldog.justmap.map.waypoint.Waypoint;
-import ru.bulldog.justmap.map.waypoint.WaypointKeeper;
-import ru.bulldog.justmap.map.waypoint.Waypoint.Icon;
-import ru.bulldog.justmap.util.Dimension;
-import ru.bulldog.justmap.util.RuleUtil;
-import ru.bulldog.justmap.util.colors.Colors;
-import ru.bulldog.justmap.util.math.MathUtil;
-import ru.bulldog.justmap.util.math.RandomUtil;
-import ru.bulldog.justmap.util.render.RenderUtil;
-
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.Element;
@@ -26,11 +15,20 @@ import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Identifier;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import org.lwjgl.glfw.GLFW;
+
+import ru.bulldog.justmap.JustMap;
+import ru.bulldog.justmap.map.data.MapDataProvider;
+import ru.bulldog.justmap.map.data.WorldKey;
+import ru.bulldog.justmap.map.waypoint.Waypoint;
+import ru.bulldog.justmap.map.waypoint.Waypoint.Icon;
+import ru.bulldog.justmap.map.waypoint.WaypointKeeper;
+import ru.bulldog.justmap.util.Dimension;
+import ru.bulldog.justmap.util.RuleUtil;
+import ru.bulldog.justmap.util.colors.Colors;
+import ru.bulldog.justmap.util.math.MathUtil;
+import ru.bulldog.justmap.util.math.RandomUtil;
+import ru.bulldog.justmap.util.render.RenderUtil;
 
 public class WaypointsListScreen extends AbstractMapScreen {
 	private static class Entry implements Element {

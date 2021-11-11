@@ -1,7 +1,5 @@
 package ru.bulldog.justmap.map.data;
 
-import java.util.Arrays;
-
 public class Layer {
 	public final static Layer SURFACE = new Layer("surface", 256);
 	public final static Layer CAVES = new Layer("caves", 8);

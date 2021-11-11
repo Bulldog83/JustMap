@@ -1,21 +1,14 @@
 package ru.bulldog.justmap.client.screen;
 
-import net.minecraft.client.gui.Element;
-import net.minecraft.client.gui.widget.SliderWidget;
-import net.minecraft.util.math.MathHelper;
+import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
 
-import ru.bulldog.justmap.JustMap;
-import ru.bulldog.justmap.client.JustMapClient;
-import ru.bulldog.justmap.client.widget.TitledButtonWidget;
-import ru.bulldog.justmap.config.ConfigKeeper.IntegerRange;
-import ru.bulldog.justmap.map.waypoint.Waypoint;
-import ru.bulldog.justmap.map.waypoint.WaypointKeeper;
-import ru.bulldog.justmap.map.waypoint.Waypoint.Icon;
-import ru.bulldog.justmap.util.Predicates;
-import ru.bulldog.justmap.util.colors.Colors;
+import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.CheckboxWidget;
+import net.minecraft.client.gui.widget.SliderWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.util.math.MatrixStack;
@@ -23,12 +16,18 @@ import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.math.BlockPos;
-
+import net.minecraft.util.math.MathHelper;
 import org.lwjgl.glfw.GLFW;
 
-import java.util.List;
-import java.util.function.Consumer;
-import java.util.function.Predicate;
+import ru.bulldog.justmap.JustMap;
+import ru.bulldog.justmap.client.JustMapClient;
+import ru.bulldog.justmap.client.widget.TitledButtonWidget;
+import ru.bulldog.justmap.config.ConfigKeeper.IntegerRange;
+import ru.bulldog.justmap.map.waypoint.Waypoint;
+import ru.bulldog.justmap.map.waypoint.Waypoint.Icon;
+import ru.bulldog.justmap.map.waypoint.WaypointKeeper;
+import ru.bulldog.justmap.util.Predicates;
+import ru.bulldog.justmap.util.colors.Colors;
 
 public class WaypointEditorScreen extends AbstractMapScreen {
 	

@@ -1,9 +1,8 @@
 package ru.bulldog.justmap.mixins;
 
+import net.minecraft.world.GameRules;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Invoker;
-
-import net.minecraft.world.GameRules;
 
 @Mixin(GameRules.BooleanRule.class)
 public interface BooleanRuleAccessor {

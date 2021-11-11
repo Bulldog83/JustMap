@@ -1,24 +1,24 @@
 package ru.bulldog.justmap.map.data.classic;
 
-import ru.bulldog.justmap.client.config.ClientSettings;
-import ru.bulldog.justmap.client.screen.WorldmapScreen;
-import ru.bulldog.justmap.map.data.MapRegion;
-import ru.bulldog.justmap.map.data.classic.event.ChunkUpdateEvent;
-import ru.bulldog.justmap.map.data.classic.event.ChunkUpdateListener;
-import ru.bulldog.justmap.map.IMap;
-import ru.bulldog.justmap.map.data.MapRegionProvider;
-import ru.bulldog.justmap.map.data.Layer;
-import ru.bulldog.justmap.map.data.RegionPos;
-import ru.bulldog.justmap.util.DataUtil;
-import ru.bulldog.justmap.util.math.MathUtil;
+import java.util.HashMap;
+import java.util.Map;
 
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.WorldChunk;
 
-import java.util.HashMap;
-import java.util.Map;
+import ru.bulldog.justmap.client.config.ClientSettings;
+import ru.bulldog.justmap.client.screen.WorldmapScreen;
+import ru.bulldog.justmap.map.IMap;
+import ru.bulldog.justmap.map.data.Layer;
+import ru.bulldog.justmap.map.data.MapRegion;
+import ru.bulldog.justmap.map.data.MapRegionProvider;
+import ru.bulldog.justmap.map.data.RegionPos;
+import ru.bulldog.justmap.map.data.classic.event.ChunkUpdateEvent;
+import ru.bulldog.justmap.map.data.classic.event.ChunkUpdateListener;
+import ru.bulldog.justmap.util.DataUtil;
+import ru.bulldog.justmap.util.math.MathUtil;
 
 public class WorldData implements MapRegionProvider {
 	private World world;

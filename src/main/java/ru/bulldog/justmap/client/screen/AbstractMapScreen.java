@@ -1,5 +1,9 @@
 package ru.bulldog.justmap.client.screen;
 
+import java.util.HashMap;
+
+import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.datafixers.util.Pair;
 import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.screen.Screen;
@@ -12,11 +16,6 @@ import net.minecraft.world.World;
 import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.util.LangUtil;
 import ru.bulldog.justmap.util.render.RenderUtil;
-
-import java.util.HashMap;
-
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.datafixers.util.Pair;
 
 public abstract class AbstractMapScreen extends Screen {
 	public static final Identifier DEFAULT_TEXTURE = new Identifier("textures/block/dirt.png");

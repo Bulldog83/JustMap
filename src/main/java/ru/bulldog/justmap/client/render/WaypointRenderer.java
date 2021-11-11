@@ -1,18 +1,10 @@
 package ru.bulldog.justmap.client.render;
 
-import ru.bulldog.justmap.client.config.ClientSettings;
-import ru.bulldog.justmap.map.data.MapDataProvider;
-import ru.bulldog.justmap.map.waypoint.Waypoint;
-import ru.bulldog.justmap.map.waypoint.WaypointKeeper;
-import ru.bulldog.justmap.map.waypoint.Waypoint.Icon;
-import ru.bulldog.justmap.util.colors.ColorUtil;
-import ru.bulldog.justmap.util.colors.Colors;
-import ru.bulldog.justmap.util.math.MathUtil;
-import ru.bulldog.justmap.util.render.RenderUtil;
+import java.util.List;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.OverlayTexture;
@@ -27,9 +19,16 @@ import net.minecraft.util.math.Matrix3f;
 import net.minecraft.util.math.Matrix4f;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3f;
-import java.util.List;
 
-import com.mojang.blaze3d.systems.RenderSystem;
+import ru.bulldog.justmap.client.config.ClientSettings;
+import ru.bulldog.justmap.map.data.MapDataProvider;
+import ru.bulldog.justmap.map.waypoint.Waypoint;
+import ru.bulldog.justmap.map.waypoint.Waypoint.Icon;
+import ru.bulldog.justmap.map.waypoint.WaypointKeeper;
+import ru.bulldog.justmap.util.colors.ColorUtil;
+import ru.bulldog.justmap.util.colors.Colors;
+import ru.bulldog.justmap.util.math.MathUtil;
+import ru.bulldog.justmap.util.render.RenderUtil;
 
 @Environment(EnvType.CLIENT)
 public class WaypointRenderer {
