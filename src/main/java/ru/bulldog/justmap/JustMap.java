@@ -9,6 +9,9 @@ import ru.bulldog.justmap.map.data.MapDataProvider;
 import ru.bulldog.justmap.util.Logger;
 import ru.bulldog.justmap.util.tasks.TaskManager;
 
+import ru.bulldog.justmap.util.Logger;
+import ru.bulldog.justmap.util.tasks.TaskManager;
+
 public class JustMap implements ModInitializer {
 	public static final String MODID = "justmap";
 	public static final Logger LOGGER = Logger.get();
