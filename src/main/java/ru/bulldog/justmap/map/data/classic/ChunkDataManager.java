@@ -31,7 +31,7 @@ class ChunkDataManager {
 	private final Set<ChunkPos> requestedChunks = new HashSet<>();
 	private final WorldData mapData;
 	private final WorldChunk emptyChunk;
-	
+
 	ChunkDataManager(WorldData data, World world) {
 		this.emptyChunk = new EmptyChunk(world, new ChunkPos(0, 0));
 		this.mapData = data;
@@ -40,7 +40,7 @@ class ChunkDataManager {
 	ChunkData getChunk(ChunkPos chunkPos) {
 		return this.getChunk(chunkPos.x, chunkPos.z);
 	}
-	
+
 	ChunkData getChunk(int posX, int posZ) {
 		ChunkPos chunkPos = new ChunkPos(posX, posZ);
 
@@ -52,24 +52,24 @@ class ChunkDataManager {
 				mapChunk = new ChunkData(mapData, chunkPos);
 				this.mapChunks.put(chunkPos, mapChunk);
 			}
-		}		
+		}
 		mapChunk.requested = System.currentTimeMillis();
-		
+
 		return mapChunk;
 	}
-	
+
 	WorldChunk getEmptyChunk() {
 		return this.emptyChunk;
 	}
-	
+
 	boolean hasChunk(ChunkPos chunkPos) {
 		return this.mapChunks.containsKey(chunkPos);
 	}
-	
+
 	void purge(int maxPurged, int timeLimit) {
 		long currentTime = System.currentTimeMillis();
 		int purged = 0;
-	
+
 		synchronized (mapChunks) {
 			List<ChunkPos> chunks = new ArrayList<>();
 			for (ChunkPos chunkPos : this.mapChunks.keySet()) {
@@ -93,7 +93,7 @@ class ChunkDataManager {
 			this.mapChunks.clear();
 		}
 	}
-	
+
 	WorldChunk callSavedChunk(World world, ChunkPos chunkPos) {
 		if (!(world instanceof ServerWorld)) return this.emptyChunk;
 		if (requestedChunks.add(chunkPos)) {
@@ -106,14 +106,14 @@ class ChunkDataManager {
 		}
 		return this.emptyChunk;
 	}
-	
+
 	private WorldChunk callSaves(World world, ChunkPos chunkPos) {
 		long usedPct = MemoryUtil.getMemoryUsage();
 		if (usedPct > 85L) {
 			JustMap.LOGGER.warning("Not enough memory, can't load more chunks.");
 			return this.emptyChunk;
-        }
-		
+	}
+
 		ServerWorld serverWorld = (ServerWorld) world;
 		try (VersionedChunkStorage storage = StorageUtil.getChunkStorage(serverWorld)) {
 			NbtCompound chunkTag = storage.updateChunkNbt(serverWorld.getRegistryKey(),

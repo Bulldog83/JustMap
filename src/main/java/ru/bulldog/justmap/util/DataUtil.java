@@ -41,7 +41,7 @@ public class DataUtil {
 	private static int coordX = 0;
 	private static int coordY = 0;
 	private static int coordZ = 0;
-	
+
 	@Environment(EnvType.CLIENT)
 	public static void updateWorld(ClientWorld world) {
 		clientWorld = world;
@@ -57,53 +57,53 @@ public class DataUtil {
 			persistentSupplier = null;
 		}
 	}
-	
+
 	public static void update() {
 		currentLayer = Layer.SURFACE;
 		currentLevel = 0;
 		coordX = 0;
 		coordY = 0;
 		coordZ = 0;
-		
+
 		Entity posEntity = getPosEntity();
 		if (posEntity == null) return;
-		
+
 		coordX = MathUtil.floor(posEntity.getX());
 		coordZ = MathUtil.floor(posEntity.getZ());
 		coordY = (int) posEntity.getY();
-		
+
 		if (clientWorld == null) return;
 		currentLayer = getLayer(getWorld(), currentPos());
 		currentLevel = getLevel(currentLayer, coordY);
 	}
-	
+
 	public static boolean isOnline() {
 		return !MinecraftClient.getInstance().isIntegratedServerRunning();
 	}
-	
+
 	public static IMap getCurrentlyShownMap() {
 		MinecraftClient minecraft = MinecraftClient.getInstance();
 		return minecraft.currentScreen instanceof WorldmapScreen ? (WorldmapScreen) minecraft.currentScreen : JustMapClient.getMiniMap();
 	}
-	
+
 	@Environment(EnvType.SERVER)
 	public static World getServerWorld(RegistryKey<World> worldKey) {
 		return JustMapServer.getServer().getWorld(worldKey);
 	}
-	
+
 	public static World getWorld() {
 		return serverWorld != null ? serverWorld : clientWorld;
 	}
-	
+
 	public static Registry<Biome> getBiomeRegistry(World world) {
 		return world.getRegistryManager().get(Registry.BIOME_KEY);
 	}
-	
+
 	public static Identifier getBiomeId(World world, Biome biome) {
 		Identifier biomeId = getBiomeRegistry(world).getId(biome);
 		return biomeId != null ? biomeId : BuiltinRegistries.BIOME.getId(biome);
 	}
-	
+
 	public static Registry<Biome> getBiomeRegistry() {
 		if (JustMap.getSide() == EnvType.CLIENT) {
 			MinecraftClient minecraft = MinecraftClient.getInstance();
@@ -119,24 +119,24 @@ public class DataUtil {
 		}
 		return registryManager.get(Registry.BIOME_KEY);
 	}
-	
+
 	public static ClientWorld getClientWorld() {
 		return clientWorld;
 	}
-	
+
 	public static ServerWorld getServerWorld() {
 		return serverWorld;
 	}
-	
+
 	public static Supplier<PersistentStateManager> getPersistentSupplier() {
 		return persistentSupplier;
 	}
-	
+
 	public static GameOptions getGameOptions() {
 		MinecraftClient minecraft = MinecraftClient.getInstance();
 		return minecraft.options;
 	}
-	
+
 	public static int coordX() {
 		return coordX;
 	}
@@ -152,7 +152,7 @@ public class DataUtil {
 	public static BlockPos currentPos() {
 		return currentPos.set(coordX, coordY, coordZ);
 	}
-	
+
 	public static double doubleX(Entity entity, float delta) {
 		if (entity == null) return 0.0;
 		return MathUtil.lerp(delta, entity.prevX, entity.getX());
@@ -162,11 +162,11 @@ public class DataUtil {
 		if (entity == null) return 0.0;
 		return MathUtil.lerp(delta, entity.prevZ, entity.getZ());
 	}
-	
+
 	public static double doubleX(float delta) {
 		return doubleX(getPosEntity(), delta);
 	}
-	
+
 	public static double doubleZ(float delta) {
 		return doubleZ(getPosEntity(), delta);
 	}
@@ -178,18 +178,18 @@ public class DataUtil {
 		if (world.getLightLevel(LightType.SKY, pos.east()) > 0) return true;
 		if (world.getLightLevel(LightType.SKY, pos.south()) > 0) return true;
 		if (world.getLightLevel(LightType.SKY, pos.west()) > 0) return true;
-		
+
 		return false;
 	}
-	
+
 	public static Layer getLayer() {
 		return currentLayer;
 	}
-	
+
 	public static int getLevel() {
 		return currentLevel;
 	}
-	
+
 	public static Layer getLayer(World world, BlockPos pos) {
 		if (Dimension.isNether(world)) {
 			return Layer.NETHER;
@@ -198,7 +198,7 @@ public class DataUtil {
 		}
 		return Layer.SURFACE;
 	}
-	
+
 	public static int getLevel(Layer layer, int y) {
 		if (Layer.SURFACE.equals(layer)) return 0;
 		return y / layer.height;

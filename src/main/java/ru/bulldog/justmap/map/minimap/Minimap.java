@@ -56,7 +56,7 @@ public class Minimap implements IMap {
 	private static final InfoText txtCoords = new CoordsInfo(TextAlignment.CENTER, "0, 0, 0");
 	private static final InfoText txtBiome = new BiomeInfo(TextAlignment.CENTER, "");
 	private static final InfoText txtTime = new TimeInfo(TextAlignment.CENTER, "");
-	
+
 	private final MinecraftClient minecraft;
 	private final FastMiniMapRenderer fastRenderer;
 	private final BufferedMiniMapRenderer bufferedRenderer;
@@ -107,7 +107,7 @@ public class Minimap implements IMap {
 		} else {
 			locPlayer = null;
 		}
-		
+
 		Window window = minecraft.getWindow();
 		if (window != null) {
 			double scale = window.getScaleFactor();
@@ -121,9 +121,9 @@ public class Minimap implements IMap {
 	public void updateMapParams() {
 		ClientConfig config = JustMapClient.getConfig();
 		this.isMapVisible = config.getBoolean("map_visible");
-		
+
 		if (!isMapVisible) return;
-		
+
 		int configSize = config.getInt("map_size");
 		float configScale = config.getMapScale();
 		boolean needRotate = config.getBoolean("rotate_map");
@@ -150,10 +150,10 @@ public class Minimap implements IMap {
 				this.scaledWidth = (int) (mapWidth * mapScale);
 				this.scaledHeight = (int) (mapHeight * mapScale);
 			}
-			
+
 			textManager.setLineWidth(mapWidth);
 		}
-		
+
 		this.border = 0;
 		if (ClientSettings.useSkins) {
 			if (isBigMap()) {
@@ -173,9 +173,9 @@ public class Minimap implements IMap {
 		} else {
 			this.mapSkin = null;
 		}
-		
+
 		this.updateMapPosition();
-		
+
 		if (!ClientSettings.fastRender) {
 			try {
 				if (ExtendedFramebuffer.canUseFramebuffer()) {
@@ -192,14 +192,14 @@ public class Minimap implements IMap {
 			this.bufferedRenderer.deleteFramebuffers();
 		}
 	}
-	
+
 	private void updateMapPosition() {
 		Window window = minecraft.getWindow();
 		int winW = window.getScaledWidth();
 		int winH = window.getScaledHeight();
 		this.offset = ClientSettings.positionOffset;
 		ScreenPosition mapPosition = ClientSettings.mapPosition;
-		
+
 		TextPosition textPos = TextPosition.UNDER;
 
 		int fullWidth = mapWidth + border * 2;
@@ -239,7 +239,7 @@ public class Minimap implements IMap {
 				this.skinX = offset;
 				this.skinY = offset;
 		}
-		
+
 		int limitW = winW - fullWidth - offset;
 		if (skinX < offset) {
 			this.skinX = offset;
@@ -252,10 +252,10 @@ public class Minimap implements IMap {
 		} else if (skinY > limitH) {
 			skinY = limitH;
 		}
-		
+
 		this.mapX = skinX + border;
-		this.mapY = skinY + border;	
-		
+		this.mapY = skinY + border;
+
 		textManager.updatePosition(textPos,
 				mapX, (textPos == TextPosition.UNDER ?
 						skinY + fullHeight + 3 :
@@ -330,8 +330,8 @@ public class Minimap implements IMap {
 			BlockPos start = new BlockPos(startX, posY - checkHeight / 2, startZ);
 			BlockPos end = new BlockPos(endX, posY + checkHeight / 2, endZ);
 			List<Entity> entities = world.getOtherEntities(player, new Box(start, end));
-		
-			int amount = 0;				
+
+			int amount = 0;
 			for (Entity entity : entities) {
 				if (entity instanceof PlayerEntity && RuleUtil.allowPlayerRadar()) {
 					PlayerEntity pEntity = (PlayerEntity) entity;
@@ -369,7 +369,7 @@ public class Minimap implements IMap {
 	public void createWaypoint() {
 		this.createWaypoint(MapDataProvider.getManager().getWorldKey(), DataUtil.currentPos());
 	}
-	
+
 	public AbstractMiniMapRenderer getRenderer() {
 		if (bufferedRenderer.isFBOLoaded()) {
 			return this.bufferedRenderer;
@@ -384,7 +384,7 @@ public class Minimap implements IMap {
 	public MapRegionProvider getMapRegionProvider() {
 		return this.mapRegionProvider;
 	}
-	
+
 	public MapSkin getSkin() {
 		return this.mapSkin;
 	}
@@ -397,7 +397,7 @@ public class Minimap implements IMap {
 	public List<MapIcon<?>> getDrawableIcons(double worldX, double worldZ, double screenX, double screenY, float delta) {
 		return this.entityRadar.getDrawableIcons(worldX, worldZ, screenX, screenY, mapScale, delta);
 	}
-	
+
 	public List<WaypointIcon> getWaypoints(BlockPos currentPos, int screenX, int screenY) {
 		this.waypoints.clear();
 		if (ClientSettings.showWaypoints) {
@@ -442,23 +442,23 @@ public class Minimap implements IMap {
 
 		return this.isMapVisible;
 	}
-	
+
 	public int getOffset() {
 		return this.offset;
 	}
-	
+
 	public int getMapX() {
 		return this.mapX;
 	}
-	
+
 	public int getMapY() {
 		return this.mapY;
 	}
-	
+
 	public int getSkinX() {
 		return this.skinX;
 	}
-	
+
 	public int getSkinY() {
 		return this.skinY;
 	}
@@ -470,11 +470,11 @@ public class Minimap implements IMap {
 	public int getLastZ() {
 		return this.lastPosZ;
 	}
-	
+
 	public int getBorder() {
 		return this.border;
 	}
-	
+
 	@Override
 	public boolean isRotated() {
 		return ClientSettings.rotateMap;
@@ -512,7 +512,7 @@ public class Minimap implements IMap {
 	public BlockPos getCenter() {
 		return DataUtil.currentPos();
 	}
-	
+
 	static {
 		textManager = AdvancedInfo.getMapTextManager();
 		textManager.add(txtCoords);

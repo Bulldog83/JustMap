@@ -43,14 +43,14 @@ import ru.bulldog.justmap.util.math.MathUtil;
 
 @Environment(EnvType.CLIENT)
 public class ColorUtil {
-	
+
 	private static final MinecraftClient minecraft = MinecraftClient.getInstance();
 	private static final BlockModels blockModels = minecraft.getBlockRenderManager().getModels();
 	private static final FluidRenderHandlerRegistryImpl fluidRenderHandlerRegistry = FluidRenderHandlerRegistryImpl.INSTANCE;
 	private static final float[] floatBuffer = new float[3];
 	private static final ColorProviders colorProvider = ColorProviders.INSTANCE;
 	private static final Colors colorPalette = Colors.INSTANCE;
-	
+
 	public static int[] toIntArray(int color) {
 		return new int[] {
 			(color >> 24) & 255,
@@ -59,15 +59,15 @@ public class ColorUtil {
 			 color & 255
 		};
 	}
-	
+
 	public static float[] toFloatArray(int color) {
 		floatBuffer[0] = ((color >> 16 & 255) / 255.0F);
 		floatBuffer[1] = ((color >> 8 & 255) / 255.0F);
 		floatBuffer[2] = ((color & 255) / 255.0F);
-		
+
 		return floatBuffer;
 	}
-	
+
 	public static void RGBtoHSB(int r, int g, int b, float[] hsbvals) {
 		float hue, saturation, brightness;
 		if (hsbvals == null) {
@@ -103,7 +103,7 @@ public class ColorUtil {
 		hsbvals[1] = saturation;
 		hsbvals[2] = brightness;
 	}
-	
+
 	public static int HSBtoRGB(float hue, float saturation, float brightness) {
 		int r = 0, g = 0, b = 0;
 		if (saturation == 0) {
@@ -149,20 +149,20 @@ public class ColorUtil {
 		}
 		return 0xFF000000 | (r << 16) | (g << 8) | (b << 0);
 	}
-	
+
 	public static int parseHex(String hexColor) {
 		int len = hexColor.length();
 		if (len < 6 || len > 8 || len % 2 > 0) {
 			return -1;
 		}
-		
+
 		int color, shift;
 		if(len == 6) {
 			color = 0xFF000000; shift = 16;
 		} else {
 			color = 0; shift = 24;
 		}
-		
+
 		try {
 			String[] splited = hexColor.split("(?<=\\G.{2})");
 			for (String digit : splited) {
@@ -173,17 +173,17 @@ public class ColorUtil {
 			JustMap.LOGGER.catching(ex);
 			return -1;
 		}
-		
+
 		return color;
 	}
-	
+
 	public static int toABGR(int color) {
 		int r = (color >> 16) & 255;
 		int g = (color >> 8) & 255;
 		int b = color & 255;
 		return 0xFF000000 | b << 16 | g << 8 | r;
 	}
-	
+
 	public static int ABGRtoARGB(int color) {
 		int a = (color >> 24) & 255;
 		int b = (color >> 16) & 255;
@@ -191,36 +191,36 @@ public class ColorUtil {
 		int r = color & 255;
 		return a << 24 | r << 16 | g << 8 | b;
 	}
-	
+
 	public static int colorBrigtness(int color, float val) {
 		RGBtoHSB((color >> 16) & 255, (color >> 8) & 255, color & 255, floatBuffer);
 		floatBuffer[2] += val / 10.0F;
 		floatBuffer[2] = MathUtil.clamp(floatBuffer[2], 0.0F, 1.0F);
 		return HSBtoRGB(floatBuffer[0], floatBuffer[1], floatBuffer[2]);
 	}
-	
+
 	public static int applyTint(int color, int tint) {
 		return colorBrigtness(ColorHelper.multiplyColor(color, tint), 1.5F);
 	}
-	
+
 	private static int extractColor(BlockState state) {
 		List<BakedQuad> quads = blockModels.getModel(state).getQuads(state, Direction.UP, new Random());
-		
+
 		Identifier blockSprite;
 		if (quads.size() > 0) {
 			blockSprite = ((BakedSpriteAccessor) quads.get(0)).getSprite().getId();
 		} else {
 			blockSprite = blockModels.getModelParticleSprite(state).getId();
 		}
-		
+
 		int color = colorPalette.getTextureColor(state, blockSprite);
 		if (color != 0x0) return color;
-		
+
 		Identifier texture = new Identifier(blockSprite.getNamespace(), String.format("textures/%s.png", blockSprite.getPath()));
 		NativeImage image = ImageUtil.loadImage(texture, 16, 16);
-		
+
 		int height = state.getBlock() instanceof FlowerBlock ? image.getHeight() / 2 : image.getHeight();
-		
+
 		List<Integer> colors = new ArrayList<>();
 		for (int i = 0; i < image.getWidth(); i++) {
 			for (int j = 0; j < height; j++) {
@@ -231,16 +231,16 @@ public class ColorUtil {
 			}
 		}
 		image.close();
-		
+
 		if (colors.size() == 0) return -1;
-		
+
 		ColorExtractor extractor = new ColorExtractor(colors);
 		color = extractor.analize();
 		colorPalette.addTextureColor(state, blockSprite, color);
-		
+
 		return color;
 	}
-	
+
 	public static int proccessColor(int color, int heightDiff, float topoLevel) {
 		RGBtoHSB((color >> 16) & 255, (color >> 8) & 255, color & 255, floatBuffer);
 		floatBuffer[1] += ClientSettings.mapSaturation / 100.0F;
@@ -257,22 +257,22 @@ public class ColorUtil {
 		}
 		return HSBtoRGB(floatBuffer[0], floatBuffer[1], floatBuffer[2]);
 	}
-	
+
 	private static int proccessColor(int blockColor, int textureColor, int defaultColor) {
-		blockColor = blockColor == -1 ? defaultColor : blockColor;		
+		blockColor = blockColor == -1 ? defaultColor : blockColor;
 		if (blockColor != -1) {
 			return ColorHelper.multiplyColor(textureColor, blockColor);
 		}
-		
+
 		return textureColor;
 	}
-	
+
 	public static int blockColor(WorldChunk worldChunk, BlockPos pos) {
 		World world = worldChunk.getWorld();
 		BlockPos overPos = new BlockPos(pos.getX(), pos.getY() + 1, pos.getZ());
 		BlockState overState = worldChunk.getBlockState(overPos);
 		BlockState blockState = worldChunk.getBlockState(pos);
-		
+
 		boolean waterTint = ClientSettings.alternateColorRender && ClientSettings.waterTint;
 		boolean skipWater = !(ClientSettings.hideWater || waterTint);
 		if (!ClientSettings.hideWater && ClientSettings.hidePlants && StateUtil.isSeaweed(overState)) {
@@ -280,8 +280,8 @@ public class ColorUtil {
 				int color = blockColor(world, blockState, pos);
 				return applyTint(color, BiomeColors.getWaterColor(world, pos));
 			}
-			return blockColor(world, Blocks.WATER.getDefaultState(), pos);			
-		} else if (!StateUtil.isAir(blockState) && StateUtil.checkState(overState, skipWater, !ClientSettings.hidePlants)) {			
+			return blockColor(world, Blocks.WATER.getDefaultState(), pos);
+		} else if (!StateUtil.isAir(blockState) && StateUtil.checkState(overState, skipWater, !ClientSettings.hidePlants)) {
 			int color = blockColor(world, blockState, pos);
 			if (ClientSettings.hideWater) return color;
 			if (waterTint && (StateUtil.isWater(overState) || StateUtil.isWaterlogged(blockState))) {
@@ -289,10 +289,10 @@ public class ColorUtil {
 			}
 			return color;
 		}
-	
+
 		return -1;
 	}
-	
+
 	public static int blockColor(World world, BlockState state, BlockPos pos) {
 		int materialColor = state.getMapColor(world, pos).color;
 		if (ClientSettings.alternateColorRender) {
@@ -300,17 +300,17 @@ public class ColorUtil {
 			if (blockColor != 0x0) {
 				return blockColor;
 			}
-			
+
 			blockColor = colorProvider.getColor(state, world, pos);
 			if (blockColor == -1) {
 				blockColor = minecraft.getBlockColors().getColor(state, world, pos, Colors.LIGHT);
 			}
 			int textureColor = extractColor(state);
-			
+
 			Block block = state.getBlock();
 			if (block instanceof VineBlock) {
 				blockColor = proccessColor(blockColor, textureColor, colorProvider.getFoliageColor(world, pos));
-			} else if (block instanceof FernBlock || block instanceof TallPlantBlock || block instanceof SugarCaneBlock) {				
+			} else if (block instanceof FernBlock || block instanceof TallPlantBlock || block instanceof SugarCaneBlock) {
 				blockColor = proccessColor(blockColor, textureColor, colorProvider.getGrassColor(world, pos));
 			} else if (block instanceof LilyPadBlock || block instanceof StemBlock || block instanceof AttachedStemBlock) {
 				blockColor = proccessColor(blockColor, textureColor, materialColor);
@@ -333,13 +333,13 @@ public class ColorUtil {
 				blockColor = textureColor != -1 ? textureColor : materialColor;
 				colorPalette.addBlockColor(state, blockColor);
 			}
-			
+
 			return blockColor;
 		}
-		
+
 		return materialColor;
 	}
-	
+
 	private static int fluidColor(World world, BlockState state, BlockPos pos, int defColor) {
 		int color = colorPalette.getFluidColor(state);
 		if (color == 0x0) {

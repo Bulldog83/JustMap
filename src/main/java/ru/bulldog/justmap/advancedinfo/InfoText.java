@@ -20,31 +20,31 @@ public abstract class InfoText {
 	int offsetX;
 	int offsetY;
 	int x, y;
-  
+
 	public abstract void update();
-	
+
 	public InfoText(String text) {
 		this(TextAlignment.LEFT, text, Colors.WHITE);
 	}
-  
+
 	public InfoText(TextAlignment alignment, String text) {
 		this(alignment, text, Colors.WHITE);
 	}
-  
+
 	public InfoText(String text, int color) {
 		this(TextAlignment.LEFT, text, color);
 	}
-	
+
 	public InfoText(TextAlignment alignment, String text, int color) {
 		this.alignment = alignment;
 		this.text = new LiteralText(text);
 		this.color = color;
 	}
-	
+
 	public void draw(MatrixStack matrixStack) {
 		this.draw(matrixStack, x, y);
 	}
-	
+
 	public void draw(MatrixStack matrixStack, int x, int y) {
 		MinecraftClient minecraft = MinecraftClient.getInstance();
 		TextRenderer textRenderer = minecraft.textRenderer;
@@ -61,30 +61,30 @@ public abstract class InfoText {
 			 break;
 		}
 	}
-	
+
 	public void setPos(int x, int y) {
 		if (!fixed) this.fixed = true;
 		this.x = x;
 		this.y = y;
-    }
-	
+	}
+
 	public InfoText setAlignment(TextAlignment alignment) {
 		this.alignment = alignment;
 		return this;
 	}
-	
+
 	public void setText(String text) {
 		this.text = new LiteralText(text);
-    }
-	
+	}
+
 	public InfoText setColor(int color) {
 		this.color = color;
 		return this;
 	}
-	
+
 	public void setVisible(boolean visible) {
 		if (this.visible != visible) {
 			this.visible = visible;
 		}
-    }
+	}
 }

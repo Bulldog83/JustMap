@@ -17,16 +17,16 @@ import ru.bulldog.justmap.map.icon.PlayerHeadIcon;
 public class MapPlayer extends AbstractClientPlayerEntity {
 
 	private final PlayerHeadIcon icon;
-	
+
 	public MapPlayer(ClientWorld world, PlayerEntity player) {
 		super(world, player.getGameProfile());
-		
+
 		this.icon = new PlayerHeadIcon();
 		this.icon.getPlayerSkin(this);
 	}
-	
+
 	public PlayerHeadIcon getIcon() {
-		long now = System.currentTimeMillis();		
+		long now = System.currentTimeMillis();
 		if (!icon.success) {
 			if (now - icon.lastCheck >= icon.delay) {
 				this.icon.updatePlayerSkin(this);
@@ -34,10 +34,10 @@ public class MapPlayer extends AbstractClientPlayerEntity {
 		} else if (now - icon.lastCheck >= 300000) {
 			this.icon.updatePlayerSkin(this);
 		}
-		
+
 		return this.icon;
 	}
-	
+
 	public static ResourceTexture loadSkinTexture(Identifier id, String playerName) {
 		TextureManager textureManager = MinecraftClient.getInstance().getTextureManager();
 		AbstractTexture abstractTexture = textureManager.getTexture(id);

@@ -12,7 +12,7 @@ public class ItemInfo extends InfoText {
 
 	private final EquipmentSlot slot;
 	private ItemStack itemStack;
-	
+
 	public ItemInfo(EquipmentSlot slot) {
 		super("Item");
 		this.slot = slot;
@@ -32,7 +32,7 @@ public class ItemInfo extends InfoText {
 				posX = x - textWidth / 2 - offsetX;
 				break;
 			default:
-				posX = x - offsetX;	
+				posX = x - offsetX;
 		}
 		MinecraftClient minecraft = MinecraftClient.getInstance();
 		minecraft.getItemRenderer().renderInGuiWithOverrides(itemStack, posX, y - 5);
@@ -44,8 +44,8 @@ public class ItemInfo extends InfoText {
 		if (minecraft.player == null) {
 			this.setVisible(false);
 			return;
-		}		
-		this.itemStack = minecraft.player.getEquippedStack(slot);		
+		}
+		this.itemStack = minecraft.player.getEquippedStack(slot);
 		this.setVisible(this.isVisible() && !this.itemStack.isEmpty());
 		if (visible) {
 			String itemString;
@@ -61,7 +61,7 @@ public class ItemInfo extends InfoText {
 			this.setText(itemString);
 		}
 	}
-	
+
 	private boolean isVisible() {
 		if (!ClientSettings.showItems) return false;
 		switch (slot) {
@@ -72,10 +72,10 @@ public class ItemInfo extends InfoText {
 			case LEGS: return ClientSettings.showLegs;
 			case FEET: return ClientSettings.showFeet;
 		}
-		
+
 		return true;
 	}
-	
+
 	private String getTranslation() {
 		return this.itemStack.getItem().getName(itemStack).getString();
 	}

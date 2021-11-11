@@ -16,15 +16,15 @@ public class MapPositionScreen extends Screen {
 
 	private final static Text TITLE = LangUtil.getText("gui", "screen.map_position");
 	private final static ClientConfig config = JustMapClient.getConfig();
-	
+
 	private final Screen parent;
 	private MapWidget mapHolder;
-	
+
 	public MapPositionScreen(Screen parent) {
 		super(TITLE);
 		this.parent = parent;
 	}
-	
+
 	@Override
 	public void init() {
 		int posX = width / 2;
@@ -34,11 +34,11 @@ public class MapPositionScreen extends Screen {
 		this.addDrawableChild(new ButtonWidget(posX + 45, posY, 80, 20, LangUtil.getText("gui", "cancel"), button -> this.onClose()));
 		this.mapHolder = this.addDrawable(new MapWidget(this, JustMapClient.getMiniMap()));
 	}
-	
+
 	private void onReset() {
 		this.mapHolder.resetPosition();
 	}
-	
+
 	private void onSave() {
 		EnumEntry<ScreenPosition> drawPosConfig = config.getEntry("map_position");
 		drawPosConfig.setValue(ScreenPosition.USER_DEFINED);
@@ -47,7 +47,7 @@ public class MapPositionScreen extends Screen {
 		config.saveChanges();
 		this.onClose();
 	}
-	
+
 	@Override
 	public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
 		fill(matrices, 0, 0, width, height, 0x66000000);

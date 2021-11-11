@@ -21,17 +21,17 @@ import ru.bulldog.justmap.util.math.Line;
 import ru.bulldog.justmap.util.math.Point;
 
 public class ImageUtil {
-	private ImageUtil() {}	
+	private ImageUtil() {}
 
 	private static ResourceManager resourceManager;
-	
+
 	private static void checkResourceManager() {
 		if (resourceManager == null) resourceManager = MinecraftClient.getInstance().getResourceManager();
 	}
-	
+
 	public static boolean imageExists(Identifier image) {
-		checkResourceManager();		
-		if (image == null) return false;		
+		checkResourceManager();
+		if (image == null) return false;
 		try {
 			return resourceManager.containsResource(image);
 		} catch(Exception ex) {
@@ -39,7 +39,7 @@ public class ImageUtil {
 			return false;
 		}
 	}
-	
+
 	public static NativeImage loadImage(File image, int w, int h) {
 		if (image.exists()) {
 			try (InputStream fis = new FileInputStream(image)) {
@@ -48,22 +48,22 @@ public class ImageUtil {
 				JustMap.LOGGER.warning(String.format("Can't load texture image: %s. Will be created empty image.", image));
 				JustMap.LOGGER.warning(String.format("Cause: %s.", ex.getMessage()));
 			}
-		}		
+		}
 		return new NativeImage(w, h, false);
 	}
-	
+
 	public static NativeImage loadImage(Identifier image, int w, int h) {
 		if (imageExists(image)) {
 			try (Resource resource = resourceManager.getResource(image)) {
-				return NativeImage.read(resource.getInputStream());			
+				return NativeImage.read(resource.getInputStream());
 			} catch (IOException e) {
 				JustMap.LOGGER.warning(String.format("Can't load texture image: %s. Will be created empty image.", image));
 				JustMap.LOGGER.warning(String.format("Cause: %s.", e.getMessage()));
 			}
-		}		
+		}
 		return new NativeImage(w, h, false);
 	}
-	
+
 	public static void applyColor(NativeImage image, int color) {
 		for (int i = 0; i < image.getWidth(); i++) {
 			for (int j = 0; j < image.getHeight(); j++) {
@@ -74,11 +74,11 @@ public class ImageUtil {
 			}
 		}
 	}
-	
+
 	public static void fillImage(NativeImage image, int color) {
 		image.fillRect(0, 0, image.getWidth(), image.getHeight(), color);
 	}
-	
+
 	public static NativeImage createSquareSkin(NativeImage texture, int width, int height, int border) {
 		NativeImage squareSkin = new NativeImage(width, height, false);
 		int imgW = texture.getWidth();
@@ -90,10 +90,10 @@ public class ImageUtil {
 			while(x < width) {
 				if (imgX >= imgW) imgX = 0;
 				if ((x >= width - border || x <= border) ||
-					(y >= height - border || y <= border)) {							
+					(y >= height - border || y <= border)) {
 					int pixel = texture.getColor(imgX, imgY);
 					squareSkin.setColor(x, y, pixel);
-				}				
+				}
 				imgX++;
 				if (imgX >= imgW) imgX = 0;
 				x++;
@@ -102,10 +102,10 @@ public class ImageUtil {
 			if (imgY >= imgH) imgY = 0;
 			y++;
 		}
-		
+
 		return squareSkin;
 	}
-	
+
 	public static NativeImage createRoundSkin(NativeImage texture, int width, int height, int border) {
 		NativeImage roundSkin = new NativeImage(width, height, false);
 		int imgW = texture.getWidth();
@@ -124,7 +124,7 @@ public class ImageUtil {
 				if (centerX != x || centerY != y) {
 					len = (int) Line.length(centerX, centerY, x, y);
 				}
-				if (len <= rOut && len >= rIn) {							
+				if (len <= rOut && len >= rIn) {
 					int pixel = texture.getColor(imgX, imgY);
 					roundSkin.setColor(x, y, pixel);
 				}
@@ -136,18 +136,18 @@ public class ImageUtil {
 			if (imgY >= imgH) imgY = 0;
 			y++;
 		}
-		
+
 		return roundSkin;
 	}
-	
+
 	public static NativeImage generateOutline(NativeImage image, int width, int height, int color) {
 		NativeImage outline = new NativeImage(width + 4, height + 4, false);
 		ImageUtil.fillImage(outline, Colors.TRANSPARENT);
-		
+
 		int outWidth = outline.getWidth();
 		int outHeight = outline.getHeight();
 		int outlineColor = ColorUtil.toABGR(color);
-		
+
 		List<Point> outlinePixels = new ArrayList<>();
 		for (int x = 0; x < width; x++) {
 			int left = x - 1;
@@ -155,11 +155,11 @@ public class ImageUtil {
 			for (int y = 0; y < height; y++) {
 				int alpha = (image.getColor(x, y) >> 24) & 255;
 				if (alpha == 0) continue;
-				
+
 				outlinePixels.add(new Point(x + 2, y + 2));
-				
+
 				int top = y - 1;
-				int bottom = y + 1;					
+				int bottom = y + 1;
 				if (top >= 0) {
 					alpha = (image.getColor(x, top) >> 24) & 255;
 					if (alpha == 0) {
@@ -277,7 +277,7 @@ public class ImageUtil {
 		outlinePixels.forEach(pixel -> {
 			outline.setColor((int) pixel.x, (int) pixel.y, outlineColor);
 		});
-		
+
 		return outline;
 	}
 }

@@ -24,10 +24,10 @@ public class RuleUtil {
 		} else if (param) {
 			return MinecraftClient.getInstance().isInSingleplayer() || MapGameRules.isAllowed(rule);
 		}
-		
+
 		return false;
 	}
-	
+
 	public static boolean detectMultiworlds() {
 		return ClientSettings.detectMultiworlds;
 	}
@@ -39,7 +39,7 @@ public class RuleUtil {
 		} else {
 			allowCaves = isAllowed(ClientSettings.drawCaves, MapGameRules.ALLOW_CAVES_MAP, false);
 		}
-		
+
 		if (Dimension.isEnd(world)) {
 			return false;
 		}
@@ -48,10 +48,10 @@ public class RuleUtil {
 			return allowCaves && (!world.isSkyVisibleAllowingSea(pos) && !DataUtil.hasSkyLight(world, pos) ||
 				   world.getRegistryKey().getValue().equals(DimensionType.OVERWORLD_CAVES_REGISTRY_KEY.getValue()));
 		}
-		
+
 		return allowCaves;
 	}
-	
+
 	public static boolean allowEntityRadar() {
 		if (JustMap.getSide() == EnvType.SERVER) {
 			return isAllowed(ServerSettings.allowEntities, MapGameRules.ALLOW_ENTITY_RADAR, true);

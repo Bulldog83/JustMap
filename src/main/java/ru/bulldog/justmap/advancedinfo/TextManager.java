@@ -17,11 +17,11 @@ public class TextManager {
 	private int x, y;
 	private int lineWidth;
 	private int spacing = 12;
-  
+
 	public TextManager() {
 		this.elements = new ArrayList<>();
 	}
-  
+
 	public void draw(MatrixStack matrixStack) {
 		int yp = this.y;
 		for (InfoText line : elements) {
@@ -31,7 +31,7 @@ public class TextManager {
 				if (textPosition == TextPosition.ABOVE ||
 					textPosition == TextPosition.ABOVE_LEFT ||
 					textPosition == TextPosition.ABOVE_RIGHT) {
-					
+
 					yp -= spacing;
 				} else {
 					yp += spacing;
@@ -40,7 +40,7 @@ public class TextManager {
 			line.draw(matrixStack);
 		}
 	}
-	
+
 	public void updatePosition(ScreenPosition position) {
 		int offset = ClientSettings.positionOffset;
 		MinecraftClient minecraft = MinecraftClient.getInstance();
@@ -70,14 +70,14 @@ public class TextManager {
 			case BOTTOM_LEFT:
 				this.updatePosition(TextPosition.ABOVE_RIGHT,
 						offset, screenH - offset - spacing);
-				break;	
+				break;
 			case BOTTOM_RIGHT:
 				this.updatePosition(TextPosition.ABOVE_LEFT,
 						screenW - offset, screenH - offset - spacing);
 				break;
 		}
 	}
-	
+
 	public void updatePosition(TextPosition pos, int x, int y) {
 		if (textPosition != pos || this.x != x || this.y != y) {
 			this.textPosition = pos;
@@ -86,12 +86,12 @@ public class TextManager {
 			this.updateLines();
 		}
 	}
-	
+
 	private void updateLines() {
 		int xp = x;
 		if (textPosition == TextPosition.LEFT ||
 			textPosition == TextPosition.ABOVE_LEFT) {
-			
+
 			xp = x - lineWidth;
 		}
 		for (InfoText line : elements) {
@@ -110,22 +110,22 @@ public class TextManager {
 			}
 			if (textPosition == TextPosition.LEFT ||
 				textPosition == TextPosition.ABOVE_LEFT) {
-				
+
 				line.x -= line.offsetX;
 			} else {
 				line.x += line.offsetX;
 			}
 		}
 	}
-  
+
 	public void add(InfoText element) {
 		this.elements.add(element);
 	}
-	
+
 	public void setLineWidth(int width) {
 		this.lineWidth = width;
 	}
-	
+
 	public void setSpacing(int spacing) {
 		this.spacing = spacing;
 	}

@@ -3,17 +3,17 @@ package ru.bulldog.justmap.util.math;
 public class Plane {
 
 	public final Point first, second;
-	
+
 	public Plane(double x1, double y1, double x2, double y2) {
 		this(new Point(x1, y1),
 			 new Point(x2, y2));
 	}
-	
+
 	public Plane(Point first, Point second) {
 		this.first = first;
 		this.second = second;
 	}
-	
+
 	public boolean contains(Point point) {
 		if (second.x > first.x && second.y > first.y) {
 			return first.x <= point.x && first.y <= point.y &&
@@ -33,7 +33,7 @@ public class Plane {
 		}
 		return false;
 	}
-	
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) return true;

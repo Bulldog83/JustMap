@@ -15,41 +15,41 @@ public class WorldKey {
 	private String worldId;
 	private String worldName;
 	private BlockPos worldPos;
-	
+
 	public WorldKey(Identifier dimension) {
 		this.dimension = dimension;
 		this.worldId = this.dimension.toString();
 	}
-	
+
 	public WorldKey(RegistryKey<World> worldKey) {
 		this(worldKey.getValue());
 	}
-	
+
 	public void setWorldName(String name) {
 		this.worldName = name;
 		// if specified, directly use world name as key
 		this.worldId = name;
 	}
-	
+
 	public void setWorldPos(BlockPos worldPos) {
 		this.worldPos = worldPos;
 		if (worldName == null) {
 			this.worldId = String.format("%s_%s", dimension, PosUtil.shortPosString(worldPos));
 		}
 	}
-	
+
 	public Identifier getDimension() {
 		return this.dimension;
 	}
-	
+
 	public String getName() {
 		return this.worldName;
 	}
-	
+
 	public BlockPos getWorldPos() {
 		return this.worldPos;
 	}
-	
+
 	public void clearName() {
 		this.worldName = null;
 		if (worldPos != null) {
@@ -58,7 +58,7 @@ public class WorldKey {
 			this.worldId = dimension.toString();
 		}
 	}
-	
+
 	public void clearWorldPos() {
 		this.worldPos = null;
 		if (worldName != null) {
@@ -67,14 +67,14 @@ public class WorldKey {
 			this.worldId = dimension.toString();
 		}
 	}
-	
+
 	public String toFolder() {
 		String folder = this.worldId.replaceAll("[\\/ ]+", "_");
 		folder = folder.replaceAll("[,:&\"\\|\\<\\>\\?\\*]", "_");
-		
+
 		return folder;
 	}
-	
+
 	public JsonElement toJson() {
 		JsonObject jsonKey = new JsonObject();
 		jsonKey.addProperty("dimension", this.dimension.toString());
@@ -88,7 +88,7 @@ public class WorldKey {
 		}
 		return jsonKey;
 	}
-	
+
 	public static WorldKey fromJson(JsonObject element) {
 		if (!element.has("dimension")) return null;
 		Identifier dimension = new Identifier(JsonHelper.getString(element, "dimension"));
@@ -101,15 +101,15 @@ public class WorldKey {
 			BlockPos worldPos = PosUtil.fromJson(JsonHelper.getObject(element, "position"));
 			worldKey.setWorldPos(worldPos);
 		}
-		
+
 		return worldKey;
 	}
-	
+
 	@Override
 	public String toString() {
 		return String.format("WorldKey [%s]", this.worldId);
 	}
-	
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) return true;
@@ -117,7 +117,7 @@ public class WorldKey {
 		WorldKey anotherKey = (WorldKey) obj;
 		return this.worldId.equals(anotherKey.worldId);
 	}
-	
+
 	@Override
 	public int hashCode() {
 		return this.worldId.hashCode();

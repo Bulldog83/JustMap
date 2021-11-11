@@ -24,7 +24,7 @@ import ru.bulldog.justmap.util.render.Image;
 import ru.bulldog.justmap.util.render.RenderUtil;
 
 public class Waypoint {
-	
+
 	public static class Icons {
 		public final static int CIRCLE = 1;
 		public final static int CROSS = 2;
@@ -44,7 +44,7 @@ public class Waypoint {
 		public final static int TRIDENT = 16;
 		public final static int SLIME = 17;
 	}
-	
+
 	private static final Icon[] WAYPOINT_ICONS = new Icon[] {
 		null,
 		new Icon(1, new Identifier(JustMap.MODID, "textures/icon/circle.png"), 0xFFFF9000, 18, 18),
@@ -65,14 +65,14 @@ public class Waypoint {
 		new Icon(16, new Identifier("textures/item/trident.png"), 0xFF54E1B2, 16, 16),
 		new Icon(17, new Identifier("textures/item/slime_ball.png"), 0xFF88DB71, 16, 16)
 	};
-	
+
 	public static final Integer[] WAYPOINT_COLORS = new Integer[] {
 		Colors.RED, Colors.GREEN, Colors.BLUE, Colors.DARK_RED,
 		Colors.GOLD, Colors.YELLOW, Colors.DARK_GREEN, Colors.CYAN,
 		Colors.DARK_AQUA, Colors.DARK_BLUE, Colors.PINK, Colors.MAGENTA,
 		Colors.PURPLE
 	};
-	
+
 	public String name = "";
 	public BlockPos pos = new BlockPos(0, 0, 0);
 	public WorldKey world;
@@ -82,26 +82,26 @@ public class Waypoint {
 	public boolean tracking = true;
 	public boolean render = true;
 	public int showRange = 1000;
-	
+
 	private int icon = -1;
-	
+
 	public static void createOnDeath(WorldKey world, BlockPos pos) {
 		Waypoint waypoint = new Waypoint();
 		waypoint.world = world;
 		waypoint.name = "Player Death";
 		waypoint.pos = pos;
 		waypoint.setIcon(Waypoint.getIcon(Icons.CROSS), Colors.RED);
-		
+
 		JustMap.LOGGER.info("Created Death waypoint at " + waypoint.pos.toShortString());
-		
+
 		WaypointKeeper.getInstance().addNew(waypoint);
 		WaypointKeeper.getInstance().saveWaypoints();
 	}
-	
+
 	public boolean isVisible() {
 		return !hidden || showAlways;
 	}
-	
+
 	public void setIcon(Icon icon, int color) {
 		if (icon.key > 0) {
 			this.icon = icon.key;
@@ -110,34 +110,34 @@ public class Waypoint {
 			this.color = color;
 		}
 	}
-	
+
 	public Icon getIcon() {
 		if (this.icon > 0) {
 			return getIcon(this.icon);
 		}
-		
+
 		return Icon.coloredIcon(this.color);
 	}
-	
+
 	public static Icon getIcon(int id) {
 		if (id > 0 && id < WAYPOINT_ICONS.length) {
 			return WAYPOINT_ICONS[id];
 		}
-		
+
 		return null;
 	}
-	
+
 	public static Icon getColoredIcon(int color) {
 		return Icon.coloredIcon(color);
 	}
-	
+
 	public static int amountIcons() {
 		return WAYPOINT_ICONS.length - 1;
 	}
-	
+
 	public JsonElement toJson() {
 		JsonObject waypoint = new JsonObject();
-		
+
 		waypoint.addProperty("name", this.name);
 		waypoint.addProperty("show_always", this.showAlways);
 		waypoint.addProperty("hidden", this.hidden);
@@ -148,14 +148,14 @@ public class Waypoint {
 		waypoint.addProperty("icon", this.icon);
 		waypoint.add("world", this.world.toJson());
 		waypoint.add("position", PosUtil.toJson(pos));
-		
+
 		return waypoint;
 	}
-	
+
 	public static Waypoint fromJson(JsonObject jsonObject) {
 		Waypoint waypoint = new Waypoint();
 
-		JsonObject position = JsonHelper.getObject(jsonObject, "position", new JsonObject());		
+		JsonObject position = JsonHelper.getObject(jsonObject, "position", new JsonObject());
 		waypoint.pos = PosUtil.fromJson(position);
 		waypoint.name = JsonHelper.getString(jsonObject, "name", "Waypoint");
 		waypoint.showAlways = JsonHelper.getBoolean(jsonObject, "show_always", false);
@@ -166,7 +166,7 @@ public class Waypoint {
 		waypoint.color = ColorUtil.parseHex(JsonHelper.getString(jsonObject, "color",
 											Integer.toHexString(RandomUtil.getElement(WAYPOINT_COLORS))));
 		waypoint.icon = JsonHelper.getInt(jsonObject, "icon", -1);
-		
+
 		if (jsonObject.has("dimension")) {
 			try {
 				waypoint.world = new WorldKey(Dimension.fromId(JsonHelper.getInt(jsonObject, "dimension", 0)));
@@ -177,60 +177,60 @@ public class Waypoint {
 		} else {
 			waypoint.world = WorldKey.fromJson(JsonHelper.getObject(jsonObject, "world", new JsonObject()));
 		}
-		
+
 		return waypoint;
 	}
-	
+
 	public static class Icon extends Image {
-		
+
 		public final static Identifier DEFAULT_ICON = new Identifier(JustMap.MODID, "textures/icon/default.png");
 		private final static NativeImage DEFAULT_TEXTURE = ImageUtil.loadImage(DEFAULT_ICON, 18, 18);
-		
+
 		public final int key;
 		public final int color;
 		private Identifier colorId;
-		
+
 		private final static Map<Integer, Icon> coloredIcons = new HashMap<>();
-		
+
 		private Icon(int key, Identifier icon, int color, int w, int h) {
 			super(icon, ImageUtil.loadImage(icon, w, h));
 			this.key = key;
 			this.color = color;
 		}
-		
+
 		private Icon(int key, Identifier icon, NativeImage texture, int color) {
 			super(icon, texture);
 			this.key = key;
 			this.color = color;
 		}
-		
+
 		private static Icon coloredIcon(int color) {
 			if(coloredIcons.containsKey(color)) {
 				return coloredIcons.get(color);
 			}
-			
+
 			NativeImage texture = new NativeImage(18, 18, false);
-			
+
 			texture.copyFrom(DEFAULT_TEXTURE);
 			ImageUtil.applyColor(texture, color);
-			
+
 			Icon icon = new Icon(-1, DEFAULT_ICON, texture, color);
 			coloredIcons.put(color, icon);
-			
+
 			return icon;
 		}
-		
+
 		@Override
 		public void bindTexture() {
 			RenderUtil.bindTexture(this.getTexture());
 		}
-		
+
 		@Override
 		public void draw(MatrixStack matrices, double x, double y, int w, int h) {
 			this.bindTexture();
 			this.draw(matrices, x, y, (float) w, (float) h);
 		}
-		
+
 		private Identifier getColoredTexture() {
 			if (colorId == null) {
 				colorId = new Identifier(JustMap.MODID, String.format("wp_icon_%d", this.color));
@@ -238,7 +238,7 @@ public class Waypoint {
 			}
 			return colorId;
 		}
-		
+
 		public Identifier getTexture() {
 			if (this.key > 0) {
 				return this.getId();

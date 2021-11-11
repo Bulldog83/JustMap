@@ -34,11 +34,11 @@ public class JustMapServer implements DedicatedServerModInitializer {
 			MapDataProvider.getManager().onTick(true);
 		});
 	}
-	
+
 	public static MinecraftServer getServer() {
 		return dedicatedServer;
 	}
-	
+
 	public static ServerNetworkHandler getNetworkHandler() {
 		return networkHandler;
 	}

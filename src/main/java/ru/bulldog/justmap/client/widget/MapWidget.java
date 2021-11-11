@@ -23,7 +23,7 @@ public class MapWidget implements Element, Drawable {
 	final double initX;
 	final double initY;
 	double x, y;
-	
+
 	public MapWidget(Screen parent, Minimap map) {
 		this.map = map;
 		this.initX = x = map.getSkinX();
@@ -39,15 +39,15 @@ public class MapWidget implements Element, Drawable {
 		this.left = parent.width - width - offset;
 		this.bottom = parent.height - height - offset;
 	}
-	
+
 	public int getX() {
 		return (int) this.x;
 	}
-	
+
 	public int getY() {
 		return (int) this.y;
 	}
-	
+
 	public void resetPosition() {
 		this.x = initX;
 		this.y = initY;
@@ -67,27 +67,27 @@ public class MapWidget implements Element, Drawable {
 			map.getSkin().draw(matrices, x, y, width, height);
 		}
 	}
-	
+
 	@Override
 	public boolean isMouseOver(double mouseX, double mouseY) {
 		return (mouseX > x && mouseY > y && mouseX < x + width && mouseY < y + height);
 	}
-	
+
 	@Override
 	public boolean mouseClicked(double mouseX, double mouseY, int button) {
 		return this.isMouseOver(mouseX, mouseY);
 	}
-	
+
 	@Override
 	public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
 		this.x += deltaX;
 		this.y += deltaY;
-		
+
 		if (x > left) x = left;
 		if (x < right) x = right;
 		if (y < top) y = top;
 		if (y > bottom) y = bottom;
-		
+
 		return true;
 	}
 }

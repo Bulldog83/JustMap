@@ -23,7 +23,7 @@ public class PosUtil {
 		position.addProperty("x", blockPos.getX());
 		position.addProperty("y", blockPos.getY());
 		position.addProperty("z", blockPos.getZ());
-		
+
 		return position;
 	}
 
@@ -31,7 +31,7 @@ public class PosUtil {
 		int x = JsonHelper.getInt(element, "x", 0);
 		int y = JsonHelper.getInt(element, "y", 0);
 		int z = JsonHelper.getInt(element, "z", 0);
-		
+
 		return new BlockPos(x, y, z);
 	}
 }

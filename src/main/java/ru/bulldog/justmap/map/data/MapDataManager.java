@@ -8,35 +8,35 @@ import net.minecraft.world.World;
 import net.minecraft.world.chunk.WorldChunk;
 
 public interface MapDataManager {
-     // WorldKey management
+	// WorldKey management
 
-     WorldKey getWorldKey();
+	WorldKey getWorldKey();
 
-     List<WorldKey> registeredWorlds();
+	List<WorldKey> registeredWorlds();
 
-     void setCurrentWorldName(String name);
+	void setCurrentWorldName(String name);
 
-     // World map management
+	// World map management
 
-     MapRegionProvider getMapRegionProvider();
+	MapRegionProvider getMapRegionProvider();
 
-     int getMapHeight(Layer mapLayer, int mapLevel, int posX, int posZ);
+	int getMapHeight(Layer mapLayer, int mapLevel, int posX, int posZ);
 
-     // Callbacks
+	// Callbacks
 
-     void onServerConnect();
+	void onServerConnect();
 
-     void onWorldChanged(World world);
+	void onWorldChanged(World world);
 
-     void onWorldSpawnPosChanged(BlockPos newPos);
+	void onWorldSpawnPosChanged(BlockPos newPos);
 
-     void onChunkLoad(World world, WorldChunk worldChunk);
+	void onChunkLoad(World world, WorldChunk worldChunk);
 
-     void onConfigUpdate();
+	void onConfigUpdate();
 
-     void onSetBlockState(BlockPos pos, BlockState state, World world);
+	void onSetBlockState(BlockPos pos, BlockState state, World world);
 
-     void onTick(boolean isServer);
+	void onTick(boolean isServer);
 
-     void onWorldStop();
+	void onWorldStop();
 }

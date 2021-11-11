@@ -18,26 +18,26 @@ import ru.bulldog.justmap.util.render.GLC;
 import ru.bulldog.justmap.util.render.RenderUtil;
 
 public class PlayerIcon extends MapIcon<PlayerIcon> {
-	
+
 	private final PlayerEntity player;
 	private final int color = Colors.GREEN;
-	
+
 	public PlayerIcon(PlayerEntity player) {
 		this.player = player;
 	}
-	
+
 	public double getX() {
 		return this.player.getX();
 	}
-	
+
 	public double getY() {
 		return this.player.getY();
 	}
-	
+
 	public double getZ() {
 		return this.player.getZ();
 	}
-	
+
 	public void draw(MatrixStack matrices, int size) {
 		double x = this.x - size / 2;
 		double y = this.y - size / 2;
@@ -82,7 +82,7 @@ public class PlayerIcon extends MapIcon<PlayerIcon> {
 		}
 		this.drawPlayerName(matrices, iconPos.x, iconPos.y);
 	}
-	
+
 	private void drawPlayerName(MatrixStack matrices, double x, double y) {
 		if (!ClientSettings.showPlayerNames) return;
 		MinecraftClient minecraft = MinecraftClient.getInstance();

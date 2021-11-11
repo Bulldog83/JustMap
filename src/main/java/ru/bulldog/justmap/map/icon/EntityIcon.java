@@ -19,20 +19,20 @@ import ru.bulldog.justmap.util.render.GLC;
 import ru.bulldog.justmap.util.render.RenderUtil;
 
 public class EntityIcon extends MapIcon<EntityIcon> {
-	
+
 	private final Entity entity;
 	final boolean hostile;
-		
+
 	public EntityIcon(Entity entity) {
 		this.hostile = entity instanceof HostileEntity;
 		this.entity = entity;
 	}
-	
+
 	@Override
 	public void draw(MatrixStack matrices, VertexConsumerProvider consumerProvider, int mapX, int mapY, int mapW, int mapH, float rotation) {
 		if (!RuleUtil.allowCreatureRadar() && !hostile) { return; }
 		if (!RuleUtil.allowHostileRadar() && hostile) { return; }
-		
+
 		int color;
 		if (entity instanceof TameableEntity) {
 			TameableEntity tameable = (TameableEntity) entity;

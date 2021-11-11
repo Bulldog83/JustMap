@@ -12,7 +12,7 @@ public class ClientSettings {
 	public static ArrowType arrowIconType = ArrowType.DIRECTION_ARROW;
 	public static MultiworldDetection multiworldDetection = MultiworldDetection.AUTO;
 	public static MapShape mapShape = MapShape.SQUARE;
-	
+
 	public static int positionOffset = 4;
 	public static int mapPositionX = positionOffset;
 	public static int mapPositionY = positionOffset;
@@ -50,7 +50,7 @@ public class ClientSettings {
 	public static int mapBrightness = 0;
 	public static int arrowIconSize = 12;
 	public static int worldmapIconSize = 12;
-	
+
 	public static boolean advancedInfo = true;
 	public static boolean mapInfo = true;
 	public static boolean showPosition = true;
@@ -65,7 +65,7 @@ public class ClientSettings {
 	public static boolean showChest = true;
 	public static boolean showLegs = true;
 	public static boolean showFeet = true;
-	
+
 	public static boolean showEntities = true;
 	public static boolean showEntityHeads = true;
 	public static boolean showHostile = true;
@@ -86,7 +86,7 @@ public class ClientSettings {
 	public static int purgeAmount = 1500;
 	public static boolean forceUpdate = false;
 	public static boolean fastRender = false;
-	
+
 	public static boolean showWaypoints = true;
 	public static boolean jumpToWaypoints = true;
 	public static boolean waypointsTracking = true;

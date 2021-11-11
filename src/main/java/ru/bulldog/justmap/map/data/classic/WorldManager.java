@@ -57,15 +57,15 @@ public final class WorldManager implements MapDataManager {
 	private boolean cacheClearing = false;
 	private boolean requestWorldName = false;
 	private boolean loaded = false;
-	
+
 	public List<WorldKey> registeredWorlds() {
 		return new ArrayList<>(worldsData.keySet());
 	}
-	
+
 	public String currentWorldName() {
 		return currentWorldName != null ? currentWorldName : "Default";
 	}
-	
+
 	public void onConfigUpdate() {
 		if (currentWorld == null) return;
 		saveConfig();
@@ -127,7 +127,7 @@ public final class WorldManager implements MapDataManager {
 			JustMapClient.startMapping();
 		}
 	}
-	
+
 	public void onWorldSpawnPosChanged(BlockPos newPos) {
 		if (!RuleUtil.detectMultiworlds()) {
 			return;
@@ -156,7 +156,7 @@ public final class WorldManager implements MapDataManager {
 			JustMapClient.startMapping();
 		}
 	}
-	
+
 	public void setCurrentWorldName(String name) {
 		if (!RuleUtil.detectMultiworlds()) {
 			return;
@@ -170,11 +170,11 @@ public final class WorldManager implements MapDataManager {
 		updateWorldKey();
 		JustMapClient.startMapping();
 	}
-	
+
 	public WorldKey getWorldKey() {
 		return currentWorldKey;
 	}
-	
+
 	public WorldKey createWorldKey(World world, BlockPos blockPos, String worldName) {
 		WorldKey newKey = new WorldKey(world.getRegistryKey());
 		if (RuleUtil.detectMultiworlds()) {
@@ -185,10 +185,10 @@ public final class WorldManager implements MapDataManager {
 				newKey.setWorldName(worldName);
 			}
 		}
-		
+
 		return newKey;
 	}
-	
+
 	private void updateWorldKey() {
 		WorldKey newKey = createWorldKey(currentWorld, currentWorldPos, currentWorldName);
 		if (!newKey.equals(currentWorldKey)) {
@@ -206,7 +206,7 @@ public final class WorldManager implements MapDataManager {
 
 	public WorldData getData(World world, WorldKey worldKey) {
 		if (world == null || worldKey == null) return null;
-		
+
 		WorldData data;
 		synchronized (worldsData) {
 			if (worldsData.containsKey(worldKey)) {
@@ -216,7 +216,7 @@ public final class WorldManager implements MapDataManager {
 				}
 				data = new WorldData(world);
 				worldsData.replace(worldKey, data);
-				
+
 				return data;
 			}
 			data = new WorldData(world);
@@ -224,7 +224,7 @@ public final class WorldManager implements MapDataManager {
 		}
 		return data;
 	}
-	
+
 	public void onChunkLoad(World world, WorldChunk worldChunk) {
 		if (world == null || worldChunk == null || worldChunk.isEmpty()) return;
 		IMap map = DataUtil.getCurrentlyShownMap();
@@ -234,7 +234,7 @@ public final class WorldManager implements MapDataManager {
 		ChunkUpdateEvent updateEvent = new ChunkUpdateEvent(worldChunk, mapChunk, map.getLayer(), map.getLevel(), 0, 0, 16, 16, true);
 		ChunkUpdateListener.accept(updateEvent);
 	}
-	
+
 	public void update() {
 		if (requestWorldName && !(minecraft.currentScreen instanceof ProgressScreen)) {
 			minecraft.setScreen(new WorldnameScreen(minecraft.currentScreen));
@@ -273,7 +273,7 @@ public final class WorldManager implements MapDataManager {
 			JustMap.LOGGER.debug(String.format("Memory usage at %2d%%.", usedPct));
 		}
 	}
-	
+
 	public void onServerConnect() {
 		loaded = true;
 		loadConfig();
@@ -303,7 +303,7 @@ public final class WorldManager implements MapDataManager {
 			}
 		}
 	}
-	
+
 	private void saveWorlds() {
 		JsonArray worldsArray = new JsonArray();
 		for (Entry<MultiworldIdentifier, String> entry : worldAssociations.entrySet()) {
@@ -316,7 +316,7 @@ public final class WorldManager implements MapDataManager {
 		File worldsFile = new File(StorageUtil.filesDir(), "worlds.json");
 		JsonFactory.storeJson(worldsFile, jsonObject);
 	}
-	
+
 	private void saveConfig() {
 		EnumEntry<MultiworldDetection> detectionType = modConfig.getEntry("multiworld_detection");
 		BooleanEntry detectMultiworlds = modConfig.getEntry("detect_multiworlds");
@@ -342,7 +342,7 @@ public final class WorldManager implements MapDataManager {
 		}
 		return true;
 	}
-	
+
 	private void loadConfig() {
 		if (!tryLoadConfig()) {
 			// load defaults
@@ -354,7 +354,7 @@ public final class WorldManager implements MapDataManager {
 			saveConfig();
 		}
 	}
-	
+
 	private void clearData() {
 		synchronized (worldsData) {
 			if (worldsData.size() > 0) {
@@ -365,7 +365,7 @@ public final class WorldManager implements MapDataManager {
 			}
 		}
 	}
-	
+
 	public void close() {
 		modConfig.reloadFromDisk();
 		currentWorld = null;

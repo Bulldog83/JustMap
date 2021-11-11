@@ -10,26 +10,26 @@ import ru.bulldog.justmap.util.math.MathUtil;
 import ru.bulldog.justmap.util.math.Point;
 
 public abstract class MapIcon<T extends MapIcon<T>> {
-	
+
 	protected Point iconPos;
 	protected boolean allowRender = true;
 	protected int lastMapX, lastMapY;
 	protected double lastX, lastY;
 	protected double x, y;
 	protected int height;
-	
+
 	public MapIcon() {}
-	
+
 	public void setPosition(double x, double y, int height) {
 		this.height = height;
 		this.x = x;
 		this.y = y;
 	}
-	
+
 	public int getHeight() {
 		return this.height;
 	}
-	
+
 	protected void updatePos(int mapX, int mapY, int mapW, int mapH, int size) {
 		if (iconPos == null || x != lastX || y != lastY || mapX != lastMapX || mapY != lastMapY) {
 			this.iconPos = new Point(x, y);
@@ -48,13 +48,13 @@ public abstract class MapIcon<T extends MapIcon<T>> {
 										   rayTR.difference(radius),
 										   rayBL.difference(radius),
 										   rayBR.difference(radius));
-				
+
 				if (diff > 0) {
 					this.allowRender = false;
 				}
 			} else if (iconPos.x < mapX || iconPos.x > (mapX + mapW) - size ||
 					   iconPos.y < mapY || iconPos.y > (mapY + mapH) - size) {
-				
+
 				this.allowRender = false;
 			}
 			this.lastMapX = mapX;
@@ -63,6 +63,6 @@ public abstract class MapIcon<T extends MapIcon<T>> {
 			this.lastY = y;
 		}
 	}
-	
+
 	public abstract void draw(MatrixStack matrixStack, VertexConsumerProvider consumerProvider, int mapX, int mapY, int mapW, int mapH, float rotation);
 }

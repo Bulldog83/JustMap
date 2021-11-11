@@ -27,30 +27,30 @@ public abstract class AbstractMapScreen extends Screen {
 			put("minecraft:the_end", new Pair<>(JustMap.MODID + ".dim.the_end", new Identifier("textures/block/end_stone.png")));
 		}
 	};
-	
-	protected final Screen parent;	
+
+	protected final Screen parent;
 	protected Pair<String, Identifier> info;
 	protected final LangUtil langUtil;
 	protected int x, y, center;
 	protected int paddingTop;
 	protected int paddingBottom;
-	
+
 	protected AbstractMapScreen(Text title) {
 		this(title, null);
 	}
-	
+
 	public AbstractMapScreen(Text title, Screen parent) {
 		super(title);
 		this.parent = parent;
 		this.langUtil = new LangUtil(LangUtil.GUI_ELEMENT);
 	}
-	
+
 	@Override
 	protected void init() {
 		RegistryKey<World> dimKey = client.world.getRegistryKey();
 		this.info = DIMENSION_INFO.getOrDefault(dimKey.getValue().toString(), null);
 	}
-	
+
 	@Override
 	public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
 		RenderSystem.disableDepthTest();
@@ -63,19 +63,19 @@ public abstract class AbstractMapScreen extends Screen {
 		}
 		RenderSystem.enableDepthTest();
 	}
-	
+
 	public void renderBackground(MatrixStack matrixStack) {
-		fill(matrixStack, 0, 0, width, height, 0x88444444);		
+		fill(matrixStack, 0, 0, width, height, 0x88444444);
 		this.drawBorders();
 	}
-	
+
 	public void renderForeground(MatrixStack matrixStack) {}
-	
+
 	@Override
 	public void onClose() {
 		this.client.setScreen(parent);
 	}
-	
+
 	public void renderTexture(int x, int y, int width, int height, float u, float v, Identifier id) {
 		RenderUtil.bindTexture(id);
 		RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
@@ -83,7 +83,7 @@ public abstract class AbstractMapScreen extends Screen {
 		RenderUtil.addQuad(x, y, width, height, 0.0F, 0.0F, u, v);
 		RenderUtil.endDraw();
 	}
-	
+
 	public void renderTextureModal(int x, int y, int width, int height, int textureWidth, int textureHeight, Identifier id) {
 		this.renderTexture(x, y, width, height, (float) width / textureWidth, (float) height / textureHeight, id);
 	}
@@ -97,18 +97,18 @@ public abstract class AbstractMapScreen extends Screen {
 			}
 		}
 	}
-	
+
 	protected void drawBorders() {
 		this.drawBorders(32, 32);
 	}
-	
+
 	protected void drawBorders(int top, int bottom) {
 		Identifier id = info != null ? info.getSecond() : DEFAULT_TEXTURE;
 		this.renderTextureRepeating(0, 0, width, top, 16, 16, id);
-		this.renderTextureRepeating(0, height - bottom, width, bottom, 16, 16, id);		
+		this.renderTextureRepeating(0, height - bottom, width, bottom, 16, 16, id);
 	}
-	
+
 	public Text lang(String key) {
 		return langUtil.getText(key);
-	}	
+	}
 }
