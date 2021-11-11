@@ -21,7 +21,7 @@ import ru.bulldog.justmap.util.colors.ColorUtil;
 public class MapTexture {
 
 	private File imageFile;
-	private ByteBuffer buffer;
+	private final ByteBuffer buffer;
 	private byte[] bytes;
 	private int glId = -1;
 	private final int width;
@@ -29,7 +29,7 @@ public class MapTexture {
 	
 	public boolean changed = false;
 	
-	private Object bufferLock = new Object();
+	private final Object bufferLock = new Object();
 	
 	public MapTexture(File imageFile, int width, int height) {
 		int size = 4 * width * (height - 1) + 4 * width;		

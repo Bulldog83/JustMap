@@ -47,7 +47,7 @@ public class EntityHeadIcon extends Image {
 	private final Identifier id;
 	private Identifier outlineId;
 	private int color = Colors.LIGHT_GRAY;
-	private boolean solid;
+	private final boolean solid;
 	
 	private EntityHeadIcon(Identifier id, Identifier texture, int w, int h) {
 		this(id, texture, ImageUtil.loadImage(texture, w, h));

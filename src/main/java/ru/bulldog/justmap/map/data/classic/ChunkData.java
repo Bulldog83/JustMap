@@ -29,15 +29,15 @@ public class ChunkData {
 	public final static ChunkLevel EMPTY_LEVEL = new ChunkLevel(-1);
 	
 	private final static TaskManager chunkUpdater = TaskManager.getManager("chunk-updater", 2);
-	private static ClientNetworkHandler networkHandler = JustMapClient.getNetworkHandler();
+	private static final ClientNetworkHandler networkHandler = JustMapClient.getNetworkHandler();
 	
 	private final WorldData mapData;
 	private final Map<Layer, ChunkLevel[]> levels = new ConcurrentHashMap<>();
 	private final ChunkPos chunkPos;
-	private World world;
+	private final World world;
 	private SoftReference<WorldChunk> worldChunk;
 	private boolean outdated = false;
-	private boolean purged = false;
+	private final boolean purged = false;
 	private boolean slime = false;
 	private boolean saved = true;
 	private long refreshed = 0;
@@ -46,7 +46,7 @@ public class ChunkData {
 	public long updated = 0;
 	public long requested = 0;
 	
-	private Object levelLock = new Object();
+	private final Object levelLock = new Object();
 	
 	public ChunkData(WorldData data, WorldChunk lifeChunk) {
 		this(data, lifeChunk.getPos());

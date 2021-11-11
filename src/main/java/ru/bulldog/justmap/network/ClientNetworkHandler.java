@@ -15,7 +15,7 @@ import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.map.data.RegionPos;
 
 public class ClientNetworkHandler extends NetworkHandler {
-	private Map<Integer, Consumer<?>> responseListeners = new HashMap<>();
+	private final Map<Integer, Consumer<?>> responseListeners = new HashMap<>();
 	private boolean serverReady = false;
 	private Random random;
 	

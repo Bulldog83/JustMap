@@ -17,8 +17,8 @@ import ru.bulldog.justmap.util.math.MathUtil;
 
 public class EntityModelRenderer {	
 
-	private static MinecraftClient minecraft = MinecraftClient.getInstance();
-	private static EntityRenderDispatcher renderDispatcher = minecraft.getEntityRenderDispatcher();
+	private static final MinecraftClient minecraft = MinecraftClient.getInstance();
+	private static final EntityRenderDispatcher renderDispatcher = minecraft.getEntityRenderDispatcher();
 	
 	public static void renderModel(MatrixStack matrices, VertexConsumerProvider consumerProvider, Entity entity, double x, double y) {
 		

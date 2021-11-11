@@ -13,7 +13,7 @@ import ru.bulldog.justmap.enums.TextPosition;
 
 public class TextManager {
 	private TextPosition textPosition = TextPosition.RIGHT;
-	private List<InfoText> elements;
+	private final List<InfoText> elements;
 	private int x, y;
 	private int lineWidth;
 	private int spacing = 12;

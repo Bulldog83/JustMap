@@ -39,9 +39,9 @@ public class WaypointEditorScreen extends AbstractMapScreen {
 	private int iconIndex;
 	private int showRange;
 	
-	private int spacing = 2;
-	private int padding = 10;
-	private int rowH = 20;
+	private final int spacing = 2;
+	private final int padding = 10;
+	private final int rowH = 20;
 	
 	private TitledButtonWidget<TextFieldWidget> nameField;
 	private CheckboxWidget isHidden;
@@ -51,7 +51,7 @@ public class WaypointEditorScreen extends AbstractMapScreen {
 	private ButtonWidget prevIconButton, nextIconButton;
 	private TextFieldWidget xField, yField, zField;
 	private ButtonWidget saveButton, cancelButton;
-	private Consumer<Waypoint> onSaveCallback;
+	private final Consumer<Waypoint> onSaveCallback;
 	
 	public WaypointEditorScreen(Waypoint waypoint, Screen parent, Consumer<Waypoint> onSaveCallback) {
 		super(TITLE, parent);

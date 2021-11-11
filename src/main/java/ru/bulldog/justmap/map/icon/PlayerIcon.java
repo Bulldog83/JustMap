@@ -19,8 +19,8 @@ import ru.bulldog.justmap.util.render.RenderUtil;
 
 public class PlayerIcon extends MapIcon<PlayerIcon> {
 	
-	private PlayerEntity player;
-	private int color = Colors.GREEN;
+	private final PlayerEntity player;
+	private final int color = Colors.GREEN;
 	
 	public PlayerIcon(PlayerEntity player) {
 		this.player = player;

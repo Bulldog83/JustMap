@@ -13,7 +13,7 @@ import ru.bulldog.justmap.util.render.RenderUtil;
 public class ListElementWidget implements Drawable, Element {
 	
 	private final Supplier<Boolean> onPress;
-	private Text text;
+	private final Text text;
 	int padding = 2;
 	int width, height;
 	int x, y;

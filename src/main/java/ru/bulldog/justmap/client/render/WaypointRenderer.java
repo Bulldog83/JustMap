@@ -32,7 +32,7 @@ import ru.bulldog.justmap.util.render.RenderUtil;
 
 @Environment(EnvType.CLIENT)
 public class WaypointRenderer {
-	private static WaypointRenderer renderer = new WaypointRenderer();
+	private static final WaypointRenderer renderer = new WaypointRenderer();
 	private final static Identifier BEAM_TEX = new Identifier("textures/entity/beacon_beam.png");
 	private final static MinecraftClient minecraft = MinecraftClient.getInstance();
 	

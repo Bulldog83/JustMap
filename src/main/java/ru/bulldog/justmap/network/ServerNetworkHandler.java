@@ -14,7 +14,7 @@ import ru.bulldog.justmap.util.Dimension;
 import ru.bulldog.justmap.util.RuleUtil;
 
 public class ServerNetworkHandler extends NetworkHandler {
-	private MinecraftServer server;
+	private final MinecraftServer server;
 	
 	public ServerNetworkHandler(MinecraftServer server) {
 		this.server = server;

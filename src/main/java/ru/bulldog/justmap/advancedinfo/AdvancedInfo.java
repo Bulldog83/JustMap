@@ -15,7 +15,7 @@ import ru.bulldog.justmap.enums.ScreenPosition;
 public class AdvancedInfo {
 
 	private static AdvancedInfo INSTANCE;
-	private static TextManager mapTextManager = new TextManager();
+	private static final TextManager mapTextManager = new TextManager();
 	
 	public static AdvancedInfo getInstance() {
 		if (INSTANCE == null) {
@@ -29,8 +29,8 @@ public class AdvancedInfo {
 		return mapTextManager;
 	}
 	
-	private MinecraftClient minecraft = MinecraftClient.getInstance();
-	private Map<ScreenPosition, TextManager> managers;
+	private final MinecraftClient minecraft = MinecraftClient.getInstance();
+	private final Map<ScreenPosition, TextManager> managers;
 	private ScreenPosition infoPos;
 	private ScreenPosition itemsPos;
 	

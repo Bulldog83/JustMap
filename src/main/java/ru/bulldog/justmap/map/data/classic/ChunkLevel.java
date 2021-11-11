@@ -20,7 +20,7 @@ public class ChunkLevel {
 	long refreshed = 0;
 	int level;
 	
-	private Object arrayLock = new Object();
+	private final Object arrayLock = new Object();
 	
 	ChunkLevel(int level) {
 		this.statemap = new int[256];

@@ -35,7 +35,7 @@ public class MapGameRules {
 		return GameRulesAccessor.callRegister(name, GameRules.Category.MISC, BooleanRuleAccessor.callCreate(defaultValue));
 	}
 	
-	private static Map<String, Key<GameRules.BooleanRule>> codes;
+	private static final Map<String, Key<GameRules.BooleanRule>> codes;
 	
 	static {
 		codes = new HashMap<>();

@@ -30,11 +30,11 @@ public class FloatSliderEntry extends TooltipListEntry<Float> {
 	protected AtomicDouble value;
 	protected final float orginial;
 	private float minimum, maximum;
-	private Consumer<Float> saveConsumer;
-	private Supplier<Float> defaultValue;
+	private final Consumer<Float> saveConsumer;
+	private final Supplier<Float> defaultValue;
 	private Function<Float, Text> textGetter = value -> new LiteralText(String.format("Value: %.1f", value));
-	private List<ClickableWidget> widgets;
-	private TextRenderer textRenderer;
+	private final List<ClickableWidget> widgets;
+	private final TextRenderer textRenderer;
 	
 	@Deprecated
 	public FloatSliderEntry(Text fieldName, float minimum, float maximum, float value, Text resetButtonKey, Supplier<Float> defaultValue, Consumer<Float> saveConsumer) {

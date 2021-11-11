@@ -20,7 +20,7 @@ public class WaypointIcon extends MapIcon<WaypointIcon> {
 	public final Waypoint waypoint;
 	private final IMap map;
 	
-	private int iconSize = 8;
+	private final int iconSize = 8;
 	private float lastRotation;
 	private float offX;
 	private float offY;

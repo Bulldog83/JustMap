@@ -7,7 +7,7 @@ import ru.bulldog.justmap.enums.TextAlignment;
 
 public class TimeInfo extends InfoText {
 
-	private String title;
+	private final String title;
 	
 	public TimeInfo() {
 		super("00:00");

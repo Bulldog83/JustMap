@@ -20,8 +20,8 @@ import ru.bulldog.justmap.util.math.Plane;
 import ru.bulldog.justmap.util.tasks.TaskManager;
 
 public class ChunkUpdateListener {
-	private static Queue<ChunkUpdateEvent> updateQueue = new ConcurrentLinkedQueue<>();
-	private static TaskManager worker = TaskManager.getManager("chunk-update-listener");
+	private static final Queue<ChunkUpdateEvent> updateQueue = new ConcurrentLinkedQueue<>();
+	private static final TaskManager worker = TaskManager.getManager("chunk-update-listener");
 	
 	public static void accept(ChunkUpdateEvent event) {
 		if (updateQueue.contains(event)) return;

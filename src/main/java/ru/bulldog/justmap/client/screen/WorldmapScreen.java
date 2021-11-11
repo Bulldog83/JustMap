@@ -68,8 +68,8 @@ public class WorldmapScreen extends AbstractMapScreen implements IMap {
 	private Layer mapLayer;
 	private ChunkGrid chunkGrid;
 	
-	private List<WaypointIcon> waypoints = new ArrayList<>();
-	private List<PlayerIcon> players = new ArrayList<>();
+	private final List<WaypointIcon> waypoints = new ArrayList<>();
+	private final List<PlayerIcon> players = new ArrayList<>();
 	
 	private WorldmapScreen() {
 		super(TITLE);

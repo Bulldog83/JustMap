@@ -21,7 +21,7 @@ import ru.bulldog.justmap.util.DataUtil;
 import ru.bulldog.justmap.util.math.MathUtil;
 
 public class WorldData implements MapRegionProvider {
-	private World world;
+	private final World world;
 	private final ChunkDataManager chunkManager;
 	private final Map<RegionPos, RegionData> regions;
 	private long lastPurged = 0;

@@ -52,18 +52,18 @@ import ru.bulldog.justmap.util.math.RandomUtil;
 import ru.bulldog.justmap.util.render.ExtendedFramebuffer;
 
 public class Minimap implements IMap {
-	private static TextManager textManager;
-	private static InfoText txtCoords = new CoordsInfo(TextAlignment.CENTER, "0, 0, 0");
-	private static InfoText txtBiome = new BiomeInfo(TextAlignment.CENTER, "");
-	private static InfoText txtTime = new TimeInfo(TextAlignment.CENTER, "");
+	private static final TextManager textManager;
+	private static final InfoText txtCoords = new CoordsInfo(TextAlignment.CENTER, "0, 0, 0");
+	private static final InfoText txtBiome = new BiomeInfo(TextAlignment.CENTER, "");
+	private static final InfoText txtTime = new TimeInfo(TextAlignment.CENTER, "");
 	
 	private final MinecraftClient minecraft;
 	private final FastMiniMapRenderer fastRenderer;
 	private final BufferedMiniMapRenderer bufferedRenderer;
-	private List<WaypointIcon> waypoints = new ArrayList<>();
+	private final List<WaypointIcon> waypoints = new ArrayList<>();
 	private PlayerEntity locPlayer = null;
 	private Layer mapLayer = Layer.SURFACE;
-	private EntityRadar entityRadar;
+	private final EntityRadar entityRadar;
 	private MapRegionProvider mapRegionProvider;
 	private MapSkin mapSkin;
 	private World world;

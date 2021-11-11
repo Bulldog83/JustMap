@@ -14,7 +14,7 @@ public class TitledButtonWidget<W extends ClickableWidget> extends ClickableWidg
 	public final LiteralText title;
 	private final TextRenderer font;
 	
-	private int spacing = 3;
+	private final int spacing = 3;
 	
 	public TitledButtonWidget(TextRenderer font, W widget, int x, int y, int width, int height, String message, String title) {
 		super(x, y, width, height, new LiteralText(message));

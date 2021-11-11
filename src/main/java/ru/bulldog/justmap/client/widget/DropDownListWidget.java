@@ -16,13 +16,14 @@ import ru.bulldog.justmap.util.render.RenderUtil;
 
 public class DropDownListWidget extends AbstractParentElement implements Drawable, Selectable {
 
-	private List<ListElementWidget> children = new ArrayList<>();
+	private final List<ListElementWidget> children = new ArrayList<>();
 	private boolean visible = false;
-	private int x, y;
+	private final int x;
+	private final int y;
 	private int width, height;
-	private int elemHeight;
-	private int padding = 3;
-	private int spacing = 1;
+	private final int elemHeight;
+	private final int padding = 3;
+	private final int spacing = 1;
 	
 	public DropDownListWidget(int x, int y, int width, int height) {
 		this.elemHeight = height;

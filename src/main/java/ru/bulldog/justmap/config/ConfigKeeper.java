@@ -21,7 +21,7 @@ public final class ConfigKeeper {
 		return instance;
 	}
 	
-	private Map<String, Entry<?>> configEntries = new HashMap<>();
+	private final Map<String, Entry<?>> configEntries = new HashMap<>();
 	
 	private ConfigKeeper() {}
 	

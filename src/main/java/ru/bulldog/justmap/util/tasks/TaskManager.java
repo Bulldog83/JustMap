@@ -14,13 +14,13 @@ import ru.bulldog.justmap.JustMap;
 public class TaskManager implements Executor {
     private final Queue<Task> workQueue = new ConcurrentLinkedQueue<>();
     private final QueueBlocker queueBlocker;
-    private ThreadGroup group;
-    private Thread[] workers;
+    private final ThreadGroup group;
+    private final Thread[] workers;
     private String name = JustMap.MODID;
     
     private boolean running = true;
     
-    private static Map<String, TaskManager> managers = new HashMap<>();
+    private static final Map<String, TaskManager> managers = new HashMap<>();
     
     public static TaskManager getManager(String name) {
     	return getManager(name, 1);
