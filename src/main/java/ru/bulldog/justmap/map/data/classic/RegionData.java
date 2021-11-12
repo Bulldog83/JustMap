@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.ChunkPos;
 
@@ -14,7 +15,6 @@ import ru.bulldog.justmap.map.IMap;
 import ru.bulldog.justmap.map.data.Layer;
 import ru.bulldog.justmap.map.data.MapRegion;
 import ru.bulldog.justmap.map.data.RegionPos;
-import ru.bulldog.justmap.util.DataUtil;
 import ru.bulldog.justmap.util.Logger;
 import ru.bulldog.justmap.util.RuleUtil;
 import ru.bulldog.justmap.util.colors.Colors;
@@ -65,7 +65,7 @@ public class RegionData implements MapRegion {
 		this.level = map.getLevel();
 		this.center = new ChunkPos(map.getCenter());
 		this.isWorldmap = map instanceof WorldmapScreen;
-		int radius = DataUtil.getGameOptions().viewDistance - 1;
+		int radius = MinecraftClient.getInstance().options.viewDistance - 1;
 		this.updateArea = new Plane(center.x - radius, center.z - radius,
 									center.x + radius, center.z + radius);
 		this.loadImage(layer, level);
@@ -122,7 +122,7 @@ public class RegionData implements MapRegion {
 	}
 
 	public void setCenter(ChunkPos centerPos) {
-		int radius = DataUtil.getGameOptions().viewDistance - 1;
+		int radius = MinecraftClient.getInstance().options.viewDistance - 1;
 		this.center = centerPos;
 		this.updateArea = new Plane(center.x - radius, center.z - radius,
 									center.x + radius, center.z + radius);

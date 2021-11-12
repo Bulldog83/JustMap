@@ -3,6 +3,7 @@ package ru.bulldog.justmap.map.data.classic;
 import java.util.HashMap;
 import java.util.Map;
 
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
@@ -120,7 +121,7 @@ public class WorldData implements WorldMapper {
 		}
 		int x = centerPos.getX();
 		int z = centerPos.getZ();
-		int distance = DataUtil.getGameOptions().viewDistance - 1;
+		int distance = MinecraftClient.getInstance().options.viewDistance - 1;
 		BlockPos.Mutable currentPos = centerPos.mutableCopy();
 		for (int step = 1; step < distance * 2; step++) {
 			boolean even = MathUtil.isEven(step);
