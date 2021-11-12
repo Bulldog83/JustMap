@@ -36,7 +36,7 @@ public class MultiworldConfig {
 	}
 
 	// try to load local configuration, return false if not successful
-	public boolean tryLoadConfig() {
+	private boolean tryLoadConfig() {
 		File configFile = new File(StorageUtil.filesDir(), "config.json");
 		if (!configFile.exists()) return false;
 		try {

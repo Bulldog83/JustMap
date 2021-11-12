@@ -9,7 +9,6 @@ import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.client.config.ClientSettings;
 import ru.bulldog.justmap.map.IMap;
-import ru.bulldog.justmap.map.data.Layer;
 import ru.bulldog.justmap.map.data.MapDataManager;
 import ru.bulldog.justmap.map.data.MapDataProvider;
 import ru.bulldog.justmap.map.data.WorldMapper;
@@ -50,12 +49,12 @@ public final class WorldManager implements MapDataManager {
 	private void updateOnTick() {
 		getWorldData().updateMap();
 		JustMap.WORKER.execute(() -> MapDataProvider.getMultiworldManager().forEachWorldMapper(
-				(key, worldMapper) -> {
-					WorldData worldData = (WorldData) worldMapper;
-					if (worldData != null) {
-						worldData.clearCache();
-					}
-				}));
+			(key, worldMapper) -> {
+				WorldData worldData = (WorldData) worldMapper;
+				if (worldData != null) {
+					worldData.clearCache();
+				}
+			}));
 	}
 
 	private void memoryControl() {
