@@ -64,9 +64,6 @@ public class WorldnameScreen extends Screen {
 	private void onPressSave(ButtonWidget button) {
 		String worldName = nameField.getText();
 		worldName = worldName.trim().replaceAll(" +", " ");
-		if (worldName == "") {
-			worldName = "Default";
-		}
 		MapDataProvider.getMultiworldManager().setCurrentWorldName(worldName);
 		this.success = true;
 		this.onClose();
@@ -108,7 +105,7 @@ public class WorldnameScreen extends Screen {
 	@Override
 	public void onClose() {
 		if (!success) {
-			MapDataProvider.getMultiworldManager().setCurrentWorldName("Default");
+			MapDataProvider.getMultiworldManager().setCurrentWorldName("");
 		}
 		this.client.setScreen(parent);
 	}

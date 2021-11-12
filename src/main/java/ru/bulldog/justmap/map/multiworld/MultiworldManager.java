@@ -39,10 +39,6 @@ public final class MultiworldManager {
 	private boolean requestWorldName = false;
 	private boolean isWorldLoaded = false;
 
-	public String currentWorldName() {
-		return currentWorldName != null ? currentWorldName : "Default";
-	}
-
 	public void onConfigUpdate(Runnable cleanAction) {
 		if (currentWorld == null) return;
 		saveConfig();
@@ -136,6 +132,10 @@ public final class MultiworldManager {
 	}
 
 	public void setCurrentWorldName(String name) {
+		if (name == "") {
+			name = "Default";
+		}
+
 		if (!RuleUtil.detectMultiworlds()) {
 			return;
 		}
@@ -183,14 +183,6 @@ public final class MultiworldManager {
 			minecraft.setScreen(new WorldnameScreen(minecraft.currentScreen));
 			requestWorldName = false;
 		}
-	}
-	// FIXME!!!
-	public void update() {
-		if (requestWorldName && !(minecraft.currentScreen instanceof ProgressScreen)) {
-			minecraft.setScreen(new WorldnameScreen(minecraft.currentScreen));
-			requestWorldName = false;
-		}
-		if (!JustMapClient.canMapping()) return;
 	}
 
 	public void onServerConnect() {

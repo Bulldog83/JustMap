@@ -78,7 +78,6 @@ public final class WorldManager implements MapDataManager {
 	}
 
 	private void updateOnTick() {
-		if (!JustMapClient.canMapping()) return;
 		getWorldData().updateMap();
 		JustMap.WORKER.execute(() -> {
 			synchronized (worldsData) {
@@ -132,6 +131,7 @@ public final class WorldManager implements MapDataManager {
 	public void onTick(boolean isServer) {
 		MapDataProvider.getMultiworldManager().onTick(isServer);
 		if (!isServer) {
+			if (!JustMapClient.canMapping()) return;
 			updateOnTick();
 			memoryControl();
 		}
