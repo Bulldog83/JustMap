@@ -17,7 +17,7 @@ import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.util.LangUtil;
 import ru.bulldog.justmap.util.render.RenderUtil;
 
-public abstract class AbstractMapScreen extends Screen {
+public abstract class AbstractJustMapScreen extends Screen {
 	public static final Identifier DEFAULT_TEXTURE = new Identifier("textures/block/dirt.png");
 	public static final HashMap<String, Pair<String, Identifier>> DIMENSION_INFO = new HashMap<>() {
 		private static final long serialVersionUID = 1L;
@@ -35,11 +35,11 @@ public abstract class AbstractMapScreen extends Screen {
 	protected int paddingTop;
 	protected int paddingBottom;
 
-	protected AbstractMapScreen(Text title) {
+	protected AbstractJustMapScreen(Text title) {
 		this(title, null);
 	}
 
-	public AbstractMapScreen(Text title, Screen parent) {
+	public AbstractJustMapScreen(Text title, Screen parent) {
 		super(title);
 		this.parent = parent;
 		this.langUtil = new LangUtil(LangUtil.GUI_ELEMENT);
@@ -110,5 +110,9 @@ public abstract class AbstractMapScreen extends Screen {
 
 	public Text lang(String key) {
 		return langUtil.getText(key);
+	}
+
+	public Pair<String, Identifier> getDimensionInfo(Identifier dim) {
+		return DIMENSION_INFO.getOrDefault(dim != null ? dim.toString() : "unknown", null);
 	}
 }

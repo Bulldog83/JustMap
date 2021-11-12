@@ -10,7 +10,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import ru.bulldog.justmap.client.config.ClientSettings;
 import ru.bulldog.justmap.client.render.EntityModelRenderer;
 import ru.bulldog.justmap.map.MapPlayerManager;
-import ru.bulldog.justmap.util.DataUtil;
+import ru.bulldog.justmap.util.CurrentWorldPos;
 import ru.bulldog.justmap.util.colors.ColorUtil;
 import ru.bulldog.justmap.util.colors.Colors;
 import ru.bulldog.justmap.util.math.MathUtil;
@@ -60,7 +60,7 @@ public class PlayerIcon extends MapIcon<PlayerIcon> {
 			EntityModelRenderer.renderModel(matrices, consumerProvider, player, iconPos.x, iconPos.y);
 		} else if (ClientSettings.showPlayerHeads) {
 			if (ClientSettings.entityIconsShading) {
-				int posY = DataUtil.coordY();
+				int posY = CurrentWorldPos.coordY();
 				int hdiff = posY - height;
 				float hmod;
 				if (hdiff < 0) {

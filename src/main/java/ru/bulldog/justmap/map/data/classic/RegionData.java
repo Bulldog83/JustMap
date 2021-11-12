@@ -16,11 +16,10 @@ import ru.bulldog.justmap.map.data.Layer;
 import ru.bulldog.justmap.map.data.MapRegion;
 import ru.bulldog.justmap.map.data.RegionPos;
 import ru.bulldog.justmap.util.Logger;
-import ru.bulldog.justmap.util.RuleUtil;
+import ru.bulldog.justmap.util.GameRulesUtil;
 import ru.bulldog.justmap.util.colors.Colors;
 import ru.bulldog.justmap.util.math.Plane;
 import ru.bulldog.justmap.util.math.Point;
-import ru.bulldog.justmap.util.render.MapTexture;
 import ru.bulldog.justmap.util.render.RenderUtil;
 import ru.bulldog.justmap.util.storage.StorageUtil;
 import ru.bulldog.justmap.util.tasks.TaskManager;
@@ -147,8 +146,8 @@ public class RegionData implements MapRegion {
 			this.alternateRender = ClientSettings.alternateColorRender;
 			this.needUpdate = true;
 		}
-		if (slimeOverlay != RuleUtil.allowSlimeChunks()) {
-			this.slimeOverlay = RuleUtil.allowSlimeChunks();
+		if (slimeOverlay != GameRulesUtil.allowSlimeChunks()) {
+			this.slimeOverlay = GameRulesUtil.allowSlimeChunks();
 			this.renewOverlay = true;
 		}
 		if (ClientSettings.showLoadedChunks != loadedOverlay) {

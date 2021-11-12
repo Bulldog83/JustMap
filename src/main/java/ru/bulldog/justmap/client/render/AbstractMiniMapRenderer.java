@@ -23,7 +23,7 @@ import ru.bulldog.justmap.map.MapPlayerManager;
 import ru.bulldog.justmap.map.data.WorldMapper;
 import ru.bulldog.justmap.map.minimap.Minimap;
 import ru.bulldog.justmap.map.minimap.skin.MapSkin;
-import ru.bulldog.justmap.util.DataUtil;
+import ru.bulldog.justmap.util.CurrentWorldPos;
 import ru.bulldog.justmap.util.colors.Colors;
 import ru.bulldog.justmap.util.math.Line;
 import ru.bulldog.justmap.util.math.MathUtil;
@@ -78,7 +78,7 @@ public abstract class AbstractMiniMapRenderer {
 
 	protected abstract void render(MatrixStack matrices, double scale);
 
-	public void updateParams() {
+	public void updateParamsOnRender() {
 		this.worldMapper = minimap.getWorldMapper();
 		this.mapSkin = minimap.getSkin();
 
@@ -91,8 +91,8 @@ public abstract class AbstractMiniMapRenderer {
 		}
 
 		this.delta = minecraft.getTickDelta();
-		this.currX = DataUtil.doubleX(delta);
-		this.currZ = DataUtil.doubleZ(delta);
+		this.currX = CurrentWorldPos.doubleX(delta);
+		this.currZ = CurrentWorldPos.doubleZ(delta);
 
 		int mapW = minimap.getWidth();
 		int mapH = minimap.getHeight();
@@ -139,7 +139,7 @@ public abstract class AbstractMiniMapRenderer {
 		if (this.lastX != lastX || this.lastZ != lastZ) {
 			this.lastX = lastX;
 			this.lastZ = lastZ;
-			this.playerPos.set(lastX, DataUtil.coordY(), lastZ);
+			this.playerPos.set(lastX, CurrentWorldPos.coordY(), lastZ);
 			this.playerMoved = true;
 		}
 
@@ -190,7 +190,7 @@ public abstract class AbstractMiniMapRenderer {
 	public void renderMap(MatrixStack matrices) {
 		if (!minimap.isMapVisible() || !JustMapClient.canMapping()) return;
 
-		this.updateParams();
+		this.updateParamsOnRender();
 
 		if (worldMapper == null) return;
 

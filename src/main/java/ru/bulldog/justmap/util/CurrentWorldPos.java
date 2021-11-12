@@ -15,7 +15,7 @@ import net.minecraft.world.World;
 
 import ru.bulldog.justmap.util.math.MathUtil;
 
-public class DataUtil {
+public class CurrentWorldPos {
 	private static final BlockPos.Mutable currentPos = new BlockPos.Mutable();
 	private static ClientWorld clientWorld = null;
 	private static ServerWorld serverWorld = null;

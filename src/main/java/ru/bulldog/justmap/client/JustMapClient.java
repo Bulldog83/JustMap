@@ -26,7 +26,7 @@ import ru.bulldog.justmap.client.control.KeyHandler;
 import ru.bulldog.justmap.map.data.MapDataProvider;
 import ru.bulldog.justmap.map.minimap.Minimap;
 import ru.bulldog.justmap.network.ClientNetworkHandler;
-import ru.bulldog.justmap.util.DataUtil;
+import ru.bulldog.justmap.util.CurrentWorldPos;
 import ru.bulldog.justmap.util.colors.Colors;
 import ru.bulldog.justmap.util.tasks.TaskManager;
 
@@ -69,7 +69,7 @@ public class JustMapClient implements ClientModInitializer {
 
 			if (!canMapping()) return;
 
-			DataUtil.updatePositionOnTick();
+			CurrentWorldPos.updatePositionOnTick();
 			JustMapClient.minimap.updateOnTick();
 			MapDataProvider.getManager().onTick(false);
 		});

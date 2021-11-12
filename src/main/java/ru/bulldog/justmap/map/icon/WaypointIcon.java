@@ -8,7 +8,7 @@ import ru.bulldog.justmap.client.config.ClientSettings;
 import ru.bulldog.justmap.map.IMap;
 import ru.bulldog.justmap.map.minimap.Minimap;
 import ru.bulldog.justmap.map.waypoint.Waypoint;
-import ru.bulldog.justmap.util.DataUtil;
+import ru.bulldog.justmap.util.CurrentWorldPos;
 import ru.bulldog.justmap.util.math.Line;
 import ru.bulldog.justmap.util.math.MathUtil;
 import ru.bulldog.justmap.util.math.Point;
@@ -52,7 +52,7 @@ public class WaypointIcon extends MapIcon<WaypointIcon> {
 		Waypoint.Icon icon = waypoint.getIcon();
 		if (icon != null) {
 			if (ClientSettings.entityIconsShading) {
-				int posY = DataUtil.coordY();
+				int posY = CurrentWorldPos.coordY();
 				int hdiff = posY - height;
 				float hmod;
 				if (hdiff < 0) {

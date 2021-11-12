@@ -11,8 +11,8 @@ import net.minecraft.util.math.Vec3f;
 
 import ru.bulldog.justmap.client.config.ClientSettings;
 import ru.bulldog.justmap.client.render.EntityModelRenderer;
-import ru.bulldog.justmap.util.DataUtil;
-import ru.bulldog.justmap.util.RuleUtil;
+import ru.bulldog.justmap.util.CurrentWorldPos;
+import ru.bulldog.justmap.util.GameRulesUtil;
 import ru.bulldog.justmap.util.colors.Colors;
 import ru.bulldog.justmap.util.math.MathUtil;
 import ru.bulldog.justmap.util.render.GLC;
@@ -30,8 +30,8 @@ public class EntityIcon extends MapIcon<EntityIcon> {
 
 	@Override
 	public void draw(MatrixStack matrices, VertexConsumerProvider consumerProvider, int mapX, int mapY, int mapW, int mapH, float rotation) {
-		if (!RuleUtil.allowCreatureRadar() && !hostile) { return; }
-		if (!RuleUtil.allowHostileRadar() && hostile) { return; }
+		if (!GameRulesUtil.allowCreatureRadar() && !hostile) { return; }
+		if (!GameRulesUtil.allowHostileRadar() && hostile) { return; }
 
 		int color;
 		if (entity instanceof TameableEntity) {
@@ -46,10 +46,10 @@ public class EntityIcon extends MapIcon<EntityIcon> {
 		if (ClientSettings.renderEntityModel) {
 			EntityModelRenderer.renderModel(matrices, consumerProvider, entity, iconPos.x, iconPos.y);
 		} else if (ClientSettings.showEntityHeads) {
-			EntityHeadIcon icon = EntityHeadIcon.getIcon(entity);
+			EntityHeadIconImage icon = EntityHeadIconImage.getIcon(entity);
 			if (icon != null) {
 				if (ClientSettings.entityIconsShading) {
-					int posY = DataUtil.coordY();
+					int posY = CurrentWorldPos.coordY();
 					int hdiff = posY - height;
 					float hmod;
 					if (hdiff < 0) {

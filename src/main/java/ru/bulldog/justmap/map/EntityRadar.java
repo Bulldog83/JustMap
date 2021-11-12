@@ -11,7 +11,7 @@ import net.minecraft.util.math.BlockPos;
 import ru.bulldog.justmap.map.icon.EntityIcon;
 import ru.bulldog.justmap.map.icon.MapIcon;
 import ru.bulldog.justmap.map.icon.PlayerIcon;
-import ru.bulldog.justmap.util.DataUtil;
+import ru.bulldog.justmap.util.CurrentWorldPos;
 import ru.bulldog.justmap.util.math.MathUtil;
 
 public class EntityRadar {
@@ -38,15 +38,15 @@ public class EntityRadar {
 	public List<MapIcon<?>> getDrawableIcons(double worldX, double worldZ, double screenX, double screenY, double scale, float delta) {
 		this.drawableIcons.clear();
 		this.players.forEach(player -> {
-			double iconX = MathUtil.screenPos(DataUtil.doubleX(player, delta), worldX, screenX, scale);
-			double iconY = MathUtil.screenPos(DataUtil.doubleZ(player, delta), worldZ, screenY, scale);
+			double iconX = MathUtil.screenPos(CurrentWorldPos.doubleX(player, delta), worldX, screenX, scale);
+			double iconY = MathUtil.screenPos(CurrentWorldPos.doubleZ(player, delta), worldZ, screenY, scale);
 			PlayerIcon icon = new PlayerIcon(player);
 			icon.setPosition(iconX, iconY, (int) icon.getY());
 			this.drawableIcons.add(icon);
 		});
 		this.creatures.forEach(mob -> {
-			double iconX = MathUtil.screenPos(DataUtil.doubleX(mob, delta), worldX, screenX, scale);
-			double iconY = MathUtil.screenPos(DataUtil.doubleZ(mob, delta), worldZ, screenY, scale);
+			double iconX = MathUtil.screenPos(CurrentWorldPos.doubleX(mob, delta), worldX, screenX, scale);
+			double iconY = MathUtil.screenPos(CurrentWorldPos.doubleZ(mob, delta), worldZ, screenY, scale);
 			EntityIcon icon = new EntityIcon(mob);
 			icon.setPosition(iconX, iconY, (int) mob.getY());
 			this.drawableIcons.add(icon);

@@ -12,20 +12,20 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.ChatUtil;
 import net.minecraft.util.Identifier;
 
-import ru.bulldog.justmap.map.icon.PlayerHeadIcon;
+import ru.bulldog.justmap.map.icon.PlayerHeadIconImage;
 
 public class MapPlayer extends AbstractClientPlayerEntity {
 
-	private final PlayerHeadIcon icon;
+	private final PlayerHeadIconImage icon;
 
 	public MapPlayer(ClientWorld world, PlayerEntity player) {
 		super(world, player.getGameProfile());
 
-		this.icon = new PlayerHeadIcon();
+		this.icon = new PlayerHeadIconImage();
 		this.icon.getPlayerSkin(this);
 	}
 
-	public PlayerHeadIcon getIcon() {
+	public PlayerHeadIconImage getIcon() {
 		long now = System.currentTimeMillis();
 		if (!icon.success) {
 			if (now - icon.lastCheck >= icon.delay) {

@@ -32,15 +32,15 @@ import ru.bulldog.justmap.map.icon.WaypointIcon;
 import ru.bulldog.justmap.map.multiworld.WorldKey;
 import ru.bulldog.justmap.map.waypoint.Waypoint;
 import ru.bulldog.justmap.map.waypoint.WaypointKeeper;
-import ru.bulldog.justmap.util.DataUtil;
+import ru.bulldog.justmap.util.CurrentWorldPos;
 import ru.bulldog.justmap.util.Dimension;
 import ru.bulldog.justmap.util.LangUtil;
 import ru.bulldog.justmap.util.PosUtil;
-import ru.bulldog.justmap.util.RuleUtil;
+import ru.bulldog.justmap.util.GameRulesUtil;
 import ru.bulldog.justmap.util.colors.Colors;
 import ru.bulldog.justmap.util.math.MathUtil;
 
-public class WorldmapScreen extends AbstractMapScreen implements IMap {
+public class WorldmapScreen extends AbstractJustMapScreen implements IMap {
 
 	private final static LiteralText TITLE = new LiteralText("Worldmap");
 
@@ -87,10 +87,10 @@ public class WorldmapScreen extends AbstractMapScreen implements IMap {
 		this.worldMapper = MapDataProvider.getManager().getWorldMapper();
 		WorldKey worldKey = MapDataProvider.getMultiworldManager().getCurrentWorldKey();
 		if (centerPos == null || !worldKey.equals(world)) {
-			this.centerPos = DataUtil.currentPos();
+			this.centerPos = CurrentWorldPos.currentPos();
 			this.world = worldKey;
 		} else if (playerTracking) {
-			this.centerPos = DataUtil.currentPos();
+			this.centerPos = CurrentWorldPos.currentPos();
 		}
 		this.cursorCoords = PosUtil.posToString(centerPos);
 		this.chunkGrid = new ChunkGrid(centerPos.getX(), centerPos.getZ(), x, y, width, height, imageScale);
@@ -99,7 +99,7 @@ public class WorldmapScreen extends AbstractMapScreen implements IMap {
 
 		if (Dimension.isNether(world.getDimension())) {
 			this.mapLayer = Layer.NETHER;
-			this.mapLevel = DataUtil.coordY() / mapLayer.height;
+			this.mapLevel = CurrentWorldPos.coordY() / mapLayer.height;
 		} else {
 			this.mapLayer = Layer.SURFACE;
 			this.mapLevel = 0;
@@ -115,7 +115,7 @@ public class WorldmapScreen extends AbstractMapScreen implements IMap {
 			}
 		}
 		this.players.clear();
-		if (RuleUtil.allowPlayerRadar()) {
+		if (GameRulesUtil.allowPlayerRadar()) {
 			List<AbstractClientPlayerEntity> players = this.client.world.getPlayers();
 			for (PlayerEntity player : players) {
 				if (player == client.player) continue;
@@ -243,7 +243,7 @@ public class WorldmapScreen extends AbstractMapScreen implements IMap {
 
 	public void setCenterByPlayer() {
 		this.playerTracking = true;
-		this.centerPos = DataUtil.currentPos();
+		this.centerPos = CurrentWorldPos.currentPos();
 		this.chunkGrid.updateCenter(centerPos.getX(), centerPos.getZ());
 		this.chunkGrid.updateGrid();
 	}

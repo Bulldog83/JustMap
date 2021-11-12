@@ -5,7 +5,7 @@ import java.util.Arrays;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 
-import ru.bulldog.justmap.util.StateUtil;
+import ru.bulldog.justmap.util.BlockStateUtil;
 
 public class ChunkLevel {
 
@@ -30,7 +30,7 @@ public class ChunkLevel {
 		this.topomap = new int[256];
 		this.level = level;
 
-		int airId = Block.getRawIdFromState(StateUtil.AIR);
+		int airId = Block.getRawIdFromState(BlockStateUtil.AIR);
 		Arrays.fill(statemap, airId);
 		Arrays.fill(colormap, -1);
 		Arrays.fill(heightmap, -1);
@@ -60,7 +60,7 @@ public class ChunkLevel {
 		int index = index(x, z);
 		synchronized (arrayLock) {
 			if (heightmap[index] != y) {
-				this.setBlockState(x, z, StateUtil.AIR);
+				this.setBlockState(x, z, BlockStateUtil.AIR);
 				heightmap[index] = y;
 			}
 		}
@@ -70,7 +70,7 @@ public class ChunkLevel {
 		int index = index(x, z);
 		synchronized (arrayLock) {
 			if (heightmap[index] != -1) {
-				this.setBlockState(x, z, StateUtil.AIR);
+				this.setBlockState(x, z, BlockStateUtil.AIR);
 				this.heightmap[index] = -1;
 			}
 

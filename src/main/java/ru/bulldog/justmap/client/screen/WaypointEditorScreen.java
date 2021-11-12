@@ -29,7 +29,7 @@ import ru.bulldog.justmap.map.waypoint.WaypointKeeper;
 import ru.bulldog.justmap.util.Predicates;
 import ru.bulldog.justmap.util.colors.Colors;
 
-public class WaypointEditorScreen extends AbstractMapScreen {
+public class WaypointEditorScreen extends AbstractJustMapScreen {
 
 	private static final Text TITLE = new TranslatableText(JustMap.MODID + ".gui.screen.waypoints_editor");
 
@@ -253,9 +253,6 @@ public class WaypointEditorScreen extends AbstractMapScreen {
 		this.borderedRect(matrixStack, x, y, w, h, color, 2, 0xFFCCCCCC);
 		icon.draw(ix, iy);
 	}
-
-	@Override
-	public void tick() {}
 
 	private void rect(MatrixStack matrixStack, int x, int y, int w, int h, int color) {
 		fill(matrixStack, x, y, x + w, y + h, color);

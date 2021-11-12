@@ -6,7 +6,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.dimension.DimensionType;
 
 import ru.bulldog.justmap.util.Dimension;
-import ru.bulldog.justmap.util.RuleUtil;
+import ru.bulldog.justmap.util.GameRulesUtil;
 
 public class Layer {
 	public final static Layer SURFACE = new Layer("surface", 256);
@@ -24,7 +24,7 @@ public class Layer {
 	public static Layer getLayer(World world, BlockPos pos) {
 		if (Dimension.isNether(world)) {
 			return NETHER;
-		} else if (RuleUtil.allowCaves() && shouldRenderCaves(world, pos)) {
+		} else if (GameRulesUtil.allowCaves() && shouldRenderCaves(world, pos)) {
 			return CAVES;
 		}
 		return SURFACE;

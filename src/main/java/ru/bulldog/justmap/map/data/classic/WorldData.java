@@ -18,7 +18,7 @@ import ru.bulldog.justmap.map.data.RegionPos;
 import ru.bulldog.justmap.map.data.WorldMapper;
 import ru.bulldog.justmap.map.data.classic.event.ChunkUpdateEvent;
 import ru.bulldog.justmap.map.data.classic.event.ChunkUpdateListener;
-import ru.bulldog.justmap.util.DataUtil;
+import ru.bulldog.justmap.util.CurrentWorldPos;
 import ru.bulldog.justmap.util.math.MathUtil;
 
 public class WorldData implements WorldMapper {
@@ -96,7 +96,7 @@ public class WorldData implements WorldMapper {
 	}
 
 	public WorldChunk callSavedChunk(ChunkPos chunkPos) {
-		World world = DataUtil.getWorld();
+		World world = CurrentWorldPos.getWorld();
 		return this.chunkManager.callSavedChunk(world, chunkPos);
 	}
 

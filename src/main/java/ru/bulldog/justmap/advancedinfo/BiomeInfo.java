@@ -9,7 +9,7 @@ import net.minecraft.world.biome.Biome;
 
 import ru.bulldog.justmap.client.config.ClientSettings;
 import ru.bulldog.justmap.enums.TextAlignment;
-import ru.bulldog.justmap.util.DataUtil;
+import ru.bulldog.justmap.util.CurrentWorldPos;
 import ru.bulldog.justmap.util.colors.BiomeColors;
 
 public class BiomeInfo extends InfoText {
@@ -33,7 +33,7 @@ public class BiomeInfo extends InfoText {
 		MinecraftClient minecraft = MinecraftClient.getInstance();
 		if (visible && minecraft.world != null) {
 			World world = minecraft.world;
-			Biome biome = world.getBiome(DataUtil.currentPos());
+			Biome biome = world.getBiome(CurrentWorldPos.currentPos());
 			Identifier biomeId = BiomeColors.getBiomeId(world, biome);
 			if (biomeId != null && !biomeId.equals(currentBiome)) {
 				this.currentBiome = biomeId;

@@ -20,7 +20,7 @@ import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.map.data.MapDataProvider;
 import ru.bulldog.justmap.map.multiworld.WorldKey;
 import ru.bulldog.justmap.mixins.SessionAccessor;
-import ru.bulldog.justmap.util.DataUtil;
+import ru.bulldog.justmap.util.CurrentWorldPos;
 import ru.bulldog.justmap.util.Dimension;
 
 public final class StorageUtil {
@@ -79,7 +79,7 @@ public final class StorageUtil {
 
 	public static File cacheDir() {
 		String dimension = "undefined";
-		World world = DataUtil.getWorld();
+		World world = CurrentWorldPos.getWorld();
 		if (world != null) {
 			RegistryKey<World> dimKey = world.getRegistryKey();
 			dimension = dimKey.getValue().getPath();

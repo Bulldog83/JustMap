@@ -17,7 +17,7 @@ import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.client.config.ClientSettings;
 import ru.bulldog.justmap.map.data.Layer;
 import ru.bulldog.justmap.network.ClientNetworkHandler;
-import ru.bulldog.justmap.util.DataUtil;
+import ru.bulldog.justmap.util.CurrentWorldPos;
 import ru.bulldog.justmap.util.Dimension;
 import ru.bulldog.justmap.util.colors.ColorUtil;
 import ru.bulldog.justmap.util.colors.Colors;
@@ -54,7 +54,7 @@ public class ChunkData {
 		this.worldChunk = new SoftReference<>(world.getChunk(pos.x, pos.z));
 
 		if (Dimension.isOverworld(world)) {
-			ServerWorld serverWorld = DataUtil.getServerWorld();
+			ServerWorld serverWorld = CurrentWorldPos.getServerWorld();
 			if (serverWorld != null) {
 				this.slime = ChunkRandom.getSlimeRandom(chunkPos.x, chunkPos.z,
 						serverWorld.getSeed(), 987234911L).nextInt(10) == 0;

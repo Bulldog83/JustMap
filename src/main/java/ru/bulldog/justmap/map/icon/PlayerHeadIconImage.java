@@ -14,7 +14,7 @@ import ru.bulldog.justmap.map.MapPlayer;
 import ru.bulldog.justmap.util.colors.Colors;
 import ru.bulldog.justmap.util.render.RenderUtil;
 
-public class PlayerHeadIcon {
+public class PlayerHeadIconImage {
 
 	public long lastCheck;
 	public final int delay = 5000;

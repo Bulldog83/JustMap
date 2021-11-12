@@ -1,4 +1,4 @@
-package ru.bulldog.justmap.util.render;
+package ru.bulldog.justmap.map.data.classic;
 
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
@@ -17,6 +17,7 @@ import org.lwjgl.opengl.GL11;
 
 import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.util.colors.ColorUtil;
+import ru.bulldog.justmap.util.render.GLC;
 
 public class MapTexture {
 
@@ -82,11 +83,11 @@ public class MapTexture {
 		this.changed = false;
 	}
 
-	public int getHeight() {
+	private int getHeight() {
 		return this.height;
 	}
 
-	public int getWidth() {
+	private int getWidth() {
 		return this.width;
 	}
 
@@ -122,7 +123,7 @@ public class MapTexture {
 		}
 	}
 
-	public void setColor(int x, int y, int color) {
+	private void setColor(int x, int y, int color) {
 		if (this.bytes == null) return;
 		if (x < 0 || x >= this.getWidth()) return;
 		if (y < 0 || y >= this.getHeight()) return;
@@ -150,7 +151,7 @@ public class MapTexture {
 		this.changed = true;
 	}
 
-	public int getColor(int x, int y) {
+	private int getColor(int x, int y) {
 		if (this.bytes == null) return -1;
 		if (x < 0 || x >= this.getWidth()) return -1;
 		if (y < 0 || y >= this.getHeight()) return -1;
@@ -177,7 +178,7 @@ public class MapTexture {
 		return pixels;
 	}
 
-	public void applyTint(int x, int y, int tint) {
+	private void applyTint(int x, int y, int tint) {
 		if (this.bytes == null) return;
 		if (x < 0 || x >= this.getWidth()) return;
 		if (y < 0 || y >= this.getHeight()) return;
@@ -273,7 +274,7 @@ public class MapTexture {
 		}
 	}
 
-	public void clear() {
+	private void clear() {
 		synchronized(bufferLock) {
 			this.buffer.clear();
 		}

@@ -5,7 +5,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.LightType;
 
 import ru.bulldog.justmap.client.config.ClientSettings;
-import ru.bulldog.justmap.util.DataUtil;
+import ru.bulldog.justmap.util.CurrentWorldPos;
 
 public class LightLevelInfo extends InfoText {
 
@@ -18,7 +18,7 @@ public class LightLevelInfo extends InfoText {
 		this.setVisible(ClientSettings.showLight);
 		MinecraftClient minecraft = MinecraftClient.getInstance();
 		if (visible && minecraft.world != null) {
-			BlockPos currentPos = DataUtil.currentPos();
+			BlockPos currentPos = CurrentWorldPos.currentPos();
 			minecraft.world.calculateAmbientDarkness();
 			int skyLight = minecraft.world.getLightLevel(currentPos);
 			int blockLight = minecraft.world.getLightLevel(LightType.BLOCK, currentPos);
