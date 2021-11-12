@@ -258,7 +258,7 @@ public class ColorUtil {
 		return HSBtoRGB(floatBuffer[0], floatBuffer[1], floatBuffer[2]);
 	}
 
-	private static int processColor(int blockColor, int textureColor, int defaultColor) {
+	private static int processAlternateColor(int blockColor, int textureColor, int defaultColor) {
 		blockColor = blockColor == -1 ? defaultColor : blockColor;
 		if (blockColor != -1) {
 			return ColorHelper.multiplyColor(textureColor, blockColor);
@@ -267,22 +267,26 @@ public class ColorUtil {
 		return textureColor;
 	}
 
-	public static int blockColor(WorldChunk worldChunk, BlockPos pos) {
+	public static int getBlockColor(WorldChunk worldChunk, BlockPos pos) {
 		World world = worldChunk.getWorld();
 		BlockPos overPos = new BlockPos(pos.getX(), pos.getY() + 1, pos.getZ());
 		BlockState overState = worldChunk.getBlockState(overPos);
 		BlockState blockState = worldChunk.getBlockState(pos);
 
+		return getTintedBlockColor(world, pos, blockState, overState);
+	}
+
+	private static int getTintedBlockColor(World world, BlockPos pos, BlockState blockState, BlockState overState) {
 		boolean waterTint = ClientSettings.alternateColorRender && ClientSettings.waterTint;
 		boolean skipWater = !(ClientSettings.hideWater || waterTint);
 		if (!ClientSettings.hideWater && ClientSettings.hidePlants && StateUtil.isSeaweed(overState)) {
 			if (waterTint) {
-				int color = blockColor(world, blockState, pos);
+				int color = getBlockColorInner(world, blockState, pos);
 				return applyTint(color, BiomeColors.getWaterColor(world, pos));
 			}
-			return blockColor(world, Blocks.WATER.getDefaultState(), pos);
+			return getBlockColorInner(world, Blocks.WATER.getDefaultState(), pos);
 		} else if (!StateUtil.isAir(blockState) && StateUtil.checkState(overState, skipWater, !ClientSettings.hidePlants)) {
-			int color = blockColor(world, blockState, pos);
+			int color = getBlockColorInner(world, blockState, pos);
 			if (ClientSettings.hideWater) return color;
 			if (waterTint && (StateUtil.isWater(overState) || StateUtil.isWaterlogged(blockState))) {
 				return applyTint(color, BiomeColors.getWaterColor(world, pos));
@@ -293,51 +297,54 @@ public class ColorUtil {
 		return -1;
 	}
 
-	public static int blockColor(World world, BlockState state, BlockPos pos) {
-		int materialColor = state.getMapColor(world, pos).color;
+	private static int getBlockColorInner(World world, BlockState blockState, BlockPos pos) {
 		if (ClientSettings.alternateColorRender) {
-			int blockColor = colorPalette.getBlockColor(state);
-			if (blockColor != 0x0) {
-				return blockColor;
-			}
+			return getAlternateBlockColor(world, blockState, pos);
+		} else {
+			return blockState.getMapColor(world, pos).color;
+		}
+	}
 
-			blockColor = colorProvider.getColor(state, world, pos);
-			if (blockColor == -1) {
-				blockColor = minecraft.getBlockColors().getColor(state, world, pos, Colors.LIGHT);
-			}
-			int textureColor = extractColor(state);
-
-			Block block = state.getBlock();
-			if (block instanceof VineBlock) {
-				blockColor = processColor(blockColor, textureColor, colorProvider.getFoliageColor(world, pos));
-			} else if (block instanceof FernBlock || block instanceof TallPlantBlock || block instanceof SugarCaneBlock) {
-				blockColor = processColor(blockColor, textureColor, colorProvider.getGrassColor(world, pos));
-			} else if (block instanceof LilyPadBlock || block instanceof StemBlock || block instanceof AttachedStemBlock) {
-				blockColor = processColor(blockColor, textureColor, materialColor);
-				colorPalette.addBlockColor(state, blockColor);
-			} else if (block instanceof FluidBlock) {
-				if (StateUtil.isWater(state)) {
-					blockColor = processColor(blockColor, textureColor, colorProvider.getWaterColor(world, pos));
-				} else {
-					blockColor = fluidColor(world, state, pos, textureColor);
-					colorPalette.addFluidColor(state, blockColor);
-				}
-			} else if (blockColor != -1) {
-				blockColor = ColorHelper.multiplyColor(textureColor, blockColor);
-				if (block.equals(Blocks.BIRCH_LEAVES) || block.equals(Blocks.SPRUCE_LEAVES)) {
-					colorPalette.addBlockColor(state, blockColor);
-				} else if (!(block instanceof LeavesBlock) && !(block instanceof GrassBlock)) {
-					colorPalette.addBlockColor(state, blockColor);
-				}
-			} else {
-				blockColor = textureColor != -1 ? textureColor : materialColor;
-				colorPalette.addBlockColor(state, blockColor);
-			}
-
+	private static int getAlternateBlockColor(World world, BlockState blockState, BlockPos pos) {
+		int blockColor = colorPalette.getBlockColor(blockState);
+		if (blockColor != 0x0) {
 			return blockColor;
 		}
 
-		return materialColor;
+		blockColor = colorProvider.getColor(blockState, world, pos);
+		if (blockColor == -1) {
+			blockColor = minecraft.getBlockColors().getColor(blockState, world, pos, Colors.LIGHT);
+		}
+		int textureColor = extractColor(blockState);
+
+		Block block = blockState.getBlock();
+		if (block instanceof VineBlock) {
+			blockColor = processAlternateColor(blockColor, textureColor, colorProvider.getFoliageColor(world, pos));
+		} else if (block instanceof FernBlock || block instanceof TallPlantBlock || block instanceof SugarCaneBlock) {
+			blockColor = processAlternateColor(blockColor, textureColor, colorProvider.getGrassColor(world, pos));
+		} else if (block instanceof LilyPadBlock || block instanceof StemBlock || block instanceof AttachedStemBlock) {
+			blockColor = processAlternateColor(blockColor, textureColor, blockState.getMapColor(world, pos).color);
+			colorPalette.addBlockColor(blockState, blockColor);
+		} else if (block instanceof FluidBlock) {
+			if (StateUtil.isWater(blockState)) {
+				blockColor = processAlternateColor(blockColor, textureColor, colorProvider.getWaterColor(world, pos));
+			} else {
+				blockColor = fluidColor(world, blockState, pos, textureColor);
+				colorPalette.addFluidColor(blockState, blockColor);
+			}
+		} else if (blockColor != -1) {
+			blockColor = ColorHelper.multiplyColor(textureColor, blockColor);
+			if (block.equals(Blocks.BIRCH_LEAVES) || block.equals(Blocks.SPRUCE_LEAVES)) {
+				colorPalette.addBlockColor(blockState, blockColor);
+			} else if (!(block instanceof LeavesBlock) && !(block instanceof GrassBlock)) {
+				colorPalette.addBlockColor(blockState, blockColor);
+			}
+		} else {
+			blockColor = textureColor != -1 ? textureColor : blockState.getMapColor(world, pos).color;
+			colorPalette.addBlockColor(blockState, blockColor);
+		}
+
+		return blockColor;
 	}
 
 	private static int fluidColor(World world, BlockState state, BlockPos pos, int defColor) {

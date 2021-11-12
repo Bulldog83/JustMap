@@ -243,7 +243,7 @@ public class ChunkData {
 		BlockState blockState = this.getBlockState(layer, level, blockPos);
 		BlockState worldState = worldChunk.getBlockState(blockPos);
 		if(outdated || !blockState.equals(worldState) || currentTime - refreshed > 60000) {
-			int color = ColorUtil.blockColor(worldChunk, blockPos);
+			int color = ColorUtil.getBlockColor(worldChunk, blockPos);
 			if (color == -1) return;
 
 			chunkLevel.setBlockState(x, z, worldState);
