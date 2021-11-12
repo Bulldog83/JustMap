@@ -35,7 +35,6 @@ public class JustMapClient implements ClientModInitializer {
 	private static Minimap minimap = new Minimap();
 	private static MinecraftClient minecraft;
 	private static ClientNetworkHandler networkHandler;
-	private static boolean canMapping = false;
 	private static boolean isOnTitleScreen = true;
 
 	@Override
@@ -87,16 +86,8 @@ public class JustMapClient implements ClientModInitializer {
 		Colors.INSTANCE.saveData();
 	}
 
-	public static void startMapping() {
-		canMapping = true;
-	}
-
-	public static void stopMapping() {
-		canMapping = false;
-	}
-
 	public static boolean canMapping() {
-		return !isOnTitleScreen && canMapping && minecraft.world != null &&
+		return !isOnTitleScreen && MapDataProvider.getMultiworldManager().isMappingEnabled() && minecraft.world != null &&
 				(minecraft.getCameraEntity() != null || minecraft.player != null);
 	}
 

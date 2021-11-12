@@ -12,7 +12,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 import ru.bulldog.justmap.JustMap;
-import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.client.screen.WorldnameScreen;
 import ru.bulldog.justmap.enums.MultiworldDetection;
 import ru.bulldog.justmap.map.data.WorldMapper;
@@ -34,6 +33,19 @@ public final class MultiworldManager {
 	private String currentWorldName;
 	private boolean requestWorldName = false;
 	private boolean isWorldLoaded = false;
+	private boolean mappingEnabled = false;
+
+	private void startMapping() {
+		mappingEnabled = true;
+	}
+
+	private void stopMapping() {
+		mappingEnabled = false;
+	}
+
+	public boolean isMappingEnabled() {
+		return mappingEnabled;
+	}
 
 	private void closeAllWorldMappers() {
 		synchronized (worldMappers) {
@@ -52,7 +64,7 @@ public final class MultiworldManager {
 		if (currentWorld == null) return;
 		config.saveConfig();
 
-		JustMapClient.stopMapping();
+		stopMapping();
 		if (!RuleUtil.detectMultiworlds()) {
 			if (currentWorldPos != null || currentWorldName != null) {
 				currentWorldPos = null;
@@ -60,7 +72,7 @@ public final class MultiworldManager {
 				closeAllWorldMappers();
 			}
 			updateWorldKey();
-			JustMapClient.startMapping();
+			startMapping();
 			return;
 		} else if (MultiworldDetection.isManual()) {
 			if (currentWorldPos != null) {
@@ -71,7 +83,7 @@ public final class MultiworldManager {
 				requestWorldName = true;
 			} else {
 				updateWorldKey();
-				JustMapClient.startMapping();
+				startMapping();
 			}
 			return;
 		} else if (MultiworldDetection.isAuto()) {
@@ -90,24 +102,24 @@ public final class MultiworldManager {
 				requestWorldName = true;
 			} else {
 				updateWorldKey();
-				JustMapClient.startMapping();
+				startMapping();
 			}
 			return;
 		}
-		JustMapClient.startMapping();
+		startMapping();
 	}
 
 	public void onWorldChanged(World world) {
 		currentWorld = world;
 		if (RuleUtil.detectMultiworlds()) {
 			JustMap.LOGGER.debug("World changed, stop mapping!");
-			JustMapClient.stopMapping();
+			stopMapping();
 			if (MultiworldDetection.isManual()) {
 				requestWorldName = true;
 			}
 		} else {
 			updateWorldKey();
-			JustMapClient.startMapping();
+			startMapping();
 		}
 	}
 
@@ -122,7 +134,7 @@ public final class MultiworldManager {
 			}
 			return;
 		}
-		JustMapClient.stopMapping();
+		stopMapping();
 		currentWorldPos = newPos;
 		if (MultiworldDetection.isMixed()) {
 			MultiworldIdentifier identifier = new MultiworldIdentifier(newPos, currentWorld);
@@ -130,13 +142,13 @@ public final class MultiworldManager {
 			if (name != null) {
 				currentWorldName = name;
 				updateWorldKey();
-				JustMapClient.startMapping();
+				startMapping();
 			} else {
 				requestWorldName = true;
 			}
 		} else {
 			updateWorldKey();
-			JustMapClient.startMapping();
+			startMapping();
 		}
 	}
 
@@ -163,7 +175,7 @@ public final class MultiworldManager {
 			config.saveWorldsConfig();
 		}
 		updateWorldKey();
-		JustMapClient.startMapping();
+		startMapping();
 	}
 
 	public WorldKey getCurrentWorldKey() {
@@ -248,7 +260,7 @@ public final class MultiworldManager {
 	}
 
 	public void onWorldStop() {
-		JustMapClient.stopMapping();
+		stopMapping();
 		JustMap.WORKER.execute("Stopping world ...", () -> {
 			config.reloadConfig();
 			currentWorld = null;
