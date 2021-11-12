@@ -169,7 +169,8 @@ public class WorldData implements MapRegionProvider {
 		this.chunkManager.clear();
 	}
 
-	public void close() {
+	@Override
+	public void onMultiworldClose() {
 		synchronized (regions) {
 			this.regions.forEach((pos, region) -> region.close());
 			this.regions.clear();

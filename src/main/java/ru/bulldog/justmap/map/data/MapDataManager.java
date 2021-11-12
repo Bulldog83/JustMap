@@ -10,10 +10,6 @@ import net.minecraft.world.chunk.WorldChunk;
 import ru.bulldog.justmap.map.multiworld.WorldKey;
 
 public interface MapDataManager {
-	// WorldKey management
-
-	List<WorldKey> registeredWorlds();
-
 	// World map management
 
 	MapRegionProvider getMapRegionProvider();
@@ -21,8 +17,6 @@ public interface MapDataManager {
 	int getMapHeight(Layer mapLayer, int mapLevel, int posX, int posZ);
 
 	// Callbacks
-
-	void onMultiworldClose();
 
 	void onChunkLoad(World world, WorldChunk worldChunk);
 

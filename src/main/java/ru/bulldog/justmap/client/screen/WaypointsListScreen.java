@@ -153,7 +153,7 @@ public class WaypointsListScreen extends AbstractMapScreen {
 
 	@Override
 	protected void init() {
-		MapDataProvider.getManager().registeredWorlds().forEach(world -> {
+		MapDataProvider.getMultiworldManager().registeredWorlds().forEach(world -> {
 			if (!worlds.contains(world)) {
 				this.worlds.add(world);
 			}

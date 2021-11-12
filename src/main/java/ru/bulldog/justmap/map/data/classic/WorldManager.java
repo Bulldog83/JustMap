@@ -1,10 +1,5 @@
 package ru.bulldog.justmap.map.data.classic;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -18,7 +13,6 @@ import ru.bulldog.justmap.map.data.Layer;
 import ru.bulldog.justmap.map.data.MapDataManager;
 import ru.bulldog.justmap.map.data.MapDataProvider;
 import ru.bulldog.justmap.map.data.MapRegionProvider;
-import ru.bulldog.justmap.map.multiworld.WorldKey;
 import ru.bulldog.justmap.map.data.classic.event.ChunkUpdateEvent;
 import ru.bulldog.justmap.map.data.classic.event.ChunkUpdateListener;
 import ru.bulldog.justmap.util.DataUtil;
@@ -27,38 +21,19 @@ import ru.bulldog.justmap.util.tasks.MemoryUtil;
 public final class WorldManager implements MapDataManager {
 	public static final WorldManager WORLD_MANAGER = new WorldManager();
 
-	private final Map<WorldKey, WorldData> worldsData = new HashMap<>();
 	private boolean cacheClearing = false;
 
-	@Override
-	public List<WorldKey> registeredWorlds() {
-		return new ArrayList<>(worldsData.keySet());
+	public WorldData getWorldData() {
+		return (WorldData) getMapRegionProvider();
+	}
+
+	private MapRegionProvider createWorldData() {
+		return new WorldData(MapDataProvider.getMultiworldManager().getCurrentWorld());
 	}
 
 	@Override
 	public MapRegionProvider getMapRegionProvider() {
-		return getWorldData();
-	}
-
-	public WorldData getWorldData() {
-		if (MapDataProvider.getMultiworldManager().getCurrentWorld() == null || MapDataProvider.getMultiworldManager().getCurrentWorldKey() == null) return null;
-
-		WorldData data;
-		synchronized (worldsData) {
-			if (worldsData.containsKey(MapDataProvider.getMultiworldManager().getCurrentWorldKey())) {
-				data = worldsData.get(MapDataProvider.getMultiworldManager().getCurrentWorldKey());
-				if (data != null) {
-					return data;
-				}
-				data = new WorldData(MapDataProvider.getMultiworldManager().getCurrentWorld());
-				worldsData.replace(MapDataProvider.getMultiworldManager().getCurrentWorldKey(), data);
-
-				return data;
-			}
-			data = new WorldData(MapDataProvider.getMultiworldManager().getCurrentWorld());
-			worldsData.put(MapDataProvider.getMultiworldManager().getCurrentWorldKey(), data);
-		}
-		return data;
+		return MapDataProvider.getMultiworldManager().getOrCreateWorldMapper(this::createWorldData);
 	}
 
 	@Override
@@ -74,13 +49,13 @@ public final class WorldManager implements MapDataManager {
 
 	private void updateOnTick() {
 		getWorldData().updateMap();
-		JustMap.WORKER.execute(() -> {
-			synchronized (worldsData) {
-				worldsData.forEach((id, data) -> {
-					if (data != null) data.clearCache();
-				});
-			}
-		});
+		JustMap.WORKER.execute(() -> MapDataProvider.getMultiworldManager().forEachWorldMapper(
+				data -> {
+					WorldData worldData = (WorldData) data;
+					if (worldData != null) {
+						worldData.clearCache();
+					}
+				}));
 	}
 
 	private void memoryControl() {
@@ -91,30 +66,17 @@ public final class WorldManager implements MapDataManager {
 			JustMap.LOGGER.debug(String.format("Memory usage at %2d%%, forcing garbage collection.", usedPct));
 			JustMap.WORKER.execute("Hard cache clearing...", () -> {
 				int amount = ClientSettings.purgeAmount * 10;
-				synchronized (worldsData) {
-					worldsData.forEach((id, world) -> {
-						if (world != null) {
-							world.getChunkManager().purge(amount, 1000);
-						}
-					});
-				}
+				MapDataProvider.getMultiworldManager().forEachWorldMapper(data -> {
+					WorldData worldData = (WorldData) data;
+					if (worldData != null) {
+						worldData.getChunkManager().purge(amount, 1000);
+					}
+				});
 				System.gc();
 				cacheClearing = false;
 			});
 			usedPct = MemoryUtil.getMemoryUsage();
 			JustMap.LOGGER.debug(String.format("Memory usage at %2d%%.", usedPct));
-		}
-	}
-
-	@Override
-	public void onMultiworldClose() {
-		synchronized (worldsData) {
-			if (worldsData.size() > 0) {
-				worldsData.forEach((id, data) -> {
-					if (data != null) data.close();
-				});
-				worldsData.clear();
-			}
 		}
 	}
 
@@ -144,7 +106,7 @@ public final class WorldManager implements MapDataManager {
 		int chunkX = posX >> 4;
 		int chunkZ = posZ >> 4;
 
-		ChunkData mapChunk = this.getWorldData().getChunk(chunkX, chunkZ);
+		ChunkData mapChunk = getWorldData().getChunk(chunkX, chunkZ);
 
 		int cx = posX - (chunkX << 4);
 		int cz = posZ - (chunkZ << 4);

@@ -1,8 +1,12 @@
 package ru.bulldog.justmap.map.multiworld;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -20,7 +24,7 @@ import ru.bulldog.justmap.client.config.ClientConfig;
 import ru.bulldog.justmap.client.screen.WorldnameScreen;
 import ru.bulldog.justmap.config.ConfigKeeper;
 import ru.bulldog.justmap.enums.MultiworldDetection;
-import ru.bulldog.justmap.map.data.MapDataProvider;
+import ru.bulldog.justmap.map.data.MapRegionProvider;
 import ru.bulldog.justmap.util.JsonFactory;
 import ru.bulldog.justmap.util.RuleUtil;
 import ru.bulldog.justmap.util.storage.StorageUtil;
@@ -33,12 +37,27 @@ public final class MultiworldManager {
 	private final MinecraftClient minecraft = MinecraftClient.getInstance();
 	private final ClientConfig modConfig = JustMapClient.getConfig();
 
+	private final Map<WorldKey, MapRegionProvider> worldMappers = new HashMap<>();
+
 	private World currentWorld;
 	private WorldKey currentWorldKey;
 	private BlockPos currentWorldPos;
 	private String currentWorldName;
 	private boolean requestWorldName = false;
 	private boolean isWorldLoaded = false;
+
+	private void closeAllWorldMappers() {
+		synchronized (worldMappers) {
+			if (worldMappers.size() > 0) {
+				worldMappers.forEach((id, data) -> {
+					if (data != null) {
+						data.onMultiworldClose();
+					}
+				});
+				worldMappers.clear();
+			}
+		}
+	}
 
 	public void onConfigUpdate() {
 		if (currentWorld == null) return;
@@ -49,7 +68,7 @@ public final class MultiworldManager {
 			if (currentWorldPos != null || currentWorldName != null) {
 				currentWorldPos = null;
 				currentWorldName = null;
-				MapDataProvider.getManager().onMultiworldClose();
+				closeAllWorldMappers();
 			}
 			updateWorldKey();
 			JustMapClient.startMapping();
@@ -57,7 +76,7 @@ public final class MultiworldManager {
 		} else if (MultiworldDetection.isManual()) {
 			if (currentWorldPos != null) {
 				currentWorldPos = null;
-				MapDataProvider.getManager().onMultiworldClose();
+				closeAllWorldMappers();
 			}
 			if (currentWorldName == null) {
 				requestWorldName = true;
@@ -69,7 +88,7 @@ public final class MultiworldManager {
 		} else if (MultiworldDetection.isAuto()) {
 			if (currentWorldName != null) {
 				currentWorldName = null;
-				MapDataProvider.getManager().onMultiworldClose();
+				closeAllWorldMappers();
 			}
 			assert minecraft.world != null;
 			onWorldSpawnPosChanged(minecraft.world.getSpawnPos());
@@ -179,6 +198,40 @@ public final class MultiworldManager {
 		}
 	}
 
+	public List<WorldKey> registeredWorlds() {
+		return new ArrayList<>(worldMappers.keySet());
+	}
+
+	public void forEachWorldMapper(Consumer<MapRegionProvider> consumer) {
+		synchronized (worldMappers) {
+			worldMappers.forEach((id, data) -> {
+				consumer.accept(data);
+			});
+		}
+	}
+
+	// Only to be used by MapDataManagers
+	public MapRegionProvider getOrCreateWorldMapper(Supplier<MapRegionProvider> worldMapperCreator) {
+		if (getCurrentWorld() == null || getCurrentWorldKey() == null) return null;
+
+		MapRegionProvider worldMapper;
+		synchronized (worldMappers) {
+			if (worldMappers.containsKey(getCurrentWorldKey())) {
+				worldMapper = worldMappers.get(getCurrentWorldKey());
+				if (worldMapper != null) {
+					return worldMapper;
+				}
+				worldMapper = worldMapperCreator.get();
+				worldMappers.replace(getCurrentWorldKey(), worldMapper);
+
+				return worldMapper;
+			}
+			worldMapper = worldMapperCreator.get();
+			worldMappers.put(getCurrentWorldKey(), worldMapper);
+		}
+		return worldMapper;
+	}
+
 	public void checkForNewWorld() {
 		if (requestWorldName && !(minecraft.currentScreen instanceof ProgressScreen)) {
 			minecraft.setScreen(new WorldnameScreen(minecraft.currentScreen));
@@ -267,13 +320,13 @@ public final class MultiworldManager {
 		}
 	}
 
-	public void closeWorker(Runnable clearAction) {
+	private void closeWorker() {
 		modConfig.reloadFromDisk();
 		currentWorld = null;
 		if (isWorldLoaded) {
 			saveWorlds();
 			worldAssociations.clear();
-			clearAction.run();
+			closeAllWorldMappers();
 			isWorldLoaded = false;
 		}
 	}
@@ -286,7 +339,7 @@ public final class MultiworldManager {
 
 	public void onWorldStop() {
 		JustMapClient.stopMapping();
-		JustMap.WORKER.execute("Stopping world ...", () -> closeWorker(() -> MapDataProvider.getManager().onMultiworldClose()));
+		JustMap.WORKER.execute("Stopping world ...", this::closeWorker);
 	}
 
 }
