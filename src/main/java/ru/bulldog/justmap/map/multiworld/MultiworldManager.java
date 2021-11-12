@@ -20,6 +20,7 @@ import ru.bulldog.justmap.client.config.ClientConfig;
 import ru.bulldog.justmap.client.screen.WorldnameScreen;
 import ru.bulldog.justmap.config.ConfigKeeper;
 import ru.bulldog.justmap.enums.MultiworldDetection;
+import ru.bulldog.justmap.map.data.MapDataProvider;
 import ru.bulldog.justmap.util.JsonFactory;
 import ru.bulldog.justmap.util.RuleUtil;
 import ru.bulldog.justmap.util.storage.StorageUtil;
@@ -39,7 +40,7 @@ public final class MultiworldManager {
 	private boolean requestWorldName = false;
 	private boolean isWorldLoaded = false;
 
-	public void onConfigUpdate(Runnable cleanAction) {
+	public void onConfigUpdate() {
 		if (currentWorld == null) return;
 		saveConfig();
 
@@ -48,7 +49,7 @@ public final class MultiworldManager {
 			if (currentWorldPos != null || currentWorldName != null) {
 				currentWorldPos = null;
 				currentWorldName = null;
-				cleanAction.run();
+				MapDataProvider.getManager().onMultiworldClose();
 			}
 			updateWorldKey();
 			JustMapClient.startMapping();
@@ -56,7 +57,7 @@ public final class MultiworldManager {
 		} else if (MultiworldDetection.isManual()) {
 			if (currentWorldPos != null) {
 				currentWorldPos = null;
-				cleanAction.run();
+				MapDataProvider.getManager().onMultiworldClose();
 			}
 			if (currentWorldName == null) {
 				requestWorldName = true;
@@ -68,7 +69,7 @@ public final class MultiworldManager {
 		} else if (MultiworldDetection.isAuto()) {
 			if (currentWorldName != null) {
 				currentWorldName = null;
-				cleanAction.run();
+				MapDataProvider.getManager().onMultiworldClose();
 			}
 			assert minecraft.world != null;
 			onWorldSpawnPosChanged(minecraft.world.getSpawnPos());
@@ -283,9 +284,9 @@ public final class MultiworldManager {
 		}
 	}
 
-	public void onWorldStop(Runnable clearAction) {
+	public void onWorldStop() {
 		JustMapClient.stopMapping();
-		JustMap.WORKER.execute("Stopping world ...", () -> closeWorker(clearAction));
+		JustMap.WORKER.execute("Stopping world ...", () -> closeWorker(() -> MapDataProvider.getManager().onMultiworldClose()));
 	}
 
 }

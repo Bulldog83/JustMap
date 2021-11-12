@@ -36,11 +36,6 @@ public final class WorldManager implements MapDataManager {
 	}
 
 	@Override
-	public void onConfigUpdate() {
-		MapDataProvider.getMultiworldManager().onConfigUpdate(this::clearData);
-	}
-
-	@Override
 	public MapRegionProvider getMapRegionProvider() {
 		return getWorldData();
 	}
@@ -111,7 +106,8 @@ public final class WorldManager implements MapDataManager {
 		}
 	}
 
-	private void clearData() {
+	@Override
+	public void onMultiworldClose() {
 		synchronized (worldsData) {
 			if (worldsData.size() > 0) {
 				worldsData.forEach((id, data) -> {
@@ -140,7 +136,6 @@ public final class WorldManager implements MapDataManager {
 
 	@Override
 	public void onWorldStop() {
-		MapDataProvider.getMultiworldManager().onWorldStop(this::clearData);
 		ChunkUpdateListener.stop();
 	}
 

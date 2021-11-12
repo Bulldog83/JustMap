@@ -22,9 +22,9 @@ public interface MapDataManager {
 
 	// Callbacks
 
-	void onChunkLoad(World world, WorldChunk worldChunk);
+	void onMultiworldClose();
 
-	void onConfigUpdate();
+	void onChunkLoad(World world, WorldChunk worldChunk);
 
 	void onSetBlockState(BlockPos pos, BlockState state, World world);
 

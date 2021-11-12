@@ -83,6 +83,7 @@ public class JustMapClient implements ClientModInitializer {
 
 	private static void stop() {
 		MapDataProvider.getManager().onWorldStop();
+		MapDataProvider.getMultiworldManager().onWorldStop();
 		Colors.INSTANCE.saveData();
 	}
 
