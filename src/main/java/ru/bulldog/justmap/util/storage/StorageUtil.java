@@ -18,7 +18,7 @@ import org.apache.commons.io.FileUtils;
 
 import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.map.data.MapDataProvider;
-import ru.bulldog.justmap.map.data.WorldKey;
+import ru.bulldog.justmap.map.multiworld.WorldKey;
 import ru.bulldog.justmap.mixins.SessionAccessor;
 import ru.bulldog.justmap.util.DataUtil;
 import ru.bulldog.justmap.util.Dimension;

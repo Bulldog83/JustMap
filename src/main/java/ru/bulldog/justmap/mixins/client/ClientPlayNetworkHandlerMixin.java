@@ -20,7 +20,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.map.MapGameRules;
 import ru.bulldog.justmap.map.data.MapDataProvider;
-import ru.bulldog.justmap.map.data.WorldKey;
+import ru.bulldog.justmap.map.multiworld.WorldKey;
 import ru.bulldog.justmap.map.waypoint.Waypoint;
 
 @Mixin(value = ClientPlayNetworkHandler.class, priority = 100)

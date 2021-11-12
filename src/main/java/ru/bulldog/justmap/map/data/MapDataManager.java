@@ -7,6 +7,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.WorldChunk;
 
+import ru.bulldog.justmap.map.multiworld.WorldKey;
+
 public interface MapDataManager {
 	// WorldKey management
 

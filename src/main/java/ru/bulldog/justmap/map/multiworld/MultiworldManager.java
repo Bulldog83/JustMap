@@ -20,7 +20,6 @@ import ru.bulldog.justmap.client.config.ClientConfig;
 import ru.bulldog.justmap.client.screen.WorldnameScreen;
 import ru.bulldog.justmap.config.ConfigKeeper;
 import ru.bulldog.justmap.enums.MultiworldDetection;
-import ru.bulldog.justmap.map.data.WorldKey;
 import ru.bulldog.justmap.util.JsonFactory;
 import ru.bulldog.justmap.util.RuleUtil;
 import ru.bulldog.justmap.util.storage.StorageUtil;

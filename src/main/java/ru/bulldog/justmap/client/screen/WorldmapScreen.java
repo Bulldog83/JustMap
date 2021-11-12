@@ -27,7 +27,7 @@ import ru.bulldog.justmap.map.data.Layer;
 import ru.bulldog.justmap.map.data.MapDataProvider;
 import ru.bulldog.justmap.map.data.MapRegion;
 import ru.bulldog.justmap.map.data.MapRegionProvider;
-import ru.bulldog.justmap.map.data.WorldKey;
+import ru.bulldog.justmap.map.multiworld.WorldKey;
 import ru.bulldog.justmap.map.icon.PlayerIcon;
 import ru.bulldog.justmap.map.icon.WaypointIcon;
 import ru.bulldog.justmap.map.waypoint.Waypoint;

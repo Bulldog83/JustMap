@@ -17,7 +17,7 @@ import ru.bulldog.justmap.map.IMap;
 import ru.bulldog.justmap.map.data.Layer;
 import ru.bulldog.justmap.map.data.MapDataManager;
 import ru.bulldog.justmap.map.data.MapRegionProvider;
-import ru.bulldog.justmap.map.data.WorldKey;
+import ru.bulldog.justmap.map.multiworld.WorldKey;
 import ru.bulldog.justmap.map.data.classic.event.ChunkUpdateEvent;
 import ru.bulldog.justmap.map.data.classic.event.ChunkUpdateListener;
 import ru.bulldog.justmap.map.multiworld.MultiworldManager;

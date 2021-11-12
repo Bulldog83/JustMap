@@ -19,7 +19,7 @@ import org.lwjgl.glfw.GLFW;
 
 import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.map.data.MapDataProvider;
-import ru.bulldog.justmap.map.data.WorldKey;
+import ru.bulldog.justmap.map.multiworld.WorldKey;
 import ru.bulldog.justmap.map.waypoint.Waypoint;
 import ru.bulldog.justmap.map.waypoint.Waypoint.Icon;
 import ru.bulldog.justmap.map.waypoint.WaypointKeeper;
