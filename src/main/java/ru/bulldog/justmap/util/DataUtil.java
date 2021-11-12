@@ -30,9 +30,9 @@ public class DataUtil {
 	private static ClientWorld clientWorld = null;
 	private static ServerWorld serverWorld = null;
 	private static Supplier<PersistentStateManager> persistentSupplier = null;
-	private static int coordX = 0;
-	private static int coordY = 0;
-	private static int coordZ = 0;
+	private static int coordX;
+	private static int coordY;
+	private static int coordZ;
 
 	@Environment(EnvType.CLIENT)
 	public static void updateWorld(ClientWorld world) {
@@ -48,17 +48,16 @@ public class DataUtil {
 		}
 	}
 
-	public static void updateOnTick() {
-		coordX = 0;
-		coordY = 0;
-		coordZ = 0;
-
-		Entity posEntity = getPosEntity();
-		if (posEntity == null) return;
-
-		coordX = MathUtil.floor(posEntity.getX());
-		coordZ = MathUtil.floor(posEntity.getZ());
-		coordY = (int) posEntity.getY();
+	public static void updatePositionOnTick() {
+		if (getPosEntity() == null) {
+			coordX = 0;
+			coordY = 0;
+			coordZ = 0;
+		} else {
+			coordX = MathUtil.floor(getPosEntity().getX());
+			coordZ = MathUtil.floor(getPosEntity().getZ());
+			coordY = (int) getPosEntity().getY();
+		}
 	}
 
 	public static World getWorld() {

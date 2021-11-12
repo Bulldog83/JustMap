@@ -69,7 +69,7 @@ public class JustMapClient implements ClientModInitializer {
 
 			if (!canMapping()) return;
 
-			DataUtil.updateOnTick();
+			DataUtil.updatePositionOnTick();
 			JustMapClient.minimap.updateOnTick();
 			MapDataProvider.getManager().onTick(false);
 		});

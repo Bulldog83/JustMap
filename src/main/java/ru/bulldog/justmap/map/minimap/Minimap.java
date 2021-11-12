@@ -101,7 +101,7 @@ public class Minimap implements IMap {
 				locPlayer = player;
 			}
 
-			this.prepareMap(player);
+			this.prepareMapOnTick(player);
 			this.updateInfoOnTick(player);
 		} else {
 			locPlayer = null;
@@ -284,7 +284,7 @@ public class Minimap implements IMap {
 			txtTime.updateOnTick();
 	}
 
-	public void prepareMap(PlayerEntity player) {
+	public void prepareMapOnTick(PlayerEntity player) {
 		this.world = player.world;
 		this.worldMapper = MapDataProvider.getManager().getWorldMapper();
 		BlockPos pos = DataUtil.currentPos();
@@ -314,6 +314,10 @@ public class Minimap implements IMap {
 		double endX = startX + scaledW;
 		double endZ = startZ + scaledH;
 
+		setupEntityRadarOnTick(player, pos, posX, posY, startX, startZ, endX, endZ);
+	}
+
+	private void setupEntityRadarOnTick(PlayerEntity player, BlockPos pos, int posX, int posY, double startX, double startZ, double endX, double endZ) {
 		int radius = (int) (posX - startX);
 		this.entityRadar.clear(pos, radius);
 		if (RuleUtil.allowEntityRadar()) {
