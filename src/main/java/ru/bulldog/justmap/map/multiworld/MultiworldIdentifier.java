@@ -1,4 +1,4 @@
-package ru.bulldog.justmap.map.data.classic;
+package ru.bulldog.justmap.map.multiworld;
 
 import com.google.gson.JsonObject;
 import net.minecraft.util.Identifier;
