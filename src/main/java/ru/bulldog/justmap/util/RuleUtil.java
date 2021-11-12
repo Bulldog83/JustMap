@@ -28,10 +28,6 @@ public class RuleUtil {
 		return false;
 	}
 
-	public static boolean detectMultiworlds() {
-		return ClientSettings.detectMultiworlds;
-	}
-
 	public static boolean needRenderCaves(World world, BlockPos pos) {
 		boolean allowCaves;
 		if (JustMap.getSide() == EnvType.SERVER) {

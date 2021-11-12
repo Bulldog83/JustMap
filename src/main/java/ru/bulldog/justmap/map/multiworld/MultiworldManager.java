@@ -12,10 +12,10 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 import ru.bulldog.justmap.JustMap;
+import ru.bulldog.justmap.client.config.ClientSettings;
 import ru.bulldog.justmap.client.screen.WorldnameScreen;
 import ru.bulldog.justmap.enums.MultiworldDetection;
 import ru.bulldog.justmap.map.data.WorldMapper;
-import ru.bulldog.justmap.util.RuleUtil;
 
 public final class MultiworldManager {
 	public static final MultiworldManager MULTIWORLD_MANAGER = new MultiworldManager();
@@ -65,7 +65,7 @@ public final class MultiworldManager {
 		config.saveConfig();
 
 		stopMapping();
-		if (!RuleUtil.detectMultiworlds()) {
+		if (!ClientSettings.detectMultiworlds) {
 			if (currentWorldPos != null || currentWorldName != null) {
 				currentWorldPos = null;
 				currentWorldName = null;
@@ -111,7 +111,7 @@ public final class MultiworldManager {
 
 	public void onWorldChanged(World world) {
 		currentWorld = world;
-		if (RuleUtil.detectMultiworlds()) {
+		if (ClientSettings.detectMultiworlds) {
 			JustMap.LOGGER.debug("World changed, stop mapping!");
 			stopMapping();
 			if (MultiworldDetection.isManual()) {
@@ -124,7 +124,7 @@ public final class MultiworldManager {
 	}
 
 	public void onWorldSpawnPosChanged(BlockPos newPos) {
-		if (!RuleUtil.detectMultiworlds()) {
+		if (!ClientSettings.detectMultiworlds) {
 			return;
 		}
 		if (MultiworldDetection.isManual()) {
@@ -165,7 +165,7 @@ public final class MultiworldManager {
 			name = "Default";
 		}
 
-		if (!RuleUtil.detectMultiworlds()) {
+		if (!ClientSettings.detectMultiworlds) {
 			return;
 		}
 		currentWorldName = name;
@@ -188,7 +188,7 @@ public final class MultiworldManager {
 
 	public WorldKey createWorldKey(World world, BlockPos blockPos, String worldName) {
 		WorldKey newKey = new WorldKey(world.getRegistryKey());
-		if (RuleUtil.detectMultiworlds()) {
+		if (ClientSettings.detectMultiworlds) {
 			if (blockPos != null) {
 				newKey.setWorldPos(blockPos);
 			}
@@ -243,9 +243,6 @@ public final class MultiworldManager {
 		config.loadWorldsConfig();
 	}
 
-
-
-
 	private void checkForNewWorld() {
 		if (requestWorldName && !(minecraft.currentScreen instanceof ProgressScreen)) {
 			minecraft.setScreen(new WorldnameScreen(minecraft.currentScreen));
@@ -272,5 +269,4 @@ public final class MultiworldManager {
 			}
 		});
 	}
-
 }
