@@ -15,7 +15,7 @@ public abstract class MinecraftClientMixin {
 
 	@Inject(method = "joinWorld", at = @At("TAIL"))
 	public void onJoinWorld(ClientWorld world, CallbackInfo cinfo) {
-		MapDataProvider.getManager().onWorldChanged(world);
+		MapDataProvider.getMultiworldManager().onWorldChanged(world);
 		DataUtil.updateWorld(world);
 	}
 }

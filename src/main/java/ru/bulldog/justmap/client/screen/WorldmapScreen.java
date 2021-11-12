@@ -85,7 +85,7 @@ public class WorldmapScreen extends AbstractMapScreen implements IMap {
 		this.centerY = height / 2.0;
 
 		this.mapRegionProvider = MapDataProvider.getManager().getMapRegionProvider();
-		WorldKey worldKey = MapDataProvider.getManager().getWorldKey();
+		WorldKey worldKey = MapDataProvider.getMultiworldManager().getCurrentWorldKey();
 		if (centerPos == null || !worldKey.equals(world)) {
 			this.centerPos = DataUtil.currentPos();
 			this.world = worldKey;

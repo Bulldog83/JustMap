@@ -85,7 +85,7 @@ public final class StorageUtil {
 			dimension = dimKey.getValue().getPath();
 		}
 
-		WorldKey worldKey = MapDataProvider.getManager().getWorldKey();
+		WorldKey worldKey = MapDataProvider.getMultiworldManager().getCurrentWorldKey();
 		File cacheDir = new File(filesDir(), worldKey.toFolder());
 		File oldCacheDir = new File(filesDir(), String.format("cache/%s", dimension));
 		if (world != null) {

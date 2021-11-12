@@ -12,11 +12,7 @@ import ru.bulldog.justmap.map.multiworld.WorldKey;
 public interface MapDataManager {
 	// WorldKey management
 
-	WorldKey getWorldKey();
-
 	List<WorldKey> registeredWorlds();
-
-	void setCurrentWorldName(String name);
 
 	// World map management
 
@@ -25,12 +21,6 @@ public interface MapDataManager {
 	int getMapHeight(Layer mapLayer, int mapLevel, int posX, int posZ);
 
 	// Callbacks
-
-	void onServerConnect();
-
-	void onWorldChanged(World world);
-
-	void onWorldSpawnPosChanged(BlockPos newPos);
 
 	void onChunkLoad(World world, WorldChunk worldChunk);
 

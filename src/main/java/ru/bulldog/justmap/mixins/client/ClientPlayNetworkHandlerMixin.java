@@ -32,13 +32,13 @@ public abstract class ClientPlayNetworkHandlerMixin {
 
 	@Inject(method = "<init>", at = @At("TAIL"))
 	public void onConnect(MinecraftClient client, Screen screen, ClientConnection connection, GameProfile profile, CallbackInfo cinfo) {
-		MapDataProvider.getManager().onServerConnect();
+		MapDataProvider.getMultiworldManager().onServerConnect();
 	}
 
 	@Inject(method = "onPlayerSpawnPosition", at = @At("TAIL"))
 	public void onPlayerSpawnPosition(PlayerSpawnPositionS2CPacket packet, CallbackInfo cinfo) {
 		JustMap.LOGGER.debug("World spawn position set to {}", packet.getPos().toShortString());
-		MapDataProvider.getManager().onWorldSpawnPosChanged(packet.getPos());
+		MapDataProvider.getMultiworldManager().onWorldSpawnPosChanged(packet.getPos());
 	}
 
 	@Inject(method = "onGameMessage", at = @At("HEAD"), cancellable = true)
@@ -64,7 +64,7 @@ public abstract class ClientPlayNetworkHandlerMixin {
 	public void onHealthUpdate(HealthUpdateS2CPacket healthUpdateS2CPacket, CallbackInfo cinfo) {
 		float health = healthUpdateS2CPacket.getHealth();
 		if (health <= 0.0F) {
-			WorldKey world = MapDataProvider.getManager().getWorldKey();
+			WorldKey world = MapDataProvider.getMultiworldManager().getCurrentWorldKey();
 			BlockPos playerPos = this.client.player.getBlockPos();
 			Waypoint.createOnDeath(world, playerPos);
 		}

@@ -25,18 +25,19 @@ import ru.bulldog.justmap.util.RuleUtil;
 import ru.bulldog.justmap.util.storage.StorageUtil;
 
 public final class MultiworldManager {
+	public static final MultiworldManager MULTIWORLD_MANAGER = new MultiworldManager();
 
 	// used only in mixed mode to associate world names with worlds
 	private final Map<MultiworldIdentifier, String> worldAssociations = new HashMap<>();
 	private final MinecraftClient minecraft = MinecraftClient.getInstance();
 	private final ClientConfig modConfig = JustMapClient.getConfig();
 
-	public World currentWorld;
-	public WorldKey currentWorldKey;
+	private World currentWorld;
+	private WorldKey currentWorldKey;
 	private BlockPos currentWorldPos;
 	private String currentWorldName;
 	private boolean requestWorldName = false;
-	public boolean isWorldLoaded = false;
+	private boolean isWorldLoaded = false;
 
 	public String currentWorldName() {
 		return currentWorldName != null ? currentWorldName : "Default";
@@ -148,8 +149,12 @@ public final class MultiworldManager {
 		JustMapClient.startMapping();
 	}
 
-	public WorldKey getWorldKey() {
+	public WorldKey getCurrentWorldKey() {
 		return currentWorldKey;
+	}
+
+	public World getCurrentWorld() {
+		return currentWorld;
 	}
 
 	public WorldKey createWorldKey(World world, BlockPos blockPos, String worldName) {

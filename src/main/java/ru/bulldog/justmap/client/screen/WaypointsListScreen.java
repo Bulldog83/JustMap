@@ -165,7 +165,7 @@ public class WaypointsListScreen extends AbstractMapScreen {
 		this.nextDimensionButton = new ButtonWidget(x + screenWidth - 30, 6, 20, 20, new LiteralText(">"), (b) -> cycleDimension(1));
 		this.addButton = new ButtonWidget(center - 62, height - 26, 60, 20, lang("create"), (b) -> add());
 		this.closeButton = new ButtonWidget(center + 2, height - 26, 60, 20, lang("close"), (b) -> onClose());
-		this.currentWorld = MapDataProvider.getManager().getWorldKey();
+		this.currentWorld = MapDataProvider.getMultiworldManager().getCurrentWorldKey();
 		this.currentIndex = this.getIndex(currentWorld);
 
 		this.reset();
@@ -270,7 +270,7 @@ public class WaypointsListScreen extends AbstractMapScreen {
 	}
 
 	public void teleport(Waypoint waypoint) {
-		if (!MapDataProvider.getManager().getWorldKey().equals(currentWorld)) return;
+		if (!MapDataProvider.getMultiworldManager().getCurrentWorldKey().equals(currentWorld)) return;
 		int y = waypoint.pos.getY() > 0 ? waypoint.pos.getY() : (Dimension.isNether(client.world) ? 128 : 64);
 		this.client.player.sendChatMessage("/tp " + this.client.player.getName().asString() + " " + waypoint.pos.getX() + " " + y + " " + waypoint.pos.getZ());
 		this.onClose();

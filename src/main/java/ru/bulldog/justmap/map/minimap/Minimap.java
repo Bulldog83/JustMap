@@ -367,7 +367,7 @@ public class Minimap implements IMap {
 	}
 
 	public void createWaypoint() {
-		this.createWaypoint(MapDataProvider.getManager().getWorldKey(), DataUtil.currentPos());
+		this.createWaypoint(MapDataProvider.getMultiworldManager().getCurrentWorldKey(), DataUtil.currentPos());
 	}
 
 	public AbstractMiniMapRenderer getRenderer() {
@@ -401,7 +401,7 @@ public class Minimap implements IMap {
 	public List<WaypointIcon> getWaypoints(BlockPos currentPos, int screenX, int screenY) {
 		this.waypoints.clear();
 		if (ClientSettings.showWaypoints) {
-			List<Waypoint> wps = WaypointKeeper.getInstance().getWaypoints(MapDataProvider.getManager().getWorldKey(), true);
+			List<Waypoint> wps = WaypointKeeper.getInstance().getWaypoints(MapDataProvider.getMultiworldManager().getCurrentWorldKey(), true);
 			if (wps != null) {
 				Stream<Waypoint> stream = wps.stream()
 						.filter(wp -> MathUtil.getDistance(currentPos, wp.pos, false) <= wp.showRange);
