@@ -37,7 +37,7 @@ import ru.bulldog.justmap.map.EntityRadar;
 import ru.bulldog.justmap.map.IMap;
 import ru.bulldog.justmap.map.data.Layer;
 import ru.bulldog.justmap.map.data.MapDataProvider;
-import ru.bulldog.justmap.map.data.MapRegionProvider;
+import ru.bulldog.justmap.map.data.WorldMapper;
 import ru.bulldog.justmap.map.multiworld.WorldKey;
 import ru.bulldog.justmap.map.icon.MapIcon;
 import ru.bulldog.justmap.map.icon.WaypointIcon;
@@ -64,7 +64,7 @@ public class Minimap implements IMap {
 	private PlayerEntity locPlayer = null;
 	private Layer mapLayer = Layer.SURFACE;
 	private final EntityRadar entityRadar;
-	private MapRegionProvider mapRegionProvider;
+	private WorldMapper worldMapper;
 	private MapSkin mapSkin;
 	private World world;
 	private boolean isMapVisible = true;
@@ -287,7 +287,7 @@ public class Minimap implements IMap {
 
 	public void prepareMap(PlayerEntity player) {
 		this.world = player.world;
-		this.mapRegionProvider = MapDataProvider.getManager().getMapRegionProvider();
+		this.worldMapper = MapDataProvider.getManager().getWorldMapper();
 		BlockPos pos = DataUtil.currentPos();
 
 		int posX = pos.getX();
@@ -381,8 +381,8 @@ public class Minimap implements IMap {
 		return this.world;
 	}
 
-	public MapRegionProvider getMapRegionProvider() {
-		return this.mapRegionProvider;
+	public WorldMapper getWorldMapper() {
+		return this.worldMapper;
 	}
 
 	public MapSkin getSkin() {

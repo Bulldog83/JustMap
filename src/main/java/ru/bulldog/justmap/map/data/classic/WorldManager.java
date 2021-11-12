@@ -12,7 +12,7 @@ import ru.bulldog.justmap.map.IMap;
 import ru.bulldog.justmap.map.data.Layer;
 import ru.bulldog.justmap.map.data.MapDataManager;
 import ru.bulldog.justmap.map.data.MapDataProvider;
-import ru.bulldog.justmap.map.data.MapRegionProvider;
+import ru.bulldog.justmap.map.data.WorldMapper;
 import ru.bulldog.justmap.map.data.classic.event.ChunkUpdateEvent;
 import ru.bulldog.justmap.map.data.classic.event.ChunkUpdateListener;
 import ru.bulldog.justmap.util.DataUtil;
@@ -24,15 +24,15 @@ public final class WorldManager implements MapDataManager {
 	private boolean cacheClearing = false;
 
 	public WorldData getWorldData() {
-		return (WorldData) getMapRegionProvider();
+		return (WorldData) getWorldMapper();
 	}
 
-	private MapRegionProvider createWorldData() {
+	private WorldData createWorldData() {
 		return new WorldData(MapDataProvider.getMultiworldManager().getCurrentWorld());
 	}
 
 	@Override
-	public MapRegionProvider getMapRegionProvider() {
+	public WorldMapper getWorldMapper() {
 		return MapDataProvider.getMultiworldManager().getOrCreateWorldMapper(this::createWorldData);
 	}
 
@@ -50,8 +50,8 @@ public final class WorldManager implements MapDataManager {
 	private void updateOnTick() {
 		getWorldData().updateMap();
 		JustMap.WORKER.execute(() -> MapDataProvider.getMultiworldManager().forEachWorldMapper(
-				data -> {
-					WorldData worldData = (WorldData) data;
+				(key, worldMapper) -> {
+					WorldData worldData = (WorldData) worldMapper;
 					if (worldData != null) {
 						worldData.clearCache();
 					}
@@ -66,8 +66,8 @@ public final class WorldManager implements MapDataManager {
 			JustMap.LOGGER.debug(String.format("Memory usage at %2d%%, forcing garbage collection.", usedPct));
 			JustMap.WORKER.execute("Hard cache clearing...", () -> {
 				int amount = ClientSettings.purgeAmount * 10;
-				MapDataProvider.getMultiworldManager().forEachWorldMapper(data -> {
-					WorldData worldData = (WorldData) data;
+				MapDataProvider.getMultiworldManager().forEachWorldMapper((key, worldMapper) -> {
+					WorldData worldData = (WorldData) worldMapper;
 					if (worldData != null) {
 						worldData.getChunkManager().purge(amount, 1000);
 					}
@@ -99,18 +99,5 @@ public final class WorldManager implements MapDataManager {
 	@Override
 	public void onWorldStop() {
 		ChunkUpdateListener.stop();
-	}
-
-	@Override
-	public int getMapHeight(Layer mapLayer, int mapLevel, int posX, int posZ) {
-		int chunkX = posX >> 4;
-		int chunkZ = posZ >> 4;
-
-		ChunkData mapChunk = getWorldData().getChunk(chunkX, chunkZ);
-
-		int cx = posX - (chunkX << 4);
-		int cz = posZ - (chunkZ << 4);
-
-		return mapChunk.getChunkLevel(mapLayer, mapLevel).sampleHeightmap(cx, cz);
 	}
 }

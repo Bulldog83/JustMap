@@ -26,7 +26,7 @@ import ru.bulldog.justmap.map.MapPlayerManager;
 import ru.bulldog.justmap.map.data.Layer;
 import ru.bulldog.justmap.map.data.MapDataProvider;
 import ru.bulldog.justmap.map.data.MapRegion;
-import ru.bulldog.justmap.map.data.MapRegionProvider;
+import ru.bulldog.justmap.map.data.WorldMapper;
 import ru.bulldog.justmap.map.multiworld.WorldKey;
 import ru.bulldog.justmap.map.icon.PlayerIcon;
 import ru.bulldog.justmap.map.icon.WaypointIcon;
@@ -61,7 +61,7 @@ public class WorldmapScreen extends AbstractMapScreen implements IMap {
 	private boolean playerTracking = true;
 	private int mapLevel = 0;
 	private DropDownListWidget mapMenu;
-	private MapRegionProvider mapRegionProvider;
+	private WorldMapper worldMapper;
 	private WorldKey world;
 	private BlockPos centerPos;
 	private String cursorCoords;
@@ -84,7 +84,7 @@ public class WorldmapScreen extends AbstractMapScreen implements IMap {
 		this.centerX = width / 2.0;
 		this.centerY = height / 2.0;
 
-		this.mapRegionProvider = MapDataProvider.getManager().getMapRegionProvider();
+		this.worldMapper = MapDataProvider.getManager().getWorldMapper();
 		WorldKey worldKey = MapDataProvider.getMultiworldManager().getCurrentWorldKey();
 		if (centerPos == null || !worldKey.equals(world)) {
 			this.centerPos = DataUtil.currentPos();
@@ -213,7 +213,7 @@ public class WorldmapScreen extends AbstractMapScreen implements IMap {
 			while (picY < scaledHeight) {
 				int cZ = cornerZ + picY;
 
-				MapRegion region = mapRegionProvider.getMapRegion(this, cX, cZ);
+				MapRegion region = worldMapper.getMapRegion(this, cX, cZ);
 
 				imgW = 512;
 				imgH = 512;
@@ -356,7 +356,7 @@ public class WorldmapScreen extends AbstractMapScreen implements IMap {
 	private BlockPos cursorBlockPos(double x, double y) {
 		int posX = this.pixelToPos(x, centerPos.getX(), centerX);
 		int posZ = this.pixelToPos(y, centerPos.getZ(), centerY);
-		int posY = MapDataProvider.getManager().getMapHeight(mapLayer, mapLevel, posX, posZ);
+		int posY = MapDataProvider.getManager().getWorldMapper().getMapHeight(mapLayer, mapLevel, posX, posZ);
 		posY = posY == -1 ? centerPos.getY() : posY;
 
 		return new BlockPos(posX, posY, posZ);

@@ -1,22 +1,17 @@
 package ru.bulldog.justmap.map.data;
 
-import java.util.List;
-
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.WorldChunk;
 
-import ru.bulldog.justmap.map.multiworld.WorldKey;
-
 public interface MapDataManager {
-	// World map management
 
-	MapRegionProvider getMapRegionProvider();
+	// World mapper management
 
-	int getMapHeight(Layer mapLayer, int mapLevel, int posX, int posZ);
+	WorldMapper getWorldMapper();
 
-	// Callbacks
+	// Event callbacks
 
 	void onChunkLoad(World world, WorldChunk worldChunk);
 

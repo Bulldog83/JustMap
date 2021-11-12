@@ -153,9 +153,11 @@ public class WaypointsListScreen extends AbstractMapScreen {
 
 	@Override
 	protected void init() {
-		MapDataProvider.getMultiworldManager().registeredWorlds().forEach(world -> {
-			if (!worlds.contains(world)) {
-				this.worlds.add(world);
+		// FIXME: don't we ever need to remove keys?
+		MapDataProvider.getMultiworldManager().forEachWorldMapper(
+				(key, worldMapper) -> {
+			if (!worlds.contains(key)) {
+				this.worlds.add(key);
 			}
 		});
 		this.center = width / 2;

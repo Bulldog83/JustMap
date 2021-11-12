@@ -1,11 +1,9 @@
 package ru.bulldog.justmap.map.multiworld;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.function.Consumer;
+import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 
 import com.google.gson.JsonArray;
@@ -24,7 +22,7 @@ import ru.bulldog.justmap.client.config.ClientConfig;
 import ru.bulldog.justmap.client.screen.WorldnameScreen;
 import ru.bulldog.justmap.config.ConfigKeeper;
 import ru.bulldog.justmap.enums.MultiworldDetection;
-import ru.bulldog.justmap.map.data.MapRegionProvider;
+import ru.bulldog.justmap.map.data.WorldMapper;
 import ru.bulldog.justmap.util.JsonFactory;
 import ru.bulldog.justmap.util.RuleUtil;
 import ru.bulldog.justmap.util.storage.StorageUtil;
@@ -37,7 +35,7 @@ public final class MultiworldManager {
 	private final MinecraftClient minecraft = MinecraftClient.getInstance();
 	private final ClientConfig modConfig = JustMapClient.getConfig();
 
-	private final Map<WorldKey, MapRegionProvider> worldMappers = new HashMap<>();
+	private final Map<WorldKey, WorldMapper> worldMappers = new HashMap<>();
 
 	private World currentWorld;
 	private WorldKey currentWorldKey;
@@ -51,7 +49,7 @@ public final class MultiworldManager {
 			if (worldMappers.size() > 0) {
 				worldMappers.forEach((id, data) -> {
 					if (data != null) {
-						data.onMultiworldClose();
+						data.onWorldMapperClose();
 					}
 				});
 				worldMappers.clear();
@@ -198,23 +196,19 @@ public final class MultiworldManager {
 		}
 	}
 
-	public List<WorldKey> registeredWorlds() {
-		return new ArrayList<>(worldMappers.keySet());
-	}
-
-	public void forEachWorldMapper(Consumer<MapRegionProvider> consumer) {
+	public void forEachWorldMapper(BiConsumer<WorldKey, WorldMapper> consumer) {
 		synchronized (worldMappers) {
-			worldMappers.forEach((id, data) -> {
-				consumer.accept(data);
+			worldMappers.forEach((key, worldMapper) -> {
+				consumer.accept(key, worldMapper);
 			});
 		}
 	}
 
 	// Only to be used by MapDataManagers
-	public MapRegionProvider getOrCreateWorldMapper(Supplier<MapRegionProvider> worldMapperCreator) {
+	public WorldMapper getOrCreateWorldMapper(Supplier<WorldMapper> worldMapperCreator) {
 		if (getCurrentWorld() == null || getCurrentWorldKey() == null) return null;
 
-		MapRegionProvider worldMapper;
+		WorldMapper worldMapper;
 		synchronized (worldMappers) {
 			if (worldMappers.containsKey(getCurrentWorldKey())) {
 				worldMapper = worldMappers.get(getCurrentWorldKey());
@@ -230,13 +224,6 @@ public final class MultiworldManager {
 			worldMappers.put(getCurrentWorldKey(), worldMapper);
 		}
 		return worldMapper;
-	}
-
-	public void checkForNewWorld() {
-		if (requestWorldName && !(minecraft.currentScreen instanceof ProgressScreen)) {
-			minecraft.setScreen(new WorldnameScreen(minecraft.currentScreen));
-			requestWorldName = false;
-		}
 	}
 
 	public void onServerConnect() {
@@ -320,14 +307,10 @@ public final class MultiworldManager {
 		}
 	}
 
-	private void closeWorker() {
-		modConfig.reloadFromDisk();
-		currentWorld = null;
-		if (isWorldLoaded) {
-			saveWorlds();
-			worldAssociations.clear();
-			closeAllWorldMappers();
-			isWorldLoaded = false;
+	private void checkForNewWorld() {
+		if (requestWorldName && !(minecraft.currentScreen instanceof ProgressScreen)) {
+			minecraft.setScreen(new WorldnameScreen(minecraft.currentScreen));
+			requestWorldName = false;
 		}
 	}
 
@@ -339,7 +322,16 @@ public final class MultiworldManager {
 
 	public void onWorldStop() {
 		JustMapClient.stopMapping();
-		JustMap.WORKER.execute("Stopping world ...", this::closeWorker);
+		JustMap.WORKER.execute("Stopping world ...", () -> {
+			modConfig.reloadFromDisk();
+			currentWorld = null;
+			if (isWorldLoaded) {
+				saveWorlds();
+				worldAssociations.clear();
+				closeAllWorldMappers();
+				isWorldLoaded = false;
+			}
+		});
 	}
 
 }
