@@ -39,7 +39,7 @@ public class ItemInfo extends InfoText {
 	}
 
 	@Override
-	public void update() {
+	public void updateOnTick() {
 		MinecraftClient minecraft = MinecraftClient.getInstance();
 		if (minecraft.player == null) {
 			this.setVisible(false);

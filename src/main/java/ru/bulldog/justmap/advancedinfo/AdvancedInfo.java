@@ -75,7 +75,7 @@ public class AdvancedInfo {
 		textManager.add(new ItemInfo(EquipmentSlot.FEET));
 	}
 
-	public void updateInfo() {
+	public void updateOnTick() {
 		if (minecraft == null || !ClientSettings.advancedInfo) return;
 		if (minecraft.currentScreen != null &&
 		  !(minecraft.currentScreen instanceof ChatScreen)) return;
@@ -84,8 +84,8 @@ public class AdvancedInfo {
 			this.initInfo();
 		}
 		this.managers.forEach((position, manager) -> {
-			manager.updatePosition(position);
-			manager.update();
+			manager.updatePositionOnTick(position);
+			manager.updateOnTick();
 		});
 	}
 

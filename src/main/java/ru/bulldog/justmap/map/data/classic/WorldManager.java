@@ -1,6 +1,7 @@
 package ru.bulldog.justmap.map.data.classic;
 
 import net.minecraft.block.BlockState;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.WorldChunk;
@@ -8,19 +9,24 @@ import net.minecraft.world.chunk.WorldChunk;
 import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.client.config.ClientSettings;
+import ru.bulldog.justmap.client.screen.WorldmapScreen;
 import ru.bulldog.justmap.map.IMap;
 import ru.bulldog.justmap.map.data.MapDataManager;
 import ru.bulldog.justmap.map.data.MapDataProvider;
 import ru.bulldog.justmap.map.data.WorldMapper;
 import ru.bulldog.justmap.map.data.classic.event.ChunkUpdateEvent;
 import ru.bulldog.justmap.map.data.classic.event.ChunkUpdateListener;
-import ru.bulldog.justmap.util.DataUtil;
 import ru.bulldog.justmap.util.tasks.MemoryUtil;
 
 public final class WorldManager implements MapDataManager {
 	public static final WorldManager WORLD_MANAGER = new WorldManager();
 
 	private boolean cacheClearing = false;
+
+	public static IMap getCurrentlyShownMap() {
+		MinecraftClient minecraft = MinecraftClient.getInstance();
+		return minecraft.currentScreen instanceof WorldmapScreen ? (WorldmapScreen) minecraft.currentScreen : JustMapClient.getMiniMap();
+	}
 
 	public WorldData getWorldData() {
 		return (WorldData) getWorldMapper();
@@ -38,7 +44,7 @@ public final class WorldManager implements MapDataManager {
 	@Override
 	public void onChunkLoad(World world, WorldChunk worldChunk) {
 		if (world == null || worldChunk == null || worldChunk.isEmpty()) return;
-		IMap map = DataUtil.getCurrentlyShownMap();
+		IMap map = getCurrentlyShownMap();
 		WorldData mapData = getWorldData();
 		if (mapData == null) return;
 		ChunkData mapChunk = mapData.getChunk(worldChunk.getPos());

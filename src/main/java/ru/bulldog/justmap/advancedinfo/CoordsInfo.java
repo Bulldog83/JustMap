@@ -12,7 +12,7 @@ public class CoordsInfo extends InfoText {
 	}
 
 	@Override
-	public void update() {
+	public void updateOnTick() {
 		this.setVisible(ClientSettings.showPosition);
 		if (visible) {
 			this.setText(PosUtil.posToString(DataUtil.currentPos()));

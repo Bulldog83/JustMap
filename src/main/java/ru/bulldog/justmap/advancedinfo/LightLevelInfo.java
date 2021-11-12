@@ -14,7 +14,7 @@ public class LightLevelInfo extends InfoText {
 	}
 
 	@Override
-	public void update() {
+	public void updateOnTick() {
 		this.setVisible(ClientSettings.showLight);
 		MinecraftClient minecraft = MinecraftClient.getInstance();
 		if (visible && minecraft.world != null) {

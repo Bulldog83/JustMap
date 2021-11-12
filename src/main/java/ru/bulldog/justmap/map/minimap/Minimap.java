@@ -45,7 +45,6 @@ import ru.bulldog.justmap.map.minimap.skin.MapSkin;
 import ru.bulldog.justmap.map.waypoint.Waypoint;
 import ru.bulldog.justmap.map.waypoint.WaypointKeeper;
 import ru.bulldog.justmap.util.DataUtil;
-import ru.bulldog.justmap.util.Dimension;
 import ru.bulldog.justmap.util.RuleUtil;
 import ru.bulldog.justmap.util.math.MathUtil;
 import ru.bulldog.justmap.util.math.RandomUtil;
@@ -91,7 +90,7 @@ public class Minimap implements IMap {
 		this.bufferedRenderer = new BufferedMiniMapRenderer(this);
 	}
 
-	public void update() {
+	public void updateOnTick() {
 		if (!this.isMapVisible()) {
 			return;
 		}
@@ -103,7 +102,7 @@ public class Minimap implements IMap {
 			}
 
 			this.prepareMap(player);
-			this.updateInfo(player);
+			this.updateInfoOnTick(player);
 		} else {
 			locPlayer = null;
 		}
@@ -263,7 +262,7 @@ public class Minimap implements IMap {
 		);
 	}
 
-	private void updateInfo(PlayerEntity player) {
+	private void updateInfoOnTick(PlayerEntity player) {
 		if (!ClientSettings.mapInfo) {
 			txtCoords.setVisible(false);
 			txtBiome.setVisible(false);
@@ -273,16 +272,16 @@ public class Minimap implements IMap {
 		}
 		txtCoords.setVisible(ClientSettings.showPosition);
 		if (ClientSettings.showPosition) {
-			txtCoords.update();
+			txtCoords.updateOnTick();
 		}
 		boolean showBiome = !ClientSettings.advancedInfo && ClientSettings.showBiome;
 		boolean showTime = !ClientSettings.advancedInfo && ClientSettings.showTime;
 		txtBiome.setVisible(showBiome);
 		txtTime.setVisible(showTime);
 		if (showBiome)
-			txtBiome.update();
+			txtBiome.updateOnTick();
 		if (showTime)
-			txtTime.update();
+			txtTime.updateOnTick();
 	}
 
 	public void prepareMap(PlayerEntity player) {
@@ -299,16 +298,8 @@ public class Minimap implements IMap {
 			this.lastPosZ = posZ;
 		}
 
-		if (Dimension.isNether(world)) {
-			this.mapLayer = Layer.NETHER;
-			this.mapLevel = posY / mapLayer.height;
-		} else if (RuleUtil.needRenderCaves(world, pos)) {
-			this.mapLayer = Layer.CAVES;
-			this.mapLevel = posY / mapLayer.height;
-		} else {
-			this.mapLayer = Layer.SURFACE;
-			this.mapLevel = 0;
-		}
+		this.mapLayer = Layer.getLayer(world, pos);
+		this.mapLevel = Layer.getLevel(this.mapLayer, posY);
 
 		int scaledW = scaledWidth;
 		int scaledH = scaledHeight;

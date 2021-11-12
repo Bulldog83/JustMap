@@ -64,13 +64,13 @@ public class JustMapClient implements ClientModInitializer {
 			}
 			isOnTitleScreen = isTitle;
 
-			AdvancedInfo.getInstance().updateInfo();
-			KeyHandler.update();
+			AdvancedInfo.getInstance().updateOnTick();
+			KeyHandler.updateOnTick();
 
 			if (!canMapping()) return;
 
-			DataUtil.update();
-			JustMapClient.minimap.update();
+			DataUtil.updateOnTick();
+			JustMapClient.minimap.updateOnTick();
 			MapDataProvider.getManager().onTick(false);
 		});
 		ClientLifecycleEvents.CLIENT_STOPPING.register(client -> {

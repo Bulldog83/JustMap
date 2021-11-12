@@ -15,7 +15,6 @@ import ru.bulldog.justmap.map.data.Layer;
 import ru.bulldog.justmap.map.data.classic.ChunkData;
 import ru.bulldog.justmap.map.data.classic.WorldData;
 import ru.bulldog.justmap.map.data.classic.WorldManager;
-import ru.bulldog.justmap.util.DataUtil;
 import ru.bulldog.justmap.util.math.Plane;
 import ru.bulldog.justmap.util.tasks.TaskManager;
 
@@ -67,9 +66,9 @@ public class ChunkUpdateListener {
 	public static void onSetBlockState(BlockPos pos, BlockState state, World world) {
 		WorldChunk worldChunk = world.getWorldChunk(pos);
 		if (!worldChunk.isEmpty()) {
-			IMap map = DataUtil.getCurrentlyShownMap();
-			Layer layer = DataUtil.getLayer(world, pos);
-			int level = DataUtil.getLevel(layer, pos.getY());
+			IMap map = WorldManager.getCurrentlyShownMap();
+			Layer layer = Layer.getLayer(world, pos);
+			int level = Layer.getLevel(layer, pos.getY());
 			if (layer.equals(map.getLayer()) && level == map.getLevel()) {
 				WorldData mapData = WorldManager.WORLD_MANAGER.getWorldData();
 				if (mapData == null) return;

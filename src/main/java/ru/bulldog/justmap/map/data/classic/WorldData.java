@@ -37,7 +37,7 @@ public class WorldData implements WorldMapper {
 	}
 
 	public RegionData getRegion(BlockPos blockPos) {
-		return this.getRegionData(DataUtil.getCurrentlyShownMap(), blockPos.getX(), blockPos.getZ());
+		return this.getRegionData(WorldManager.getCurrentlyShownMap(), blockPos.getX(), blockPos.getZ());
 	}
 
 	public RegionData getRegionData(IMap map, int x, int z) {
@@ -104,7 +104,7 @@ public class WorldData implements WorldMapper {
 	}
 
 	public void updateMap() {
-		IMap map = DataUtil.getCurrentlyShownMap();
+		IMap map = WorldManager.getCurrentlyShownMap();
 		BlockPos centerPos = map.getCenter();
 		Layer layer = map.getLayer();
 		int level = map.getLevel();

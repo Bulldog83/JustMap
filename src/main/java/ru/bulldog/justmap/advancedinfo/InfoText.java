@@ -21,7 +21,7 @@ public abstract class InfoText {
 	int offsetY;
 	int x, y;
 
-	public abstract void update();
+	public abstract void updateOnTick();
 
 	public InfoText(String text) {
 		this(TextAlignment.LEFT, text, Colors.WHITE);

@@ -27,7 +27,7 @@ public class BiomeInfo extends InfoText {
 	}
 
 	@Override
-	public void update() {
+	public void updateOnTick() {
 		this.setVisible(ClientSettings.showBiome);
 		MinecraftClient minecraft = MinecraftClient.getInstance();
 		if (visible && minecraft.world != null) {

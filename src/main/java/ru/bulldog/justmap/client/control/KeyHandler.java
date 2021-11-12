@@ -145,7 +145,7 @@ public final class KeyHandler {
 		});
 	}
 
-	public static void update() {
+	public static void updateOnTick() {
 		for (KeyParser kp : parsers) {
 			if (kp.isListening()) {
 				if (kp.keyBinding.wasPressed()) {
