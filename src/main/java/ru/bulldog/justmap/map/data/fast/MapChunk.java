@@ -70,7 +70,7 @@ public class MapChunk {
 		int z = getChunkRelativeZ(blockPos);
 
 	//    int color = Colors.INSTANCE.getBlockColor(blockState);
-		int color = blockColorPos(FastMapManager.MANAGER.currentWorld, blockPos, blockState);
+		int color = blockColorPos(FastMapManager.MANAGER.getFastWorldMapper().getWorld(), blockPos, blockState);
 
 		setColor(x, z, color);
 	}
@@ -114,7 +114,7 @@ public class MapChunk {
 
 	private int blockColorChunk(WorldChunk worldChunk, BlockPos pos) {
 		// return ColorUtil.blockColor(world, blockState, pos);
-		return blockColorVanilla(FastMapManager.MANAGER.currentWorld, worldChunk, pos);
+		return blockColorVanilla(FastMapManager.MANAGER.getFastWorldMapper().getWorld(), worldChunk, pos);
 	}
 
 	private int blockColorPos(World world, BlockPos pos, BlockState blockState) {

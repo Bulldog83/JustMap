@@ -5,16 +5,26 @@ import java.util.Map;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 import net.minecraft.world.chunk.WorldChunk;
-import org.jetbrains.annotations.NotNull;
 
 import ru.bulldog.justmap.map.IMap;
+import ru.bulldog.justmap.map.data.Layer;
 import ru.bulldog.justmap.map.data.MapRegion;
-import ru.bulldog.justmap.map.data.MapRegionProvider;
 import ru.bulldog.justmap.map.data.RegionPos;
+import ru.bulldog.justmap.map.data.WorldMapper;
 
-public class MapRegionRegistry implements MapRegionProvider {
+public class FastWorldMapper implements WorldMapper {
 	private final Map<RegionPos, DrawableMapRegion> registry = new HashMap<>();
+	private final World world;
+
+	public FastWorldMapper(World world) {
+		this.world = world;
+	}
+
+	public World getWorld() {
+		return world;
+	}
 
 	@Override
 	public MapRegion getMapRegion(IMap map, int blockX, int blockZ) {
@@ -23,7 +33,17 @@ public class MapRegionRegistry implements MapRegionProvider {
 		return getOrCreateRegion(regionPos);
 	}
 
-	@NotNull
+	@Override
+	public int getMapHeight(Layer mapLayer, int mapLevel, int posX, int posZ) {
+		// FIXME: implement
+		return 0;
+	}
+
+	@Override
+	public void onWorldMapperClose() {
+		// do nothing
+	}
+
 	private DrawableMapRegion getOrCreateRegion(RegionPos regionPos) {
 		DrawableMapRegion region = registry.get(regionPos);
 		if (region == null) {
