@@ -99,7 +99,7 @@ public class WorldmapScreen extends AbstractJustMapScreen implements IMap {
 
 		if (Dimension.isNether(world.getDimension())) {
 			this.mapLayer = Layer.NETHER;
-			this.mapLevel = CurrentWorldPos.coordY() / mapLayer.height;
+			this.mapLevel = CurrentWorldPos.coordY() / mapLayer.getHeight();
 		} else {
 			this.mapLayer = Layer.SURFACE;
 			this.mapLevel = 0;

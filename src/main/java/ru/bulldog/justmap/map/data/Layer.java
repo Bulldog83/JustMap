@@ -8,17 +8,31 @@ import net.minecraft.world.dimension.DimensionType;
 import ru.bulldog.justmap.util.Dimension;
 import ru.bulldog.justmap.util.GameRulesUtil;
 
-public class Layer {
-	public final static Layer SURFACE = new Layer("surface", 256);
-	public final static Layer CAVES = new Layer("caves", 8);
-	public final static Layer NETHER = new Layer("nether", 16);
+public enum Layer {
+	SURFACE("surface", 256),
+	CAVES("caves", 8),
+	NETHER("nether", 16);
 
-	public final String name;
-	public final int height;
+	private static final int WORLD_HEIGHT = 256;
 
-	private Layer(String name, int height) {
+	private final String name;
+	private final int height;
+
+	Layer(String name, int height) {
 		this.name = name;
 		this.height = height;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public int getHeight() {
+		return height;
+	}
+
+	public int getLevels() {
+		return WORLD_HEIGHT / getHeight();
 	}
 
 	public static Layer getLayer(World world, BlockPos pos) {
@@ -59,25 +73,5 @@ public class Layer {
 		if (world.getLightLevel(LightType.SKY, pos.west()) > 0) return true;
 
 		return false;
-	}
-
-	@Override
-	public int hashCode() {
-		return 31 * name.hashCode() + height;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) return true;
-		if (!(obj instanceof Layer)) return false;
-
-		Layer layer = (Layer) obj;
-		return this.name == layer.name &&
-			   this.height == layer.height;
-	}
-
-	@Override
-	public String toString() {
-		return this.name.toUpperCase();
 	}
 }

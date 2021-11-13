@@ -32,8 +32,8 @@ public class MapProcessor {
 
 		boolean plants = !ClientSettings.hidePlants;
 		if ((layer.equals(Layer.NETHER) || layer.equals(Layer.CAVES))) {
-			int floor = level * layer.height;
-			for (int i = floor + (layer.height - 1); i >= floor; i--) {
+			int floor = level * layer.getHeight();
+			for (int i = floor + (layer.getHeight() - 1); i >= floor; i--) {
 				BlockPos worldPos = loopPos(worldChunk, new BlockPos(posX, i, posZ), 0, liquids, plants);
 				BlockPos overPos = new BlockPos(posX, worldPos.getY() + 1, posZ);
 				if (BlockStateUtil.checkState(worldChunk.getBlockState(overPos), liquids, plants)) {

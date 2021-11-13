@@ -286,7 +286,7 @@ public class RegionData implements MapRegion {
 		} else if (Layer.NETHER.equals(layer)) {
 			dir = new File(dir, Integer.toString(level));
 		} else {
-			dir = new File(dir, String.format("%s/%d", layer.name, level));
+			dir = new File(dir, String.format("%s/%d", layer.getName(), level));
 		}
 		if (!dir.exists()) {
 			dir.mkdirs();

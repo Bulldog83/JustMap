@@ -81,7 +81,7 @@ public class ChunkData {
 	}
 
 	private void initLayer(Layer layer) {
-		int levels = this.world.getDimension().getHeight() / layer.height;
+		int levels = this.world.getDimension().getHeight() / layer.getHeight();
 		this.levels.put(layer, new ChunkLevel[levels]);
 	}
 
@@ -178,7 +178,7 @@ public class ChunkData {
 			this.updateArea(worldChunk, layer, level, x, z, width, height);
 			if (saveNeeded()) {
 				BlockPos.Mutable chunkBlockPos = this.chunkPos.getStartPos().mutableCopy();
-				chunkBlockPos.setY(level * layer.height);
+				chunkBlockPos.setY(level * layer.getHeight());
 				RegionData region = this.mapData.getRegion(chunkBlockPos);
 				if (region.getLayer().equals(layer) && region.getLevel() == level) {
 					region.writeChunkData(this);
@@ -248,7 +248,7 @@ public class ChunkData {
 
 			chunkLevel.setBlockState(x, z, worldState);
 
-			int height = layer.height;
+			int height = layer.getHeight();
 			int bottom;
 			int baseHeight;
 			if (layer == Layer.NETHER) {
