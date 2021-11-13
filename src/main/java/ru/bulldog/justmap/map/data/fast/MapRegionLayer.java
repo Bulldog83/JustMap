@@ -13,6 +13,7 @@ import net.minecraft.world.chunk.WorldChunk;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.opengl.GL11;
 
+import ru.bulldog.justmap.map.data.Layer;
 import ru.bulldog.justmap.util.render.GLC;
 import ru.bulldog.justmap.util.render.RenderUtil;
 
@@ -29,7 +30,13 @@ public class MapRegionLayer {
 
 	private int glId = -1;
 	private volatile boolean isModified;
+	private final Layer layer;
+	private final int level;
 
+	public MapRegionLayer(Layer layer, int level) {
+		this.layer = layer;
+		this.level = level;
+	}
 
 	public void updateChunk(WorldChunk worldChunk) {
 		// FIXME: verify/assert that chunkpos is inside region?
@@ -56,7 +63,7 @@ public class MapRegionLayer {
 
 		MapChunk mapChunk = chunks[relRegX][relRegZ];
 		if (mapChunk == null) {
-			mapChunk = new MapChunk(relRegX, relRegZ);
+			mapChunk = new MapChunk(relRegX, relRegZ, layer, level);
 			chunks[relRegX][relRegZ] = mapChunk;
 		}
 		return mapChunk;

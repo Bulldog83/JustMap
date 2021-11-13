@@ -11,8 +11,9 @@ public class BlockStateUtil {
 	public static final BlockState CAVE_AIR = Blocks.CAVE_AIR.getDefaultState();
 	public static final BlockState VOID_AIR = Blocks.VOID_AIR.getDefaultState();
 
-	public static boolean checkState(BlockState state, boolean liquids, boolean plants) {
-		return BlockStateUtil.isAir(state) || (!liquids && isLiquid(state, false)) || (!plants && isPlant(state));
+	// if "includePlants" is true, plants will count as a full block, and will hence *not* be skipped
+	public static boolean isSkippedBlockState(BlockState state, boolean includeLiquids, boolean includePlants) {
+		return BlockStateUtil.isAir(state) || (!includeLiquids && isLiquid(state, false)) || (!includePlants && isPlant(state));
 	}
 
 	public static boolean isAir(BlockState state) {

@@ -13,6 +13,8 @@ import net.minecraft.world.Heightmap;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.WorldChunk;
 
+import ru.bulldog.justmap.map.data.Layer;
+import ru.bulldog.justmap.util.BlockStateUtil;
 import ru.bulldog.justmap.util.colors.Colors;
 
 import static ru.bulldog.justmap.util.colors.ColorUtil.ABGRtoARGB;
@@ -20,14 +22,18 @@ import static ru.bulldog.justmap.util.colors.ColorUtil.ABGRtoARGB;
 public class MapChunk {
 	private final int relRegX;
 	private final int relRegZ;
+	private final Layer layer;
+	private final int level;
 
 	private final byte[][] colorData = new byte[MapRegionLayer.CHUNK_SIZE][MapRegionLayer.CHUNK_SIZE * MapRegionLayer.BYTES_PER_PIXEL];
 	private final byte[][] heightData = new byte[MapRegionLayer.CHUNK_SIZE][MapRegionLayer.CHUNK_SIZE];
 	private final int[][] blockStateData = new int[MapRegionLayer.CHUNK_SIZE][MapRegionLayer.CHUNK_SIZE];
 
-	public MapChunk(int relRegX, int relRegZ) {
+	public MapChunk(int relRegX, int relRegZ, Layer layer, int level) {
 		this.relRegX = relRegX;
 		this.relRegZ = relRegZ;
+		this.layer = layer;
+		this.level = level;
 	}
 
 	private int getChunkRelative(int coord) {
@@ -43,7 +49,45 @@ public class MapChunk {
 	}
 
 	private int getTopBlockY(WorldChunk worldChunk, int x, int z) {
+		if (layer == Layer.SURFACE) {
+			return getTopBlockYOnSurface(worldChunk, x, z);
+		} else {
+			return getTopBlockYInLeveledLayer(worldChunk, x, z, false, true);
+		}
+	}
+
+	private int getTopBlockYOnSurface(WorldChunk worldChunk, int x, int z) {
 		return worldChunk.sampleHeightmap(Heightmap.Type.WORLD_SURFACE, x, z);
+	}
+
+	private int getTopBlockYInLeveledLayer(WorldChunk worldChunk, int posX, int posZ, boolean hideWater, boolean hidePlants) {
+		int floor = layer.height * level;
+		int ceiling = layer.height * (level + 1);
+		int y = ceiling;
+		BlockPos.Mutable pos = new BlockPos.Mutable();
+		pos.set(posX, y, posZ);
+		boolean caveFound;
+		do {
+			if (y < floor) {
+				return -1;
+			}
+			caveFound = BlockStateUtil.isSkippedBlockState(worldChunk.getBlockState(pos), !hideWater, !hidePlants);
+			y--;
+			pos.set(posX, y, posZ);
+		} while (!caveFound);
+
+		boolean bottomFound;
+		do {
+			if (y < 0) {
+				return -1;
+			}
+			bottomFound = !BlockStateUtil.isSkippedBlockState(worldChunk.getBlockState(pos), !hideWater, !hidePlants);
+			y--;
+			pos.set(posX, y, posZ);
+		} while (!bottomFound);
+
+		// We overstepped by one
+		return y+1;
 	}
 
 	public void updateChunk(WorldChunk worldChunk) {

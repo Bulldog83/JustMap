@@ -32,29 +32,37 @@ public class MapProcessor {
 
 		boolean plants = !ClientSettings.hidePlants;
 		if ((layer.equals(Layer.NETHER) || layer.equals(Layer.CAVES))) {
-			int floor = level * layer.getHeight();
-			for (int i = floor + (layer.getHeight() - 1); i >= floor; i--) {
-				BlockPos worldPos = loopPos(worldChunk, new BlockPos(posX, i, posZ), 0, liquids, plants);
-				BlockPos overPos = new BlockPos(posX, worldPos.getY() + 1, posZ);
-				if (BlockStateUtil.checkState(worldChunk.getBlockState(overPos), liquids, plants)) {
-					return worldPos.getY();
-				}
-			}
+			return getTopYInLeveledLayer(worldChunk, layer, level, liquids, posX, posZ, plants);
 		} else {
-			BlockPos worldPos = loopPos(worldChunk, new BlockPos(posX, y, posZ), 0, liquids, plants);
-			BlockState overState = worldChunk.getBlockState(new BlockPos(posX, worldPos.getY() + 1, posZ));
-			if (BlockStateUtil.checkState(overState, liquids, plants)) {
+			return getTopYWithSkyAcccess(worldChunk, y, liquids, posX, posZ, plants);
+		}
+	}
+
+	private static int getTopYWithSkyAcccess(WorldChunk worldChunk, int y, boolean liquids, int posX, int posZ, boolean plants) {
+		BlockPos worldPos = loopPos(worldChunk, new BlockPos(posX, y, posZ), 0, liquids, plants);
+		BlockState overState = worldChunk.getBlockState(new BlockPos(posX, worldPos.getY() + 1, posZ));
+		if (BlockStateUtil.isSkippedBlockState(overState, liquids, plants)) {
+			return worldPos.getY();
+		}
+		return -1;
+	}
+
+	private static int getTopYInLeveledLayer(WorldChunk worldChunk, Layer layer, int level, boolean liquids, int posX, int posZ, boolean plants) {
+		int floor = level * layer.getHeight();
+		for (int i = floor + (layer.getHeight() - 1); i >= floor; i--) {
+			BlockPos worldPos = loopPos(worldChunk, new BlockPos(posX, i, posZ), 0, liquids, plants);
+			BlockPos overPos = new BlockPos(posX, worldPos.getY() + 1, posZ);
+			if (BlockStateUtil.isSkippedBlockState(worldChunk.getBlockState(overPos), liquids, plants)) {
 				return worldPos.getY();
 			}
 		}
-
 		return -1;
 	}
 
 	private static BlockPos loopPos(WorldChunk worldChunk, BlockPos pos, int stop, boolean liquids, boolean plants) {
 		boolean loop;
 		do {
-			loop = BlockStateUtil.checkState(worldChunk.getBlockState(pos), liquids, plants);
+			loop = BlockStateUtil.isSkippedBlockState(worldChunk.getBlockState(pos), liquids, plants);
 			loop &= pos.getY() > stop;
 			if (loop) pos = pos.down();
 		} while (loop);
