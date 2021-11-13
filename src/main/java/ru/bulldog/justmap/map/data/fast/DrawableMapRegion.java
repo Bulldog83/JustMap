@@ -10,21 +10,18 @@ import ru.bulldog.justmap.map.data.MapRegion;
 import ru.bulldog.justmap.map.data.RegionPos;
 
 public class DrawableMapRegion implements MapRegion {
-	private final static int WORLD_HEIGHT = 256;
-	private final static int NETHER_LEVELS = WORLD_HEIGHT / Layer.NETHER.height;
-	private final static int CAVES_LEVELS = WORLD_HEIGHT / Layer.CAVES.height;
 	private final RegionPos regionPos;
 	private final MapRegionLayer surfaceLayer;
-	private final MapRegionLayer[] cavesLayers = new MapRegionLayer[CAVES_LEVELS];
-	private final MapRegionLayer[] netherLayers = new MapRegionLayer[NETHER_LEVELS];
+	private final MapRegionLayer[] cavesLayers = new MapRegionLayer[Layer.CAVES.getLevels()];
+	private final MapRegionLayer[] netherLayers = new MapRegionLayer[Layer.NETHER.getLevels()];
 
 	public DrawableMapRegion(RegionPos regionPos) {
 		this.regionPos = regionPos;
 		surfaceLayer = new MapRegionLayer(Layer.SURFACE, 0);
-		for (int i = 0; i < CAVES_LEVELS; i++) {
+		for (int i = 0; i < cavesLayers.length; i++) {
 			cavesLayers[i] = new MapRegionLayer(Layer.CAVES, i);
 		}
-		for (int i = 0; i < NETHER_LEVELS; i++) {
+		for (int i = 0; i < netherLayers.length; i++) {
 			netherLayers[i] = new MapRegionLayer(Layer.NETHER, i);
 		}
 	}
@@ -33,7 +30,7 @@ public class DrawableMapRegion implements MapRegion {
 		if (layer.equals(Layer.SURFACE)) {
 			return surfaceLayer;
 		} else if (layer.equals(Layer.CAVES)) {
-			assert(level < CAVES_LEVELS);
+			assert(level < Layer.CAVES.getLevels());
 			MapRegionLayer mapLayer = cavesLayers[level];
 			if (mapLayer == null) {
 				mapLayer = new MapRegionLayer(layer, level);
@@ -41,7 +38,7 @@ public class DrawableMapRegion implements MapRegion {
 			}
 			return mapLayer;
 		} else if (layer.equals(Layer.NETHER)) {
-			assert(level < NETHER_LEVELS);
+			assert(level < Layer.NETHER.getLevels());
 			MapRegionLayer mapLayer = cavesLayers[level];
 			if (mapLayer == null) {
 				mapLayer = new MapRegionLayer(layer, level);
@@ -56,18 +53,11 @@ public class DrawableMapRegion implements MapRegion {
 
 	private MapRegionLayer getMapRegionLayer(Layer layer, int level) {
 		if (level < 0) return null;
-		if (layer.equals(Layer.SURFACE)) {
-			return surfaceLayer;
-		} else if (layer.equals(Layer.CAVES)) {
-			if (level >= CAVES_LEVELS) return null;
-			return cavesLayers[level];
-		} else if (layer.equals(Layer.NETHER)) {
-			if (level >= NETHER_LEVELS) return null;
-			return netherLayers[level];
-		} else {
-			assert(false);
-			return null;
-		}
+		return switch (layer) {
+			case SURFACE -> surfaceLayer;
+			case NETHER  -> (level >= Layer.NETHER.getLevels()) ? null : cavesLayers[level];
+			case CAVES   -> (level >= Layer.CAVES.getLevels())  ? null : netherLayers[level];
+		};
 	}
 
 	@Override
