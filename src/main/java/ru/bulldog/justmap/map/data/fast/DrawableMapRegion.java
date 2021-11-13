@@ -77,7 +77,8 @@ public class DrawableMapRegion implements MapRegion {
 		surfaceLayer.updateChunk(worldChunk);
 		// FIXME: other layers except surface should be calculated lazily
 		for (MapRegionLayer layer : cavesLayers) {
-			layer.updateChunk(worldChunk);
+		// FIXME: disable for now
+		//	layer.updateChunk(worldChunk);
 		}
 		// FIXME: only update nether if actually in the nether, how to check?
 	}
