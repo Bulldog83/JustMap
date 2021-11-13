@@ -61,8 +61,8 @@ public class MapChunk {
 	}
 
 	private int getTopBlockYInLeveledLayer(WorldChunk worldChunk, int posX, int posZ, boolean hideWater, boolean hidePlants) {
-		int floor = layer.height * level;
-		int ceiling = layer.height * (level + 1);
+		int floor = layer.getHeight() * level;
+		int ceiling = layer.getHeight() * (level + 1);
 		int y = ceiling;
 		BlockPos.Mutable pos = new BlockPos.Mutable();
 		pos.set(posX, y, posZ);
