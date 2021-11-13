@@ -15,7 +15,7 @@ public class DrawableMapRegion implements MapRegion {
 	private final static int CAVES_LEVELS = WORLD_HEIGHT / Layer.CAVES.height;
 	private final RegionPos regionPos;
 	private final MapRegionLayer surfaceLayer;
-	private final MapRegionLayer[] cavesLayers = new MapRegionLayer[NETHER_LEVELS];
+	private final MapRegionLayer[] cavesLayers = new MapRegionLayer[CAVES_LEVELS];
 	private final MapRegionLayer[] netherLayers = new MapRegionLayer[NETHER_LEVELS];
 
 	public DrawableMapRegion(RegionPos regionPos) {
@@ -55,13 +55,14 @@ public class DrawableMapRegion implements MapRegion {
 	}
 
 	private MapRegionLayer getMapRegionLayer(Layer layer, int level) {
+		if (level < 0) return null;
 		if (layer.equals(Layer.SURFACE)) {
 			return surfaceLayer;
 		} else if (layer.equals(Layer.CAVES)) {
-			assert(level < CAVES_LEVELS);
+			if (level >= CAVES_LEVELS) return null;
 			return cavesLayers[level];
 		} else if (layer.equals(Layer.NETHER)) {
-			assert(level < NETHER_LEVELS);
+			if (level >= NETHER_LEVELS) return null;
 			return netherLayers[level];
 		} else {
 			assert(false);
@@ -71,7 +72,10 @@ public class DrawableMapRegion implements MapRegion {
 
 	@Override
 	public void drawLayer(MatrixStack matrices, Layer layer, int level, double x, double y, double width, double height, int imgX, int imgY, int imgW, int imgH) {
-		getMapRegionLayer(layer, level).draw(matrices, x, y, width, height, imgX, imgY, imgW, imgH);
+		MapRegionLayer mapLayer = getMapRegionLayer(layer, level);
+		if (mapLayer != null) {
+			mapLayer.draw(matrices, x, y, width, height, imgX, imgY, imgW, imgH);
+		}
 	}
 
 	@Override
