@@ -3,7 +3,9 @@ package ru.bulldog.justmap.map.data.classic;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.mojang.brigadier.context.CommandContext;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
@@ -177,6 +179,11 @@ public class WorldData implements WorldMapper {
 			this.regions.clear();
 		}
 		this.clear();
+	}
+
+	@Override
+	public int onMapCommand(CommandContext<ServerCommandSource> context) {
+		return 0;
 	}
 
 	@Override
