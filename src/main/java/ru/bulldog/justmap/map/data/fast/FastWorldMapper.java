@@ -3,7 +3,6 @@ package ru.bulldog.justmap.map.data.fast;
 import java.util.HashMap;
 import java.util.Map;
 
-import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.WorldChunk;
@@ -59,9 +58,9 @@ public class FastWorldMapper implements WorldMapper {
 		region.updateChunk(worldChunk);
 	}
 
-	public void updateBlock(BlockPos pos, BlockState state) {
+	public void updateBlock(BlockPos pos) {
 		RegionPos regionPos = new RegionPos(pos.getX(), pos.getZ());
 		DrawableMapRegion region = getOrCreateRegion(regionPos);
-		region.updateBlock(pos, state);
+		region.updateBlock(pos);
 	}
 }

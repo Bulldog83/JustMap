@@ -5,7 +5,6 @@ import java.nio.ByteOrder;
 
 import com.mojang.blaze3d.platform.TextureUtil;
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.block.BlockState;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
@@ -47,11 +46,11 @@ public class MapRegionLayer {
 		isModified = true;
 	}
 
-	public void updateBlock(BlockPos pos, BlockState state) {
+	public void updateBlock(BlockPos pos) {
 		ChunkPos chunkPos = new ChunkPos(pos);
 		MapChunk mapChunk = getMapChunk(chunkPos);
 
-		mapChunk.updateBlock(pos, state);
+		mapChunk.updateBlock(pos);
 		mapChunk.writeToTextureBuffer(buffer);
 		isModified = true;
 	}

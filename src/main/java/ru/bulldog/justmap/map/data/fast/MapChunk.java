@@ -29,6 +29,7 @@ public class MapChunk {
 	private final byte[][] solidY = new byte[MapRegionLayer.CHUNK_SIZE][MapRegionLayer.CHUNK_SIZE];
 	private final byte[][] transparentY = new byte[MapRegionLayer.CHUNK_SIZE][MapRegionLayer.CHUNK_SIZE];
 	private final byte[][] waterY = new byte[MapRegionLayer.CHUNK_SIZE][MapRegionLayer.CHUNK_SIZE];
+	private final byte[][] delta = new byte[MapRegionLayer.CHUNK_SIZE][MapRegionLayer.CHUNK_SIZE];
 
 	private final int[][] solidBlock = new int[MapRegionLayer.CHUNK_SIZE][MapRegionLayer.CHUNK_SIZE];
 	private final int[][] transparentBlock = new int[MapRegionLayer.CHUNK_SIZE][MapRegionLayer.CHUNK_SIZE];
@@ -88,12 +89,30 @@ public class MapChunk {
 		transparentBlock[xOffset][zOffset] = Block.getRawIdFromState(transparent_block);
 	}
 
-	private int blockColorChunkFromCache(World world, WorldChunk worldChunk, BlockPos pos) {
-		int xOffset = pos.getX() & 15;
-		int zOffset = pos.getZ() & 15;
+	private void calculateDelta(World world, WorldChunk worldChunk, int xOffset, int zOffset) {
+		int solid_y = solidY[xOffset][zOffset];
+
+		// For terrain, Vanilla calculate shading according to height difference
+		// with north (z-1) neighbor
+
+		// FIXME: this breaks at chunk border!
+		int north_solid_y;
+		if (zOffset > 0) {
+			north_solid_y = solidY[xOffset][zOffset - 1];
+		} else {
+			// FIXME: fake! use our own height
+			north_solid_y = solidY[xOffset][zOffset];
+		}
+
+		int my_delta = solid_y - north_solid_y;
+		delta[xOffset][zOffset] = (byte) my_delta;
+	}
+
+	private int blockColorChunkFromCache(int xOffset, int zOffset) {
 		int solid_y = solidY[xOffset][zOffset];
 		int transparent_y = transparentY[xOffset][zOffset];
 		int water_y = waterY[xOffset][zOffset];
+		int y_delta = delta[xOffset][zOffset];
 
 		BlockState solid_block = Block.getStateFromRawId(solidBlock[xOffset][zOffset]);
 		BlockState transparent_block =  Block.getStateFromRawId(transparentBlock[xOffset][zOffset]);
@@ -116,18 +135,8 @@ public class MapChunk {
 			mapColor = MapColor.WATER_BLUE;
 		} else {
 			// For terrain, calculate shading according to height difference
-			// with north (z-1) neighbor
-			// FIXME: this breaks at chunk border!
-			int north_solid_y;
-			if (zOffset > 0) {
-				north_solid_y = solidY[xOffset][zOffset - 1];
-			} else {
-				// FIXME: fake! use our own height
-				north_solid_y = solidY[xOffset][zOffset];
-			}
-
-			double shadeArg = (solid_y - north_solid_y) * 4/5.0d
-					+ ((xOffset + zOffset & 1) - 0.5d) * 0.4d;
+			// with neighbor
+			double shadeArg = y_delta * 4/5.0d + ((xOffset + zOffset & 1) - 0.5d) * 0.4d;
 			if (shadeArg > 0.6d) {
 				shade = 2;
 			} else if (shadeArg < -0.6d) {
@@ -135,7 +144,14 @@ public class MapChunk {
 			} else {
 				shade = 1;
 			}
-			mapColor = solid_block.getMapColor(world, pos);
+			try {
+				// We're taking a bit of a chance here. In practice, the
+				// implementation of getMapColor() ignores its arguments, but
+				// that might change in the future
+				mapColor = solid_block.getMapColor(null, null);
+			} catch (NullPointerException e) {
+				mapColor = MapColor.CLEAR;
+			}
 		}
 
 		if (mapColor == MapColor.CLEAR) {
@@ -196,24 +212,37 @@ public class MapChunk {
 			for (int z = 0; z < MapRegionLayer.CHUNK_SIZE; z++) {
 				blockPos.setZ(worldChunk.getPos().getStartZ() + z);
 				examinePos(world, worldChunk, blockPos);
+			}
+		}
 
-				int color = blockColorChunkFromCache(world, worldChunk, blockPos);
+		for (int x = 0; x < MapRegionLayer.CHUNK_SIZE; x++) {
+			for (int z = 0; z < MapRegionLayer.CHUNK_SIZE; z++) {
+				calculateDelta(world, worldChunk, x, z);
+			}
+		}
+
+		for (int x = 0; x < MapRegionLayer.CHUNK_SIZE; x++) {
+			for (int z = 0; z < MapRegionLayer.CHUNK_SIZE; z++) {
+				int color = blockColorChunkFromCache(x, z);
 				setColor(x, z, color);
 			}
 		}
 	}
 
-	public void updateBlock(BlockPos blockPos, BlockState blockState) {
+	public void updateBlock(BlockPos blockPos) {
 		int x = blockPos.getX() & 15;
 		int z = blockPos.getZ() & 15;
 		int relevantY = solidY[x][z];
 		if (blockPos.getY() >= relevantY) {
+			// Only look at changes to blocks that could possibly affect the map
 			BlockPos.Mutable pos = new BlockPos.Mutable();
 			pos.set(blockPos);
 			World world = FastMapManager.MANAGER.getFastWorldMapper().getWorld();
 			WorldChunk worldChunk = world.getWorldChunk(pos);
 			examinePos(world, worldChunk, pos);
-			int color = blockColorChunkFromCache(world, worldChunk, blockPos);
+			calculateDelta(world, worldChunk, x, z);
+			// FIXME: We also need to calculate delta on it's neighbor!
+			int color = blockColorChunkFromCache(x, z);
 			setColor(x, z, color);
 		}
 	}

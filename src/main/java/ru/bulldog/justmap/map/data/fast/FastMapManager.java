@@ -34,7 +34,7 @@ public class FastMapManager implements MapDataManager {
 	@Override
 	public void onSetBlockState(BlockPos pos, BlockState state, World world) {
 		assert(world == getFastWorldMapper().getWorld());
-		getFastWorldMapper().updateBlock(pos, state);
+		getFastWorldMapper().updateBlock(pos);
 	}
 
 	@Override

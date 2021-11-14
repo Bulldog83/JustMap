@@ -1,6 +1,5 @@
 package ru.bulldog.justmap.map.data.fast;
 
-import net.minecraft.block.BlockState;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.chunk.WorldChunk;
@@ -83,8 +82,8 @@ public class DrawableMapRegion implements MapRegion {
 		// FIXME: only update nether if actually in the nether, how to check?
 	}
 
-	public void updateBlock(BlockPos pos, BlockState state) {
+	public void updateBlock(BlockPos pos) {
 		// FIXME: should probably check if the block is on the surface here
-		surfaceLayer.updateBlock(pos, state);
+		surfaceLayer.updateBlock(pos);
 	}
 }
