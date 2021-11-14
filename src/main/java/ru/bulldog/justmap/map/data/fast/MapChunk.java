@@ -8,7 +8,6 @@ import net.minecraft.block.Blocks;
 import net.minecraft.block.MapColor;
 import net.minecraft.block.Material;
 import net.minecraft.client.color.world.BiomeColors;
-import net.minecraft.state.property.Properties;
 import net.minecraft.tag.FluidTags;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
@@ -145,7 +144,7 @@ public class MapChunk {
 		derivedDeltaY[xOffset][zOffset] = (byte) my_delta;
 	}
 
-	private int getJustMapPixelColor(int xOffset, int zOffset) {
+	private int getJustMapPixelColor(int xOffset, int zOffset, BlockPos.Mutable blockPos) {
 		int solidY = scoutedSolidY[xOffset][zOffset];
 		int transparentY = scoutedTransparentY[xOffset][zOffset];
 		int waterY = scoutedWaterY[xOffset][zOffset];
@@ -154,15 +153,13 @@ public class MapChunk {
 		BlockState solidBlock = Block.getStateFromRawId(scoutedSolidBlocks[xOffset][zOffset]);
 		BlockState transparentBlock = Block.getStateFromRawId(scoutedTransparentBlocks[xOffset][zOffset]);
 
-		// FIXME: it is not corrrect to have "overBlock" as transparent block, but use it for now
-		BlockPos pos = new BlockPos(chunkPos.getStartX() + xOffset, solidY, chunkPos.getStartZ() + zOffset);
+		blockPos.setY(solidY);
 		// Get basic pixel color
-		int color = getTintedBlockColor(FastMapManager.MANAGER.getFastWorldMapper().getWorld(), pos, solidBlock, transparentBlock);
+		int color = getTintedBlockColor(FastMapManager.MANAGER.getFastWorldMapper().getWorld(), blockPos, transparentY, waterY, solidBlock, transparentBlock);
 		if (color != -1) {
 			// Topology processing
-			int heightDiff = deltaY;
 			float topoLevel = getTopoLevel(solidY);
-			color = ColorUtil.processColor(color, heightDiff, topoLevel);
+			color = ColorUtil.processColor(color, deltaY, topoLevel);
 			if (ClientSettings.showTopography) {
 				return MathUtil.isEven(solidY) ? color : ColorUtil.colorBrigtness(color, -0.6F);
 			}
@@ -190,43 +187,38 @@ public class MapChunk {
 		return topoLevel;
 	}
 
-	private static int getTintedBlockColor(World world, BlockPos pos, BlockState blockState, BlockState overState) {
-		if (BlockStateUtil.isAir(blockState)) {
-			return -1;
+	private static int getTintedBlockColor(World world, BlockPos.Mutable pos, int transparentY, int waterY, BlockState blockState, BlockState transparentBlockState) {
+		int topY = pos.getY();
+		if (!ClientSettings.hidePlants && transparentY > topY && isPlant(transparentBlockState)) {
+			// We'll use the plant block pointed to by "transparent" instead
+			topY = transparentY;
+			pos.setY(topY);
+			blockState = transparentBlockState;
 		}
-		Material overStateMaterial = overState.getMaterial();
-		if (!ClientSettings.hideWater && ClientSettings.hidePlants && isSeaweed(overState)) {
-			// We are showing water but not plants, and we have seaweed above us
+
+		if (topY <= waterY && !ClientSettings.hideWater) {
 			if (ClientSettings.waterTint) {
 				int color = ColorUtil.getBlockColorInner(world, blockState, pos);
 				return ColorUtil.applyTint(color, BiomeColors.getWaterColor(world, pos));
 			} else {
 				return ColorUtil.getBlockColorInner(world, Blocks.WATER.getDefaultState(), pos);
 			}
-		} else if (BlockStateUtil.isAir(overState)
-				|| ((ClientSettings.hideWater || ClientSettings.waterTint) && overStateMaterial.isLiquid() && overStateMaterial != Material.LAVA)
-				|| (ClientSettings.hidePlants && (overStateMaterial == Material.PLANT || overStateMaterial == Material.REPLACEABLE_PLANT ||
-				isSeaweed(overState)))) {
-			int color = ColorUtil.getBlockColorInner(world, blockState, pos);
-			if (ClientSettings.hideWater) {
-				return color;
-			} else {
-				if (ClientSettings.waterTint &&
-						(!isSeaweed(overState) && overState.getFluidState().isIn(FluidTags.WATER) ||
-								(blockState.contains(Properties.WATERLOGGED) && blockState.get(Properties.WATERLOGGED)) || isSeaweed(blockState))) {
-					return ColorUtil.applyTint(color, BiomeColors.getWaterColor(world, pos));
-				} else {
-					return color;
-				}
-			}
 		} else {
-			return -1;
+			if (topY >= 0) {
+				return ColorUtil.getBlockColorInner(world, blockState, pos);
+			} else {
+				// Hole to the void
+				return -1;
+			}
 		}
 	}
 
-	public static boolean isSeaweed(BlockState state) {
+	public static boolean isPlant(BlockState state) {
 		Material material = state.getMaterial();
-		return material == Material.UNDERWATER_PLANT || material == Material.REPLACEABLE_UNDERWATER_PLANT;
+		return material == Material.PLANT
+				|| material == Material.REPLACEABLE_PLANT
+				|| material == Material.UNDERWATER_PLANT
+				|| material == Material.REPLACEABLE_UNDERWATER_PLANT;
 	}
 
 
@@ -283,8 +275,8 @@ public class MapChunk {
 		}
 	}
 
-	private void updatePixelColor(int x, int z) {
-		int color = getJustMapPixelColor(x, z);
+	private void updatePixelColor(int x, int z, BlockPos.Mutable blockPos) {
+		int color = getJustMapPixelColor(x, z, blockPos);
 
 		int xOffset = x * 4;
 		pixelColors[z][xOffset + 0] = (byte) 0;
@@ -306,9 +298,11 @@ public class MapChunk {
 		}
 
 		for (int x = 0; x < MapRegionLayer.CHUNK_SIZE; x++) {
+			blockPos.setX(worldChunk.getPos().getStartX() + x);
 			for (int z = 0; z < MapRegionLayer.CHUNK_SIZE; z++) {
+				blockPos.setZ(worldChunk.getPos().getStartZ() + z);
 				updateDerivedData(world, worldChunk, x, z);
-				updatePixelColor(x, z);
+				updatePixelColor(x, z, blockPos);
 			}
 		}
 	}
@@ -326,7 +320,7 @@ public class MapChunk {
 			updateScoutedData(world, worldChunk, pos);
 			updateDerivedData(world, worldChunk, x, z);
 			// FIXME: We also need to calculate delta on it's neighbor!
-			updatePixelColor(x, z);
+			updatePixelColor(x, z, pos);
 		}
 	}
 
