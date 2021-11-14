@@ -3,6 +3,9 @@ package ru.bulldog.justmap.map.data.fast;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.mojang.brigadier.context.CommandContext;
+import net.minecraft.server.command.ServerCommandSource;
+import net.minecraft.text.LiteralText;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.WorldChunk;
@@ -62,5 +65,12 @@ public class FastWorldMapper implements WorldMapper {
 		RegionPos regionPos = new RegionPos(pos.getX(), pos.getZ());
 		DrawableMapRegion region = getOrCreateRegion(regionPos);
 		region.updateBlock(pos);
+	}
+
+	@Override
+	public int onMapCommand(CommandContext<ServerCommandSource> context) {
+		registry.clear();
+		context.getSource().sendFeedback(new LiteralText("Map cleared"), false);
+		return 0;
 	}
 }
