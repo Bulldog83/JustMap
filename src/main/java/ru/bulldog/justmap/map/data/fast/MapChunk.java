@@ -132,15 +132,16 @@ public class MapChunk {
 		// with north (z-1) neighbor
 
 		// FIXME: this breaks at chunk border!
-		int northSolidY;
-		if (zOffset > 0) {
-			northSolidY = scoutedSolidY[xOffset][zOffset - 1];
+		int neighborSolidY;
+		if (zOffset > 0 && xOffset > 0) {
+			// Use north-west for almost correct JustMap style
+			neighborSolidY = scoutedSolidY[xOffset - 1][zOffset - 1];
 		} else {
 			// FIXME: fake! use our own height
-			northSolidY = scoutedSolidY[xOffset][zOffset];
+			neighborSolidY = scoutedSolidY[xOffset][zOffset];
 		}
 
-		int my_delta = solidY - northSolidY;
+		int my_delta = solidY - neighborSolidY;
 		derivedDeltaY[xOffset][zOffset] = (byte) my_delta;
 	}
 
