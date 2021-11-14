@@ -13,9 +13,8 @@ import net.minecraft.world.chunk.WorldChunk;
 
 import ru.bulldog.justmap.map.data.Layer;
 import ru.bulldog.justmap.util.BlockStateUtil;
+import ru.bulldog.justmap.util.colors.ColorUtil;
 import ru.bulldog.justmap.util.colors.Colors;
-
-import static ru.bulldog.justmap.util.colors.ColorUtil.ABGRtoARGB;
 
 public class MapChunk {
 	private final int relRegX;
@@ -24,153 +23,21 @@ public class MapChunk {
 	private final int level;
 
 	// Note that color data has a different layout than the scouted data
-	private final byte[][] colorData = new byte[MapRegionLayer.CHUNK_SIZE][MapRegionLayer.CHUNK_SIZE * MapRegionLayer.BYTES_PER_PIXEL];
+	private final byte[][] pixelColors = new byte[MapRegionLayer.CHUNK_SIZE][MapRegionLayer.CHUNK_SIZE * MapRegionLayer.BYTES_PER_PIXEL];
 
-	private final byte[][] solidY = new byte[MapRegionLayer.CHUNK_SIZE][MapRegionLayer.CHUNK_SIZE];
-	private final byte[][] transparentY = new byte[MapRegionLayer.CHUNK_SIZE][MapRegionLayer.CHUNK_SIZE];
-	private final byte[][] waterY = new byte[MapRegionLayer.CHUNK_SIZE][MapRegionLayer.CHUNK_SIZE];
-	private final byte[][] delta = new byte[MapRegionLayer.CHUNK_SIZE][MapRegionLayer.CHUNK_SIZE];
+	private final int[][] scoutedTransparentBlocks = new int[MapRegionLayer.CHUNK_SIZE][MapRegionLayer.CHUNK_SIZE];
+	private final int[][] scoutedSolidBlocks = new int[MapRegionLayer.CHUNK_SIZE][MapRegionLayer.CHUNK_SIZE];
+	private final byte[][] scoutedTransparentY = new byte[MapRegionLayer.CHUNK_SIZE][MapRegionLayer.CHUNK_SIZE];
+	private final byte[][] scoutedWaterY = new byte[MapRegionLayer.CHUNK_SIZE][MapRegionLayer.CHUNK_SIZE];
+	private final byte[][] scoutedSolidY = new byte[MapRegionLayer.CHUNK_SIZE][MapRegionLayer.CHUNK_SIZE];
 
-	private final int[][] solidBlock = new int[MapRegionLayer.CHUNK_SIZE][MapRegionLayer.CHUNK_SIZE];
-	private final int[][] transparentBlock = new int[MapRegionLayer.CHUNK_SIZE][MapRegionLayer.CHUNK_SIZE];
+	private final byte[][] derivedDeltaY = new byte[MapRegionLayer.CHUNK_SIZE][MapRegionLayer.CHUNK_SIZE];
 
 	public MapChunk(int relRegX, int relRegZ, Layer layer, int level) {
 		this.relRegX = relRegX;
 		this.relRegZ = relRegZ;
 		this.layer = layer;
 		this.level = level;
-	}
-
-	private void examinePos(World world, WorldChunk worldChunk, BlockPos.Mutable thisBlockPos) {
-		int posX = thisBlockPos.getX();
-		int posZ = thisBlockPos.getZ();
-
-		// Get the highest non-air block
-		int y =  worldChunk.sampleHeightmap(Heightmap.Type.WORLD_SURFACE, posX, posZ);
-
-		int solid_y = -1;
-		int transparent_y = -1;
-		int water_y = -1;
-		BlockState solid_block = BlockStateUtil.AIR;
-		BlockState transparent_block = BlockStateUtil.AIR;
-		while (solid_y < 0) {
-			thisBlockPos.setY(y);
-			BlockState blockState = worldChunk.getBlockState(thisBlockPos);
-			if (water_y < 0 &&
-					(!blockState.getFluidState().isEmpty() && blockState.getFluidState().isIn(FluidTags.WATER))) {
-				water_y = y;
-			}
-			if (transparent_y < 0 &&
-					blockState.getMapColor(world, thisBlockPos) == MapColor.CLEAR) {
-				transparent_y = y;
-				transparent_block = blockState;
-			}
-
-			if (blockState.getMapColor(world, thisBlockPos) != MapColor.CLEAR
-					&& blockState.getFluidState().isEmpty() && !blockState.getFluidState().isIn(FluidTags.WATER)) {
-				solid_y = y;
-				solid_block = blockState;
-			}
-			y--;
-			if (y < 0) {
-				// got just void
-				solid_y = 0;
-				solid_block = BlockStateUtil.AIR;
-			}
-		}
-
-		int xOffset = posX & 15;
-		int zOffset = posZ & 15;
-		solidY[xOffset][zOffset] = (byte) solid_y;
-		transparentY[xOffset][zOffset] = (byte) transparent_y;
-		waterY[xOffset][zOffset] = (byte) water_y;
-
-		solidBlock[xOffset][zOffset] = Block.getRawIdFromState(solid_block);
-		transparentBlock[xOffset][zOffset] = Block.getRawIdFromState(transparent_block);
-	}
-
-	private void calculateDelta(World world, WorldChunk worldChunk, int xOffset, int zOffset) {
-		int solid_y = solidY[xOffset][zOffset];
-
-		// For terrain, Vanilla calculate shading according to height difference
-		// with north (z-1) neighbor
-
-		// FIXME: this breaks at chunk border!
-		int north_solid_y;
-		if (zOffset > 0) {
-			north_solid_y = solidY[xOffset][zOffset - 1];
-		} else {
-			// FIXME: fake! use our own height
-			north_solid_y = solidY[xOffset][zOffset];
-		}
-
-		int my_delta = solid_y - north_solid_y;
-		delta[xOffset][zOffset] = (byte) my_delta;
-	}
-
-	private int blockColorChunkFromCache(int xOffset, int zOffset) {
-		int solid_y = solidY[xOffset][zOffset];
-		int transparent_y = transparentY[xOffset][zOffset];
-		int water_y = waterY[xOffset][zOffset];
-		int y_delta = delta[xOffset][zOffset];
-
-		BlockState solid_block = Block.getStateFromRawId(solidBlock[xOffset][zOffset]);
-		BlockState transparent_block =  Block.getStateFromRawId(transparentBlock[xOffset][zOffset]);
-
-		int shade = 0;
-
-		MapColor mapColor;
-
-		if (water_y > solid_y) {
-			// For water, calculate shading according to depth
-			int waterDepth = water_y - solid_y;
-			double shadeArg = waterDepth * 0.1d + (xOffset + zOffset & 1) * 0.2d;
-			if (shadeArg < 0.5d) {
-				shade = 2;
-			} else if (shadeArg > 0.9d) {
-				shade = 0;
-			} else {
-				shade = 1;
-			}
-			mapColor = MapColor.WATER_BLUE;
-		} else {
-			// For terrain, calculate shading according to height difference
-			// with neighbor
-			double shadeArg = y_delta * 4/5.0d + ((xOffset + zOffset & 1) - 0.5d) * 0.4d;
-			if (shadeArg > 0.6d) {
-				shade = 2;
-			} else if (shadeArg < -0.6d) {
-				shade = 0;
-			} else {
-				shade = 1;
-			}
-			try {
-				// We're taking a bit of a chance here. In practice, the
-				// implementation of getMapColor() ignores its arguments, but
-				// that might change in the future
-				mapColor = solid_block.getMapColor(null, null);
-			} catch (NullPointerException e) {
-				mapColor = MapColor.CLEAR;
-			}
-		}
-
-		if (mapColor == MapColor.CLEAR) {
-			return Colors.BLACK;
-		} else {
-			return ABGRtoARGB(MapColor.COLORS[mapColor.id].getRenderColor(shade));
-		}
-	}
-
-	private int getTopBlockY(WorldChunk worldChunk, int x, int z) {
-		if (layer == Layer.SURFACE) {
-			return getTopBlockYOnSurface(worldChunk, x, z);
-		} else {
-			return getTopBlockYInLeveledLayer(worldChunk, x, z, false, true);
-		}
-	}
-
-	private int getTopBlockYOnSurface(WorldChunk worldChunk, int x, int z) {
-		return worldChunk.sampleHeightmap(Heightmap.Type.WORLD_SURFACE, x, z);
 	}
 
 	private int getTopBlockYInLeveledLayer(WorldChunk worldChunk, int posX, int posZ, boolean hideWater, boolean hidePlants) {
@@ -203,7 +70,135 @@ public class MapChunk {
 		return y+1;
 	}
 
-	public void updateChunk(WorldChunk worldChunk) {
+	private void updateScoutedData(World world, WorldChunk worldChunk, BlockPos.Mutable pos) {
+		int xOffset = pos.getX() & 15;
+		int zOffset = pos.getZ() & 15;
+
+		// Get the highest non-air block
+		int y =  worldChunk.sampleHeightmap(Heightmap.Type.WORLD_SURFACE, xOffset, zOffset);
+
+		int solidY = -1;
+		int transparentY = -1;
+		int waterY = -1;
+		BlockState solidBlock = BlockStateUtil.AIR;
+		BlockState transparentBlock = BlockStateUtil.AIR;
+		while (solidY < 0) {
+			pos.setY(y);
+			BlockState blockState = worldChunk.getBlockState(pos);
+			if (waterY < 0 &&
+					(!blockState.getFluidState().isEmpty() && blockState.getFluidState().isIn(FluidTags.WATER))) {
+				waterY = y;
+			}
+			if (transparentY < 0 &&
+					blockState.getMapColor(world, pos) == MapColor.CLEAR) {
+				transparentY = y;
+				transparentBlock = blockState;
+			}
+
+			if (blockState.getMapColor(world, pos) != MapColor.CLEAR
+					&& blockState.getFluidState().isEmpty() && !blockState.getFluidState().isIn(FluidTags.WATER)) {
+				solidY = y;
+				solidBlock = blockState;
+			}
+			y--;
+			if (y < 0) {
+				// got just void
+				solidY = 0;
+				solidBlock = BlockStateUtil.AIR;
+			}
+		}
+
+		scoutedSolidY[xOffset][zOffset] = (byte) solidY;
+		scoutedTransparentY[xOffset][zOffset] = (byte) transparentY;
+		scoutedWaterY[xOffset][zOffset] = (byte) waterY;
+
+		scoutedSolidBlocks[xOffset][zOffset] = Block.getRawIdFromState(solidBlock);
+		scoutedTransparentBlocks[xOffset][zOffset] = Block.getRawIdFromState(transparentBlock);
+	}
+
+	private void updateDerivedData(World world, WorldChunk worldChunk, int xOffset, int zOffset) {
+		int solidY = scoutedSolidY[xOffset][zOffset];
+
+		// For terrain, Vanilla calculate shading according to height difference
+		// with north (z-1) neighbor
+
+		// FIXME: this breaks at chunk border!
+		int northSolidY;
+		if (zOffset > 0) {
+			northSolidY = scoutedSolidY[xOffset][zOffset - 1];
+		} else {
+			// FIXME: fake! use our own height
+			northSolidY = scoutedSolidY[xOffset][zOffset];
+		}
+
+		int my_delta = solidY - northSolidY;
+		derivedDeltaY[xOffset][zOffset] = (byte) my_delta;
+	}
+
+	private int getVanillaPixelColor(int xOffset, int zOffset) {
+		int solidY = scoutedSolidY[xOffset][zOffset];
+		int transparentY = scoutedTransparentY[xOffset][zOffset];
+		int waterY = scoutedWaterY[xOffset][zOffset];
+		int deltaY = derivedDeltaY[xOffset][zOffset];
+
+		BlockState solidBlock = Block.getStateFromRawId(scoutedSolidBlocks[xOffset][zOffset]);
+		BlockState transparentBlock =  Block.getStateFromRawId(scoutedTransparentBlocks[xOffset][zOffset]);
+
+		int shade = 0;
+
+		MapColor mapColor;
+
+		if (waterY > solidY) {
+			// For water, calculate shading according to depth
+			int waterDepth = waterY - solidY;
+			double shadeArg = waterDepth * 0.1d + (xOffset + zOffset & 1) * 0.2d;
+			if (shadeArg < 0.5d) {
+				shade = 2;
+			} else if (shadeArg > 0.9d) {
+				shade = 0;
+			} else {
+				shade = 1;
+			}
+			mapColor = MapColor.WATER_BLUE;
+		} else {
+			// For terrain, calculate shading according to height difference
+			// with neighbor
+			double shadeArg = deltaY * 4/5.0d + ((xOffset + zOffset & 1) - 0.5d) * 0.4d;
+			if (shadeArg > 0.6d) {
+				shade = 2;
+			} else if (shadeArg < -0.6d) {
+				shade = 0;
+			} else {
+				shade = 1;
+			}
+			try {
+				// We're taking a bit of a chance here. In practice, the
+				// implementation of getMapColor() ignores its arguments, but
+				// that might change in the future
+				mapColor = solidBlock.getMapColor(null, null);
+			} catch (NullPointerException e) {
+				mapColor = MapColor.CLEAR;
+			}
+		}
+
+		if (mapColor == MapColor.CLEAR) {
+			return Colors.BLACK;
+		} else {
+			return ColorUtil.ABGRtoARGB(MapColor.COLORS[mapColor.id].getRenderColor(shade));
+		}
+	}
+
+	private void updatePixelColor(int x, int z) {
+		int color = getVanillaPixelColor(x, z);
+
+		int xOffset = x * 4;
+		pixelColors[z][xOffset + 0] = (byte) 0;
+		pixelColors[z][xOffset + 1] = (byte) (color & 255);
+		pixelColors[z][xOffset + 2] = (byte) ((color >> 8) & 255);
+		pixelColors[z][xOffset + 3] = (byte) ((color >> 16) & 255);
+	}
+
+	public void onChunkUpdate(WorldChunk worldChunk) {
 		World world = FastMapManager.MANAGER.getFastWorldMapper().getWorld();
 		BlockPos.Mutable blockPos = new BlockPos.Mutable();
 
@@ -211,39 +206,32 @@ public class MapChunk {
 			blockPos.setX(worldChunk.getPos().getStartX() + x);
 			for (int z = 0; z < MapRegionLayer.CHUNK_SIZE; z++) {
 				blockPos.setZ(worldChunk.getPos().getStartZ() + z);
-				examinePos(world, worldChunk, blockPos);
+				updateScoutedData(world, worldChunk, blockPos);
 			}
 		}
 
 		for (int x = 0; x < MapRegionLayer.CHUNK_SIZE; x++) {
 			for (int z = 0; z < MapRegionLayer.CHUNK_SIZE; z++) {
-				calculateDelta(world, worldChunk, x, z);
-			}
-		}
-
-		for (int x = 0; x < MapRegionLayer.CHUNK_SIZE; x++) {
-			for (int z = 0; z < MapRegionLayer.CHUNK_SIZE; z++) {
-				int color = blockColorChunkFromCache(x, z);
-				setColor(x, z, color);
+				updateDerivedData(world, worldChunk, x, z);
+				updatePixelColor(x, z);
 			}
 		}
 	}
 
-	public void updateBlock(BlockPos blockPos) {
+	public void onBlockUpdate(BlockPos blockPos) {
 		int x = blockPos.getX() & 15;
 		int z = blockPos.getZ() & 15;
-		int relevantY = solidY[x][z];
+		int relevantY = scoutedSolidY[x][z];
 		if (blockPos.getY() >= relevantY) {
 			// Only look at changes to blocks that could possibly affect the map
 			BlockPos.Mutable pos = new BlockPos.Mutable();
 			pos.set(blockPos);
 			World world = FastMapManager.MANAGER.getFastWorldMapper().getWorld();
 			WorldChunk worldChunk = world.getWorldChunk(pos);
-			examinePos(world, worldChunk, pos);
-			calculateDelta(world, worldChunk, x, z);
+			updateScoutedData(world, worldChunk, pos);
+			updateDerivedData(world, worldChunk, x, z);
 			// FIXME: We also need to calculate delta on it's neighbor!
-			int color = blockColorChunkFromCache(x, z);
-			setColor(x, z, color);
+			updatePixelColor(x, z);
 		}
 	}
 
@@ -252,16 +240,9 @@ public class MapChunk {
 			buffer.put((relRegZ * MapRegionLayer.CHUNK_SIZE + row)
 					* MapRegionLayer.REGION_SIZE * MapRegionLayer.BYTES_PER_PIXEL
 					+ (relRegX * MapRegionLayer.CHUNK_SIZE * MapRegionLayer.BYTES_PER_PIXEL),
-					colorData[row], 0,
+					pixelColors[row], 0,
 					MapRegionLayer.CHUNK_SIZE * MapRegionLayer.BYTES_PER_PIXEL);
 		}
 	}
 
-	private void setColor(int x, int z, int color) {
-		int xOffset = x * 4;
-		colorData[z][xOffset + 0] = (byte) 0;
-		colorData[z][xOffset + 1] = (byte) (color & 255);
-		colorData[z][xOffset + 2] = (byte) ((color >> 8) & 255);
-		colorData[z][xOffset + 3] = (byte) ((color >> 16) & 255);
-	}
 }

@@ -41,7 +41,7 @@ public class MapRegionLayer {
 		// FIXME: verify/assert that chunkpos is inside region?
 		MapChunk mapChunk = getMapChunk(worldChunk.getPos());
 
-		mapChunk.updateChunk(worldChunk);
+		mapChunk.onChunkUpdate(worldChunk);
 		mapChunk.writeToTextureBuffer(buffer);
 		isModified = true;
 	}
@@ -50,7 +50,7 @@ public class MapRegionLayer {
 		ChunkPos chunkPos = new ChunkPos(pos);
 		MapChunk mapChunk = getMapChunk(chunkPos);
 
-		mapChunk.updateBlock(pos);
+		mapChunk.onBlockUpdate(pos);
 		mapChunk.writeToTextureBuffer(buffer);
 		isModified = true;
 	}
