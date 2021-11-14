@@ -93,18 +93,15 @@ public class MapChunk {
 		while (solidY < 0) {
 			pos.setY(y);
 			BlockState blockState = worldChunk.getBlockState(pos);
-			if (waterY < 0 &&
-					(!blockState.getFluidState().isEmpty() && blockState.getFluidState().isIn(FluidTags.WATER))) {
+			if (waterY < 0 && isWaterBlockState(blockState)) {
 				waterY = y;
 			}
-			if (transparentY < 0 &&
-					blockState.getMapColor(world, pos) == MapColor.CLEAR) {
+			if (transparentY < 0 && isTransparentBlockState(world, pos, blockState)) {
 				transparentY = y;
 				transparentBlock = blockState;
 			}
 
-			if (blockState.getMapColor(world, pos) != MapColor.CLEAR
-					&& blockState.getFluidState().isEmpty() && !blockState.getFluidState().isIn(FluidTags.WATER)) {
+			if (!isTransparentBlockState(world, pos, blockState) && !isWaterBlockState(blockState)) {
 				solidY = y;
 				solidBlock = blockState;
 			}
@@ -122,6 +119,22 @@ public class MapChunk {
 
 		scoutedSolidBlocks[xOffset][zOffset] = Block.getRawIdFromState(solidBlock);
 		scoutedTransparentBlocks[xOffset][zOffset] = Block.getRawIdFromState(transparentBlock);
+	}
+
+	private boolean isWaterBlockState(BlockState blockState) {
+		return !blockState.getFluidState().isEmpty() && blockState.getFluidState().isIn(FluidTags.WATER);
+	}
+
+	private boolean isTransparentBlockState(World world, BlockPos.Mutable pos, BlockState blockState) {
+		return blockState.getMapColor(world, pos) == MapColor.CLEAR || isPlant(blockState);
+	}
+
+	private boolean isPlant(BlockState state) {
+		Material material = state.getMaterial();
+		return material == Material.PLANT
+				|| material == Material.REPLACEABLE_PLANT
+				|| material == Material.UNDERWATER_PLANT
+				|| material == Material.REPLACEABLE_UNDERWATER_PLANT;
 	}
 
 	private void updateDerivedData(World world, WorldChunk worldChunk, int xOffset, int zOffset) {
@@ -144,7 +157,10 @@ public class MapChunk {
 		derivedDeltaY[xOffset][zOffset] = (byte) my_delta;
 	}
 
-	private int getJustMapPixelColor(int xOffset, int zOffset, BlockPos.Mutable blockPos) {
+	private int calculateJustMapPixelColor(int xOffset, int zOffset, BlockPos.Mutable blockPos) {
+		World world = FastMapManager.MANAGER.getFastWorldMapper().getWorld();
+		int color;
+
 		int solidY = scoutedSolidY[xOffset][zOffset];
 		int transparentY = scoutedTransparentY[xOffset][zOffset];
 		int waterY = scoutedWaterY[xOffset][zOffset];
@@ -153,19 +169,41 @@ public class MapChunk {
 		BlockState solidBlock = Block.getStateFromRawId(scoutedSolidBlocks[xOffset][zOffset]);
 		BlockState transparentBlock = Block.getStateFromRawId(scoutedTransparentBlocks[xOffset][zOffset]);
 
+		// Determine highest Y to look at
 		blockPos.setY(solidY);
-		// Get basic pixel color
-		int color = getTintedBlockColor(FastMapManager.MANAGER.getFastWorldMapper().getWorld(), blockPos, transparentY, waterY, solidBlock, transparentBlock);
-		if (color != -1) {
-			// Topology processing
-			float topoLevel = getTopoLevel(solidY);
-			color = ColorUtil.processColor(color, deltaY, topoLevel);
-			if (ClientSettings.showTopography) {
-				return MathUtil.isEven(solidY) ? color : ColorUtil.colorBrigtness(color, -0.6F);
-			}
-			return color;
+		int topY = solidY;
+		if (!ClientSettings.hidePlants && transparentY > topY && isPlant(transparentBlock)) {
+			// We'll use the plant block pointed to by "transparent" instead
+			topY = transparentY;
+			blockPos.setY(topY);
+			solidBlock = transparentBlock;
 		}
-		return Colors.BLACK;
+
+		// Get base color
+		if (topY <= waterY && !ClientSettings.hideWater) {
+			// Top Y is under water
+			if (ClientSettings.waterTint) {
+				int innerColor = ColorUtil.getBlockColorInner(world, solidBlock, blockPos);
+				color = ColorUtil.applyTint(innerColor, BiomeColors.getWaterColor(world, blockPos));
+			} else {
+				color = ColorUtil.getBlockColorInner(world, Blocks.WATER.getDefaultState(), blockPos);
+			}
+		} else {
+			if (topY >= 0) {
+				color = ColorUtil.getBlockColorInner(world, solidBlock, blockPos);
+			} else {
+				// Hole to the void
+				return Colors.BLACK;
+			}
+		}
+
+		// Topology processing
+		float topoLevel = getTopoLevel(solidY);
+		color = ColorUtil.processColor(color, deltaY, topoLevel);
+		if (ClientSettings.showTopography) {
+			return MathUtil.isEven(solidY) ? color : ColorUtil.colorBrigtness(color, -0.6F);
+		}
+		return color;
 	}
 
 	private float getTopoLevel(int solidY) {
@@ -187,42 +225,7 @@ public class MapChunk {
 		return topoLevel;
 	}
 
-	private static int getTintedBlockColor(World world, BlockPos.Mutable pos, int transparentY, int waterY, BlockState blockState, BlockState transparentBlockState) {
-		int topY = pos.getY();
-		if (!ClientSettings.hidePlants && transparentY > topY && isPlant(transparentBlockState)) {
-			// We'll use the plant block pointed to by "transparent" instead
-			topY = transparentY;
-			pos.setY(topY);
-			blockState = transparentBlockState;
-		}
-
-		if (topY <= waterY && !ClientSettings.hideWater) {
-			if (ClientSettings.waterTint) {
-				int color = ColorUtil.getBlockColorInner(world, blockState, pos);
-				return ColorUtil.applyTint(color, BiomeColors.getWaterColor(world, pos));
-			} else {
-				return ColorUtil.getBlockColorInner(world, Blocks.WATER.getDefaultState(), pos);
-			}
-		} else {
-			if (topY >= 0) {
-				return ColorUtil.getBlockColorInner(world, blockState, pos);
-			} else {
-				// Hole to the void
-				return -1;
-			}
-		}
-	}
-
-	public static boolean isPlant(BlockState state) {
-		Material material = state.getMaterial();
-		return material == Material.PLANT
-				|| material == Material.REPLACEABLE_PLANT
-				|| material == Material.UNDERWATER_PLANT
-				|| material == Material.REPLACEABLE_UNDERWATER_PLANT;
-	}
-
-
-	private int getVanillaPixelColor(int xOffset, int zOffset) {
+	private int calculateVanillaPixelColor(int xOffset, int zOffset, BlockPos.Mutable ignored) {
 		int solidY = scoutedSolidY[xOffset][zOffset];
 		int transparentY = scoutedTransparentY[xOffset][zOffset];
 		int waterY = scoutedWaterY[xOffset][zOffset];
@@ -276,7 +279,7 @@ public class MapChunk {
 	}
 
 	private void updatePixelColor(int x, int z, BlockPos.Mutable blockPos) {
-		int color = getJustMapPixelColor(x, z, blockPos);
+		int color = calculateJustMapPixelColor(x, z, blockPos);
 
 		int xOffset = x * 4;
 		pixelColors[z][xOffset + 0] = (byte) 0;
