@@ -194,34 +194,35 @@ public class MapChunk {
 		if (BlockStateUtil.isAir(blockState)) {
 			return -1;
 		}
-		Material material = overState.getMaterial();
+		Material overStateMaterial = overState.getMaterial();
 		if (!ClientSettings.hideWater && ClientSettings.hidePlants && isSeaweed(overState)) {
 			// We are showing water but not plants, and we have seaweed above us
 			if (ClientSettings.waterTint) {
 				int color = ColorUtil.getBlockColorInner(world, blockState, pos);
 				return ColorUtil.applyTint(color, BiomeColors.getWaterColor(world, pos));
+			} else {
+				return ColorUtil.getBlockColorInner(world, Blocks.WATER.getDefaultState(), pos);
 			}
-			return ColorUtil.getBlockColorInner(world, Blocks.WATER.getDefaultState(), pos);
-		} else if (BlockStateUtil.isAir(overState) || (!!(ClientSettings.hideWater || ClientSettings.waterTint) && material.isLiquid() && material != Material.LAVA) || (!!ClientSettings.hidePlants && (material == Material.PLANT || material == Material.REPLACEABLE_PLANT ||
+		} else if (BlockStateUtil.isAir(overState)
+				|| ((ClientSettings.hideWater || ClientSettings.waterTint) && overStateMaterial.isLiquid() && overStateMaterial != Material.LAVA)
+				|| (ClientSettings.hidePlants && (overStateMaterial == Material.PLANT || overStateMaterial == Material.REPLACEABLE_PLANT ||
 				isSeaweed(overState)))) {
 			int color = ColorUtil.getBlockColorInner(world, blockState, pos);
-			if (ClientSettings.hideWater) return color;
-			boolean isWaterLogged;
-			if (blockState.contains(Properties.WATERLOGGED)) {
-				isWaterLogged = blockState.get(Properties.WATERLOGGED);
+			if (ClientSettings.hideWater) {
+				return color;
 			} else {
-				isWaterLogged = isSeaweed(blockState);
+				if (ClientSettings.waterTint &&
+						(!isSeaweed(overState) && overState.getFluidState().isIn(FluidTags.WATER) ||
+								(blockState.contains(Properties.WATERLOGGED) && blockState.get(Properties.WATERLOGGED)) || isSeaweed(blockState))) {
+					return ColorUtil.applyTint(color, BiomeColors.getWaterColor(world, pos));
+				} else {
+					return color;
+				}
 			}
-
-			if (ClientSettings.waterTint && (!isSeaweed(overState) && overState.getFluidState().isIn(FluidTags.WATER) || isWaterLogged)) {
-				return ColorUtil.applyTint(color, BiomeColors.getWaterColor(world, pos));
-			}
-			return color;
+		} else {
+			return -1;
 		}
-
-		return -1;
 	}
-
 
 	public static boolean isSeaweed(BlockState state) {
 		Material material = state.getMaterial();
