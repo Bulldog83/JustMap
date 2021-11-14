@@ -297,7 +297,7 @@ public class ColorUtil {
 		return -1;
 	}
 
-	private static int getBlockColorInner(World world, BlockState blockState, BlockPos pos) {
+	public static int getBlockColorInner(World world, BlockState blockState, BlockPos pos) {
 		if (ClientSettings.alternateColorRender) {
 			return getAlternateBlockColor(world, blockState, pos);
 		} else {

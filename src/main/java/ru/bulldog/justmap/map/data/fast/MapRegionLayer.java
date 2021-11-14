@@ -62,7 +62,7 @@ public class MapRegionLayer {
 
 		MapChunk mapChunk = chunks[relRegX][relRegZ];
 		if (mapChunk == null) {
-			mapChunk = new MapChunk(relRegX, relRegZ, layer, level);
+			mapChunk = new MapChunk(relRegX, relRegZ, layer, level, chunkPos);
 			chunks[relRegX][relRegZ] = mapChunk;
 		}
 		return mapChunk;

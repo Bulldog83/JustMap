@@ -4,23 +4,31 @@ import java.nio.ByteBuffer;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.block.MapColor;
+import net.minecraft.block.Material;
+import net.minecraft.client.color.world.BiomeColors;
+import net.minecraft.state.property.Properties;
 import net.minecraft.tag.FluidTags;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.Heightmap;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.WorldChunk;
 
+import ru.bulldog.justmap.client.config.ClientSettings;
 import ru.bulldog.justmap.map.data.Layer;
 import ru.bulldog.justmap.util.BlockStateUtil;
 import ru.bulldog.justmap.util.colors.ColorUtil;
 import ru.bulldog.justmap.util.colors.Colors;
+import ru.bulldog.justmap.util.math.MathUtil;
 
 public class MapChunk {
 	private final int relRegX;
 	private final int relRegZ;
 	private final Layer layer;
 	private final int level;
+	private final ChunkPos chunkPos;
 
 	// Note that color data has a different layout than the scouted data
 	private final byte[][] pixelColors = new byte[MapRegionLayer.CHUNK_SIZE][MapRegionLayer.CHUNK_SIZE * MapRegionLayer.BYTES_PER_PIXEL];
@@ -33,11 +41,12 @@ public class MapChunk {
 
 	private final byte[][] derivedDeltaY = new byte[MapRegionLayer.CHUNK_SIZE][MapRegionLayer.CHUNK_SIZE];
 
-	public MapChunk(int relRegX, int relRegZ, Layer layer, int level) {
+	public MapChunk(int relRegX, int relRegZ, Layer layer, int level, ChunkPos chunkPos) {
 		this.relRegX = relRegX;
 		this.relRegZ = relRegZ;
 		this.layer = layer;
 		this.level = level;
+		this.chunkPos = chunkPos;
 	}
 
 	private int getTopBlockYInLeveledLayer(WorldChunk worldChunk, int posX, int posZ, boolean hideWater, boolean hidePlants) {
@@ -135,6 +144,90 @@ public class MapChunk {
 		derivedDeltaY[xOffset][zOffset] = (byte) my_delta;
 	}
 
+	private int getJustMapPixelColor(int xOffset, int zOffset) {
+		int solidY = scoutedSolidY[xOffset][zOffset];
+		int transparentY = scoutedTransparentY[xOffset][zOffset];
+		int waterY = scoutedWaterY[xOffset][zOffset];
+		int deltaY = derivedDeltaY[xOffset][zOffset];
+
+		BlockState solidBlock = Block.getStateFromRawId(scoutedSolidBlocks[xOffset][zOffset]);
+		BlockState transparentBlock = Block.getStateFromRawId(scoutedTransparentBlocks[xOffset][zOffset]);
+
+		// FIXME: it is not corrrect to have "overBlock" as transparent block, but use it for now
+		BlockPos pos = new BlockPos(chunkPos.getStartX() + xOffset, solidY, chunkPos.getStartZ() + zOffset);
+		// Get basic pixel color
+		int color = getTintedBlockColor(FastMapManager.MANAGER.getFastWorldMapper().getWorld(), pos, solidBlock, transparentBlock);
+		if (color != -1) {
+			// Topology processing
+			int heightDiff = deltaY;
+			float topoLevel = getTopoLevel(solidY);
+			color = ColorUtil.processColor(color, heightDiff, topoLevel);
+			if (ClientSettings.showTopography) {
+				return MathUtil.isEven(solidY) ? color : ColorUtil.colorBrigtness(color, -0.6F);
+			}
+			return color;
+		}
+		return Colors.BLACK;
+	}
+
+	private float getTopoLevel(int solidY) {
+		int height = layer.getHeight();
+		int bottom;
+		int baseHeight;
+		if (layer == Layer.NETHER) {
+			bottom = level * height;
+			baseHeight = 128;
+		} else if (layer == Layer.SURFACE) {
+			bottom = FastMapManager.MANAGER.getFastWorldMapper().getWorld().getSeaLevel();
+			baseHeight = 256;
+		} else {
+			bottom = level * height;
+			baseHeight = 32;
+		}
+
+		float topoLevel = ((float) (solidY - bottom) / baseHeight);
+		return topoLevel;
+	}
+
+	private static int getTintedBlockColor(World world, BlockPos pos, BlockState blockState, BlockState overState) {
+		if (BlockStateUtil.isAir(blockState)) {
+			return -1;
+		}
+		Material material = overState.getMaterial();
+		if (!ClientSettings.hideWater && ClientSettings.hidePlants && isSeaweed(overState)) {
+			// We are showing water but not plants, and we have seaweed above us
+			if (ClientSettings.waterTint) {
+				int color = ColorUtil.getBlockColorInner(world, blockState, pos);
+				return ColorUtil.applyTint(color, BiomeColors.getWaterColor(world, pos));
+			}
+			return ColorUtil.getBlockColorInner(world, Blocks.WATER.getDefaultState(), pos);
+		} else if (BlockStateUtil.isAir(overState) || (!!(ClientSettings.hideWater || ClientSettings.waterTint) && material.isLiquid() && material != Material.LAVA) || (!!ClientSettings.hidePlants && (material == Material.PLANT || material == Material.REPLACEABLE_PLANT ||
+				isSeaweed(overState)))) {
+			int color = ColorUtil.getBlockColorInner(world, blockState, pos);
+			if (ClientSettings.hideWater) return color;
+			boolean isWaterLogged;
+			if (blockState.contains(Properties.WATERLOGGED)) {
+				isWaterLogged = blockState.get(Properties.WATERLOGGED);
+			} else {
+				isWaterLogged = isSeaweed(blockState);
+			}
+
+			if (ClientSettings.waterTint && (!isSeaweed(overState) && overState.getFluidState().isIn(FluidTags.WATER) || isWaterLogged)) {
+				return ColorUtil.applyTint(color, BiomeColors.getWaterColor(world, pos));
+			}
+			return color;
+		}
+
+		return -1;
+	}
+
+
+	public static boolean isSeaweed(BlockState state) {
+		Material material = state.getMaterial();
+		return material == Material.UNDERWATER_PLANT || material == Material.REPLACEABLE_UNDERWATER_PLANT;
+	}
+
+
 	private int getVanillaPixelColor(int xOffset, int zOffset) {
 		int solidY = scoutedSolidY[xOffset][zOffset];
 		int transparentY = scoutedTransparentY[xOffset][zOffset];
@@ -189,7 +282,7 @@ public class MapChunk {
 	}
 
 	private void updatePixelColor(int x, int z) {
-		int color = getVanillaPixelColor(x, z);
+		int color = getJustMapPixelColor(x, z);
 
 		int xOffset = x * 4;
 		pixelColors[z][xOffset + 0] = (byte) 0;
