@@ -126,17 +126,17 @@ public class RenderUtil extends DrawableHelper {
 	}
 	
 	public static void enableScissor() {
-		RenderSystem.assertThread(RenderSystem::isOnRenderThread);
+		RenderSystem.assertOnRenderThread();
 		enable(GLC.GL_SCISSOR_TEST);
 	}
 	
 	public static void disableScissor() {
-		RenderSystem.assertThread(RenderSystem::isOnRenderThread);
+		RenderSystem.assertOnRenderThread();
 		disable(GLC.GL_SCISSOR_TEST);
 	}
 	
 	public static void applyScissor(int x, int y, int width, int height) {
-		RenderSystem.assertThread(RenderSystem::isOnRenderThread);
+		RenderSystem.assertOnRenderThread();
 		GL11.glScissor(x, y, width, height);
 	}
 	
@@ -251,7 +251,7 @@ public class RenderUtil extends DrawableHelper {
 	}
 	
 	public static void fill(MatrixStack matrices, double x, double y, double w, double h, int color) {
-		fill(matrices.peek().getModel(), x, y, w, h, color);
+		fill(matrices.peek().getPositionMatrix(), x, y, w, h, color);
 	}
 
 	public static void fill(Matrix4f matrix4f, double x, double y, double w, double h, int color) {
@@ -402,8 +402,8 @@ public class RenderUtil extends DrawableHelper {
 		matrixStack.push();
 		matrixStack.translate(x, y, 0);
 
-		Matrix4f m4f = matrixStack.peek().getModel();
-		Matrix3f m3f = matrixStack.peek().getNormal();
+		Matrix4f m4f = matrixStack.peek().getPositionMatrix();
+		Matrix3f m3f = matrixStack.peek().getNormalMatrix();
 
 		addVertices(m4f, m3f, vertexConsumer, w, h, minU, minV, maxU, maxV);
 
@@ -437,8 +437,8 @@ public class RenderUtil extends DrawableHelper {
 	}
 
 	public static void addQuad(MatrixStack matrices, double x, double y, double w, double h, float minU, float minV, float maxU, float maxV) {
-		Matrix4f m4f = matrices.peek().getModel();
-		Matrix3f m3f = matrices.peek().getNormal();
+		Matrix4f m4f = matrices.peek().getPositionMatrix();
+		Matrix3f m3f = matrices.peek().getNormalMatrix();
 
 		vertex(m4f, m3f, vertexBuffer, (float) x, (float) (y + h), 1.0F, minU, maxV);
 		vertex(m4f, m3f, vertexBuffer, (float) (x + w), (float) (y + h), 1.0F, maxU, maxV);

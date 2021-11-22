@@ -109,7 +109,7 @@ public class BufferedRenderer extends MapRenderer {
 		RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 		RenderSystem.setShader(GameRenderer::getPositionTexShader);
 		// yarn mapping missing for beginRead
-		this.primaryFramebuffer.method_35610();
+		this.primaryFramebuffer.beginRead();
 		RenderUtil.startDraw();
 		BufferBuilder buffer = RenderUtil.getBuffer();
 		buffer.vertex(0.0, scaledH, 0.0).texture(0.0F, 0.0F).next();
@@ -154,7 +154,7 @@ public class BufferedRenderer extends MapRenderer {
 		matrices.multiply(Vec3f.POSITIVE_Z.getDegreesQuaternion(180.0F));
 		RenderSystem.setShader(GameRenderer::getPositionTexShader);
 		// yarn mapping missing: beginRead
-		this.secondaryFramebuffer.method_35610();
+		this.secondaryFramebuffer.beginRead();
 		RenderUtil.startDraw();
 		buffer = RenderUtil.getBuffer();
 		buffer.vertex(imgX, imgY + imgH, 0.0).texture(0.0F, 0.0F).next();

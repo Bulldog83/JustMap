@@ -45,12 +45,12 @@ public final class StorageUtil {
 	
 	public static VersionedChunkStorage getChunkStorage(ServerWorld world) {
 		File regionDir = new File(savesDir(world), "region");
-		return new VersionedChunkStorage(regionDir, world.getServer().getDataFixer(), true);
+		return new VersionedChunkStorage(regionDir.toPath(), world.getServer().getDataFixer(), true);
 	}
 	
 	public static File savesDir(ServerWorld world) {
 		if (world == null || !(world instanceof ServerWorld)) return null;
-		return ((SessionAccessor) world.getServer()).getServerSession().getWorldDirectory(world.getRegistryKey());
+		return ((SessionAccessor) world.getServer()).getServerSession().getWorldDirectory(world.getRegistryKey()).toFile();
 	}
 	
 	public static File configDir() {

@@ -9,8 +9,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.world.World;
-import net.minecraft.world.gen.ChunkRandom;
-
+import net.minecraft.world.gen.random.ChunkRandom;
 import ru.bulldog.justmap.util.Dimension;
 import ru.bulldog.justmap.util.RuleUtil;
 
@@ -59,7 +58,7 @@ public class ServerNetworkHandler extends NetworkHandler {
 		
 		boolean slime = false;
 		if (RuleUtil.allowSlimeChunks() && Dimension.isOverworld(player.world)) {
-			ServerWorld world = player.getServerWorld();
+			ServerWorld world = player.getWorld();
 			slime = ChunkRandom.getSlimeRandom(x, z, world.getSeed(), 987234911L).nextInt(10) == 0;
 		}
 		PacketByteBuf response = new PacketByteBuf(Unpooled.buffer());

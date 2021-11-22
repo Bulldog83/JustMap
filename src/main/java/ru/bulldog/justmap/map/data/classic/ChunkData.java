@@ -17,8 +17,7 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.chunk.WorldChunk;
-import net.minecraft.world.gen.ChunkRandom;
-
+import net.minecraft.world.gen.random.ChunkRandom;
 import java.lang.ref.SoftReference;
 import java.util.Arrays;
 import java.util.Map;

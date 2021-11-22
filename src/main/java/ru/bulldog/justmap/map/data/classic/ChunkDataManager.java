@@ -1,21 +1,20 @@
 package ru.bulldog.justmap.map.data.classic;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+
+import com.mojang.serialization.Codec;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.ChunkPos;
+import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.ChunkSerializer;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.EmptyChunk;
 import net.minecraft.world.chunk.ReadOnlyChunk;
 import net.minecraft.world.chunk.WorldChunk;
+import net.minecraft.world.gen.chunk.ChunkGenerator;
 import net.minecraft.world.storage.VersionedChunkStorage;
 
 import ru.bulldog.justmap.JustMap;
@@ -114,12 +113,14 @@ class ChunkDataManager {
         }
 		
 		ServerWorld serverWorld = (ServerWorld) world;
-		try (VersionedChunkStorage storage = StorageUtil.getChunkStorage(serverWorld);) {		
-			NbtCompound chunkTag = storage.updateChunkNbt(serverWorld.getRegistryKey(),
-					DataUtil.getPersistentSupplier(), storage.getNbt(chunkPos));
+		try (VersionedChunkStorage storage = StorageUtil.getChunkStorage(serverWorld);) {
+			//guessing here that null might work for the optional parameter.  Hopefully there is a null check.
+			Optional<RegistryKey<Codec<? extends ChunkGenerator>>> opt = Optional.ofNullable(null);
+			NbtCompound chunkTag = storage.updateChunkNbt(serverWorld.getRegistryKey(), DataUtil.getPersistentSupplier(), storage.getNbt(chunkPos), opt);
 			if (chunkTag == null) return this.emptyChunk;
 			Chunk chunk = ChunkSerializer.deserialize(
-					serverWorld, serverWorld.getStructureManager(), serverWorld.getPointOfInterestStorage(), chunkPos, chunkTag);
+					serverWorld, serverWorld.getPointOfInterestStorage(), chunkPos, chunkTag);
+					// serverWorld, serverWorld.getStructureManager(), serverWorld.getPointOfInterestStorage(), chunkPos, chunkTag);
 			if (chunk instanceof ReadOnlyChunk) {
 				return ((ReadOnlyChunk) chunk).getWrappedChunk();
 			}

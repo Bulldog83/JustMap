@@ -80,11 +80,12 @@ public class ColorProviders implements ColorProvider {
 	public int getGrassColor(World world, BlockPos pos) {
 		if (world != null && pos != null) {
 			Chunk chunk = world.getChunk(pos.getX() >> 4, pos.getZ() >> 4, ChunkStatus.BIOMES, false);
-			if (chunk != null && chunk.getBiomeArray() != null) {
+
+			if (chunk != null) {
 				int bx = pos.getX() >> 2;
 				int by = pos.getY() >> 2;
 				int bz = pos.getZ() >> 2;
-				Biome biome = chunk.getBiomeArray().getBiomeForNoiseGen(bx, by, bz);
+				Biome biome = chunk.getBiomeForNoiseGen(bx, by, bz);
 				return this.colorPalette.getGrassColor(world, biome, pos.getX(), pos.getZ());
 			}
 		}
@@ -94,11 +95,11 @@ public class ColorProviders implements ColorProvider {
 	public int getFoliageColor(World world, BlockPos pos) {
 		if (world != null && pos != null) {
 			Chunk chunk = world.getChunk(pos.getX() >> 4, pos.getZ() >> 4, ChunkStatus.BIOMES, false);
-			if (chunk != null && chunk.getBiomeArray() != null) {
+			if (chunk != null ) {
 				int bx = pos.getX() >> 2;
 				int by = pos.getY() >> 2;
 				int bz = pos.getZ() >> 2;
-				Biome biome = chunk.getBiomeArray().getBiomeForNoiseGen(bx, by, bz);
+				Biome biome = chunk.getBiomeForNoiseGen(bx, by, bz);
 				return this.colorPalette.getFoliageColor(world, biome);
 			}
 		}
@@ -108,11 +109,11 @@ public class ColorProviders implements ColorProvider {
 	public int getWaterColor(World world, BlockPos pos) {
 		if (world != null && pos != null) {
 			Chunk chunk = world.getChunk(pos.getX() >> 4, pos.getZ() >> 4, ChunkStatus.BIOMES, false);
-			if (chunk != null && chunk.getBiomeArray() != null) {
+			if (chunk != null ) {
 				int bx = pos.getX() >> 2;
 				int by = pos.getY() >> 2;
 				int bz = pos.getZ() >> 2;
-				Biome biome = chunk.getBiomeArray().getBiomeForNoiseGen(bx, by, bz);
+				Biome biome = chunk.getBiomeForNoiseGen(bx, by, bz);
 				return this.colorPalette.getWaterColor(world, biome);
 			}
 		}

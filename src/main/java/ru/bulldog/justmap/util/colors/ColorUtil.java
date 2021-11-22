@@ -47,7 +47,7 @@ public class ColorUtil {
 	
 	private static MinecraftClient minecraft = MinecraftClient.getInstance();
 	private static BlockModels blockModels = minecraft.getBlockRenderManager().getModels();
-	private static FluidRenderHandlerRegistryImpl fluidRenderHandlerRegistry = FluidRenderHandlerRegistryImpl.INSTANCE;
+	private static FluidRenderHandlerRegistryImpl fluidRenderHandlerRegistry = (FluidRenderHandlerRegistryImpl) FluidRenderHandlerRegistryImpl.INSTANCE;
 	private static float[] floatBuffer = new float[3];
 	private static ColorProviders colorProvider = ColorProviders.INSTANCE;
 	private static Colors colorPalette = Colors.INSTANCE;

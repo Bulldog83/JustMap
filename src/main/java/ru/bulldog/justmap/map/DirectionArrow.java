@@ -60,8 +60,8 @@ public class DirectionArrow extends Sprite {
 			matrix.translate(x, y, 0);
 			matrix.multiply(Vec3f.POSITIVE_Z.getDegreesQuaternion(rotation + 180));
 			
-			Matrix4f m4f = matrix.peek().getModel();
-			Matrix3f m3f = matrix.peek().getNormal();
+			Matrix4f m4f = matrix.peek().getPositionMatrix();
+			Matrix3f m3f = matrix.peek().getNormalMatrix();
 			
 			addVertices(m4f, m3f, vertexConsumer, size);
 			tessellator.draw();
