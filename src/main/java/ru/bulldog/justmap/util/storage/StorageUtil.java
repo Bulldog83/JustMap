@@ -18,7 +18,7 @@ import org.apache.commons.io.FileUtils;
 
 import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.map.data.MapDataProvider;
-import ru.bulldog.justmap.map.data.WorldKey;
+import ru.bulldog.justmap.map.multiworld.WorldKey;
 import ru.bulldog.justmap.mixins.SessionAccessor;
 import ru.bulldog.justmap.util.DataUtil;
 import ru.bulldog.justmap.util.Dimension;
@@ -85,7 +85,7 @@ public final class StorageUtil {
 			dimension = dimKey.getValue().getPath();
 		}
 
-		WorldKey worldKey = MapDataProvider.getManager().getWorldKey();
+		WorldKey worldKey = MapDataProvider.getMultiworldManager().getCurrentWorldKey();
 		File cacheDir = new File(filesDir(), worldKey.toFolder());
 		File oldCacheDir = new File(filesDir(), String.format("cache/%s", dimension));
 		if (world != null) {

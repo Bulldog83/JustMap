@@ -37,8 +37,8 @@ import ru.bulldog.justmap.map.EntityRadar;
 import ru.bulldog.justmap.map.IMap;
 import ru.bulldog.justmap.map.data.Layer;
 import ru.bulldog.justmap.map.data.MapDataProvider;
-import ru.bulldog.justmap.map.data.MapRegionProvider;
-import ru.bulldog.justmap.map.data.WorldKey;
+import ru.bulldog.justmap.map.data.WorldMapper;
+import ru.bulldog.justmap.map.multiworld.WorldKey;
 import ru.bulldog.justmap.map.icon.MapIcon;
 import ru.bulldog.justmap.map.icon.WaypointIcon;
 import ru.bulldog.justmap.map.minimap.skin.MapSkin;
@@ -64,7 +64,7 @@ public class Minimap implements IMap {
 	private PlayerEntity locPlayer = null;
 	private Layer mapLayer = Layer.SURFACE;
 	private final EntityRadar entityRadar;
-	private MapRegionProvider mapRegionProvider;
+	private WorldMapper worldMapper;
 	private MapSkin mapSkin;
 	private World world;
 	private boolean isMapVisible = true;
@@ -287,7 +287,7 @@ public class Minimap implements IMap {
 
 	public void prepareMap(PlayerEntity player) {
 		this.world = player.world;
-		this.mapRegionProvider = MapDataProvider.getManager().getMapRegionProvider();
+		this.worldMapper = MapDataProvider.getManager().getWorldMapper();
 		BlockPos pos = DataUtil.currentPos();
 
 		int posX = pos.getX();
@@ -367,7 +367,7 @@ public class Minimap implements IMap {
 	}
 
 	public void createWaypoint() {
-		this.createWaypoint(MapDataProvider.getManager().getWorldKey(), DataUtil.currentPos());
+		this.createWaypoint(MapDataProvider.getMultiworldManager().getCurrentWorldKey(), DataUtil.currentPos());
 	}
 
 	public AbstractMiniMapRenderer getRenderer() {
@@ -381,8 +381,8 @@ public class Minimap implements IMap {
 		return this.world;
 	}
 
-	public MapRegionProvider getMapRegionProvider() {
-		return this.mapRegionProvider;
+	public WorldMapper getWorldMapper() {
+		return this.worldMapper;
 	}
 
 	public MapSkin getSkin() {
@@ -401,7 +401,7 @@ public class Minimap implements IMap {
 	public List<WaypointIcon> getWaypoints(BlockPos currentPos, int screenX, int screenY) {
 		this.waypoints.clear();
 		if (ClientSettings.showWaypoints) {
-			List<Waypoint> wps = WaypointKeeper.getInstance().getWaypoints(MapDataProvider.getManager().getWorldKey(), true);
+			List<Waypoint> wps = WaypointKeeper.getInstance().getWaypoints(MapDataProvider.getMultiworldManager().getCurrentWorldKey(), true);
 			if (wps != null) {
 				Stream<Waypoint> stream = wps.stream()
 						.filter(wp -> MathUtil.getDistance(currentPos, wp.pos, false) <= wp.showRange);

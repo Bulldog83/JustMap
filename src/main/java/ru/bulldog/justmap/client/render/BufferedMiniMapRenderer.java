@@ -185,7 +185,7 @@ public class BufferedMiniMapRenderer extends AbstractMiniMapRenderer {
 				if (picY + texH > scaledH) texH = scaledH - picY;
 
 				int cZ = cornerZ + picY;
-				MapRegion region = mapRegionProvider.getMapRegion(minimap, cX, cZ);
+				MapRegion region = worldMapper.getMapRegion(minimap, cX, cZ);
 
 				int texX = cX - (region.getPos().x << 9);
 				int texY = cZ - (region.getPos().z << 9);

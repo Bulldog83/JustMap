@@ -13,14 +13,14 @@ import ru.bulldog.justmap.client.screen.WorldmapScreen;
 import ru.bulldog.justmap.map.IMap;
 import ru.bulldog.justmap.map.data.Layer;
 import ru.bulldog.justmap.map.data.MapRegion;
-import ru.bulldog.justmap.map.data.MapRegionProvider;
+import ru.bulldog.justmap.map.data.WorldMapper;
 import ru.bulldog.justmap.map.data.RegionPos;
 import ru.bulldog.justmap.map.data.classic.event.ChunkUpdateEvent;
 import ru.bulldog.justmap.map.data.classic.event.ChunkUpdateListener;
 import ru.bulldog.justmap.util.DataUtil;
 import ru.bulldog.justmap.util.math.MathUtil;
 
-public class WorldData implements MapRegionProvider {
+public class WorldData implements WorldMapper {
 	private final World world;
 	private final ChunkDataManager chunkManager;
 	private final Map<RegionPos, RegionData> regions;
@@ -169,11 +169,25 @@ public class WorldData implements MapRegionProvider {
 		this.chunkManager.clear();
 	}
 
-	public void close() {
+	@Override
+	public void onWorldMapperClose() {
 		synchronized (regions) {
 			this.regions.forEach((pos, region) -> region.close());
 			this.regions.clear();
 		}
 		this.clear();
+	}
+
+	@Override
+	public int getMapHeight(Layer mapLayer, int mapLevel, int posX, int posZ) {
+		int chunkX = posX >> 4;
+		int chunkZ = posZ >> 4;
+
+		ChunkData mapChunk = getChunk(chunkX, chunkZ);
+
+		int cx = posX - (chunkX << 4);
+		int cz = posZ - (chunkZ << 4);
+
+		return mapChunk.getChunkLevel(mapLayer, mapLevel).sampleHeightmap(cx, cz);
 	}
 }

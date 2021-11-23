@@ -13,7 +13,7 @@ import net.minecraft.util.JsonHelper;
 import net.minecraft.util.math.BlockPos;
 
 import ru.bulldog.justmap.JustMap;
-import ru.bulldog.justmap.map.data.WorldKey;
+import ru.bulldog.justmap.map.multiworld.WorldKey;
 import ru.bulldog.justmap.util.Dimension;
 import ru.bulldog.justmap.util.ImageUtil;
 import ru.bulldog.justmap.util.PosUtil;

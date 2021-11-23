@@ -1,4 +1,4 @@
-package ru.bulldog.justmap.map.data;
+package ru.bulldog.justmap.map.multiworld;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
