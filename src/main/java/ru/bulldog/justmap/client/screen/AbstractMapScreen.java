@@ -18,7 +18,7 @@ import java.util.HashMap;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.datafixers.util.Pair;
 
-public class MapScreen extends Screen {
+public abstract class AbstractMapScreen extends Screen {
 	public static final Identifier DEFAULT_TEXTURE = new Identifier("textures/block/dirt.png");
 	public static final HashMap<String, Pair<String, Identifier>> DIMENSION_INFO = new HashMap<String, Pair<String, Identifier>>() {
 		private static final long serialVersionUID = 1L;
@@ -36,11 +36,11 @@ public class MapScreen extends Screen {
 	protected int paddingTop;
 	protected int paddingBottom;
 	
-	protected MapScreen(Text title) {
+	protected AbstractMapScreen(Text title) {
 		this(title, null);
 	}
 	
-	public MapScreen(Text title, Screen parent) {
+	public AbstractMapScreen(Text title, Screen parent) {
 		super(title);
 		this.parent = parent;
 		this.langUtil = new LangUtil(LangUtil.GUI_ELEMENT);

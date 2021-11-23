@@ -9,6 +9,7 @@ import net.minecraft.util.math.ChunkPos;
 
 import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.client.config.ClientSettings;
+import ru.bulldog.justmap.client.screen.WorldmapScreen;
 import ru.bulldog.justmap.map.IMap;
 import ru.bulldog.justmap.map.data.MapRegion;
 import ru.bulldog.justmap.map.data.Layer;
@@ -52,7 +53,7 @@ public class RegionData implements MapRegion {
 	private boolean loadedOverlay = false;
 	private boolean gridOverlay = false;
 	private boolean imageChanged = false;	
-	private boolean worldmap = false;
+	private boolean isWorldmap = false;
 	
 	public long updated = 0;
 	
@@ -64,7 +65,7 @@ public class RegionData implements MapRegion {
 		this.layer = map.getLayer();
 		this.level = map.getLevel();
 		this.center = new ChunkPos(map.getCenter());
-		this.worldmap = map.isWorldmap();
+		this.isWorldmap = map instanceof WorldmapScreen;
 		int radius = DataUtil.getGameOptions().viewDistance - 1;
 		this.updateArea = new Plane(center.x - radius, center.z - radius,
 									center.x + radius, center.z + radius);
@@ -91,7 +92,7 @@ public class RegionData implements MapRegion {
 	}
 	
 	public void setIsWorldmap(boolean isWorldmap) {
-		this.worldmap = isWorldmap;
+		this.isWorldmap = isWorldmap;
 	}
 	
 	private void loadImage(Layer layer, int level) {
@@ -179,7 +180,7 @@ public class RegionData implements MapRegion {
 				ChunkData mapChunk = this.mapData.getChunk(chunkX, chunkZ);
 				if (updateArea.contains(Point.fromPos(mapChunk.getPos()))) {
 					boolean updated = mapChunk.saveNeeded();
-					if (!worldmap) {
+					if (!isWorldmap) {
 						if (!updated) {
 							mapChunk.updateFullChunk(layer, level, needUpdate);
 						}

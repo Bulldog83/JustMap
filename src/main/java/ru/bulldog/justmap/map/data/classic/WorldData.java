@@ -1,6 +1,7 @@
 package ru.bulldog.justmap.map.data.classic;
 
 import ru.bulldog.justmap.client.config.ClientSettings;
+import ru.bulldog.justmap.client.screen.WorldmapScreen;
 import ru.bulldog.justmap.map.data.MapRegion;
 import ru.bulldog.justmap.map.data.classic.event.ChunkUpdateEvent;
 import ru.bulldog.justmap.map.data.classic.event.ChunkUpdateListener;
@@ -38,7 +39,7 @@ public class WorldData implements MapRegionProvider {
 	}
 	
 	public RegionData getRegion(BlockPos blockPos) {
-		return this.getRegionData(DataUtil.getMap(), blockPos.getX(), blockPos.getZ());
+		return this.getRegionData(DataUtil.getCurrentlyShownMap(), blockPos.getX(), blockPos.getZ());
 	}
 	
 	public RegionData getRegionData(IMap map, int x, int z) {
@@ -53,7 +54,7 @@ public class WorldData implements MapRegionProvider {
 				regions.put(regPos, region);
 			}
 		}
-		region.setIsWorldmap(map.isWorldmap());
+		region.setIsWorldmap(map instanceof WorldmapScreen);
 		long time = System.currentTimeMillis();
 		if (time - region.updated > 1000) {
 			region.updateImage(ClientSettings.forceUpdate);
@@ -105,7 +106,7 @@ public class WorldData implements MapRegionProvider {
 	}
 	
 	public void updateMap() {
-		IMap map = DataUtil.getMap();
+		IMap map = DataUtil.getCurrentlyShownMap();
 		BlockPos centerPos = map.getCenter();
 		Layer layer = map.getLayer();
 		int level = map.getLevel();

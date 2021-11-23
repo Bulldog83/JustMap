@@ -140,7 +140,7 @@ public class ClientConfig extends Config {
 	@Override
 	public void saveChanges() {
 		ConfigWriter.save(KEEPER.toJson());
-		JustMapClient.getMap().updateMapParams();
+		JustMapClient.getMiniMap().updateMapParams();
 		MapDataProvider.getManager().onConfigUpdate();
 	}
 }

@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-public class WaypointEditor extends MapScreen {
+public class WaypointEditorScreen extends AbstractMapScreen {
 	
 	private static final Text TITLE = new TranslatableText(JustMap.MODID + ".gui.screen.waypoints_editor");
 
@@ -54,7 +54,7 @@ public class WaypointEditor extends MapScreen {
 	private ButtonWidget saveButton, cancelButton;
 	private Consumer<Waypoint> onSaveCallback;
 	
-	public WaypointEditor(Waypoint waypoint, Screen parent, Consumer<Waypoint> onSaveCallback) {
+	public WaypointEditorScreen(Waypoint waypoint, Screen parent, Consumer<Waypoint> onSaveCallback) {
 		super(TITLE, parent);
 		
 		this.waypoint = waypoint;
@@ -155,12 +155,12 @@ public class WaypointEditor extends MapScreen {
 
 			@Override
 			protected void updateMessage() {
-				this.setMessage(new LiteralText(lang("wp_render_dist").getString() + WaypointEditor.this.showRange));
+				this.setMessage(new LiteralText(lang("wp_render_dist").getString() + WaypointEditorScreen.this.showRange));
 			}
 
 			@Override
 			protected void applyValue() {
-				WaypointEditor.this.showRange = MathHelper.floor(MathHelper.clampedLerp(0, SHOW_RANGE_MAX, this.value));
+				WaypointEditorScreen.this.showRange = MathHelper.floor(MathHelper.clampedLerp(0, SHOW_RANGE_MAX, this.value));
 			}
 		});
 		
