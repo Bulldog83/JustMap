@@ -10,10 +10,13 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 public interface BiomeColorsAccessor {
 	@Accessor
 	int getWaterColor();
+
 	@Accessor
 	Optional<Integer> getFoliageColor();
+
 	@Accessor
 	Optional<Integer> getGrassColor();
+
 	@Accessor
 	BiomeEffects.GrassColorModifier getGrassColorModifier();
 }

@@ -35,11 +35,11 @@ public class WorldData implements MapRegionProvider {
 	public ChunkDataManager getChunkManager() {
 		return this.chunkManager;
 	}
-	
+
 	public RegionData getRegion(BlockPos blockPos) {
 		return this.getRegionData(DataUtil.getCurrentlyShownMap(), blockPos.getX(), blockPos.getZ());
 	}
-	
+
 	public RegionData getRegionData(IMap map, int x, int z) {
 		RegionPos regPos = new RegionPos(x, z);
 		RegionData region;
@@ -57,7 +57,7 @@ public class WorldData implements MapRegionProvider {
 		if (time - region.updated > 1000) {
 			region.updateImage(ClientSettings.forceUpdate);
 		}
-		
+
 		return region;
 	}
 
@@ -73,15 +73,15 @@ public class WorldData implements MapRegionProvider {
 	public ChunkData getChunk(ChunkPos chunkPos) {
 		return this.chunkManager.getChunk(chunkPos.x, chunkPos.z);
 	}
-	
+
 	public ChunkData getChunk(int x, int z) {
 		return this.chunkManager.getChunk(x, z);
 	}
-	
+
 	public WorldChunk getWorldChunk(BlockPos blockPos) {
 		return this.getWorldChunk(blockPos.getX() >> 4, blockPos.getZ() >> 4);
 	}
-	
+
 	public WorldChunk getWorldChunk(int x, int z) {
 		WorldChunk worldChunk = this.world.getChunk(x, z);
 		if (worldChunk.isEmpty()) {
@@ -89,7 +89,7 @@ public class WorldData implements MapRegionProvider {
 		}
 		return worldChunk;
 	}
-	
+
 	public WorldChunk getEmptyChunk() {
 		return this.chunkManager.getEmptyChunk();
 	}
@@ -102,14 +102,14 @@ public class WorldData implements MapRegionProvider {
 	public World getWorld() {
 		return this.world;
 	}
-	
+
 	public void updateMap() {
 		IMap map = DataUtil.getCurrentlyShownMap();
 		BlockPos centerPos = map.getCenter();
 		Layer layer = map.getLayer();
 		int level = map.getLevel();
 		boolean update = ClientSettings.forceUpdate;
-		
+
 		long time = System.currentTimeMillis();
 		long interval = ClientSettings.chunkUpdateInterval;
 		ChunkData mapChunk = this.getChunk(centerPos);
@@ -151,24 +151,24 @@ public class WorldData implements MapRegionProvider {
 				}
 			}
 		}
-		
+
 	}
-	
+
 	public void clearCache() {
 		long purgeDelay = ClientSettings.purgeDelay * 1000;
 		int purgeAmount = ClientSettings.purgeAmount;
-		
+
 		long currentTime = System.currentTimeMillis();
 		if (currentTime - lastPurged > purgeDelay) {
 			this.chunkManager.purge(purgeAmount, 5000);
 			this.lastPurged = currentTime;
 		}
 	}
-	
+
 	public void clear() {
 		this.chunkManager.clear();
 	}
-	
+
 	public void close() {
 		synchronized (regions) {
 			this.regions.forEach((pos, region) -> region.close());

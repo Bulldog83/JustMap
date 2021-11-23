@@ -17,17 +17,17 @@ import ru.bulldog.justmap.enums.ScreenPosition;
 import ru.bulldog.justmap.map.data.MapDataProvider;
 
 public class ClientConfig extends Config {
-	
+
 	private static ClientConfig instance;
-	
+
 	public static ClientConfig get() {
 		if (instance == null) {
 			instance = new ClientConfig();
 		}
-		
+
 		return instance;
 	}
-	
+
 	private ClientConfig() {
 		KEEPER.registerEntry("map_visible", new BooleanEntry(ClientSettings.mapVisible, (b) -> ClientSettings.mapVisible = b, () -> ClientSettings.mapVisible));
 		KEEPER.registerEntry("map_position", new EnumEntry<ScreenPosition>(ClientSettings.mapPosition, (e) -> ClientSettings.mapPosition = e, () -> ClientSettings.mapPosition));
@@ -112,7 +112,7 @@ public class ClientConfig extends Config {
 		KEEPER.registerEntry("items_position", new EnumEntry<ScreenPosition>(ClientSettings.itemsPosition, (e) -> ClientSettings.itemsPosition = e, () -> ClientSettings.itemsPosition));
 		KEEPER.registerEntry("map_shape", new EnumEntry<MapShape>(ClientSettings.mapShape, (e) -> ClientSettings.mapShape = e, () -> ClientSettings.mapShape));
 		KEEPER.registerEntry("multiworld_detection", new EnumEntry<MultiworldDetection>(ClientSettings.multiworldDetection, (e) -> ClientSettings.multiworldDetection = e, () -> ClientSettings.multiworldDetection));
-		
+
 		JsonObject config = ConfigWriter.load();
 		if (config.size() > 0) {
 			KEEPER.fromJson(config);
@@ -120,16 +120,16 @@ public class ClientConfig extends Config {
 			ConfigWriter.save(KEEPER.toJson());
 		}
 	}
-	
+
 	public float getMapScale() {
 		return this.getFloat("map_scale");
 	}
-	
+
 	public void updateMapScale(float value) {
 		this.setRanged("map_scale", this.getMapScale() * value);
 		this.saveChanges();
 	}
-	
+
 	public void reloadFromDisk() {
 		JsonObject config = ConfigWriter.load();
 		if (config.size() > 0) {

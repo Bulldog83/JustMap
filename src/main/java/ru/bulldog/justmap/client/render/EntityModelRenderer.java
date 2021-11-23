@@ -15,27 +15,27 @@ import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.client.config.ClientSettings;
 import ru.bulldog.justmap.util.math.MathUtil;
 
-public class EntityModelRenderer {	
+public class EntityModelRenderer {
 
 	private static final MinecraftClient minecraft = MinecraftClient.getInstance();
 	private static final EntityRenderDispatcher renderDispatcher = minecraft.getEntityRenderDispatcher();
-	
+
 	public static void renderModel(MatrixStack matrices, VertexConsumerProvider consumerProvider, Entity entity, double x, double y) {
-		
+
 		LivingEntity livingEntity = (LivingEntity) entity;
-		
+
 		float headYaw = livingEntity.headYaw;
 		float bodyYaw = livingEntity.bodyYaw;
 		float prevHeadYaw = livingEntity.prevHeadYaw;
 		float prevBodyYaw = livingEntity.prevBodyYaw;
 		float pitch = livingEntity.getPitch();
 		float prevPitch = livingEntity.prevPitch;
-		
+
 		setPitchAndYaw(livingEntity);
-		
+
 		float scale = (float) getScale(livingEntity);
 		int modelSize = ClientSettings.entityModelSize;
-		
+
 		matrices.push();
 		matrices.translate(x, y, 0);
 		matrices.translate(modelSize / 4, modelSize / 2, 0);
@@ -52,7 +52,7 @@ public class EntityModelRenderer {
 		renderDispatcher.setRenderShadows(true);
 		matrices.pop();
 		matrices.pop();
-		
+
 		livingEntity.setPitch(pitch);
 		livingEntity.headYaw = headYaw;
 		livingEntity.bodyYaw = bodyYaw;
@@ -60,35 +60,35 @@ public class EntityModelRenderer {
 		livingEntity.prevHeadYaw = prevHeadYaw;
 		livingEntity.prevBodyYaw = prevBodyYaw;
 	}
-	
+
 	private static double getScale(LivingEntity livingEntity) {
 		int modelSize = ClientSettings.entityModelSize;
 		double mapScale = JustMapClient.getMiniMap().getScale();
-		
+
 		modelSize = (int) Math.min(modelSize, modelSize / mapScale);
-		
+
 		double scaleX = modelSize / Math.max(livingEntity.getWidth(), 1.0F);
 		double scaleY = modelSize / Math.max(livingEntity.getHeight(), 1.0F);
-		
+
 		double scale = Math.max(Math.min(scaleX, scaleY), modelSize);
-		
+
 		if (livingEntity instanceof GhastEntity || livingEntity instanceof EnderDragonEntity) {
 			scale = modelSize / 3.0F;
 		}
 		if (livingEntity instanceof WaterCreatureEntity) {
 			scale = modelSize / 1.35F;
-		}	
+		}
 		if (livingEntity.isSleeping()) {
 			scale = modelSize;
 		}
-		
+
 		return scale;
 	}
-	
+
 	private static void setPitchAndYaw(LivingEntity livingEntity) {
 		livingEntity.setPitch(0.0F);
 		livingEntity.prevPitch = 0.0F;
-		
+
 		switch(livingEntity.getMovementDirection()) {
 			case NORTH:
 				livingEntity.headYaw = 0.0F;

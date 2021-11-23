@@ -15,12 +15,12 @@ public class BiomeInfo extends InfoText {
 
 	private final String title;
 	private Identifier currentBiome;
-	
+
 	public BiomeInfo() {
 		super("Void");
 		this.title = "Biome: ";
 	}
-	
+
 	public BiomeInfo(TextAlignment alignment, String title) {
 		super(alignment, "Void");
 		this.title = title;

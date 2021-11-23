@@ -22,7 +22,7 @@ public class FastMiniMapRenderer extends AbstractMiniMapRenderer {
 	public FastMiniMapRenderer(Minimap map) {
 		super(map);
 	}
-	
+
 	protected void render(MatrixStack matrices, double scale) {
 		Framebuffer minecraftFramebuffer = minecraft.getFramebuffer();
 		int fbuffH = minecraftFramebuffer.viewportHeight;
@@ -33,7 +33,7 @@ public class FastMiniMapRenderer extends AbstractMiniMapRenderer {
 		RenderUtil.enableScissor();
 		RenderUtil.applyScissor(scissX, scissY, scissW, scissH);
 		RenderSystem.enableBlend();
-        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+		RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 		if (Minimap.isRound()) {
 			RenderSystem.colorMask(false, false, false, true);
 			RenderSystem.clearColor(0.0F, 0.0F, 0.0F, 0.0F);
@@ -54,21 +54,21 @@ public class FastMiniMapRenderer extends AbstractMiniMapRenderer {
 			matrices.translate(-moveX, -moveY, 0.0);
 		}
 		matrices.translate(-offX, -offY, 0.0);
-		
+
 		this.drawMap(matrices);
 		if (ClientSettings.showGrid) {
 			this.drawGrid();
 		}
-		
+
 		VertexConsumerProvider.Immediate consumerProvider = minecraft.getBufferBuilders().getEntityVertexConsumers();
 		List<MapIcon<?>> drawableEntities = minimap.getDrawableIcons(lastX, lastZ, centerX, centerY, delta);
 		for (MapIcon<?> icon : drawableEntities) {
 			icon.draw(matrices, consumerProvider, mapX, mapY, mapWidth, mapHeight, rotation);
 		}
 		consumerProvider.draw();
-		
+
 		matrices.pop();
-		
+
 		List<WaypointIcon> drawableWaypoints = minimap.getWaypoints(playerPos, centerX, centerY);
 		for (WaypointIcon icon : drawableWaypoints) {
 			icon.draw(matrices, consumerProvider, mapX, mapY, mapWidth, mapHeight, offX, offY, rotation);
@@ -76,22 +76,22 @@ public class FastMiniMapRenderer extends AbstractMiniMapRenderer {
 		consumerProvider.draw();
 		RenderUtil.disableScissor();
 	}
-	
+
 	private void drawMap(MatrixStack matrices) {
 		int cornerX = lastX - scaledW / 2;
 		int cornerZ = lastZ - scaledH / 2;
-		
+
 		int picX = 0;
 		while(picX < scaledW) {
 			int texW = 512;
 			if (picX + texW > scaledW) texW = scaledW - picX;
-			
+
 			int picY = 0;
 			int cX = cornerX + picX;
 			while (picY < scaledH) {
 				int texH = 512;
 				if (picY + texH > scaledH) texH = scaledH - picY;
-				
+
 				int cZ = cornerZ + picY;
 				MapRegion region = mapRegionProvider.getMapRegion(minimap, cX, cZ);
 
@@ -99,21 +99,21 @@ public class FastMiniMapRenderer extends AbstractMiniMapRenderer {
 				int texY = cZ - (region.getPos().z << 9);
 				if (texX + texW >= 512) texW = 512 - texX;
 				if (texY + texH >= 512) texH = 512 - texY;
-				
+
 				double scX = (double) picX / mapScale;
 				double scY = (double) picY / mapScale;
 				double scW = (double) texW / mapScale;
 				double scH = (double) texH / mapScale;
-				
+
 				region.drawLayer(matrices, minimap.getLayer(), minimap.getLevel(), imgX + scX, imgY + scY, scW, scH, texX, texY, texW, texH);
 
 				picY += texH > 0 ? texH : 512;
 			}
-			
+
 			picX += texW > 0 ? texW : 512;
 		}
 	}
-	
+
 	private void drawGrid() {
 		if (paramsUpdated) {
 			if (chunkGrid == null) {

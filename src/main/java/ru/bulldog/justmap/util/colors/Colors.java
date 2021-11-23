@@ -45,70 +45,70 @@ public final class Colors {
 	public final static int ATTACHED_STEM = 0xFFE0C71C;
 	public final static int GRASS = BiomeColors.defaultGrassColor();
 	public final static int FOLIAGE = BiomeColors.defaultFoliageColor();
-	
+
 	public final static Colors INSTANCE = new Colors();
-	
+
 	private final Map<String, ColorPalette> palettes = Maps.newHashMap();
-	
+
 	private Colors() {}
-	
+
 	private ColorPalette getPalette(String key) {
 		if (palettes.containsKey(key)) {
 			return this.palettes.get(key);
 		}
 		ColorPalette palette = new ColorPalette();
 		this.palettes.put(key, palette);
-		
+
 		return palette;
 	}
-	
+
 	public int getBlockColor(BlockState block) {
 		Identifier stateId = Registry.BLOCK.getId(block.getBlock());
 		return this.getPalette(stateId.getNamespace()).getBlockColor(block);
 	}
-	
+
 	public void addBlockColor(BlockState block, int color) {
 		Identifier stateId = Registry.BLOCK.getId(block.getBlock());
 		this.getPalette(stateId.getNamespace()).addBlockColor(block, color);
 	}
-	
+
 	public int getFluidColor(BlockState block) {
 		Identifier stateId = Registry.BLOCK.getId(block.getBlock());
 		return this.getPalette(stateId.getNamespace()).getFluidColor(block);
 	}
-	
+
 	public void addFluidColor(BlockState block, int color) {
 		Identifier stateId = Registry.BLOCK.getId(block.getBlock());
 		this.getPalette(stateId.getNamespace()).addFluidColor(block, color);
 	}
-	
+
 	public int getTextureColor(BlockState block, Identifier texture) {
 		Identifier stateId = Registry.BLOCK.getId(block.getBlock());
 		return this.getPalette(stateId.getNamespace()).getTextureColor(texture);
 	}
-	
+
 	public void addTextureColor(BlockState block, Identifier texture, int color) {
 		Identifier stateId = Registry.BLOCK.getId(block.getBlock());
 		this.getPalette(stateId.getNamespace()).addTextureColor(texture, color);
 	}
-	
+
 	public int getFoliageColor(World world, Biome biome) {
 		Identifier biomeId = DataUtil.getBiomeId(world, biome);
 		return this.getPalette(biomeId.getNamespace()).getFoliageColor(biomeId, biome);
 	}
-	
+
 	public int getGrassColor(World world, Biome biome, int x, int z) {
 		Identifier biomeId = DataUtil.getBiomeId(world, biome);
 		return this.getPalette(biomeId.getNamespace()).getGrassColor(biomeId, biome, x, z);
 	}
-	
+
 	public int getWaterColor(World world, Biome biome) {
 		Identifier biomeId = DataUtil.getBiomeId(world, biome);
 		return this.getPalette(biomeId.getNamespace()).getWaterColor(biomeId, biome);
 	}
-	
-	
-	
+
+
+
 	public void saveData() {
 		File dir = new File(StorageUtil.mapDir(), "palettes");
 		this.palettes.forEach((mod, palette) -> {
@@ -117,7 +117,7 @@ public final class Colors {
 			palette.saveData(saveDir);
 		});
 	}
-	
+
 	public void loadData() {
 		File dir = new File(StorageUtil.mapDir(), "palettes");
 		if (!dir.exists()) return;

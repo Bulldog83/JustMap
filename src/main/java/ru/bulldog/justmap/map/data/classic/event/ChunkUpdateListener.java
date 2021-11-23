@@ -22,12 +22,12 @@ import ru.bulldog.justmap.util.tasks.TaskManager;
 public class ChunkUpdateListener {
 	private static final Queue<ChunkUpdateEvent> updateQueue = new ConcurrentLinkedQueue<>();
 	private static final TaskManager worker = TaskManager.getManager("chunk-update-listener");
-	
+
 	public static void accept(ChunkUpdateEvent event) {
 		if (updateQueue.contains(event)) return;
 		updateQueue.offer(event);
 	}
-	
+
 	private static void updateChunks() {
 		if (updateQueue.isEmpty()) return;
 		if (!JustMapClient.canMapping()) {
@@ -54,12 +54,12 @@ public class ChunkUpdateListener {
 			}
 		}
 	}
-	
+
 	public static void proceed() {
 		if (updateQueue.isEmpty() || worker.queueSize() > 0) return;
 		worker.execute(ChunkUpdateListener::updateChunks);
 	}
-	
+
 	public static void stop() {
 		updateQueue.clear();
 	}

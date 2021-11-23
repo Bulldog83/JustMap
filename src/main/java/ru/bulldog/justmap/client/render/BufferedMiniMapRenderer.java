@@ -24,16 +24,16 @@ import ru.bulldog.justmap.util.render.GLC;
 import ru.bulldog.justmap.util.render.RenderUtil;
 
 public class BufferedMiniMapRenderer extends AbstractMiniMapRenderer {
-	
+
 	private Framebuffer primaryFramebuffer;
 	private Framebuffer secondaryFramebuffer;
 	private boolean triedFBO = false;
 	private boolean loadedFBO = false;
-	
+
 	public BufferedMiniMapRenderer(Minimap map) {
 		super(map);
 	}
-	
+
 	public void loadFrameBuffers() {
 		if (!ExtendedFramebuffer.canUseFramebuffer()) {
 			JustMap.LOGGER.warning("FBO not supported! Using fast minimap render.");
@@ -51,7 +51,7 @@ public class BufferedMiniMapRenderer extends AbstractMiniMapRenderer {
 	@Override
 	protected void render(MatrixStack matrices, double scale) {
 		VertexConsumerProvider.Immediate consumerProvider = minecraft.getBufferBuilders().getEntityVertexConsumers();
-		
+
 		int scaledW = (int) (imgW * scale);
 		int scaledH = (int) (imgH * scale);
 		boolean isMac = MinecraftClient.IS_SYSTEM_MAC;
@@ -90,7 +90,7 @@ public class BufferedMiniMapRenderer extends AbstractMiniMapRenderer {
 		}
 		this.primaryFramebuffer.endWrite();
 		matrices.pop();
-		
+
 		this.secondaryFramebuffer.beginWrite(false);
 		RenderSystem.clear(GLC.GL_COLOR_OR_DEPTH_BUFFER_BIT, isMac);
 		matrices.push();
@@ -126,7 +126,7 @@ public class BufferedMiniMapRenderer extends AbstractMiniMapRenderer {
 		RenderSystem.restoreProjectionMatrix();
 		RenderSystem.applyModelViewMatrix();
 		matrices.pop();
-		
+
 		Framebuffer minecraftFramebuffer = minecraft.getFramebuffer();
 		int fbuffW = minecraftFramebuffer.viewportWidth;
 		int fbuffH = minecraftFramebuffer.viewportHeight;
@@ -168,22 +168,22 @@ public class BufferedMiniMapRenderer extends AbstractMiniMapRenderer {
 		consumerProvider.draw();
 		RenderUtil.disableScissor();
 	}
-	
+
 	private void drawMap(MatrixStack matrices) {
 		int cornerX = lastX - scaledW / 2;
 		int cornerZ = lastZ - scaledH / 2;
-		
+
 		int picX = 0;
 		while(picX < scaledW) {
 			int texW = 512;
 			if (picX + texW > scaledW) texW = scaledW - picX;
-			
+
 			int picY = 0;
 			int cX = cornerX + picX;
 			while (picY < scaledH) {
 				int texH = 512;
 				if (picY + texH > scaledH) texH = scaledH - picY;
-				
+
 				int cZ = cornerZ + picY;
 				MapRegion region = mapRegionProvider.getMapRegion(minimap, cX, cZ);
 
@@ -191,21 +191,21 @@ public class BufferedMiniMapRenderer extends AbstractMiniMapRenderer {
 				int texY = cZ - (region.getPos().z << 9);
 				if (texX + texW >= 512) texW = 512 - texX;
 				if (texY + texH >= 512) texH = 512 - texY;
-				
+
 				double scX = (double) picX / mapScale;
 				double scY = (double) picY / mapScale;
 				double scW = (double) texW / mapScale;
 				double scH = (double) texH / mapScale;
-				
+
 				region.drawLayer(matrices, minimap.getLayer(), minimap.getLevel(), scX, scY, scW, scH, texX, texY, texW, texH);
-				
+
 				picY += texH > 0 ? texH : 512;
 			}
-			
+
 			picX += texW > 0 ? texW : 512;
 		}
 	}
-	
+
 	private void drawGrid() {
 		if (playerMoved) {
 			this.chunkGrid.updateCenter(lastX, lastZ);
@@ -214,7 +214,7 @@ public class BufferedMiniMapRenderer extends AbstractMiniMapRenderer {
 		}
 		this.chunkGrid.draw();
 	}
-	
+
 	private void drawEntities(MatrixStack matrices, VertexConsumerProvider.Immediate consumerProvider) {
 		float halfW = imgW / 2.0F;
 		float halfH = imgH / 2.0F;
@@ -226,27 +226,27 @@ public class BufferedMiniMapRenderer extends AbstractMiniMapRenderer {
 			consumerProvider.draw();
 		}
 	}
-	
+
 	public void resize(int width, int height, boolean isMac) {
 		this.primaryFramebuffer.resize(width, height, isMac);
 		this.secondaryFramebuffer.resize(width, height, isMac);
 	}
-	
+
 	public void deleteFramebuffers() {
 		this.primaryFramebuffer.delete();
 		this.secondaryFramebuffer.delete();
 		this.setLoadedFBO(false);
 		this.triedFBO = false;
 	}
-	
+
 	public boolean isFBOLoaded() {
 		return this.loadedFBO;
 	}
-	
+
 	public void setLoadedFBO(boolean loadedFBO) {
 		this.loadedFBO = loadedFBO;
 	}
-	
+
 	public boolean isFBOTried() {
 		return this.triedFBO;
 	}

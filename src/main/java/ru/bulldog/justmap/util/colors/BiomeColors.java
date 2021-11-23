@@ -18,14 +18,14 @@ import ru.bulldog.justmap.util.storage.ResourceLoader;
 public class BiomeColors {
 	private static int[] foliageMap;
 	private static int[] grassMap;
-	
+
 	private Biome biome;
 	private Optional<Integer> foliageColor;
 	private Optional<Integer> grassColor;
 	private int waterColor;
-	
+
 	private BiomeColors() {}
-	
+
 	public BiomeColors(Biome biome) {
 		this.biome = biome;
 		BiomeColorsAccessor accessor = (BiomeColorsAccessor) biome.getEffects();
@@ -33,17 +33,17 @@ public class BiomeColors {
 		this.grassColor = accessor.getGrassColor();
 		this.waterColor = accessor.getWaterColor();
 	}
-	
+
 	public int getWaterColor() {
 		return this.waterColor;
 	}
-	
+
 	public int getFoliageColor() {
 		float temperature = this.biome.getTemperature();
 		float humidity = this.biome.getDownfall();
 		return this.foliageColor.orElse(getFoliageColor(temperature, humidity));
 	}
-	
+
 	public int getGrassColor(int x, int z) {
 		float temperature = this.biome.getTemperature();
 		float humidity = this.biome.getDownfall();
@@ -56,14 +56,14 @@ public class BiomeColors {
 			}
 			case SWAMP: {
 				double noise = Biome.FOLIAGE_NOISE.sample(x * 0.0225D, z * 0.0225D, false);
-	            return noise < -0.1D ? 5011004 : 6975545;
+				return noise < -0.1D ? 5011004 : 6975545;
 			}
 			default: {
 				return color;
 			}
 		}
 	}
-	
+
 	public static int getGrassColor(double temperature, double humidity) {
 		humidity *= temperature;
 		int t = (int) ((1.0D - temperature) * 255.0D);
@@ -72,11 +72,11 @@ public class BiomeColors {
 		if (k < 0 || k > grassMap.length) return Colors.GRASS;
 		return grassMap[k];
 	}
-	
+
 	public static int defaultGrassColor() {
 		return getGrassColor(0.5, 1.0);
 	}
-	
+
 	public static int getFoliageColor(double temperature, double humidity) {
 		humidity *= temperature;
 		int t = (int) ((1.0D - temperature) * 255.0D);
@@ -85,11 +85,11 @@ public class BiomeColors {
 		if (k < 0 || k > foliageMap.length) return Colors.FOLIAGE;
 		return foliageMap[k];
 	}
-	
+
 	public static int defaultFoliageColor() {
 		return getFoliageColor(0.5, 1.0);
 	}
-	
+
 	public JsonObject toJson() {
 		JsonObject json = new JsonObject();
 		if (foliageColor.isPresent()) {
@@ -99,10 +99,10 @@ public class BiomeColors {
 			json.addProperty("grass", Integer.toHexString(grassColor.get()));
 		}
 		json.addProperty("water", Integer.toHexString(waterColor));
-		
+
 		return json;
 	}
-	
+
 	public static BiomeColors fromJson(Biome biome, JsonObject json) {
 		BiomeColors biomeColors = new BiomeColors();
 		BiomeColorsAccessor accessor = (BiomeColorsAccessor) biome.getEffects();
@@ -125,17 +125,17 @@ public class BiomeColors {
 		} else {
 			biomeColors.waterColor = accessor.getWaterColor();
 		}
-		
+
 		return biomeColors;
 	}
-	
+
 	public String toString() {
 		return "[" + "foliage=" + foliageColor +
 				"," + "grass=" + grassColor +
 				"," + "water=" + waterColor +
 				"]";
 	}
-	
+
 	static {
 		ResourceLoader foliageColors = new ResourceLoader("textures/colormap/foliage.png");
 		try (InputStream ins = foliageColors.getInputStream()) {

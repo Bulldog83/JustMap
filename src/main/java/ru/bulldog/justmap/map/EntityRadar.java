@@ -18,23 +18,23 @@ public class EntityRadar {
 	private final List<PlayerEntity> players;
 	private final List<MobEntity> creatures;
 	private final List<MapIcon<?>> drawableIcons;
-	
+
 	public EntityRadar() {
 		this.players = new LinkedList<>();
 		this.creatures = new LinkedList<>();
 		this.drawableIcons = new ArrayList<>();
 	}
-	
+
 	public void addPlayer(PlayerEntity player) {
 		if (players.contains(player)) return;
 		this.players.add(player);
 	}
-	
+
 	public void addCreature(MobEntity creature) {
 		if (creatures.contains(creature)) return;
 		this.creatures.add(creature);
 	}
-	
+
 	public List<MapIcon<?>> getDrawableIcons(double worldX, double worldZ, double screenX, double screenY, double scale, float delta) {
 		this.drawableIcons.clear();
 		this.players.forEach(player -> {
@@ -53,7 +53,7 @@ public class EntityRadar {
 		});
 		return this.drawableIcons;
 	}
-	
+
 	public void clear(BlockPos center, int radius) {
 		if (players.size() > 0) {
 			List<PlayerEntity> playersToClear = new ArrayList<>();
@@ -70,7 +70,7 @@ public class EntityRadar {
 			List<MobEntity> mobsToClear = new ArrayList<>();
 			this.creatures.forEach(mob -> {
 				boolean tooFar = MathUtil.getDistance(center, mob.getBlockPos()) > radius ||
-						         Math.abs(mob.getY() - center.getY()) > 24;
+					Math.abs(mob.getY() - center.getY()) > 24;
 				if (mob.isDead() || mob.isRemoved()) {
 					mobsToClear.add(mob);
 				} else if (tooFar) {
@@ -80,7 +80,7 @@ public class EntityRadar {
 			mobsToClear.forEach(mob -> this.creatures.remove(mob));
 		}
 	}
-	
+
 	public void clearAll() {
 		this.players.clear();
 		this.creatures.clear();

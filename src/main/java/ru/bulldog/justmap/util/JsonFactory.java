@@ -17,9 +17,9 @@ import net.minecraft.resource.Resource;
 import ru.bulldog.justmap.JustMap;
 
 public class JsonFactory {
-	
+
 	public final static Gson GSON = new GsonBuilder().setPrettyPrinting().create();
-	
+
 	public static JsonObject getJsonObject(String path) throws IOException {
 		try (InputStream is = JsonFactory.class.getResourceAsStream(path)) {
 			Reader reader = new InputStreamReader(is);
@@ -30,7 +30,7 @@ public class JsonFactory {
 			return jsonObject;
 		}
 	}
-	
+
 	public static JsonObject getJsonObject(Resource jsonSource) {
 		if (jsonSource != null) {
 			try (InputStream is = jsonSource.getInputStream()) {
@@ -45,10 +45,10 @@ public class JsonFactory {
 				return new JsonObject();
 			}
 		}
-		
+
 		return new JsonObject();
 	}
-	
+
 	public static JsonObject getJsonObject(File jsonFile) {
 		if (jsonFile.exists()) {
 			JsonObject jsonObject = loadJson(jsonFile).getAsJsonObject();
@@ -57,10 +57,10 @@ public class JsonFactory {
 			}
 			return jsonObject;
 		}
-		
+
 		return new JsonObject();
 	}
-	
+
 	public static JsonElement loadJson(File jsonFile) {
 		if (jsonFile.exists()) {
 			try (Reader reader = new FileReader(jsonFile)) {
@@ -71,13 +71,13 @@ public class JsonFactory {
 		}
 		return null;
 	}
-	
+
 	public static JsonElement loadJson(Reader reader) {
 		return GSON.fromJson(reader, JsonElement.class);
 	}
-	
+
 	public static void storeJson(File jsonFile, JsonElement jsonObject) {
-		try(FileWriter writer = new FileWriter(jsonFile)) {			
+		try(FileWriter writer = new FileWriter(jsonFile)) {
 			String json = GSON.toJson(jsonObject);
 			writer.write(json);
 			writer.flush();

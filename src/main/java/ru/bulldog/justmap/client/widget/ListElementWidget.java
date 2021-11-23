@@ -11,13 +11,13 @@ import ru.bulldog.justmap.util.colors.Colors;
 import ru.bulldog.justmap.util.render.RenderUtil;
 
 public class ListElementWidget implements Drawable, Element {
-	
+
 	private final Supplier<Boolean> onPress;
 	private final Text text;
 	final int padding = 2;
 	int width, height;
 	int x, y;
-	
+
 	public ListElementWidget(Text text, Supplier<Boolean> action) {
 		this.width = RenderUtil.getWidth(text) + padding * 2;
 		this.onPress = action;
@@ -31,12 +31,12 @@ public class ListElementWidget implements Drawable, Element {
 		}
 		RenderUtil.drawCenteredText(matrices, text, x + width / 2, y + height / 2 - 5, Colors.WHITE);
 	}
-	
+
 	@Override
 	public boolean isMouseOver(double mouseX, double mouseY) {
 		return (mouseX > x && mouseY > y && mouseX < x + width && mouseY < y + height);
 	}
-	
+
 	@Override
 	public boolean mouseReleased(double mouseX, double mouseY, int button) {
 		return this.onPress.get();

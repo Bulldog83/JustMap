@@ -12,7 +12,7 @@ import net.minecraft.util.JsonHelper;
 import ru.bulldog.justmap.JustMap;
 
 public final class ConfigKeeper {
-	
+
 	private static ConfigKeeper instance;
 	public static ConfigKeeper getInstance() {
 		if (instance == null) {
@@ -20,48 +20,48 @@ public final class ConfigKeeper {
 		}
 		return instance;
 	}
-	
+
 	private final Map<String, Entry<?>> configEntries = new HashMap<>();
-	
+
 	private ConfigKeeper() {}
-	
+
 	@SuppressWarnings("unchecked")
 	public <E extends Entry<?>> E getEntry(String key) {
 		Entry<?> entry = this.configEntries.get(key);
 		if (entry == null) {
-			JustMap.LOGGER.warning(String.format("Entry '%s' doesn't exists.", key));			
+			JustMap.LOGGER.warning(String.format("Entry '%s' doesn't exists.", key));
 			return null;
 		}
 		return (E) entry;
 	}
-	
+
 	public <T> T getValue(String key) {
 		Entry<T> entry = this.getEntry(key);
 		if (entry == null) {
-			JustMap.LOGGER.warning(String.format("Empty value will be returned.", key));			
+			JustMap.LOGGER.warning(String.format("Empty value will be returned.", key));
 			return null;
 		}
 		return entry.getValue();
 	}
-	
+
 	public void set(String key, Entry<?> entry) {
 		configEntries.put(key, entry);
 	}
-	
+
 	public <T extends Entry<?>> void registerEntry(String key, T entry) {
 		configEntries.put(key, entry);
 	}
-	
+
 	public JsonElement toJson() {
 		JsonObject jsonObject = new JsonObject();
-		
+
 		for (String param : configEntries.keySet()) {
 			jsonObject.addProperty(param, configEntries.get(param).asString());
 		}
-		
+
 		return jsonObject;
 	}
-	
+
 	public void fromJson(JsonObject jsonObject) {
 		for (String param : configEntries.keySet()) {
 			if (jsonObject.has(param)) {
@@ -70,7 +70,7 @@ public final class ConfigKeeper {
 			}
 		}
 	}
-	
+
 	public static class BooleanEntry extends Entry<Boolean> {
 
 		public BooleanEntry(Boolean defaultValue, Consumer<Boolean> consumer, Supplier<Boolean> supplier) {
@@ -103,7 +103,7 @@ public final class ConfigKeeper {
 		}
 
 	}
-	
+
 	public static class FloatEntry extends Entry<Float> {
 
 		public FloatEntry(Float defaultValue, Consumer<Float> consumer, Supplier<Float> supplier) {
@@ -136,7 +136,7 @@ public final class ConfigKeeper {
 		}
 
 	}
-	
+
 	public static class FloatRange extends RangeEntry<Float> {
 
 		public FloatRange(Float defaultValue, Consumer<Float> consumer, Supplier<Float> supplier, Float minVal, Float maxVal) {
@@ -162,9 +162,9 @@ public final class ConfigKeeper {
 		public String asString() {
 			return Float.toString(getValue());
 		}
-		
+
 	}
-	
+
 	public static class IntegerEntry extends Entry<Integer> {
 
 		public IntegerEntry(Integer defaultValue, Consumer<Integer> consumer, Supplier<Integer> supplier) {
@@ -197,7 +197,7 @@ public final class ConfigKeeper {
 		}
 
 	}
-	
+
 	public static class IntegerRange extends RangeEntry<Integer> {
 
 		public IntegerRange(Integer defaultValue, Consumer<Integer> consumer, Supplier<Integer> supplier, Integer minVal, Integer maxVal) {
@@ -223,9 +223,9 @@ public final class ConfigKeeper {
 		public String asString() {
 			return Integer.toString(getValue());
 		}
-		
+
 	}
-	
+
 	public static class StringEntry extends Entry<String> {
 
 		public StringEntry(String defaultValue, Consumer<String> consumer, Supplier<String> supplier) {
@@ -258,7 +258,7 @@ public final class ConfigKeeper {
 		}
 
 	}
-	
+
 	public static class EnumEntry<T extends Enum<T>> extends Entry<T> {
 
 		public EnumEntry(T defaultValue, Consumer<T> consumer, Supplier<T> supplier) {
@@ -274,7 +274,7 @@ public final class ConfigKeeper {
 		public void setValue(T value) {
 			this.setter.accept(value);
 		}
-		
+
 		@SuppressWarnings("unchecked")
 		public void setValue(String name) {
 			try {
@@ -283,12 +283,12 @@ public final class ConfigKeeper {
 				JustMap.LOGGER.catching(ex);
 			}
 		}
-		
+
 		@Override
 		public T getDefault() {
 			return this.defaultValue;
 		}
-		
+
 		@Override
 		public String asString() {
 			return getValue().name();
@@ -297,16 +297,16 @@ public final class ConfigKeeper {
 		@Override
 		public void fromString(String value) {
 			this.setValue(value);
-		}		
+		}
 	}
-	
+
 	public static abstract class RangeEntry<T extends Comparable<T>> extends Entry<T> {
 
 		private final T min, max;
 
 		public RangeEntry(T defaultValue, Consumer<T> consumer, Supplier<T> supplier, T minVal, T maxVal) {
 			super(defaultValue, consumer, supplier);
-			
+
 			this.min = minVal;
 			this.max = maxVal;
 		}
@@ -315,23 +315,23 @@ public final class ConfigKeeper {
 		public void setValue(T value) {
 			this.setter.accept(value.compareTo(min) < 0 ? min : value.compareTo(max) > 0 ? max : value);
 		}
-		
+
 		public T minValue() {
 			return this.min;
 		}
-		
+
 		public T maxValue() {
 			return this.max;
 		}
 	}
-	
+
 	public static abstract class Entry<T> {
-		
+
 		protected final T defaultValue;
-		
+
 		protected final Consumer<T> setter;
 		protected final Supplier<T> getter;
-		
+
 		public Entry (T defaultValue, Consumer<T> consumer, Supplier<T> supplier) {
 			this.defaultValue = defaultValue;
 			this.setter = consumer;
@@ -339,11 +339,11 @@ public final class ConfigKeeper {
 		}
 
 		public abstract T getValue();
-		public abstract void setValue(T value);	
+		public abstract void setValue(T value);
 		public abstract T getDefault();
 		public abstract void fromString(String value);
 		public abstract String asString();
-		
+
 		public void setDefault() {
 			this.setter.accept(defaultValue);
 		}

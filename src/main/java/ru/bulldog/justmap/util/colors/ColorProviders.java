@@ -19,12 +19,12 @@ import ru.bulldog.justmap.mixins.RedstoneLevelAccessor;
 import ru.bulldog.justmap.util.math.MathUtil;
 
 public class ColorProviders implements ColorProvider {
-	
+
 	public final static ColorProviders INSTANCE = registerProviders();
-	
+
 	private final Colors colorPalette = Colors.INSTANCE;
 	private final Map<Block, ColorProvider> providers = Maps.newHashMap();
-	
+
 	private ColorProviders() {}
 
 	private static ColorProviders registerProviders() {
@@ -65,17 +65,17 @@ public class ColorProviders implements ColorProvider {
 		blockColors.registerColorProvider((state, world, pos) -> {
 			return Colors.LILY_PAD;
 		}, Blocks.LILY_PAD);
-		
+
 		return blockColors;
 	}
-	
+
 	public void registerColorProvider(ColorProvider provider, Block... blocks) {
 		for(int i = 0; i < blocks.length; i++) {
 			Block block = blocks[i];
 			this.providers.put(block, provider);
 		}
 	}
-	
+
 	public int getGrassColor(World world, BlockPos pos) {
 		if (world != null && pos != null) {
 			Chunk chunk = world.getChunk(pos.getX() >> 4, pos.getZ() >> 4, ChunkStatus.BIOMES, false);
@@ -89,7 +89,7 @@ public class ColorProviders implements ColorProvider {
 		}
 		return Colors.GRASS;
 	}
-	
+
 	public int getFoliageColor(World world, BlockPos pos) {
 		if (world != null && pos != null) {
 			Chunk chunk = world.getChunk(pos.getX() >> 4, pos.getZ() >> 4, ChunkStatus.BIOMES, false);
@@ -103,7 +103,7 @@ public class ColorProviders implements ColorProvider {
 		}
 		return Colors.FOLIAGE;
 	}
-	
+
 	public int getWaterColor(World world, BlockPos pos) {
 		if (world != null && pos != null) {
 			Chunk chunk = world.getChunk(pos.getX() >> 4, pos.getZ() >> 4, ChunkStatus.BIOMES, false);
