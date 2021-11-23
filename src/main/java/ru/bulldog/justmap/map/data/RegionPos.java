@@ -1,8 +1,5 @@
 package ru.bulldog.justmap.map.data;
 
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
-
 public class RegionPos {
 	public final int x;
 	public final int z;

@@ -43,7 +43,7 @@ public class MapPlayer extends AbstractClientPlayerEntity {
 		AbstractTexture abstractTexture = textureManager.getTexture(id);
 		if (abstractTexture == null) {
 			abstractTexture = new PlayerSkinTexture(null, String.format("http://skins.minecraft.net/MinecraftSkins/%s.png", ChatUtil.stripTextFormat(playerName)), DefaultSkinHelper.getTexture(getOfflinePlayerUuid(playerName)), true, null);
-			textureManager.registerTexture(id, (AbstractTexture) abstractTexture);
+			textureManager.registerTexture(id, abstractTexture);
 		}
 		return (ResourceTexture) abstractTexture;
 	}

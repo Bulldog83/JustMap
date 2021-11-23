@@ -1,5 +1,9 @@
 package ru.bulldog.justmap.client.screen;
 
+import java.util.HashMap;
+
+import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.datafixers.util.Pair;
 import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.screen.Screen;
@@ -12,11 +16,6 @@ import net.minecraft.world.World;
 import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.util.LangUtil;
 import ru.bulldog.justmap.util.render.RenderUtil;
-
-import java.util.HashMap;
-
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.datafixers.util.Pair;
 
 public abstract class AbstractMapScreen extends Screen {
 	public static final Identifier DEFAULT_TEXTURE = new Identifier("textures/block/dirt.png");
@@ -31,7 +30,7 @@ public abstract class AbstractMapScreen extends Screen {
 	
 	protected final Screen parent;	
 	protected Pair<String, Identifier> info;
-	protected LangUtil langUtil;
+	protected final LangUtil langUtil;
 	protected int x, y, center;
 	protected int paddingTop;
 	protected int paddingBottom;
@@ -88,11 +87,7 @@ public abstract class AbstractMapScreen extends Screen {
 	public void renderTextureModal(int x, int y, int width, int height, int textureWidth, int textureHeight, Identifier id) {
 		this.renderTexture(x, y, width, height, (float) width / textureWidth, (float) height / textureHeight, id);
 	}
-	
-	public void renderTextureRepeating(int x, int y, int width, int height, int textureHeight, int textureWidth, String id) {
-		this.renderTextureRepeating(x, y, width, height, textureHeight, textureWidth, new Identifier(id));
-	}
-	
+
 	public void renderTextureRepeating(int x, int y, int width, int height, int textureHeight, int textureWidth, Identifier id) {
 		for (int xp = 0; xp < width; xp += textureWidth) {
 			int w = (xp + textureWidth < width) ? textureWidth : width - xp;

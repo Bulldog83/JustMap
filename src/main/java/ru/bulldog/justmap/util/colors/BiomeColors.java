@@ -5,10 +5,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Optional;
 
-import javax.imageio.ImageIO;
-
 import com.google.gson.JsonObject;
-
+import javax.imageio.ImageIO;
 import net.minecraft.util.JsonHelper;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.BiomeEffects;
@@ -132,16 +130,10 @@ public class BiomeColors {
 	}
 	
 	public String toString() {
-		StringBuilder builder = new StringBuilder();
-		builder.append("[")
-			   .append("foliage=" + foliageColor)
-			   .append(",")
-			   .append("grass=" + grassColor)
-			   .append(",")
-			   .append("water=" + waterColor)
-			   .append("]");
-		
-		return builder.toString();
+		return "[" + "foliage=" + foliageColor +
+				"," + "grass=" + grassColor +
+				"," + "water=" + waterColor +
+				"]";
 	}
 	
 	static {

@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ChatScreen;
 import net.minecraft.client.util.math.MatrixStack;
@@ -16,7 +15,7 @@ import ru.bulldog.justmap.enums.ScreenPosition;
 public class AdvancedInfo {
 
 	private static AdvancedInfo INSTANCE;
-	private static TextManager mapTextManager = new TextManager();
+	private static final TextManager mapTextManager = new TextManager();
 	
 	public static AdvancedInfo getInstance() {
 		if (INSTANCE == null) {
@@ -30,8 +29,8 @@ public class AdvancedInfo {
 		return mapTextManager;
 	}
 	
-	private MinecraftClient minecraft = MinecraftClient.getInstance();
-	private Map<ScreenPosition, TextManager> managers;
+	private final MinecraftClient minecraft = MinecraftClient.getInstance();
+	private final Map<ScreenPosition, TextManager> managers;
 	private ScreenPosition infoPos;
 	private ScreenPosition itemsPos;
 	

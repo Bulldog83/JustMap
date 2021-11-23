@@ -1,7 +1,6 @@
 package ru.bulldog.justmap.map.icon;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.util.Window;
@@ -20,8 +19,8 @@ import ru.bulldog.justmap.util.render.RenderUtil;
 
 public class PlayerIcon extends MapIcon<PlayerIcon> {
 	
-	private PlayerEntity player;
-	private int color = Colors.GREEN;
+	private final PlayerEntity player;
+	private final int color = Colors.GREEN;
 	
 	public PlayerIcon(PlayerEntity player) {
 		this.player = player;

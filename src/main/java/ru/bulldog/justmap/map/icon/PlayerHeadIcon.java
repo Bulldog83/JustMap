@@ -1,5 +1,7 @@
 package ru.bulldog.justmap.map.icon;
 
+import java.io.IOException;
+
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.texture.ResourceTexture;
 import net.minecraft.client.util.DefaultSkinHelper;
@@ -12,12 +14,10 @@ import ru.bulldog.justmap.map.MapPlayer;
 import ru.bulldog.justmap.util.colors.Colors;
 import ru.bulldog.justmap.util.render.RenderUtil;
 
-import java.io.IOException;
-
 public class PlayerHeadIcon {
 	
 	public long lastCheck;
-	public int delay = 5000;
+	public final int delay = 5000;
 	public boolean success = false;
 	
 	private ResourceTexture playerSkin;

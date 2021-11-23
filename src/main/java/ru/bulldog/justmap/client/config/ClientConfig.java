@@ -4,12 +4,12 @@ import com.google.gson.JsonObject;
 
 import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.config.Config;
-import ru.bulldog.justmap.config.ConfigWriter;
 import ru.bulldog.justmap.config.ConfigKeeper.BooleanEntry;
 import ru.bulldog.justmap.config.ConfigKeeper.EnumEntry;
 import ru.bulldog.justmap.config.ConfigKeeper.FloatRange;
 import ru.bulldog.justmap.config.ConfigKeeper.IntegerEntry;
 import ru.bulldog.justmap.config.ConfigKeeper.IntegerRange;
+import ru.bulldog.justmap.config.ConfigWriter;
 import ru.bulldog.justmap.enums.ArrowType;
 import ru.bulldog.justmap.enums.MapShape;
 import ru.bulldog.justmap.enums.MultiworldDetection;

@@ -13,7 +13,7 @@ import ru.bulldog.justmap.util.DataUtil;
 
 public class BiomeInfo extends InfoText {
 
-	private String title;
+	private final String title;
 	private Identifier currentBiome;
 	
 	public BiomeInfo() {

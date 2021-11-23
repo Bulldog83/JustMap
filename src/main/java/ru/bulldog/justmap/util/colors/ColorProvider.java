@@ -5,5 +5,5 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 public interface ColorProvider {
-	public int getColor(BlockState state, World world, BlockPos pos);
+	int getColor(BlockState state, World world, BlockPos pos);
 }

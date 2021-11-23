@@ -1,12 +1,12 @@
 package ru.bulldog.justmap.server.config;
 
 import com.google.gson.JsonObject;
-
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+
 import ru.bulldog.justmap.config.Config;
-import ru.bulldog.justmap.config.ConfigWriter;
 import ru.bulldog.justmap.config.ConfigKeeper.BooleanEntry;
+import ru.bulldog.justmap.config.ConfigWriter;
 
 @Environment(EnvType.SERVER)
 public class ServerConfig extends Config {

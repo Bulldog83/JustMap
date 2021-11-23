@@ -6,14 +6,15 @@ import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
+
 import ru.bulldog.justmap.util.colors.Colors;
 import ru.bulldog.justmap.util.render.RenderUtil;
 
 public class ListElementWidget implements Drawable, Element {
 	
 	private final Supplier<Boolean> onPress;
-	private Text text;
-	int padding = 2;
+	private final Text text;
+	final int padding = 2;
 	int width, height;
 	int x, y;
 	

@@ -13,7 +13,7 @@ import ru.bulldog.justmap.enums.TextPosition;
 
 public class TextManager {
 	private TextPosition textPosition = TextPosition.RIGHT;
-	private List<InfoText> elements;
+	private final List<InfoText> elements;
 	private int x, y;
 	private int lineWidth;
 	private int spacing = 12;
@@ -41,7 +41,7 @@ public class TextManager {
 		}
 	}
 	
-	public TextManager updatePosition(ScreenPosition position) {
+	public void updatePosition(ScreenPosition position) {
 		int offset = ClientSettings.positionOffset;
 		MinecraftClient minecraft = MinecraftClient.getInstance();
 		int screenW = minecraft.getWindow().getScaledWidth();
@@ -76,17 +76,15 @@ public class TextManager {
 						screenW - offset, screenH - offset - spacing);
 				break;
 		}
-		return this;
 	}
 	
-	public TextManager updatePosition(TextPosition pos, int x, int y) {
+	public void updatePosition(TextPosition pos, int x, int y) {
 		if (textPosition != pos || this.x != x || this.y != y) {
 			this.textPosition = pos;
 			this.x = x;
 			this.y = y;
 			this.updateLines();
 		}
-		return this;
 	}
 	
 	private void updateLines() {
@@ -124,14 +122,12 @@ public class TextManager {
 		this.elements.add(element);
 	}
 	
-	public TextManager setLineWidth(int width) {
+	public void setLineWidth(int width) {
 		this.lineWidth = width;
-		return this;
 	}
 	
-	public TextManager setSpacing(int spacing) {
+	public void setSpacing(int spacing) {
 		this.spacing = spacing;
-		return this;
 	}
 
 	public void update() {

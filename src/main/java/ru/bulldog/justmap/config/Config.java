@@ -1,7 +1,12 @@
 package ru.bulldog.justmap.config;
 
 import ru.bulldog.justmap.JustMap;
-import ru.bulldog.justmap.config.ConfigKeeper.*;
+import ru.bulldog.justmap.config.ConfigKeeper.BooleanEntry;
+import ru.bulldog.justmap.config.ConfigKeeper.Entry;
+import ru.bulldog.justmap.config.ConfigKeeper.FloatEntry;
+import ru.bulldog.justmap.config.ConfigKeeper.IntegerEntry;
+import ru.bulldog.justmap.config.ConfigKeeper.RangeEntry;
+import ru.bulldog.justmap.config.ConfigKeeper.StringEntry;
 
 public abstract class Config {
 	
@@ -23,18 +28,14 @@ public abstract class Config {
 		return str != null ? str : "";
 	}
 	
-	public boolean setString(String key, String value) {
+	public void setString(String key, String value) {
 		try {
 			StringEntry entry = KEEPER.getEntry(key);
 			entry.setValue(value);
 			KEEPER.set(key, entry);
-			
-			return true;
 		} catch (NullPointerException ex) {
 			JustMap.LOGGER.catching(ex);
 		}
-		
-		return false;
 	}
 	
 	public int getInt(String key) {
@@ -42,32 +43,24 @@ public abstract class Config {
 		return val != null ? val : 0;
 	}
 	
-	public boolean setInt(String key, int value) {
+	public void setInt(String key, int value) {
 		try {
 			IntegerEntry entry = KEEPER.getEntry(key);
 			entry.setValue(value);
 			KEEPER.set(key, entry);
-			
-			return true;
-		} catch (NullPointerException ex) {
+        } catch (NullPointerException ex) {
 			JustMap.LOGGER.catching(ex);
 		}
-		
-		return false;
-	}
+    }
 	
-	public <T extends Comparable<T>> boolean setRanged(String key, T value) {
+	public <T extends Comparable<T>> void setRanged(String key, T value) {
 		try {
 			RangeEntry<T> entry = KEEPER.getEntry(key);
 			entry.setValue(value);
 			KEEPER.set(key, entry);
-			
-			return true;
 		} catch (NullPointerException | ClassCastException ex) {
 			JustMap.LOGGER.catching(ex);
 		}
-		
-		return false;
 	}
 	
 	public float getFloat(String key) {
@@ -75,18 +68,14 @@ public abstract class Config {
 		return val != null ? val : 0.0F;
 	}
 	
-	public boolean setFloat(String key, float value) {
+	public void setFloat(String key, float value) {
 		try {
 			FloatEntry entry = KEEPER.getEntry(key);
 			entry.setValue(value);
 			KEEPER.set(key, entry);
-			
-			return true;
 		} catch (NullPointerException ex) {
 			JustMap.LOGGER.catching(ex);
 		}
-		
-		return false;
 	}
 	
 	public boolean getBoolean(String key) {
@@ -94,17 +83,13 @@ public abstract class Config {
 		return val != null ? val : false;
 	}
 	
-	public boolean setBoolean(String key, boolean value) {
+	public void setBoolean(String key, boolean value) {
 		try {
 			BooleanEntry entry = KEEPER.getEntry(key);
 			entry.setValue(value);
 			KEEPER.set(key, entry);
-			
-			return true;
 		} catch (NullPointerException ex) {
 			JustMap.LOGGER.catching(ex);
 		}
-		
-		return false;
 	}
 }

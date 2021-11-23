@@ -1,23 +1,20 @@
 package ru.bulldog.justmap.util.render;
 
-import org.lwjgl.opengl.EXTFramebufferObject;
-
-import org.lwjgl.opengl.ARBFramebufferObject;
-import org.lwjgl.opengl.GL30;
-import org.lwjgl.opengl.GL;
-
 import com.mojang.blaze3d.platform.GlStateManager;
-import com.mojang.blaze3d.systems.RenderSystem;
-
 import com.mojang.blaze3d.platform.TextureUtil;
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gl.Framebuffer;
+import org.lwjgl.opengl.ARBFramebufferObject;
+import org.lwjgl.opengl.EXTFramebufferObject;
+import org.lwjgl.opengl.GL;
+import org.lwjgl.opengl.GL30;
 
 public class ExtendedFramebuffer extends Framebuffer {
 	private int colorAttachment;
 	private int depthAttachment;
 	private FboType fboType;
 	
-	public ExtendedFramebuffer(int width, int height, boolean useDepthIn) {
+	public ExtendedFramebuffer(boolean useDepthIn) {
 		super(useDepthIn);
 	}
 
@@ -71,7 +68,9 @@ public class ExtendedFramebuffer extends Framebuffer {
 		try {
 			this.checkFramebufferStatus();
 			this.clear(isMac);
-		} catch (Exception ex) {}
+		} catch (Exception ex) {
+			// ignore
+		}
 		this.endRead();
 	}
 	
@@ -343,10 +342,10 @@ public class ExtendedFramebuffer extends Framebuffer {
 		this.bindFramebuffer(GLC.GL_FRAMEBUFFER, 0);
 	}
 	
-	public static enum FboType {
+	public enum FboType {
 		BASE,
 		ARB,
 		EXT,
-		NONE;
-	}
+		NONE
+    }
 }

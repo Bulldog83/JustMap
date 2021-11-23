@@ -1,10 +1,10 @@
 package ru.bulldog.justmap;
 
-import ru.bulldog.justmap.util.Logger;
-import ru.bulldog.justmap.util.tasks.TaskManager;
-
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.ModInitializer;
+
+import ru.bulldog.justmap.util.Logger;
+import ru.bulldog.justmap.util.tasks.TaskManager;
 
 public class JustMap implements ModInitializer {
 	public static final String MODID = "justmap";

@@ -7,17 +7,18 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import ru.bulldog.justmap.JustMap;
-import ru.bulldog.justmap.util.colors.ColorUtil;
-import ru.bulldog.justmap.util.colors.Colors;
-import ru.bulldog.justmap.util.math.Line;
-import ru.bulldog.justmap.util.math.Point;
 import net.fabricmc.fabric.impl.client.indigo.renderer.helper.ColorHelper;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.resource.Resource;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.util.Identifier;
+
+import ru.bulldog.justmap.JustMap;
+import ru.bulldog.justmap.util.colors.ColorUtil;
+import ru.bulldog.justmap.util.colors.Colors;
+import ru.bulldog.justmap.util.math.Line;
+import ru.bulldog.justmap.util.math.Point;
 
 public class ImageUtil {
 	private ImageUtil() {}	
@@ -63,7 +64,7 @@ public class ImageUtil {
 		return new NativeImage(w, h, false);
 	}
 	
-	public static NativeImage applyColor(NativeImage image, int color) {
+	public static void applyColor(NativeImage image, int color) {
 		for (int i = 0; i < image.getWidth(); i++) {
 			for (int j = 0; j < image.getHeight(); j++) {
 				if (image.getOpacity(i, j) == -1) {
@@ -72,8 +73,6 @@ public class ImageUtil {
 				}
 			}
 		}
-		
-		return image;
 	}
 	
 	public static void fillImage(NativeImage image, int color) {

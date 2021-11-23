@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.ChunkPos;
@@ -114,7 +115,7 @@ class ChunkDataManager {
         }
 		
 		ServerWorld serverWorld = (ServerWorld) world;
-		try (VersionedChunkStorage storage = StorageUtil.getChunkStorage(serverWorld);) {		
+		try (VersionedChunkStorage storage = StorageUtil.getChunkStorage(serverWorld)) {
 			NbtCompound chunkTag = storage.updateChunkNbt(serverWorld.getRegistryKey(),
 					DataUtil.getPersistentSupplier(), storage.getNbt(chunkPos));
 			if (chunkTag == null) return this.emptyChunk;

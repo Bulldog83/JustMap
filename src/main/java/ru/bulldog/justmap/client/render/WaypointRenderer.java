@@ -1,18 +1,10 @@
 package ru.bulldog.justmap.client.render;
 
-import ru.bulldog.justmap.client.config.ClientSettings;
-import ru.bulldog.justmap.map.data.MapDataProvider;
-import ru.bulldog.justmap.map.waypoint.Waypoint;
-import ru.bulldog.justmap.map.waypoint.WaypointKeeper;
-import ru.bulldog.justmap.map.waypoint.Waypoint.Icon;
-import ru.bulldog.justmap.util.colors.ColorUtil;
-import ru.bulldog.justmap.util.colors.Colors;
-import ru.bulldog.justmap.util.math.MathUtil;
-import ru.bulldog.justmap.util.render.RenderUtil;
+import java.util.List;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.OverlayTexture;
@@ -27,13 +19,20 @@ import net.minecraft.util.math.Matrix3f;
 import net.minecraft.util.math.Matrix4f;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3f;
-import java.util.List;
 
-import com.mojang.blaze3d.systems.RenderSystem;
+import ru.bulldog.justmap.client.config.ClientSettings;
+import ru.bulldog.justmap.map.data.MapDataProvider;
+import ru.bulldog.justmap.map.waypoint.Waypoint;
+import ru.bulldog.justmap.map.waypoint.Waypoint.Icon;
+import ru.bulldog.justmap.map.waypoint.WaypointKeeper;
+import ru.bulldog.justmap.util.colors.ColorUtil;
+import ru.bulldog.justmap.util.colors.Colors;
+import ru.bulldog.justmap.util.math.MathUtil;
+import ru.bulldog.justmap.util.render.RenderUtil;
 
 @Environment(EnvType.CLIENT)
 public class WaypointRenderer {
-	private static WaypointRenderer renderer = new WaypointRenderer();
+	private static final WaypointRenderer renderer = new WaypointRenderer();
 	private final static Identifier BEAM_TEX = new Identifier("textures/entity/beacon_beam.png");
 	private final static MinecraftClient minecraft = MinecraftClient.getInstance();
 	
@@ -47,12 +46,12 @@ public class WaypointRenderer {
 		for (Waypoint wp : wayPoints) {
 			int dist = (int) MathUtil.getDistance(wp.pos, minecraft.player.getBlockPos(), false);
 			if (wp.tracking && dist <= wp.showRange) {
-				renderer.renderHUD(wp, minecraft, delta, fov, dist);
+				renderer.renderHUD(wp, delta, fov, dist);
 			}
 		}
 	}
 	
-	private void renderHUD(Waypoint waypoint, MinecraftClient minecraft, float delta, float fov, int dist) {
+	private void renderHUD(Waypoint waypoint, float delta, float fov, int dist) {
 		int wpX = waypoint.pos.getX();
 		int wpZ = waypoint.pos.getZ();
 		
@@ -62,9 +61,9 @@ public class WaypointRenderer {
 		int screenWidth = minecraft.getWindow().getScaledWidth();
 		
 		double dx = minecraft.player.getX() - wpX;
-		double dy = wpZ - minecraft.player.getZ();		
+		double dy = wpZ - minecraft.player.getZ();
 		double wfi = correctAngle((float) (Math.atan2(dx, dy) * (180 / Math.PI)));		
-		double pfi = correctAngle(minecraft.player.getYaw(delta) % 360);		
+		double pfi = correctAngle(minecraft.player.getYaw(delta) % 360);
 		double a0 = pfi - fov / 2;
 		double a1 = pfi + fov / 2;		
 		double ax = correctAngle((float) (2 * pfi - wfi));		
@@ -78,7 +77,7 @@ public class WaypointRenderer {
 		} else {
 			RenderUtil.drawDiamond(x, y, size, size, waypoint.color);
 		}
-		RenderUtil.drawBoundedString((int) dist + "m", x + size / 2, y + size + 2, 0, screenWidth, Colors.WHITE);
+		RenderUtil.drawBoundedString(dist + "m", x + size / 2, y + size + 2, 0, screenWidth, Colors.WHITE);
 	}
 	
 	public static void renderWaypoints(MatrixStack matrixStack, Camera camera, float tickDelta) {
@@ -102,7 +101,7 @@ public class WaypointRenderer {
 		for (Waypoint wp : wayPoints) {
 			int dist = (int) MathUtil.getDistance(wp.pos, playerPos, false);
 			if (wp.render && dist >= ClientSettings.minRenderDist && dist <= wp.showRange) {
-				renderer.renderWaypoint(matrixStack, consumerProvider, wp, minecraft, camera, tick, dist);
+				renderer.renderWaypoint(matrixStack, consumerProvider, wp, camera, tick, dist);
 			}
 		}
 		consumerProvider.draw();
@@ -110,7 +109,7 @@ public class WaypointRenderer {
 		RenderSystem.depthMask(true);
 	}
 	
-	private void renderWaypoint(MatrixStack matrixStack, VertexConsumerProvider consumerProvider, Waypoint waypoint, MinecraftClient client, Camera camera, float tick, int dist) {
+	private void renderWaypoint(MatrixStack matrixStack, VertexConsumerProvider consumerProvider, Waypoint waypoint, Camera camera, float tick, int dist) {
 		int wpX = waypoint.pos.getX();
 		int wpY = waypoint.pos.getY();
 		int wpZ = waypoint.pos.getZ();
@@ -146,13 +145,13 @@ public class WaypointRenderer {
    	 		
    	 		Identifier texture = waypoint.getIcon().getTexture();
    	 		VertexConsumer vertexConsumer = consumerProvider.getBuffer(RenderLayer.getBeaconBeam(texture, true));
-   	 		this.renderIcon(matrixStack, vertexConsumer, colors, alpha, waypoint.getIcon().getWidth());
+   	 		this.renderIcon(matrixStack, vertexConsumer, colors, alpha);
    	 		matrixStack.pop();
 		}
 		matrixStack.pop();
 	}
 	
-	private void renderIcon(MatrixStack matrixStack, VertexConsumer vertexConsumer, float[] colors, float alpha, int size) {
+	private void renderIcon(MatrixStack matrixStack, VertexConsumer vertexConsumer, float[] colors, float alpha) {
 		MatrixStack.Entry entry = matrixStack.peek();
 		Matrix4f matrix4f = entry.getModel();
 		Matrix3f matrix3f = entry.getNormal();

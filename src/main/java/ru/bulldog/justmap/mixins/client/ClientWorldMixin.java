@@ -1,5 +1,7 @@
 package ru.bulldog.justmap.mixins.client;
 
+import java.util.function.Supplier;
+
 import net.minecraft.block.BlockState;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.util.math.BlockPos;
@@ -12,9 +14,8 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import ru.bulldog.justmap.map.data.MapDataProvider;
 
-import java.util.function.Supplier;
+import ru.bulldog.justmap.map.data.MapDataProvider;
 
 @Mixin(ClientWorld.class)
 public abstract class ClientWorldMixin extends World {

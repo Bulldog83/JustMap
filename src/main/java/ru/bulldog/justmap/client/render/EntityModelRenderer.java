@@ -1,24 +1,24 @@
 package ru.bulldog.justmap.client.render;
 
-import ru.bulldog.justmap.client.JustMapClient;
-import ru.bulldog.justmap.client.config.ClientSettings;
-import ru.bulldog.justmap.util.math.MathUtil;
-
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.EntityRenderDispatcher;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.boss.dragon.EnderDragonEntity;
 import net.minecraft.entity.mob.GhastEntity;
 import net.minecraft.entity.mob.WaterCreatureEntity;
 import net.minecraft.util.math.Vec3f;
-import net.minecraft.entity.LivingEntity;
+
+import ru.bulldog.justmap.client.JustMapClient;
+import ru.bulldog.justmap.client.config.ClientSettings;
+import ru.bulldog.justmap.util.math.MathUtil;
 
 public class EntityModelRenderer {	
 
-	private static MinecraftClient minecraft = MinecraftClient.getInstance();
-	private static EntityRenderDispatcher renderDispatcher = minecraft.getEntityRenderDispatcher();
+	private static final MinecraftClient minecraft = MinecraftClient.getInstance();
+	private static final EntityRenderDispatcher renderDispatcher = minecraft.getEntityRenderDispatcher();
 	
 	public static void renderModel(MatrixStack matrices, VertexConsumerProvider consumerProvider, Entity entity, double x, double y) {
 		

@@ -10,13 +10,10 @@ import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
-import javax.imageio.ImageIO;
-
-import org.lwjgl.opengl.GL11;
-
-import com.mojang.blaze3d.systems.RenderSystem;
-
 import com.mojang.blaze3d.platform.TextureUtil;
+import com.mojang.blaze3d.systems.RenderSystem;
+import javax.imageio.ImageIO;
+import org.lwjgl.opengl.GL11;
 
 import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.util.colors.ColorUtil;
@@ -24,7 +21,7 @@ import ru.bulldog.justmap.util.colors.ColorUtil;
 public class MapTexture {
 
 	private File imageFile;
-	private ByteBuffer buffer;
+	private final ByteBuffer buffer;
 	private byte[] bytes;
 	private int glId = -1;
 	private final int width;
@@ -32,7 +29,7 @@ public class MapTexture {
 	
 	public boolean changed = false;
 	
-	private Object bufferLock = new Object();
+	private final Object bufferLock = new Object();
 	
 	public MapTexture(File imageFile, int width, int height) {
 		int size = 4 * width * (height - 1) + 4 * width;		
@@ -269,7 +266,7 @@ public class MapTexture {
 				JustMap.LOGGER.debug("Image loaded: {}", png);
 				return true;
 			} catch (Exception ex) {
-				JustMap.LOGGER.warning("Can't load image: " + png.toString());
+				JustMap.LOGGER.warning("Can't load image: " + png);
 				JustMap.LOGGER.warning(ex.getLocalizedMessage());
 				return false;
 			}

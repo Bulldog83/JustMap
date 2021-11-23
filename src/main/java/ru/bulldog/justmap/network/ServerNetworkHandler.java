@@ -2,7 +2,6 @@ package ru.bulldog.justmap.network;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
 import net.minecraft.server.MinecraftServer;
@@ -15,7 +14,7 @@ import ru.bulldog.justmap.util.Dimension;
 import ru.bulldog.justmap.util.RuleUtil;
 
 public class ServerNetworkHandler extends NetworkHandler {
-	private MinecraftServer server;
+	private final MinecraftServer server;
 	
 	public ServerNetworkHandler(MinecraftServer server) {
 		this.server = server;

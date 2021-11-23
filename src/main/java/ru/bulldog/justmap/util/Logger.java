@@ -9,7 +9,7 @@ public final class Logger {
 	
 	private static final org.apache.logging.log4j.Logger LOGGER = LogManager.getLogger();
 	
-	private String modPref = "[" + JustMap.MODID + "] ";
+	private final String modPref = "[" + JustMap.MODID + "] ";
 	
 	private Logger() {}
 	

@@ -11,8 +11,8 @@ import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.client.config.ClientSettings;
 import ru.bulldog.justmap.client.screen.WorldmapScreen;
 import ru.bulldog.justmap.map.IMap;
-import ru.bulldog.justmap.map.data.MapRegion;
 import ru.bulldog.justmap.map.data.Layer;
+import ru.bulldog.justmap.map.data.MapRegion;
 import ru.bulldog.justmap.map.data.RegionPos;
 import ru.bulldog.justmap.util.DataUtil;
 import ru.bulldog.justmap.util.Logger;
@@ -27,14 +27,14 @@ import ru.bulldog.justmap.util.tasks.TaskManager;
 
 public class RegionData implements MapRegion {
 	
-	private static TaskManager updater = TaskManager.getManager("region-updater");
-	private static TaskManager worker = JustMap.WORKER;
-	private static Logger logger = JustMap.LOGGER;
+	private static final TaskManager updater = TaskManager.getManager("region-updater");
+	private static final TaskManager worker = JustMap.WORKER;
+	private static final Logger logger = JustMap.LOGGER;
 	
 	private final WorldData mapData;
 	private final RegionPos regPos;
 	private final Map<Layer, MapTexture> images = new ConcurrentHashMap<>();
-	private File cacheDir;
+	private final File cacheDir;
 	private MapTexture image;
 	private MapTexture texture;
 	private MapTexture overlay;
@@ -51,13 +51,12 @@ public class RegionData implements MapRegion {
 	private boolean alternateRender = true;
 	private boolean slimeOverlay = false;
 	private boolean loadedOverlay = false;
-	private boolean gridOverlay = false;
-	private boolean imageChanged = false;	
+	private boolean imageChanged = false;
 	private boolean isWorldmap = false;
 	
 	public long updated = 0;
 	
-	private Object imageLock = new Object();
+	private final Object imageLock = new Object();
 	
 	public RegionData(IMap map, WorldData data, RegionPos regPos) {
 		this(data, regPos);
@@ -156,7 +155,7 @@ public class RegionData implements MapRegion {
 			this.loadedOverlay = ClientSettings.showLoadedChunks;
 			this.renewOverlay = true;
 		}
-		this.overlayNeeded = gridOverlay || slimeOverlay || loadedOverlay;
+		this.overlayNeeded = slimeOverlay || loadedOverlay;
 		synchronized (imageLock) {
 			if (overlayNeeded && texture == null) {
 				this.texture = new MapTexture(null, image);

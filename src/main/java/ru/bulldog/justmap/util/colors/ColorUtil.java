@@ -8,7 +8,6 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.impl.client.indigo.renderer.helper.ColorHelper;
 import net.fabricmc.fabric.impl.client.rendering.fluid.FluidRenderHandlerRegistryImpl;
-
 import net.minecraft.block.AttachedStemBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -45,12 +44,12 @@ import ru.bulldog.justmap.util.math.MathUtil;
 @Environment(EnvType.CLIENT)
 public class ColorUtil {
 	
-	private static MinecraftClient minecraft = MinecraftClient.getInstance();
-	private static BlockModels blockModels = minecraft.getBlockRenderManager().getModels();
-	private static FluidRenderHandlerRegistryImpl fluidRenderHandlerRegistry = FluidRenderHandlerRegistryImpl.INSTANCE;
-	private static float[] floatBuffer = new float[3];
-	private static ColorProviders colorProvider = ColorProviders.INSTANCE;
-	private static Colors colorPalette = Colors.INSTANCE;
+	private static final MinecraftClient minecraft = MinecraftClient.getInstance();
+	private static final BlockModels blockModels = minecraft.getBlockRenderManager().getModels();
+	private static final FluidRenderHandlerRegistryImpl fluidRenderHandlerRegistry = FluidRenderHandlerRegistryImpl.INSTANCE;
+	private static final float[] floatBuffer = new float[3];
+	private static final ColorProviders colorProvider = ColorProviders.INSTANCE;
+	private static final Colors colorPalette = Colors.INSTANCE;
 	
 	public static int[] toIntArray(int color) {
 		return new int[] {
@@ -69,7 +68,7 @@ public class ColorUtil {
 		return floatBuffer;
 	}
 	
-	public static float[] RGBtoHSB(int r, int g, int b, float[] hsbvals) {
+	public static void RGBtoHSB(int r, int g, int b, float[] hsbvals) {
 		float hue, saturation, brightness;
 		if (hsbvals == null) {
 			hsbvals = floatBuffer;
@@ -103,7 +102,6 @@ public class ColorUtil {
 		hsbvals[0] = hue;
 		hsbvals[1] = saturation;
 		hsbvals[2] = brightness;
-		return hsbvals;
 	}
 	
 	public static int HSBtoRGB(float hue, float saturation, float brightness) {

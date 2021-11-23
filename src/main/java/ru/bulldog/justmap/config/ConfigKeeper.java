@@ -7,7 +7,6 @@ import java.util.function.Supplier;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-
 import net.minecraft.util.JsonHelper;
 
 import ru.bulldog.justmap.JustMap;
@@ -22,7 +21,7 @@ public final class ConfigKeeper {
 		return instance;
 	}
 	
-	private Map<String, Entry<?>> configEntries = new HashMap<>();
+	private final Map<String, Entry<?>> configEntries = new HashMap<>();
 	
 	private ConfigKeeper() {}
 	
@@ -100,7 +99,7 @@ public final class ConfigKeeper {
 
 		@Override
 		public void fromString(String value) {
-			setValue(value.equals("true") ? true : false);
+			setValue(value.equals("true"));
 		}
 
 	}
@@ -277,15 +276,12 @@ public final class ConfigKeeper {
 		}
 		
 		@SuppressWarnings("unchecked")
-		public boolean setValue(String name) {
+		public void setValue(String name) {
 			try {
 				this.setter.accept((T) Enum.valueOf(this.defaultValue.getClass(), name));
-				return true;
 			} catch(IllegalArgumentException ex) {
 				JustMap.LOGGER.catching(ex);
 			}
-			
-			return false;
 		}
 		
 		@Override

@@ -1,17 +1,17 @@
 package ru.bulldog.justmap.client.control;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.minecraft.client.option.KeyBinding;
+import org.lwjgl.glfw.GLFW;
+
 import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.client.config.ConfigFactory;
 import ru.bulldog.justmap.client.screen.WaypointsListScreen;
 import ru.bulldog.justmap.client.screen.WorldmapScreen;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import org.lwjgl.glfw.GLFW;
 
 public final class KeyHandler {
 	

@@ -4,7 +4,6 @@ import java.util.function.Supplier;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.option.GameOptions;
@@ -32,8 +31,8 @@ import ru.bulldog.justmap.server.JustMapServer;
 import ru.bulldog.justmap.util.math.MathUtil;
 
 public class DataUtil {
-	private static BlockPos.Mutable currentPos = new BlockPos.Mutable();
-	private static DynamicRegistryManager registryManager = DynamicRegistryManager.create();
+	private static final BlockPos.Mutable currentPos = new BlockPos.Mutable();
+	private static final DynamicRegistryManager registryManager = DynamicRegistryManager.create();
 	private static ClientWorld clientWorld = null;
 	private static ServerWorld serverWorld = null;
 	private static Supplier<PersistentStateManager> persistentSupplier = null;

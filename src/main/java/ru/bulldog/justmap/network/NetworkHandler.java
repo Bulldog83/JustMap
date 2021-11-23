@@ -2,10 +2,8 @@ package ru.bulldog.justmap.network;
 
 import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GenericFutureListener;
-
 import net.fabricmc.fabric.api.network.ClientSidePacketRegistry;
 import net.fabricmc.fabric.api.network.ServerSidePacketRegistry;
-
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.Packet;
 import net.minecraft.util.Identifier;
@@ -43,7 +41,7 @@ public class NetworkHandler {
 		sendToServer(packet, null);
 	}
 	
-	public static enum PacketType {
+	public enum PacketType {
 		SLIME_CHUNK_PACKET,
 		GET_IMAGE_PACKET;
 		

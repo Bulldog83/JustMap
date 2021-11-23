@@ -4,6 +4,7 @@ import java.util.Arrays;
 
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
+
 import ru.bulldog.justmap.map.data.RegionPos;
 
 public class Point {

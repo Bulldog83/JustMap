@@ -5,6 +5,12 @@ import java.util.Map;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import net.minecraft.client.texture.NativeImage;
+import net.minecraft.client.texture.NativeImageBackedTexture;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.JsonHelper;
+import net.minecraft.util.math.BlockPos;
 
 import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.map.data.WorldKey;
@@ -16,12 +22,6 @@ import ru.bulldog.justmap.util.colors.Colors;
 import ru.bulldog.justmap.util.math.RandomUtil;
 import ru.bulldog.justmap.util.render.Image;
 import ru.bulldog.justmap.util.render.RenderUtil;
-import net.minecraft.client.texture.NativeImage;
-import net.minecraft.client.texture.NativeImageBackedTexture;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.JsonHelper;
-import net.minecraft.util.math.BlockPos;
 
 public class Waypoint {
 	
@@ -198,7 +198,7 @@ public class Waypoint {
 			this.color = color;
 		}
 		
-		private Icon(int key, Identifier icon, NativeImage texture, int color, int w, int h) {
+		private Icon(int key, Identifier icon, NativeImage texture, int color) {
 			super(icon, texture);
 			this.key = key;
 			this.color = color;
@@ -214,7 +214,7 @@ public class Waypoint {
 			texture.copyFrom(DEFAULT_TEXTURE);
 			ImageUtil.applyColor(texture, color);
 			
-			Icon icon = new Icon(-1, DEFAULT_ICON, texture, color, 18, 18);
+			Icon icon = new Icon(-1, DEFAULT_ICON, texture, color);
 			coloredIcons.put(color, icon);
 			
 			return icon;

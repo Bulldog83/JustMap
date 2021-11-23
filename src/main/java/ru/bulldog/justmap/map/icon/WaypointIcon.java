@@ -1,9 +1,9 @@
 package ru.bulldog.justmap.map.icon;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.util.math.MatrixStack;
+
 import ru.bulldog.justmap.client.config.ClientSettings;
 import ru.bulldog.justmap.map.IMap;
 import ru.bulldog.justmap.map.minimap.Minimap;
@@ -20,7 +20,7 @@ public class WaypointIcon extends MapIcon<WaypointIcon> {
 	public final Waypoint waypoint;
 	private final IMap map;
 	
-	private int iconSize = 8;
+	private final int iconSize = 8;
 	private float lastRotation;
 	private float offX;
 	private float offY;

@@ -3,18 +3,17 @@ package ru.bulldog.justmap.map;
 import java.util.HashMap;
 import java.util.Map;
 
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.world.GameRules;
+import net.minecraft.world.GameRules.Key;
+
 import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.mixins.BooleanRuleAccessor;
 import ru.bulldog.justmap.mixins.GameRulesAccessor;
 import ru.bulldog.justmap.server.JustMapServer;
-
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
-
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.world.GameRules;
-import net.minecraft.world.GameRules.Key;
-import net.minecraft.server.MinecraftServer;
 
 public class MapGameRules {
 
@@ -36,7 +35,7 @@ public class MapGameRules {
 		return GameRulesAccessor.callRegister(name, GameRules.Category.MISC, BooleanRuleAccessor.callCreate(defaultValue));
 	}
 	
-	private static Map<String, Key<GameRules.BooleanRule>> codes;
+	private static final Map<String, Key<GameRules.BooleanRule>> codes;
 	
 	static {
 		codes = new HashMap<>();
@@ -89,7 +88,7 @@ public class MapGameRules {
 		codes.forEach((key, rule) -> {
 			if (command.contains(key)) {
 				int valPos = command.indexOf(key) + 2;
-				boolean value = command.substring(valPos, valPos + 2).equals("§1");
+				boolean value = command.startsWith("§1", valPos);
 				gameRules.get(rule).set(value, server);
 				JustMap.LOGGER.info("Map rule {} switched to: {}", rule, value);
 			}

@@ -8,8 +8,8 @@ import java.util.Random;
 import ru.bulldog.justmap.util.math.MathUtil;
 
 public class ColorExtractor {
-	private List<Center> centers = new ArrayList<>();
-	private List<Integer> colors;
+	private final List<Center> centers = new ArrayList<>();
+	private final List<Integer> colors;
 	private Integer result;
 	
 	public ColorExtractor(List<Integer> colors) {
@@ -62,8 +62,8 @@ public class ColorExtractor {
 				red += center.r * weight;
 				green += center.g * weight;
 				blue += center.b * weight;
-			};
-			
+			}
+
 			int a = (int) Math.round(alpha / weights);
 			int r = (int) Math.round(red / weights);
 			int g = (int) Math.round(green / weights);
@@ -101,7 +101,7 @@ public class ColorExtractor {
 			}
 		};
 		
-		List<Integer> colors = new ArrayList<>();
+		final List<Integer> colors = new ArrayList<>();
 		double a, r, g, b;
 		
 		Center(int color) {

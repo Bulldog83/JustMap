@@ -1,33 +1,31 @@
 package ru.bulldog.justmap.map.data.classic;
 
-import ru.bulldog.justmap.client.config.ClientSettings;
-import ru.bulldog.justmap.client.screen.WorldmapScreen;
-import ru.bulldog.justmap.map.data.MapRegion;
-import ru.bulldog.justmap.map.data.classic.event.ChunkUpdateEvent;
-import ru.bulldog.justmap.map.data.classic.event.ChunkUpdateListener;
-import ru.bulldog.justmap.map.IMap;
-import ru.bulldog.justmap.map.data.MapRegionProvider;
-import ru.bulldog.justmap.map.data.Layer;
-import ru.bulldog.justmap.map.data.RegionPos;
-import ru.bulldog.justmap.util.DataUtil;
-import ru.bulldog.justmap.util.math.MathUtil;
+import java.util.HashMap;
+import java.util.Map;
 
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.WorldChunk;
 
-import java.util.HashMap;
-import java.util.Map;
+import ru.bulldog.justmap.client.config.ClientSettings;
+import ru.bulldog.justmap.client.screen.WorldmapScreen;
+import ru.bulldog.justmap.map.IMap;
+import ru.bulldog.justmap.map.data.Layer;
+import ru.bulldog.justmap.map.data.MapRegion;
+import ru.bulldog.justmap.map.data.MapRegionProvider;
+import ru.bulldog.justmap.map.data.RegionPos;
+import ru.bulldog.justmap.map.data.classic.event.ChunkUpdateEvent;
+import ru.bulldog.justmap.map.data.classic.event.ChunkUpdateListener;
+import ru.bulldog.justmap.util.DataUtil;
+import ru.bulldog.justmap.util.math.MathUtil;
 
 public class WorldData implements MapRegionProvider {
-	private World world;
+	private final World world;
 	private final ChunkDataManager chunkManager;
 	private final Map<RegionPos, RegionData> regions;
 	private long lastPurged = 0;
-	private long purgeDelay = 1000;
-	private int purgeAmount = 500;
-	
+
 	public WorldData(World world) {
 		this.regions = new HashMap<>();
 		this.chunkManager = new ChunkDataManager(this, world);
@@ -157,8 +155,8 @@ public class WorldData implements MapRegionProvider {
 	}
 	
 	public void clearCache() {
-		this.purgeDelay = ClientSettings.purgeDelay * 1000;
-		this.purgeAmount = ClientSettings.purgeAmount;
+		long purgeDelay = ClientSettings.purgeDelay * 1000;
+		int purgeAmount = ClientSettings.purgeAmount;
 		
 		long currentTime = System.currentTimeMillis();
 		if (currentTime - lastPurged > purgeDelay) {

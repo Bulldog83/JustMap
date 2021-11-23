@@ -3,16 +3,15 @@ package ru.bulldog.justmap.client.render;
 import java.util.List;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gl.Framebuffer;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.util.math.MatrixStack;
-
 import net.minecraft.util.math.Matrix4f;
 import net.minecraft.util.math.Vec3f;
+
 import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.client.config.ClientSettings;
 import ru.bulldog.justmap.map.ChunkGrid;
@@ -42,8 +41,8 @@ public class BufferedMiniMapRenderer extends AbstractMiniMapRenderer {
 			double scale = minecraft.getWindow().getScaleFactor();
 			int scaledW = (int) (imgW * scale);
 			int scaledH = (int) (imgH * scale);
-			this.primaryFramebuffer = new ExtendedFramebuffer(scaledW, scaledH, false);
-			this.secondaryFramebuffer = new ExtendedFramebuffer(scaledW, scaledH, false);
+			this.primaryFramebuffer = new ExtendedFramebuffer(false);
+			this.secondaryFramebuffer = new ExtendedFramebuffer(false);
 			this.loadedFBO = (this.primaryFramebuffer.fbo != -1 && this.secondaryFramebuffer.fbo != -1);
 		}
 		this.triedFBO = true;
@@ -219,8 +218,8 @@ public class BufferedMiniMapRenderer extends AbstractMiniMapRenderer {
 	private void drawEntities(MatrixStack matrices, VertexConsumerProvider.Immediate consumerProvider) {
 		float halfW = imgW / 2.0F;
 		float halfH = imgH / 2.0F;
-		int iconX = (int) (imgW - mapWidth);
-		int iconY = (int) (imgH - mapHeight);
+		int iconX = imgW - mapWidth;
+		int iconY = imgH - mapHeight;
 		List<MapIcon<?>> drawableEntities = minimap.getDrawableIcons(lastX, lastZ, halfW, halfH, delta);
 		for (MapIcon<?> icon : drawableEntities) {
 			icon.draw(matrices, consumerProvider, iconX, iconY, mapWidth, mapHeight, rotation);

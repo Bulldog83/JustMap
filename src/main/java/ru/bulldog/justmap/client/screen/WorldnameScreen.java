@@ -1,9 +1,6 @@
 package ru.bulldog.justmap.client.screen;
 
-import org.lwjgl.glfw.GLFW;
-
 import com.mojang.blaze3d.systems.RenderSystem;
-
 import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.screen.Screen;
@@ -13,6 +10,7 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
+import org.lwjgl.glfw.GLFW;
 
 import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.map.data.MapDataProvider;
@@ -100,13 +98,11 @@ public class WorldnameScreen extends Screen {
 	
 	@Override
 	public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-		switch (keyCode) {
-			case GLFW.GLFW_KEY_ENTER:
-				this.onPressSave(null);
-				return true;
-		  	default:
-		  		return super.keyPressed(keyCode, scanCode, modifiers);
+		if (keyCode == GLFW.GLFW_KEY_ENTER) {
+			this.onPressSave(null);
+			return true;
 		}
+		return super.keyPressed(keyCode, scanCode, modifiers);
 	}
 
 	@Override

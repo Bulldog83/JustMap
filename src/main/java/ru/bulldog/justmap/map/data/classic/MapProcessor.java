@@ -1,15 +1,15 @@
 package ru.bulldog.justmap.map.data.classic;
 
-import ru.bulldog.justmap.client.config.ClientSettings;
-import ru.bulldog.justmap.map.data.Layer;
-import ru.bulldog.justmap.util.StateUtil;
-
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.Heightmap;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.WorldChunk;
+
+import ru.bulldog.justmap.client.config.ClientSettings;
+import ru.bulldog.justmap.map.data.Layer;
+import ru.bulldog.justmap.util.StateUtil;
 
 public class MapProcessor {
 	

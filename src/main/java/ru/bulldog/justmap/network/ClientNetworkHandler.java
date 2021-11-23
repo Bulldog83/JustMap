@@ -7,7 +7,6 @@ import java.util.function.Consumer;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.c2s.play.CustomPayloadC2SPacket;
 import net.minecraft.util.math.ChunkPos;
@@ -16,7 +15,7 @@ import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.map.data.RegionPos;
 
 public class ClientNetworkHandler extends NetworkHandler {
-	private Map<Integer, Consumer<?>> responseListeners = new HashMap<>();
+	private final Map<Integer, Consumer<?>> responseListeners = new HashMap<>();
 	private boolean serverReady = false;
 	private Random random;
 	

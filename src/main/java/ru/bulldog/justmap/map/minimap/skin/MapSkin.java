@@ -6,14 +6,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-
-import ru.bulldog.justmap.JustMap;
-import ru.bulldog.justmap.client.config.ClientSettings;
-import ru.bulldog.justmap.map.minimap.Minimap;
-import ru.bulldog.justmap.util.ImageUtil;
-import ru.bulldog.justmap.util.render.Image;
-import ru.bulldog.justmap.util.render.RenderUtil;
-
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
@@ -25,9 +17,16 @@ import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
+import ru.bulldog.justmap.JustMap;
+import ru.bulldog.justmap.client.config.ClientSettings;
+import ru.bulldog.justmap.map.minimap.Minimap;
+import ru.bulldog.justmap.util.ImageUtil;
+import ru.bulldog.justmap.util.render.Image;
+import ru.bulldog.justmap.util.render.RenderUtil;
+
 @Environment(EnvType.CLIENT)
 public class MapSkin extends Image {	
-	public static enum SkinType {
+	public enum SkinType {
 		UNIVERSAL,
 		SQUARE,
 		ROUND
@@ -188,15 +187,13 @@ public class MapSkin extends Image {
 	}
 	
 	public static List<MapSkin> getSquareSkins() {
-		return Collections.unmodifiableList(SKINS.stream()
-												 .filter(MapSkin::isSquare)
-												 .collect(Collectors.toList()));
+		return SKINS.stream()
+				.filter(MapSkin::isSquare).collect(Collectors.toUnmodifiableList());
 	}
 	
 	public static List<MapSkin> getRoundSkins() {
-		return Collections.unmodifiableList(SKINS.stream()
-												 .filter(MapSkin::isRound)
-												 .collect(Collectors.toList()));
+		return SKINS.stream()
+				.filter(MapSkin::isRound).collect(Collectors.toUnmodifiableList());
 	}
 	
 	public static MapSkin getCurrentSkin() {

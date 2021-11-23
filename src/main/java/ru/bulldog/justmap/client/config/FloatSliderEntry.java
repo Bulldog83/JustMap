@@ -8,9 +8,7 @@ import java.util.function.Supplier;
 
 import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.AtomicDouble;
-
 import me.shedaniel.clothconfig2.gui.entries.TooltipListEntry;
-
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.Element;
@@ -27,16 +25,16 @@ import net.minecraft.util.math.MathHelper;
 
 public class FloatSliderEntry extends TooltipListEntry<Float> {
 
-	protected Slider sliderWidget;
-	protected ButtonWidget resetButton;
-	protected AtomicDouble value;
+	protected final Slider sliderWidget;
+	protected final ButtonWidget resetButton;
+	protected final AtomicDouble value;
 	protected final float orginial;
 	private float minimum, maximum;
-	private Consumer<Float> saveConsumer;
-	private Supplier<Float> defaultValue;
+	private final Consumer<Float> saveConsumer;
+	private final Supplier<Float> defaultValue;
 	private Function<Float, Text> textGetter = value -> new LiteralText(String.format("Value: %.1f", value));
-	private List<ClickableWidget> widgets;
-	private TextRenderer textRenderer;
+	private final List<ClickableWidget> widgets;
+	private final TextRenderer textRenderer;
 	
 	@Deprecated
 	public FloatSliderEntry(Text fieldName, float minimum, float maximum, float value, Text resetButtonKey, Supplier<Float> defaultValue, Consumer<Float> saveConsumer) {
@@ -59,7 +57,7 @@ public class FloatSliderEntry extends TooltipListEntry<Float> {
 		this.saveConsumer = saveConsumer;
 		this.maximum = maximum;
 		this.minimum = minimum;
-		this.sliderWidget = new Slider(0, 0, 152, 20, ((double) this.value.get() - minimum) / Math.abs(maximum - minimum));
+		this.sliderWidget = new Slider(0, 0, 152, 20, (this.value.get() - minimum) / Math.abs(maximum - minimum));
 		int width = textRenderer.getWidth(resetButtonKey);
 		this.resetButton = new ButtonWidget(0, 0, width + 6, 20, resetButtonKey, widget -> {
 			setValue(defaultValue.get());
@@ -78,10 +76,9 @@ public class FloatSliderEntry extends TooltipListEntry<Float> {
 		return textGetter;
 	}
 	
-	public FloatSliderEntry setTextGetter(Function<Float, Text> textGetter) {
+	public void setTextGetter(Function<Float, Text> textGetter) {
 		this.textGetter = textGetter;
 		this.sliderWidget.setMessage(textGetter.apply((float) FloatSliderEntry.this.value.get()));
-		return this;
 	}
 	
 	@Override

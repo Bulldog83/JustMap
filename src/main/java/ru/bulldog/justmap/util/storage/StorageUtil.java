@@ -4,12 +4,9 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 
-import org.apache.commons.io.FileUtils;
-
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.loader.api.FabricLoader;
-
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ServerInfo;
 import net.minecraft.server.MinecraftServer;
@@ -17,6 +14,7 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.World;
 import net.minecraft.world.storage.VersionedChunkStorage;
+import org.apache.commons.io.FileUtils;
 
 import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.map.data.MapDataProvider;
@@ -49,7 +47,7 @@ public final class StorageUtil {
 	}
 	
 	public static File savesDir(ServerWorld world) {
-		if (world == null || !(world instanceof ServerWorld)) return null;
+		if (!(world instanceof ServerWorld)) return null;
 		return ((SessionAccessor) world.getServer()).getServerSession().getWorldDirectory(world.getRegistryKey());
 	}
 	

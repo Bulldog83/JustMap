@@ -3,7 +3,6 @@ package ru.bulldog.justmap.util.colors;
 import java.util.Map;
 
 import com.google.common.collect.Maps;
-
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;

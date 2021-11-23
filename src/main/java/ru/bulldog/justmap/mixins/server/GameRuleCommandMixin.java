@@ -1,12 +1,6 @@
 package ru.bulldog.justmap.mixins.server;
 
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-
 import com.mojang.brigadier.context.CommandContext;
-
 import net.minecraft.network.MessageType;
 import net.minecraft.network.packet.s2c.play.GameMessageS2CPacket;
 import net.minecraft.server.command.GameRuleCommand;
@@ -16,6 +10,11 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Util;
 import net.minecraft.world.GameRules;
 import net.minecraft.world.GameRules.BooleanRule;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+
 import ru.bulldog.justmap.server.config.ServerSettings;
 
 @Mixin(GameRuleCommand.class)
@@ -24,7 +23,7 @@ public abstract class GameRuleCommandMixin {
 	@Inject(method = "executeSet", at = @At("RETURN"))
 	private static <T extends GameRules.Rule<T>> void executeSet(CommandContext<ServerCommandSource> commandContext, GameRules.Key<T> Key, CallbackInfoReturnable<Integer> cir) {
 		if (ServerSettings.useGameRules) {
-			ServerCommandSource serverCommandSource = (ServerCommandSource)commandContext.getSource();
+			ServerCommandSource serverCommandSource = commandContext.getSource();
 			T rule = serverCommandSource.getServer().getGameRules().get(Key);
 			
 			if (rule instanceof BooleanRule) {

@@ -12,7 +12,7 @@ public class MapPlayerManager {
 
 	private MapPlayerManager() {}
 	
-	private static Map<UUID, MapPlayer> players = new HashMap<>();
+	private static final Map<UUID, MapPlayer> players = new HashMap<>();
 	
 	public static MapPlayer getPlayer(PlayerEntity player) {
 		UUID id = player.getUuid();

@@ -1,21 +1,21 @@
 package ru.bulldog.justmap.client.widget;
 
+import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
+import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.client.sound.SoundManager;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.LiteralText;
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.widget.ClickableWidget;
 
 
 public class TitledButtonWidget<W extends ClickableWidget> extends ClickableWidget implements Element {
 	public final W widget;
 	public final LiteralText title;
 	private final TextRenderer font;
-	
-	private int spacing = 3;
-	
+
+	private final static int SPACING = 3;
+
 	public TitledButtonWidget(TextRenderer font, W widget, int x, int y, int width, int height, String message, String title) {
 		super(x, y, width, height, new LiteralText(message));
 		this.widget = widget;
@@ -29,8 +29,8 @@ public class TitledButtonWidget<W extends ClickableWidget> extends ClickableWidg
 		int titleWidth = font.getWidth(title);
 		int widgetWidth = widget.getWidth();
 		int wx = x + width - widgetWidth;
-		if (x + titleWidth + spacing > wx) {
-			wx = x + titleWidth + spacing;
+		if (x + titleWidth + SPACING > wx) {
+			wx = x + titleWidth + SPACING;
 			widget.setWidth((x + width) - wx);
 		}
 		

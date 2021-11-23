@@ -2,7 +2,6 @@ package ru.bulldog.justmap.map;
 
 import com.google.common.collect.ImmutableMap;
 import com.mojang.blaze3d.systems.RenderSystem;
-
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.Tessellator;
@@ -11,11 +10,11 @@ import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.resource.metadata.AnimationResourceMetadata;
 import net.minecraft.client.texture.Sprite;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Matrix3f;
 import net.minecraft.util.math.Matrix4f;
 import net.minecraft.util.math.Vec3f;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.Identifier;
 
 import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.client.config.ClientSettings;
@@ -31,12 +30,8 @@ public class DirectionArrow extends Sprite {
 	private DirectionArrow(Identifier texture, int w, int h) {
 		super(SpriteAtlas.MAP_ICONS, new Sprite.Info(texture, w, h, AnimationResourceMetadata.EMPTY), 0, w, h, 0, 0, ImageUtil.loadImage(texture, w, h));
 	}
-	
-	public static void draw(int x, int y, float rotation) {
-		draw(x, y, 14, rotation);
-	}
-	
-	public static void draw(double x, double y, int size, float rotation) {		
+
+	public static void draw(double x, double y, int size, float rotation) {
 		if (!ClientSettings.simpleArrow) {
 			if (ARROW == null) {
 				ARROW = new DirectionArrow(new Identifier(JustMap.MODID, "textures/icon/player_arrow.png"), 20, 20);

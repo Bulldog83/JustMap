@@ -9,18 +9,18 @@ import ru.bulldog.justmap.util.StateUtil;
 
 public class ChunkLevel {
 	
-	int[] statemap;
-	int[] heightmap;
-	int[] colormap;
-	int[] levelmap;
-	int[] topomap;
+	final int[] statemap;
+	final int[] heightmap;
+	final int[] colormap;
+	final int[] levelmap;
+	final int[] topomap;
 	
 	boolean updating = false;
-	long updated = 0;
+	final long updated = 0;
 	long refreshed = 0;
-	int level;
+	final int level;
 	
-	private Object arrayLock = new Object();
+	private final Object arrayLock = new Object();
 	
 	ChunkLevel(int level) {
 		this.statemap = new int[256];

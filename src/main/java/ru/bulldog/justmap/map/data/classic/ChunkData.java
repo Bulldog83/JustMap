@@ -1,5 +1,18 @@
 package ru.bulldog.justmap.map.data.classic;
 
+import java.lang.ref.SoftReference;
+import java.util.Arrays;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
+import net.minecraft.block.BlockState;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.ChunkPos;
+import net.minecraft.world.World;
+import net.minecraft.world.chunk.WorldChunk;
+import net.minecraft.world.gen.ChunkRandom;
+
 import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.client.config.ClientSettings;
 import ru.bulldog.justmap.map.data.Layer;
@@ -11,33 +24,19 @@ import ru.bulldog.justmap.util.colors.Colors;
 import ru.bulldog.justmap.util.math.MathUtil;
 import ru.bulldog.justmap.util.tasks.TaskManager;
 
-import net.minecraft.world.World;
-import net.minecraft.block.BlockState;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.world.chunk.WorldChunk;
-import net.minecraft.world.gen.ChunkRandom;
-
-import java.lang.ref.SoftReference;
-import java.util.Arrays;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
 public class ChunkData {
 	
 	public final static ChunkLevel EMPTY_LEVEL = new ChunkLevel(-1);
 	
 	private final static TaskManager chunkUpdater = TaskManager.getManager("chunk-updater", 2);
-	private static ClientNetworkHandler networkHandler = JustMapClient.getNetworkHandler();
+	private static final ClientNetworkHandler networkHandler = JustMapClient.getNetworkHandler();
 	
 	private final WorldData mapData;
 	private final Map<Layer, ChunkLevel[]> levels = new ConcurrentHashMap<>();
 	private final ChunkPos chunkPos;
-	private World world;
+	private final World world;
 	private SoftReference<WorldChunk> worldChunk;
 	private boolean outdated = false;
-	private boolean purged = false;
 	private boolean slime = false;
 	private boolean saved = true;
 	private long refreshed = 0;
@@ -46,13 +45,8 @@ public class ChunkData {
 	public long updated = 0;
 	public long requested = 0;
 	
-	private Object levelLock = new Object();
-	
-	public ChunkData(WorldData data, WorldChunk lifeChunk) {
-		this(data, lifeChunk.getPos());
-		this.updateWorldChunk(lifeChunk);
-	}
-	
+	private final Object levelLock = new Object();
+
 	public ChunkData(WorldData data, ChunkPos pos) {
 		this.mapData = data;
 		this.world = data.getWorld();
@@ -173,7 +167,7 @@ public class ChunkData {
 
 	public boolean updateChunkArea(Layer layer, int level, boolean forceUpdate, int x, int z, int width, int height) {
 		if (!JustMapClient.canMapping()) return false;
-		if (purged || checkUpdating(layer, level)) return false;
+		if (checkUpdating(layer, level)) return false;
 		if (!outdated && forceUpdate) {
 			this.outdated = forceUpdate;
 		}

@@ -4,7 +4,6 @@ import java.io.File;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
-
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.texture.NativeImageBackedTexture;
@@ -40,7 +39,7 @@ public final class SkinLoader extends JsonFactory {
 		}
 	}
 	
-	private static void loadSkin(File folder, File skinFile) throws Exception {
+	private static void loadSkin(File folder, File skinFile) {
 		JsonObject skinData = getJsonObject(skinFile);
 		String name = JsonHelper.getString(skinData, "name");
 		int width = JsonHelper.getInt(skinData, "width");

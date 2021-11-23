@@ -4,13 +4,6 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
-import ru.bulldog.justmap.client.config.ClientSettings;
-import ru.bulldog.justmap.util.ImageUtil;
-import ru.bulldog.justmap.util.colors.Colors;
-import ru.bulldog.justmap.util.render.Image;
-import ru.bulldog.justmap.util.render.RenderUtil;
-import ru.bulldog.justmap.util.storage.StorageUtil;
-
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.texture.NativeImageBackedTexture;
 import net.minecraft.client.util.math.MatrixStack;
@@ -19,6 +12,13 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.entity.passive.TameableEntity;
 import net.minecraft.util.Identifier;
+
+import ru.bulldog.justmap.client.config.ClientSettings;
+import ru.bulldog.justmap.util.ImageUtil;
+import ru.bulldog.justmap.util.colors.Colors;
+import ru.bulldog.justmap.util.render.Image;
+import ru.bulldog.justmap.util.render.RenderUtil;
+import ru.bulldog.justmap.util.storage.StorageUtil;
 
 public class EntityHeadIcon extends Image {
 	
@@ -47,7 +47,7 @@ public class EntityHeadIcon extends Image {
 	private final Identifier id;
 	private Identifier outlineId;
 	private int color = Colors.LIGHT_GRAY;
-	private boolean solid;
+	private final boolean solid;
 	
 	private EntityHeadIcon(Identifier id, Identifier texture, int w, int h) {
 		this(id, texture, ImageUtil.loadImage(texture, w, h));
