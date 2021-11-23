@@ -34,7 +34,7 @@ public class ChunkUpdateListener {
 			updateQueue.clear();
 			return;
 		}
-		while(!updateQueue.isEmpty()) {
+		while (!updateQueue.isEmpty()) {
 			ChunkUpdateEvent event = updateQueue.poll();
 			if (event == null) break;
 			event.mapChunk.updateWorldChunk(event.worldChunk);

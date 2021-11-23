@@ -82,7 +82,7 @@ public class FastMiniMapRenderer extends AbstractMiniMapRenderer {
 		int cornerZ = lastZ - scaledH / 2;
 
 		int picX = 0;
-		while(picX < scaledW) {
+		while (picX < scaledW) {
 			int texW = 512;
 			if (picX + texW > scaledW) texW = scaledW - picX;
 

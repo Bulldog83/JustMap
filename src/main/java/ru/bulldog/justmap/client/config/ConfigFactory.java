@@ -44,11 +44,11 @@ public final class ConfigFactory {
 
 		EnumEntry<ScreenPosition> drawPosConfig = modConfig.getEntry("map_position");
 		EnumSelectorBuilder<ScreenPosition> drawPosEntry = entryBuilder.startEnumSelector(lang("map_position"), ScreenPosition.class, drawPosConfig.getValue());
-		drawPosEntry.setSaveConsumer(val -> drawPosConfig.setValue(val))
+		drawPosEntry.setSaveConsumer(drawPosConfig::setValue)
 					.setDefaultValue(drawPosConfig.getDefault());
 		EnumEntry<MultiworldDetection> mwDetectConfig = modConfig.getEntry("multiworld_detection");
 		EnumSelectorBuilder<MultiworldDetection> mwDetectEntry = entryBuilder.startEnumSelector(lang("multiworld_detection_type"), MultiworldDetection.class, mwDetectConfig.getValue());
-		mwDetectEntry.setSaveConsumer(val -> mwDetectConfig.setValue(val))
+		mwDetectEntry.setSaveConsumer(mwDetectConfig::setValue)
 					 .setDefaultValue(mwDetectConfig.getDefault());
 
 		MinecraftClient minecraft = MinecraftClient.getInstance();
@@ -69,9 +69,7 @@ public final class ConfigFactory {
 				.setSaveConsumer(val -> modConfig.setInt("map_position_y", val))
 				.setDefaultValue((int) modConfig.getDefault("map_position_y"))
 				.build());
-		general.addEntry(entryBuilder.startDropdownMenu(lang("map_size"), modConfig.getInt("map_size"), (val) -> {
-					return getIntValue(val, modConfig.getDefault("map_size"));
-				})
+		general.addEntry(entryBuilder.startDropdownMenu(lang("map_size"), modConfig.getInt("map_size"), (val) -> getIntValue(val, modConfig.getDefault("map_size")))
 				.setSaveConsumer(val -> modConfig.setRanged("map_size", val))
 				.setDefaultValue((int) modConfig.getDefault("map_size"))
 				.setSelections(Arrays.asList(32, 64, 96, 128, 160, 192, 224, 256))
@@ -80,9 +78,7 @@ public final class ConfigFactory {
 				.setSaveConsumer(val -> modConfig.setBoolean("show_big_map", val))
 				.setDefaultValue((boolean) modConfig.getDefault("show_big_map"))
 				.build());
-		general.addEntry(entryBuilder.startDropdownMenu(lang("big_map_size"), modConfig.getInt("big_map_size"), (val) -> {
-					return getIntValue(val, modConfig.getDefault("big_map_size"));
-				})
+		general.addEntry(entryBuilder.startDropdownMenu(lang("big_map_size"), modConfig.getInt("big_map_size"), (val) -> getIntValue(val, modConfig.getDefault("big_map_size")))
 				.setSaveConsumer(val -> modConfig.setRanged("big_map_size", val))
 				.setDefaultValue((int) modConfig.getDefault("big_map_size"))
 				.setSelections(Arrays.asList(256, 272, 288, 304, 320, 336, 352, 368, 384, 400))
@@ -153,11 +149,11 @@ public final class ConfigFactory {
 
 		EnumEntry<ArrowType> arrowTypeConfig = modConfig.getEntry("arrow_type");
 		EnumSelectorBuilder<ArrowType> arrowTypeEntry = entryBuilder.startEnumSelector(lang("arrow_type"), ArrowType.class, arrowTypeConfig.getValue());
-		arrowTypeEntry.setSaveConsumer(val -> arrowTypeConfig.setValue(val))
+		arrowTypeEntry.setSaveConsumer(arrowTypeConfig::setValue)
 					  .setDefaultValue(arrowTypeConfig.getDefault());
 		EnumEntry<MapShape> mapShapeConfig = modConfig.getEntry("map_shape");
 		EnumSelectorBuilder<MapShape> mapShapeEntry = entryBuilder.startEnumSelector(lang("map_shape"), MapShape.class, mapShapeConfig.getValue());
-		mapShapeEntry.setSaveConsumer(val -> mapShapeConfig.setValue(val))
+		mapShapeEntry.setSaveConsumer(mapShapeConfig::setValue)
 					 .setDefaultValue(mapShapeConfig.getDefault());
 		FloatSliderBuilder doubleSlider = new FloatSliderBuilder(entryBuilder.getResetButtonKey(), lang("skin_border_scale"), modConfig.getFloat("skin_scale"), 0.5F, 3.0F)
 				.setSaveConsumer(val -> modConfig.setRanged("skin_scale", val))
@@ -426,7 +422,7 @@ public final class ConfigFactory {
 
 	private static int getIntValue(String value, int defVal) {
 		try {
-			return Integer.valueOf(value);
+			return Integer.parseInt(value);
 		} catch (NumberFormatException ex) {
 			return defVal;
 		}

@@ -49,9 +49,7 @@ public class DataUtil {
 		if (minecraft.isIntegratedServerRunning()) {
 			MinecraftServer server = minecraft.getServer();
 			serverWorld = minecraft.getServer().getWorld(world.getRegistryKey());
-			persistentSupplier = () -> {
-				return server.getOverworld().getPersistentStateManager();
-			};
+			persistentSupplier = () -> server.getOverworld().getPersistentStateManager();
 		} else {
 			serverWorld = null;
 			persistentSupplier = null;

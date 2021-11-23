@@ -59,9 +59,7 @@ public class ChunkData {
 				this.slime = ChunkRandom.getSlimeRandom(chunkPos.x, chunkPos.z,
 						serverWorld.getSeed(), 987234911L).nextInt(10) == 0;
 			} else if (networkHandler.canRequestData()) {
-				networkHandler.requestChunkHasSlime(chunkPos, result -> {
-					this.slime = result;
-				});
+				networkHandler.requestChunkHasSlime(chunkPos, result -> this.slime = result);
 			}
 		}
 		if (Dimension.isNether(world)) {
@@ -251,7 +249,8 @@ public class ChunkData {
 			chunkLevel.setBlockState(x, z, worldState);
 
 			int height = layer.height;
-			int bottom = 0, baseHeight = 0;
+			int bottom;
+			int baseHeight;
 			if (layer == Layer.NETHER) {
 				bottom = level * height;
 				baseHeight = 128;
@@ -296,7 +295,7 @@ public class ChunkData {
 		if (color != -1) {
 			int heightDiff = chunkLevel.levelmap[index];
 			float topoLevel = chunkLevel.topomap[index] / 100F;
-			color = ColorUtil.proccessColor(color, heightDiff, topoLevel);
+			color = ColorUtil.processColor(color, heightDiff, topoLevel);
 			if (ClientSettings.showTopography) {
 				return MathUtil.isOdd(chunkLevel.sampleHeightmap(index)) ?
 						ColorUtil.colorBrigtness(color, -0.6F) : color;

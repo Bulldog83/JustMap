@@ -159,7 +159,7 @@ public class WaypointsListScreen extends AbstractMapScreen {
 			}
 		});
 		this.center = width / 2;
-		this.screenWidth = center > 480 ? center : width > 480 ? 480 : width;
+		this.screenWidth = center > 480 ? center : Math.min(width, 480);
 		this.x = center - screenWidth / 2;
 		this.prevDimensionButton = new ButtonWidget(x + 10, 6, 20, 20, new LiteralText("<"), (b) -> cycleDimension(-1));
 		this.nextDimensionButton = new ButtonWidget(x + screenWidth - 30, 6, 20, 20, new LiteralText(">"), (b) -> cycleDimension(1));

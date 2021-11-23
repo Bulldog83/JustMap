@@ -4,7 +4,7 @@ public class Line {
 	public final Point first;
 	public final Point second;
 
-	private double lenght;
+	private double length;
 
 	public static double length(double sx, double sy, double ex, double ey) {
 		return Math.sqrt(MathUtil.pow2(ex - sx) + MathUtil.pow2(ey - sy));
@@ -18,28 +18,28 @@ public class Line {
 	public Line(Point first, Point second) {
 		this.first = first;
 		this.second = second;
-		this.lenght = first.distance(second);
+		this.length = first.distance(second);
 	}
 
-	public double lenght() {
-		return this.lenght;
+	public double length() {
+		return this.length;
 	}
 
 	public void add(double length) {
-		double len = this.lenght + length;
+		double len = this.length + length;
 
 		if (len <= 0.0) return;
 
-		double cx = second.x + (second.x - first.x) / this.lenght * length;
-		double cy = second.y + (second.y - first.y) / this.lenght * length;
+		double cx = second.x + (second.x - first.x) / this.length * length;
+		double cy = second.y + (second.y - first.y) / this.length * length;
 
 		this.second.x = cx;
 		this.second.y = cy;
-		this.lenght = len;
+		this.length = len;
 	}
 
 	public void add(Line line) {
-		this.add(line.lenght);
+		this.add(line.length);
 	}
 
 	public void subtract(double length) {
@@ -47,11 +47,11 @@ public class Line {
 	}
 
 	public void subtract(Line line) {
-		this.subtract(line.lenght);
+		this.subtract(line.length);
 	}
 
 	public double difference(Line line) {
-		return this.lenght - line.lenght;
+		return this.length - line.length;
 	}
 
 	@Override

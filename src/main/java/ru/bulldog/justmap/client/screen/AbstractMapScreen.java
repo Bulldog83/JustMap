@@ -19,7 +19,7 @@ import ru.bulldog.justmap.util.render.RenderUtil;
 
 public abstract class AbstractMapScreen extends Screen {
 	public static final Identifier DEFAULT_TEXTURE = new Identifier("textures/block/dirt.png");
-	public static final HashMap<String, Pair<String, Identifier>> DIMENSION_INFO = new HashMap<String, Pair<String, Identifier>>() {
+	public static final HashMap<String, Pair<String, Identifier>> DIMENSION_INFO = new HashMap<>() {
 		private static final long serialVersionUID = 1L;
 		{
 			put("minecraft:overworld", new Pair<>(JustMap.MODID + ".dim.overworld", new Identifier("textures/block/stone.png")));

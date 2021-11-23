@@ -49,7 +49,7 @@ public class TaskManager implements Executor {
 			if (manager.isRunning()) {
 				manager.stop();
 				long time = System.currentTimeMillis();
-				while(manager.isRunning()) {
+				while (manager.isRunning()) {
 					long now = System.currentTimeMillis();
 					if (now - time > timeout) {
 						manager.running = false;
@@ -100,9 +100,8 @@ public class TaskManager implements Executor {
 	}
 
 	public void stop() {
-		this.execute("Stopping " + this.name, () -> {
-			this.running = false;
-		});
+		this.execute("Stopping " + this.name, () ->
+			this.running = false);
 	}
 
 	public int queueSize() {

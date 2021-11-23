@@ -52,7 +52,7 @@ public class MapProcessor {
 	}
 
 	private static BlockPos loopPos(WorldChunk worldChunk, BlockPos pos, int stop, boolean liquids, boolean plants) {
-		boolean loop = false;
+		boolean loop;
 		do {
 			loop = StateUtil.checkState(worldChunk.getBlockState(pos), liquids, plants);
 			loop &= pos.getY() > stop;

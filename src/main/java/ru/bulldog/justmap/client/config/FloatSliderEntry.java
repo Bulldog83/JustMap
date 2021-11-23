@@ -28,7 +28,7 @@ public class FloatSliderEntry extends TooltipListEntry<Float> {
 	protected final Slider sliderWidget;
 	protected final ButtonWidget resetButton;
 	protected final AtomicDouble value;
-	protected final float orginial;
+	protected final float original;
 	private float minimum, maximum;
 	private final Consumer<Float> saveConsumer;
 	private final Supplier<Float> defaultValue;
@@ -51,7 +51,7 @@ public class FloatSliderEntry extends TooltipListEntry<Float> {
 		super(fieldName, tooltipSupplier, requiresRestart);
 		MinecraftClient client = MinecraftClient.getInstance();
 		this.textRenderer = client.textRenderer;
-		this.orginial = value;
+		this.original = value;
 		this.defaultValue = defaultValue;
 		this.value = new AtomicDouble(value);
 		this.saveConsumer = saveConsumer;
@@ -59,9 +59,8 @@ public class FloatSliderEntry extends TooltipListEntry<Float> {
 		this.minimum = minimum;
 		this.sliderWidget = new Slider(0, 0, 152, 20, (this.value.get() - minimum) / Math.abs(maximum - minimum));
 		int width = textRenderer.getWidth(resetButtonKey);
-		this.resetButton = new ButtonWidget(0, 0, width + 6, 20, resetButtonKey, widget -> {
-			setValue(defaultValue.get());
-		});
+		this.resetButton = new ButtonWidget(0, 0, width + 6, 20, resetButtonKey, widget ->
+				setValue(defaultValue.get()));
 		this.sliderWidget.setMessage(textGetter.apply((float) FloatSliderEntry.this.value.get()));
 		this.widgets = Lists.newArrayList(sliderWidget, resetButton);
 	}
@@ -95,7 +94,7 @@ public class FloatSliderEntry extends TooltipListEntry<Float> {
 
 	@Override
 	public boolean isEdited() {
-		return super.isEdited() || getValue() != orginial;
+		return super.isEdited() || getValue() != original;
 	}
 
 	@Override

@@ -73,9 +73,9 @@ public class ColorUtil {
 		if (hsbvals == null) {
 			hsbvals = floatBuffer;
 		}
-		int cmax = (r > g) ? r : g;
+		int cmax = Math.max(r, g);
 		if (b > cmax) cmax = b;
-		int cmin = (r < g) ? r : g;
+		int cmin = Math.min(r, g);
 		if (b < cmin) cmin = b;
 
 		brightness = ((float) cmax) / 255.0F;
@@ -157,7 +157,7 @@ public class ColorUtil {
 		}
 
 		int color, shift;
-		if(len == 6) {
+		if (len == 6) {
 			color = 0xFF000000; shift = 16;
 		} else {
 			color = 0; shift = 24;
@@ -235,13 +235,13 @@ public class ColorUtil {
 		if (colors.size() == 0) return -1;
 
 		ColorExtractor extractor = new ColorExtractor(colors);
-		color = extractor.analize();
+		color = extractor.analyze();
 		colorPalette.addTextureColor(state, blockSprite, color);
 
 		return color;
 	}
 
-	public static int proccessColor(int color, int heightDiff, float topoLevel) {
+	public static int processColor(int color, int heightDiff, float topoLevel) {
 		RGBtoHSB((color >> 16) & 255, (color >> 8) & 255, color & 255, floatBuffer);
 		floatBuffer[1] += ClientSettings.mapSaturation / 100.0F;
 		floatBuffer[1] = MathUtil.clamp(floatBuffer[1], 0.0F, 1.0F);
@@ -258,7 +258,7 @@ public class ColorUtil {
 		return HSBtoRGB(floatBuffer[0], floatBuffer[1], floatBuffer[2]);
 	}
 
-	private static int proccessColor(int blockColor, int textureColor, int defaultColor) {
+	private static int processColor(int blockColor, int textureColor, int defaultColor) {
 		blockColor = blockColor == -1 ? defaultColor : blockColor;
 		if (blockColor != -1) {
 			return ColorHelper.multiplyColor(textureColor, blockColor);
@@ -309,20 +309,20 @@ public class ColorUtil {
 
 			Block block = state.getBlock();
 			if (block instanceof VineBlock) {
-				blockColor = proccessColor(blockColor, textureColor, colorProvider.getFoliageColor(world, pos));
+				blockColor = processColor(blockColor, textureColor, colorProvider.getFoliageColor(world, pos));
 			} else if (block instanceof FernBlock || block instanceof TallPlantBlock || block instanceof SugarCaneBlock) {
-				blockColor = proccessColor(blockColor, textureColor, colorProvider.getGrassColor(world, pos));
+				blockColor = processColor(blockColor, textureColor, colorProvider.getGrassColor(world, pos));
 			} else if (block instanceof LilyPadBlock || block instanceof StemBlock || block instanceof AttachedStemBlock) {
-				blockColor = proccessColor(blockColor, textureColor, materialColor);
+				blockColor = processColor(blockColor, textureColor, materialColor);
 				colorPalette.addBlockColor(state, blockColor);
 			} else if (block instanceof FluidBlock) {
 				if (StateUtil.isWater(state)) {
-					blockColor = proccessColor(blockColor, textureColor, colorProvider.getWaterColor(world, pos));
+					blockColor = processColor(blockColor, textureColor, colorProvider.getWaterColor(world, pos));
 				} else {
 					blockColor = fluidColor(world, state, pos, textureColor);
 					colorPalette.addFluidColor(state, blockColor);
 				}
-			} else if (blockColor != -1){
+			} else if (blockColor != -1) {
 				blockColor = ColorHelper.multiplyColor(textureColor, blockColor);
 				if (block.equals(Blocks.BIRCH_LEAVES) || block.equals(Blocks.SPRUCE_LEAVES)) {
 					colorPalette.addBlockColor(state, blockColor);

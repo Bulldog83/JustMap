@@ -47,7 +47,7 @@ public final class StorageUtil {
 	}
 
 	public static File savesDir(ServerWorld world) {
-		if (!(world instanceof ServerWorld)) return null;
+		if (world == null) return null;
 		return ((SessionAccessor) world.getServer()).getServerSession().getWorldDirectory(world.getRegistryKey());
 	}
 
@@ -150,8 +150,8 @@ public final class StorageUtil {
 	}
 
 	private static String scrubFileName(String input) {
-		input = input.replaceAll("[/\\ ]+", "_");
-		input = input.replaceAll("[,:&\"\\|\\<\\>\\?\\*]", "_");
+		input = input.replaceAll("[/ ]+", "_");
+		input = input.replaceAll("[,:&\"|<>?*]", "_");
 
 		return input;
 	}

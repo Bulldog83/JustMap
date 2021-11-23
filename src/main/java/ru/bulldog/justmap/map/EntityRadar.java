@@ -64,7 +64,7 @@ public class EntityRadar {
 					playersToClear.add(player);
 				}
 			});
-			playersToClear.forEach(player -> this.players.remove(player));
+			playersToClear.forEach(this.players::remove);
 		}
 		if (creatures.size() > 0) {
 			List<MobEntity> mobsToClear = new ArrayList<>();
@@ -77,7 +77,7 @@ public class EntityRadar {
 					mobsToClear.add(mob);
 				}
 			});
-			mobsToClear.forEach(mob -> this.creatures.remove(mob));
+			mobsToClear.forEach(this.creatures::remove);
 		}
 	}
 

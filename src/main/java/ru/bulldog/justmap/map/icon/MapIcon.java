@@ -1,6 +1,5 @@
 package ru.bulldog.justmap.map.icon;
 
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.util.math.MatrixStack;
 

@@ -160,7 +160,7 @@ public abstract class AbstractMiniMapRenderer {
 
 			Line radius = new Line(center, pointN);
 			Line corner = new Line(center, new Point(mapX, mapY));
-			int len = (int) (Minimap.isRound() ? radius.lenght() : corner.lenght());
+			int len = (int) (Minimap.isRound() ? radius.length() : corner.length());
 
 			pointN.y = centerY - len;
 			pointS.y = centerY + len;

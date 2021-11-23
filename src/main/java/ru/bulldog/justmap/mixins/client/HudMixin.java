@@ -75,7 +75,7 @@ abstract class HudMixin extends DrawableHelper {
 		Iterator<StatusEffectInstance> effectsIterator = Ordering.natural().reverse().sortedCopy(statusEffects).iterator();
 
 	 	int i = 0, j = 0;
-		while(effectsIterator.hasNext()) {
+		while (effectsIterator.hasNext()) {
 	 		StatusEffectInstance statusEffectInstance = effectsIterator.next();
 			StatusEffect statusEffect = statusEffectInstance.getEffectType();
 			if (statusEffectInstance.shouldShowIcon()) {
@@ -116,9 +116,8 @@ abstract class HudMixin extends DrawableHelper {
 					drawSprite(matrixStack, fx + 3, fy + 3, this.getZOffset(), 18, 18, sprite);
 		   		});
 		   		if (ClientSettings.showEffectTimers) {
-			   		timers.add(() -> {
-			   			drawCenteredText(matrixStack, client.textRenderer, convertDuration(effectDuration), fx + size / 2, fy + (size + 1), Colors.WHITE);
-			   		});
+			   		timers.add(() ->
+						drawCenteredText(matrixStack, client.textRenderer, convertDuration(effectDuration), fx + size / 2, fy + (size + 1), Colors.WHITE));
 		   		}
 			}
 	 	}

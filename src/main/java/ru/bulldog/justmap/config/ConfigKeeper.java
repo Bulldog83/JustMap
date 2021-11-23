@@ -38,7 +38,7 @@ public final class ConfigKeeper {
 	public <T> T getValue(String key) {
 		Entry<T> entry = this.getEntry(key);
 		if (entry == null) {
-			JustMap.LOGGER.warning(String.format("Empty value will be returned.", key));
+			JustMap.LOGGER.warning(String.format("Empty value will be returned for entry '%s'.", key));
 			return null;
 		}
 		return entry.getValue();
