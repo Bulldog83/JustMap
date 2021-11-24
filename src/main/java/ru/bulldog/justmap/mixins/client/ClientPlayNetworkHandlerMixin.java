@@ -4,6 +4,7 @@ import com.mojang.authlib.GameProfile;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
+import net.minecraft.client.util.telemetry.TelemetrySender;
 import net.minecraft.network.ClientConnection;
 import net.minecraft.network.MessageType;
 import net.minecraft.network.packet.s2c.play.GameMessageS2CPacket;
@@ -31,7 +32,7 @@ public abstract class ClientPlayNetworkHandlerMixin {
 	private MinecraftClient client;
 
 	@Inject(method = "<init>", at = @At("TAIL"))
-	public void onConnect(MinecraftClient client, Screen screen, ClientConnection connection, GameProfile profile, CallbackInfo cinfo) {
+	public void onConnect(MinecraftClient client, Screen screen, ClientConnection connection, GameProfile profile, TelemetrySender telemetrySender, CallbackInfo cinfo) {
 		MapDataProvider.getMultiworldManager().onServerConnect();
 	}
 
@@ -43,7 +44,7 @@ public abstract class ClientPlayNetworkHandlerMixin {
 
 	@Inject(method = "onGameMessage", at = @At("HEAD"), cancellable = true)
 	public void onGameMessage(GameMessageS2CPacket gameMessageS2CPacket, CallbackInfo cinfo) {
-		if (gameMessageS2CPacket.getLocation() == MessageType.SYSTEM) {
+		if (gameMessageS2CPacket.getType() == MessageType.SYSTEM) {
 			String pref = "§0§0", suff = "§f§f";
 			String message = gameMessageS2CPacket.getMessage().getString().replaceAll("[&$]", "§");
 
