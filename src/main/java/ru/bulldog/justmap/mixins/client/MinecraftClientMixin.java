@@ -8,7 +8,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import ru.bulldog.justmap.map.data.MapDataProvider;
-import ru.bulldog.justmap.util.DataUtil;
+import ru.bulldog.justmap.util.CurrentWorldPos;
 
 @Mixin(MinecraftClient.class)
 public abstract class MinecraftClientMixin {
@@ -16,6 +16,6 @@ public abstract class MinecraftClientMixin {
 	@Inject(method = "joinWorld", at = @At("TAIL"))
 	public void onJoinWorld(ClientWorld world, CallbackInfo cinfo) {
 		MapDataProvider.getMultiworldManager().onWorldChanged(world);
-		DataUtil.updateWorld(world);
+		CurrentWorldPos.updateWorld(world);
 	}
 }

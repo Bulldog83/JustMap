@@ -38,15 +38,14 @@ import ru.bulldog.justmap.map.IMap;
 import ru.bulldog.justmap.map.data.Layer;
 import ru.bulldog.justmap.map.data.MapDataProvider;
 import ru.bulldog.justmap.map.data.WorldMapper;
-import ru.bulldog.justmap.map.multiworld.WorldKey;
 import ru.bulldog.justmap.map.icon.MapIcon;
 import ru.bulldog.justmap.map.icon.WaypointIcon;
 import ru.bulldog.justmap.map.minimap.skin.MapSkin;
+import ru.bulldog.justmap.map.multiworld.WorldKey;
 import ru.bulldog.justmap.map.waypoint.Waypoint;
 import ru.bulldog.justmap.map.waypoint.WaypointKeeper;
-import ru.bulldog.justmap.util.DataUtil;
-import ru.bulldog.justmap.util.Dimension;
-import ru.bulldog.justmap.util.RuleUtil;
+import ru.bulldog.justmap.util.CurrentWorldPos;
+import ru.bulldog.justmap.util.GameRulesUtil;
 import ru.bulldog.justmap.util.math.MathUtil;
 import ru.bulldog.justmap.util.math.RandomUtil;
 import ru.bulldog.justmap.util.render.ExtendedFramebuffer;
@@ -72,8 +71,6 @@ public class Minimap implements IMap {
 	private boolean bigMap = false;
 	private double winScale;
 	private float mapScale;
-	private int lastPosX;
-	private int lastPosZ;
 	private int skinX, skinY;
 	private int mapX, mapY;
 	private int offset;
@@ -91,7 +88,7 @@ public class Minimap implements IMap {
 		this.bufferedRenderer = new BufferedMiniMapRenderer(this);
 	}
 
-	public void update() {
+	public void updateOnTick() {
 		if (!this.isMapVisible()) {
 			return;
 		}
@@ -102,8 +99,8 @@ public class Minimap implements IMap {
 				locPlayer = player;
 			}
 
-			this.prepareMap(player);
-			this.updateInfo(player);
+			this.prepareMapOnTick(player);
+			this.updateInfoOnTick(player);
 		} else {
 			locPlayer = null;
 		}
@@ -263,7 +260,7 @@ public class Minimap implements IMap {
 		);
 	}
 
-	private void updateInfo(PlayerEntity player) {
+	private void updateInfoOnTick(PlayerEntity player) {
 		if (!ClientSettings.mapInfo) {
 			txtCoords.setVisible(false);
 			txtBiome.setVisible(false);
@@ -273,42 +270,29 @@ public class Minimap implements IMap {
 		}
 		txtCoords.setVisible(ClientSettings.showPosition);
 		if (ClientSettings.showPosition) {
-			txtCoords.update();
+			txtCoords.updateOnTick();
 		}
 		boolean showBiome = !ClientSettings.advancedInfo && ClientSettings.showBiome;
 		boolean showTime = !ClientSettings.advancedInfo && ClientSettings.showTime;
 		txtBiome.setVisible(showBiome);
 		txtTime.setVisible(showTime);
 		if (showBiome)
-			txtBiome.update();
+			txtBiome.updateOnTick();
 		if (showTime)
-			txtTime.update();
+			txtTime.updateOnTick();
 	}
 
-	public void prepareMap(PlayerEntity player) {
+	public void prepareMapOnTick(PlayerEntity player) {
 		this.world = player.world;
 		this.worldMapper = MapDataProvider.getManager().getWorldMapper();
-		BlockPos pos = DataUtil.currentPos();
+		BlockPos pos = CurrentWorldPos.currentPos();
 
 		int posX = pos.getX();
 		int posZ = pos.getZ();
 		int posY = pos.getY();
 
-		if (lastPosX != posX || lastPosZ != posZ) {
-			this.lastPosX = posX;
-			this.lastPosZ = posZ;
-		}
-
-		if (Dimension.isNether(world)) {
-			this.mapLayer = Layer.NETHER;
-			this.mapLevel = posY / mapLayer.height;
-		} else if (RuleUtil.needRenderCaves(world, pos)) {
-			this.mapLayer = Layer.CAVES;
-			this.mapLevel = posY / mapLayer.height;
-		} else {
-			this.mapLayer = Layer.SURFACE;
-			this.mapLevel = 0;
-		}
+		this.mapLayer = Layer.getLayer(world, pos);
+		this.mapLevel = Layer.getLevel(this.mapLayer, posY);
 
 		int scaledW = scaledWidth;
 		int scaledH = scaledHeight;
@@ -323,9 +307,13 @@ public class Minimap implements IMap {
 		double endX = startX + scaledW;
 		double endZ = startZ + scaledH;
 
+		setupEntityRadarOnTick(player, pos, posX, posY, startX, startZ, endX, endZ);
+	}
+
+	private void setupEntityRadarOnTick(PlayerEntity player, BlockPos pos, int posX, int posY, double startX, double startZ, double endX, double endZ) {
 		int radius = (int) (posX - startX);
 		this.entityRadar.clear(pos, radius);
-		if (RuleUtil.allowEntityRadar()) {
+		if (GameRulesUtil.allowEntityRadar()) {
 			int checkHeight = 24;
 			BlockPos start = new BlockPos(startX, posY - checkHeight / 2, startZ);
 			BlockPos end = new BlockPos(endX, posY + checkHeight / 2, endZ);
@@ -333,17 +321,17 @@ public class Minimap implements IMap {
 
 			int amount = 0;
 			for (Entity entity : entities) {
-				if (entity instanceof PlayerEntity && RuleUtil.allowPlayerRadar()) {
+				if (entity instanceof PlayerEntity && GameRulesUtil.allowPlayerRadar()) {
 					PlayerEntity pEntity = (PlayerEntity) entity;
 					if (pEntity.isMainPlayer()) continue;
 					this.entityRadar.addPlayer(pEntity);
 				} else if (entity instanceof MobEntity) {
 					MobEntity mobEntity = (MobEntity) entity;
 					boolean hostile = mobEntity instanceof HostileEntity;
-					if (hostile && RuleUtil.allowHostileRadar()) {
+					if (hostile && GameRulesUtil.allowHostileRadar()) {
 						this.entityRadar.addCreature(mobEntity);
 						amount++;
-					} else if (!hostile && RuleUtil.allowCreatureRadar()) {
+					} else if (!hostile && GameRulesUtil.allowCreatureRadar()) {
 						this.entityRadar.addCreature(mobEntity);
 						amount++;
 					}
@@ -367,7 +355,7 @@ public class Minimap implements IMap {
 	}
 
 	public void createWaypoint() {
-		this.createWaypoint(MapDataProvider.getMultiworldManager().getCurrentWorldKey(), DataUtil.currentPos());
+		this.createWaypoint(MapDataProvider.getMultiworldManager().getCurrentWorldKey(), CurrentWorldPos.currentPos());
 	}
 
 	public AbstractMiniMapRenderer getRenderer() {
@@ -375,10 +363,6 @@ public class Minimap implements IMap {
 			return this.bufferedRenderer;
 		}
 		return this.fastRenderer;
-	}
-
-	public World getWorld() {
-		return this.world;
 	}
 
 	public WorldMapper getWorldMapper() {
@@ -463,14 +447,6 @@ public class Minimap implements IMap {
 		return this.skinY;
 	}
 
-	public int getLastX() {
-		return this.lastPosX;
-	}
-
-	public int getLastZ() {
-		return this.lastPosZ;
-	}
-
 	public int getBorder() {
 		return this.border;
 	}
@@ -510,7 +486,7 @@ public class Minimap implements IMap {
 
 	@Override
 	public BlockPos getCenter() {
-		return DataUtil.currentPos();
+		return CurrentWorldPos.currentPos();
 	}
 
 	static {

@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.ChunkPos;
 
@@ -14,13 +15,11 @@ import ru.bulldog.justmap.map.IMap;
 import ru.bulldog.justmap.map.data.Layer;
 import ru.bulldog.justmap.map.data.MapRegion;
 import ru.bulldog.justmap.map.data.RegionPos;
-import ru.bulldog.justmap.util.DataUtil;
 import ru.bulldog.justmap.util.Logger;
-import ru.bulldog.justmap.util.RuleUtil;
+import ru.bulldog.justmap.util.GameRulesUtil;
 import ru.bulldog.justmap.util.colors.Colors;
 import ru.bulldog.justmap.util.math.Plane;
 import ru.bulldog.justmap.util.math.Point;
-import ru.bulldog.justmap.util.render.MapTexture;
 import ru.bulldog.justmap.util.render.RenderUtil;
 import ru.bulldog.justmap.util.storage.StorageUtil;
 import ru.bulldog.justmap.util.tasks.TaskManager;
@@ -65,7 +64,7 @@ public class RegionData implements MapRegion {
 		this.level = map.getLevel();
 		this.center = new ChunkPos(map.getCenter());
 		this.isWorldmap = map instanceof WorldmapScreen;
-		int radius = DataUtil.getGameOptions().viewDistance - 1;
+		int radius = MinecraftClient.getInstance().options.viewDistance - 1;
 		this.updateArea = new Plane(center.x - radius, center.z - radius,
 									center.x + radius, center.z + radius);
 		this.loadImage(layer, level);
@@ -122,7 +121,7 @@ public class RegionData implements MapRegion {
 	}
 
 	public void setCenter(ChunkPos centerPos) {
-		int radius = DataUtil.getGameOptions().viewDistance - 1;
+		int radius = MinecraftClient.getInstance().options.viewDistance - 1;
 		this.center = centerPos;
 		this.updateArea = new Plane(center.x - radius, center.z - radius,
 									center.x + radius, center.z + radius);
@@ -147,8 +146,8 @@ public class RegionData implements MapRegion {
 			this.alternateRender = ClientSettings.alternateColorRender;
 			this.needUpdate = true;
 		}
-		if (slimeOverlay != RuleUtil.allowSlimeChunks()) {
-			this.slimeOverlay = RuleUtil.allowSlimeChunks();
+		if (slimeOverlay != GameRulesUtil.allowSlimeChunks()) {
+			this.slimeOverlay = GameRulesUtil.allowSlimeChunks();
 			this.renewOverlay = true;
 		}
 		if (ClientSettings.showLoadedChunks != loadedOverlay) {
@@ -287,7 +286,7 @@ public class RegionData implements MapRegion {
 		} else if (Layer.NETHER.equals(layer)) {
 			dir = new File(dir, Integer.toString(level));
 		} else {
-			dir = new File(dir, String.format("%s/%d", layer.name, level));
+			dir = new File(dir, String.format("%s/%d", layer.getName(), level));
 		}
 		if (!dir.exists()) {
 			dir.mkdirs();

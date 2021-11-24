@@ -9,6 +9,6 @@ public class MapText extends InfoText {
 	}
 
 	@Override
-	public void update() {}
+	public void updateOnTick() {}
 
 }

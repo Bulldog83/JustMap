@@ -9,7 +9,7 @@ import net.minecraft.world.chunk.WorldChunk;
 
 import ru.bulldog.justmap.client.config.ClientSettings;
 import ru.bulldog.justmap.map.data.Layer;
-import ru.bulldog.justmap.util.StateUtil;
+import ru.bulldog.justmap.util.BlockStateUtil;
 
 public class MapProcessor {
 
@@ -32,18 +32,18 @@ public class MapProcessor {
 
 		boolean plants = !ClientSettings.hidePlants;
 		if ((layer.equals(Layer.NETHER) || layer.equals(Layer.CAVES))) {
-			int floor = level * layer.height;
-			for (int i = floor + (layer.height - 1); i >= floor; i--) {
+			int floor = level * layer.getHeight();
+			for (int i = floor + (layer.getHeight() - 1); i >= floor; i--) {
 				BlockPos worldPos = loopPos(worldChunk, new BlockPos(posX, i, posZ), 0, liquids, plants);
 				BlockPos overPos = new BlockPos(posX, worldPos.getY() + 1, posZ);
-				if (StateUtil.checkState(worldChunk.getBlockState(overPos), liquids, plants)) {
+				if (BlockStateUtil.checkState(worldChunk.getBlockState(overPos), liquids, plants)) {
 					return worldPos.getY();
 				}
 			}
 		} else {
 			BlockPos worldPos = loopPos(worldChunk, new BlockPos(posX, y, posZ), 0, liquids, plants);
 			BlockState overState = worldChunk.getBlockState(new BlockPos(posX, worldPos.getY() + 1, posZ));
-			if (StateUtil.checkState(overState, liquids, plants)) {
+			if (BlockStateUtil.checkState(overState, liquids, plants)) {
 				return worldPos.getY();
 			}
 		}
@@ -54,7 +54,7 @@ public class MapProcessor {
 	private static BlockPos loopPos(WorldChunk worldChunk, BlockPos pos, int stop, boolean liquids, boolean plants) {
 		boolean loop;
 		do {
-			loop = StateUtil.checkState(worldChunk.getBlockState(pos), liquids, plants);
+			loop = BlockStateUtil.checkState(worldChunk.getBlockState(pos), liquids, plants);
 			loop &= pos.getY() > stop;
 			if (loop) pos = pos.down();
 		} while (loop);
@@ -67,7 +67,7 @@ public class MapProcessor {
 
 		BlockPos pos = new BlockPos(x + (worldChunk.getPos().x << 4), y, z + (worldChunk.getPos().z << 4));
 		BlockState state = worldChunk.getBlockState(pos);
-		if (StateUtil.isLiquid(state, false)) {
+		if (BlockStateUtil.isLiquid(state, false)) {
 			y = getTopBlockY(worldChunk, layer, level, x, y, z, false);
 		}
 

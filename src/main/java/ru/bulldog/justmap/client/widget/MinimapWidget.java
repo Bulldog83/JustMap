@@ -8,7 +8,7 @@ import net.minecraft.client.util.math.MatrixStack;
 import ru.bulldog.justmap.map.minimap.Minimap;
 import ru.bulldog.justmap.util.render.RenderUtil;
 
-public class MapWidget implements Element, Drawable {
+public class MinimapWidget implements Element, Drawable {
 
 	final Minimap map;
 	final int left;
@@ -24,7 +24,7 @@ public class MapWidget implements Element, Drawable {
 	final double initY;
 	double x, y;
 
-	public MapWidget(Screen parent, Minimap map) {
+	public MinimapWidget(Screen parent, Minimap map) {
 		this.map = map;
 		this.initX = x = map.getSkinX();
 		this.initY = y = map.getSkinY();

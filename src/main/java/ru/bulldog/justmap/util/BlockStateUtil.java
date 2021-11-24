@@ -6,13 +6,13 @@ import net.minecraft.block.Material;
 import net.minecraft.state.property.Properties;
 import net.minecraft.tag.FluidTags;
 
-public class StateUtil {
+public class BlockStateUtil {
 	public static final BlockState AIR = Blocks.AIR.getDefaultState();
 	public static final BlockState CAVE_AIR = Blocks.CAVE_AIR.getDefaultState();
 	public static final BlockState VOID_AIR = Blocks.VOID_AIR.getDefaultState();
 
 	public static boolean checkState(BlockState state, boolean liquids, boolean plants) {
-		return StateUtil.isAir(state) || (!liquids && isLiquid(state, false)) || (!plants && isPlant(state));
+		return BlockStateUtil.isAir(state) || (!liquids && isLiquid(state, false)) || (!plants && isPlant(state));
 	}
 
 	public static boolean isAir(BlockState state) {

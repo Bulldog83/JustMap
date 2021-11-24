@@ -20,7 +20,7 @@ public class TimeInfo extends InfoText {
 	}
 
 	@Override
-	public void update() {
+	public void updateOnTick() {
 		this.setVisible(ClientSettings.showTime);
 		MinecraftClient minecraft = MinecraftClient.getInstance();
 		if (visible && minecraft.world != null) {

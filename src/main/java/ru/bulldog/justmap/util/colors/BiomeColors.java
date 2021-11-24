@@ -7,17 +7,29 @@ import java.util.Optional;
 
 import com.google.gson.JsonObject;
 import javax.imageio.ImageIO;
+import net.fabricmc.api.EnvType;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.network.ClientPlayNetworkHandler;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.JsonHelper;
+import net.minecraft.util.registry.BuiltinRegistries;
+import net.minecraft.util.registry.DynamicRegistryManager;
+import net.minecraft.util.registry.Registry;
+import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.BiomeEffects;
 
 import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.mixins.BiomeColorsAccessor;
+import ru.bulldog.justmap.server.JustMapServer;
 import ru.bulldog.justmap.util.storage.ResourceLoader;
 
 public class BiomeColors {
 	private static int[] foliageMap;
 	private static int[] grassMap;
+
+	private static final DynamicRegistryManager registryManager = DynamicRegistryManager.create();
 
 	private Biome biome;
 	private Optional<Integer> foliageColor;
@@ -62,6 +74,27 @@ public class BiomeColors {
 				return color;
 			}
 		}
+	}
+
+	public static Identifier getBiomeId(World world, Biome biome) {
+		Identifier biomeId = world.getRegistryManager().get(Registry.BIOME_KEY).getId(biome);
+		return biomeId != null ? biomeId : BuiltinRegistries.BIOME.getId(biome);
+	}
+
+	public static Registry<Biome> getBiomeRegistry() {
+		if (JustMap.getSide() == EnvType.CLIENT) {
+			MinecraftClient minecraft = MinecraftClient.getInstance();
+			ClientPlayNetworkHandler networkHandler = minecraft.getNetworkHandler();
+			if (networkHandler != null) {
+				return minecraft.getNetworkHandler().getRegistryManager().get(Registry.BIOME_KEY);
+			}
+			return registryManager.get(Registry.BIOME_KEY);
+		}
+		MinecraftServer server = JustMapServer.getServer();
+		if (server != null) {
+			return server.getRegistryManager().get(Registry.BIOME_KEY);
+		}
+		return registryManager.get(Registry.BIOME_KEY);
 	}
 
 	public static int getGrassColor(double temperature, double humidity) {

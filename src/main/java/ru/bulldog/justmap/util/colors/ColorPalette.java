@@ -20,7 +20,6 @@ import net.minecraft.util.registry.Registry;
 import net.minecraft.world.biome.Biome;
 import org.jetbrains.annotations.Nullable;
 
-import ru.bulldog.justmap.util.DataUtil;
 import ru.bulldog.justmap.util.JsonFactory;
 
 public class ColorPalette {
@@ -190,7 +189,7 @@ public class ColorPalette {
 						String key = entry.getKey();
 						JsonObject biomeJson = entry.getValue().getAsJsonObject();
 						Identifier biomeId = new Identifier(key);
-						Biome biome = DataUtil.getBiomeRegistry().get(biomeId);
+						Biome biome = BiomeColors.getBiomeRegistry().get(biomeId);
 						this.biomeColors.put(biomeId, BiomeColors.fromJson(biome, biomeJson));
 					});
 				}

@@ -41,7 +41,7 @@ public class TextManager {
 		}
 	}
 
-	public void updatePosition(ScreenPosition position) {
+	public void updatePositionOnTick(ScreenPosition position) {
 		int offset = ClientSettings.positionOffset;
 		MinecraftClient minecraft = MinecraftClient.getInstance();
 		int screenW = minecraft.getWindow().getScaledWidth();
@@ -130,8 +130,8 @@ public class TextManager {
 		this.spacing = spacing;
 	}
 
-	public void update() {
-		this.elements.forEach(InfoText::update);
+	public void updateOnTick() {
+		this.elements.forEach(InfoText::updateOnTick);
 	}
 
 	public int size() {

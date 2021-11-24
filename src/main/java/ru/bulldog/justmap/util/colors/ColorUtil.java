@@ -38,7 +38,7 @@ import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.client.config.ClientSettings;
 import ru.bulldog.justmap.mixins.client.BakedSpriteAccessor;
 import ru.bulldog.justmap.util.ImageUtil;
-import ru.bulldog.justmap.util.StateUtil;
+import ru.bulldog.justmap.util.BlockStateUtil;
 import ru.bulldog.justmap.util.math.MathUtil;
 
 @Environment(EnvType.CLIENT)
@@ -279,16 +279,16 @@ public class ColorUtil {
 	private static int getTintedBlockColor(World world, BlockPos pos, BlockState blockState, BlockState overState) {
 		boolean waterTint = ClientSettings.alternateColorRender && ClientSettings.waterTint;
 		boolean skipWater = !(ClientSettings.hideWater || waterTint);
-		if (!ClientSettings.hideWater && ClientSettings.hidePlants && StateUtil.isSeaweed(overState)) {
+		if (!ClientSettings.hideWater && ClientSettings.hidePlants && BlockStateUtil.isSeaweed(overState)) {
 			if (waterTint) {
 				int color = getBlockColorInner(world, blockState, pos);
 				return applyTint(color, BiomeColors.getWaterColor(world, pos));
 			}
 			return getBlockColorInner(world, Blocks.WATER.getDefaultState(), pos);
-		} else if (!StateUtil.isAir(blockState) && StateUtil.checkState(overState, skipWater, !ClientSettings.hidePlants)) {
+		} else if (!BlockStateUtil.isAir(blockState) && BlockStateUtil.checkState(overState, skipWater, !ClientSettings.hidePlants)) {
 			int color = getBlockColorInner(world, blockState, pos);
 			if (ClientSettings.hideWater) return color;
-			if (waterTint && (StateUtil.isWater(overState) || StateUtil.isWaterlogged(blockState))) {
+			if (waterTint && (BlockStateUtil.isWater(overState) || BlockStateUtil.isWaterlogged(blockState))) {
 				return applyTint(color, BiomeColors.getWaterColor(world, pos));
 			}
 			return color;
@@ -326,7 +326,7 @@ public class ColorUtil {
 			blockColor = processAlternateColor(blockColor, textureColor, blockState.getMapColor(world, pos).color);
 			colorPalette.addBlockColor(blockState, blockColor);
 		} else if (block instanceof FluidBlock) {
-			if (StateUtil.isWater(blockState)) {
+			if (BlockStateUtil.isWater(blockState)) {
 				blockColor = processAlternateColor(blockColor, textureColor, colorProvider.getWaterColor(world, pos));
 			} else {
 				blockColor = fluidColor(world, blockState, pos, textureColor);

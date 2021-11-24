@@ -11,7 +11,7 @@ public class FpsInfo extends InfoText {
 	}
 
 	@Override
-	public void update() {
+	public void updateOnTick() {
 		this.setVisible(ClientSettings.showFPS);
 		MinecraftClient minecraft = MinecraftClient.getInstance();
 		if (visible && minecraft.fpsDebugString.indexOf("fps") > 0) {

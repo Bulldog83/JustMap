@@ -17,7 +17,7 @@ import ru.bulldog.justmap.client.JustMapClient;
 import ru.bulldog.justmap.client.config.ClientSettings;
 import ru.bulldog.justmap.map.data.Layer;
 import ru.bulldog.justmap.network.ClientNetworkHandler;
-import ru.bulldog.justmap.util.DataUtil;
+import ru.bulldog.justmap.util.CurrentWorldPos;
 import ru.bulldog.justmap.util.Dimension;
 import ru.bulldog.justmap.util.colors.ColorUtil;
 import ru.bulldog.justmap.util.colors.Colors;
@@ -54,7 +54,7 @@ public class ChunkData {
 		this.worldChunk = new SoftReference<>(world.getChunk(pos.x, pos.z));
 
 		if (Dimension.isOverworld(world)) {
-			ServerWorld serverWorld = DataUtil.getServerWorld();
+			ServerWorld serverWorld = CurrentWorldPos.getServerWorld();
 			if (serverWorld != null) {
 				this.slime = ChunkRandom.getSlimeRandom(chunkPos.x, chunkPos.z,
 						serverWorld.getSeed(), 987234911L).nextInt(10) == 0;
@@ -81,7 +81,7 @@ public class ChunkData {
 	}
 
 	private void initLayer(Layer layer) {
-		int levels = this.world.getDimension().getHeight() / layer.height;
+		int levels = this.world.getDimension().getHeight() / layer.getHeight();
 		this.levels.put(layer, new ChunkLevel[levels]);
 	}
 
@@ -178,7 +178,7 @@ public class ChunkData {
 			this.updateArea(worldChunk, layer, level, x, z, width, height);
 			if (saveNeeded()) {
 				BlockPos.Mutable chunkBlockPos = this.chunkPos.getStartPos().mutableCopy();
-				chunkBlockPos.setY(level * layer.height);
+				chunkBlockPos.setY(level * layer.getHeight());
 				RegionData region = this.mapData.getRegion(chunkBlockPos);
 				if (region.getLayer().equals(layer) && region.getLevel() == level) {
 					region.writeChunkData(this);
@@ -248,7 +248,7 @@ public class ChunkData {
 
 			chunkLevel.setBlockState(x, z, worldState);
 
-			int height = layer.height;
+			int height = layer.getHeight();
 			int bottom;
 			int baseHeight;
 			if (layer == Layer.NETHER) {

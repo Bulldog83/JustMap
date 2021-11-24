@@ -11,7 +11,6 @@ import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 
 import ru.bulldog.justmap.JustMap;
-import ru.bulldog.justmap.util.DataUtil;
 import ru.bulldog.justmap.util.storage.StorageUtil;
 
 public final class Colors {
@@ -93,21 +92,19 @@ public final class Colors {
 	}
 
 	public int getFoliageColor(World world, Biome biome) {
-		Identifier biomeId = DataUtil.getBiomeId(world, biome);
+		Identifier biomeId = BiomeColors.getBiomeId(world, biome);
 		return this.getPalette(biomeId.getNamespace()).getFoliageColor(biomeId, biome);
 	}
 
 	public int getGrassColor(World world, Biome biome, int x, int z) {
-		Identifier biomeId = DataUtil.getBiomeId(world, biome);
+		Identifier biomeId = BiomeColors.getBiomeId(world, biome);
 		return this.getPalette(biomeId.getNamespace()).getGrassColor(biomeId, biome, x, z);
 	}
 
 	public int getWaterColor(World world, Biome biome) {
-		Identifier biomeId = DataUtil.getBiomeId(world, biome);
+		Identifier biomeId = BiomeColors.getBiomeId(world, biome);
 		return this.getPalette(biomeId.getNamespace()).getWaterColor(biomeId, biome);
 	}
-
-
 
 	public void saveData() {
 		File dir = new File(StorageUtil.mapDir(), "palettes");

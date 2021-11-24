@@ -11,7 +11,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.gen.ChunkRandom;
 
 import ru.bulldog.justmap.util.Dimension;
-import ru.bulldog.justmap.util.RuleUtil;
+import ru.bulldog.justmap.util.GameRulesUtil;
 
 public class ServerNetworkHandler extends NetworkHandler {
 	private final MinecraftServer server;
@@ -57,7 +57,7 @@ public class ServerNetworkHandler extends NetworkHandler {
 		int z = data.readInt();
 
 		boolean slime = false;
-		if (RuleUtil.allowSlimeChunks() && Dimension.isOverworld(player.world)) {
+		if (GameRulesUtil.allowSlimeChunks() && Dimension.isOverworld(player.world)) {
 			ServerWorld world = player.getServerWorld();
 			slime = ChunkRandom.getSlimeRandom(x, z, world.getSeed(), 987234911L).nextInt(10) == 0;
 		}

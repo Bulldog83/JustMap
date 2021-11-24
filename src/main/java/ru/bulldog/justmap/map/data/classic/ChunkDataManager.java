@@ -20,7 +20,7 @@ import net.minecraft.world.chunk.WorldChunk;
 import net.minecraft.world.storage.VersionedChunkStorage;
 
 import ru.bulldog.justmap.JustMap;
-import ru.bulldog.justmap.util.DataUtil;
+import ru.bulldog.justmap.util.CurrentWorldPos;
 import ru.bulldog.justmap.util.storage.StorageUtil;
 import ru.bulldog.justmap.util.tasks.MemoryUtil;
 import ru.bulldog.justmap.util.tasks.TaskManager;
@@ -117,7 +117,7 @@ class ChunkDataManager {
 		ServerWorld serverWorld = (ServerWorld) world;
 		try (VersionedChunkStorage storage = StorageUtil.getChunkStorage(serverWorld)) {
 			NbtCompound chunkTag = storage.updateChunkNbt(serverWorld.getRegistryKey(),
-					DataUtil.getPersistentSupplier(), storage.getNbt(chunkPos));
+					CurrentWorldPos.getPersistentSupplier(), storage.getNbt(chunkPos));
 			if (chunkTag == null) return this.emptyChunk;
 			Chunk chunk = ChunkSerializer.deserialize(
 					serverWorld, serverWorld.getStructureManager(), serverWorld.getPointOfInterestStorage(), chunkPos, chunkTag);

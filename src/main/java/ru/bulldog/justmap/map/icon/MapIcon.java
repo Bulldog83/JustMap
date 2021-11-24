@@ -25,10 +25,6 @@ public abstract class MapIcon<T extends MapIcon<T>> {
 		this.y = y;
 	}
 
-	public int getHeight() {
-		return this.height;
-	}
-
 	protected void updatePos(int mapX, int mapY, int mapW, int mapH, int size) {
 		if (iconPos == null || x != lastX || y != lastY || mapX != lastMapX || mapY != lastMapY) {
 			this.iconPos = new Point(x, y);

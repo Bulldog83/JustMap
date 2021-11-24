@@ -3,6 +3,7 @@ package ru.bulldog.justmap.map.data.classic;
 import java.util.HashMap;
 import java.util.Map;
 
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
@@ -13,11 +14,11 @@ import ru.bulldog.justmap.client.screen.WorldmapScreen;
 import ru.bulldog.justmap.map.IMap;
 import ru.bulldog.justmap.map.data.Layer;
 import ru.bulldog.justmap.map.data.MapRegion;
-import ru.bulldog.justmap.map.data.WorldMapper;
 import ru.bulldog.justmap.map.data.RegionPos;
+import ru.bulldog.justmap.map.data.WorldMapper;
 import ru.bulldog.justmap.map.data.classic.event.ChunkUpdateEvent;
 import ru.bulldog.justmap.map.data.classic.event.ChunkUpdateListener;
-import ru.bulldog.justmap.util.DataUtil;
+import ru.bulldog.justmap.util.CurrentWorldPos;
 import ru.bulldog.justmap.util.math.MathUtil;
 
 public class WorldData implements WorldMapper {
@@ -37,7 +38,7 @@ public class WorldData implements WorldMapper {
 	}
 
 	public RegionData getRegion(BlockPos blockPos) {
-		return this.getRegionData(DataUtil.getCurrentlyShownMap(), blockPos.getX(), blockPos.getZ());
+		return this.getRegionData(WorldManager.getCurrentlyShownMap(), blockPos.getX(), blockPos.getZ());
 	}
 
 	public RegionData getRegionData(IMap map, int x, int z) {
@@ -95,7 +96,7 @@ public class WorldData implements WorldMapper {
 	}
 
 	public WorldChunk callSavedChunk(ChunkPos chunkPos) {
-		World world = DataUtil.getWorld();
+		World world = CurrentWorldPos.getWorld();
 		return this.chunkManager.callSavedChunk(world, chunkPos);
 	}
 
@@ -104,7 +105,7 @@ public class WorldData implements WorldMapper {
 	}
 
 	public void updateMap() {
-		IMap map = DataUtil.getCurrentlyShownMap();
+		IMap map = WorldManager.getCurrentlyShownMap();
 		BlockPos centerPos = map.getCenter();
 		Layer layer = map.getLayer();
 		int level = map.getLevel();
@@ -120,7 +121,7 @@ public class WorldData implements WorldMapper {
 		}
 		int x = centerPos.getX();
 		int z = centerPos.getZ();
-		int distance = DataUtil.getGameOptions().viewDistance - 1;
+		int distance = MinecraftClient.getInstance().options.viewDistance - 1;
 		BlockPos.Mutable currentPos = centerPos.mutableCopy();
 		for (int step = 1; step < distance * 2; step++) {
 			boolean even = MathUtil.isEven(step);

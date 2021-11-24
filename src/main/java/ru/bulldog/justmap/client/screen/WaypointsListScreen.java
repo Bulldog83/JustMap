@@ -24,13 +24,13 @@ import ru.bulldog.justmap.map.waypoint.Waypoint;
 import ru.bulldog.justmap.map.waypoint.Waypoint.Icon;
 import ru.bulldog.justmap.map.waypoint.WaypointKeeper;
 import ru.bulldog.justmap.util.Dimension;
-import ru.bulldog.justmap.util.RuleUtil;
+import ru.bulldog.justmap.util.GameRulesUtil;
 import ru.bulldog.justmap.util.colors.Colors;
 import ru.bulldog.justmap.util.math.MathUtil;
 import ru.bulldog.justmap.util.math.RandomUtil;
 import ru.bulldog.justmap.util.render.RenderUtil;
 
-public class WaypointsListScreen extends AbstractMapScreen {
+public class WaypointsListScreen extends AbstractJustMapScreen {
 	private static class Entry implements Element {
 		private final MinecraftClient minecraft;
 
@@ -95,7 +95,7 @@ public class WaypointsListScreen extends AbstractMapScreen {
 			int posX = tpButton.x - 5;
 			RenderUtil.drawRightAlignedString(matrixStack, waypoint.pos.toShortString(), posX, stringY, Colors.WHITE);
 
-			if (RuleUtil.allowTeleportation()) {
+			if (GameRulesUtil.allowTeleportation()) {
 				this.tpButton.render(matrixStack, mouseX, mouseY, delta);
 			}
 			this.editButton.render(matrixStack, mouseX, mouseY, delta);
@@ -239,14 +239,6 @@ public class WaypointsListScreen extends AbstractMapScreen {
 		}
 		drawCenteredText(matrixStack, textRenderer, screenTitle, center, 15, Colors.WHITE);
 		this.drawScrollBar();
-	}
-
-	private Pair<String, Identifier> getDimensionInfo(Identifier dim) {
-		String key = "unknown";
-		if (dim != null) {
-			 key = dim.toString();
-		}
-		return DIMENSION_INFO.getOrDefault(key, null);
 	}
 
 	private void drawScrollBar() {}
