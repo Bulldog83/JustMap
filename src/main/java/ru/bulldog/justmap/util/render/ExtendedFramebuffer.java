@@ -319,7 +319,6 @@ public class ExtendedFramebuffer extends Framebuffer {
 		this.bindFramebuffer(GLC.GL_FRAMEBUFFER, 0);
 	}
 
-	// yarn mapping missing for beginRead
 	@Override
 	public void beginRead() {
 		RenderSystem.bindTexture(colorAttachment);

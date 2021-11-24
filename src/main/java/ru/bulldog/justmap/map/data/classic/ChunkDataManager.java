@@ -1,7 +1,13 @@
 package ru.bulldog.justmap.map.data.classic;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.Set;
+import java.util.HashSet;
+import java.util.HashMap;
+import java.util.Optional;
 
 import com.mojang.serialization.Codec;
 import net.minecraft.nbt.NbtCompound;
@@ -114,13 +120,11 @@ class ChunkDataManager {
 		
 		ServerWorld serverWorld = (ServerWorld) world;
 		try (VersionedChunkStorage storage = StorageUtil.getChunkStorage(serverWorld);) {
-			//guessing here that null might work for the optional parameter.  Hopefully there is a null check.
 			Optional<RegistryKey<Codec<? extends ChunkGenerator>>> opt = Optional.ofNullable(null);
 			NbtCompound chunkTag = storage.updateChunkNbt(serverWorld.getRegistryKey(), DataUtil.getPersistentSupplier(), storage.getNbt(chunkPos), opt);
 			if (chunkTag == null) return this.emptyChunk;
 			Chunk chunk = ChunkSerializer.deserialize(
 					serverWorld, serverWorld.getPointOfInterestStorage(), chunkPos, chunkTag);
-					// serverWorld, serverWorld.getStructureManager(), serverWorld.getPointOfInterestStorage(), chunkPos, chunkTag);
 			if (chunk instanceof ReadOnlyChunk) {
 				return ((ReadOnlyChunk) chunk).getWrappedChunk();
 			}
