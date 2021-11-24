@@ -6,7 +6,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import ru.bulldog.justmap.map.MapGameRules;
 
 @Mixin(GameRules.class)
-public abstract class GameRulesMixin {	
+public abstract class GameRulesMixin {
 	static {
 		MapGameRules.init();
 	}

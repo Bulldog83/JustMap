@@ -15,26 +15,25 @@ import ru.bulldog.justmap.map.data.Layer;
 import ru.bulldog.justmap.map.data.classic.ChunkData;
 import ru.bulldog.justmap.map.data.classic.WorldData;
 import ru.bulldog.justmap.map.data.classic.WorldManager;
-import ru.bulldog.justmap.util.DataUtil;
 import ru.bulldog.justmap.util.math.Plane;
 import ru.bulldog.justmap.util.tasks.TaskManager;
 
 public class ChunkUpdateListener {
 	private static final Queue<ChunkUpdateEvent> updateQueue = new ConcurrentLinkedQueue<>();
 	private static final TaskManager worker = TaskManager.getManager("chunk-update-listener");
-	
+
 	public static void accept(ChunkUpdateEvent event) {
 		if (updateQueue.contains(event)) return;
 		updateQueue.offer(event);
 	}
-	
+
 	private static void updateChunks() {
 		if (updateQueue.isEmpty()) return;
 		if (!JustMapClient.canMapping()) {
 			updateQueue.clear();
 			return;
 		}
-		while(!updateQueue.isEmpty()) {
+		while (!updateQueue.isEmpty()) {
 			ChunkUpdateEvent event = updateQueue.poll();
 			if (event == null) break;
 			event.mapChunk.updateWorldChunk(event.worldChunk);
@@ -54,12 +53,12 @@ public class ChunkUpdateListener {
 			}
 		}
 	}
-	
+
 	public static void proceed() {
 		if (updateQueue.isEmpty() || worker.queueSize() > 0) return;
 		worker.execute(ChunkUpdateListener::updateChunks);
 	}
-	
+
 	public static void stop() {
 		updateQueue.clear();
 	}
@@ -67,11 +66,11 @@ public class ChunkUpdateListener {
 	public static void onSetBlockState(BlockPos pos, BlockState state, World world) {
 		WorldChunk worldChunk = world.getWorldChunk(pos);
 		if (!worldChunk.isEmpty()) {
-			IMap map = DataUtil.getCurrentlyShownMap();
-			Layer layer = DataUtil.getLayer(world, pos);
-			int level = DataUtil.getLevel(layer, pos.getY());
+			IMap map = WorldManager.getCurrentlyShownMap();
+			Layer layer = Layer.getLayer(world, pos);
+			int level = Layer.getLevel(layer, pos.getY());
 			if (layer.equals(map.getLayer()) && level == map.getLevel()) {
-				WorldData mapData = WorldManager.WORLD_MANAGER.getData();
+				WorldData mapData = WorldManager.WORLD_MANAGER.getWorldData();
 				if (mapData == null) return;
 				ChunkPos chunkPos = worldChunk.getPos();
 				int chunkX = chunkPos.x;

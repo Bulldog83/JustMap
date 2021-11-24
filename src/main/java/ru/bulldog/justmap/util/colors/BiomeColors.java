@@ -7,25 +7,37 @@ import java.util.Optional;
 
 import com.google.gson.JsonObject;
 import javax.imageio.ImageIO;
+import net.fabricmc.api.EnvType;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.network.ClientPlayNetworkHandler;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.JsonHelper;
+import net.minecraft.util.registry.BuiltinRegistries;
+import net.minecraft.util.registry.DynamicRegistryManager;
+import net.minecraft.util.registry.Registry;
+import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.BiomeEffects;
 
 import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.mixins.BiomeColorsAccessor;
+import ru.bulldog.justmap.server.JustMapServer;
 import ru.bulldog.justmap.util.storage.ResourceLoader;
 
 public class BiomeColors {
 	private static int[] foliageMap;
 	private static int[] grassMap;
-	
+
+	private static final DynamicRegistryManager registryManager = DynamicRegistryManager.create();
+
 	private Biome biome;
 	private Optional<Integer> foliageColor;
 	private Optional<Integer> grassColor;
 	private int waterColor;
-	
+
 	private BiomeColors() {}
-	
+
 	public BiomeColors(Biome biome) {
 		this.biome = biome;
 		BiomeColorsAccessor accessor = (BiomeColorsAccessor) biome.getEffects();
@@ -33,17 +45,17 @@ public class BiomeColors {
 		this.grassColor = accessor.getGrassColor();
 		this.waterColor = accessor.getWaterColor();
 	}
-	
+
 	public int getWaterColor() {
 		return this.waterColor;
 	}
-	
+
 	public int getFoliageColor() {
 		float temperature = this.biome.getTemperature();
 		float humidity = this.biome.getDownfall();
 		return this.foliageColor.orElse(getFoliageColor(temperature, humidity));
 	}
-	
+
 	public int getGrassColor(int x, int z) {
 		float temperature = this.biome.getTemperature();
 		float humidity = this.biome.getDownfall();
@@ -56,14 +68,35 @@ public class BiomeColors {
 			}
 			case SWAMP: {
 				double noise = Biome.FOLIAGE_NOISE.sample(x * 0.0225D, z * 0.0225D, false);
-	            return noise < -0.1D ? 5011004 : 6975545;
+				return noise < -0.1D ? 5011004 : 6975545;
 			}
 			default: {
 				return color;
 			}
 		}
 	}
-	
+
+	public static Identifier getBiomeId(World world, Biome biome) {
+		Identifier biomeId = world.getRegistryManager().get(Registry.BIOME_KEY).getId(biome);
+		return biomeId != null ? biomeId : BuiltinRegistries.BIOME.getId(biome);
+	}
+
+	public static Registry<Biome> getBiomeRegistry() {
+		if (JustMap.getSide() == EnvType.CLIENT) {
+			MinecraftClient minecraft = MinecraftClient.getInstance();
+			ClientPlayNetworkHandler networkHandler = minecraft.getNetworkHandler();
+			if (networkHandler != null) {
+				return minecraft.getNetworkHandler().getRegistryManager().get(Registry.BIOME_KEY);
+			}
+			return registryManager.get(Registry.BIOME_KEY);
+		}
+		MinecraftServer server = JustMapServer.getServer();
+		if (server != null) {
+			return server.getRegistryManager().get(Registry.BIOME_KEY);
+		}
+		return registryManager.get(Registry.BIOME_KEY);
+	}
+
 	public static int getGrassColor(double temperature, double humidity) {
 		humidity *= temperature;
 		int t = (int) ((1.0D - temperature) * 255.0D);
@@ -72,11 +105,11 @@ public class BiomeColors {
 		if (k < 0 || k > grassMap.length) return Colors.GRASS;
 		return grassMap[k];
 	}
-	
+
 	public static int defaultGrassColor() {
 		return getGrassColor(0.5, 1.0);
 	}
-	
+
 	public static int getFoliageColor(double temperature, double humidity) {
 		humidity *= temperature;
 		int t = (int) ((1.0D - temperature) * 255.0D);
@@ -85,11 +118,11 @@ public class BiomeColors {
 		if (k < 0 || k > foliageMap.length) return Colors.FOLIAGE;
 		return foliageMap[k];
 	}
-	
+
 	public static int defaultFoliageColor() {
 		return getFoliageColor(0.5, 1.0);
 	}
-	
+
 	public JsonObject toJson() {
 		JsonObject json = new JsonObject();
 		if (foliageColor.isPresent()) {
@@ -99,10 +132,10 @@ public class BiomeColors {
 			json.addProperty("grass", Integer.toHexString(grassColor.get()));
 		}
 		json.addProperty("water", Integer.toHexString(waterColor));
-		
+
 		return json;
 	}
-	
+
 	public static BiomeColors fromJson(Biome biome, JsonObject json) {
 		BiomeColors biomeColors = new BiomeColors();
 		BiomeColorsAccessor accessor = (BiomeColorsAccessor) biome.getEffects();
@@ -125,17 +158,17 @@ public class BiomeColors {
 		} else {
 			biomeColors.waterColor = accessor.getWaterColor();
 		}
-		
+
 		return biomeColors;
 	}
-	
+
 	public String toString() {
 		return "[" + "foliage=" + foliageColor +
 				"," + "grass=" + grassColor +
 				"," + "water=" + waterColor +
 				"]";
 	}
-	
+
 	static {
 		ResourceLoader foliageColors = new ResourceLoader("textures/colormap/foliage.png");
 		try (InputStream ins = foliageColors.getInputStream()) {

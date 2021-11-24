@@ -24,29 +24,29 @@ public class NetworkHandler {
 	public boolean canPlayerReceive(PlayerEntity player) {
 		return serverPacketRegistry.canPlayerReceive(player, CHANNEL_ID);
 	}
-	
+
 	public void sendToPlayer(PlayerEntity player, Packet<?> packet, GenericFutureListener<? extends Future<? super Void>> completionListener) {
 		serverPacketRegistry.sendToPlayer(player, packet, completionListener);
 	}
-	
+
 	public void sendToPlayer(PlayerEntity player, Packet<?> packet) {
 		sendToPlayer(player, packet, null);
 	}
-	
+
 	public void sendToServer(Packet<?> packet, GenericFutureListener<? extends Future<? super Void>> completionListener) {
 		clientPacketRegistry.sendToServer(packet, completionListener);
 	}
-	
+
 	public void sendToServer(Packet<?> packet) {
 		sendToServer(packet, null);
 	}
-	
+
 	public enum PacketType {
 		SLIME_CHUNK_PACKET,
 		GET_IMAGE_PACKET;
-		
+
 		private final static PacketType[] values = values();
-		
+
 		public static PacketType get(int id) {
 			return values[id];
 		}

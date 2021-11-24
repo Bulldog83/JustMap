@@ -17,7 +17,7 @@ import ru.bulldog.justmap.client.render.WaypointRenderer;
 
 @Mixin(WorldRenderer.class)
 public abstract class WorldRendererMixin {
-	
+
 	@Inject(method = "render", at = @At(value = "RETURN", ordinal = 0))
 	public void renderBeam(MatrixStack matrixStack, float f, long l, boolean bl, Camera camera, GameRenderer gameRenderer, LightmapTextureManager lightmapTextureManager, Matrix4f matrix4f, CallbackInfo ci) {
 		if (!MinecraftClient.isFabulousGraphicsOrBetter()) WaypointRenderer.renderWaypoints(matrixStack, camera, f);

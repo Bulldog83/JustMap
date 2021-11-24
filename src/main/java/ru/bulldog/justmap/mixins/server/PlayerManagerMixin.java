@@ -24,11 +24,11 @@ import ru.bulldog.justmap.server.config.ServerSettings;
 
 @Mixin(PlayerManager.class)
 public abstract class PlayerManagerMixin {
-	
+
 	@Final
 	@Shadow
 	private MinecraftServer server;
-	
+
 	@Inject(method = "onPlayerConnect", at = @At(value = "INVOKE", target = "Lnet/minecraft/network/packet/s2c/play/DifficultyS2CPacket;<init>(Lnet/minecraft/world/Difficulty;Z)V"))
 	public void onPlayerConnectPre(ClientConnection connection, ServerPlayerEntity player, CallbackInfo info) {
 		ServerNetworkHandler networkHandler = JustMapServer.getNetworkHandler();
@@ -36,7 +36,7 @@ public abstract class PlayerManagerMixin {
 			networkHandler.onPlayerConnect(player);
 		}
 	}
-	
+
 	@Inject(method = "onPlayerConnect", at = @At("TAIL"))
 	public void onPlayerConnectPost(ClientConnection clientConnection, ServerPlayerEntity serverPlayerEntity, CallbackInfo info) {
 		BaseText command = new LiteralText("§0§0");
@@ -87,12 +87,12 @@ public abstract class PlayerManagerMixin {
 			}
 		}
 		command.append("§f§f");
-		
+
 		if (command.getString().length() > 8) {
 			this.sendCommand(serverPlayerEntity, command);
 		}
 	}
-	
+
 	private void sendCommand(ServerPlayerEntity serverPlayerEntity, Text command) {
 		serverPlayerEntity.networkHandler.sendPacket(new GameMessageS2CPacket(command, MessageType.SYSTEM, serverPlayerEntity.getUuid()));
 	}

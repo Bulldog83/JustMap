@@ -22,40 +22,40 @@ import ru.bulldog.justmap.map.minimap.skin.MapSkin;
 import ru.bulldog.justmap.util.LangUtil;
 
 public final class ConfigFactory {
-	
+
 	private final static ClientConfig modConfig = JustMapClient.getConfig();
-	
+
 	private static Text lang(String key) {
 		return LangUtil.getText("configuration", key);
 	}
-	
+
 	public static Screen getConfigScreen(Screen parent) {
-		ConfigBuilder configBuilder = ConfigFactory.getConfigBuilder();		
+		ConfigBuilder configBuilder = ConfigFactory.getConfigBuilder();
 		configBuilder.setParentScreen(parent);
-		
+
 		return configBuilder.build();
 	}
-	
+
 	private static ConfigBuilder getConfigBuilder() {
 		ConfigBuilder configBuilder = ConfigBuilder.create().setTitle(new LiteralText("Just Map Configuration"));
 		ConfigEntryBuilder entryBuilder = ConfigEntryBuilder.create();
-		
+
 		ConfigCategory general = configBuilder.getOrCreateCategory(lang("category.general"));
-		
+
 		EnumEntry<ScreenPosition> drawPosConfig = modConfig.getEntry("map_position");
 		EnumSelectorBuilder<ScreenPosition> drawPosEntry = entryBuilder.startEnumSelector(lang("map_position"), ScreenPosition.class, drawPosConfig.getValue());
-		drawPosEntry.setSaveConsumer(val -> drawPosConfig.setValue(val))
+		drawPosEntry.setSaveConsumer(drawPosConfig::setValue)
 					.setDefaultValue(drawPosConfig.getDefault());
 		EnumEntry<MultiworldDetection> mwDetectConfig = modConfig.getEntry("multiworld_detection");
 		EnumSelectorBuilder<MultiworldDetection> mwDetectEntry = entryBuilder.startEnumSelector(lang("multiworld_detection_type"), MultiworldDetection.class, mwDetectConfig.getValue());
-		mwDetectEntry.setSaveConsumer(val -> mwDetectConfig.setValue(val))
+		mwDetectEntry.setSaveConsumer(mwDetectConfig::setValue)
 					 .setDefaultValue(mwDetectConfig.getDefault());
-		
+
 		MinecraftClient minecraft = MinecraftClient.getInstance();
 		int offset = modConfig.getInt("map_offset");
 		int maxX = minecraft.getWindow().getScaledWidth();
 		int maxY = minecraft.getWindow().getScaledHeight();
-		
+
 		general.addEntry(drawPosEntry.build());
 		general.addEntry(entryBuilder.startIntField(lang("map_offset"), offset)
 				.setSaveConsumer(val -> modConfig.setInt("map_offset", val))
@@ -69,9 +69,7 @@ public final class ConfigFactory {
 				.setSaveConsumer(val -> modConfig.setInt("map_position_y", val))
 				.setDefaultValue((int) modConfig.getDefault("map_position_y"))
 				.build());
-		general.addEntry(entryBuilder.startDropdownMenu(lang("map_size"), modConfig.getInt("map_size"), (val) -> {
-					return getIntValue(val, modConfig.getDefault("map_size"));
-				})
+		general.addEntry(entryBuilder.startDropdownMenu(lang("map_size"), modConfig.getInt("map_size"), (val) -> getIntValue(val, modConfig.getDefault("map_size")))
 				.setSaveConsumer(val -> modConfig.setRanged("map_size", val))
 				.setDefaultValue((int) modConfig.getDefault("map_size"))
 				.setSelections(Arrays.asList(32, 64, 96, 128, 160, 192, 224, 256))
@@ -80,9 +78,7 @@ public final class ConfigFactory {
 				.setSaveConsumer(val -> modConfig.setBoolean("show_big_map", val))
 				.setDefaultValue((boolean) modConfig.getDefault("show_big_map"))
 				.build());
-		general.addEntry(entryBuilder.startDropdownMenu(lang("big_map_size"), modConfig.getInt("big_map_size"), (val) -> {
-					return getIntValue(val, modConfig.getDefault("big_map_size"));
-				})
+		general.addEntry(entryBuilder.startDropdownMenu(lang("big_map_size"), modConfig.getInt("big_map_size"), (val) -> getIntValue(val, modConfig.getDefault("big_map_size")))
 				.setSaveConsumer(val -> modConfig.setRanged("big_map_size", val))
 				.setDefaultValue((int) modConfig.getDefault("big_map_size"))
 				.setSelections(Arrays.asList(256, 272, 288, 304, 320, 336, 352, 368, 384, 400))
@@ -150,19 +146,19 @@ public final class ConfigFactory {
 				.setSaveConsumer(val -> modConfig.setBoolean("hide_water", val))
 				.setDefaultValue((boolean) modConfig.getDefault("hide_water"))
 				.build());
-		
+
 		EnumEntry<ArrowType> arrowTypeConfig = modConfig.getEntry("arrow_type");
 		EnumSelectorBuilder<ArrowType> arrowTypeEntry = entryBuilder.startEnumSelector(lang("arrow_type"), ArrowType.class, arrowTypeConfig.getValue());
-		arrowTypeEntry.setSaveConsumer(val -> arrowTypeConfig.setValue(val))
+		arrowTypeEntry.setSaveConsumer(arrowTypeConfig::setValue)
 					  .setDefaultValue(arrowTypeConfig.getDefault());
 		EnumEntry<MapShape> mapShapeConfig = modConfig.getEntry("map_shape");
 		EnumSelectorBuilder<MapShape> mapShapeEntry = entryBuilder.startEnumSelector(lang("map_shape"), MapShape.class, mapShapeConfig.getValue());
-		mapShapeEntry.setSaveConsumer(val -> mapShapeConfig.setValue(val))
+		mapShapeEntry.setSaveConsumer(mapShapeConfig::setValue)
 					 .setDefaultValue(mapShapeConfig.getDefault());
 		FloatSliderBuilder doubleSlider = new FloatSliderBuilder(entryBuilder.getResetButtonKey(), lang("skin_border_scale"), modConfig.getFloat("skin_scale"), 0.5F, 3.0F)
 				.setSaveConsumer(val -> modConfig.setRanged("skin_scale", val))
 				.setDefaultValue((float) modConfig.getDefault("skin_scale"));
-		
+
 		ConfigCategory mapAppearance = configBuilder.getOrCreateCategory(lang("category.appearance"));
 		mapAppearance.addEntry(mapShapeEntry.build());
 		mapAppearance.addEntry(entryBuilder.startBooleanToggle(lang("use_skins"), modConfig.getBoolean("use_skins"))
@@ -219,7 +215,7 @@ public final class ConfigFactory {
 				.setSaveConsumer(val -> modConfig.setRanged("map_brightness", val))
 				.setDefaultValue((int) modConfig.getDefault("map_brightness"))
 				.build());
-		
+
 		ConfigCategory waypoints = configBuilder.getOrCreateCategory(lang("category.waypoints"));
 		waypoints.addEntry(entryBuilder.startBooleanToggle(lang("show_waypoints"), modConfig.getBoolean("show_waypoints"))
 				.setSaveConsumer(val -> modConfig.setBoolean("show_waypoints", val))
@@ -257,7 +253,7 @@ public final class ConfigFactory {
 				.setSaveConsumer(val -> modConfig.setRanged("max_render_dist", val))
 				.setDefaultValue((int) modConfig.getDefault("max_render_dist"))
 				.build());
-		
+
 		ConfigCategory entityRadar = configBuilder.getOrCreateCategory(lang("category.entity_radar"));
 		entityRadar.addEntry(entryBuilder.startBooleanToggle(lang("show_entities"), modConfig.getBoolean("show_entities"))
 				.setSaveConsumer(val -> modConfig.setBoolean("show_entities", val))
@@ -311,7 +307,7 @@ public final class ConfigFactory {
 				.setSaveConsumer(val -> modConfig.setRanged("entity_model_size", val))
 				.setDefaultValue((int) modConfig.getDefault("entity_model_size"))
 				.build());
-		
+
 		EnumEntry<ScreenPosition> infoPosConfig = modConfig.getEntry("info_position");
 		EnumSelectorBuilder<ScreenPosition> infoPosEntry = entryBuilder.startEnumSelector(lang("info_position"), ScreenPosition.class, infoPosConfig.getValue());
 		infoPosEntry.setSaveConsumer(val -> {
@@ -330,7 +326,7 @@ public final class ConfigFactory {
 			itemsPosConfig.setValue(val);
 		})
 		.setDefaultValue(itemsPosConfig.getDefault());
-		
+
 		ConfigCategory mapInfo = configBuilder.getOrCreateCategory(lang("category.info"));
 		mapInfo.addEntry(infoPosEntry.build());
 		mapInfo.addEntry(itemsPosEntry.build());
@@ -390,7 +386,7 @@ public final class ConfigFactory {
 				.setSaveConsumer(val -> modConfig.setBoolean("show_feet", val))
 				.setDefaultValue((boolean) modConfig.getDefault("show_feet"))
 				.build());
-	
+
 		ConfigCategory optimization = configBuilder.getOrCreateCategory(lang("category.optimization"));
 		optimization.addEntry(entryBuilder.startIntField(lang("chunk_update_interval"), modConfig.getInt("chunk_update_interval"))
 				.setSaveConsumer(val -> modConfig.setRanged("chunk_update_interval", val))
@@ -416,17 +412,17 @@ public final class ConfigFactory {
 				.setSaveConsumer(val -> modConfig.setBoolean("use_fast_render", val))
 				.setDefaultValue((boolean) modConfig.getDefault("use_fast_render"))
 				.build());
-		
+
 		configBuilder.setDoesConfirmSave(false);
 		configBuilder.transparentBackground();
 		configBuilder.setSavingRunnable(modConfig::saveChanges);
-		
+
 		return configBuilder;
 	}
-	
+
 	private static int getIntValue(String value, int defVal) {
 		try {
-			return Integer.valueOf(value);
+			return Integer.parseInt(value);
 		} catch (NumberFormatException ex) {
 			return defVal;
 		}

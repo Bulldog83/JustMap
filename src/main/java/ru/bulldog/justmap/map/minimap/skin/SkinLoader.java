@@ -21,9 +21,9 @@ public final class SkinLoader extends JsonFactory {
 
 	private final static File SKINS_FOLDER = StorageUtil.skinsDir();
 	private final static TextureManager textureManager = MinecraftClient.getInstance().getTextureManager();
-	
+
 	private SkinLoader() {}
-	
+
 	public static void loadSkins() {
 		File[] skinFolders = SKINS_FOLDER.listFiles();
 		for (File folder : skinFolders) {
@@ -38,7 +38,7 @@ public final class SkinLoader extends JsonFactory {
 			}
 		}
 	}
-	
+
 	private static void loadSkin(File folder, File skinFile) {
 		JsonObject skinData = getJsonObject(skinFile);
 		String name = JsonHelper.getString(skinData, "name");
@@ -49,7 +49,7 @@ public final class SkinLoader extends JsonFactory {
 		boolean resizable = JsonHelper.getBoolean(skinData, "resizable", false);
 		boolean repeating = JsonHelper.getBoolean(skinData, "repeating", false);
 		String textureType = JsonHelper.getString(skinData, "texture_type");
-		if (textureType.equals("source")) {	
+		if (textureType.equals("source")) {
 			Identifier texture = new Identifier(JsonHelper.getString(skinData, "texture"));
 			MapSkin.addUniversalSkin(name, texture, width, height, border);
 		} else if (textureType.equals("image")) {
@@ -73,7 +73,7 @@ public final class SkinLoader extends JsonFactory {
 			throw new JsonParseException("Invalid skin texture type: '" + textureType + "'");
 		}
 	}
-	
+
 	private static SkinType getSkinType(String shape) throws JsonParseException {
 		switch(shape.toLowerCase()) {
 			case "round":
@@ -85,6 +85,6 @@ public final class SkinLoader extends JsonFactory {
 				return SkinType.SQUARE;
 			default:
 				throw new JsonParseException("Invalid skin shape: '" + shape + "'");
-		}		
+		}
 	}
 }

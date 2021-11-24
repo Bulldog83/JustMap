@@ -20,11 +20,26 @@ import ru.bulldog.justmap.util.render.Image;
 import ru.bulldog.justmap.util.render.RenderUtil;
 import ru.bulldog.justmap.util.storage.StorageUtil;
 
-public class EntityHeadIcon extends Image {
-	
-	private final static Map<Identifier, EntityHeadIcon> ICONS = new HashMap<>();
-	
-	public static EntityHeadIcon getIcon(Entity entity) {
+public class EntityHeadIconImage extends Image {
+
+	private final static Map<Identifier, EntityHeadIconImage> ICONS = new HashMap<>();
+	private final Identifier id;
+	private Identifier outlineId;
+	private int color = Colors.LIGHT_GRAY;
+	private final boolean solid;
+
+	private EntityHeadIconImage(Identifier id, Identifier texture, int w, int h) {
+		this(id, texture, ImageUtil.loadImage(texture, w, h));
+	}
+
+	private EntityHeadIconImage(Identifier id, Identifier texture, NativeImage image) {
+		super(texture, image);
+
+		this.solid = this.isSolid();
+		this.id = id;
+	}
+
+	public static EntityHeadIconImage getIcon(Entity entity) {
 		Identifier id = EntityType.getId(entity.getType());
 		if (ICONS.containsKey(id)) {
 			return ICONS.get(id);
@@ -40,24 +55,8 @@ public class EntityHeadIcon extends Image {
 				}
 			}
 		}
-		
+
 		return null;
-	}
-	
-	private final Identifier id;
-	private Identifier outlineId;
-	private int color = Colors.LIGHT_GRAY;
-	private final boolean solid;
-	
-	private EntityHeadIcon(Identifier id, Identifier texture, int w, int h) {
-		this(id, texture, ImageUtil.loadImage(texture, w, h));
-	}
-	
-	private EntityHeadIcon(Identifier id, Identifier texture, NativeImage image) {
-		super(texture, image);
-		
-		this.solid = this.isSolid();
-		this.id = id;
 	}
 
 	@Override
@@ -73,7 +72,7 @@ public class EntityHeadIcon extends Image {
 		}
 		this.draw(matrices, x, y, (float) w, (float) h);
 	}
-	
+
 	private void bindOutline() {
 		if (outlineId == null) {
 			NativeImage outline = ImageUtil.generateOutline(image, width, height, color);
@@ -82,13 +81,13 @@ public class EntityHeadIcon extends Image {
 		}
 		RenderUtil.bindTexture(outlineId);
 	}
-	
+
 	private boolean isSolid() {
 		NativeImage icon = this.image;
-		
+
 		int width = icon.getWidth();
 		int height = icon.getHeight();
-		
+
 		boolean solid = true;
 		for (int i = 0; i < width; i++) {
 			for (int j = 0; j < height; j++) {
@@ -97,29 +96,29 @@ public class EntityHeadIcon extends Image {
 				if (!solid) break;
 			}
 		}
-		
+
 		return solid;
 	}
-	
+
 	private static Identifier iconId(Identifier id) {
 		String path = String.format("textures/minimap/entities/%s.png", id.getPath());
 		return new Identifier(id.getNamespace(), path);
 	}
-	
-	private static EntityHeadIcon registerIcon(Entity entity, Identifier entityId, Identifier texture) {
-		EntityHeadIcon icon = new EntityHeadIcon(entityId, texture, 32, 32);
+
+	private static EntityHeadIconImage registerIcon(Entity entity, Identifier entityId, Identifier texture) {
+		EntityHeadIconImage icon = new EntityHeadIconImage(entityId, texture, 32, 32);
 		return registerIcon(entity, entityId, icon);
 	}
-	
-	private static EntityHeadIcon registerIcon(Entity entity, Identifier entityId, File image) {
+
+	private static EntityHeadIconImage registerIcon(Entity entity, Identifier entityId, File image) {
 		NativeImage iconImage = ImageUtil.loadImage(image, 32, 32);
 		String prefix = String.format("icon_%s_%s", entityId.getNamespace(), entityId.getPath());
 		Identifier textureId = textureManager.registerDynamicTexture(prefix, new NativeImageBackedTexture(iconImage));
-		EntityHeadIcon icon = new EntityHeadIcon(entityId, textureId, iconImage);
+		EntityHeadIconImage icon = new EntityHeadIconImage(entityId, textureId, iconImage);
 		return registerIcon(entity, entityId, icon);
 	}
-	
-	private static EntityHeadIcon registerIcon(Entity entity, Identifier entityId, EntityHeadIcon icon) {
+
+	private static EntityHeadIconImage registerIcon(Entity entity, Identifier entityId, EntityHeadIconImage icon) {
 		if (entity instanceof HostileEntity) {
 			icon.color = Colors.DARK_RED;
 		} else if (entity instanceof TameableEntity) {
@@ -128,9 +127,9 @@ public class EntityHeadIcon extends Image {
 		} else {
 			icon.color = Colors.YELLOW;
 		}
-		
+
 		ICONS.put(entityId, icon);
-		
+
 		return icon;
 	}
 }

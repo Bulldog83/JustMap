@@ -18,7 +18,7 @@ public class ClientNetworkHandler extends NetworkHandler {
 	private final Map<Integer, Consumer<?>> responseListeners = new HashMap<>();
 	private boolean serverReady = false;
 	private Random random;
-	
+
 	public void registerPacketsListeners() {
 		clientPacketRegistry.register(INIT_PACKET_ID, (context, data) -> {
 			long seed = data.readLong();
@@ -41,11 +41,11 @@ public class ClientNetworkHandler extends NetworkHandler {
 			}
 		});
 	}
-	
+
 	public boolean canRequestData() {
 		return serverReady;
 	}
-	
+
 	public void requestChunkHasSlime(ChunkPos chunkPos, Consumer<Boolean> responseConsumer) {
 		if (!canServerReceive()) return;
 		int packet_id = this.registerResponseConsumer(responseConsumer);
@@ -61,7 +61,7 @@ public class ClientNetworkHandler extends NetworkHandler {
 			}
 		});
 	}
-	
+
 	private void onChunkHasSlimeResponse(ByteBuf data) {
 		int packet_id = data.readInt();
 		boolean result = data.readBoolean();
@@ -71,15 +71,15 @@ public class ClientNetworkHandler extends NetworkHandler {
 			responseConsumer.accept(result);
 		}
 	}
-	
+
 	public void requestRegionImage(RegionPos regionPos, Consumer<byte[]> responseConsumer) {
 		this.registerResponseConsumer(responseConsumer);
 	}
-	
+
 	private void onRegionImageResponse(ByteBuf data) {
-		
+
 	}
-	
+
 	private int registerResponseConsumer(Consumer<?> responseConsumer) {
 		int request_id = random.nextInt();
 		this.responseListeners.put(request_id, responseConsumer);

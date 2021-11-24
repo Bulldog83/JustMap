@@ -31,14 +31,14 @@ import ru.bulldog.justmap.util.colors.Colors;
 
 @Mixin(InGameHud.class)
 abstract class HudMixin extends DrawableHelper {
-	
+
 	@Final
 	@Shadow
 	private MinecraftClient client;
-	
+
 	@Shadow
 	private int scaledWidth;
-	
+
 	@Inject(at = @At("HEAD"), method = "renderStatusEffectOverlay", cancellable = true)
 	protected void renderStatusEffects(MatrixStack matrices, CallbackInfo info) {
 		if (ClientSettings.moveEffects) {
@@ -47,27 +47,27 @@ abstract class HudMixin extends DrawableHelper {
 			if (ClientSettings.mapPosition == ScreenPosition.TOP_RIGHT) {
 				posX = JustMapClient.getMiniMap().getSkinX();
 			}
-			
-			this.drawMovedEffects(matrices, posX, posY);			
+
+			this.drawMovedEffects(matrices, posX, posY);
 			info.cancel();
 		}
 	}
-	
+
 	private void drawMovedEffects(MatrixStack matrixStack, int screenX, int screenY) {
 		Collection<StatusEffectInstance> statusEffects = this.client.player.getStatusEffects();
 		if (statusEffects.isEmpty()) return;
-		
+
 		RenderSystem.enableBlend();
-		
+
 		int size = 24;
 		int hOffset = 6;
 		int vOffset = 10;
-		
+
 		if (!ClientSettings.showEffectTimers) {
 			hOffset = 1;
 			vOffset = 2;
 		}
-		
+
 		StatusEffectSpriteManager statusEffectSpriteManager = this.client.getStatusEffectSpriteManager();
 		List<Runnable> icons = Lists.newArrayListWithExpectedSize(statusEffects.size());
 		List<Runnable> timers = Lists.newArrayListWithExpectedSize(statusEffects.size());
@@ -75,7 +75,7 @@ abstract class HudMixin extends DrawableHelper {
 		Iterator<StatusEffectInstance> effectsIterator = Ordering.natural().reverse().sortedCopy(statusEffects).iterator();
 
 	 	int i = 0, j = 0;
-		while(effectsIterator.hasNext()) {
+		while (effectsIterator.hasNext()) {
 	 		StatusEffectInstance statusEffectInstance = effectsIterator.next();
 			StatusEffect statusEffect = statusEffectInstance.getEffectType();
 			if (statusEffectInstance.shouldShowIcon()) {
@@ -106,7 +106,7 @@ abstract class HudMixin extends DrawableHelper {
 				 		alpha = MathHelper.clamp(effectDuration / 10F / 5F * 0.5F, 0F, 0.5F) + MathHelper.cos((float) (effectDuration * Math.PI) / 5F) * MathHelper.clamp(m / 10F * 0.25F, 0.0F, 0.25F);
 			  		}
 		   		}
-		   		
+
 		   		Sprite sprite = statusEffectSpriteManager.getSprite(statusEffect);
 		   		final int fx = x, fy = y;
 		   		final float fa = alpha;
@@ -116,9 +116,8 @@ abstract class HudMixin extends DrawableHelper {
 					drawSprite(matrixStack, fx + 3, fy + 3, this.getZOffset(), 18, 18, sprite);
 		   		});
 		   		if (ClientSettings.showEffectTimers) {
-			   		timers.add(() -> {
-			   			drawCenteredText(matrixStack, client.textRenderer, convertDuration(effectDuration), fx + size / 2, fy + (size + 1), Colors.WHITE);
-			   		});
+			   		timers.add(() ->
+						drawCenteredText(matrixStack, client.textRenderer, convertDuration(effectDuration), fx + size / 2, fy + (size + 1), Colors.WHITE));
 		   		}
 			}
 	 	}
@@ -126,7 +125,7 @@ abstract class HudMixin extends DrawableHelper {
 	 	icons.forEach(Runnable::run);
 	 	timers.forEach(Runnable::run);
 	}
-	
+
 	private String convertDuration(int time) {
 		int mils = time * 50;
 		int s = (mils / 1000) % 60;

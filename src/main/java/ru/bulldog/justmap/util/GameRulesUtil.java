@@ -2,19 +2,16 @@ package ru.bulldog.justmap.util;
 
 import net.fabricmc.api.EnvType;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.GameRules;
-import net.minecraft.world.World;
-import net.minecraft.world.dimension.DimensionType;
 
 import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.client.config.ClientSettings;
 import ru.bulldog.justmap.map.MapGameRules;
 import ru.bulldog.justmap.server.config.ServerSettings;
 
-public class RuleUtil {
+public class GameRulesUtil {
 
-	public static boolean isAllowed(boolean param, GameRules.Key<GameRules.BooleanRule> rule, boolean isServer) {
+	private static boolean isAllowed(boolean param, GameRules.Key<GameRules.BooleanRule> rule, boolean isServer) {
 		if (isServer) {
 			if (ServerSettings.useGameRules) {
 				return MapGameRules.isAllowed(rule);
@@ -24,34 +21,17 @@ public class RuleUtil {
 		} else if (param) {
 			return MinecraftClient.getInstance().isInSingleplayer() || MapGameRules.isAllowed(rule);
 		}
-		
+
 		return false;
 	}
-	
-	public static boolean detectMultiworlds() {
-		return ClientSettings.detectMultiworlds;
+
+	public static boolean allowCaves() {
+		if (JustMap.getSide() == EnvType.SERVER) {
+			return isAllowed(ServerSettings.allowCavesMap, MapGameRules.ALLOW_CAVES_MAP, true);
+		}
+		return isAllowed(ClientSettings.drawCaves, MapGameRules.ALLOW_CAVES_MAP, false);
 	}
 
-	public static boolean needRenderCaves(World world, BlockPos pos) {
-		boolean allowCaves = false;
-		if (JustMap.getSide() == EnvType.SERVER) {
-			allowCaves = isAllowed(ServerSettings.allowCavesMap, MapGameRules.ALLOW_CAVES_MAP, true);
-		} else {
-			allowCaves = isAllowed(ClientSettings.drawCaves, MapGameRules.ALLOW_CAVES_MAP, false);
-		}
-		
-		if (Dimension.isEnd(world)) {
-			return false;
-		}
-		DimensionType dimType = world.getDimension();
-		if (!dimType.hasCeiling() && dimType.hasSkyLight()) {
-			return allowCaves && (!world.isSkyVisibleAllowingSea(pos) && !DataUtil.hasSkyLight(world, pos) ||
-				   world.getRegistryKey().getValue().equals(DimensionType.OVERWORLD_CAVES_REGISTRY_KEY.getValue()));
-		}
-		
-		return allowCaves;
-	}
-	
 	public static boolean allowEntityRadar() {
 		if (JustMap.getSide() == EnvType.SERVER) {
 			return isAllowed(ServerSettings.allowEntities, MapGameRules.ALLOW_ENTITY_RADAR, true);

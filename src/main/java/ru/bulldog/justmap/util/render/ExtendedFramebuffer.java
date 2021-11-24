@@ -13,18 +13,18 @@ public class ExtendedFramebuffer extends Framebuffer {
 	private int colorAttachment;
 	private int depthAttachment;
 	private FboType fboType;
-	
+
 	public ExtendedFramebuffer(boolean useDepthIn) {
 		super(useDepthIn);
 	}
 
 	public static boolean canUseFramebuffer() {
-        return GL.getCapabilities().OpenGL14 && (
-        		GL.getCapabilities().GL_ARB_framebuffer_object ||
-        	    GL.getCapabilities().GL_EXT_framebuffer_object ||
-        	    GL.getCapabilities().OpenGL30);
-    }
-	
+		return GL.getCapabilities().OpenGL14 && (
+			GL.getCapabilities().GL_ARB_framebuffer_object ||
+			GL.getCapabilities().GL_EXT_framebuffer_object ||
+			GL.getCapabilities().OpenGL30);
+	}
+
 	@Override
 	public void resize(int width, int height, boolean isMac) {
 		RenderSystem.assertThread(RenderSystem::isOnRenderThreadOrInit);
@@ -35,7 +35,7 @@ public class ExtendedFramebuffer extends Framebuffer {
 		this.initFbo(width, height, isMac);
 		this.bindFramebuffer(GLC.GL_FRAMEBUFFER, 0);
 	}
-	
+
 	@Override
 	public void initFbo(int width, int height, boolean isMac) {
 		RenderSystem.assertThread(RenderSystem::isOnRenderThreadOrInit);
@@ -73,7 +73,7 @@ public class ExtendedFramebuffer extends Framebuffer {
 		}
 		this.endRead();
 	}
-	
+
 	private int genFrameBuffers() {
 		int fbo = -1;
 		this.fboType = FboType.NONE;
@@ -91,7 +91,7 @@ public class ExtendedFramebuffer extends Framebuffer {
 		}
 		return fbo;
 	}
-	
+
 	public int genRenderbuffers() {
 		switch (fboType) {
 			case BASE: {
@@ -108,7 +108,7 @@ public class ExtendedFramebuffer extends Framebuffer {
 			}
 		}
 	}
-	
+
 	public void delete() {
 		this.endRead();
 		this.endWrite();
@@ -126,7 +126,7 @@ public class ExtendedFramebuffer extends Framebuffer {
 			this.fbo = -1;
 		}
 	}
-	
+
 	private void deleteFramebuffers(int framebufferIn) {
 		switch (fboType) {
 			case BASE: {
@@ -144,7 +144,7 @@ public class ExtendedFramebuffer extends Framebuffer {
 			default: {}
 		}
 	}
-	
+
 	private void deleteRenderbuffers(int renderbuffer) {
 		switch (fboType) {
 			case BASE: {
@@ -162,7 +162,7 @@ public class ExtendedFramebuffer extends Framebuffer {
 			default: {}
 		}
 	}
-	
+
 	@Override
 	public void checkFramebufferStatus() {
 		int status = this.checkFramebufferStatus(GLC.GL_FRAMEBUFFER);
@@ -187,7 +187,7 @@ public class ExtendedFramebuffer extends Framebuffer {
 			}
 		}
 	}
-	
+
 	private int checkFramebufferStatus(int target) {
 		switch (fboType) {
 			case BASE: {
@@ -204,7 +204,7 @@ public class ExtendedFramebuffer extends Framebuffer {
 			}
 		}
 	}
-	
+
 	public void bindFramebuffer(int target, int framebufferIn) {
 		switch (fboType) {
 			case BASE: {
@@ -224,7 +224,7 @@ public class ExtendedFramebuffer extends Framebuffer {
 			}
 		}
 	}
-	
+
 	public void framebufferTexture2D(int target, int attachment, int textarget, int texture, int level) {
 		switch (fboType) {
 			case BASE: {
@@ -244,7 +244,7 @@ public class ExtendedFramebuffer extends Framebuffer {
 			}
 		}
 	}
-	
+
 	public void bindRenderbuffer(int target, int renderbuffer) {
 		switch (fboType) {
 			case BASE: {
@@ -264,7 +264,7 @@ public class ExtendedFramebuffer extends Framebuffer {
 			}
 		}
 	}
-	
+
 	public void renderbufferStorage(int target, int internalFormat, int width, int height) {
 		switch (fboType) {
 			case BASE: {
@@ -284,7 +284,7 @@ public class ExtendedFramebuffer extends Framebuffer {
 			}
 		}
 	}
-	
+
 	public void framebufferRenderbuffer(int target, int attachment, int renderBufferTarget, int renderBuffer) {
 		switch (fboType) {
 			case BASE: {
@@ -304,7 +304,7 @@ public class ExtendedFramebuffer extends Framebuffer {
 			}
 		}
 	}
-	
+
 	@Override
 	public void beginWrite(boolean setViewport) {
 		this.bindFramebuffer(GLC.GL_FRAMEBUFFER, fbo);
@@ -312,7 +312,7 @@ public class ExtendedFramebuffer extends Framebuffer {
 			RenderSystem.viewport(0, 0, viewportWidth, viewportHeight);
 		}
 	}
-	
+
 	@Override
 	public void endWrite() {
 		this.bindFramebuffer(GLC.GL_FRAMEBUFFER, 0);
@@ -323,12 +323,12 @@ public class ExtendedFramebuffer extends Framebuffer {
 	public void method_35610() {
 		RenderSystem.bindTexture(colorAttachment);
 	}
-	
+
 	@Override
 	public void endRead() {
 		RenderSystem.bindTexture(0);
 	}
-	
+
 	@Override
 	public void setTexFilter(int filter) {
 		RenderSystem.assertThread(RenderSystem::isOnRenderThreadOrInit);
@@ -341,11 +341,11 @@ public class ExtendedFramebuffer extends Framebuffer {
 		RenderSystem.bindTexture(0);
 		this.bindFramebuffer(GLC.GL_FRAMEBUFFER, 0);
 	}
-	
+
 	public enum FboType {
 		BASE,
 		ARB,
 		EXT,
 		NONE
-    }
+	}
 }

@@ -26,7 +26,7 @@ import ru.bulldog.justmap.client.control.KeyHandler;
 import ru.bulldog.justmap.map.data.MapDataProvider;
 import ru.bulldog.justmap.map.minimap.Minimap;
 import ru.bulldog.justmap.network.ClientNetworkHandler;
-import ru.bulldog.justmap.util.DataUtil;
+import ru.bulldog.justmap.util.CurrentWorldPos;
 import ru.bulldog.justmap.util.colors.Colors;
 import ru.bulldog.justmap.util.tasks.TaskManager;
 
@@ -35,7 +35,6 @@ public class JustMapClient implements ClientModInitializer {
 	private static Minimap minimap = new Minimap();
 	private static MinecraftClient minecraft;
 	private static ClientNetworkHandler networkHandler;
-	private static boolean canMapping = false;	
 	private static boolean isOnTitleScreen = true;
 
 	@Override
@@ -64,14 +63,14 @@ public class JustMapClient implements ClientModInitializer {
 				JustMapClient.stop();
 			}
 			isOnTitleScreen = isTitle;
-			
-			AdvancedInfo.getInstance().updateInfo();
-			KeyHandler.update();
+
+			AdvancedInfo.getInstance().updateOnTick();
+			KeyHandler.updateOnTick();
 
 			if (!canMapping()) return;
 
-			DataUtil.update();
-			JustMapClient.minimap.update();
+			CurrentWorldPos.updatePositionOnTick();
+			JustMapClient.minimap.updateOnTick();
 			MapDataProvider.getManager().onTick(false);
 		});
 		ClientLifecycleEvents.CLIENT_STOPPING.register(client -> {
@@ -80,56 +79,48 @@ public class JustMapClient implements ClientModInitializer {
 			minecraft = null;
 		});
 	}
-	
+
 	private static void stop() {
-		stopMapping();
 		MapDataProvider.getManager().onWorldStop();
+		MapDataProvider.getMultiworldManager().onWorldStop();
 		Colors.INSTANCE.saveData();
 	}
-	
-	public static void startMapping() {
-		canMapping = true;
-	}
-	
-	public static void stopMapping() {
-		canMapping = false;
-	}
-	
+
 	public static boolean canMapping() {
-		return !isOnTitleScreen && canMapping && minecraft.world != null &&
+		return !isOnTitleScreen && MapDataProvider.getMultiworldManager().isMappingEnabled() && minecraft.world != null &&
 				(minecraft.getCameraEntity() != null || minecraft.player != null);
 	}
-	
+
 	public static Minimap getMiniMap() {
 		return minimap;
 	}
-	
+
 	public static ClientConfig getConfig() {
 		return config;
 	}
-	
+
 	public static ClientNetworkHandler getNetworkHandler() {
 		return networkHandler;
 	}
-	
+
 	private boolean isOnTitleScreen(Screen currentScreen) {
 		if (currentScreen == null) return false;
-		
+
 		boolean isTitleScreen = false;
 		if (currentScreen.getTitle() instanceof TranslatableText) {
 			TranslatableText title = (TranslatableText) currentScreen.getTitle();
 			isTitleScreen = title.getKey().equals("dataPack.title");
 		}
-		
+
 		return currentScreen instanceof TitleScreen ||
-			   currentScreen instanceof SelectWorldScreen ||
-		       currentScreen instanceof MultiplayerScreen ||
-		       currentScreen instanceof BackupPromptScreen ||
-		       currentScreen instanceof CreateWorldScreen ||
-		       currentScreen instanceof EditGameRulesScreen ||
-		       currentScreen instanceof EditWorldScreen ||
-		       currentScreen instanceof RealmsMainScreen ||
-		       currentScreen instanceof RealmsGenericErrorScreen ||
-		       isTitleScreen;
+			currentScreen instanceof SelectWorldScreen ||
+			currentScreen instanceof MultiplayerScreen ||
+			currentScreen instanceof BackupPromptScreen ||
+			currentScreen instanceof CreateWorldScreen ||
+			currentScreen instanceof EditGameRulesScreen ||
+			currentScreen instanceof EditWorldScreen ||
+			currentScreen instanceof RealmsMainScreen ||
+			currentScreen instanceof RealmsGenericErrorScreen ||
+			isTitleScreen;
 	}
 }

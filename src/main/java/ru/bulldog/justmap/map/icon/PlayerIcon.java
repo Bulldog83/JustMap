@@ -10,7 +10,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import ru.bulldog.justmap.client.config.ClientSettings;
 import ru.bulldog.justmap.client.render.EntityModelRenderer;
 import ru.bulldog.justmap.map.MapPlayerManager;
-import ru.bulldog.justmap.util.DataUtil;
+import ru.bulldog.justmap.util.CurrentWorldPos;
 import ru.bulldog.justmap.util.colors.ColorUtil;
 import ru.bulldog.justmap.util.colors.Colors;
 import ru.bulldog.justmap.util.math.MathUtil;
@@ -18,26 +18,26 @@ import ru.bulldog.justmap.util.render.GLC;
 import ru.bulldog.justmap.util.render.RenderUtil;
 
 public class PlayerIcon extends MapIcon<PlayerIcon> {
-	
+
 	private final PlayerEntity player;
 	private final int color = Colors.GREEN;
-	
+
 	public PlayerIcon(PlayerEntity player) {
 		this.player = player;
 	}
-	
+
 	public double getX() {
 		return this.player.getX();
 	}
-	
+
 	public double getY() {
 		return this.player.getY();
 	}
-	
+
 	public double getZ() {
 		return this.player.getZ();
 	}
-	
+
 	public void draw(MatrixStack matrices, int size) {
 		double x = this.x - size / 2;
 		double y = this.y - size / 2;
@@ -60,7 +60,7 @@ public class PlayerIcon extends MapIcon<PlayerIcon> {
 			EntityModelRenderer.renderModel(matrices, consumerProvider, player, iconPos.x, iconPos.y);
 		} else if (ClientSettings.showPlayerHeads) {
 			if (ClientSettings.entityIconsShading) {
-				int posY = DataUtil.coordY();
+				int posY = CurrentWorldPos.coordY();
 				int hdiff = posY - height;
 				float hmod;
 				if (hdiff < 0) {
@@ -82,7 +82,7 @@ public class PlayerIcon extends MapIcon<PlayerIcon> {
 		}
 		this.drawPlayerName(matrices, iconPos.x, iconPos.y);
 	}
-	
+
 	private void drawPlayerName(MatrixStack matrices, double x, double y) {
 		if (!ClientSettings.showPlayerNames) return;
 		MinecraftClient minecraft = MinecraftClient.getInstance();

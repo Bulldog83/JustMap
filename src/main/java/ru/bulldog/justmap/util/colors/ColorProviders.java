@@ -19,42 +19,28 @@ import ru.bulldog.justmap.mixins.RedstoneLevelAccessor;
 import ru.bulldog.justmap.util.math.MathUtil;
 
 public class ColorProviders implements ColorProvider {
-	
+
 	public final static ColorProviders INSTANCE = registerProviders();
-	
+
 	private final Colors colorPalette = Colors.INSTANCE;
 	private final Map<Block, ColorProvider> providers = Maps.newHashMap();
-	
+
 	private ColorProviders() {}
 
 	private static ColorProviders registerProviders() {
 		ColorProviders blockColors = new ColorProviders();
-		blockColors.registerColorProvider((state, world, pos) -> {
-			return blockColors.getGrassColor(world, pos);
-		}, Blocks.LARGE_FERN, Blocks.TALL_GRASS, Blocks.GRASS_BLOCK, Blocks.FERN, Blocks.GRASS, Blocks.POTTED_FERN);
-		blockColors.registerColorProvider((state, world, pos) -> {
-			return blockColors.getGrassColor(world, pos);
-		}, Blocks.SUGAR_CANE);
-		blockColors.registerColorProvider((state, world, pos) -> {
-			return Colors.SPRUCE_LEAVES;
-		}, Blocks.SPRUCE_LEAVES);
-		blockColors.registerColorProvider((state, world, pos) -> {
-			return Colors.BIRCH_LEAVES;
-		}, Blocks.BIRCH_LEAVES);
-		blockColors.registerColorProvider((state, world, pos) -> {
-			return blockColors.getFoliageColor(world, pos);
-		}, Blocks.OAK_LEAVES, Blocks.JUNGLE_LEAVES, Blocks.ACACIA_LEAVES, Blocks.DARK_OAK_LEAVES, Blocks.VINE);
-		blockColors.registerColorProvider((state, world, pos) -> {
-			return blockColors.getWaterColor(world, pos);
-		}, Blocks.WATER, Blocks.BUBBLE_COLUMN, Blocks.CAULDRON);
+		blockColors.registerColorProvider((state, world, pos) -> blockColors.getGrassColor(world, pos), Blocks.LARGE_FERN, Blocks.TALL_GRASS, Blocks.GRASS_BLOCK, Blocks.FERN, Blocks.GRASS, Blocks.POTTED_FERN);
+		blockColors.registerColorProvider((state, world, pos) -> blockColors.getGrassColor(world, pos), Blocks.SUGAR_CANE);
+		blockColors.registerColorProvider((state, world, pos) -> Colors.SPRUCE_LEAVES, Blocks.SPRUCE_LEAVES);
+		blockColors.registerColorProvider((state, world, pos) -> Colors.BIRCH_LEAVES, Blocks.BIRCH_LEAVES);
+		blockColors.registerColorProvider((state, world, pos) -> blockColors.getFoliageColor(world, pos), Blocks.OAK_LEAVES, Blocks.JUNGLE_LEAVES, Blocks.ACACIA_LEAVES, Blocks.DARK_OAK_LEAVES, Blocks.VINE);
+		blockColors.registerColorProvider((state, world, pos) -> blockColors.getWaterColor(world, pos), Blocks.WATER, Blocks.BUBBLE_COLUMN, Blocks.CAULDRON);
 		blockColors.registerColorProvider((state, world, pos) -> {
 			int power = state.get(RedstoneWireBlock.POWER);
 			Vec3d powerVector = RedstoneLevelAccessor.getPowerVectors()[power];
 			return MathUtil.packRgb((float) powerVector.getX(), (float) powerVector.getY(), (float) powerVector.getZ());
 		}, Blocks.REDSTONE_WIRE);
-		blockColors.registerColorProvider((state, world, pos) -> {
-			return Colors.ATTACHED_STEM;
-		}, Blocks.ATTACHED_MELON_STEM, Blocks.ATTACHED_PUMPKIN_STEM);
+		blockColors.registerColorProvider((state, world, pos) -> Colors.ATTACHED_STEM, Blocks.ATTACHED_MELON_STEM, Blocks.ATTACHED_PUMPKIN_STEM);
 		blockColors.registerColorProvider((state, world, pos) -> {
 			int age = state.get(StemBlock.AGE);
 			int i = age * 32;
@@ -62,20 +48,17 @@ public class ColorProviders implements ColorProvider {
 			int k = age * 4;
 			return i << 16 | j << 8 | k;
 		}, Blocks.MELON_STEM, Blocks.PUMPKIN_STEM);
-		blockColors.registerColorProvider((state, world, pos) -> {
-			return Colors.LILY_PAD;
-		}, Blocks.LILY_PAD);
-		
+		blockColors.registerColorProvider((state, world, pos) -> Colors.LILY_PAD, Blocks.LILY_PAD);
+
 		return blockColors;
 	}
-	
+
 	public void registerColorProvider(ColorProvider provider, Block... blocks) {
-		for(int i = 0; i < blocks.length; i++) {
-			Block block = blocks[i];
+		for (Block block : blocks) {
 			this.providers.put(block, provider);
 		}
 	}
-	
+
 	public int getGrassColor(World world, BlockPos pos) {
 		if (world != null && pos != null) {
 			Chunk chunk = world.getChunk(pos.getX() >> 4, pos.getZ() >> 4, ChunkStatus.BIOMES, false);
@@ -89,7 +72,7 @@ public class ColorProviders implements ColorProvider {
 		}
 		return Colors.GRASS;
 	}
-	
+
 	public int getFoliageColor(World world, BlockPos pos) {
 		if (world != null && pos != null) {
 			Chunk chunk = world.getChunk(pos.getX() >> 4, pos.getZ() >> 4, ChunkStatus.BIOMES, false);
@@ -103,7 +86,7 @@ public class ColorProviders implements ColorProvider {
 		}
 		return Colors.FOLIAGE;
 	}
-	
+
 	public int getWaterColor(World world, BlockPos pos) {
 		if (world != null && pos != null) {
 			Chunk chunk = world.getChunk(pos.getX() >> 4, pos.getZ() >> 4, ChunkStatus.BIOMES, false);

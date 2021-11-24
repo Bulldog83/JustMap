@@ -24,7 +24,7 @@ public class DropDownListWidget extends AbstractParentElement implements Drawabl
 	private final int elemHeight;
 	private final int padding = 3;
 	private final int spacing = 1;
-	
+
 	public DropDownListWidget(int x, int y, int width, int height) {
 		this.elemHeight = height;
 		this.width = width;
@@ -43,12 +43,12 @@ public class DropDownListWidget extends AbstractParentElement implements Drawabl
 		int y = this.y + padding;
 		for (ListElementWidget element : children) {
 			element.x = x;
-			element.y = y;			
-			element.render(matrices, mouseX, mouseY, delta);			
+			element.y = y;
+			element.render(matrices, mouseX, mouseY, delta);
 			y += elemHeight + spacing;
 		}
 	}
-	
+
 	private void renderBackground(MatrixStack matrices) {
 		RenderUtil.fill(matrices, x, y, x + width, y + height, 0xAA222222);
 		RenderUtil.drawLine(x, y, x + width, y, Colors.LIGHT_GRAY);
@@ -56,7 +56,7 @@ public class DropDownListWidget extends AbstractParentElement implements Drawabl
 		RenderUtil.drawLine(x + width, y, x + width, y + height, Colors.LIGHT_GRAY);
 		RenderUtil.drawLine(x, y + height, x + width, y + height, Colors.LIGHT_GRAY);
 	}
-	
+
 	public void addElement(ListElementWidget element) {
 		element.height = elemHeight;
 		this.width = Math.max(width, element.width + padding * 2);
@@ -64,11 +64,11 @@ public class DropDownListWidget extends AbstractParentElement implements Drawabl
 		this.children.forEach(elem -> elem.width = width - padding * 2);
 		this.height = children.size() * (elemHeight + spacing) + padding * 2;
 	}
-	
+
 	public void toggleVisible() {
 		this.visible = !visible;
 	}
-	
+
 	@Override
 	public boolean isMouseOver(double mouseX, double mouseY) {
 		for (Element elem : children) {

@@ -13,14 +13,14 @@ import ru.bulldog.justmap.client.render.WaypointRenderer;
 
 @Mixin(GameRenderer.class)
 public abstract class GameRenderMixin {
-	
+
 	@Final
 	@Shadow
 	private Camera camera;
-	
+
 	@Shadow
 	protected abstract double getFov(Camera camera, float f, boolean bl);
-	
+
 	@Inject(method = "render", at = @At("RETURN"))
 	public void renderHUD(float f, long l, boolean bl, CallbackInfo ci) {
 		WaypointRenderer.renderHUD(f, (float) this.getFov(camera, f, true));

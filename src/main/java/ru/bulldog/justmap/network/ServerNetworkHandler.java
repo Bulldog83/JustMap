@@ -11,15 +11,15 @@ import net.minecraft.world.World;
 import net.minecraft.world.gen.ChunkRandom;
 
 import ru.bulldog.justmap.util.Dimension;
-import ru.bulldog.justmap.util.RuleUtil;
+import ru.bulldog.justmap.util.GameRulesUtil;
 
 public class ServerNetworkHandler extends NetworkHandler {
 	private final MinecraftServer server;
-	
+
 	public ServerNetworkHandler(MinecraftServer server) {
 		this.server = server;
 	}
-	
+
 	public void onPlayerConnect(ServerPlayerEntity player) {
 		PacketByteBuf data = new PacketByteBuf(Unpooled.buffer());
 		ServerWorld world = server.getWorld(World.OVERWORLD);
@@ -27,7 +27,7 @@ public class ServerNetworkHandler extends NetworkHandler {
 		CustomPayloadS2CPacket packet = new CustomPayloadS2CPacket(INIT_PACKET_ID, data);
 		this.sendToPlayer(player, packet);
 	}
-	
+
 	public void registerPacketsListeners() {
 		serverPacketRegistry.register(CHANNEL_ID, (context, data) -> {
 			ByteBuf packetData = data.copy();
@@ -45,19 +45,19 @@ public class ServerNetworkHandler extends NetworkHandler {
 			}
 		});
 	}
-	
+
 	private void onRegionImageRequest(ServerPlayerEntity player, ByteBuf data) {
-		
+
 	}
-	
+
 	private void onChunkHasSlimeRequest(ServerPlayerEntity player, ByteBuf data) {
 		if (!canPlayerReceive(player)) return;
 		int packet_id = data.readInt();
 		int x = data.readInt();
 		int z = data.readInt();
-		
+
 		boolean slime = false;
-		if (RuleUtil.allowSlimeChunks() && Dimension.isOverworld(player.world)) {
+		if (GameRulesUtil.allowSlimeChunks() && Dimension.isOverworld(player.world)) {
 			ServerWorld world = player.getServerWorld();
 			slime = ChunkRandom.getSlimeRandom(x, z, world.getSeed(), 987234911L).nextInt(10) == 0;
 		}
