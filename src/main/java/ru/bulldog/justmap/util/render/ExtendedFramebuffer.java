@@ -27,7 +27,7 @@ public class ExtendedFramebuffer extends Framebuffer {
 
 	@Override
 	public void resize(int width, int height, boolean isMac) {
-		RenderSystem.assertThread(RenderSystem::isOnRenderThreadOrInit);
+		RenderSystem.assertOnRenderThreadOrInit();
 		RenderSystem.enableDepthTest();
 		if (fbo >= 0) {
 			this.delete();
@@ -38,7 +38,7 @@ public class ExtendedFramebuffer extends Framebuffer {
 
 	@Override
 	public void initFbo(int width, int height, boolean isMac) {
-		RenderSystem.assertThread(RenderSystem::isOnRenderThreadOrInit);
+		RenderSystem.assertOnRenderThreadOrInit();
 		this.viewportWidth = width;
 		this.viewportHeight = height;
 		this.textureWidth = width;
@@ -320,7 +320,7 @@ public class ExtendedFramebuffer extends Framebuffer {
 
 	// yarn mapping missing for beginRead
 	@Override
-	public void method_35610() {
+	public void beginRead() {
 		RenderSystem.bindTexture(colorAttachment);
 	}
 
@@ -331,7 +331,7 @@ public class ExtendedFramebuffer extends Framebuffer {
 
 	@Override
 	public void setTexFilter(int filter) {
-		RenderSystem.assertThread(RenderSystem::isOnRenderThreadOrInit);
+		RenderSystem.assertOnRenderThreadOrInit();
 		this.texFilter = filter;
 		RenderSystem.bindTexture(colorAttachment);
 		RenderSystem.texParameter(GLC.GL_TEXTURE_2D, GLC.GL_TEXTURE_MIN_FILTER, filter);

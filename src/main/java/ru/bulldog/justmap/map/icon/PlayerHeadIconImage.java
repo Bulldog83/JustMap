@@ -10,9 +10,9 @@ import net.minecraft.client.texture.TextureManager;
 import net.minecraft.client.util.DefaultSkinHelper;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.ChatUtil;
 import net.minecraft.util.Identifier;
 
+import net.minecraft.util.StringHelper;
 import ru.bulldog.justmap.JustMap;
 import ru.bulldog.justmap.client.config.ClientSettings;
 import ru.bulldog.justmap.map.MapPlayer;
@@ -104,7 +104,7 @@ public class PlayerHeadIconImage {
 		TextureManager textureManager = MinecraftClient.getInstance().getTextureManager();
 		AbstractTexture abstractTexture = textureManager.getTexture(id);
 		if (abstractTexture == null) {
-			abstractTexture = new PlayerSkinTexture(null, String.format("http://skins.minecraft.net/MinecraftSkins/%s.png", ChatUtil.stripTextFormat(playerName)), DefaultSkinHelper.getTexture(PlayerEntity.getOfflinePlayerUuid(playerName)), true, null);
+			abstractTexture = new PlayerSkinTexture(null, String.format("http://skins.minecraft.net/MinecraftSkins/%s.png", StringHelper.stripTextFormat(playerName)), DefaultSkinHelper.getTexture(PlayerEntity.getOfflinePlayerUuid(playerName)), true, null);
 			textureManager.registerTexture(id, abstractTexture);
 		}
 		return (ResourceTexture) abstractTexture;
